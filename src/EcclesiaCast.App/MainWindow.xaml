@@ -154,7 +154,14 @@
                                  SelectedItem="{Binding SelectedSong}"
                                  Background="Transparent"
                                  BorderThickness="0"
-                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ToolTip="Doble clic proyecta la primera diapositiva">
+                            <ListBox.InputBindings>
+                                <MouseBinding MouseAction="LeftDoubleClick"
+                                              Command="{Binding ProjectFirstSlideCommand}"/>
+                                <KeyBinding Key="Enter"
+                                            Command="{Binding ProjectFirstSlideCommand}"/>
+                            </ListBox.InputBindings>
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="ListBoxItem">
                                     <Setter Property="Padding" Value="10,6"/>
@@ -291,7 +298,7 @@
                             BorderBrush="{StaticResource LineBrush}"
                             BorderThickness="0,1,0,0">
                         <Grid>
-                            <TextBlock Text="Elegí una canción de la biblioteca (o creala con ➕)&#10;y sus secciones aparecen acá como diapositivas.&#10;&#10;Clic en una diapositiva la proyecta · flechas ←→ navegan en vivo.">
+                            <TextBlock Text="Elegí una canción de la biblioteca (o creala con ➕)&#10;y cada línea de la letra aparece acá como una diapositiva.&#10;&#10;Clic en una diapositiva la proyecta · doble clic en la canción arranca desde la primera&#10;· flechas ←→ navegan en vivo.">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock" BasedOn="{StaticResource PlaceholderText}">
                                         <Setter Property="Visibility" Value="Collapsed"/>
@@ -304,7 +311,7 @@
                                 </TextBlock.Style>
                             </TextBlock>
                             <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="6">
-                                <ItemsControl ItemsSource="{Binding SongSlides}">
+                                <ItemsControl x:Name="SlideGrid" ItemsSource="{Binding SongSlides}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <WrapPanel/>
@@ -312,12 +319,12 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Button Command="{Binding DataContext.ProjectSlideCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            <Button Command="{Binding DataContext.ProjectSlideCommand, ElementName=SlideGrid}"
                                                     CommandParameter="{Binding}"
                                                     Cursor="Hand">
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="Button">
-                                                        <Border x:Name="card" Width="180" Height="110" Margin="6"
+                                                        <Border x:Name="card" Width="180" Height="84" Margin="6"
                                                                 CornerRadius="6" Background="#10141E"
                                                                 BorderBrush="{StaticResource LineBrush}"
                                                                 BorderThickness="1" Padding="10">

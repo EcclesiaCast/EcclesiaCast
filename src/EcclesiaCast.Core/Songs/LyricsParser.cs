@@ -1,89 +1,72 @@
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace EcclesiaCast.Core.Songs;
 
 /// <summary>
 /// Converts between the lyrics text the operator edits and the list of
-/// sections that gets stored and projected.
+/// sections (slides) that gets stored and projected.
 ///
-/// Tagged form: lines like <c>[Coro]</c> start a new section. Untagged
-/// lyrics are split on blank lines, one verse per block.
+/// Every non-empty line is one slide. Blank lines are ignored. A line like
+/// <c>[Coro]</c> is optional: it does not become a slide, it only labels
+/// the lines that follow it. Lines without a label are numbered.
 /// </summary>
 public static partial class LyricsParser
 {
     [GeneratedRegex(@"^\s*\[(?<label>[^\]]+)\]\s*$")]
     private static partial Regex TagLine();
 
-    [GeneratedRegex(@"\n\s*\n")]
-    private static partial Regex BlankLines();
-
     public static List<SongSection> Parse(string? lyrics)
     {
-        var normalized = (lyrics ?? string.Empty).Replace("\r\n", "\n").Trim();
-        if (normalized.Length == 0)
-            return [];
-
-        var lines = normalized.Split('\n');
-        if (!lines.Any(l => TagLine().IsMatch(l)))
-            return ParseUntagged(normalized);
-
+        var normalized = (lyrics ?? string.Empty).Replace("\r\n", "\n");
         var sections = new List<SongSection>();
-        string? currentLabel = null;
-        var buffer = new List<string>();
+        string? label = null;
 
-        void Flush()
+        foreach (var raw in normalized.Split('\n'))
         {
-            var text = string.Join("\n", buffer).Trim();
-            if (text.Length > 0)
-            {
-                sections.Add(new SongSection
-                {
-                    Order = sections.Count,
-                    Label = currentLabel ?? "Verso",
-                    Text = text,
-                });
-            }
-            buffer.Clear();
-        }
+            var line = raw.Trim();
+            if (line.Length == 0)
+                continue;
 
-        foreach (var line in lines)
-        {
             var match = TagLine().Match(line);
             if (match.Success)
             {
-                Flush();
-                currentLabel = match.Groups["label"].Value.Trim();
+                label = match.Groups["label"].Value.Trim();
+                continue;
             }
-            else
+
+            sections.Add(new SongSection
             {
-                buffer.Add(line);
-            }
+                Order = sections.Count,
+                Label = label ?? (sections.Count + 1).ToString(),
+                Text = line,
+            });
         }
 
-        Flush();
         return sections;
     }
 
-    private static List<SongSection> ParseUntagged(string normalized)
+    /// <summary>Serializes sections back to the text shown in the editor.</summary>
+    public static string ToTaggedText(IEnumerable<SongSection> sections)
     {
-        var blocks = BlankLines().Split(normalized)
-            .Select(b => b.Trim())
-            .Where(b => b.Length > 0)
-            .ToList();
+        var builder = new StringBuilder();
+        string? currentLabel = null;
 
-        return blocks
-            .Select((text, i) => new SongSection
+        foreach (var section in sections.OrderBy(s => s.Order))
+        {
+            // Numeric labels were auto-assigned; they don't need a tag line.
+            var isAutoLabel = int.TryParse(section.Label, out _);
+            if (!isAutoLabel && section.Label != currentLabel)
             {
-                Order = i,
-                Label = blocks.Count == 1 ? "Verso" : $"Verso {i + 1}",
-                Text = text,
-            })
-            .ToList();
-    }
+                if (builder.Length > 0)
+                    builder.Append('\n');
+                builder.Append('[').Append(section.Label).Append("]\n");
+                currentLabel = section.Label;
+            }
 
-    /// <summary>Serializes sections back to the tagged text shown in the editor.</summary>
-    public static string ToTaggedText(IEnumerable<SongSection> sections) =>
-        string.Join("\n\n", sections
-            .OrderBy(s => s.Order)
-            .Select(s => $"[{s.Label}]\n{s.Text}"));
+            builder.Append(section.Text).Append('\n');
+        }
+
+        return builder.ToString().TrimEnd();
+    }
 }

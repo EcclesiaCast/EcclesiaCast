@@ -7,6 +7,7 @@ using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Displays;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Core.Songs;
+using Serilog;
 
 namespace EcclesiaCast.App.ViewModels;
 
@@ -211,6 +212,9 @@ public sealed partial class MainViewModel : ObservableObject
     private void ProjectSlide(SlideItemViewModel item) => GoLiveSlide(item.Index);
 
     [RelayCommand]
+    private void ProjectFirstSlide() => GoLiveSlide(0);
+
+    [RelayCommand]
     private void NextSlide() => GoLiveSlide(LiveSlideIndex < 0 ? 0 : LiveSlideIndex + 1);
 
     [RelayCommand]
@@ -218,8 +222,18 @@ public sealed partial class MainViewModel : ObservableObject
 
     private void GoLiveSlide(int index)
     {
-        if (SelectedDisplay is null || index < 0 || index >= SongSlides.Count)
+        if (SelectedDisplay is null)
+        {
+            Log.Warning("GoLiveSlide({Index}) rechazado: no hay pantalla de salida seleccionada", index);
+            StatusText = "No hay pantalla de salida seleccionada.";
             return;
+        }
+
+        if (index < 0 || index >= SongSlides.Count)
+        {
+            Log.Debug("GoLiveSlide({Index}) fuera de rango (slides: {Count})", index, SongSlides.Count);
+            return;
+        }
 
         var item = SongSlides[index];
         _presentation.GoLive(item.Slide);
@@ -232,7 +246,8 @@ public sealed partial class MainViewModel : ObservableObject
             slide.IsLive = slide.Index == index;
 
         PreviewSlide = index + 1 < SongSlides.Count ? SongSlides[index + 1].Slide : null;
-        StatusText = $"En vivo: {item.Label}. Flechas ←→ para navegar · F1 Clear · F2 Black · F3 Logo.";
+        Log.Debug("Slide {Index} en vivo: {Label}", index, item.Label);
+        StatusText = $"En vivo: diapositiva {index + 1} de {SongSlides.Count}. Flechas ←→ para navegar · F1 Clear · F2 Black · F3 Logo.";
     }
 
     // ── Texto rápido ─────────────────────────────────────────────

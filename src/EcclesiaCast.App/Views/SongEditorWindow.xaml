@@ -51,7 +51,7 @@
         <TextBlock Grid.Row="3"
                    FontSize="11" Foreground="{StaticResource FaintBrush}"
                    TextWrapping="Wrap" Margin="0,0,0,6"
-                   Text="Separá las secciones con etiquetas entre corchetes: [Verso 1], [Coro], [Puente]… Cada sección es una diapositiva. Si pegás la letra sin etiquetas, cada bloque separado por una línea en blanco se convierte en un verso."/>
+                   Text="Cada línea es una diapositiva; las líneas en blanco se ignoran. Opcional: una línea [Coro] o [Verso 1] no se proyecta, solo le pone nombre a las líneas que siguen."/>
 
         <TextBox Grid.Row="4"
                  x:Name="LyricsBox"
