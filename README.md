@@ -2,7 +2,7 @@
 
 Software libre y nativo de Windows para proyección en iglesias: letras de canciones, Biblia multiversión, fondos de imagen y video, y formato de texto totalmente personalizable.
 
-> 🚧 **En desarrollo activo.** El proyecto está en el sprint 0 de 8. Todavía no hay una versión usable para servicios; la primera release instalable llegará al final del plan de desarrollo.
+> 🚧 **En desarrollo activo.** El proyecto está en el sprint 2 de 8. Ya proyecta texto en vivo y canciones por secciones a un segundo monitor; la primera release instalable llegará al final del plan de desarrollo.
 
 ## ¿Por qué?
 
