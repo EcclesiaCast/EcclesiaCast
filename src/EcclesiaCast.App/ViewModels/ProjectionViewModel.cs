@@ -16,14 +16,19 @@ public sealed partial class ProjectionViewModel : ObservableObject
     [ObservableProperty]
     private OutputState _state;
 
+    [ObservableProperty]
+    private string? _overlay;
+
     public ProjectionViewModel(IPresentationService presentation)
     {
         presentation.Changed += (_, _) =>
         {
             Slide = presentation.CurrentSlide;
             State = presentation.State;
+            Overlay = presentation.OverlayMessage;
         };
         Slide = presentation.CurrentSlide;
         State = presentation.State;
+        Overlay = presentation.OverlayMessage;
     }
 }

@@ -12,5 +12,6 @@
         KeyDown="OnKeyDown">
     <controls:SlideView Slide="{Binding Slide}"
                         State="{Binding State}"
+                        Overlay="{Binding Overlay}"
                         AnimateTransitions="True"/>
 </Window>

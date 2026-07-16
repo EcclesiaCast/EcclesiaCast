@@ -23,6 +23,10 @@ public partial class SlideView : UserControl
         DependencyProperty.Register(nameof(AnimateTransitions), typeof(bool), typeof(SlideView),
             new PropertyMetadata(false));
 
+    public static readonly DependencyProperty OverlayProperty =
+        DependencyProperty.Register(nameof(Overlay), typeof(string), typeof(SlideView),
+            new PropertyMetadata(null, (d, _) => ((SlideView)d).OnOverlayChanged()));
+
     public SlideView()
     {
         InitializeComponent();
@@ -45,6 +49,12 @@ public partial class SlideView : UserControl
     {
         get => (bool)GetValue(AnimateTransitionsProperty);
         set => SetValue(AnimateTransitionsProperty, value);
+    }
+
+    public string? Overlay
+    {
+        get => (string?)GetValue(OverlayProperty);
+        set => SetValue(OverlayProperty, value);
     }
 
     private void OnSlideChanged()
@@ -76,6 +86,16 @@ public partial class SlideView : UserControl
         {
             BlackLayer.Opacity = blackTarget;
         }
+    }
+
+    private void OnOverlayChanged()
+    {
+        var hasMessage = !string.IsNullOrWhiteSpace(Overlay);
+        OverlayText.Text = Overlay ?? string.Empty;
+        OverlayLayer.Visibility = hasMessage ? Visibility.Visible : Visibility.Collapsed;
+
+        if (AnimateTransitions && hasMessage)
+            FadeIn(OverlayLayer);
     }
 
     private static void FadeIn(UIElement element) =>

@@ -6,6 +6,8 @@ public sealed class PresentationService : IPresentationService
 
     public OutputState State { get; private set; } = OutputState.Clear;
 
+    public string? OverlayMessage { get; private set; }
+
     public event EventHandler? Changed;
 
     public void GoLive(SlideContent slide)
@@ -23,6 +25,21 @@ public sealed class PresentationService : IPresentationService
 
     public void ToggleLogo() =>
         SetState(State == OutputState.Logo ? OutputState.Content : OutputState.Logo);
+
+    public void ShowOverlay(string message)
+    {
+        OverlayMessage = message;
+        OnChanged();
+    }
+
+    public void HideOverlay()
+    {
+        if (OverlayMessage is null)
+            return;
+
+        OverlayMessage = null;
+        OnChanged();
+    }
 
     private void SetState(OutputState state)
     {

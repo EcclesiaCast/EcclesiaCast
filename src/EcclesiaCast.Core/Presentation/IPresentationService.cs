@@ -11,7 +11,13 @@ public interface IPresentationService
 
     OutputState State { get; }
 
-    /// <summary>Raised whenever the slide or the output state changes.</summary>
+    /// <summary>
+    /// Bottom-of-screen announcement (lower third) shown above everything
+    /// else, independent of the output state. Null when hidden.
+    /// </summary>
+    string? OverlayMessage { get; }
+
+    /// <summary>Raised whenever the slide, the output state or the overlay changes.</summary>
     event EventHandler? Changed;
 
     /// <summary>Puts a slide live and switches the output to content.</summary>
@@ -25,4 +31,9 @@ public interface IPresentationService
 
     /// <summary>Toggles between the logo and the current content.</summary>
     void ToggleLogo();
+
+    /// <summary>Shows an announcement at the bottom of the output.</summary>
+    void ShowOverlay(string message);
+
+    void HideOverlay();
 }

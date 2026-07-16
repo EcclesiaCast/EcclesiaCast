@@ -42,6 +42,22 @@
             <!-- Capa de negro -->
             <Rectangle x:Name="BlackLayer" Fill="Black" Opacity="0" IsHitTestVisible="False"/>
 
+            <!-- Aviso al pie: por encima de todo, incluso del negro -->
+            <Border x:Name="OverlayLayer"
+                    VerticalAlignment="Bottom"
+                    Background="#E0000000"
+                    BorderBrush="#2F63C9"
+                    BorderThickness="0,4,0,0"
+                    Padding="70,30"
+                    Visibility="Collapsed">
+                <TextBlock x:Name="OverlayText"
+                           FontFamily="Segoe UI"
+                           FontSize="54" FontWeight="Medium"
+                           Foreground="White"
+                           TextWrapping="Wrap" TextAlignment="Center"
+                           HorizontalAlignment="Center"/>
+            </Border>
+
         </Grid>
     </Viewbox>
 </UserControl>

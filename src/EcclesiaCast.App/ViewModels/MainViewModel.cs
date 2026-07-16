@@ -43,6 +43,12 @@ public sealed partial class MainViewModel : ObservableObject
     private SlideContent? _previewSlide;
 
     [ObservableProperty]
+    private string _overlayText = string.Empty;
+
+    [ObservableProperty]
+    private bool _isOverlayActive;
+
+    [ObservableProperty]
     private bool _isClearActive;
 
     [ObservableProperty]
@@ -118,6 +124,25 @@ public sealed partial class MainViewModel : ObservableObject
     private void ToggleLogo() => _presentation.ToggleLogo();
 
     [RelayCommand]
+    private void ShowOverlay()
+    {
+        if (string.IsNullOrWhiteSpace(OverlayText) || SelectedDisplay is null)
+            return;
+
+        _presentation.ShowOverlay(OverlayText.Trim());
+        _projection.EnsureVisible(SelectedDisplay.Info);
+        IsProjecting = true;
+        StatusText = "Aviso al pie visible sobre la salida.";
+    }
+
+    [RelayCommand]
+    private void HideOverlay()
+    {
+        _presentation.HideOverlay();
+        StatusText = "Aviso al pie retirado.";
+    }
+
+    [RelayCommand]
     private void HideOutput()
     {
         _projection.HideOutput();
@@ -130,5 +155,6 @@ public sealed partial class MainViewModel : ObservableObject
         IsClearActive = _presentation.State == OutputState.Clear;
         IsBlackActive = _presentation.State == OutputState.Black;
         IsLogoActive = _presentation.State == OutputState.Logo;
+        IsOverlayActive = _presentation.OverlayMessage is not null;
     }
 }

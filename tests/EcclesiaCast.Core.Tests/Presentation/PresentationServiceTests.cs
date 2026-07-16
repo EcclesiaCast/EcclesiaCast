@@ -82,6 +82,52 @@ public class PresentationServiceTests
     }
 
     [Fact]
+    public void ShowOverlay_sets_the_message_and_raises_Changed()
+    {
+        var raised = 0;
+        _service.Changed += (_, _) => raised++;
+
+        _service.ShowOverlay("El auto ABC 123 está mal estacionado");
+
+        Assert.Equal("El auto ABC 123 está mal estacionado", _service.OverlayMessage);
+        Assert.Equal(1, raised);
+    }
+
+    [Fact]
+    public void HideOverlay_clears_the_message()
+    {
+        _service.ShowOverlay("Aviso");
+
+        _service.HideOverlay();
+
+        Assert.Null(_service.OverlayMessage);
+    }
+
+    [Fact]
+    public void Overlay_survives_state_changes()
+    {
+        _service.GoLive(new SlideContent("Letra"));
+        _service.ShowOverlay("Aviso");
+
+        _service.ToggleBlack();
+        Assert.Equal("Aviso", _service.OverlayMessage);
+
+        _service.ToggleLogo();
+        Assert.Equal("Aviso", _service.OverlayMessage);
+    }
+
+    [Fact]
+    public void HideOverlay_when_already_hidden_does_not_raise_Changed()
+    {
+        var raised = 0;
+        _service.Changed += (_, _) => raised++;
+
+        _service.HideOverlay();
+
+        Assert.Equal(0, raised);
+    }
+
+    [Fact]
     public void GoLive_while_black_returns_to_content()
     {
         _service.GoLive(new SlideContent("Uno"));
