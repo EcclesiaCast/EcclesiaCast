@@ -91,6 +91,7 @@ public sealed partial class MainViewModel : ObservableObject
         Projection = projectionViewModel;
 
         _presentation.Changed += (_, _) => UpdateStateFlags();
+        _projection.VisibilityChanged += (_, _) => IsProjecting = _projection.IsOutputVisible;
         UpdateStateFlags();
         RefreshDisplays();
         LoadSongs();

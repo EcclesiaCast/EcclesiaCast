@@ -11,10 +11,16 @@ public sealed class ProjectionWindowService(ProjectionViewModel projectionViewMo
 
     public bool IsOutputVisible => _window?.IsVisible == true;
 
+    public event EventHandler? VisibilityChanged;
+
     public void EnsureVisible(DisplayInfo display)
     {
         if (_window is null || !_window.IsLoaded)
+        {
             _window = new OutputWindow { DataContext = projectionViewModel };
+            _window.IsVisibleChanged += (_, _) =>
+                VisibilityChanged?.Invoke(this, EventArgs.Empty);
+        }
 
         _window.ShowOn(display);
     }

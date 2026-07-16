@@ -6,10 +6,11 @@
         WindowStyle="None"
         ResizeMode="NoResize"
         ShowInTaskbar="False"
+        ShowActivated="False"
+        Focusable="False"
         Topmost="True"
         Cursor="None"
-        Background="Black"
-        KeyDown="OnKeyDown">
+        Background="Black">
     <controls:SlideView Slide="{Binding Slide}"
                         State="{Binding State}"
                         Overlay="{Binding Overlay}"
