@@ -6,6 +6,7 @@ using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Displays;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Data.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
@@ -42,13 +43,19 @@ public partial class App : Application
             args.Handled = true;
         };
 
+        var dbPath = Path.Combine(appDataDir, "ecclesiacast.db");
+        Directory.CreateDirectory(appDataDir);
+        using (var db = new AppDbContext(dbPath))
+            db.Database.Migrate();
+
         var services = new ServiceCollection();
         services.AddSingleton<IDisplayProvider, ScreenDisplayProvider>();
         services.AddSingleton<IPresentationService, PresentationService>();
         services.AddSingleton<ProjectionViewModel>();
         services.AddSingleton<IProjectionWindowService, ProjectionWindowService>();
-        services.AddSingleton<ISettingsStore>(
-            _ => new SqliteSettingsStore(Path.Combine(appDataDir, "ecclesiacast.db")));
+        services.AddSingleton<ISettingsStore>(_ => new SqliteSettingsStore(dbPath));
+        services.AddSingleton<ISongRepository>(_ => new SongRepository(dbPath));
+        services.AddSingleton<ISongEditor, SongEditorService>();
         services.AddSingleton<MainViewModel>();
         _services = services.BuildServiceProvider();
 

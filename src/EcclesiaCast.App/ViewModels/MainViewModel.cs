@@ -1,10 +1,12 @@
 using System.Collections.ObjectModel;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Displays;
 using EcclesiaCast.Core.Presentation;
+using EcclesiaCast.Core.Songs;
 
 namespace EcclesiaCast.App.ViewModels;
 
@@ -19,18 +21,22 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly IProjectionWindowService _projection;
     private readonly ISettingsStore _settings;
     private readonly IPresentationService _presentation;
+    private readonly ISongRepository _songs;
+    private readonly ISongEditor _songEditor;
 
     /// <summary>What the projector is showing; the Live box binds to it.</summary>
     public ProjectionViewModel Projection { get; }
 
     public ObservableCollection<DisplayOption> Displays { get; } = [];
+    public ObservableCollection<Song> Songs { get; } = [];
+    public ObservableCollection<SlideItemViewModel> SongSlides { get; } = [];
 
     [ObservableProperty]
     private DisplayOption? _selectedDisplay;
 
     [ObservableProperty]
     private string _statusText =
-        "Escribí un texto rápido y presioná Ctrl+Enter para proyectarlo.";
+        "Creá una canción con ➕, o escribí un texto rápido y presioná Ctrl+Enter.";
 
     [ObservableProperty]
     private bool _isProjecting;
@@ -57,28 +63,39 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private bool _isLogoActive;
 
+    [ObservableProperty]
+    private string _searchText = string.Empty;
+
+    [ObservableProperty]
+    private Song? _selectedSong;
+
+    [ObservableProperty]
+    private int _liveSlideIndex = -1;
+
     public MainViewModel(
         IDisplayProvider displayProvider,
         IProjectionWindowService projection,
         ISettingsStore settings,
         IPresentationService presentation,
+        ISongRepository songs,
+        ISongEditor songEditor,
         ProjectionViewModel projectionViewModel)
     {
         _displayProvider = displayProvider;
         _projection = projection;
         _settings = settings;
         _presentation = presentation;
+        _songs = songs;
+        _songEditor = songEditor;
         Projection = projectionViewModel;
 
         _presentation.Changed += (_, _) => UpdateStateFlags();
         UpdateStateFlags();
         RefreshDisplays();
+        LoadSongs();
     }
 
-    partial void OnQuickTextChanged(string value) =>
-        PreviewSlide = string.IsNullOrWhiteSpace(value)
-            ? null
-            : new SlideContent(value.Trim());
+    // ── Pantallas ────────────────────────────────────────────────
 
     [RelayCommand]
     private void RefreshDisplays()
@@ -101,27 +118,150 @@ public sealed partial class MainViewModel : ObservableObject
             ?? Displays.FirstOrDefault();
     }
 
-    [RelayCommand]
-    private void GoLive()
+    // ── Canciones ────────────────────────────────────────────────
+
+    partial void OnSearchTextChanged(string value) => LoadSongs();
+
+    partial void OnSelectedSongChanged(Song? value) => BuildSlides();
+
+    private void LoadSongs()
     {
-        if (PreviewSlide is null || SelectedDisplay is null)
+        var keepId = SelectedSong?.Id;
+        Songs.Clear();
+        foreach (var song in _songs.Search(SearchText))
+            Songs.Add(song);
+        SelectedSong = Songs.FirstOrDefault(s => s.Id == keepId) ?? SelectedSong;
+    }
+
+    private void BuildSlides()
+    {
+        SongSlides.Clear();
+        LiveSlideIndex = -1;
+
+        if (SelectedSong is null)
             return;
 
-        _presentation.GoLive(PreviewSlide);
-        _projection.EnsureVisible(SelectedDisplay.Info);
-        _settings.Set(OutputDisplayKey, SelectedDisplay.Info.DeviceName);
-        IsProjecting = true;
-        StatusText = "En vivo. F1 Clear · F2 Black · F3 Logo · Esc apaga la salida.";
+        var caption = string.IsNullOrWhiteSpace(SelectedSong.Artist)
+            ? SelectedSong.Title
+            : $"{SelectedSong.Title} — {SelectedSong.Artist}";
+
+        foreach (var section in SelectedSong.Sections)
+        {
+            SongSlides.Add(new SlideItemViewModel(
+                SongSlides.Count,
+                section.Label,
+                new SlideContent(section.Text, caption)));
+        }
+
+        PreviewSlide = SongSlides.FirstOrDefault()?.Slide;
     }
 
     [RelayCommand]
-    private void ToggleClear() => _presentation.ToggleClear();
+    private void NewSong()
+    {
+        var created = _songEditor.Edit(null);
+        if (created is null)
+            return;
+
+        var saved = _songs.Save(created);
+        LoadSongs();
+        SelectedSong = Songs.FirstOrDefault(s => s.Id == saved.Id);
+        StatusText = $"Canción \"{saved.Title}\" guardada.";
+    }
 
     [RelayCommand]
-    private void ToggleBlack() => _presentation.ToggleBlack();
+    private void EditSong()
+    {
+        if (SelectedSong is null)
+            return;
+
+        var edited = _songEditor.Edit(SelectedSong);
+        if (edited is null)
+            return;
+
+        var saved = _songs.Save(edited);
+        LoadSongs();
+        SelectedSong = Songs.FirstOrDefault(s => s.Id == saved.Id);
+        StatusText = $"Canción \"{saved.Title}\" actualizada.";
+    }
 
     [RelayCommand]
-    private void ToggleLogo() => _presentation.ToggleLogo();
+    private void DeleteSong()
+    {
+        if (SelectedSong is null)
+            return;
+
+        var confirm = MessageBox.Show(
+            $"¿Eliminar \"{SelectedSong.Title}\" de la biblioteca?",
+            "EcclesiaCast",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
+        if (confirm != MessageBoxResult.Yes)
+            return;
+
+        _songs.Delete(SelectedSong.Id);
+        SelectedSong = null;
+        LoadSongs();
+        StatusText = "Canción eliminada.";
+    }
+
+    // ── Proyección de slides ─────────────────────────────────────
+
+    [RelayCommand]
+    private void ProjectSlide(SlideItemViewModel item) => GoLiveSlide(item.Index);
+
+    [RelayCommand]
+    private void NextSlide() => GoLiveSlide(LiveSlideIndex < 0 ? 0 : LiveSlideIndex + 1);
+
+    [RelayCommand]
+    private void PreviousSlide() => GoLiveSlide(LiveSlideIndex - 1);
+
+    private void GoLiveSlide(int index)
+    {
+        if (SelectedDisplay is null || index < 0 || index >= SongSlides.Count)
+            return;
+
+        var item = SongSlides[index];
+        _presentation.GoLive(item.Slide);
+        _projection.EnsureVisible(SelectedDisplay.Info);
+        _settings.Set(OutputDisplayKey, SelectedDisplay.Info.DeviceName);
+        IsProjecting = true;
+
+        LiveSlideIndex = index;
+        foreach (var slide in SongSlides)
+            slide.IsLive = slide.Index == index;
+
+        PreviewSlide = index + 1 < SongSlides.Count ? SongSlides[index + 1].Slide : null;
+        StatusText = $"En vivo: {item.Label}. Flechas ←→ para navegar · F1 Clear · F2 Black · F3 Logo.";
+    }
+
+    // ── Texto rápido ─────────────────────────────────────────────
+
+    partial void OnQuickTextChanged(string value)
+    {
+        if (!string.IsNullOrWhiteSpace(value))
+            PreviewSlide = new SlideContent(value.Trim());
+    }
+
+    [RelayCommand]
+    private void GoLive()
+    {
+        if (string.IsNullOrWhiteSpace(QuickText) || SelectedDisplay is null)
+            return;
+
+        _presentation.GoLive(new SlideContent(QuickText.Trim()));
+        _projection.EnsureVisible(SelectedDisplay.Info);
+        _settings.Set(OutputDisplayKey, SelectedDisplay.Info.DeviceName);
+        IsProjecting = true;
+
+        LiveSlideIndex = -1;
+        foreach (var slide in SongSlides)
+            slide.IsLive = false;
+
+        StatusText = "Texto rápido en vivo. F1 Clear · F2 Black · F3 Logo · Esc apaga la salida.";
+    }
+
+    // ── Aviso al pie ─────────────────────────────────────────────
 
     [RelayCommand]
     private void ShowOverlay()
@@ -141,6 +281,17 @@ public sealed partial class MainViewModel : ObservableObject
         _presentation.HideOverlay();
         StatusText = "Aviso al pie retirado.";
     }
+
+    // ── Estados de salida ────────────────────────────────────────
+
+    [RelayCommand]
+    private void ToggleClear() => _presentation.ToggleClear();
+
+    [RelayCommand]
+    private void ToggleBlack() => _presentation.ToggleBlack();
+
+    [RelayCommand]
+    private void ToggleLogo() => _presentation.ToggleLogo();
 
     [RelayCommand]
     private void HideOutput()

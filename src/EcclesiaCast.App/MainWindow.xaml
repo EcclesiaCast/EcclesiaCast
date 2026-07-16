@@ -13,6 +13,8 @@
         <KeyBinding Key="F2" Command="{Binding ToggleBlackCommand}"/>
         <KeyBinding Key="F3" Command="{Binding ToggleLogoCommand}"/>
         <KeyBinding Key="Escape" Command="{Binding HideOutputCommand}"/>
+        <KeyBinding Key="Right" Command="{Binding NextSlideCommand}"/>
+        <KeyBinding Key="Left" Command="{Binding PreviousSlideCommand}"/>
     </Window.InputBindings>
 
     <Grid>
@@ -117,17 +119,78 @@
 
                 <Border Grid.Row="0" Style="{StaticResource Panel}">
                     <DockPanel>
-                        <TextBlock DockPanel.Dock="Top" Text="BIBLIOTECA" Style="{StaticResource PanelTitle}"/>
+                        <DockPanel DockPanel.Dock="Top">
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
+                                        VerticalAlignment="Center" Margin="0,10,10,8">
+                                <Button Content="➕" FontSize="11" Padding="7,4"
+                                        Style="{StaticResource DarkButton}"
+                                        Command="{Binding NewSongCommand}"
+                                        ToolTip="Nueva canción"/>
+                                <Button Content="✏️" FontSize="11" Padding="7,4" Margin="4,0,0,0"
+                                        Style="{StaticResource DarkButton}"
+                                        Command="{Binding EditSongCommand}"
+                                        ToolTip="Editar canción"/>
+                                <Button Content="🗑" FontSize="11" Padding="7,4" Margin="4,0,0,0"
+                                        Style="{StaticResource DarkButton}"
+                                        Command="{Binding DeleteSongCommand}"
+                                        ToolTip="Eliminar canción"/>
+                            </StackPanel>
+                            <TextBlock Text="CANCIONES" Style="{StaticResource PanelTitle}"/>
+                        </DockPanel>
                         <TextBox DockPanel.Dock="Top"
                                  Margin="12,0,12,8" Padding="8,6"
                                  Background="{StaticResource SurfaceAltBrush}"
-                                 Foreground="{StaticResource FaintBrush}"
+                                 Foreground="White"
                                  BorderBrush="{StaticResource LineBrush}"
                                  CaretBrush="White"
-                                 Text="Buscar…  (sprint 2)"
-                                 IsEnabled="False"/>
-                        <TextBlock Style="{StaticResource PlaceholderText}"
-                                   Text="🎵 Canciones (sprint 2)&#10;&#10;📖 Biblia (sprint 3)&#10;&#10;🖼 Medios (sprints 4–5)"/>
+                                 FontSize="13"
+                                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                 ToolTip="Buscar por título, artista o letra"/>
+                        <TextBlock DockPanel.Dock="Bottom"
+                                   Text="📖 Biblia (sprint 3) · 🖼 Medios (sprints 4–5)"
+                                   FontSize="10" Foreground="{StaticResource FaintBrush}"
+                                   Margin="12,4,12,10"/>
+                        <ListBox ItemsSource="{Binding Songs}"
+                                 SelectedItem="{Binding SelectedSong}"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Padding" Value="10,6"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <Border x:Name="bd" Background="Transparent"
+                                                        CornerRadius="4" Margin="6,1"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="bd" Property="Background" Value="#20242F"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsSelected" Value="True">
+                                                        <Setter TargetName="bd" Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Title}" FontSize="13"
+                                                   Foreground="White" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding Artist}" FontSize="11"
+                                                   Foreground="{StaticResource MutedBrush}"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
                     </DockPanel>
                 </Border>
 
@@ -227,8 +290,66 @@
                     <Border Grid.Row="4"
                             BorderBrush="{StaticResource LineBrush}"
                             BorderThickness="0,1,0,0">
-                        <TextBlock Style="{StaticResource PlaceholderText}"
-                                   Text="Acá aparecerá la grilla de diapositivas de la canción o el pasaje seleccionado.&#10;&#10;(sprint 2: canciones · sprint 3: Biblia)"/>
+                        <Grid>
+                            <TextBlock Text="Elegí una canción de la biblioteca (o creala con ➕)&#10;y sus secciones aparecen acá como diapositivas.&#10;&#10;Clic en una diapositiva la proyecta · flechas ←→ navegan en vivo.">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource PlaceholderText}">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedSong}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="6">
+                                <ItemsControl ItemsSource="{Binding SongSlides}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Command="{Binding DataContext.ProjectSlideCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Cursor="Hand">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border x:Name="card" Width="180" Height="110" Margin="6"
+                                                                CornerRadius="6" Background="#10141E"
+                                                                BorderBrush="{StaticResource LineBrush}"
+                                                                BorderThickness="1" Padding="10">
+                                                            <DockPanel>
+                                                                <TextBlock DockPanel.Dock="Top"
+                                                                           Text="{Binding Label}"
+                                                                           FontSize="10" FontWeight="SemiBold"
+                                                                           Foreground="{StaticResource MutedBrush}"/>
+                                                                <TextBlock Text="{Binding PreviewText}"
+                                                                           FontSize="11" Foreground="White"
+                                                                           TextWrapping="Wrap"
+                                                                           TextTrimming="CharacterEllipsis"
+                                                                           Margin="0,5,0,0"/>
+                                                            </DockPanel>
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="card" Property="Background" Value="#1A2030"/>
+                                                            </Trigger>
+                                                            <DataTrigger Binding="{Binding IsLive}" Value="True">
+                                                                <Setter TargetName="card" Property="BorderBrush" Value="{StaticResource LiveBrush}"/>
+                                                                <Setter TargetName="card" Property="BorderThickness" Value="2"/>
+                                                            </DataTrigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
                     </Border>
                 </Grid>
             </Border>
