@@ -5,33 +5,36 @@ namespace EcclesiaCast.Core.Tests.Songs;
 public class LyricsParserTests
 {
     [Fact]
-    public void Every_line_becomes_one_slide()
+    public void Each_paragraph_becomes_one_slide()
     {
         const string lyrics = """
             Grande es tu fidelidad
             oh Dios mi Padre
-            no hay sombra de variación
+
+            No hay sombra de variación
+            tu compasión no falla
             """;
 
         var sections = LyricsParser.Parse(lyrics);
 
-        Assert.Equal(3, sections.Count);
-        Assert.Equal("Grande es tu fidelidad", sections[0].Text);
-        Assert.Equal("oh Dios mi Padre", sections[1].Text);
-        Assert.Equal(new[] { 0, 1, 2 }, sections.Select(s => s.Order));
+        Assert.Equal(2, sections.Count);
+        Assert.Equal("Grande es tu fidelidad\noh Dios mi Padre", sections[0].Text);
+        Assert.Equal("No hay sombra de variación\ntu compasión no falla", sections[1].Text);
     }
 
     [Fact]
-    public void Blank_lines_are_ignored()
+    public void Line_breaks_inside_a_paragraph_are_preserved()
     {
-        const string lyrics = """
-            Línea uno
+        var sections = LyricsParser.Parse("Línea uno\nLínea dos\nLínea tres");
 
+        var section = Assert.Single(sections);
+        Assert.Equal("Línea uno\nLínea dos\nLínea tres", section.Text);
+    }
 
-            Línea dos
-            """;
-
-        var sections = LyricsParser.Parse(lyrics);
+    [Fact]
+    public void Multiple_blank_lines_count_as_one_separator()
+    {
+        var sections = LyricsParser.Parse("Uno\n\n\n\nDos");
 
         Assert.Equal(2, sections.Count);
     }
@@ -39,14 +42,14 @@ public class LyricsParserTests
     [Fact]
     public void Unlabeled_slides_are_numbered()
     {
-        var sections = LyricsParser.Parse("Uno\nDos");
+        var sections = LyricsParser.Parse("Uno\n\nDos");
 
         Assert.Equal("1", sections[0].Label);
         Assert.Equal("2", sections[1].Label);
     }
 
     [Fact]
-    public void A_tag_line_labels_the_following_slides_and_is_not_a_slide()
+    public void A_tag_line_labels_the_following_paragraphs_and_is_not_a_slide()
     {
         const string lyrics = """
             [Coro]
@@ -56,8 +59,9 @@ public class LyricsParserTests
 
         var sections = LyricsParser.Parse(lyrics);
 
-        Assert.Equal(2, sections.Count);
-        Assert.All(sections, s => Assert.Equal("Coro", s.Label));
+        var section = Assert.Single(sections);
+        Assert.Equal("Coro", section.Label);
+        Assert.Equal("Grande es tu fidelidad\ncada mañana veo tu amor", section.Text);
     }
 
     [Fact]
@@ -66,6 +70,7 @@ public class LyricsParserTests
         const string lyrics = """
             [Verso 1]
             Uno
+
             [Coro]
             Dos
             """;
@@ -73,6 +78,22 @@ public class LyricsParserTests
         var sections = LyricsParser.Parse(lyrics);
 
         Assert.Equal("Verso 1", sections[0].Label);
+        Assert.Equal("Coro", sections[1].Label);
+    }
+
+    [Fact]
+    public void A_tag_also_splits_paragraphs_even_without_a_blank_line()
+    {
+        const string lyrics = """
+            Uno
+            [Coro]
+            Dos
+            """;
+
+        var sections = LyricsParser.Parse(lyrics);
+
+        Assert.Equal(2, sections.Count);
+        Assert.Equal("1", sections[0].Label);
         Assert.Equal("Coro", sections[1].Label);
     }
 
@@ -87,20 +108,21 @@ public class LyricsParserTests
     [Fact]
     public void Handles_windows_line_endings()
     {
-        var sections = LyricsParser.Parse("Línea uno\r\nLínea dos");
+        var sections = LyricsParser.Parse("Línea uno\r\n\r\nLínea dos");
 
         Assert.Equal(2, sections.Count);
-        Assert.Equal("Línea uno", sections[0].Text);
     }
 
     [Fact]
     public void Round_trips_through_editor_text()
     {
         const string lyrics = """
-            Sin etiqueta
+            Primer párrafo
+            con dos líneas
+
             [Coro]
-            Con etiqueta uno
-            Con etiqueta dos
+            El coro entero
+            también de dos
             """;
 
         var parsed = LyricsParser.Parse(lyrics);

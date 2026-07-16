@@ -7,9 +7,10 @@ namespace EcclesiaCast.Core.Songs;
 /// Converts between the lyrics text the operator edits and the list of
 /// sections (slides) that gets stored and projected.
 ///
-/// Every non-empty line is one slide. Blank lines are ignored. A line like
-/// <c>[Coro]</c> is optional: it does not become a slide, it only labels
-/// the lines that follow it. Lines without a label are numbered.
+/// Each paragraph — a block of lines separated by a blank line — is one
+/// slide. A line like <c>[Coro]</c> is optional: it does not become a
+/// slide, it only labels the paragraphs that follow it. Paragraphs
+/// without a label are numbered.
 /// </summary>
 public static partial class LyricsParser
 {
@@ -18,31 +19,51 @@ public static partial class LyricsParser
 
     public static List<SongSection> Parse(string? lyrics)
     {
-        var normalized = (lyrics ?? string.Empty).Replace("\r\n", "\n");
+        var normalized = (lyrics ?? string.Empty).Replace("\r\n", "\n").Trim();
+        if (normalized.Length == 0)
+            return [];
+
         var sections = new List<SongSection>();
         string? label = null;
+        var buffer = new List<string>();
+
+        void Flush()
+        {
+            var text = string.Join("\n", buffer).Trim();
+            if (text.Length > 0)
+            {
+                sections.Add(new SongSection
+                {
+                    Order = sections.Count,
+                    Label = label ?? (sections.Count + 1).ToString(),
+                    Text = text,
+                });
+            }
+            buffer.Clear();
+        }
 
         foreach (var raw in normalized.Split('\n'))
         {
             var line = raw.Trim();
-            if (line.Length == 0)
-                continue;
 
             var match = TagLine().Match(line);
             if (match.Success)
             {
+                Flush();
                 label = match.Groups["label"].Value.Trim();
                 continue;
             }
 
-            sections.Add(new SongSection
+            if (line.Length == 0)
             {
-                Order = sections.Count,
-                Label = label ?? (sections.Count + 1).ToString(),
-                Text = line,
-            });
+                Flush();
+                continue;
+            }
+
+            buffer.Add(line);
         }
 
+        Flush();
         return sections;
     }
 
@@ -54,12 +75,13 @@ public static partial class LyricsParser
 
         foreach (var section in sections.OrderBy(s => s.Order))
         {
+            if (builder.Length > 0)
+                builder.Append('\n');
+
             // Numeric labels were auto-assigned; they don't need a tag line.
             var isAutoLabel = int.TryParse(section.Label, out _);
             if (!isAutoLabel && section.Label != currentLabel)
             {
-                if (builder.Length > 0)
-                    builder.Append('\n');
                 builder.Append('[').Append(section.Label).Append("]\n");
                 currentLabel = section.Label;
             }

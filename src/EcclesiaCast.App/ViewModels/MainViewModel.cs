@@ -299,14 +299,55 @@ public sealed partial class MainViewModel : ObservableObject
 
     // ── Estados de salida ────────────────────────────────────────
 
-    [RelayCommand]
-    private void ToggleClear() => _presentation.ToggleClear();
+    /// <summary>Turns the output window on (if a display is selected).</summary>
+    private bool EnsureOutputOn()
+    {
+        if (SelectedDisplay is null)
+        {
+            StatusText = "No hay pantalla de salida seleccionada.";
+            return false;
+        }
+
+        _projection.EnsureVisible(SelectedDisplay.Info);
+        IsProjecting = true;
+        return true;
+    }
 
     [RelayCommand]
-    private void ToggleBlack() => _presentation.ToggleBlack();
+    private void ToggleOutput()
+    {
+        if (IsProjecting)
+        {
+            _projection.HideOutput();
+            IsProjecting = false;
+            StatusText = "Salida apagada.";
+        }
+        else if (EnsureOutputOn())
+        {
+            StatusText = "Salida en vivo.";
+        }
+    }
 
     [RelayCommand]
-    private void ToggleLogo() => _presentation.ToggleLogo();
+    private void ToggleClear()
+    {
+        _presentation.ToggleClear();
+        EnsureOutputOn();
+    }
+
+    [RelayCommand]
+    private void ToggleBlack()
+    {
+        _presentation.ToggleBlack();
+        EnsureOutputOn();
+    }
+
+    [RelayCommand]
+    private void ToggleLogo()
+    {
+        _presentation.ToggleLogo();
+        EnsureOutputOn();
+    }
 
     [RelayCommand]
     private void HideOutput()

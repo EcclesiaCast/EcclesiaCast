@@ -13,8 +13,6 @@
         <KeyBinding Key="F2" Command="{Binding ToggleBlackCommand}"/>
         <KeyBinding Key="F3" Command="{Binding ToggleLogoCommand}"/>
         <KeyBinding Key="Escape" Command="{Binding HideOutputCommand}"/>
-        <KeyBinding Key="Right" Command="{Binding NextSlideCommand}"/>
-        <KeyBinding Key="Left" Command="{Binding PreviousSlideCommand}"/>
     </Window.InputBindings>
 
     <Grid>
@@ -90,9 +88,22 @@
                             Command="{Binding RefreshDisplaysCommand}"
                             ToolTip="Actualizar pantallas"
                             Padding="9,6" Margin="6,0,14,0"/>
-                    <Button Content="Apagar salida  (Esc)"
-                            Style="{StaticResource DarkButton}"
-                            Command="{Binding HideOutputCommand}"/>
+                    <Button Command="{Binding ToggleOutputCommand}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                <Setter Property="Content" Value="🔴  Poner en vivo"/>
+                                <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsProjecting}" Value="True">
+                                        <Setter Property="Content" Value="Apagar salida  (Esc)"/>
+                                        <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+                                        <Setter Property="BorderThickness" Value="1"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
                 </StackPanel>
 
                 <Grid/>

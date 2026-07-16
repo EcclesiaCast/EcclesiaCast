@@ -51,7 +51,7 @@
         <TextBlock Grid.Row="3"
                    FontSize="11" Foreground="{StaticResource FaintBrush}"
                    TextWrapping="Wrap" Margin="0,0,0,6"
-                   Text="Cada línea es una diapositiva; las líneas en blanco se ignoran. Opcional: una línea [Coro] o [Verso 1] no se proyecta, solo le pone nombre a las líneas que siguen."/>
+                   Text="Cada párrafo es una diapositiva: separá las diapositivas con una línea en blanco. Opcional: una línea [Coro] o [Verso 1] no se proyecta, solo le pone nombre a los párrafos que siguen."/>
 
         <TextBox Grid.Row="4"
                  x:Name="LyricsBox"
