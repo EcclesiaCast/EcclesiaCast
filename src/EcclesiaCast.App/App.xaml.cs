@@ -4,6 +4,7 @@ using EcclesiaCast.App.Services;
 using EcclesiaCast.App.ViewModels;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Displays;
+using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Data.Persistence;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -43,6 +44,8 @@ public partial class App : Application
 
         var services = new ServiceCollection();
         services.AddSingleton<IDisplayProvider, ScreenDisplayProvider>();
+        services.AddSingleton<IPresentationService, PresentationService>();
+        services.AddSingleton<ProjectionViewModel>();
         services.AddSingleton<IProjectionWindowService, ProjectionWindowService>();
         services.AddSingleton<ISettingsStore>(
             _ => new SqliteSettingsStore(Path.Combine(appDataDir, "ecclesiacast.db")));

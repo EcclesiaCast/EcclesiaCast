@@ -1,6 +1,7 @@
 <Window x:Class="EcclesiaCast.App.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:EcclesiaCast.App.Controls"
         Title="EcclesiaCast — Operador"
         Width="1280" Height="800"
         MinWidth="1000" MinHeight="640"
@@ -8,7 +9,9 @@
         Background="{StaticResource BgBrush}"
         FontFamily="Segoe UI">
     <Window.InputBindings>
-        <KeyBinding Key="F1" Command="{Binding ProjectTestCommand}"/>
+        <KeyBinding Key="F1" Command="{Binding ToggleClearCommand}"/>
+        <KeyBinding Key="F2" Command="{Binding ToggleBlackCommand}"/>
+        <KeyBinding Key="F3" Command="{Binding ToggleLogoCommand}"/>
         <KeyBinding Key="Escape" Command="{Binding HideOutputCommand}"/>
     </Window.InputBindings>
 
@@ -32,6 +35,46 @@
                            FontSize="17" FontWeight="SemiBold" Foreground="White"
                            VerticalAlignment="Center"/>
 
+                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal"
+                            VerticalAlignment="Center" Margin="24,0,0,0">
+                    <Button Content="Clear  (F1)" Command="{Binding ToggleClearCommand}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsClearActive}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Content="Black  (F2)" Command="{Binding ToggleBlackCommand}" Margin="6,0,0,0">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsBlackActive}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Content="Logo  (F3)" Command="{Binding ToggleLogoCommand}" Margin="6,0,0,0">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsLogoActive}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="Salida:" Foreground="{StaticResource MutedBrush}"
                                FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
@@ -45,13 +88,9 @@
                             Command="{Binding RefreshDisplaysCommand}"
                             ToolTip="Actualizar pantallas"
                             Padding="9,6" Margin="6,0,14,0"/>
-                    <Button Content="Proyectar prueba  (F1)"
-                            Style="{StaticResource AccentButton}"
-                            Command="{Binding ProjectTestCommand}"/>
-                    <Button Content="Ocultar  (Esc)"
+                    <Button Content="Apagar salida  (Esc)"
                             Style="{StaticResource DarkButton}"
-                            Command="{Binding HideOutputCommand}"
-                            Margin="8,0,0,0"/>
+                            Command="{Binding HideOutputCommand}"/>
                 </StackPanel>
 
                 <Grid/>
@@ -104,13 +143,49 @@
             <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Background="Transparent"/>
             <GridSplitter Grid.Column="3" HorizontalAlignment="Stretch" Background="Transparent"/>
 
-            <!-- Panel central: grilla de slides -->
+            <!-- Panel central: texto rápido + futura grilla de slides -->
             <Border Grid.Column="2" Style="{StaticResource Panel}">
-                <DockPanel>
-                    <TextBlock DockPanel.Dock="Top" Text="SLIDES" Style="{StaticResource PanelTitle}"/>
-                    <TextBlock Style="{StaticResource PlaceholderText}"
-                               Text="Las diapositivas de la canción o el pasaje seleccionado aparecen acá,&#10;listas para proyectar con un clic o con las flechas del teclado.&#10;&#10;(sprint 1: texto rápido · sprint 2: canciones · sprint 3: Biblia)"/>
-                </DockPanel>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="TEXTO RÁPIDO — anuncios al momento" Style="{StaticResource PanelTitle}"/>
+
+                    <Grid Grid.Row="1" Margin="12,0,12,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Height="96"
+                                 AcceptsReturn="True" TextWrapping="Wrap"
+                                 VerticalScrollBarVisibility="Auto"
+                                 Text="{Binding QuickText, UpdateSourceTrigger=PropertyChanged}"
+                                 Background="{StaticResource SurfaceAltBrush}"
+                                 Foreground="White"
+                                 BorderBrush="{StaticResource LineBrush}"
+                                 CaretBrush="White"
+                                 Padding="8,6" FontSize="14">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Modifiers="Control" Command="{Binding GoLiveCommand}"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
+                        <Button Grid.Column="1"
+                                Content="Proyectar ▶&#10;(Ctrl+Enter)"
+                                Style="{StaticResource AccentButton}"
+                                Command="{Binding GoLiveCommand}"
+                                Margin="10,0,0,0"/>
+                    </Grid>
+
+                    <Border Grid.Row="2"
+                            BorderBrush="{StaticResource LineBrush}"
+                            BorderThickness="0,1,0,0">
+                        <TextBlock Style="{StaticResource PlaceholderText}"
+                                   Text="Acá aparecerá la grilla de diapositivas de la canción o el pasaje seleccionado.&#10;&#10;(sprint 2: canciones · sprint 3: Biblia)"/>
+                    </Border>
+                </Grid>
             </Border>
 
             <!-- Panel derecho: preview y live -->
@@ -127,8 +202,7 @@
                         <TextBlock Text="PREVIEW · SIGUIENTE" Style="{StaticResource PanelTitle}"/>
                         <Border Height="165" Margin="12,0,12,12"
                                 Background="#0B0D12" CornerRadius="4">
-                            <TextBlock Style="{StaticResource PlaceholderText}"
-                                       Text="Lo que se prepara,&#10;antes de salir en vivo. (sprint 1)"/>
+                            <controls:SlideView Slide="{Binding PreviewSlide}"/>
                         </Border>
                     </StackPanel>
                 </Border>
@@ -156,8 +230,8 @@
                                     </Style.Triggers>
                                 </Style>
                             </Border.Style>
-                            <TextBlock Text="{Binding LiveLabel}"
-                                       Style="{StaticResource PlaceholderText}"/>
+                            <controls:SlideView Slide="{Binding Projection.Slide}"
+                                                State="{Binding Projection.State}"/>
                         </Border>
                     </StackPanel>
                 </Border>

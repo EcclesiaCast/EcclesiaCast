@@ -1,0 +1,47 @@
+<UserControl x:Class="EcclesiaCast.App.Controls.SlideView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Renders at a fixed virtual 1920×1080 and scales uniformly, so the
+         projector output and the small preview boxes look identical. -->
+    <Viewbox Stretch="Uniform">
+        <Grid Width="1920" Height="1080" Background="#10141E">
+
+            <!-- Capa de texto -->
+            <Grid x:Name="TextLayer" Margin="110,80">
+                <TextBlock x:Name="MainText"
+                           FontFamily="Segoe UI"
+                           FontSize="92" FontWeight="SemiBold"
+                           Foreground="White"
+                           TextWrapping="Wrap" TextAlignment="Center"
+                           HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock.Effect>
+                        <DropShadowEffect BlurRadius="18" ShadowDepth="3" Opacity="0.75"/>
+                    </TextBlock.Effect>
+                </TextBlock>
+                <TextBlock x:Name="CaptionText"
+                           FontFamily="Segoe UI"
+                           FontSize="40"
+                           Foreground="#B9C6DE"
+                           HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                           Visibility="Collapsed">
+                    <TextBlock.Effect>
+                        <DropShadowEffect BlurRadius="12" ShadowDepth="2" Opacity="0.75"/>
+                    </TextBlock.Effect>
+                </TextBlock>
+            </Grid>
+
+            <!-- Capa de logo -->
+            <Grid x:Name="LogoLayer" Background="#10141E" Visibility="Collapsed">
+                <TextBlock Text="EcclesiaCast"
+                           FontFamily="Segoe UI"
+                           FontSize="120" FontWeight="SemiBold"
+                           Foreground="White"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+
+            <!-- Capa de negro -->
+            <Rectangle x:Name="BlackLayer" Fill="Black" Opacity="0" IsHitTestVisible="False"/>
+
+        </Grid>
+    </Viewbox>
+</UserControl>

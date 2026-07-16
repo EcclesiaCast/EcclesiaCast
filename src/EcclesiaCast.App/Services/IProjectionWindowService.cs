@@ -7,8 +7,8 @@ public interface IProjectionWindowService
 {
     bool IsOutputVisible { get; }
 
-    /// <summary>Shows the test signal fullscreen on the given display.</summary>
-    void ShowTest(DisplayInfo display);
+    /// <summary>Shows (or moves) the output window fullscreen on the given display.</summary>
+    void EnsureVisible(DisplayInfo display);
 
     void HideOutput();
 }

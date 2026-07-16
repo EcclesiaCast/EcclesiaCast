@@ -19,7 +19,6 @@ public partial class OutputWindow : Window
     public void ShowOn(DisplayInfo display)
     {
         _display = display;
-        DisplayLabel.Text = $"{display.Width} × {display.Height}   ·   {display.DeviceName.TrimStart('\\', '.')}";
         Show();
         MoveToDisplay();
     }
