@@ -10,6 +10,28 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+
+        // Keep the live slide card visible when navigating with the arrows.
+        DataContextChanged += (_, _) =>
+        {
+            if (DataContext is not MainViewModel vm)
+                return;
+
+            vm.PropertyChanged += (_, args) =>
+            {
+                if (args.PropertyName == nameof(MainViewModel.LiveSlideIndex))
+                    ScrollLiveSlideIntoView(vm.LiveSlideIndex);
+            };
+        };
+    }
+
+    private void ScrollLiveSlideIntoView(int index)
+    {
+        if (index < 0)
+            return;
+
+        if (SlideGrid.ItemContainerGenerator.ContainerFromIndex(index) is FrameworkElement container)
+            container.BringIntoView();
     }
 
     // Arrow keys must be intercepted before WPF's directional focus
