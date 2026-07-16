@@ -4,5 +4,80 @@
              ShutdownMode="OnMainWindowClose">
     <Application.Resources>
 
+        <!-- Dark theme palette -->
+        <SolidColorBrush x:Key="BgBrush" Color="#14161C"/>
+        <SolidColorBrush x:Key="SurfaceBrush" Color="#1C1F27"/>
+        <SolidColorBrush x:Key="SurfaceAltBrush" Color="#232630"/>
+        <SolidColorBrush x:Key="LineBrush" Color="#2A2E3A"/>
+        <SolidColorBrush x:Key="MutedBrush" Color="#9AA1B2"/>
+        <SolidColorBrush x:Key="FaintBrush" Color="#5B6070"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#2F63C9"/>
+        <SolidColorBrush x:Key="LiveBrush" Color="#C43B3B"/>
+
+        <Style x:Key="DarkButton" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12,7"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Opacity" Value="0.85"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Opacity" Value="0.7"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="AccentButton" TargetType="Button" BasedOn="{StaticResource DarkButton}">
+            <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+
+        <!-- Section headers inside panels (e.g. BIBLIOTECA, PLAYLIST) -->
+        <Style x:Key="PanelTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="Margin" Value="12,10,12,8"/>
+        </Style>
+
+        <!-- Rounded container for each panel of the operator window -->
+        <Style x:Key="Panel" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+        </Style>
+
+        <!-- Centered hint text for panels whose feature arrives in a later sprint -->
+        <Style x:Key="PlaceholderText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{StaticResource FaintBrush}"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="16"/>
+        </Style>
+
     </Application.Resources>
 </Application>

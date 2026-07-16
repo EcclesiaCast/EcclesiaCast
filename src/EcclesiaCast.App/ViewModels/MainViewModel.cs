@@ -26,6 +26,12 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string _statusText = "Salida oculta. Elegí una pantalla y presioná F1 para proyectar.";
 
+    [ObservableProperty]
+    private bool _isProjecting;
+
+    [ObservableProperty]
+    private string _liveLabel = "Sin señal";
+
     public MainViewModel(
         IDisplayProvider displayProvider,
         IProjectionWindowService projection,
@@ -66,6 +72,8 @@ public sealed partial class MainViewModel : ObservableObject
 
         _projection.ShowTest(SelectedDisplay.Info);
         _settings.Set(OutputDisplayKey, SelectedDisplay.Info.DeviceName);
+        IsProjecting = true;
+        LiveLabel = "Señal de prueba";
         StatusText = $"Proyectando señal de prueba en {SelectedDisplay.Label}. Esc para ocultar.";
     }
 
@@ -73,6 +81,8 @@ public sealed partial class MainViewModel : ObservableObject
     private void HideOutput()
     {
         _projection.HideOutput();
+        IsProjecting = false;
+        LiveLabel = "Sin señal";
         StatusText = "Salida oculta.";
     }
 }
