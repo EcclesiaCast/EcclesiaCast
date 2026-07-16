@@ -133,7 +133,11 @@
                         <DockPanel DockPanel.Dock="Top">
                             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
                                         VerticalAlignment="Center" Margin="0,10,10,8">
-                                <Button Content="➕" FontSize="11" Padding="7,4"
+                                <Button Content="📥" FontSize="11" Padding="7,4"
+                                        Style="{StaticResource DarkButton}"
+                                        Command="{Binding ImportSongsCommand}"
+                                        ToolTip="Importar canciones (.txt o ProPresenter .pro)"/>
+                                <Button Content="➕" FontSize="11" Padding="7,4" Margin="4,0,0,0"
                                         Style="{StaticResource DarkButton}"
                                         Command="{Binding NewSongCommand}"
                                         ToolTip="Nueva canción"/>

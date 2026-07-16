@@ -1,4 +1,6 @@
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Text;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -205,6 +207,77 @@ public sealed partial class MainViewModel : ObservableObject
         SelectedSong = null;
         LoadSongs();
         StatusText = "Canción eliminada.";
+    }
+
+    [RelayCommand]
+    private void ImportSongs()
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = "Importar canciones",
+            Filter = "Canciones (*.txt, *.pro)|*.txt;*.pro|Texto plano (*.txt)|*.txt|ProPresenter 7 (*.pro)|*.pro",
+            Multiselect = true,
+        };
+        if (dialog.ShowDialog() != true)
+            return;
+
+        int imported = 0, skipped = 0, failed = 0;
+
+        foreach (var path in dialog.FileNames)
+        {
+            try
+            {
+                var song = Path.GetExtension(path).ToLowerInvariant() == ".pro"
+                    ? ProPresenterImporter.FromFile(Path.GetFileName(path), File.ReadAllBytes(path))
+                    : TxtSongImporter.FromText(Path.GetFileName(path), ReadTextFile(path));
+
+                if (song.Sections.Count == 0)
+                {
+                    Log.Warning("Importación sin texto: {Path}", path);
+                    skipped++;
+                    continue;
+                }
+
+                var duplicate = _songs.Search(song.Title).Any(s =>
+                    string.Equals(s.Title, song.Title, StringComparison.OrdinalIgnoreCase));
+                if (duplicate)
+                {
+                    skipped++;
+                    continue;
+                }
+
+                _songs.Save(song);
+                imported++;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Falló la importación de {Path}", path);
+                failed++;
+            }
+        }
+
+        LoadSongs();
+
+        var parts = new List<string> { $"{imported} canciones importadas" };
+        if (skipped > 0)
+            parts.Add($"{skipped} omitidas (vacías o ya existentes)");
+        if (failed > 0)
+            parts.Add($"{failed} con error (ver log)");
+        StatusText = string.Join(" · ", parts) + ".";
+    }
+
+    /// <summary>Reads a text file as UTF-8, falling back to Latin-1.</summary>
+    private static string ReadTextFile(string path)
+    {
+        var bytes = File.ReadAllBytes(path);
+        try
+        {
+            return new UTF8Encoding(false, throwOnInvalidBytes: true).GetString(bytes);
+        }
+        catch (DecoderFallbackException)
+        {
+            return Encoding.Latin1.GetString(bytes);
+        }
     }
 
     // ── Proyección de slides ─────────────────────────────────────
