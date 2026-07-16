@@ -1,0 +1,35 @@
+<Window x:Class="EcclesiaCast.App.Views.OutputWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="EcclesiaCast — Salida"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Topmost="True"
+        Cursor="None"
+        Background="#0E1420"
+        KeyDown="OnKeyDown">
+    <Grid>
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock Text="EcclesiaCast"
+                       FontFamily="Segoe UI"
+                       FontSize="96"
+                       FontWeight="SemiBold"
+                       Foreground="White"
+                       HorizontalAlignment="Center"/>
+            <TextBlock Text="Señal de prueba"
+                       FontFamily="Segoe UI"
+                       FontSize="28"
+                       Foreground="#8FA3C8"
+                       HorizontalAlignment="Center"
+                       Margin="0,12,0,0"/>
+        </StackPanel>
+        <TextBlock x:Name="DisplayLabel"
+                   FontFamily="Segoe UI"
+                   FontSize="18"
+                   Foreground="#5B6B8C"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Bottom"
+                   Margin="0,0,0,36"/>
+    </Grid>
+</Window>

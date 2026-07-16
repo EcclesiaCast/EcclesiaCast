@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/EcclesiaCast.App/EcclesiaCast.App.csproj" />
+    <Project Path="src/EcclesiaCast.Core/EcclesiaCast.Core.csproj" />
+    <Project Path="src/EcclesiaCast.Data/EcclesiaCast.Data.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/EcclesiaCast.Core.Tests/EcclesiaCast.Core.Tests.csproj" />
+  </Folder>
+</Solution>
