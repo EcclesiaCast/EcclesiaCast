@@ -562,7 +562,7 @@ public sealed partial class MainViewModel : ObservableObject
             }
             else
             {
-                SetPreviewIndex(Slides.Count > 0 ? 0 : -1);
+                SetPreviewIndex(Slides.FirstOrDefault(s => s.JumpTarget is null)?.Index ?? -1);
             }
             return;
         }
@@ -605,6 +605,18 @@ public sealed partial class MainViewModel : ObservableObject
         Slides.Clear();
         LiveSlideIndex = -1;
 
+        // Opening card: jump back to the previous chapter (crossing into the
+        // previous book's last chapter when needed). Never projected as-is.
+        if (GetPreviousChapter(reference) is var (prevBook, prevChapter, prevName))
+        {
+            Slides.Add(new SlideItemViewModel(
+                Slides.Count,
+                "ANTERIOR",
+                new SlideContent($"◀  {prevName} {prevChapter}", "Volver al capítulo anterior"),
+                new BibleReference(prevBook, prevChapter, null, null),
+                jumpToEnd: true));
+        }
+
         foreach (var v in verses)
         {
             var caption = secondary is null
@@ -634,8 +646,36 @@ public sealed partial class MainViewModel : ObservableObject
         if (SelectedBibleBook?.Number == reference.BookNumber)
             MarkChapterSelected(reference.Chapter);
 
-        PreviewSlide = Slides.FirstOrDefault()?.Slide;
+        PreviewSlide = Slides.FirstOrDefault(s => s.JumpTarget is null)?.Slide;
         BibleStatusText = $"{verses.Count} versículo(s). Clic en una diapositiva para proyectar.";
+    }
+
+    /// <summary>Previous chapter before a reference: within the book, or the previous book's last chapter.</summary>
+    private (int Book, int Chapter, string Name)? GetPreviousChapter(BibleReference current)
+    {
+        var primary = PrimaryVersion;
+        if (primary is null)
+            return null;
+
+        var previousInBook = _bibles.GetChapterNumbers(primary.Id, current.BookNumber)
+            .Where(c => c < current.Chapter)
+            .Cast<int?>()
+            .LastOrDefault();
+        if (previousInBook is int chapter)
+            return (current.BookNumber, chapter, BibleBookCatalog.FindByNumber(current.BookNumber)?.Name ?? string.Empty);
+
+        var previousBook = _bibles.GetAvailableBookNumbers(primary.Id)
+            .Where(n => n < current.BookNumber)
+            .Cast<int?>()
+            .LastOrDefault();
+        if (previousBook is int book)
+        {
+            var lastChapter = _bibles.GetChapterNumbers(primary.Id, book).Cast<int?>().LastOrDefault();
+            if (lastChapter is int last)
+                return (book, last, BibleBookCatalog.FindByNumber(book)?.Name ?? string.Empty);
+        }
+
+        return null;
     }
 
     /// <summary>Next chapter after a reference: within the book, or the next book's first chapter.</summary>
@@ -683,8 +723,8 @@ public sealed partial class MainViewModel : ObservableObject
     {
         if (PreviewSlideIndex >= 0)
             GoLiveSlide(PreviewSlideIndex);
-        else if (Slides.Count > 0)
-            GoLiveSlide(0);
+        else if (Slides.FirstOrDefault(s => s.JumpTarget is null) is { } first)
+            GoLiveSlide(first.Index);
     }
 
     // ── Resaltado en vivo ────────────────────────────────────────
@@ -871,16 +911,23 @@ public sealed partial class MainViewModel : ObservableObject
 
         var item = Slides[index];
 
-        // The "next chapter" card never projects itself: it loads the next
-        // passage and goes live on its first verse in one motion.
+        // Chapter jump cards never project themselves: they load the target
+        // passage and go live on its first verse (next) or its last verse
+        // (previous, so backward reading is continuous) in one motion.
         if (item.JumpTarget is { } jump)
         {
+            var jumpToEnd = item.JumpToEnd;
+
             if (SelectedBibleBook?.Number != jump.BookNumber)
                 SelectedBibleBook = BibleBooksAvailable.FirstOrDefault(b => b.Number == jump.BookNumber);
 
             LoadBiblePassage(jump);
-            if (Slides.Count > 0 && Slides[0].JumpTarget is null)
-                GoLiveSlide(0);
+
+            var landing = jumpToEnd
+                ? Slides.LastOrDefault(s => s.JumpTarget is null)
+                : Slides.FirstOrDefault(s => s.JumpTarget is null);
+            if (landing is not null)
+                GoLiveSlide(landing.Index);
             return;
         }
 
