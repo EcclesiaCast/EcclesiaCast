@@ -53,6 +53,17 @@ public sealed class PresentationService : IPresentationService
         OnChanged();
     }
 
+    public Media.MediaItem? Background { get; private set; }
+
+    public void SetBackground(Media.MediaItem? background)
+    {
+        if (background?.Id == Background?.Id)
+            return;
+
+        Background = background;
+        OnChanged();
+    }
+
     private void SetState(OutputState state)
     {
         // There is nothing to return to without a slide: fall back to clear.

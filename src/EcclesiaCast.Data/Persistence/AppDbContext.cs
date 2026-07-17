@@ -1,4 +1,5 @@
 using EcclesiaCast.Core.Bible;
+using EcclesiaCast.Core.Media;
 using EcclesiaCast.Core.Songs;
 using EcclesiaCast.Core.Themes;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,7 @@ public sealed class AppDbContext : DbContext
     public DbSet<BibleBook> BibleBooks => Set<BibleBook>();
     public DbSet<BibleVerse> BibleVerses => Set<BibleVerse>();
     public DbSet<SlideTheme> Themes => Set<SlideTheme>();
+    public DbSet<MediaItem> MediaItems => Set<MediaItem>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseSqlite($"Data Source={_dbPath}");
@@ -74,6 +76,12 @@ public sealed class AppDbContext : DbContext
         {
             theme.HasKey(t => t.Id);
             theme.Property(t => t.Name).IsRequired();
+        });
+
+        modelBuilder.Entity<MediaItem>(media =>
+        {
+            media.HasKey(m => m.Id);
+            media.Property(m => m.Path).IsRequired();
         });
     }
 }

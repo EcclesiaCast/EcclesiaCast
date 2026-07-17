@@ -745,7 +745,8 @@
                         <TextBlock Text="PREVIEW · SIGUIENTE" Style="{StaticResource PanelTitle}"/>
                         <Border Height="165" Margin="12,0,12,12"
                                 Background="#0B0D12" CornerRadius="4">
-                            <controls:SlideView Slide="{Binding PreviewSlide}"/>
+                            <controls:ProjectedView Slide="{Binding PreviewSlide}"
+                                                    BackgroundMedia="{Binding Projection.Background}"/>
                         </Border>
                     </StackPanel>
                 </Border>
@@ -773,10 +774,11 @@
                                     </Style.Triggers>
                                 </Style>
                             </Border.Style>
-                            <controls:SlideView Slide="{Binding Projection.Slide}"
-                                                State="{Binding Projection.State}"
-                                                Overlay="{Binding Projection.Overlay}"
-                                                Highlight="{Binding Projection.Highlight}"/>
+                            <controls:ProjectedView Slide="{Binding Projection.Slide}"
+                                                    State="{Binding Projection.State}"
+                                                    Overlay="{Binding Projection.Overlay}"
+                                                    Highlight="{Binding Projection.Highlight}"
+                                                    BackgroundMedia="{Binding Projection.Background}"/>
                         </Border>
                     </StackPanel>
                 </Border>
@@ -784,11 +786,89 @@
         </Grid>
 
         <!-- ══ Barra de medios ══ -->
-        <Border Grid.Row="2" Style="{StaticResource Panel}" Margin="10,10,10,0" Height="86">
+        <Border Grid.Row="2" Style="{StaticResource Panel}" Margin="10,10,10,0" Height="108">
             <DockPanel>
-                <TextBlock DockPanel.Dock="Top" Text="FONDOS" Style="{StaticResource PanelTitle}" Margin="12,8,12,4"/>
-                <TextBlock Style="{StaticResource PlaceholderText}" Margin="16,0,16,8"
-                           Text="Miniaturas de imágenes y videos de fondo, aplicables con un clic. (sprints 4–5)"/>
+                <DockPanel DockPanel.Dock="Top">
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,6,10,2">
+                        <Button Content="📥 Agregar" FontSize="11" Padding="8,4"
+                                Style="{StaticResource DarkButton}"
+                                Command="{Binding ImportMediaCommand}"
+                                ToolTip="Agregar imágenes o videos de fondo"/>
+                        <Button Content="Sin fondo" FontSize="11" Padding="8,4" Margin="6,0,0,0"
+                                Style="{StaticResource DarkButton}"
+                                Command="{Binding ClearBackgroundCommand}"
+                                ToolTip="Quitar el fondo (queda negro/transparente)"/>
+                    </StackPanel>
+                    <TextBlock Text="FONDOS" Style="{StaticResource PanelTitle}" Margin="12,8,12,4"/>
+                </DockPanel>
+
+                <Grid>
+                    <TextBlock Margin="16,0,16,8"
+                               Text="Agregá imágenes o videos con 📥 y aplicalos con un clic.">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource PlaceholderText}">
+                                <Setter Property="FontSize" Value="11"/>
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding MediaItems.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <ScrollViewer x:Name="MediaScroll" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                        <ItemsControl ItemsSource="{Binding MediaItems}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Command="{Binding DataContext.ApplyBackgroundCommand, ElementName=MediaScroll}"
+                                            CommandParameter="{Binding}"
+                                            Cursor="Hand" Margin="6,2"
+                                            Tag="{Binding DataContext, ElementName=MediaScroll}"
+                                            ToolTip="{Binding Name}">
+                                        <Button.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Quitar de la biblioteca"
+                                                          Command="{Binding PlacementTarget.Tag.DeleteMediaCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                            </ContextMenu>
+                                        </Button.ContextMenu>
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="card" Width="98" Height="56" CornerRadius="4"
+                                                        Background="#10141E"
+                                                        BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
+                                                        Tag="{Binding DataContext, ElementName=MediaScroll}"
+                                                        ClipToBounds="True">
+                                                    <Grid>
+                                                        <Image Source="{Binding ThumbnailPath}" Stretch="UniformToFill"/>
+                                                        <Border Background="#66000000" VerticalAlignment="Bottom" Padding="4,1">
+                                                            <TextBlock Text="{Binding Name}" FontSize="9" Foreground="White"
+                                                                       TextTrimming="CharacterEllipsis"/>
+                                                        </Border>
+                                                        <TextBlock Text="🎞" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                   Visibility="Collapsed" x:Name="videoIcon"/>
+                                                    </Grid>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="card" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                                    </Trigger>
+                                                    <DataTrigger Binding="{Binding Type}" Value="Video">
+                                                        <Setter TargetName="videoIcon" Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
             </DockPanel>
         </Border>
 

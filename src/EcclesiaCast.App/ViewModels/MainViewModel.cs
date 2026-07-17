@@ -8,6 +8,7 @@ using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Bible;
 using EcclesiaCast.Core.Displays;
+using EcclesiaCast.Core.Media;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Core.Songs;
 using EcclesiaCast.Core.Themes;
@@ -36,6 +37,7 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly IThemeManagerDialog _themeManager;
     private readonly ISongDesigner _songDesigner;
     private readonly IQuickTextEditor _quickTextEditor;
+    private readonly IMediaRepository _media;
 
     /// <summary>Copied slide (label + text + style) for paste/duplicate.</summary>
     private (string Label, string Text, string? StyleJson)? _clipboardSlide;
@@ -160,6 +162,7 @@ public sealed partial class MainViewModel : ObservableObject
         IThemeManagerDialog themeManager,
         ISongDesigner songDesigner,
         IQuickTextEditor quickTextEditor,
+        IMediaRepository media,
         ProjectionViewModel projectionViewModel)
     {
         _displayProvider = displayProvider;
@@ -175,6 +178,7 @@ public sealed partial class MainViewModel : ObservableObject
         _themeManager = themeManager;
         _songDesigner = songDesigner;
         _quickTextEditor = quickTextEditor;
+        _media = media;
         Projection = projectionViewModel;
 
         _presentation.Changed += (_, _) => UpdateStateFlags();
@@ -184,6 +188,95 @@ public sealed partial class MainViewModel : ObservableObject
         RefreshDisplays();
         LoadSongs();
         LoadBibleVersions();
+        LoadMedia();
+    }
+
+    // ── Fondos (biblioteca de medios) ────────────────────────────
+
+    public ObservableCollection<MediaItem> MediaItems { get; } = [];
+
+    private static readonly HashSet<string> ImageExtensions =
+        new(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png", ".bmp", ".webp", ".gif" };
+    private static readonly HashSet<string> VideoExtensions =
+        new(StringComparer.OrdinalIgnoreCase) { ".mp4", ".mov", ".m4v", ".avi", ".mkv", ".wmv", ".webm" };
+
+    private void LoadMedia()
+    {
+        MediaItems.Clear();
+        foreach (var item in _media.GetAll())
+            MediaItems.Add(item);
+    }
+
+    [RelayCommand]
+    private void ImportMedia()
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = "Agregar fondos",
+            Filter = "Imágenes y videos|*.jpg;*.jpeg;*.png;*.bmp;*.webp;*.gif;*.mp4;*.mov;*.m4v;*.avi;*.mkv;*.wmv;*.webm"
+                   + "|Imágenes|*.jpg;*.jpeg;*.png;*.bmp;*.webp;*.gif"
+                   + "|Videos|*.mp4;*.mov;*.m4v;*.avi;*.mkv;*.wmv;*.webm",
+            Multiselect = true,
+        };
+        if (dialog.ShowDialog() != true)
+            return;
+
+        var added = 0;
+        foreach (var path in dialog.FileNames)
+        {
+            var ext = Path.GetExtension(path);
+            MediaType? type = ImageExtensions.Contains(ext) ? MediaType.Image
+                : VideoExtensions.Contains(ext) ? MediaType.Video
+                : null;
+            if (type is null)
+                continue;
+
+            _media.Add(new MediaItem
+            {
+                Name = Path.GetFileNameWithoutExtension(path),
+                Path = path,
+                Type = type.Value,
+                ThumbnailPath = type == MediaType.Image ? path : null,
+            });
+            added++;
+        }
+
+        LoadMedia();
+        StatusText = $"{added} fondo(s) agregado(s).";
+    }
+
+    [RelayCommand]
+    private void ApplyBackground(MediaItem? item)
+    {
+        if (item is null)
+            return;
+
+        _presentation.SetBackground(item);
+        if (SelectedDisplay is not null)
+        {
+            _projection.EnsureVisible(SelectedDisplay.Info);
+            IsProjecting = true;
+        }
+        StatusText = $"Fondo: {item.Name}.";
+    }
+
+    [RelayCommand]
+    private void ClearBackground()
+    {
+        _presentation.SetBackground(null);
+        StatusText = "Fondo quitado.";
+    }
+
+    [RelayCommand]
+    private void DeleteMedia(MediaItem? item)
+    {
+        if (item is null)
+            return;
+
+        if (_presentation.Background?.Id == item.Id)
+            _presentation.SetBackground(null);
+        _media.Delete(item.Id);
+        LoadMedia();
     }
 
     // ── Pantallas ────────────────────────────────────────────────

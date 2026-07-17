@@ -70,6 +70,7 @@ public partial class App : Application
         services.AddSingleton<IThemeManagerDialog, ThemeManagerDialogService>();
         services.AddSingleton<ISongDesigner, SongDesignerService>();
         services.AddSingleton<IQuickTextEditor, QuickTextEditorService>();
+        services.AddSingleton<IMediaRepository>(_ => new MediaRepository(dbPath));
         services.AddSingleton<MainViewModel>();
         _services = services.BuildServiceProvider();
 

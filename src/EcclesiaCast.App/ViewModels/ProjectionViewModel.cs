@@ -22,6 +22,9 @@ public sealed partial class ProjectionViewModel : ObservableObject
     [ObservableProperty]
     private string? _highlight;
 
+    [ObservableProperty]
+    private EcclesiaCast.Core.Media.MediaItem? _background;
+
     public ProjectionViewModel(IPresentationService presentation)
     {
         presentation.Changed += (_, _) =>
@@ -30,10 +33,12 @@ public sealed partial class ProjectionViewModel : ObservableObject
             State = presentation.State;
             Overlay = presentation.OverlayMessage;
             Highlight = presentation.HighlightTerm;
+            Background = presentation.Background;
         };
         Slide = presentation.CurrentSlide;
         State = presentation.State;
         Overlay = presentation.OverlayMessage;
         Highlight = presentation.HighlightTerm;
+        Background = presentation.Background;
     }
 }
