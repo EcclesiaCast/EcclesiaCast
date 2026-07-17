@@ -6,6 +6,7 @@ using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Displays;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Data.Persistence;
+using LibVLCSharp.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -55,6 +56,20 @@ public partial class App : Application
         // Temas iniciales (Canciones y Biblia) en la primera ejecución.
         ThemeSeeder.EnsureDefaults(new ThemeRepository(dbPath), new SqliteSettingsStore(dbPath));
 
+        // Motor de video (VLC) para los fondos en movimiento.
+        LibVLC? libVlc = null;
+        try
+        {
+            LibVLCSharp.Shared.Core.Initialize();
+            libVlc = new LibVLC("--no-osd", "--quiet");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "No se pudo inicializar LibVLC; los videos de fondo quedan deshabilitados");
+        }
+
+        VideoEngine = libVlc;
+
         var services = new ServiceCollection();
         services.AddSingleton<IDisplayProvider, ScreenDisplayProvider>();
         services.AddSingleton<IPresentationService, PresentationService>();
@@ -71,6 +86,7 @@ public partial class App : Application
         services.AddSingleton<ISongDesigner, SongDesignerService>();
         services.AddSingleton<IQuickTextEditor, QuickTextEditorService>();
         services.AddSingleton<IMediaRepository>(_ => new MediaRepository(dbPath));
+        services.AddSingleton<IMediaInspector, MediaInspectorService>();
         services.AddSingleton<MainViewModel>();
         _services = services.BuildServiceProvider();
 
@@ -89,4 +105,7 @@ public partial class App : Application
         _services?.Dispose();
         base.OnExit(e);
     }
+
+    /// <summary>Convenience for windows/services that optionally use video.</summary>
+    public static LibVLC? VideoEngine { get; internal set; }
 }

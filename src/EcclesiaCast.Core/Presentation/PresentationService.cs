@@ -64,6 +64,8 @@ public sealed class PresentationService : IPresentationService
         OnChanged();
     }
 
+    public void ShowBackgroundOnly() => SetState(OutputState.Clear);
+
     private void SetState(OutputState state)
     {
         // There is nothing to return to without a slide: fall back to clear.

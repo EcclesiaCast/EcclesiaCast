@@ -1,6 +1,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using EcclesiaCast.Core.Media;
 using EcclesiaCast.Core.Presentation;
@@ -38,6 +39,15 @@ public partial class ProjectedView : UserControl
     public static readonly DependencyProperty AnimateTransitionsProperty =
         DependencyProperty.Register(nameof(AnimateTransitions), typeof(bool), typeof(ProjectedView),
             new PropertyMetadata(false, (d, e) => ((ProjectedView)d).SlideView.AnimateTransitions = (bool)e.NewValue));
+
+    /// <summary>
+    /// True in the output window, where a real video plays behind this
+    /// control — so a video background shows nothing here (the video shows
+    /// through). False in previews, where the video's poster is shown.
+    /// </summary>
+    public static readonly DependencyProperty IsLiveOutputProperty =
+        DependencyProperty.Register(nameof(IsLiveOutput), typeof(bool), typeof(ProjectedView),
+            new PropertyMetadata(false, (d, _) => ((ProjectedView)d).OnBackgroundChanged()));
 
     private string? _lastImagePath;
 
@@ -85,13 +95,29 @@ public partial class ProjectedView : UserControl
         set => SetValue(AnimateTransitionsProperty, value);
     }
 
+    public bool IsLiveOutput
+    {
+        get => (bool)GetValue(IsLiveOutputProperty);
+        set => SetValue(IsLiveOutputProperty, value);
+    }
+
     private void OnBackgroundChanged()
     {
         var media = BackgroundMedia;
 
-        // Images render directly; videos use their poster thumbnail here
-        // (live playback is added with the LibVLC output layer).
-        var path = media?.Type == MediaType.Image ? media.Path : media?.ThumbnailPath;
+        // Images render directly. Videos show their poster in previews, but
+        // in the live output the poster is hidden so the moving video (behind
+        // this control) shows through.
+        var path = media?.Type == MediaType.Image
+            ? media.Path
+            : IsLiveOutput ? null : media?.ThumbnailPath;
+
+        BackgroundImage.Stretch = media?.Scaling switch
+        {
+            MediaScaling.Fit => System.Windows.Media.Stretch.Uniform,
+            MediaScaling.Stretch => System.Windows.Media.Stretch.Fill,
+            _ => System.Windows.Media.Stretch.UniformToFill,
+        };
 
         if (path == _lastImagePath)
             return;
@@ -110,6 +136,9 @@ public partial class ProjectedView : UserControl
                 bitmap.Freeze();
                 BackgroundImage.Source = bitmap;
                 BackgroundImage.Visibility = Visibility.Visible;
+                if (AnimateTransitions)
+                    BackgroundImage.BeginAnimation(OpacityProperty,
+                        new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(320)) { EasingFunction = new QuadraticEase() });
                 return;
             }
             catch

@@ -2,7 +2,9 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:EcclesiaCast.App.Controls">
-    <Grid Background="Black" ClipToBounds="True">
+    <!-- Transparent root so the video (behind, in the output window) shows
+         through where there is no image background. -->
+    <Grid Background="Transparent" ClipToBounds="True">
         <!-- Capa de fondo global (imagen; el video llega después) -->
         <Image x:Name="BackgroundImage" Stretch="UniformToFill" Visibility="Collapsed"/>
 

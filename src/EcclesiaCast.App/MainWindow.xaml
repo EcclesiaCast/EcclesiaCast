@@ -793,13 +793,47 @@
                         <Button Content="📥 Agregar" FontSize="11" Padding="8,4"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding ImportMediaCommand}"
-                                ToolTip="Agregar imágenes o videos de fondo"/>
+                                ToolTip="Agregar imágenes o videos a la pestaña actual"/>
                         <Button Content="Sin fondo" FontSize="11" Padding="8,4" Margin="6,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding ClearBackgroundCommand}"
                                 ToolTip="Quitar el fondo (queda negro/transparente)"/>
                     </StackPanel>
-                    <TextBlock Text="FONDOS" Style="{StaticResource PanelTitle}" Margin="12,8,12,4"/>
+                    <TextBlock Text="MEDIOS" Style="{StaticResource PanelTitle}" Margin="12,8,10,4" VerticalAlignment="Center"/>
+                    <!-- Pestañas por categoría -->
+                    <ListBox ItemsSource="{Binding MediaTabs}" SelectedItem="{Binding SelectedMediaTab}"
+                             Background="Transparent" BorderThickness="0" VerticalAlignment="Center"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border x:Name="bd" CornerRadius="4" Margin="2,0" Padding="10,4" Background="Transparent">
+                                                <TextBlock Text="{Binding}" FontSize="12" FontWeight="SemiBold"
+                                                           Foreground="{StaticResource MutedBrush}"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="bd" Property="Background" Value="#20242F"/>
+                                                </Trigger>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="bd" Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                    <Button Content="＋" FontSize="12" Padding="7,2" Margin="4,0,0,0"
+                            Style="{StaticResource DarkButton}"
+                            Command="{Binding NewMediaTabCommand}"
+                            ToolTip="Nueva pestaña (categoría)"/>
                 </DockPanel>
 
                 <Grid>
@@ -831,6 +865,13 @@
                                             ToolTip="{Binding Name}">
                                         <Button.ContextMenu>
                                             <ContextMenu>
+                                                <MenuItem Header="Propiedades (Inspector)…"
+                                                          Command="{Binding PlacementTarget.Tag.InspectMediaCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                <MenuItem Header="Abrir ubicación del archivo"
+                                                          Command="{Binding PlacementTarget.Tag.OpenMediaLocationCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                <Separator/>
                                                 <MenuItem Header="Quitar de la biblioteca"
                                                           Command="{Binding PlacementTarget.Tag.DeleteMediaCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                           CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>

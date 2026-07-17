@@ -55,4 +55,7 @@ public interface IPresentationService
 
     /// <summary>Sets the background layer; null clears it.</summary>
     void SetBackground(Media.MediaItem? background);
+
+    /// <summary>Hides the text so only the background shows (for image/video-only slides).</summary>
+    void ShowBackgroundOnly();
 }

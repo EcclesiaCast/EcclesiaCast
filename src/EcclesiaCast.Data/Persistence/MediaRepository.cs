@@ -20,6 +20,13 @@ public sealed class MediaRepository(string dbPath) : IMediaRepository
         return item;
     }
 
+    public void Update(MediaItem item)
+    {
+        using var db = new AppDbContext(dbPath);
+        db.MediaItems.Update(item);
+        db.SaveChanges();
+    }
+
     public void Delete(int id)
     {
         using var db = new AppDbContext(dbPath);

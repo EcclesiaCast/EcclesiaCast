@@ -2,6 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:EcclesiaCast.App.Controls"
+        xmlns:vlc="clr-namespace:LibVLCSharp.WPF;assembly=LibVLCSharp.WPF"
         Title="EcclesiaCast — Salida"
         WindowStyle="None"
         ResizeMode="NoResize"
@@ -11,10 +12,17 @@
         Topmost="True"
         Cursor="None"
         Background="Black">
-    <controls:ProjectedView Slide="{Binding Slide}"
-                            State="{Binding State}"
-                            Overlay="{Binding Overlay}"
-                            Highlight="{Binding Highlight}"
-                            BackgroundMedia="{Binding Background}"
-                            AnimateTransitions="True"/>
+    <!-- The WPF VideoView renders the video in its own airspace and overlays
+         its Content (image background + text) on top, avoiding the classic
+         WPF-over-native compositing problem. -->
+    <vlc:VideoView x:Name="Video" Background="Black">
+        <controls:ProjectedView x:Name="Projected"
+                                Slide="{Binding Slide}"
+                                State="{Binding State}"
+                                Overlay="{Binding Overlay}"
+                                Highlight="{Binding Highlight}"
+                                BackgroundMedia="{Binding Background}"
+                                IsLiveOutput="True"
+                                AnimateTransitions="True"/>
+    </vlc:VideoView>
 </Window>

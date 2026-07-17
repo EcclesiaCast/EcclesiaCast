@@ -8,5 +8,7 @@ public interface IMediaRepository
 
     MediaItem Add(MediaItem item);
 
+    void Update(MediaItem item);
+
     void Delete(int id);
 }

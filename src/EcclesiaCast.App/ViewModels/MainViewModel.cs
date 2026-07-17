@@ -38,6 +38,7 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly ISongDesigner _songDesigner;
     private readonly IQuickTextEditor _quickTextEditor;
     private readonly IMediaRepository _media;
+    private readonly IMediaInspector _mediaInspector;
 
     /// <summary>Copied slide (label + text + style) for paste/duplicate.</summary>
     private (string Label, string Text, string? StyleJson)? _clipboardSlide;
@@ -163,6 +164,7 @@ public sealed partial class MainViewModel : ObservableObject
         ISongDesigner songDesigner,
         IQuickTextEditor quickTextEditor,
         IMediaRepository media,
+        IMediaInspector mediaInspector,
         ProjectionViewModel projectionViewModel)
     {
         _displayProvider = displayProvider;
@@ -179,6 +181,7 @@ public sealed partial class MainViewModel : ObservableObject
         _songDesigner = songDesigner;
         _quickTextEditor = quickTextEditor;
         _media = media;
+        _mediaInspector = mediaInspector;
         Projection = projectionViewModel;
 
         _presentation.Changed += (_, _) => UpdateStateFlags();
@@ -191,9 +194,19 @@ public sealed partial class MainViewModel : ObservableObject
         LoadMedia();
     }
 
-    // ── Fondos (biblioteca de medios) ────────────────────────────
+    // ── Medios (biblioteca con tabs por categoría) ───────────────
 
+    /// <summary>All media, unfiltered; the bar shows the current tab's items.</summary>
+    private readonly List<MediaItem> _allMedia = [];
+
+    /// <summary>Items shown in the media bar (filtered by the current tab).</summary>
     public ObservableCollection<MediaItem> MediaItems { get; } = [];
+
+    /// <summary>The tabs across the media bar (categories).</summary>
+    public ObservableCollection<string> MediaTabs { get; } = [];
+
+    [ObservableProperty]
+    private string _selectedMediaTab = "Fondos";
 
     private static readonly HashSet<string> ImageExtensions =
         new(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png", ".bmp", ".webp", ".gif" };
@@ -202,9 +215,41 @@ public sealed partial class MainViewModel : ObservableObject
 
     private void LoadMedia()
     {
+        _allMedia.Clear();
+        _allMedia.AddRange(_media.GetAll());
+
+        var keepTab = SelectedMediaTab;
+        MediaTabs.Clear();
+        foreach (var tab in _allMedia.Select(m => m.Category)
+                     .Prepend("Fondos").Prepend("Anuncios")
+                     .Distinct(StringComparer.OrdinalIgnoreCase)
+                     .OrderBy(t => t == "Fondos" ? 0 : t == "Anuncios" ? 1 : 2))
+            MediaTabs.Add(tab);
+
+        SelectedMediaTab = MediaTabs.Contains(keepTab) ? keepTab : MediaTabs.FirstOrDefault() ?? "Fondos";
+        FilterMediaByTab();
+    }
+
+    partial void OnSelectedMediaTabChanged(string value) => FilterMediaByTab();
+
+    private void FilterMediaByTab()
+    {
         MediaItems.Clear();
-        foreach (var item in _media.GetAll())
+        foreach (var item in _allMedia.Where(m =>
+                     string.Equals(m.Category, SelectedMediaTab, StringComparison.OrdinalIgnoreCase)))
             MediaItems.Add(item);
+    }
+
+    [RelayCommand]
+    private void NewMediaTab()
+    {
+        var name = _textPrompt.Ask("Nueva pestaña", "Nombre de la pestaña (ej. Jóvenes):");
+        if (string.IsNullOrWhiteSpace(name))
+            return;
+        name = name.Trim();
+        if (!MediaTabs.Contains(name, StringComparer.OrdinalIgnoreCase))
+            MediaTabs.Add(name);
+        SelectedMediaTab = name;
     }
 
     [RelayCommand]
@@ -212,7 +257,7 @@ public sealed partial class MainViewModel : ObservableObject
     {
         var dialog = new Microsoft.Win32.OpenFileDialog
         {
-            Title = "Agregar fondos",
+            Title = $"Agregar a «{SelectedMediaTab}»",
             Filter = "Imágenes y videos|*.jpg;*.jpeg;*.png;*.bmp;*.webp;*.gif;*.mp4;*.mov;*.m4v;*.avi;*.mkv;*.wmv;*.webm"
                    + "|Imágenes|*.jpg;*.jpeg;*.png;*.bmp;*.webp;*.gif"
                    + "|Videos|*.mp4;*.mov;*.m4v;*.avi;*.mkv;*.wmv;*.webm",
@@ -231,8 +276,6 @@ public sealed partial class MainViewModel : ObservableObject
             if (type is null)
                 continue;
 
-            // A poster thumbnail for the bar and video previews (falls back to
-            // the image itself if the shell can't produce one).
             var thumbnail = ShellThumbnail.Save(path) ?? (type == MediaType.Image ? path : null);
 
             _media.Add(new MediaItem
@@ -241,14 +284,19 @@ public sealed partial class MainViewModel : ObservableObject
                 Path = path,
                 Type = type.Value,
                 ThumbnailPath = thumbnail,
+                Category = SelectedMediaTab,
+                // Videos with audio default to a foreground announcement; silent
+                // ones and images to a background — the operator can change it.
+                Behavior = MediaBehavior.Background,
             });
             added++;
         }
 
         LoadMedia();
-        StatusText = $"{added} fondo(s) agregado(s).";
+        StatusText = $"{added} medio(s) agregado(s) a «{SelectedMediaTab}».";
     }
 
+    /// <summary>Click a media: background layers behind the text, foreground takes the screen.</summary>
     [RelayCommand]
     private void ApplyBackground(MediaItem? item)
     {
@@ -256,12 +304,17 @@ public sealed partial class MainViewModel : ObservableObject
             return;
 
         _presentation.SetBackground(item);
+        if (item.Behavior == MediaBehavior.Foreground)
+            _presentation.ShowBackgroundOnly();
+
         if (SelectedDisplay is not null)
         {
             _projection.EnsureVisible(SelectedDisplay.Info);
             IsProjecting = true;
         }
-        StatusText = $"Fondo: {item.Name}.";
+        StatusText = item.Behavior == MediaBehavior.Foreground
+            ? $"Primer plano: {item.Name} (a pantalla completa)."
+            : $"Fondo: {item.Name}.";
     }
 
     [RelayCommand]
@@ -269,6 +322,39 @@ public sealed partial class MainViewModel : ObservableObject
     {
         _presentation.SetBackground(null);
         StatusText = "Fondo quitado.";
+    }
+
+    [RelayCommand]
+    private void InspectMedia(MediaItem? item)
+    {
+        if (item is null)
+            return;
+
+        if (_mediaInspector.Edit(item, MediaTabs.ToList()))
+        {
+            _media.Update(item);
+            LoadMedia();
+            if (_presentation.Background?.Id == item.Id)
+                _presentation.SetBackground(item); // re-aplica con las nuevas opciones
+            StatusText = $"«{item.Name}» actualizado.";
+        }
+    }
+
+    [RelayCommand]
+    private void OpenMediaLocation(MediaItem? item)
+    {
+        if (item is null || !File.Exists(item.Path))
+        {
+            StatusText = "No se encuentra el archivo.";
+            return;
+        }
+
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = "explorer.exe",
+            Arguments = $"/select,\"{item.Path}\"",
+            UseShellExecute = true,
+        });
     }
 
     [RelayCommand]
