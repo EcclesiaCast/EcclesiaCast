@@ -659,6 +659,7 @@
                                                     CommandParameter="{Binding}"
                                                     Cursor="Hand"
                                                     Tag="{Binding DataContext, ElementName=SlideGrid}"
+                                                    ContextMenuOpening="SlideCard_ContextMenuOpening"
                                                     ToolTip="Clic: proyectar · Clic derecho: más opciones">
                                                 <Button.ContextMenu>
                                                     <ContextMenu>

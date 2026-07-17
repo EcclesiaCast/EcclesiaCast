@@ -84,6 +84,9 @@ public sealed class SlideTheme
     public string BackgroundColor { get; set; } = "#10141E";
     public string? BackgroundImagePath { get; set; }
 
+    /// <summary>No solid fill: lets whatever is behind (a video/image layer) show through.</summary>
+    public bool TransparentBackground { get; set; }
+
     /// <summary>0–1: black layer over the background to keep text readable.</summary>
     public double BackgroundDim { get; set; }
 

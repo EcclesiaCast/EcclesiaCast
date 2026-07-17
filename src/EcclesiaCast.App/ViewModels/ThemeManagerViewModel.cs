@@ -29,6 +29,9 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     [ObservableProperty]
     private string _defaultsText = string.Empty;
 
+    [ObservableProperty]
+    private string _statusText = string.Empty;
+
     /// <summary>True if anything was saved, deleted, or set as default.</summary>
     public bool ChangesMade { get; private set; }
 
@@ -57,6 +60,7 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     [ObservableProperty] private double _boxHeight = 920;
     [ObservableProperty] private bool _fitToWidth;
     [ObservableProperty] private string _backgroundColor = "#10141E";
+    [ObservableProperty] private bool _transparentBackground;
     [ObservableProperty] private string? _backgroundImagePath;
     [ObservableProperty] private double _backgroundDimPercent;         // 0–100
     [ObservableProperty] private bool _showCaption = true;
@@ -78,7 +82,8 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
 
         // Cualquier cambio de campo refresca la vista previa en vivo.
         if (!_loading
-            && e.PropertyName is not (nameof(PreviewSlide) or nameof(SelectedTheme) or nameof(DefaultsText) or nameof(IsBibleKind)))
+            && e.PropertyName is not (nameof(PreviewSlide) or nameof(SelectedTheme) or nameof(DefaultsText)
+                or nameof(IsBibleKind) or nameof(StatusText)))
             UpdatePreview();
 
         if (e.PropertyName == nameof(KindIndex))
@@ -127,6 +132,7 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         FitToWidth = theme.FitToWidth;
 
         BackgroundColor = theme.BackgroundColor;
+        TransparentBackground = theme.TransparentBackground;
         BackgroundImagePath = theme.BackgroundImagePath;
         BackgroundDimPercent = theme.BackgroundDim * 100;
         ShowCaption = theme.ShowCaption;
@@ -161,6 +167,7 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         BoxHeight = BoxHeight,
         FitToWidth = FitToWidth,
         BackgroundColor = BackgroundColor,
+        TransparentBackground = TransparentBackground,
         BackgroundImagePath = string.IsNullOrWhiteSpace(BackgroundImagePath) ? null : BackgroundImagePath,
         BackgroundDim = Math.Clamp(BackgroundDimPercent / 100, 0, 1),
         ShowCaption = ShowCaption,
@@ -208,6 +215,7 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         var saved = _themes.Save(BuildTheme(SelectedTheme.Id));
         ChangesMade = true;
         LoadThemes(saved.Id);
+        StatusText = $"✓ \"{saved.Name}\" guardado.";
     }
 
     [RelayCommand]

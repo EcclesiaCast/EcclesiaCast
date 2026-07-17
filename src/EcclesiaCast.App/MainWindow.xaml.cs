@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 using EcclesiaCast.App.ViewModels;
+using EcclesiaCast.Core.Presentation;
 
 namespace EcclesiaCast.App;
 
@@ -40,6 +41,13 @@ public partial class MainWindow : Window
                     ChaptersScroll.ScrollToTop();
             };
         };
+    }
+
+    // Bible slides have no per-slide actions, so suppress their context menu.
+    private void SlideCard_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: SlideItemViewModel { SectionId: 0 } })
+            e.Handled = true;
     }
 
     private void ScrollSlideIntoView(int index)

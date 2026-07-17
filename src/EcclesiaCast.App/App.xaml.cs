@@ -20,6 +20,10 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
+        // Dark title bar for every window (main and dialogs).
+        EventManager.RegisterClassHandler(typeof(Window), Window.LoadedEvent,
+            new RoutedEventHandler((s, _) => DarkTitleBar.Apply((Window)s)));
+
         var appDataDir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "EcclesiaCast");

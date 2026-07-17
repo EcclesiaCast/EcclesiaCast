@@ -365,9 +365,11 @@ public partial class SongDesignerWindow : Window
             return;
         }
 
-        // Don't start a drag when grabbing the resize handle.
+        // Don't start a drag when grabbing a resize handle.
         if (e.OriginalSource is System.Windows.Controls.Primitives.Thumb)
             return;
+
+        BoxBorder.Focus(); // habilita el ajuste fino con flechas
         _dragging = true;
         var p = e.GetPosition(Overlay);
         _dragOffset = new Point(p.X - Canvas.GetLeft(BoxBorder), p.Y - Canvas.GetTop(BoxBorder));
@@ -393,14 +395,44 @@ public partial class SongDesignerWindow : Window
         CommitBox();
     }
 
-    private void BoxResize_DragDelta(object sender, DragDeltaEventArgs e)
+    private void Handle_DragDelta(object sender, DragDeltaEventArgs e)
     {
-        var maxW = CanvasW - Canvas.GetLeft(BoxBorder);
-        var maxH = CanvasH - Canvas.GetTop(BoxBorder);
-        BoxBorder.Width = Math.Clamp(BoxBorder.Width + e.HorizontalChange, 60, maxW);
-        BoxBorder.Height = Math.Clamp(BoxBorder.Height + e.VerticalChange, 40, maxH);
+        if (sender is not FrameworkElement { Tag: string handle })
+            return;
+
+        var (x, y, w, h) = BoxGeometry.Resize(handle,
+            Canvas.GetLeft(BoxBorder), Canvas.GetTop(BoxBorder), BoxBorder.Width, BoxBorder.Height,
+            e.HorizontalChange, e.VerticalChange, CanvasW, CanvasH);
+
+        Canvas.SetLeft(BoxBorder, x);
+        Canvas.SetTop(BoxBorder, y);
+        BoxBorder.Width = w;
+        BoxBorder.Height = h;
         UpdateBoxInfo();
         CommitBox();
+    }
+
+    private void Box_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (_editing)
+            return;
+
+        var step = (Keyboard.Modifiers & ModifierKeys.Control) != 0 ? 1 : 4;
+        double dx = 0, dy = 0;
+        switch (e.Key)
+        {
+            case Key.Left: dx = -step; break;
+            case Key.Right: dx = step; break;
+            case Key.Up: dy = -step; break;
+            case Key.Down: dy = step; break;
+            default: return;
+        }
+
+        Canvas.SetLeft(BoxBorder, Math.Clamp(Canvas.GetLeft(BoxBorder) + dx, 0, CanvasW - BoxBorder.Width));
+        Canvas.SetTop(BoxBorder, Math.Clamp(Canvas.GetTop(BoxBorder) + dy, 0, CanvasH - BoxBorder.Height));
+        UpdateBoxInfo();
+        CommitBox();
+        e.Handled = true;
     }
 
     private void UpdateBoxInfo()

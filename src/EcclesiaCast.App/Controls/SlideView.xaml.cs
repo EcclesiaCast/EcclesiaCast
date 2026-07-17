@@ -124,7 +124,9 @@ public partial class SlideView : UserControl
     {
         var theme = CurrentTheme;
 
-        RootCanvas.Background = BrushFromHex(theme.BackgroundColor, "#10141E");
+        RootCanvas.Background = theme.TransparentBackground
+            ? Brushes.Transparent
+            : BrushFromHex(theme.BackgroundColor, "#10141E");
         ApplyBackgroundImage(theme.BackgroundImagePath);
         DimLayer.Opacity = Math.Clamp(theme.BackgroundDim, 0, 1);
 

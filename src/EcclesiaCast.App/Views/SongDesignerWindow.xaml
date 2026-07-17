@@ -176,10 +176,12 @@
                                 <Border x:Name="BoxBorder"
                                         BorderBrush="{StaticResource AccentBrush}" BorderThickness="1.5"
                                         Background="#11FFFFFF" Cursor="SizeAll"
+                                        Focusable="True"
                                         MouseLeftButtonDown="Box_MouseDown"
                                         MouseMove="Box_MouseMove"
                                         MouseLeftButtonUp="Box_MouseUp"
-                                        ToolTip="Doble clic para escribir sobre la diapositiva">
+                                        PreviewKeyDown="Box_KeyDown"
+                                        ToolTip="Doble clic para escribir · flechas para ajustar fino">
                                     <Grid>
                                         <TextBox x:Name="InlineEditor"
                                                  Visibility="Collapsed"
@@ -188,15 +190,22 @@
                                                  Foreground="White" CaretBrush="White"
                                                  LostFocus="InlineEditor_LostFocus"
                                                  PreviewKeyDown="InlineEditor_KeyDown"/>
-                                        <Thumb x:Name="BoxResize" Width="16" Height="16"
-                                               HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                                               Cursor="SizeNWSE" DragDelta="BoxResize_DragDelta">
-                                            <Thumb.Template>
-                                                <ControlTemplate TargetType="Thumb">
-                                                    <Border Background="{StaticResource AccentBrush}" CornerRadius="3"/>
-                                                </ControlTemplate>
-                                            </Thumb.Template>
-                                        </Thumb>
+                                        <Thumb Style="{StaticResource BoxHandle}" Tag="NW" Cursor="SizeNWSE"
+                                               HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-6" DragDelta="Handle_DragDelta"/>
+                                        <Thumb Style="{StaticResource BoxHandle}" Tag="N" Cursor="SizeNS"
+                                               HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-6,0,0" DragDelta="Handle_DragDelta"/>
+                                        <Thumb Style="{StaticResource BoxHandle}" Tag="NE" Cursor="SizeNESW"
+                                               HorizontalAlignment="Right" VerticalAlignment="Top" Margin="-6" DragDelta="Handle_DragDelta"/>
+                                        <Thumb Style="{StaticResource BoxHandle}" Tag="W" Cursor="SizeWE"
+                                               HorizontalAlignment="Left" VerticalAlignment="Center" Margin="-6,0,0,0" DragDelta="Handle_DragDelta"/>
+                                        <Thumb Style="{StaticResource BoxHandle}" Tag="E" Cursor="SizeWE"
+                                               HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,-6,0" DragDelta="Handle_DragDelta"/>
+                                        <Thumb Style="{StaticResource BoxHandle}" Tag="SW" Cursor="SizeNESW"
+                                               HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="-6" DragDelta="Handle_DragDelta"/>
+                                        <Thumb Style="{StaticResource BoxHandle}" Tag="S" Cursor="SizeNS"
+                                               HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,-6" DragDelta="Handle_DragDelta"/>
+                                        <Thumb Style="{StaticResource BoxHandle}" Tag="SE" Cursor="SizeNWSE"
+                                               HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="-6" DragDelta="Handle_DragDelta"/>
                                     </Grid>
                                 </Border>
                             </Canvas>
