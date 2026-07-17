@@ -108,7 +108,6 @@ public partial class SongDesignerWindow : Window
     {
         _loading = true;
 
-        TextEditor.Text = _texts[Selected];
         FontCombo.Text = over.FontFamily ?? _theme.FontFamily;
         SizeSlider.Value = over.FontSize ?? _theme.MaxFontSize;
         BoldToggle.IsChecked = over.Bold ?? _theme.Bold;
@@ -119,6 +118,7 @@ public partial class SongDesignerWindow : Window
         ColorBox.Text = over.TextColor ?? _theme.TextColor;
         CaseCombo.SelectedIndex = (int)(over.Case ?? (_theme.Uppercase ? TextCase.Upper : TextCase.None));
         LineSlider.Value = over.LineSpacing is > 0 ? over.LineSpacing.Value : 1;
+        FitWidthCheck.IsChecked = over.FitToWidth ?? _theme.FitToWidth;
 
         var alignH = over.AlignH ?? _theme.AlignH;
         HLeft.IsChecked = alignH == HAlign.Left;
@@ -164,6 +164,7 @@ public partial class SongDesignerWindow : Window
             AlignV = alignV,
             Case = (TextCase)Math.Clamp(CaseCombo.SelectedIndex, 0, 3),
             LineSpacing = LineSlider.Value,
+            FitToWidth = FitWidthCheck.IsChecked == true,
         };
 
         RefreshSelected();
@@ -190,14 +191,6 @@ public partial class SongDesignerWindow : Window
         {
             ColorSwatch.Background = Brushes.White;
         }
-    }
-
-    private void TextEditor_Changed(object sender, TextChangedEventArgs e)
-    {
-        if (_loading || Selected < 0)
-            return;
-        _texts[Selected] = TextEditor.Text;
-        RefreshSelected();
     }
 
     // ── Edición del texto sobre la propia diapositiva ────────────
@@ -251,13 +244,6 @@ public partial class SongDesignerWindow : Window
         {
             _texts[index] = InlineEditor.Text;
             _thumbs[index].Slide = BuildSlide(index);
-
-            if (Selected == index)
-            {
-                _loading = true;
-                TextEditor.Text = _texts[index];
-                _loading = false;
-            }
         }
 
         RefreshSelected();
@@ -533,6 +519,7 @@ public partial class SongDesignerWindow : Window
             AlignV = over.AlignV == _theme.AlignV ? null : over.AlignV,
             Case = over.Case == (_theme.Uppercase ? TextCase.Upper : TextCase.None) ? null : over.Case,
             LineSpacing = over.LineSpacing is double ls && Math.Abs(ls - 1) < 0.01 ? null : over.LineSpacing,
+            FitToWidth = over.FitToWidth == _theme.FitToWidth ? null : over.FitToWidth,
         };
 
         return result.IsEmpty ? null : result;

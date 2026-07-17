@@ -107,11 +107,33 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Vista previa -->
+            <!-- Vista previa con caja arrastrable -->
             <Border Grid.Row="0" Background="#0B0D12" CornerRadius="6"
                     BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
-                    Height="250" Margin="0,0,0,10">
-                <controls:SlideView Slide="{Binding PreviewSlide}"/>
+                    Height="280" Margin="0,0,0,10">
+                <Viewbox Stretch="Uniform" Margin="6">
+                    <Grid Width="960" Height="540" ClipToBounds="True">
+                        <controls:SlideView Slide="{Binding PreviewSlide}"/>
+                        <Canvas x:Name="Overlay" Background="Transparent">
+                            <Border x:Name="BoxBorder"
+                                    BorderBrush="{StaticResource AccentBrush}" BorderThickness="1.5"
+                                    Background="#11FFFFFF" Cursor="SizeAll"
+                                    MouseLeftButtonDown="Box_MouseDown"
+                                    MouseMove="Box_MouseMove"
+                                    MouseLeftButtonUp="Box_MouseUp">
+                                <Thumb x:Name="BoxResize" Width="18" Height="18"
+                                       HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                       Cursor="SizeNWSE" DragDelta="BoxResize_DragDelta">
+                                    <Thumb.Template>
+                                        <ControlTemplate TargetType="Thumb">
+                                            <Border Background="{StaticResource AccentBrush}" CornerRadius="3"/>
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                </Thumb>
+                            </Border>
+                        </Canvas>
+                    </Grid>
+                </Viewbox>
             </Border>
 
             <!-- Campos -->
@@ -178,17 +200,13 @@
                         </ComboBox>
                     </StackPanel>
 
-                    <!-- Columna derecha: lienzo y leyenda -->
+                    <!-- Columna derecha: fondo y leyenda -->
                     <StackPanel Grid.Column="2">
-                        <TextBlock Style="{StaticResource FieldLabel}">
-                            <Run Text="Margen horizontal: "/><Run Text="{Binding MarginHorizontal, StringFormat={}{0:0} px}"/>
-                        </TextBlock>
-                        <Slider Minimum="0" Maximum="500" Value="{Binding MarginHorizontal}"/>
-
-                        <TextBlock Style="{StaticResource FieldLabel}">
-                            <Run Text="Margen vertical: "/><Run Text="{Binding MarginVertical, StringFormat={}{0:0} px}"/>
-                        </TextBlock>
-                        <Slider Minimum="0" Maximum="400" Value="{Binding MarginVertical}"/>
+                        <CheckBox Content="Ajustar a una línea" IsChecked="{Binding FitToWidth}" Margin="0,10,0,0"
+                                  ToolTip="Achica el texto hasta que cada renglón entre en una sola línea"/>
+                        <TextBlock Text="La caja de texto se ajusta arrastrándola en la vista previa de arriba."
+                                   FontSize="11" Foreground="{StaticResource FaintBrush}"
+                                   TextWrapping="Wrap" Margin="0,8,0,0"/>
 
                         <TextBlock Text="Color de fondo" Style="{StaticResource FieldLabel}"/>
                         <DockPanel>

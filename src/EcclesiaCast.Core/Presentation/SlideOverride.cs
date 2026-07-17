@@ -24,7 +24,8 @@ public sealed record SlideOverride(
     HAlign? AlignH = null,
     VAlign? AlignV = null,
     TextCase? Case = null,
-    double? LineSpacing = null)
+    double? LineSpacing = null,
+    bool? FitToWidth = null)
 {
     public bool HasBox => BoxX is not null && BoxY is not null && BoxWidth is not null && BoxHeight is not null;
 

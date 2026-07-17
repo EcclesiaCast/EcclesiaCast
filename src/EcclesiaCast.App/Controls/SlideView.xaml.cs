@@ -104,6 +104,7 @@ public partial class SlideView : UserControl
     private HAlign EffectiveAlignH => Slide?.Override?.AlignH ?? CurrentTheme.AlignH;
     private VAlign EffectiveAlignV => Slide?.Override?.AlignV ?? CurrentTheme.AlignV;
     private double? EffectiveLineSpacing => Slide?.Override?.LineSpacing;
+    private bool EffectiveFitToWidth => Slide?.Override?.FitToWidth ?? CurrentTheme.FitToWidth;
 
     private TextCase EffectiveCase =>
         Slide?.Override?.Case ?? (CurrentTheme.Uppercase ? TextCase.Upper : TextCase.None);
@@ -252,12 +253,18 @@ public partial class SlideView : UserControl
         var theme = CurrentTheme;
         var over = Slide?.Override;
 
-        if (over?.HasBox == true)
+        // Per-slide box wins; then the theme's default box; then margins.
+        double? bx = over?.BoxX ?? theme.BoxX;
+        double? by = over?.BoxY ?? theme.BoxY;
+        double? bw = over?.BoxWidth ?? theme.BoxWidth;
+        double? bh = over?.BoxHeight ?? theme.BoxHeight;
+
+        if (bx is not null && by is not null && bw is not null && bh is not null)
         {
-            var x = Math.Clamp(over.BoxX!.Value, 0, CanvasWidth - 100);
-            var y = Math.Clamp(over.BoxY!.Value, 0, CanvasHeight - 60);
-            var w = Math.Clamp(over.BoxWidth!.Value, 100, CanvasWidth - x);
-            var h = Math.Clamp(over.BoxHeight!.Value, 60, CanvasHeight - y);
+            var x = Math.Clamp(bx.Value, 0, CanvasWidth - 100);
+            var y = Math.Clamp(by.Value, 0, CanvasHeight - 60);
+            var w = Math.Clamp(bw.Value, 100, CanvasWidth - x);
+            var h = Math.Clamp(bh.Value, 60, CanvasHeight - y);
             return (new Thickness(x, y, CanvasWidth - x - w, CanvasHeight - y - h), w, h);
         }
 
@@ -288,6 +295,11 @@ public partial class SlideView : UserControl
         var hasCaption = !string.IsNullOrEmpty(Slide?.Caption);
         var (margin, areaWidth, areaHeight) = ComputeTextArea(hasCaption);
         TextLayer.Margin = margin;
+
+        // "Fit to width" keeps each written line unbroken; otherwise wrap.
+        var wrapping = EffectiveFitToWidth ? TextWrapping.NoWrap : TextWrapping.Wrap;
+        MainText.TextWrapping = wrapping;
+        SecondaryText.TextWrapping = wrapping;
 
         var fontSize = FitFontSize(main, secondary, theme, areaWidth, areaHeight);
         MainText.FontSize = fontSize;
@@ -359,25 +371,51 @@ public partial class SlideView : UserControl
         if (string.IsNullOrEmpty(main))
             return maxSize;
 
-        var minSize = Math.Min(theme.MinFontSize, maxSize);
+        // Fit-to-width can shrink well below the theme minimum, since its
+        // whole point is to keep long lines unbroken.
+        var minSize = EffectiveFitToWidth ? 8 : Math.Min(theme.MinFontSize, maxSize);
 
-        for (var size = maxSize; size >= minSize; size -= 3)
+        for (var size = maxSize; size >= minSize; size -= 2)
         {
-            var total = MeasureHeight(main, size, theme, width);
-            if (!string.IsNullOrEmpty(secondary))
-                total += SecondarySpacing + MeasureHeight(secondary, size * SecondaryRatio, theme, width);
+            var fits = EffectiveFitToWidth
+                ? WidestLine(main, size, theme) <= width && MeasureHeight(main, size, theme, width) <= height
+                : MeasureHeight(main, size, theme, width) <= height;
 
-            if (total <= height)
+            if (fits && !string.IsNullOrEmpty(secondary))
+            {
+                var secondarySize = size * SecondaryRatio;
+                fits = MeasureHeight(secondary, secondarySize, theme, width) + SecondarySpacing
+                    <= height - MeasureHeight(main, size, theme, width);
+                if (EffectiveFitToWidth)
+                    fits = fits && WidestLine(secondary, secondarySize, theme) <= width;
+            }
+
+            if (fits)
                 return size;
         }
 
         return minSize;
     }
 
-    private double MeasureHeight(string text, double fontSize, SlideTheme theme, double maxWidth)
+    /// <summary>Width of the longest line (split on hard breaks) at a given size, unwrapped.</summary>
+    private double WidestLine(string text, double fontSize, SlideTheme theme)
+    {
+        var widest = 0d;
+        foreach (var line in text.Split('\n'))
+        {
+            var formatted = FormatLine(line.Length == 0 ? " " : line, fontSize, theme, double.PositiveInfinity);
+            widest = Math.Max(widest, formatted.WidthIncludingTrailingWhitespace);
+        }
+        return widest;
+    }
+
+    private double MeasureHeight(string text, double fontSize, SlideTheme theme, double maxWidth) =>
+        FormatLine(text, fontSize, theme, maxWidth).Height;
+
+    private FormattedText FormatLine(string text, double fontSize, SlideTheme theme, double maxWidth)
     {
         var typeface = new Typeface(
-            new FontFamily(theme.FontFamily),
+            new FontFamily(EffectiveFontFamily),
             EffectiveItalic ? FontStyles.Italic : FontStyles.Normal,
             EffectiveBold ? FontWeights.SemiBold : FontWeights.Normal,
             FontStretches.Normal);
@@ -389,12 +427,12 @@ public partial class SlideView : UserControl
             typeface,
             fontSize,
             Brushes.White,
-            VisualTreeHelper.GetDpi(this).PixelsPerDip)
-        {
-            MaxTextWidth = maxWidth,
-        };
+            VisualTreeHelper.GetDpi(this).PixelsPerDip);
 
-        return formatted.Height;
+        if (!double.IsPositiveInfinity(maxWidth))
+            formatted.MaxTextWidth = maxWidth;
+
+        return formatted;
     }
 
     private void RenderWithHighlight(TextBlock target, string? text)

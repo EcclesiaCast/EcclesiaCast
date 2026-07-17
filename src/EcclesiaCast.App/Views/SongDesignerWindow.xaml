@@ -147,20 +147,6 @@
                            FontSize="11" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap"/>
             </Border>
 
-            <!-- Texto editable de la diapositiva -->
-            <Border DockPanel.Dock="Bottom" Style="{StaticResource Panel}" Padding="8" Margin="0,8,0,0">
-                <DockPanel>
-                    <TextBlock DockPanel.Dock="Top" Text="TEXTO DE LA DIAPOSITIVA" Style="{StaticResource PanelTitle}" Margin="2,0,0,4"/>
-                    <TextBox x:Name="TextEditor" Height="70"
-                             AcceptsReturn="True" TextWrapping="Wrap"
-                             VerticalScrollBarVisibility="Auto"
-                             Background="{StaticResource SurfaceAltBrush}" Foreground="White"
-                             BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
-                             Padding="8,6" FontSize="14"
-                             TextChanged="TextEditor_Changed"/>
-                </DockPanel>
-            </Border>
-
             <!-- Barra de zoom -->
             <Border DockPanel.Dock="Bottom" Padding="0,6,0,0">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
@@ -292,6 +278,9 @@
 
                                 <CheckBox x:Name="ShadowCheck" Content="Sombra" Margin="0,12,0,0"
                                           Checked="Style_Changed" Unchecked="Style_Changed"/>
+                                <CheckBox x:Name="FitWidthCheck" Content="Ajustar a una línea" Margin="0,4,0,0"
+                                          Checked="Style_Changed" Unchecked="Style_Changed"
+                                          ToolTip="Achica el texto hasta que cada renglón entre en una sola línea"/>
                             </StackPanel>
                         </ScrollViewer>
                     </TabItem>

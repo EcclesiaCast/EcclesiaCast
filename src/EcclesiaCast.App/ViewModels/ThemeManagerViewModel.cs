@@ -51,6 +51,11 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     [ObservableProperty] private int _alignVIndex = 1;                 // 0 Arriba · 1 Centro · 2 Abajo
     [ObservableProperty] private double _marginHorizontal = 110;
     [ObservableProperty] private double _marginVertical = 80;
+    [ObservableProperty] private double _boxX = 110;
+    [ObservableProperty] private double _boxY = 80;
+    [ObservableProperty] private double _boxWidth = 1700;
+    [ObservableProperty] private double _boxHeight = 920;
+    [ObservableProperty] private bool _fitToWidth;
     [ObservableProperty] private string _backgroundColor = "#10141E";
     [ObservableProperty] private string? _backgroundImagePath;
     [ObservableProperty] private double _backgroundDimPercent;         // 0–100
@@ -113,6 +118,14 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         AlignVIndex = (int)theme.AlignV;
         MarginHorizontal = theme.MarginHorizontal;
         MarginVertical = theme.MarginVertical;
+
+        // Use the theme's box if it has one; otherwise derive it from the margins.
+        BoxX = theme.BoxX ?? theme.MarginHorizontal;
+        BoxY = theme.BoxY ?? theme.MarginVertical;
+        BoxWidth = theme.BoxWidth ?? (1920 - 2 * theme.MarginHorizontal);
+        BoxHeight = theme.BoxHeight ?? (1080 - 2 * theme.MarginVertical);
+        FitToWidth = theme.FitToWidth;
+
         BackgroundColor = theme.BackgroundColor;
         BackgroundImagePath = theme.BackgroundImagePath;
         BackgroundDimPercent = theme.BackgroundDim * 100;
@@ -142,6 +155,11 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         AlignV = (VAlign)Math.Clamp(AlignVIndex, 0, 2),
         MarginHorizontal = MarginHorizontal,
         MarginVertical = MarginVertical,
+        BoxX = BoxX,
+        BoxY = BoxY,
+        BoxWidth = BoxWidth,
+        BoxHeight = BoxHeight,
+        FitToWidth = FitToWidth,
         BackgroundColor = BackgroundColor,
         BackgroundImagePath = string.IsNullOrWhiteSpace(BackgroundImagePath) ? null : BackgroundImagePath,
         BackgroundDim = Math.Clamp(BackgroundDimPercent / 100, 0, 1),

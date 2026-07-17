@@ -70,6 +70,16 @@ public sealed class SlideTheme
     public double MarginHorizontal { get; set; } = 110;
     public double MarginVertical { get; set; } = 80;
 
+    // ── Caja de texto por defecto (px sobre 1920×1080) ───────────
+    // Si está definida, reemplaza a los márgenes como área de texto.
+    public double? BoxX { get; set; }
+    public double? BoxY { get; set; }
+    public double? BoxWidth { get; set; }
+    public double? BoxHeight { get; set; }
+
+    /// <summary>Achicar el texto hasta que ningún renglón se parta en dos líneas.</summary>
+    public bool FitToWidth { get; set; }
+
     // ── Fondo ────────────────────────────────────────────────────
     public string BackgroundColor { get; set; } = "#10141E";
     public string? BackgroundImagePath { get; set; }
