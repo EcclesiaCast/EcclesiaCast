@@ -304,7 +304,13 @@ public sealed partial class MainViewModel : ObservableObject
             return;
 
         _presentation.SetBackground(item);
-        if (item.Behavior == MediaBehavior.Foreground)
+
+        // Foreground = the media alone (no text). Background with no live slide
+        // also shows alone; Black/Logo would hide it, so drop back to showing
+        // the media immediately.
+        if (item.Behavior == MediaBehavior.Foreground
+            || _presentation.CurrentSlide is null
+            || _presentation.State is OutputState.Black or OutputState.Logo)
             _presentation.ShowBackgroundOnly();
 
         if (SelectedDisplay is not null)

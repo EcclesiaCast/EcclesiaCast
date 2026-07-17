@@ -1,0 +1,8 @@
+<UserControl x:Class="EcclesiaCast.App.Controls.VlcVideoSurface"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- The decoded video frames are written into a WriteableBitmap, so the
+         text (a normal WPF layer above) composites cleanly on top — no
+         native/WPF airspace problem. -->
+    <Image x:Name="Surface" Stretch="UniformToFill"/>
+</UserControl>
