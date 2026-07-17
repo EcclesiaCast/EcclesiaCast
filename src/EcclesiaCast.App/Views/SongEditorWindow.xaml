@@ -13,6 +13,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -47,13 +48,20 @@
             </StackPanel>
         </Grid>
 
-        <TextBlock Grid.Row="2" Text="Letra *" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,16,0,4"/>
-        <TextBlock Grid.Row="3"
+        <StackPanel Grid.Row="2" Margin="0,12,0,0" x:Name="ThemeRow">
+            <TextBlock Text="Tema de proyección" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,4"/>
+            <ComboBox x:Name="ThemeCombo" FontSize="13"
+                      DisplayMemberPath="Label"
+                      ToolTip="Cada canción puede tener su propio tema; '(Tema por defecto)' usa el global"/>
+        </StackPanel>
+
+        <TextBlock Grid.Row="3" Text="Letra *" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,16,0,4"/>
+        <TextBlock Grid.Row="4"
                    FontSize="11" Foreground="{StaticResource FaintBrush}"
                    TextWrapping="Wrap" Margin="0,0,0,6"
                    Text="Cada párrafo es una diapositiva: separá las diapositivas con una línea en blanco. Opcional: una línea [Coro] o [Verso 1] no se proyecta, solo le pone nombre a los párrafos que siguen."/>
 
-        <TextBox Grid.Row="4"
+        <TextBox Grid.Row="5"
                  x:Name="LyricsBox"
                  AcceptsReturn="True" TextWrapping="Wrap"
                  VerticalScrollBarVisibility="Auto"
@@ -61,7 +69,7 @@
                  BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
                  Padding="10,8" FontSize="14"/>
 
-        <DockPanel Grid.Row="5" Margin="0,16,0,0">
+        <DockPanel Grid.Row="6" Margin="0,16,0,0">
             <TextBlock x:Name="ErrorText"
                        Foreground="#E08A8A" FontSize="12"
                        VerticalAlignment="Center"/>

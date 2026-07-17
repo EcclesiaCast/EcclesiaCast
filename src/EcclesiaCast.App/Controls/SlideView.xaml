@@ -4,21 +4,21 @@
     <!-- Renders at a fixed virtual 1920×1080 and scales uniformly, so the
          projector output and the small preview boxes look identical. -->
     <Viewbox Stretch="Uniform">
-        <Grid Width="1920" Height="1080" Background="#10141E">
+        <Grid x:Name="RootCanvas" Width="1920" Height="1080" Background="#10141E">
+
+            <!-- Fondo: imagen opcional + oscurecedor -->
+            <Image x:Name="BackgroundImage" Stretch="UniformToFill" Visibility="Collapsed"/>
+            <Rectangle x:Name="DimLayer" Fill="Black" Opacity="0" IsHitTestVisible="False"/>
 
             <!-- Capa de texto -->
             <Grid x:Name="TextLayer" Margin="110,80">
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel x:Name="TextStack" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <TextBlock x:Name="MainText"
                                FontFamily="Segoe UI"
                                FontSize="92" FontWeight="SemiBold"
                                Foreground="White"
                                TextWrapping="Wrap" TextAlignment="Center"
-                               HorizontalAlignment="Center">
-                        <TextBlock.Effect>
-                            <DropShadowEffect BlurRadius="18" ShadowDepth="3" Opacity="0.75"/>
-                        </TextBlock.Effect>
-                    </TextBlock>
+                               HorizontalAlignment="Center"/>
                     <!-- Segunda versión bíblica, cuando hay dos seleccionadas -->
                     <TextBlock x:Name="SecondaryText"
                                FontFamily="Segoe UI"
@@ -26,23 +26,15 @@
                                Foreground="#C9D4E8"
                                TextWrapping="Wrap" TextAlignment="Center"
                                HorizontalAlignment="Center"
-                               Margin="0,54,0,0"
-                               Visibility="Collapsed">
-                        <TextBlock.Effect>
-                            <DropShadowEffect BlurRadius="14" ShadowDepth="2" Opacity="0.75"/>
-                        </TextBlock.Effect>
-                    </TextBlock>
+                               Margin="0,50,0,0"
+                               Visibility="Collapsed"/>
                 </StackPanel>
                 <TextBlock x:Name="CaptionText"
                            FontFamily="Segoe UI"
                            FontSize="40"
                            Foreground="#B9C6DE"
                            HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                           Visibility="Collapsed">
-                    <TextBlock.Effect>
-                        <DropShadowEffect BlurRadius="12" ShadowDepth="2" Opacity="0.75"/>
-                    </TextBlock.Effect>
-                </TextBlock>
+                           Visibility="Collapsed"/>
             </Grid>
 
             <!-- Capa de logo -->

@@ -10,6 +10,8 @@ using EcclesiaCast.Core.Bible;
 using EcclesiaCast.Core.Displays;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Core.Songs;
+using EcclesiaCast.Core.Themes;
+using EcclesiaCast.Data.Persistence;
 using Serilog;
 
 namespace EcclesiaCast.App.ViewModels;
@@ -30,6 +32,8 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly IBibleRepository _bibles;
     private readonly IBibleImportDialog _bibleImportDialog;
     private readonly ITextPrompt _textPrompt;
+    private readonly IThemeRepository _themes;
+    private readonly IThemeManagerDialog _themeManager;
 
     /// <summary>What the projector is showing; the Live box binds to it.</summary>
     public ProjectionViewModel Projection { get; }
@@ -147,6 +151,8 @@ public sealed partial class MainViewModel : ObservableObject
         IBibleRepository bibles,
         IBibleImportDialog bibleImportDialog,
         ITextPrompt textPrompt,
+        IThemeRepository themes,
+        IThemeManagerDialog themeManager,
         ProjectionViewModel projectionViewModel)
     {
         _displayProvider = displayProvider;
@@ -158,6 +164,8 @@ public sealed partial class MainViewModel : ObservableObject
         _bibles = bibles;
         _bibleImportDialog = bibleImportDialog;
         _textPrompt = textPrompt;
+        _themes = themes;
+        _themeManager = themeManager;
         Projection = projectionViewModel;
 
         _presentation.Changed += (_, _) => UpdateStateFlags();
@@ -190,6 +198,55 @@ public sealed partial class MainViewModel : ObservableObject
             Displays.FirstOrDefault(o => o.Info.DeviceName == saved)
             ?? Displays.FirstOrDefault(o => !o.Info.IsPrimary)
             ?? Displays.FirstOrDefault();
+    }
+
+    // ── Temas ────────────────────────────────────────────────────
+
+    private SlideTheme DefaultSongTheme =>
+        Resolve(ThemeSeeder.GetDefaultId(_settings, ThemeSeeder.DefaultSongThemeKey));
+
+    private SlideTheme DefaultBibleTheme =>
+        Resolve(ThemeSeeder.GetDefaultId(_settings, ThemeSeeder.DefaultBibleThemeKey));
+
+    private SlideTheme Resolve(int? themeId) =>
+        (themeId is int id ? _themes.Get(id) : null) ?? SlideTheme.Fallback;
+
+    private SlideTheme ResolveSongTheme(Song song) =>
+        song.ThemeId is int id ? _themes.Get(id) ?? DefaultSongTheme : DefaultSongTheme;
+
+    [RelayCommand]
+    private void OpenThemes()
+    {
+        if (!_themeManager.Show())
+            return;
+
+        // Re-render whatever is on the grid with the fresh themes, keeping
+        // the live slide projected.
+        RebuildSlidesPreservingLive(() =>
+        {
+            if (_currentPassage is not null)
+                LoadBiblePassage(_currentPassage);
+            else if (SelectedSong is not null)
+                BuildSongSlides();
+        });
+        StatusText = "Temas actualizados.";
+    }
+
+    /// <summary>Rebuilds the slide grid and re-projects the slide that was live.</summary>
+    private void RebuildSlidesPreservingLive(Action rebuild)
+    {
+        var liveLabel = LiveSlideIndex >= 0 && LiveSlideIndex < Slides.Count
+            ? Slides[LiveSlideIndex].Label
+            : null;
+
+        rebuild();
+
+        if (liveLabel is not null)
+        {
+            var index = Slides.ToList().FindIndex(s => s.Label == liveLabel);
+            if (index >= 0)
+                GoLiveSlide(index);
+        }
     }
 
     // ── Pestañas de biblioteca ───────────────────────────────────
@@ -225,6 +282,7 @@ public sealed partial class MainViewModel : ObservableObject
         if (SelectedSong is null)
             return;
 
+        var theme = ResolveSongTheme(SelectedSong);
         var caption = string.IsNullOrWhiteSpace(SelectedSong.Artist)
             ? SelectedSong.Title
             : $"{SelectedSong.Title} — {SelectedSong.Artist}";
@@ -234,7 +292,7 @@ public sealed partial class MainViewModel : ObservableObject
             Slides.Add(new SlideItemViewModel(
                 Slides.Count,
                 section.Label,
-                new SlideContent(section.Text, caption)));
+                new SlideContent(section.Text, caption, Theme: theme)));
         }
 
         PreviewSlide = Slides.FirstOrDefault()?.Slide;
@@ -433,23 +491,12 @@ public sealed partial class MainViewModel : ObservableObject
     /// </summary>
     private void RefreshAfterVersionChange()
     {
-        var liveLabel = LiveSlideIndex >= 0 && LiveSlideIndex < Slides.Count
-            ? Slides[LiveSlideIndex].Label
-            : null;
-
-        LoadBibleBooksAvailable();
-
-        if (_currentPassage is not null)
+        RebuildSlidesPreservingLive(() =>
         {
-            LoadBiblePassage(_currentPassage);
-
-            if (liveLabel is not null)
-            {
-                var index = Slides.ToList().FindIndex(s => s.Label == liveLabel);
-                if (index >= 0)
-                    GoLiveSlide(index);
-            }
-        }
+            LoadBibleBooksAvailable();
+            if (_currentPassage is not null)
+                LoadBiblePassage(_currentPassage);
+        });
     }
 
     private void LoadBibleBooksAvailable()
@@ -605,6 +652,8 @@ public sealed partial class MainViewModel : ObservableObject
         Slides.Clear();
         LiveSlideIndex = -1;
 
+        var theme = DefaultBibleTheme;
+
         // Opening card: jump back to the previous chapter (crossing into the
         // previous book's last chapter when needed). Never projected as-is.
         if (GetPreviousChapter(reference) is var (prevBook, prevChapter, prevName))
@@ -612,16 +661,21 @@ public sealed partial class MainViewModel : ObservableObject
             Slides.Add(new SlideItemViewModel(
                 Slides.Count,
                 "ANTERIOR",
-                new SlideContent($"◀  {prevName} {prevChapter}", "Volver al capítulo anterior"),
+                new SlideContent($"◀  {prevName} {prevChapter}", "Volver al capítulo anterior", Theme: theme),
                 new BibleReference(prevBook, prevChapter, null, null),
                 jumpToEnd: true));
         }
 
         foreach (var v in verses)
         {
-            var caption = secondary is null
-                ? $"{v.Reference} · {primary.Abbreviation}"
-                : $"{v.Reference} · {primary.Abbreviation} / {secondary.Abbreviation}";
+            var versionsLabel = secondary is null
+                ? primary.Abbreviation
+                : $"{primary.Abbreviation} / {secondary.Abbreviation}";
+            var caption = theme.ShowVersionName
+                ? $"{v.Reference} · {versionsLabel}"
+                : v.Reference;
+
+            var mainText = theme.ShowVerseNumbers ? $"{v.Verse}  {v.Text}" : v.Text;
 
             string? secondaryText = null;
             secondaryTexts?.TryGetValue((v.Chapter, v.Verse), out secondaryText);
@@ -629,7 +683,7 @@ public sealed partial class MainViewModel : ObservableObject
             Slides.Add(new SlideItemViewModel(
                 Slides.Count,
                 $"{v.Chapter}:{v.Verse}",
-                new SlideContent(v.Text, caption, secondaryText)));
+                new SlideContent(mainText, caption, secondaryText, theme)));
         }
 
         // Closing card: jump to the next chapter (crossing into the next
@@ -639,7 +693,7 @@ public sealed partial class MainViewModel : ObservableObject
             Slides.Add(new SlideItemViewModel(
                 Slides.Count,
                 "SIGUIENTE",
-                new SlideContent($"▶  {nextName} {nextChapter}", "Pasar al siguiente capítulo"),
+                new SlideContent($"▶  {nextName} {nextChapter}", "Pasar al siguiente capítulo", Theme: theme),
                 new BibleReference(nextBook, nextChapter, null, null)));
         }
 
@@ -954,7 +1008,7 @@ public sealed partial class MainViewModel : ObservableObject
     partial void OnQuickTextChanged(string value)
     {
         if (!string.IsNullOrWhiteSpace(value))
-            PreviewSlide = new SlideContent(value.Trim());
+            PreviewSlide = new SlideContent(value.Trim(), Theme: DefaultSongTheme);
     }
 
     [RelayCommand]
@@ -963,7 +1017,7 @@ public sealed partial class MainViewModel : ObservableObject
         if (string.IsNullOrWhiteSpace(QuickText) || SelectedDisplay is null)
             return;
 
-        _presentation.GoLive(new SlideContent(QuickText.Trim()));
+        _presentation.GoLive(new SlideContent(QuickText.Trim(), Theme: DefaultSongTheme));
         _projection.EnsureVisible(SelectedDisplay.Info);
         _settings.Set(OutputDisplayKey, SelectedDisplay.Info.DeviceName);
         IsProjecting = true;

@@ -51,6 +51,7 @@ public sealed class SongRepository(string dbPath) : ISongRepository
         existing.Title = song.Title;
         existing.Artist = song.Artist;
         existing.Copyright = song.Copyright;
+        existing.ThemeId = song.ThemeId;
 
         db.SongSections.RemoveRange(existing.Sections);
         existing.Sections = song.Sections

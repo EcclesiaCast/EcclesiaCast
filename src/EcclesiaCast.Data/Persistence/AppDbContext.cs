@@ -1,5 +1,6 @@
 using EcclesiaCast.Core.Bible;
 using EcclesiaCast.Core.Songs;
+using EcclesiaCast.Core.Themes;
 using Microsoft.EntityFrameworkCore;
 
 namespace EcclesiaCast.Data.Persistence;
@@ -16,6 +17,7 @@ public sealed class AppDbContext : DbContext
     public DbSet<BibleVersion> BibleVersions => Set<BibleVersion>();
     public DbSet<BibleBook> BibleBooks => Set<BibleBook>();
     public DbSet<BibleVerse> BibleVerses => Set<BibleVerse>();
+    public DbSet<SlideTheme> Themes => Set<SlideTheme>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseSqlite($"Data Source={_dbPath}");
@@ -66,6 +68,12 @@ public sealed class AppDbContext : DbContext
             verse.HasKey(v => v.Id);
             verse.Property(v => v.Text).IsRequired();
             verse.HasIndex(v => new { v.BookId, v.Chapter, v.Verse });
+        });
+
+        modelBuilder.Entity<SlideTheme>(theme =>
+        {
+            theme.HasKey(t => t.Id);
+            theme.Property(t => t.Name).IsRequired();
         });
     }
 }

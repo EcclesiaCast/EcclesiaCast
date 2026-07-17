@@ -48,6 +48,9 @@ public partial class App : Application
         using (var db = new AppDbContext(dbPath))
             db.Database.Migrate();
 
+        // Temas iniciales (Canciones y Biblia) en la primera ejecución.
+        ThemeSeeder.EnsureDefaults(new ThemeRepository(dbPath), new SqliteSettingsStore(dbPath));
+
         var services = new ServiceCollection();
         services.AddSingleton<IDisplayProvider, ScreenDisplayProvider>();
         services.AddSingleton<IPresentationService, PresentationService>();
@@ -59,6 +62,8 @@ public partial class App : Application
         services.AddSingleton<IBibleRepository>(_ => new BibleRepository(dbPath));
         services.AddSingleton<IBibleImportDialog, BibleImportDialogService>();
         services.AddSingleton<ITextPrompt, TextPromptService>();
+        services.AddSingleton<IThemeRepository>(_ => new ThemeRepository(dbPath));
+        services.AddSingleton<IThemeManagerDialog, ThemeManagerDialogService>();
         services.AddSingleton<MainViewModel>();
         _services = services.BuildServiceProvider();
 

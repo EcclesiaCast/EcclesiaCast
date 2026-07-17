@@ -73,6 +73,10 @@
                             </Style>
                         </Button.Style>
                     </Button>
+                    <Button Content="🎨 Temas" Margin="14,0,0,0"
+                            Style="{StaticResource DarkButton}"
+                            Command="{Binding OpenThemesCommand}"
+                            ToolTip="Tipografía, colores, márgenes y fondos"/>
                 </StackPanel>
 
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">

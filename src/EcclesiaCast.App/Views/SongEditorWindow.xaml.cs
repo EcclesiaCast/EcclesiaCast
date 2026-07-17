@@ -1,15 +1,24 @@
 using System.Windows;
 using EcclesiaCast.Core.Songs;
+using EcclesiaCast.Core.Themes;
 
 namespace EcclesiaCast.App.Views;
 
 public partial class SongEditorWindow : Window
 {
+    /// <summary>An entry in the theme dropdown; null Id means "use the default theme".</summary>
+    public sealed record ThemeChoice(int? Id, string Label);
+
     private readonly int _songId;
 
-    public SongEditorWindow(Song? existing)
+    public SongEditorWindow(Song? existing, IReadOnlyList<SlideTheme> themes)
     {
         InitializeComponent();
+
+        var choices = new List<ThemeChoice> { new(null, "(Tema por defecto)") };
+        choices.AddRange(themes.Select(t => new ThemeChoice(t.Id, t.Name)));
+        ThemeCombo.ItemsSource = choices;
+        ThemeCombo.SelectedItem = choices.FirstOrDefault(c => c.Id == existing?.ThemeId) ?? choices[0];
 
         if (existing is not null)
         {
@@ -54,6 +63,7 @@ public partial class SongEditorWindow : Window
             Title = title,
             Artist = ArtistBox.Text.Trim(),
             Copyright = string.IsNullOrWhiteSpace(CopyrightBox.Text) ? null : CopyrightBox.Text.Trim(),
+            ThemeId = (ThemeCombo.SelectedItem as ThemeChoice)?.Id,
             Sections = sections,
         };
         DialogResult = true;
