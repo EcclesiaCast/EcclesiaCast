@@ -208,14 +208,23 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         if (isBible && theme.ShowVerseNumbers)
             text = "16 " + text;
 
-        var caption = isBible
-            ? theme.ShowVersionName ? "Juan 3:16 · RVC / NTV" : "Juan 3:16"
-            : "Grande es tu fidelidad — Marcos Witt";
-
-        // For Bible themes, show a second-version sample so its style is visible.
+        // For Bible themes, show a second-version sample so its style is visible;
+        // with two versions each text carries its abbreviation inline.
         var secondary = isBible
             ? "For God so loved the world, that he gave his only Son"
             : null;
+
+        string caption;
+        if (isBible)
+        {
+            text = $"[RVC] {text}";
+            secondary = $"[NTV] {secondary}";
+            caption = "Juan 3:16";
+        }
+        else
+        {
+            caption = "Grande es tu fidelidad — Marcos Witt";
+        }
 
         PreviewSlide = new SlideContent(text, caption, secondary, theme);
     }

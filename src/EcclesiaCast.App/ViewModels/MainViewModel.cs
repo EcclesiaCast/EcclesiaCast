@@ -875,17 +875,25 @@ public sealed partial class MainViewModel : ObservableObject
 
         foreach (var v in verses)
         {
-            var versionsLabel = secondary is null
-                ? primary.Abbreviation
-                : $"{primary.Abbreviation} / {secondary.Abbreviation}";
-            var caption = theme.ShowVersionName
-                ? $"{v.Reference} · {versionsLabel}"
-                : v.Reference;
-
             var mainText = theme.ShowVerseNumbers ? $"{v.Verse}  {v.Text}" : v.Text;
 
             string? secondaryText = null;
             secondaryTexts?.TryGetValue((v.Chapter, v.Verse), out secondaryText);
+
+            string caption;
+            if (secondary is not null)
+            {
+                // Two versions: label each text inline with its abbreviation
+                // (like BibleShow) and drop the version(s) from the reference.
+                mainText = $"[{primary.Abbreviation}] {mainText}";
+                if (secondaryText is not null)
+                    secondaryText = $"[{secondary.Abbreviation}] {secondaryText}";
+                caption = v.Reference;
+            }
+            else
+            {
+                caption = theme.ShowVersionName ? $"{v.Reference} · {primary.Abbreviation}" : v.Reference;
+            }
 
             Slides.Add(new SlideItemViewModel(
                 Slides.Count,
