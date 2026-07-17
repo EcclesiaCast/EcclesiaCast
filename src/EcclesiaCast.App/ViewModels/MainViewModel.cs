@@ -231,12 +231,16 @@ public sealed partial class MainViewModel : ObservableObject
             if (type is null)
                 continue;
 
+            // A poster thumbnail for the bar and video previews (falls back to
+            // the image itself if the shell can't produce one).
+            var thumbnail = ShellThumbnail.Save(path) ?? (type == MediaType.Image ? path : null);
+
             _media.Add(new MediaItem
             {
                 Name = Path.GetFileNameWithoutExtension(path),
                 Path = path,
                 Type = type.Value,
-                ThumbnailPath = type == MediaType.Image ? path : null,
+                ThumbnailPath = thumbnail,
             });
             added++;
         }
