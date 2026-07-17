@@ -256,7 +256,8 @@
                                         Background="{StaticResource SurfaceAltBrush}"
                                         BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
                                         CornerRadius="4" MaxHeight="98">
-                                    <ListBox ItemsSource="{Binding BibleVersionOptions}"
+                                    <ListBox x:Name="VersionsList"
+                                             ItemsSource="{Binding BibleVersionOptions}"
                                              SelectedItem="{Binding SelectedBibleVersionOption}"
                                              Background="Transparent" BorderThickness="0"
                                              ScrollViewer.HorizontalScrollBarVisibility="Disabled">
@@ -295,7 +296,16 @@
                                                                FontSize="12" Foreground="White"
                                                                Margin="6,0,6,0"
                                                                VerticalAlignment="Center"
-                                                               TextTrimming="CharacterEllipsis"/>
+                                                               TextTrimming="CharacterEllipsis"
+                                                               Background="Transparent"
+                                                               Cursor="Hand"
+                                                               ToolTip="Clic: usar solo esta versión. La casilla agrega una segunda.">
+                                                        <TextBlock.InputBindings>
+                                                            <MouseBinding MouseAction="LeftClick"
+                                                                          Command="{Binding DataContext.SelectSoloVersionCommand, ElementName=VersionsList}"
+                                                                          CommandParameter="{Binding}"/>
+                                                        </TextBlock.InputBindings>
+                                                    </TextBlock>
                                                 </DockPanel>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
@@ -382,12 +392,23 @@
                                                 </ItemsControl.ItemsPanel>
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
-                                                        <Button Content="{Binding}"
-                                                                Style="{StaticResource DarkButton}"
+                                                        <Button Content="{Binding Number}"
                                                                 Width="40" Height="32" Margin="2"
                                                                 Padding="0" FontSize="12"
                                                                 Command="{Binding DataContext.SelectChapterCommand, ElementName=ChaptersGrid}"
-                                                                CommandParameter="{Binding}"/>
+                                                                CommandParameter="{Binding}">
+                                                            <Button.Style>
+                                                                <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                            <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                                                            <Setter Property="BorderThickness" Value="0"/>
+                                                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </Button.Style>
+                                                        </Button>
                                                     </DataTemplate>
                                                 </ItemsControl.ItemTemplate>
                                             </ItemsControl>

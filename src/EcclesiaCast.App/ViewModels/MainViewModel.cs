@@ -45,7 +45,7 @@ public sealed partial class MainViewModel : ObservableObject
     public ObservableCollection<BibleBookInfo> BibleBooksAvailable { get; } = [];
 
     /// <summary>Chapters available for the selected book — the numbered button grid.</summary>
-    public ObservableCollection<int> BibleChapters { get; } = [];
+    public ObservableCollection<ChapterOption> BibleChapters { get; } = [];
 
     /// <summary>Ids of the checked versions, oldest first; index 0 is the primary.</summary>
     private readonly List<int> _checkedVersionIds = [];
@@ -404,8 +404,35 @@ public sealed partial class MainViewModel : ObservableObject
             _checkedVersionIds.Remove(option.Info.Id);
         }
 
-        // Refresh the grid and — if a verse is live — re-project it right away,
-        // so checking/unchecking a version updates the output in real time.
+        RefreshAfterVersionChange();
+    }
+
+    /// <summary>Clicking a version's name makes it the only active one.</summary>
+    [RelayCommand]
+    private void SelectSoloVersion(BibleVersionOption? option)
+    {
+        if (option is null)
+            return;
+
+        SelectedBibleVersionOption = option;
+
+        _suppressVersionEvents = true;
+        foreach (var other in BibleVersionOptions)
+            other.IsSelected = other == option;
+        _suppressVersionEvents = false;
+
+        _checkedVersionIds.Clear();
+        _checkedVersionIds.Add(option.Info.Id);
+
+        RefreshAfterVersionChange();
+    }
+
+    /// <summary>
+    /// Refreshes the grid and — if a verse is live — re-projects it right
+    /// away, so version changes update the output in real time.
+    /// </summary>
+    private void RefreshAfterVersionChange()
+    {
         var liveLabel = LiveSlideIndex >= 0 && LiveSlideIndex < Slides.Count
             ? Slides[LiveSlideIndex].Label
             : null;
@@ -458,7 +485,7 @@ public sealed partial class MainViewModel : ObservableObject
         if (value is not null && PrimaryVersion is not null)
         {
             foreach (var chapter in _bibles.GetChapterNumbers(PrimaryVersion.Id, value.Number))
-                BibleChapters.Add(chapter);
+                BibleChapters.Add(new ChapterOption(chapter));
         }
 
         UpdateBibleViewState();
@@ -468,15 +495,21 @@ public sealed partial class MainViewModel : ObservableObject
     private void BackToBooks() => SelectedBibleBook = null;
 
     [RelayCommand]
-    private void SelectChapter(int chapter)
+    private void SelectChapter(ChapterOption? option)
     {
-        if (SelectedBibleBook is null)
+        if (option is null || SelectedBibleBook is null)
             return;
 
         // Browsing and typing a reference are two paths to the same grid;
         // clear the search box so they don't fight visually.
         BibleQuery = string.Empty;
-        LoadBiblePassage(new BibleReference(SelectedBibleBook.Number, chapter, null, null));
+        LoadBiblePassage(new BibleReference(SelectedBibleBook.Number, option.Number, null, null));
+    }
+
+    private void MarkChapterSelected(int? chapter)
+    {
+        foreach (var option in BibleChapters)
+            option.IsSelected = option.Number == chapter;
     }
 
     /// <summary>Which of the three views (books / chapters / results) the Bible tab shows.</summary>
@@ -587,8 +620,50 @@ public sealed partial class MainViewModel : ObservableObject
                 new SlideContent(v.Text, caption, secondaryText)));
         }
 
+        // Closing card: jump to the next chapter (crossing into the next
+        // book when this was the last one). Never projected as-is.
+        if (GetNextChapter(reference) is var (nextBook, nextChapter, nextName))
+        {
+            Slides.Add(new SlideItemViewModel(
+                Slides.Count,
+                "SIGUIENTE",
+                new SlideContent($"▶  {nextName} {nextChapter}", "Pasar al siguiente capítulo"),
+                new BibleReference(nextBook, nextChapter, null, null)));
+        }
+
+        if (SelectedBibleBook?.Number == reference.BookNumber)
+            MarkChapterSelected(reference.Chapter);
+
         PreviewSlide = Slides.FirstOrDefault()?.Slide;
         BibleStatusText = $"{verses.Count} versículo(s). Clic en una diapositiva para proyectar.";
+    }
+
+    /// <summary>Next chapter after a reference: within the book, or the next book's first chapter.</summary>
+    private (int Book, int Chapter, string Name)? GetNextChapter(BibleReference current)
+    {
+        var primary = PrimaryVersion;
+        if (primary is null)
+            return null;
+
+        var nextInBook = _bibles.GetChapterNumbers(primary.Id, current.BookNumber)
+            .Where(c => c > current.Chapter)
+            .Cast<int?>()
+            .FirstOrDefault();
+        if (nextInBook is int chapter)
+            return (current.BookNumber, chapter, BibleBookCatalog.FindByNumber(current.BookNumber)?.Name ?? string.Empty);
+
+        var nextBook = _bibles.GetAvailableBookNumbers(primary.Id)
+            .Where(n => n > current.BookNumber)
+            .Cast<int?>()
+            .FirstOrDefault();
+        if (nextBook is int book)
+        {
+            var firstChapter = _bibles.GetChapterNumbers(primary.Id, book).Cast<int?>().FirstOrDefault();
+            if (firstChapter is int first)
+                return (book, first, BibleBookCatalog.FindByNumber(book)?.Name ?? string.Empty);
+        }
+
+        return null;
     }
 
     /// <summary>Marks a slide as "next up": accent border, preview box, and scroll-into-view.</summary>
@@ -795,6 +870,20 @@ public sealed partial class MainViewModel : ObservableObject
         }
 
         var item = Slides[index];
+
+        // The "next chapter" card never projects itself: it loads the next
+        // passage and goes live on its first verse in one motion.
+        if (item.JumpTarget is { } jump)
+        {
+            if (SelectedBibleBook?.Number != jump.BookNumber)
+                SelectedBibleBook = BibleBooksAvailable.FirstOrDefault(b => b.Number == jump.BookNumber);
+
+            LoadBiblePassage(jump);
+            if (Slides.Count > 0 && Slides[0].JumpTarget is null)
+                GoLiveSlide(0);
+            return;
+        }
+
         _presentation.GoLive(item.Slide);
         _projection.EnsureVisible(SelectedDisplay.Info);
         _settings.Set(OutputDisplayKey, SelectedDisplay.Info.DeviceName);
