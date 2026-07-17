@@ -184,12 +184,12 @@
                                            Text="🖼 Medios (sprints 4–5)"
                                            FontSize="10" Foreground="{StaticResource FaintBrush}"
                                            Margin="12,4,12,10"/>
-                                <ListBox ItemsSource="{Binding Songs}"
+                                <ListBox x:Name="SongsList" ItemsSource="{Binding Songs}"
                                          SelectedItem="{Binding SelectedSong}"
                                          Background="Transparent"
                                          BorderThickness="0"
                                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                         ToolTip="Doble clic proyecta la primera diapositiva">
+                                         ToolTip="Doble clic proyecta · clic derecho: más opciones">
                                     <ListBox.InputBindings>
                                         <MouseBinding MouseAction="LeftDoubleClick"
                                                       Command="{Binding ProjectFirstSlideCommand}"/>
@@ -199,6 +199,28 @@
                                     <ListBox.ItemContainerStyle>
                                         <Style TargetType="ListBoxItem">
                                             <Setter Property="Padding" Value="10,6"/>
+                                            <Setter Property="Tag"
+                                                    Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+                                            <Setter Property="ContextMenu">
+                                                <Setter.Value>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="Editar canción (diseño)"
+                                                                  Command="{Binding PlacementTarget.Tag.EditSongDesignForCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                        <MenuItem Header="Editar como texto plano"
+                                                                  Command="{Binding PlacementTarget.Tag.EditSongTextForCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                        <Separator/>
+                                                        <MenuItem Header="Duplicar canción"
+                                                                  Command="{Binding PlacementTarget.Tag.DuplicateSongCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                        <Separator/>
+                                                        <MenuItem Header="Eliminar canción"
+                                                                  Command="{Binding PlacementTarget.Tag.DeleteSongForCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                    </ContextMenu>
+                                                </Setter.Value>
+                                            </Setter>
                                             <Setter Property="Template">
                                                 <Setter.Value>
                                                     <ControlTemplate TargetType="ListBoxItem">

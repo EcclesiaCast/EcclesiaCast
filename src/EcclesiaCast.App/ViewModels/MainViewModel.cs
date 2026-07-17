@@ -421,6 +421,59 @@ public sealed partial class MainViewModel : ObservableObject
         StatusText = status;
     }
 
+    // ── Menú contextual de la lista de canciones ─────────────────
+
+    [RelayCommand]
+    private void EditSongDesignFor(Song? song)
+    {
+        if (song is null)
+            return;
+        SelectedSong = Songs.FirstOrDefault(s => s.Id == song.Id) ?? song;
+        EditSongDesign(null);
+    }
+
+    [RelayCommand]
+    private void EditSongTextFor(Song? song)
+    {
+        if (song is null)
+            return;
+        SelectedSong = Songs.FirstOrDefault(s => s.Id == song.Id) ?? song;
+        EditSong();
+    }
+
+    [RelayCommand]
+    private void DuplicateSong(Song? song)
+    {
+        var source = song is null ? null : _songs.Get(song.Id);
+        if (source is null)
+            return;
+
+        var copy = new Song
+        {
+            Title = $"{source.Title} (copia)",
+            Artist = source.Artist,
+            Copyright = source.Copyright,
+            ThemeId = source.ThemeId,
+            Sections = source.Sections
+                .Select(s => new SongSection { Order = s.Order, Label = s.Label, Text = s.Text, StyleJson = s.StyleJson })
+                .ToList(),
+        };
+
+        var saved = _songs.Save(copy);
+        LoadSongs();
+        SelectedSong = Songs.FirstOrDefault(s => s.Id == saved.Id);
+        StatusText = $"Canción duplicada: \"{saved.Title}\".";
+    }
+
+    [RelayCommand]
+    private void DeleteSongFor(Song? song)
+    {
+        if (song is null)
+            return;
+        SelectedSong = Songs.FirstOrDefault(s => s.Id == song.Id) ?? song;
+        DeleteSong();
+    }
+
     [RelayCommand]
     private void NewSong()
     {
