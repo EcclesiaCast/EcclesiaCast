@@ -192,16 +192,26 @@
                                         Background="#11FFFFFF" Cursor="SizeAll"
                                         MouseLeftButtonDown="Box_MouseDown"
                                         MouseMove="Box_MouseMove"
-                                        MouseLeftButtonUp="Box_MouseUp">
-                                    <Thumb x:Name="BoxResize" Width="16" Height="16"
-                                           HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                                           Cursor="SizeNWSE" DragDelta="BoxResize_DragDelta">
-                                        <Thumb.Template>
-                                            <ControlTemplate TargetType="Thumb">
-                                                <Border Background="{StaticResource AccentBrush}" CornerRadius="3"/>
-                                            </ControlTemplate>
-                                        </Thumb.Template>
-                                    </Thumb>
+                                        MouseLeftButtonUp="Box_MouseUp"
+                                        ToolTip="Doble clic para escribir sobre la diapositiva">
+                                    <Grid>
+                                        <TextBox x:Name="InlineEditor"
+                                                 Visibility="Collapsed"
+                                                 Background="Transparent" BorderThickness="0"
+                                                 AcceptsReturn="True" TextWrapping="Wrap"
+                                                 Foreground="White" CaretBrush="White"
+                                                 LostFocus="InlineEditor_LostFocus"
+                                                 PreviewKeyDown="InlineEditor_KeyDown"/>
+                                        <Thumb x:Name="BoxResize" Width="16" Height="16"
+                                               HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                               Cursor="SizeNWSE" DragDelta="BoxResize_DragDelta">
+                                            <Thumb.Template>
+                                                <ControlTemplate TargetType="Thumb">
+                                                    <Border Background="{StaticResource AccentBrush}" CornerRadius="3"/>
+                                                </ControlTemplate>
+                                            </Thumb.Template>
+                                        </Thumb>
+                                    </Grid>
                                 </Border>
                             </Canvas>
                         </Grid>

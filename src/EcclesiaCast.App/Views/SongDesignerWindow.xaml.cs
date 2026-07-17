@@ -44,6 +44,8 @@ public partial class SongDesignerWindow : Window
     private Point _dragOffset;
     private double _zoom = 1;
     private bool _fitMode = true;
+    private bool _editing;
+    private int _editingIndex = -1;
 
     public SongDesignerWindow(Song song, SlideTheme theme, int selectIndex)
     {
@@ -91,6 +93,9 @@ public partial class SongDesignerWindow : Window
 
     private void SlidesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        if (_editing)
+            CommitEdit();
+
         if (Selected < 0)
             return;
 
@@ -195,6 +200,92 @@ public partial class SongDesignerWindow : Window
         RefreshSelected();
     }
 
+    // ── Edición del texto sobre la propia diapositiva ────────────
+
+    private void EnterEdit()
+    {
+        if (Selected < 0)
+            return;
+
+        _editing = true;
+        _editingIndex = Selected;
+
+        var over = _overrides[Selected]!;
+        InlineEditor.Text = _texts[Selected];
+        InlineEditor.FontFamily = new FontFamily(over.FontFamily ?? _theme.FontFamily);
+        InlineEditor.FontSize = Math.Max(8, (over.FontSize ?? _theme.MaxFontSize) * Scale);
+        InlineEditor.FontWeight = (over.Bold ?? _theme.Bold) ? FontWeights.SemiBold : FontWeights.Normal;
+        InlineEditor.FontStyle = (over.Italic ?? _theme.Italic) ? FontStyles.Italic : FontStyles.Normal;
+        InlineEditor.Foreground = BrushFromHex(over.TextColor ?? _theme.TextColor);
+        InlineEditor.TextAlignment = (over.AlignH ?? _theme.AlignH) switch
+        {
+            HAlign.Left => TextAlignment.Left,
+            HAlign.Right => TextAlignment.Right,
+            _ => TextAlignment.Center,
+        };
+        InlineEditor.VerticalContentAlignment = (over.AlignV ?? _theme.AlignV) switch
+        {
+            VAlign.Top => VerticalAlignment.Top,
+            VAlign.Bottom => VerticalAlignment.Bottom,
+            _ => VerticalAlignment.Center,
+        };
+
+        // Hide the rendered text behind so only the editable copy shows.
+        Preview.Slide = new SlideContent(string.Empty, null, null, _theme, over);
+        InlineEditor.Visibility = Visibility.Visible;
+        InlineEditor.Focus();
+        InlineEditor.SelectAll();
+    }
+
+    private void CommitEdit()
+    {
+        if (!_editing)
+            return;
+
+        _editing = false;
+        var index = _editingIndex;
+        _editingIndex = -1;
+        InlineEditor.Visibility = Visibility.Collapsed;
+
+        if (index >= 0 && index < _texts.Count)
+        {
+            _texts[index] = InlineEditor.Text;
+            _thumbs[index].Slide = BuildSlide(index);
+
+            if (Selected == index)
+            {
+                _loading = true;
+                TextEditor.Text = _texts[index];
+                _loading = false;
+            }
+        }
+
+        RefreshSelected();
+    }
+
+    private void InlineEditor_LostFocus(object sender, RoutedEventArgs e) => CommitEdit();
+
+    private void InlineEditor_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape)
+        {
+            e.Handled = true;
+            BoxBorder.Focus(); // dispara LostFocus → CommitEdit
+        }
+    }
+
+    private static Brush BrushFromHex(string hex)
+    {
+        try
+        {
+            return new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex));
+        }
+        catch
+        {
+            return Brushes.White;
+        }
+    }
+
     private void PickColor_Click(object sender, RoutedEventArgs e)
     {
         var picked = ColorPickerHelper.Pick(ColorBox.Text.Trim());
@@ -276,6 +367,18 @@ public partial class SongDesignerWindow : Window
 
     private void Box_MouseDown(object sender, MouseButtonEventArgs e)
     {
+        // While editing text, let the inner TextBox handle the mouse.
+        if (_editing)
+            return;
+
+        // Double-click writes directly on the slide.
+        if (e.ClickCount == 2)
+        {
+            EnterEdit();
+            e.Handled = true;
+            return;
+        }
+
         // Don't start a drag when grabbing the resize handle.
         if (e.OriginalSource is System.Windows.Controls.Primitives.Thumb)
             return;
@@ -395,6 +498,9 @@ public partial class SongDesignerWindow : Window
 
     private void Save_Click(object sender, RoutedEventArgs e)
     {
+        if (_editing)
+            CommitEdit();
+
         for (var i = 0; i < _song.Sections.Count; i++)
         {
             var text = _texts[i].Trim();
