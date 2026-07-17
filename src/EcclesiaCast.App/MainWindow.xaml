@@ -636,12 +636,32 @@
                                             <Button Command="{Binding DataContext.ProjectSlideCommand, ElementName=SlideGrid}"
                                                     CommandParameter="{Binding}"
                                                     Cursor="Hand"
-                                                    ToolTip="Clic: proyectar · Clic derecho: diseñar esta diapositiva">
-                                                <Button.InputBindings>
-                                                    <MouseBinding MouseAction="RightClick"
-                                                                  Command="{Binding DataContext.EditSlideDesignCommand, ElementName=SlideGrid}"
-                                                                  CommandParameter="{Binding}"/>
-                                                </Button.InputBindings>
+                                                    Tag="{Binding DataContext, ElementName=SlideGrid}"
+                                                    ToolTip="Clic: proyectar · Clic derecho: más opciones">
+                                                <Button.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="Editar canción (diseño)"
+                                                                  Command="{Binding PlacementTarget.Tag.EditSongDesignCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                        <MenuItem Header="Editar como texto plano"
+                                                                  Command="{Binding PlacementTarget.Tag.EditSongAsTextCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                        <Separator/>
+                                                        <MenuItem Header="Copiar"
+                                                                  Command="{Binding PlacementTarget.Tag.CopySlideCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                        <MenuItem Header="Pegar"
+                                                                  Command="{Binding PlacementTarget.Tag.PasteSlideCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                        <MenuItem Header="Duplicar"
+                                                                  Command="{Binding PlacementTarget.Tag.DuplicateSlideCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                        <Separator/>
+                                                        <MenuItem Header="Eliminar"
+                                                                  Command="{Binding PlacementTarget.Tag.DeleteSlideCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                    </ContextMenu>
+                                                </Button.ContextMenu>
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="Button">
                                                         <Border x:Name="card" Width="180" Height="84" Margin="6"

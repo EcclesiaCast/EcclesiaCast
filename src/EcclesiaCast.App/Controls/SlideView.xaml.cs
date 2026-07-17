@@ -94,11 +94,19 @@ public partial class SlideView : UserControl
     // ── Estilo efectivo: tema + overrides del slide ──────────────
 
     private double EffectiveMaxFontSize => Slide?.Override?.FontSize ?? CurrentTheme.MaxFontSize;
+    private string EffectiveFontFamily => Slide?.Override?.FontFamily ?? CurrentTheme.FontFamily;
     private bool EffectiveBold => Slide?.Override?.Bold ?? CurrentTheme.Bold;
     private bool EffectiveItalic => Slide?.Override?.Italic ?? CurrentTheme.Italic;
+    private bool EffectiveUnderline => Slide?.Override?.Underline ?? false;
+    private bool EffectiveStrikethrough => Slide?.Override?.Strikethrough ?? false;
+    private bool EffectiveShadow => Slide?.Override?.Shadow ?? CurrentTheme.Shadow;
     private string EffectiveTextColor => Slide?.Override?.TextColor ?? CurrentTheme.TextColor;
     private HAlign EffectiveAlignH => Slide?.Override?.AlignH ?? CurrentTheme.AlignH;
     private VAlign EffectiveAlignV => Slide?.Override?.AlignV ?? CurrentTheme.AlignV;
+    private double? EffectiveLineSpacing => Slide?.Override?.LineSpacing;
+
+    private TextCase EffectiveCase =>
+        Slide?.Override?.Case ?? (CurrentTheme.Uppercase ? TextCase.Upper : TextCase.None);
 
     private void OnSlideChanged()
     {
@@ -132,7 +140,7 @@ public partial class SlideView : UserControl
             _ => VerticalAlignment.Center,
         };
 
-        var fontFamily = new FontFamily(theme.FontFamily);
+        var fontFamily = new FontFamily(EffectiveFontFamily);
         var alignment = EffectiveAlignH switch
         {
             HAlign.Left => TextAlignment.Left,
@@ -140,15 +148,17 @@ public partial class SlideView : UserControl
             _ => TextAlignment.Center,
         };
         var foreground = BrushFromHex(EffectiveTextColor, "#FFFFFF");
-        var effect = theme.Shadow
+        var effect = EffectiveShadow
             ? new DropShadowEffect { BlurRadius = 18, ShadowDepth = 3, Opacity = 0.75 }
             : null;
+        var decorations = BuildDecorations();
 
         MainText.FontFamily = fontFamily;
         MainText.FontWeight = EffectiveBold ? FontWeights.SemiBold : FontWeights.Normal;
         MainText.FontStyle = EffectiveItalic ? FontStyles.Italic : FontStyles.Normal;
         MainText.Foreground = foreground;
         MainText.TextAlignment = alignment;
+        MainText.TextDecorations = decorations;
         MainText.Effect = effect;
 
         SecondaryText.FontFamily = fontFamily;
@@ -158,7 +168,7 @@ public partial class SlideView : UserControl
 
         CaptionLayer.Margin = new Thickness(theme.MarginHorizontal, theme.MarginVertical * 0.5,
             theme.MarginHorizontal, theme.MarginVertical * 0.5);
-        CaptionText.FontFamily = fontFamily;
+        CaptionText.FontFamily = new FontFamily(theme.FontFamily);
         CaptionText.FontSize = theme.CaptionFontSize;
         CaptionText.HorizontalAlignment = theme.CaptionPosition switch
         {
@@ -173,6 +183,19 @@ public partial class SlideView : UserControl
 
     private static bool IsCaptionOnTop(CaptionPosition position) =>
         position is CaptionPosition.TopLeft or CaptionPosition.TopCenter or CaptionPosition.TopRight;
+
+    private TextDecorationCollection? BuildDecorations()
+    {
+        if (!EffectiveUnderline && !EffectiveStrikethrough)
+            return null;
+
+        var decorations = new TextDecorationCollection();
+        if (EffectiveUnderline)
+            decorations.Add(TextDecorations.Underline);
+        if (EffectiveStrikethrough)
+            decorations.Add(TextDecorations.Strikethrough);
+        return decorations;
+    }
 
     private void ApplyBackgroundImage(string? path)
     {
@@ -259,8 +282,8 @@ public partial class SlideView : UserControl
     private void RenderText()
     {
         var theme = CurrentTheme;
-        var main = Transform(Slide?.MainText, theme);
-        var secondary = Transform(Slide?.SecondaryText, theme);
+        var main = Transform(Slide?.MainText);
+        var secondary = Transform(Slide?.SecondaryText);
 
         var hasCaption = !string.IsNullOrEmpty(Slide?.Caption);
         var (margin, areaWidth, areaHeight) = ComputeTextArea(hasCaption);
@@ -269,6 +292,16 @@ public partial class SlideView : UserControl
         var fontSize = FitFontSize(main, secondary, theme, areaWidth, areaHeight);
         MainText.FontSize = fontSize;
         SecondaryText.FontSize = Math.Max(20, fontSize * SecondaryRatio);
+
+        if (EffectiveLineSpacing is double spacing && spacing > 0)
+        {
+            MainText.LineStackingStrategy = LineStackingStrategy.BlockLineHeight;
+            MainText.LineHeight = fontSize * spacing;
+        }
+        else
+        {
+            MainText.LineHeight = double.NaN;
+        }
 
         RenderWithHighlight(MainText, main);
         RenderWithHighlight(SecondaryText, secondary);
@@ -282,8 +315,39 @@ public partial class SlideView : UserControl
             : Visibility.Collapsed;
     }
 
-    private static string? Transform(string? text, SlideTheme theme) =>
-        text is null ? null : theme.Uppercase ? text.ToUpper(CultureInfo.CurrentCulture) : text;
+    private string? Transform(string? text)
+    {
+        if (text is null)
+            return null;
+
+        var culture = CultureInfo.CurrentCulture;
+        return EffectiveCase switch
+        {
+            TextCase.Upper => text.ToUpper(culture),
+            TextCase.Title => culture.TextInfo.ToTitleCase(text.ToLower(culture)),
+            TextCase.Sentence => ToSentenceCase(text, culture),
+            _ => text,
+        };
+    }
+
+    private static string ToSentenceCase(string text, CultureInfo culture)
+    {
+        var chars = text.ToCharArray();
+        var startOfSentence = true;
+        for (var i = 0; i < chars.Length; i++)
+        {
+            if (startOfSentence && char.IsLetter(chars[i]))
+            {
+                chars[i] = char.ToUpper(chars[i], culture);
+                startOfSentence = false;
+            }
+            else if (chars[i] is '.' or '!' or '?' or '\n')
+            {
+                startOfSentence = true;
+            }
+        }
+        return new string(chars);
+    }
 
     /// <summary>
     /// Starts at the preferred size and shrinks until the whole text fits

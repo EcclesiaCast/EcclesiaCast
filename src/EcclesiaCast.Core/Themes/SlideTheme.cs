@@ -30,6 +30,15 @@ public enum CaptionPosition
     BottomRight,
 }
 
+/// <summary>How the text's casing is transformed, mirroring ProPresenter's options.</summary>
+public enum TextCase
+{
+    None,
+    Upper,
+    Title,
+    Sentence,
+}
+
 /// <summary>
 /// Everything configurable about how a slide looks. Sizes and margins are
 /// in pixels over the virtual 1920×1080 canvas that <c>SlideView</c> renders.

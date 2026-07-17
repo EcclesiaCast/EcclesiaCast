@@ -1,0 +1,305 @@
+<Window x:Class="EcclesiaCast.App.Views.SongDesignerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:EcclesiaCast.App.Controls"
+        Title="Diseño de la canción"
+        Width="1320" Height="780"
+        MinWidth="1120" MinHeight="640"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BgBrush}"
+        FontFamily="Segoe UI">
+    <Window.Resources>
+        <Style TargetType="TextBlock" x:Key="FieldLabel">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="Margin" Value="0,12,0,3"/>
+        </Style>
+        <Style TargetType="CheckBox">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Margin" Value="0,4,14,4"/>
+        </Style>
+        <Style TargetType="TextBox" x:Key="Field">
+            <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
+            <Setter Property="CaretBrush" Value="White"/>
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+        <!-- Botón de dos estados (B/I/U/S) -->
+        <Style TargetType="ToggleButton" x:Key="Seg">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Width" Value="34"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Margin" Value="0,0,4,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="bd" CornerRadius="4"
+                                Background="{StaticResource SurfaceAltBrush}"
+                                BorderBrush="{StaticResource LineBrush}" BorderThickness="1">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{StaticResource AccentBrush}"/>
+                                <Setter TargetName="bd" Property="BorderThickness" Value="0"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Opacity" Value="0.85"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- Botón de alineación (radio mutuamente excluyente) -->
+        <Style TargetType="RadioButton" x:Key="SegRadio">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="MinWidth" Value="34"/>
+            <Setter Property="Padding" Value="6,0"/>
+            <Setter Property="Margin" Value="0,0,4,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="bd" CornerRadius="4"
+                                Background="{StaticResource SurfaceAltBrush}"
+                                BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{StaticResource AccentBrush}"/>
+                                <Setter TargetName="bd" Property="BorderThickness" Value="0"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="180"/>
+            <ColumnDefinition Width="12"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="12"/>
+            <ColumnDefinition Width="310"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ── Lista de diapositivas ── -->
+        <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource Panel}">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="DIAPOSITIVAS" Style="{StaticResource PanelTitle}"/>
+                <ListBox x:Name="SlidesList" Background="Transparent" BorderThickness="0"
+                         SelectionChanged="SlidesList_SelectionChanged"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="6,4"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="bd" Background="Transparent" CornerRadius="4"
+                                                Margin="4,3" Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="bd" Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding Label}" FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{StaticResource MutedBrush}" Margin="2,0,0,3"/>
+                                <Border Width="150" Height="84" CornerRadius="4"
+                                        BorderBrush="{StaticResource LineBrush}" BorderThickness="1">
+                                    <controls:SlideView Slide="{Binding Slide}"/>
+                                </Border>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Border>
+
+        <!-- ── Lienzo de edición ── -->
+        <DockPanel Grid.Row="0" Grid.Column="2">
+            <Border DockPanel.Dock="Top" Style="{StaticResource Panel}" Padding="8,6" Margin="0,0,0,8">
+                <TextBlock Text="Arrastrá la caja para moverla · esquina inferior derecha para el tamaño · usá el panel derecho para alinear y dar formato."
+                           FontSize="11" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap"/>
+            </Border>
+            <Border Background="#0B0D12" CornerRadius="6"
+                    BorderBrush="{StaticResource LineBrush}" BorderThickness="1">
+                <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Grid x:Name="CanvasRoot" Width="960" Height="540" ClipToBounds="True">
+                        <controls:SlideView x:Name="Preview"/>
+                        <Canvas x:Name="Overlay" Background="Transparent">
+                            <Border x:Name="BoxBorder"
+                                    BorderBrush="{StaticResource AccentBrush}" BorderThickness="1.5"
+                                    Background="#11FFFFFF" Cursor="SizeAll"
+                                    MouseLeftButtonDown="Box_MouseDown"
+                                    MouseMove="Box_MouseMove"
+                                    MouseLeftButtonUp="Box_MouseUp">
+                                <Thumb x:Name="BoxResize" Width="16" Height="16"
+                                       HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                       Cursor="SizeNWSE" DragDelta="BoxResize_DragDelta">
+                                    <Thumb.Template>
+                                        <ControlTemplate TargetType="Thumb">
+                                            <Border Background="{StaticResource AccentBrush}" CornerRadius="3"/>
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                </Thumb>
+                            </Border>
+                        </Canvas>
+                    </Grid>
+                </Grid>
+            </Border>
+        </DockPanel>
+
+        <!-- ── Panel de formato ── -->
+        <Border Grid.Row="0" Grid.Column="4" Style="{StaticResource Panel}">
+            <DockPanel Margin="10">
+                <TextBlock DockPanel.Dock="Top" Text="{Binding ElementName=SlidesList, Path=SelectedItem.Label, StringFormat='FORMATO — {0}'}"
+                           Style="{StaticResource PanelTitle}" Margin="2,0,0,6"/>
+                <TabControl DockPanel.Dock="Top" Background="Transparent" BorderThickness="0">
+                    <TabItem Header="Texto">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,4,6,0">
+                            <StackPanel>
+                                <TextBlock Text="Tipografía" Style="{StaticResource FieldLabel}"/>
+                                <ComboBox x:Name="FontCombo" IsEditable="True" FontSize="12"
+                                          SelectionChanged="Style_Changed" LostFocus="Style_Changed"/>
+
+                                <TextBlock Style="{StaticResource FieldLabel}">
+                                    <Run Text="Tamaño de letra: "/><Run x:Name="SizeValue" Text="92"/>
+                                </TextBlock>
+                                <Slider x:Name="SizeSlider" Minimum="24" Maximum="200"
+                                        ValueChanged="Style_Changed"/>
+
+                                <TextBlock Text="Estilo" Style="{StaticResource FieldLabel}"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <ToggleButton x:Name="BoldToggle" Content="B" FontWeight="Bold"
+                                                  Style="{StaticResource Seg}" Click="Style_Changed"/>
+                                    <ToggleButton x:Name="ItalicToggle" Content="I" FontStyle="Italic"
+                                                  Style="{StaticResource Seg}" Click="Style_Changed"/>
+                                    <ToggleButton x:Name="UnderlineToggle" Content="U"
+                                                  Style="{StaticResource Seg}" Click="Style_Changed"/>
+                                    <ToggleButton x:Name="StrikeToggle" Content="S"
+                                                  Style="{StaticResource Seg}" Click="Style_Changed"/>
+                                </StackPanel>
+
+                                <TextBlock Text="Uso de mayúscula" Style="{StaticResource FieldLabel}"/>
+                                <ComboBox x:Name="CaseCombo" FontSize="12" SelectionChanged="Style_Changed">
+                                    <ComboBoxItem Content="Ninguno"/>
+                                    <ComboBoxItem Content="Todas mayúsculas"/>
+                                    <ComboBoxItem Content="Mayúscula en cada palabra"/>
+                                    <ComboBoxItem Content="Mayúscula inicial"/>
+                                </ComboBox>
+
+                                <TextBlock Text="Color del texto (hex)" Style="{StaticResource FieldLabel}"/>
+                                <TextBox x:Name="ColorBox" Style="{StaticResource Field}" TextChanged="Style_Changed"/>
+
+                                <TextBlock Text="Alineación horizontal" Style="{StaticResource FieldLabel}"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton x:Name="HLeft" GroupName="H" Content="◧ Izq" Style="{StaticResource SegRadio}" Checked="Style_Changed"/>
+                                    <RadioButton x:Name="HCenter" GroupName="H" Content="▣ Centro" Style="{StaticResource SegRadio}" Checked="Style_Changed"/>
+                                    <RadioButton x:Name="HRight" GroupName="H" Content="◨ Der" Style="{StaticResource SegRadio}" Checked="Style_Changed"/>
+                                </StackPanel>
+
+                                <TextBlock Text="Alineación vertical" Style="{StaticResource FieldLabel}"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton x:Name="VTop" GroupName="V" Content="⬒ Arriba" Style="{StaticResource SegRadio}" Checked="Style_Changed"/>
+                                    <RadioButton x:Name="VCenter" GroupName="V" Content="▤ Centro" Style="{StaticResource SegRadio}" Checked="Style_Changed"/>
+                                    <RadioButton x:Name="VBottom" GroupName="V" Content="⬓ Abajo" Style="{StaticResource SegRadio}" Checked="Style_Changed"/>
+                                </StackPanel>
+
+                                <TextBlock Style="{StaticResource FieldLabel}">
+                                    <Run Text="Interlineado: "/><Run x:Name="LineValue" Text="1.0"/>
+                                </TextBlock>
+                                <Slider x:Name="LineSlider" Minimum="0.8" Maximum="2" Value="1"
+                                        ValueChanged="Style_Changed"/>
+
+                                <CheckBox x:Name="ShadowCheck" Content="Sombra" Margin="0,12,0,0"
+                                          Checked="Style_Changed" Unchecked="Style_Changed"/>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <TabItem Header="Caja">
+                        <StackPanel Margin="0,4,6,0">
+                            <TextBlock Text="Tamaño de la caja (16:9, centrada)" Style="{StaticResource FieldLabel}"/>
+                            <StackPanel Orientation="Horizontal">
+                                <ComboBox x:Name="SizePercentCombo" Width="90" FontSize="12"
+                                          SelectionChanged="SizePercent_Changed">
+                                    <ComboBoxItem Content="50 %"/>
+                                    <ComboBoxItem Content="60 %"/>
+                                    <ComboBoxItem Content="70 %"/>
+                                    <ComboBoxItem Content="75 %"/>
+                                    <ComboBoxItem Content="80 %"/>
+                                    <ComboBoxItem Content="90 %"/>
+                                    <ComboBoxItem Content="100 %"/>
+                                </ComboBox>
+                                <TextBlock Text="aplica al instante" FontSize="11" VerticalAlignment="Center"
+                                           Foreground="{StaticResource FaintBrush}" Margin="8,0,0,0"/>
+                            </StackPanel>
+
+                            <TextBlock Text="Alinear la caja en la pantalla" Style="{StaticResource FieldLabel}"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <Button Content="◧" Style="{StaticResource DarkButton}" Width="34" Padding="0,6"
+                                        Tag="HL" Click="AlignBox_Click" ToolTip="Pegar a la izquierda"/>
+                                <Button Content="▣" Style="{StaticResource DarkButton}" Width="34" Padding="0,6" Margin="4,0,0,0"
+                                        Tag="HC" Click="AlignBox_Click" ToolTip="Centrar horizontal"/>
+                                <Button Content="◨" Style="{StaticResource DarkButton}" Width="34" Padding="0,6" Margin="4,0,0,0"
+                                        Tag="HR" Click="AlignBox_Click" ToolTip="Pegar a la derecha"/>
+                                <Button Content="⬒" Style="{StaticResource DarkButton}" Width="34" Padding="0,6" Margin="12,0,0,0"
+                                        Tag="VT" Click="AlignBox_Click" ToolTip="Pegar arriba"/>
+                                <Button Content="▤" Style="{StaticResource DarkButton}" Width="34" Padding="0,6" Margin="4,0,0,0"
+                                        Tag="VC" Click="AlignBox_Click" ToolTip="Centrar vertical"/>
+                                <Button Content="⬓" Style="{StaticResource DarkButton}" Width="34" Padding="0,6" Margin="4,0,0,0"
+                                        Tag="VB" Click="AlignBox_Click" ToolTip="Pegar abajo"/>
+                            </StackPanel>
+                            <Button Content="Centrar en la pantalla" Style="{StaticResource DarkButton}"
+                                    Tag="CC" Click="AlignBox_Click" Margin="0,4,0,0" HorizontalAlignment="Left" Padding="12,6"/>
+
+                            <TextBlock Text="Posición y tamaño (px sobre 1920×1080)" Style="{StaticResource FieldLabel}"/>
+                            <TextBlock x:Name="BoxInfo" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
+                        </StackPanel>
+                    </TabItem>
+                </TabControl>
+            </DockPanel>
+        </Border>
+
+        <!-- ── Barra de acciones ── -->
+        <DockPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5" Margin="0,12,0,0">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                <Button Content="Aplicar formato a todas" Style="{StaticResource DarkButton}"
+                        Click="ApplyToAll_Click" Padding="14,8"
+                        ToolTip="Copia el formato (y la caja) de esta diapositiva al resto de la canción"/>
+                <Button Content="Restablecer diapositiva" Style="{StaticResource DarkButton}" Margin="8,0,0,0"
+                        Click="ResetSlide_Click" Padding="14,8"
+                        ToolTip="Esta diapositiva vuelve a seguir el tema"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Guardar" Style="{StaticResource AccentButton}" Click="Save_Click" Padding="22,8"/>
+                <Button Content="Cancelar" Style="{StaticResource DarkButton}" IsCancel="True" Padding="22,8" Margin="8,0,0,0"/>
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</Window>

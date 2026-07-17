@@ -34,7 +34,10 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly ITextPrompt _textPrompt;
     private readonly IThemeRepository _themes;
     private readonly IThemeManagerDialog _themeManager;
-    private readonly ISlideDesigner _slideDesigner;
+    private readonly ISongDesigner _songDesigner;
+
+    /// <summary>Copied slide (label + text + style) for paste/duplicate.</summary>
+    private (string Label, string Text, string? StyleJson)? _clipboardSlide;
 
     /// <summary>What the projector is showing; the Live box binds to it.</summary>
     public ProjectionViewModel Projection { get; }
@@ -154,7 +157,7 @@ public sealed partial class MainViewModel : ObservableObject
         ITextPrompt textPrompt,
         IThemeRepository themes,
         IThemeManagerDialog themeManager,
-        ISlideDesigner slideDesigner,
+        ISongDesigner songDesigner,
         ProjectionViewModel projectionViewModel)
     {
         _displayProvider = displayProvider;
@@ -168,7 +171,7 @@ public sealed partial class MainViewModel : ObservableObject
         _textPrompt = textPrompt;
         _themes = themes;
         _themeManager = themeManager;
-        _slideDesigner = slideDesigner;
+        _songDesigner = songDesigner;
         Projection = projectionViewModel;
 
         _presentation.Changed += (_, _) => UpdateStateFlags();
@@ -302,34 +305,120 @@ public sealed partial class MainViewModel : ObservableObject
         PreviewSlide = Slides.FirstOrDefault()?.Slide;
     }
 
-    /// <summary>Opens the ProPresenter-style designer for one song slide (right-click on its card).</summary>
-    [RelayCommand]
-    private void EditSlideDesign(SlideItemViewModel? item)
-    {
-        if (item is null)
-            return;
+    private SongSection? SectionOf(SlideItemViewModel? item) =>
+        item is null || SelectedSong is null || item.SectionId == 0
+            ? null
+            : SelectedSong.Sections.FirstOrDefault(s => s.Id == item.SectionId);
 
-        if (SelectedSong is null || item.SectionId == 0)
+    /// <summary>Opens the full-song ProPresenter-style designer (right-click → Editar canción / Diseñar).</summary>
+    [RelayCommand]
+    private void EditSongDesign(SlideItemViewModel? item)
+    {
+        if (SelectedSong is null || (item is not null && item.SectionId == 0))
         {
-            StatusText = "El diseño por diapositiva es para canciones; la Biblia usa su tema global (🎨 Temas).";
+            StatusText = "El diseño es para canciones; la Biblia usa su tema global (🎨 Temas).";
             return;
         }
 
-        var section = SelectedSong.Sections.FirstOrDefault(s => s.Id == item.SectionId);
-        if (section is null)
-            return;
+        var index = item is not null
+            ? SelectedSong.Sections.FindIndex(s => s.Id == item.SectionId)
+            : 0;
+        if (index < 0)
+            index = 0;
 
         var theme = ResolveSongTheme(SelectedSong);
-        var (saved, result) = _slideDesigner.Edit(section.Text, theme, section.GetOverride());
-        if (!saved)
+        if (!_songDesigner.Edit(SelectedSong, theme, index))
             return;
 
-        section.SetOverride(result);
-        _songs.Save(SelectedSong);
-        RebuildSlidesPreservingLive(LoadSongs);
-        StatusText = result is null
-            ? "Diseño restablecido: la diapositiva vuelve a seguir el tema."
-            : "Diseño de la diapositiva guardado.";
+        var saved = _songs.Save(SelectedSong);
+        RebuildSlidesPreservingLive(() =>
+        {
+            LoadSongs();
+            SelectedSong = Songs.FirstOrDefault(s => s.Id == saved.Id);
+        });
+        StatusText = "Diseño de la canción guardado.";
+    }
+
+    /// <summary>Right-click → "Editar como texto plano": the lyrics editor.</summary>
+    [RelayCommand]
+    private void EditSongAsText(SlideItemViewModel? item)
+    {
+        if (SelectedSong is not null)
+            EditSong();
+    }
+
+    // ── Copiar / pegar / duplicar / eliminar diapositivas ────────
+
+    [RelayCommand]
+    private void CopySlide(SlideItemViewModel? item)
+    {
+        var section = SectionOf(item);
+        if (section is null)
+            return;
+        _clipboardSlide = (section.Label, section.Text, section.StyleJson);
+        StatusText = "Diapositiva copiada.";
+    }
+
+    [RelayCommand]
+    private void PasteSlide(SlideItemViewModel? item)
+    {
+        if (_clipboardSlide is null || SelectedSong is null)
+            return;
+
+        var at = item is not null
+            ? SelectedSong.Sections.FindIndex(s => s.Id == item.SectionId) + 1
+            : SelectedSong.Sections.Count;
+        if (at <= 0)
+            at = SelectedSong.Sections.Count;
+
+        var c = _clipboardSlide.Value;
+        SelectedSong.Sections.Insert(at,
+            new SongSection { Label = c.Label, Text = c.Text, StyleJson = c.StyleJson });
+        ReindexAndSaveSong("Diapositiva pegada.");
+    }
+
+    [RelayCommand]
+    private void DuplicateSlide(SlideItemViewModel? item)
+    {
+        var section = SectionOf(item);
+        if (section is null || SelectedSong is null)
+            return;
+
+        var at = SelectedSong.Sections.FindIndex(s => s.Id == section.Id) + 1;
+        SelectedSong.Sections.Insert(at,
+            new SongSection { Label = section.Label, Text = section.Text, StyleJson = section.StyleJson });
+        ReindexAndSaveSong("Diapositiva duplicada.");
+    }
+
+    [RelayCommand]
+    private void DeleteSlide(SlideItemViewModel? item)
+    {
+        var section = SectionOf(item);
+        if (section is null || SelectedSong is null)
+            return;
+
+        if (SelectedSong.Sections.Count <= 1)
+        {
+            StatusText = "La canción debe tener al menos una diapositiva.";
+            return;
+        }
+
+        SelectedSong.Sections.RemoveAll(s => s.Id == section.Id);
+        ReindexAndSaveSong("Diapositiva eliminada.");
+    }
+
+    private void ReindexAndSaveSong(string status)
+    {
+        if (SelectedSong is null)
+            return;
+
+        for (var i = 0; i < SelectedSong.Sections.Count; i++)
+            SelectedSong.Sections[i].Order = i;
+
+        var saved = _songs.Save(SelectedSong);
+        LoadSongs();
+        SelectedSong = Songs.FirstOrDefault(s => s.Id == saved.Id);
+        StatusText = status;
     }
 
     [RelayCommand]
