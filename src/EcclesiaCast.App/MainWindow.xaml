@@ -252,6 +252,32 @@
                                               DisplayMemberPath="Name"
                                               Margin="0,0,8,0" VerticalAlignment="Center"/>
                                 </DockPanel>
+
+                                <Grid DockPanel.Dock="Top" Margin="12,0,12,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="8"/>
+                                        <ColumnDefinition Width="86"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="LIBRO"
+                                               FontSize="10" Foreground="{StaticResource FaintBrush}" Margin="0,0,0,2"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="CAP."
+                                               FontSize="10" Foreground="{StaticResource FaintBrush}" Margin="0,0,0,2"/>
+                                    <ComboBox Grid.Row="1" Grid.Column="0"
+                                              ItemsSource="{Binding BibleBooksAvailable}"
+                                              SelectedItem="{Binding SelectedBibleBook}"
+                                              DisplayMemberPath="Name"
+                                              ToolTip="Navegar por libro — en orden, como en la Biblia"/>
+                                    <ComboBox Grid.Row="1" Grid.Column="2"
+                                              ItemsSource="{Binding BibleChapters}"
+                                              SelectedItem="{Binding SelectedBibleChapter}"
+                                              ToolTip="Capítulo"/>
+                                </Grid>
+
                                 <TextBox DockPanel.Dock="Top"
                                          Margin="12,0,12,6" Padding="8,6"
                                          Background="{StaticResource SurfaceAltBrush}"

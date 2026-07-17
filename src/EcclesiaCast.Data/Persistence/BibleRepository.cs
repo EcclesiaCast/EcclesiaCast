@@ -70,6 +70,32 @@ public sealed class BibleRepository(string dbPath) : IBibleRepository
         db.SaveChanges();
     }
 
+    public IReadOnlyList<int> GetAvailableBookNumbers(int versionId)
+    {
+        using var db = new AppDbContext(dbPath);
+        return db.BibleBooks.AsNoTracking()
+            .Where(b => b.VersionId == versionId)
+            .OrderBy(b => b.Number)
+            .Select(b => b.Number)
+            .ToList();
+    }
+
+    public IReadOnlyList<int> GetChapterNumbers(int versionId, int bookNumber)
+    {
+        using var db = new AppDbContext(dbPath);
+        var book = db.BibleBooks.AsNoTracking()
+            .FirstOrDefault(b => b.VersionId == versionId && b.Number == bookNumber);
+        if (book is null)
+            return [];
+
+        return db.BibleVerses.AsNoTracking()
+            .Where(v => v.BookId == book.Id)
+            .Select(v => v.Chapter)
+            .Distinct()
+            .OrderBy(c => c)
+            .ToList();
+    }
+
     public IReadOnlyList<BibleVerseResult> GetPassage(int versionId, BibleReference reference)
     {
         using var db = new AppDbContext(dbPath);

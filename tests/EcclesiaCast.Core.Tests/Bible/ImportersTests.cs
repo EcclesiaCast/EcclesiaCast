@@ -56,6 +56,88 @@ public class JsonBibleImporterTests
     }
 }
 
+public class YouVersionStyleJsonBibleImporterTests
+{
+    [Fact]
+    public void Parses_verses_by_usfm_code_skipping_non_verse_items()
+    {
+        const string json = """
+            {
+              "books": [
+                {
+                  "book_usfm": "JHN",
+                  "name": "Juan",
+                  "chapters": [
+                    {
+                      "chapter_usfm": "JHN.3",
+                      "items": [
+                        { "type": "heading1", "verse_numbers": [], "lines": ["Un encuentro de noche"] },
+                        { "type": "verse", "verse_numbers": [16], "lines": ["Porque de tal manera amó Dios al mundo,", "que ha dado a su Hijo unigénito."] },
+                        { "type": "verse", "verse_numbers": [17], "lines": ["Porque no envió Dios a su Hijo para condenar al mundo."] }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            """;
+
+        var bible = JsonBibleImporter.Parse(json);
+
+        var john = Assert.Single(bible.Books);
+        Assert.Equal(43, john.Number);
+        Assert.Equal("Juan", john.Name);
+        Assert.Equal(2, john.Verses.Count);
+        Assert.Equal(new ParsedVerse(3, 16, "Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito."), john.Verses[0]);
+        Assert.Equal(new ParsedVerse(3, 17, "Porque no envió Dios a su Hijo para condenar al mundo."), john.Verses[1]);
+    }
+
+    [Fact]
+    public void Books_with_unrecognized_usfm_codes_are_skipped()
+    {
+        const string json = """
+            { "books": [ { "book_usfm": "INTRO", "name": "Introducción", "chapters": [] } ] }
+            """;
+
+        var bible = JsonBibleImporter.Parse(json);
+
+        Assert.Empty(bible.Books);
+    }
+
+    [Fact]
+    public void A_verse_covering_multiple_numbers_is_stored_under_each()
+    {
+        const string json = """
+            {
+              "books": [
+                {
+                  "book_usfm": "GEN",
+                  "chapters": [
+                    {
+                      "chapter_usfm": "GEN.1",
+                      "items": [
+                        { "type": "verse", "verse_numbers": [1, 2], "lines": ["Texto combinado"] }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            """;
+
+        var bible = JsonBibleImporter.Parse(json);
+
+        Assert.Equal(2, bible.Books[0].Verses.Count);
+        Assert.All(bible.Books[0].Verses, v => Assert.Equal("Texto combinado", v.Text));
+    }
+
+    [Fact]
+    public void Objects_without_a_books_array_throw()
+    {
+        Assert.Throws<FormatException>(() => JsonBibleImporter.Parse("""{ "version_id": 1 }"""));
+    }
+}
+
 public class ZefaniaBibleImporterTests
 {
     [Fact]

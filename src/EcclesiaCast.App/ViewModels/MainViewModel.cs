@@ -39,6 +39,12 @@ public sealed partial class MainViewModel : ObservableObject
     public ObservableCollection<BibleVersionInfo> BibleVersions { get; } = [];
     public ObservableCollection<BibleVerseResult> BibleSearchResults { get; } = [];
 
+    /// <summary>Books present in the selected version, in Bible order — for the Libro dropdown.</summary>
+    public ObservableCollection<BibleBookInfo> BibleBooksAvailable { get; } = [];
+
+    /// <summary>Chapters available for the selected book — for the Capítulo dropdown.</summary>
+    public ObservableCollection<int> BibleChapters { get; } = [];
+
     /// <summary>The center slide grid — filled from either a song or a Bible passage.</summary>
     public ObservableCollection<SlideItemViewModel> Slides { get; } = [];
 
@@ -88,6 +94,12 @@ public sealed partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     private BibleVersionInfo? _selectedBibleVersion;
+
+    [ObservableProperty]
+    private BibleBookInfo? _selectedBibleBook;
+
+    [ObservableProperty]
+    private int? _selectedBibleChapter;
 
     [ObservableProperty]
     private string _bibleQuery = string.Empty;
@@ -325,8 +337,55 @@ public sealed partial class MainViewModel : ObservableObject
 
     partial void OnSelectedBibleVersionChanged(BibleVersionInfo? value)
     {
+        LoadBibleBooksAvailable();
         if (!string.IsNullOrWhiteSpace(BibleQuery))
             RunBibleQuery();
+    }
+
+    private void LoadBibleBooksAvailable()
+    {
+        BibleBooksAvailable.Clear();
+
+        if (SelectedBibleVersion is null)
+        {
+            SelectedBibleBook = null;
+            return;
+        }
+
+        foreach (var number in _bibles.GetAvailableBookNumbers(SelectedBibleVersion.Id))
+        {
+            var info = BibleBookCatalog.FindByNumber(number);
+            if (info is not null)
+                BibleBooksAvailable.Add(info);
+        }
+
+        // Keep the same book selected across a version switch when possible.
+        var keepNumber = SelectedBibleBook?.Number;
+        SelectedBibleBook = BibleBooksAvailable.FirstOrDefault(b => b.Number == keepNumber)
+            ?? BibleBooksAvailable.FirstOrDefault();
+    }
+
+    partial void OnSelectedBibleBookChanged(BibleBookInfo? value)
+    {
+        BibleChapters.Clear();
+        SelectedBibleChapter = null;
+
+        if (value is null || SelectedBibleVersion is null)
+            return;
+
+        foreach (var chapter in _bibles.GetChapterNumbers(SelectedBibleVersion.Id, value.Number))
+            BibleChapters.Add(chapter);
+    }
+
+    partial void OnSelectedBibleChapterChanged(int? value)
+    {
+        if (value is null || SelectedBibleBook is null)
+            return;
+
+        // Browsing by book/chapter and typing a reference are two paths to
+        // the same grid; clear the search box so they don't fight visually.
+        BibleQuery = string.Empty;
+        LoadBiblePassage(new BibleReference(SelectedBibleBook.Number, value.Value, null, null));
     }
 
     private void RunBibleQuery()

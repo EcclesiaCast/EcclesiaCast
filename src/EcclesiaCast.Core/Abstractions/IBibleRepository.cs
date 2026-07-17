@@ -19,6 +19,12 @@ public interface IBibleRepository
 
     void DeleteVersion(int versionId);
 
+    /// <summary>Canonical book numbers (1–66) present in this version, in Bible order.</summary>
+    IReadOnlyList<int> GetAvailableBookNumbers(int versionId);
+
+    /// <summary>Chapter numbers available for a book in this version, in order.</summary>
+    IReadOnlyList<int> GetChapterNumbers(int versionId, int bookNumber);
+
     /// <summary>Verses for a reference: a single verse, a range, or the whole chapter (null start).</summary>
     IReadOnlyList<BibleVerseResult> GetPassage(int versionId, BibleReference reference);
 
