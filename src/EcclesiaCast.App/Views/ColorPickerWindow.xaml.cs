@@ -14,12 +14,16 @@ public partial class ColorPickerWindow : Window
         "#E8C34A", "#F2A93B", "#C43B3B", "#E06666", "#8E44AD", "#D264C8",
     ];
 
+    /// <summary>Returned when the operator picks "Transparent".</summary>
+    public const string Transparent = "TRANSPARENT";
+
     private bool _loading;
 
-    public ColorPickerWindow(string? currentHex)
+    public ColorPickerWindow(string? currentHex, bool allowTransparent = false)
     {
         InitializeComponent();
         Swatches.ItemsSource = Presets;
+        TransparentButton.Visibility = allowTransparent ? Visibility.Visible : Visibility.Collapsed;
 
         var color = ParseOr(currentHex, Colors.White);
         _loading = true;
@@ -102,6 +106,12 @@ public partial class ColorPickerWindow : Window
     private void Accept_Click(object sender, RoutedEventArgs e)
     {
         ResultHex = HexBox.Text.Trim();
+        DialogResult = true;
+    }
+
+    private void Transparent_Click(object sender, RoutedEventArgs e)
+    {
+        ResultHex = Transparent;
         DialogResult = true;
     }
 }

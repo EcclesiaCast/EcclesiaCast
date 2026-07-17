@@ -112,7 +112,7 @@
                     BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
                     Height="280" Margin="0,0,0,10">
                 <Viewbox Stretch="Uniform" Margin="6">
-                    <Grid Width="960" Height="540" ClipToBounds="True">
+                    <Grid Width="960" Height="540" ClipToBounds="True" Background="{StaticResource CheckerBrush}">
                         <controls:SlideView Slide="{Binding PreviewSlide}"/>
                         <Canvas x:Name="Overlay" Background="Transparent">
                             <Border x:Name="BoxBorder"
@@ -147,6 +147,14 @@
                     </Grid>
                 </Viewbox>
             </Border>
+
+            <StackPanel Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Right"
+                        Orientation="Horizontal" Margin="0,0,10,20">
+                <Button Content="Centrar H" Style="{StaticResource DarkButton}" FontSize="11" Padding="8,4"
+                        Click="CenterBoxH_Click" ToolTip="Centrar la caja horizontalmente"/>
+                <Button Content="Centrar V" Style="{StaticResource DarkButton}" FontSize="11" Padding="8,4" Margin="6,0,0,0"
+                        Click="CenterBoxV_Click" ToolTip="Centrar la caja verticalmente"/>
+            </StackPanel>
 
             <!-- Campos -->
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
@@ -265,12 +273,40 @@
                         </TextBlock>
                         <Slider Minimum="20" Maximum="70" Value="{Binding CaptionFontSize}"/>
 
+                        <TextBlock Text="Tipografía de la leyenda" Style="{StaticResource FieldLabel}"/>
+                        <ComboBox x:Name="CaptionFontCombo" IsEditable="True" FontSize="12"
+                                  Text="{Binding CaptionFontFamily, UpdateSourceTrigger=LostFocus}"/>
+
+                        <TextBlock Text="Color de la leyenda" Style="{StaticResource FieldLabel}"/>
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Content="Paleta…" FontSize="11" Padding="8,3" Margin="6,0,0,0"
+                                    Style="{StaticResource DarkButton}" Command="{Binding PickCaptionColorCommand}"/>
+                            <TextBox Style="{StaticResource Field}" Text="{Binding CaptionColor, UpdateSourceTrigger=PropertyChanged}"/>
+                        </DockPanel>
+
                         <StackPanel Visibility="{Binding IsBibleKind, Converter={StaticResource BoolToVis}}">
-                            <TextBlock Text="Solo Biblia" Style="{StaticResource FieldLabel}"/>
+                            <TextBlock Text="Solo Biblia — referencia" Style="{StaticResource FieldLabel}"/>
                             <WrapPanel>
                                 <CheckBox Content="Mostrar versión en la referencia" IsChecked="{Binding ShowVersionName}"/>
                                 <CheckBox Content="Número de versículo en el texto" IsChecked="{Binding ShowVerseNumbers}"/>
                             </WrapPanel>
+
+                            <TextBlock Text="Segunda versión (proyección de dos versiones)" Style="{StaticResource FieldLabel}"/>
+                            <CheckBox Content="Usa el mismo estilo que la primera"
+                                      IsChecked="{Binding SecondaryMatchesPrimary}"/>
+                            <StackPanel Visibility="{Binding SecondaryMatchesPrimary, Converter={StaticResource InverseBoolToVis}}">
+                                <TextBlock Style="{StaticResource FieldLabel}">
+                                    <Run Text="Tamaño de la 2ª versión: "/><Run Text="{Binding SecondaryScalePercent, StringFormat={}{0:0} %}"/>
+                                </TextBlock>
+                                <Slider Minimum="30" Maximum="120" Value="{Binding SecondaryScalePercent}"/>
+                                <CheckBox Content="Cursiva" IsChecked="{Binding SecondaryItalic}" Margin="0,6,0,0"/>
+                                <TextBlock Text="Color de la 2ª versión" Style="{StaticResource FieldLabel}"/>
+                                <DockPanel>
+                                    <Button DockPanel.Dock="Right" Content="Paleta…" FontSize="11" Padding="8,3" Margin="6,0,0,0"
+                                            Style="{StaticResource DarkButton}" Command="{Binding PickSecondaryColorCommand}"/>
+                                    <TextBox Style="{StaticResource Field}" Text="{Binding SecondaryColor, UpdateSourceTrigger=PropertyChanged}"/>
+                                </DockPanel>
+                            </StackPanel>
                         </StackPanel>
                     </StackPanel>
                 </Grid>

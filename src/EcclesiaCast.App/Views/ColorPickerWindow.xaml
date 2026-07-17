@@ -68,9 +68,16 @@
             </DockPanel>
         </StackPanel>
 
-        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
-            <Button Content="Aceptar" Style="{StaticResource AccentButton}" Click="Accept_Click" Padding="20,8"/>
-            <Button Content="Cancelar" Style="{StaticResource DarkButton}" IsCancel="True" Padding="20,8" Margin="8,0,0,0"/>
-        </StackPanel>
+        <DockPanel Grid.Row="4" Margin="0,16,0,0">
+            <Button x:Name="TransparentButton" DockPanel.Dock="Left"
+                    Content="Transparente" Style="{StaticResource DarkButton}"
+                    Click="Transparent_Click" Padding="14,8"
+                    Visibility="Collapsed"
+                    ToolTip="Sin color de fondo: se verá el video/imagen detrás"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Aceptar" Style="{StaticResource AccentButton}" Click="Accept_Click" Padding="20,8"/>
+                <Button Content="Cancelar" Style="{StaticResource DarkButton}" IsCancel="True" Padding="20,8" Margin="8,0,0,0"/>
+            </StackPanel>
+        </DockPanel>
     </Grid>
 </Window>

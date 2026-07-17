@@ -25,14 +25,29 @@ public partial class ThemeManagerWindow : Window
         _viewModel = viewModel;
         DataContext = viewModel;
 
-        FontCombo.ItemsSource = Fonts.SystemFontFamilies
+        var fonts = Fonts.SystemFontFamilies
             .Select(f => f.Source)
             .OrderBy(name => name)
             .ToList();
+        FontCombo.ItemsSource = fonts;
+        CaptionFontCombo.ItemsSource = fonts;
 
         // Reposition the box whenever the loaded theme's box changes.
         viewModel.PropertyChanged += OnViewModelChanged;
+        viewModel.CloseRequested += (_, _) => { DialogResult = true; };
         Loaded += (_, _) => PlaceBox();
+    }
+
+    private void CenterBoxH_Click(object sender, RoutedEventArgs e)
+    {
+        Canvas.SetLeft(BoxBorder, (CanvasW - BoxBorder.Width) / 2);
+        CommitBox();
+    }
+
+    private void CenterBoxV_Click(object sender, RoutedEventArgs e)
+    {
+        Canvas.SetTop(BoxBorder, (CanvasH - BoxBorder.Height) / 2);
+        CommitBox();
     }
 
     private void OnViewModelChanged(object? sender, PropertyChangedEventArgs e)

@@ -144,6 +144,29 @@
             </Setter>
         </Style>
 
+        <!-- Checkerboard behind the editor canvas: marks the slide bounds and
+             signals a transparent background (like Photoshop). -->
+        <DrawingBrush x:Key="CheckerBrush" TileMode="Tile"
+                      Viewport="0,0,40,40" ViewportUnits="Absolute" Stretch="None">
+            <DrawingBrush.Drawing>
+                <DrawingGroup>
+                    <GeometryDrawing Brush="#191C24">
+                        <GeometryDrawing.Geometry>
+                            <RectangleGeometry Rect="0,0,40,40"/>
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+                    <GeometryDrawing Brush="#20242E">
+                        <GeometryDrawing.Geometry>
+                            <GeometryGroup>
+                                <RectangleGeometry Rect="0,0,20,20"/>
+                                <RectangleGeometry Rect="20,20,20,20"/>
+                            </GeometryGroup>
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+                </DrawingGroup>
+            </DrawingBrush.Drawing>
+        </DrawingBrush>
+
         <!-- Resize handle for the text-box editor (corners + edge midpoints) -->
         <Style x:Key="BoxHandle" TargetType="Thumb">
             <Setter Property="Width" Value="12"/>

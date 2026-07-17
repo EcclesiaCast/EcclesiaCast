@@ -66,8 +66,16 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     [ObservableProperty] private bool _showCaption = true;
     [ObservableProperty] private int _captionPositionIndex = 5;        // orden del enum
     [ObservableProperty] private double _captionFontSize = 40;
+    [ObservableProperty] private string _captionFontFamily = "Segoe UI";
+    [ObservableProperty] private string _captionColor = "#B9C6DE";
     [ObservableProperty] private bool _showVersionName = true;
     [ObservableProperty] private bool _showVerseNumbers;
+
+    // Segunda versión bíblica
+    [ObservableProperty] private bool _secondaryMatchesPrimary;
+    [ObservableProperty] private double _secondaryScalePercent = 62;   // 0–100
+    [ObservableProperty] private string _secondaryColor = "#C9D4E8";
+    [ObservableProperty] private bool _secondaryItalic = true;
 
     public ThemeManagerViewModel(IThemeRepository themes, ISettingsStore settings)
     {
@@ -138,8 +146,14 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         ShowCaption = theme.ShowCaption;
         CaptionPositionIndex = (int)theme.CaptionPosition;
         CaptionFontSize = theme.CaptionFontSize;
+        CaptionFontFamily = theme.CaptionFontFamily ?? theme.FontFamily;
+        CaptionColor = theme.CaptionColor;
         ShowVersionName = theme.ShowVersionName;
         ShowVerseNumbers = theme.ShowVerseNumbers;
+        SecondaryMatchesPrimary = theme.SecondaryMatchesPrimary;
+        SecondaryScalePercent = theme.SecondaryScale * 100;
+        SecondaryColor = theme.SecondaryColor;
+        SecondaryItalic = theme.SecondaryItalic;
         _loading = false;
         UpdatePreview();
     }
@@ -173,8 +187,14 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         ShowCaption = ShowCaption,
         CaptionPosition = (CaptionPosition)Math.Clamp(CaptionPositionIndex, 0, 5),
         CaptionFontSize = CaptionFontSize,
+        CaptionFontFamily = string.IsNullOrWhiteSpace(CaptionFontFamily) ? null : CaptionFontFamily.Trim(),
+        CaptionColor = CaptionColor,
         ShowVersionName = ShowVersionName,
         ShowVerseNumbers = ShowVerseNumbers,
+        SecondaryMatchesPrimary = SecondaryMatchesPrimary,
+        SecondaryScale = Math.Clamp(SecondaryScalePercent / 100, 0.2, 1.5),
+        SecondaryColor = SecondaryColor,
+        SecondaryItalic = SecondaryItalic,
     };
 
     private void UpdatePreview()
@@ -189,10 +209,15 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
             text = "16 " + text;
 
         var caption = isBible
-            ? theme.ShowVersionName ? "Juan 3:16 · RVC" : "Juan 3:16"
+            ? theme.ShowVersionName ? "Juan 3:16 · RVC / NTV" : "Juan 3:16"
             : "Grande es tu fidelidad — Marcos Witt";
 
-        PreviewSlide = new SlideContent(text, caption, Theme: theme);
+        // For Bible themes, show a second-version sample so its style is visible.
+        var secondary = isBible
+            ? "For God so loved the world, that he gave his only Son"
+            : null;
+
+        PreviewSlide = new SlideContent(text, caption, secondary, theme);
     }
 
     private void UpdateDefaultsText()
@@ -206,22 +231,24 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
 
     // ── Comandos ─────────────────────────────────────────────────
 
+    /// <summary>Raised when the operator saves — the window closes in response.</summary>
+    public event EventHandler? CloseRequested;
+
     [RelayCommand]
     private void SaveTheme()
     {
         if (SelectedTheme is null)
             return;
 
-        var saved = _themes.Save(BuildTheme(SelectedTheme.Id));
+        _themes.Save(BuildTheme(SelectedTheme.Id));
         ChangesMade = true;
-        LoadThemes(saved.Id);
-        StatusText = $"✓ \"{saved.Name}\" guardado.";
+        CloseRequested?.Invoke(this, EventArgs.Empty);
     }
 
     [RelayCommand]
     private void NewTheme()
     {
-        var created = _themes.Save(new SlideTheme { Name = "Nuevo tema", Kind = ThemeKind.Song });
+        var created = _themes.Save(new SlideTheme { Name = "Nuevo tema", Kind = ThemeKind.Song, TransparentBackground = true });
         ChangesMade = true;
         LoadThemes(created.Id);
     }
@@ -310,8 +337,34 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     [RelayCommand]
     private void PickBackgroundColor()
     {
-        var picked = ColorPickerHelper.Pick(BackgroundColor);
-        if (picked is not null)
+        var picked = ColorPickerHelper.Pick(BackgroundColor, allowTransparent: true);
+        if (picked is null)
+            return;
+
+        if (picked == ColorPickerHelper.Transparent)
+        {
+            TransparentBackground = true;
+        }
+        else
+        {
+            TransparentBackground = false;
             BackgroundColor = picked;
+        }
+    }
+
+    [RelayCommand]
+    private void PickCaptionColor()
+    {
+        var picked = ColorPickerHelper.Pick(CaptionColor);
+        if (picked is not null)
+            CaptionColor = picked;
+    }
+
+    [RelayCommand]
+    private void PickSecondaryColor()
+    {
+        var picked = ColorPickerHelper.Pick(SecondaryColor);
+        if (picked is not null)
+            SecondaryColor = picked;
     }
 }

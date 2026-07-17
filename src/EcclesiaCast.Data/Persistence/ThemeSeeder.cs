@@ -19,6 +19,7 @@ public static class ThemeSeeder
                 {
                     Name = "Canciones",
                     Kind = ThemeKind.Song,
+                    TransparentBackground = true,
                 });
             settings.Set(DefaultSongThemeKey, song.Id.ToString());
         }
@@ -34,6 +35,7 @@ public static class ThemeSeeder
                     Bold = false,
                     MaxFontSize = 76,
                     ShowVerseNumbers = false,
+                    TransparentBackground = true,
                 });
             settings.Set(DefaultBibleThemeKey, bible.Id.ToString());
         }

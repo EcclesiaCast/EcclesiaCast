@@ -95,6 +95,22 @@ public sealed class SlideTheme
     public CaptionPosition CaptionPosition { get; set; } = CaptionPosition.BottomRight;
     public double CaptionFontSize { get; set; } = 40;
 
+    /// <summary>Caption typeface; null uses the main text font.</summary>
+    public string? CaptionFontFamily { get; set; }
+
+    public string CaptionColor { get; set; } = "#B9C6DE";
+
+    // ── Segunda versión bíblica (proyección de dos versiones) ────
+    /// <summary>The 2nd version renders with the same style as the main text.</summary>
+    public bool SecondaryMatchesPrimary { get; set; }
+
+    /// <summary>Size of the 2nd version relative to the main text (when it differs).</summary>
+    public double SecondaryScale { get; set; } = 0.62;
+
+    public string SecondaryColor { get; set; } = "#C9D4E8";
+
+    public bool SecondaryItalic { get; set; } = true;
+
     // ── Solo Biblia ──────────────────────────────────────────────
     /// <summary>Include the version abbreviation in the reference caption.</summary>
     public bool ShowVersionName { get; set; } = true;

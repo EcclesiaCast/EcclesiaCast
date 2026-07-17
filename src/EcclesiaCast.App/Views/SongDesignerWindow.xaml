@@ -167,7 +167,8 @@
                               HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
                               SizeChanged="CanvasScroll_SizeChanged">
                     <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <Grid x:Name="CanvasRoot" Width="960" Height="540" ClipToBounds="True">
+                        <Grid x:Name="CanvasRoot" Width="960" Height="540" ClipToBounds="True"
+                              Background="{StaticResource CheckerBrush}">
                             <Grid.LayoutTransform>
                                 <ScaleTransform x:Name="ZoomTransform" ScaleX="1" ScaleY="1"/>
                             </Grid.LayoutTransform>

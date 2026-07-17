@@ -164,14 +164,21 @@ public partial class SlideView : UserControl
         MainText.TextDecorations = decorations;
         MainText.Effect = effect;
 
+        // La 2ª versión bíblica: mismo estilo que la principal, o el suyo.
+        var matches = theme.SecondaryMatchesPrimary;
         SecondaryText.FontFamily = fontFamily;
+        SecondaryText.FontWeight = matches && EffectiveBold ? FontWeights.SemiBold : FontWeights.Normal;
+        SecondaryText.FontStyle = (matches ? EffectiveItalic : theme.SecondaryItalic)
+            ? FontStyles.Italic : FontStyles.Normal;
+        SecondaryText.Foreground = matches ? foreground : BrushFromHex(theme.SecondaryColor, "#C9D4E8");
         SecondaryText.TextAlignment = alignment;
         SecondaryText.Effect = effect;
         SecondaryText.Margin = new Thickness(0, SecondarySpacing, 0, 0);
 
         CaptionLayer.Margin = new Thickness(theme.MarginHorizontal, theme.MarginVertical * 0.5,
             theme.MarginHorizontal, theme.MarginVertical * 0.5);
-        CaptionText.FontFamily = new FontFamily(theme.FontFamily);
+        CaptionText.FontFamily = new FontFamily(theme.CaptionFontFamily ?? theme.FontFamily);
+        CaptionText.Foreground = BrushFromHex(theme.CaptionColor, "#B9C6DE");
         CaptionText.FontSize = theme.CaptionFontSize;
         CaptionText.HorizontalAlignment = theme.CaptionPosition switch
         {
@@ -305,7 +312,8 @@ public partial class SlideView : UserControl
 
         var fontSize = FitFontSize(main, secondary, theme, areaWidth, areaHeight);
         MainText.FontSize = fontSize;
-        SecondaryText.FontSize = Math.Max(20, fontSize * SecondaryRatio);
+        var secondaryScale = theme.SecondaryMatchesPrimary ? 1.0 : theme.SecondaryScale;
+        SecondaryText.FontSize = Math.Max(20, fontSize * secondaryScale);
 
         if (EffectiveLineSpacing is double spacing && spacing > 0)
         {
@@ -385,7 +393,7 @@ public partial class SlideView : UserControl
 
             if (fits && !string.IsNullOrEmpty(secondary))
             {
-                var secondarySize = size * SecondaryRatio;
+                var secondarySize = size * (theme.SecondaryMatchesPrimary ? 1.0 : theme.SecondaryScale);
                 fits = MeasureHeight(secondary, secondarySize, theme, width) + SecondarySpacing
                     <= height - MeasureHeight(main, size, theme, width);
                 if (EffectiveFitToWidth)
