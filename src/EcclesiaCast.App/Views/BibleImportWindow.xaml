@@ -1,0 +1,59 @@
+<Window x:Class="EcclesiaCast.App.Views.BibleImportWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Importar Biblia"
+        Width="440" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BgBrush}"
+        FontFamily="Segoe UI">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0">
+            <TextBlock Text="Nombre *" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,4"/>
+            <TextBox x:Name="NameBox"
+                     Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                     BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
+                     Padding="8,6" FontSize="14"/>
+        </StackPanel>
+
+        <Grid Grid.Row="1" Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="120"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Abreviatura *" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,4"/>
+                <TextBox x:Name="AbbreviationBox"
+                         Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                         BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
+                         Padding="8,6" FontSize="14"
+                         ToolTip="Se muestra junto a cada versículo proyectado, ej. RVR1960"/>
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+                <TextBlock Text="Idioma" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,4"/>
+                <TextBox x:Name="LanguageBox" Text="es"
+                         Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                         BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
+                         Padding="8,6" FontSize="14"/>
+            </StackPanel>
+        </Grid>
+
+        <TextBlock Grid.Row="2"
+                   x:Name="ErrorText"
+                   Foreground="#E08A8A" FontSize="12"
+                   Margin="0,10,0,0"/>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button Content="Cancelar" Style="{StaticResource DarkButton}" IsCancel="True" Padding="18,9"/>
+            <Button Content="Importar" Style="{StaticResource AccentButton}"
+                    Click="Import_Click" Padding="18,9" Margin="10,0,0,0"/>
+        </StackPanel>
+    </Grid>
+</Window>

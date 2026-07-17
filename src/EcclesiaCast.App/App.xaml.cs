@@ -56,6 +56,9 @@ public partial class App : Application
         services.AddSingleton<ISettingsStore>(_ => new SqliteSettingsStore(dbPath));
         services.AddSingleton<ISongRepository>(_ => new SongRepository(dbPath));
         services.AddSingleton<ISongEditor, SongEditorService>();
+        services.AddSingleton<IBibleRepository>(_ => new BibleRepository(dbPath));
+        services.AddSingleton<IBibleImportDialog, BibleImportDialogService>();
+        services.AddSingleton<ITextPrompt, TextPromptService>();
         services.AddSingleton<MainViewModel>();
         _services = services.BuildServiceProvider();
 

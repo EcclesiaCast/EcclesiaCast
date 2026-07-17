@@ -1,3 +1,4 @@
+using EcclesiaCast.Core.Bible;
 using EcclesiaCast.Core.Songs;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,9 @@ public sealed class AppDbContext : DbContext
     public DbSet<Setting> Settings => Set<Setting>();
     public DbSet<Song> Songs => Set<Song>();
     public DbSet<SongSection> SongSections => Set<SongSection>();
+    public DbSet<BibleVersion> BibleVersions => Set<BibleVersion>();
+    public DbSet<BibleBook> BibleBooks => Set<BibleBook>();
+    public DbSet<BibleVerse> BibleVerses => Set<BibleVerse>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseSqlite($"Data Source={_dbPath}");
@@ -35,6 +39,33 @@ public sealed class AppDbContext : DbContext
         {
             section.HasKey(x => x.Id);
             section.Property(x => x.Text).IsRequired();
+        });
+
+        modelBuilder.Entity<BibleVersion>(version =>
+        {
+            version.HasKey(v => v.Id);
+            version.Property(v => v.Name).IsRequired();
+            version.HasMany(v => v.Books)
+                .WithOne()
+                .HasForeignKey(b => b.VersionId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<BibleBook>(book =>
+        {
+            book.HasKey(b => b.Id);
+            book.HasIndex(b => new { b.VersionId, b.Number }).IsUnique();
+            book.HasMany(b => b.Verses)
+                .WithOne(v => v.Book)
+                .HasForeignKey(v => v.BookId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<BibleVerse>(verse =>
+        {
+            verse.HasKey(v => v.Id);
+            verse.Property(v => v.Text).IsRequired();
+            verse.HasIndex(v => new { v.BookId, v.Chapter, v.Verse });
         });
     }
 }
