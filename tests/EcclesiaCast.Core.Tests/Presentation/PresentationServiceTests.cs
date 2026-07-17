@@ -128,6 +128,40 @@ public class PresentationServiceTests
     }
 
     [Fact]
+    public void SetHighlight_trims_and_raises_Changed()
+    {
+        var raised = 0;
+        _service.Changed += (_, _) => raised++;
+
+        _service.SetHighlight("  gracia  ");
+
+        Assert.Equal("gracia", _service.HighlightTerm);
+        Assert.Equal(1, raised);
+    }
+
+    [Fact]
+    public void SetHighlight_with_blank_clears_the_term()
+    {
+        _service.SetHighlight("gracia");
+
+        _service.SetHighlight("   ");
+
+        Assert.Null(_service.HighlightTerm);
+    }
+
+    [Fact]
+    public void SetHighlight_with_the_same_value_does_not_raise_Changed()
+    {
+        _service.SetHighlight("gracia");
+        var raised = 0;
+        _service.Changed += (_, _) => raised++;
+
+        _service.SetHighlight("gracia");
+
+        Assert.Equal(0, raised);
+    }
+
+    [Fact]
     public void GoLive_while_black_returns_to_content()
     {
         _service.GoLive(new SlideContent("Uno"));

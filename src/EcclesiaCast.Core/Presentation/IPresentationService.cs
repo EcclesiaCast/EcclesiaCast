@@ -17,6 +17,12 @@ public interface IPresentationService
     /// </summary>
     string? OverlayMessage { get; }
 
+    /// <summary>
+    /// Word or phrase highlighted inside the projected text (like a marker
+    /// pen over the live verse). Null when nothing is highlighted.
+    /// </summary>
+    string? HighlightTerm { get; }
+
     /// <summary>Raised whenever the slide, the output state or the overlay changes.</summary>
     event EventHandler? Changed;
 
@@ -36,4 +42,7 @@ public interface IPresentationService
     void ShowOverlay(string message);
 
     void HideOverlay();
+
+    /// <summary>Highlights a word or phrase in the projected text; null or blank clears it.</summary>
+    void SetHighlight(string? term);
 }

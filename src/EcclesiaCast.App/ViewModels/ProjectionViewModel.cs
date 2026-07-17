@@ -19,6 +19,9 @@ public sealed partial class ProjectionViewModel : ObservableObject
     [ObservableProperty]
     private string? _overlay;
 
+    [ObservableProperty]
+    private string? _highlight;
+
     public ProjectionViewModel(IPresentationService presentation)
     {
         presentation.Changed += (_, _) =>
@@ -26,9 +29,11 @@ public sealed partial class ProjectionViewModel : ObservableObject
             Slide = presentation.CurrentSlide;
             State = presentation.State;
             Overlay = presentation.OverlayMessage;
+            Highlight = presentation.HighlightTerm;
         };
         Slide = presentation.CurrentSlide;
         State = presentation.State;
         Overlay = presentation.OverlayMessage;
+        Highlight = presentation.HighlightTerm;
     }
 }

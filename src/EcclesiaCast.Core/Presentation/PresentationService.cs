@@ -41,6 +41,18 @@ public sealed class PresentationService : IPresentationService
         OnChanged();
     }
 
+    public string? HighlightTerm { get; private set; }
+
+    public void SetHighlight(string? term)
+    {
+        term = string.IsNullOrWhiteSpace(term) ? null : term.Trim();
+        if (term == HighlightTerm)
+            return;
+
+        HighlightTerm = term;
+        OnChanged();
+    }
+
     private void SetState(OutputState state)
     {
         // There is nothing to return to without a slide: fall back to clear.

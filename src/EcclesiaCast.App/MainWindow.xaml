@@ -232,7 +232,8 @@
 
                             <!-- ── Pestaña Biblia ── -->
                             <DockPanel Visibility="{Binding IsBibleTabActive, Converter={StaticResource BoolToVis}}">
-                                <DockPanel DockPanel.Dock="Top" Margin="12,0,12,8">
+                                <!-- Versiones (hasta 2 tildadas a la vez, estilo BibleShow) -->
+                                <DockPanel DockPanel.Dock="Top" Margin="12,0,12,4">
                                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
                                         <Button Content="📥" FontSize="11" Padding="7,4"
                                                 Style="{StaticResource DarkButton}"
@@ -247,36 +248,59 @@
                                                 Command="{Binding DeleteBibleVersionCommand}"
                                                 ToolTip="Eliminar versión"/>
                                     </StackPanel>
-                                    <ComboBox ItemsSource="{Binding BibleVersions}"
-                                              SelectedItem="{Binding SelectedBibleVersion}"
-                                              DisplayMemberPath="Name"
-                                              Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="VERSIONES — hasta 2 a la vez"
+                                               FontSize="10" Foreground="{StaticResource FaintBrush}"
+                                               VerticalAlignment="Center"/>
                                 </DockPanel>
-
-                                <Grid DockPanel.Dock="Top" Margin="12,0,12,6">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="8"/>
-                                        <ColumnDefinition Width="86"/>
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="LIBRO"
-                                               FontSize="10" Foreground="{StaticResource FaintBrush}" Margin="0,0,0,2"/>
-                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="CAP."
-                                               FontSize="10" Foreground="{StaticResource FaintBrush}" Margin="0,0,0,2"/>
-                                    <ComboBox Grid.Row="1" Grid.Column="0"
-                                              ItemsSource="{Binding BibleBooksAvailable}"
-                                              SelectedItem="{Binding SelectedBibleBook}"
-                                              DisplayMemberPath="Name"
-                                              ToolTip="Navegar por libro — en orden, como en la Biblia"/>
-                                    <ComboBox Grid.Row="1" Grid.Column="2"
-                                              ItemsSource="{Binding BibleChapters}"
-                                              SelectedItem="{Binding SelectedBibleChapter}"
-                                              ToolTip="Capítulo"/>
-                                </Grid>
+                                <Border DockPanel.Dock="Top" Margin="12,0,12,6"
+                                        Background="{StaticResource SurfaceAltBrush}"
+                                        BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
+                                        CornerRadius="4" MaxHeight="98">
+                                    <ListBox ItemsSource="{Binding BibleVersionOptions}"
+                                             SelectedItem="{Binding SelectedBibleVersionOption}"
+                                             Background="Transparent" BorderThickness="0"
+                                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                        <ListBox.ItemContainerStyle>
+                                            <Style TargetType="ListBoxItem">
+                                                <Setter Property="Padding" Value="8,3"/>
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="ListBoxItem">
+                                                            <Border x:Name="bd" Background="Transparent"
+                                                                    CornerRadius="3"
+                                                                    Padding="{TemplateBinding Padding}">
+                                                                <ContentPresenter/>
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsSelected" Value="True">
+                                                                    <Setter TargetName="bd" Property="Background" Value="#2C3040"/>
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </ListBox.ItemContainerStyle>
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <DockPanel>
+                                                    <CheckBox IsChecked="{Binding IsSelected}"
+                                                              VerticalAlignment="Center"
+                                                              ToolTip="Activa esta versión para proyectar (la segunda se muestra debajo de la primera)"/>
+                                                    <TextBlock Text="{Binding Info.Abbreviation}"
+                                                               DockPanel.Dock="Right"
+                                                               FontSize="10" Foreground="{StaticResource MutedBrush}"
+                                                               VerticalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding Info.Name}"
+                                                               FontSize="12" Foreground="White"
+                                                               Margin="6,0,6,0"
+                                                               VerticalAlignment="Center"
+                                                               TextTrimming="CharacterEllipsis"/>
+                                                </DockPanel>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </Border>
 
                                 <TextBox DockPanel.Dock="Top"
                                          Margin="12,0,12,6" Padding="8,6"
@@ -292,8 +316,84 @@
                                            FontSize="10" Foreground="{StaticResource FaintBrush}"
                                            TextWrapping="Wrap"
                                            Margin="12,4,12,10"/>
-                                <ListBox x:Name="BibleResultsList"
+
+                                <Grid>
+                                    <!-- Lista de libros, en orden bíblico -->
+                                    <ListBox ItemsSource="{Binding BibleBooksAvailable}"
+                                             SelectedItem="{Binding SelectedBibleBook}"
+                                             Visibility="{Binding ShowBooksList, Converter={StaticResource BoolToVis}}"
+                                             Background="Transparent" BorderThickness="0"
+                                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                        <ListBox.ItemContainerStyle>
+                                            <Style TargetType="ListBoxItem">
+                                                <Setter Property="Padding" Value="10,4"/>
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="ListBoxItem">
+                                                            <Border x:Name="bd" Background="Transparent"
+                                                                    CornerRadius="4" Margin="6,0"
+                                                                    Padding="{TemplateBinding Padding}">
+                                                                <ContentPresenter/>
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter TargetName="bd" Property="Background" Value="#20242F"/>
+                                                                </Trigger>
+                                                                <Trigger Property="IsSelected" Value="True">
+                                                                    <Setter TargetName="bd" Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </ListBox.ItemContainerStyle>
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Name}" FontSize="13" Foreground="White"/>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+
+                                    <!-- Capítulos del libro elegido, como grilla numérica -->
+                                    <DockPanel Visibility="{Binding ShowChaptersView, Converter={StaticResource BoolToVis}}">
+                                        <DockPanel DockPanel.Dock="Top" Margin="10,0,10,6">
+                                            <Button DockPanel.Dock="Left" Content="◀ Libros"
+                                                    Style="{StaticResource DarkButton}"
+                                                    FontSize="11" Padding="8,4"
+                                                    Command="{Binding BackToBooksCommand}"/>
+                                            <TextBlock Text="{Binding ChaptersTitle}"
+                                                       FontSize="13" FontWeight="SemiBold" Foreground="White"
+                                                       Margin="10,0,0,0" VerticalAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                        </DockPanel>
+                                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                            <ItemsControl x:Name="ChaptersGrid"
+                                                          ItemsSource="{Binding BibleChapters}"
+                                                          Margin="8,0">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <WrapPanel/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Button Content="{Binding}"
+                                                                Style="{StaticResource DarkButton}"
+                                                                Width="40" Height="32" Margin="2"
+                                                                Padding="0" FontSize="12"
+                                                                Command="{Binding DataContext.SelectChapterCommand, ElementName=ChaptersGrid}"
+                                                                CommandParameter="{Binding}"/>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+                                    </DockPanel>
+
+                                    <!-- Resultados de búsqueda por texto -->
+                                    <ListBox x:Name="BibleResultsList"
                                          ItemsSource="{Binding BibleSearchResults}"
+                                         Visibility="{Binding ShowBibleResults, Converter={StaticResource BoolToVis}}"
                                          Background="Transparent"
                                          BorderThickness="0"
                                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -343,7 +443,8 @@
                                             </StackPanel>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
-                                </ListBox>
+                                    </ListBox>
+                                </Grid>
                             </DockPanel>
                         </Grid>
                     </DockPanel>
@@ -399,47 +500,83 @@
                                 Margin="10,0,0,0"/>
                     </Grid>
 
-                    <TextBlock Grid.Row="2"
-                               Text="AVISO AL PIE — aparece sobre todo lo demás"
-                               Style="{StaticResource PanelTitle}"/>
+                    <Grid Grid.Row="2" Margin="0,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="AVISO AL PIE — sobre todo lo demás"
+                                   Style="{StaticResource PanelTitle}"/>
+                        <TextBlock Grid.Column="1"
+                                   Text="RESALTAR EN VIVO"
+                                   Style="{StaticResource PanelTitle}"/>
+                    </Grid>
 
                     <Grid Grid.Row="3" Margin="12,0,12,12">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="2*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox Text="{Binding OverlayText, UpdateSourceTrigger=PropertyChanged}"
-                                 Background="{StaticResource SurfaceAltBrush}"
-                                 Foreground="White"
-                                 BorderBrush="{StaticResource LineBrush}"
-                                 CaretBrush="White"
-                                 Padding="8,6" FontSize="14"
-                                 VerticalContentAlignment="Center">
-                            <TextBox.InputBindings>
-                                <KeyBinding Key="Enter" Command="{Binding ShowOverlayCommand}"/>
-                            </TextBox.InputBindings>
-                        </TextBox>
-                        <Button Grid.Column="1"
-                                Content="Mostrar aviso"
-                                Command="{Binding ShowOverlayCommand}"
-                                Margin="10,0,0,0">
-                            <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsOverlayActive}" Value="True">
-                                            <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
-                                            <Setter Property="BorderThickness" Value="0"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                        <Button Grid.Column="2"
-                                Content="Quitar"
-                                Style="{StaticResource DarkButton}"
-                                Command="{Binding HideOverlayCommand}"
-                                Margin="6,0,0,0"/>
+
+                        <Grid Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Text="{Binding OverlayText, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{StaticResource SurfaceAltBrush}"
+                                     Foreground="White"
+                                     BorderBrush="{StaticResource LineBrush}"
+                                     CaretBrush="White"
+                                     Padding="8,6" FontSize="14"
+                                     VerticalContentAlignment="Center">
+                                <TextBox.InputBindings>
+                                    <KeyBinding Key="Enter" Command="{Binding ShowOverlayCommand}"/>
+                                </TextBox.InputBindings>
+                            </TextBox>
+                            <Button Grid.Column="1"
+                                    Content="Mostrar"
+                                    Command="{Binding ShowOverlayCommand}"
+                                    Margin="8,0,0,0">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsOverlayActive}" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                                <Setter Property="BorderThickness" Value="0"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                            <Button Grid.Column="2"
+                                    Content="Quitar"
+                                    Style="{StaticResource DarkButton}"
+                                    Command="{Binding HideOverlayCommand}"
+                                    Margin="6,0,0,0"/>
+                        </Grid>
+
+                        <Grid Grid.Column="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Text="{Binding HighlightText, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{StaticResource SurfaceAltBrush}"
+                                     Foreground="White"
+                                     BorderBrush="{StaticResource LineBrush}"
+                                     CaretBrush="White"
+                                     Padding="8,6" FontSize="14"
+                                     VerticalContentAlignment="Center"
+                                     ToolTip="Escribí una palabra o frase y se pinta al instante sobre lo proyectado"/>
+                            <Button Grid.Column="1"
+                                    Content="Quitar"
+                                    Style="{StaticResource DarkButton}"
+                                    Command="{Binding ClearHighlightCommand}"
+                                    Margin="6,0,0,0"/>
+                        </Grid>
                     </Grid>
 
                     <Border Grid.Row="4"
@@ -553,7 +690,8 @@
                             </Border.Style>
                             <controls:SlideView Slide="{Binding Projection.Slide}"
                                                 State="{Binding Projection.State}"
-                                                Overlay="{Binding Projection.Overlay}"/>
+                                                Overlay="{Binding Projection.Overlay}"
+                                                Highlight="{Binding Projection.Highlight}"/>
                         </Border>
                     </StackPanel>
                 </Border>

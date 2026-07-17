@@ -36,14 +36,24 @@ public sealed partial class MainViewModel : ObservableObject
 
     public ObservableCollection<DisplayOption> Displays { get; } = [];
     public ObservableCollection<Song> Songs { get; } = [];
-    public ObservableCollection<BibleVersionInfo> BibleVersions { get; } = [];
+    /// <summary>Versions with their "active for projection" checkbox (up to 2 checked).</summary>
+    public ObservableCollection<BibleVersionOption> BibleVersionOptions { get; } = [];
+
     public ObservableCollection<BibleVerseResult> BibleSearchResults { get; } = [];
 
-    /// <summary>Books present in the selected version, in Bible order — for the Libro dropdown.</summary>
+    /// <summary>Books present in the primary version, in Bible order.</summary>
     public ObservableCollection<BibleBookInfo> BibleBooksAvailable { get; } = [];
 
-    /// <summary>Chapters available for the selected book — for the Capítulo dropdown.</summary>
+    /// <summary>Chapters available for the selected book — the numbered button grid.</summary>
     public ObservableCollection<int> BibleChapters { get; } = [];
+
+    /// <summary>Ids of the checked versions, oldest first; index 0 is the primary.</summary>
+    private readonly List<int> _checkedVersionIds = [];
+
+    private bool _suppressVersionEvents;
+
+    /// <summary>The passage currently shown in the grid, to re-render when versions change.</summary>
+    private BibleReference? _currentPassage;
 
     /// <summary>The center slide grid — filled from either a song or a Bible passage.</summary>
     public ObservableCollection<SlideItemViewModel> Slides { get; } = [];
@@ -92,14 +102,27 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private Song? _selectedSong;
 
+    /// <summary>The row highlighted in the versions list (target of rename/delete).</summary>
     [ObservableProperty]
-    private BibleVersionInfo? _selectedBibleVersion;
+    private BibleVersionOption? _selectedBibleVersionOption;
 
     [ObservableProperty]
     private BibleBookInfo? _selectedBibleBook;
 
     [ObservableProperty]
-    private int? _selectedBibleChapter;
+    private string _chaptersTitle = string.Empty;
+
+    [ObservableProperty]
+    private bool _showBooksList = true;
+
+    [ObservableProperty]
+    private bool _showChaptersView;
+
+    [ObservableProperty]
+    private bool _showBibleResults;
+
+    [ObservableProperty]
+    private string _highlightText = string.Empty;
 
     [ObservableProperty]
     private string _bibleQuery = string.Empty;
@@ -333,119 +356,202 @@ public sealed partial class MainViewModel : ObservableObject
 
     // ── Biblia ───────────────────────────────────────────────────
 
-    partial void OnBibleQueryChanged(string value) => RunBibleQuery();
+    /// <summary>The version projected as main text (the first one checked).</summary>
+    private BibleVersionInfo? PrimaryVersion =>
+        _checkedVersionIds.Count > 0
+            ? BibleVersionOptions.FirstOrDefault(o => o.Info.Id == _checkedVersionIds[0])?.Info
+            : null;
 
-    partial void OnSelectedBibleVersionChanged(BibleVersionInfo? value)
+    /// <summary>The second checked version, shown below the main text.</summary>
+    private BibleVersionInfo? SecondaryVersion =>
+        _checkedVersionIds.Count > 1
+            ? BibleVersionOptions.FirstOrDefault(o => o.Info.Id == _checkedVersionIds[1])?.Info
+            : null;
+
+    private void OnVersionOptionChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
+        if (_suppressVersionEvents
+            || e.PropertyName != nameof(BibleVersionOption.IsSelected)
+            || sender is not BibleVersionOption option)
+            return;
+
+        if (option.IsSelected)
+        {
+            _checkedVersionIds.Add(option.Info.Id);
+
+            // Up to two versions at a time: checking a third releases the oldest.
+            while (_checkedVersionIds.Count > 2)
+            {
+                var oldestId = _checkedVersionIds[0];
+                _checkedVersionIds.RemoveAt(0);
+                var oldest = BibleVersionOptions.FirstOrDefault(o => o.Info.Id == oldestId);
+                if (oldest is not null)
+                {
+                    _suppressVersionEvents = true;
+                    oldest.IsSelected = false;
+                    _suppressVersionEvents = false;
+                }
+            }
+        }
+        else
+        {
+            _checkedVersionIds.Remove(option.Info.Id);
+        }
+
         LoadBibleBooksAvailable();
-        if (!string.IsNullOrWhiteSpace(BibleQuery))
-            RunBibleQuery();
+        if (_currentPassage is not null)
+            LoadBiblePassage(_currentPassage);
     }
 
     private void LoadBibleBooksAvailable()
     {
         BibleBooksAvailable.Clear();
+        SelectedBibleBook = null;
 
-        if (SelectedBibleVersion is null)
+        if (PrimaryVersion is null)
         {
-            SelectedBibleBook = null;
+            UpdateBibleViewState();
             return;
         }
 
-        foreach (var number in _bibles.GetAvailableBookNumbers(SelectedBibleVersion.Id))
+        foreach (var number in _bibles.GetAvailableBookNumbers(PrimaryVersion.Id))
         {
             var info = BibleBookCatalog.FindByNumber(number);
             if (info is not null)
                 BibleBooksAvailable.Add(info);
         }
 
-        // Keep the same book selected across a version switch when possible.
-        var keepNumber = SelectedBibleBook?.Number;
-        SelectedBibleBook = BibleBooksAvailable.FirstOrDefault(b => b.Number == keepNumber)
-            ?? BibleBooksAvailable.FirstOrDefault();
+        UpdateBibleViewState();
     }
 
     partial void OnSelectedBibleBookChanged(BibleBookInfo? value)
     {
         BibleChapters.Clear();
-        SelectedBibleChapter = null;
+        ChaptersTitle = value?.Name ?? string.Empty;
 
-        if (value is null || SelectedBibleVersion is null)
-            return;
+        if (value is not null && PrimaryVersion is not null)
+        {
+            foreach (var chapter in _bibles.GetChapterNumbers(PrimaryVersion.Id, value.Number))
+                BibleChapters.Add(chapter);
+        }
 
-        foreach (var chapter in _bibles.GetChapterNumbers(SelectedBibleVersion.Id, value.Number))
-            BibleChapters.Add(chapter);
+        UpdateBibleViewState();
     }
 
-    partial void OnSelectedBibleChapterChanged(int? value)
+    [RelayCommand]
+    private void BackToBooks() => SelectedBibleBook = null;
+
+    [RelayCommand]
+    private void SelectChapter(int chapter)
     {
-        if (value is null || SelectedBibleBook is null)
+        if (SelectedBibleBook is null)
             return;
 
-        // Browsing by book/chapter and typing a reference are two paths to
-        // the same grid; clear the search box so they don't fight visually.
+        // Browsing and typing a reference are two paths to the same grid;
+        // clear the search box so they don't fight visually.
         BibleQuery = string.Empty;
-        LoadBiblePassage(new BibleReference(SelectedBibleBook.Number, value.Value, null, null));
+        LoadBiblePassage(new BibleReference(SelectedBibleBook.Number, chapter, null, null));
     }
+
+    /// <summary>Which of the three views (books / chapters / results) the Bible tab shows.</summary>
+    private void UpdateBibleViewState()
+    {
+        ShowBibleResults = BibleSearchResults.Count > 0;
+        ShowChaptersView = !ShowBibleResults && SelectedBibleBook is not null;
+        ShowBooksList = !ShowBibleResults && !ShowChaptersView;
+    }
+
+    partial void OnBibleQueryChanged(string value) => RunBibleQuery();
 
     private void RunBibleQuery()
     {
         BibleSearchResults.Clear();
 
-        if (SelectedBibleVersion is null)
+        if (PrimaryVersion is null)
         {
-            BibleStatusText = "Importá o elegí una versión de la Biblia primero.";
+            BibleStatusText = "Importá una Biblia con 📥 y marcá su casilla.";
+            UpdateBibleViewState();
             return;
         }
 
         if (string.IsNullOrWhiteSpace(BibleQuery))
         {
-            BibleStatusText = "Escribí una referencia (ej. \"Juan 3:16\", \"sal 23\") o una palabra.";
+            BibleStatusText = "Referencia (\"Juan 3:16\", \"sal 23\") o palabra a buscar.";
+            UpdateBibleViewState();
             return;
         }
 
         var reference = BibleReferenceParser.TryParse(BibleQuery);
         if (reference is not null)
         {
+            UpdateBibleViewState();
             LoadBiblePassage(reference);
             return;
         }
 
-        if (BibleQuery.Trim().Length < 3)
-            return;
+        if (BibleQuery.Trim().Length >= 3)
+        {
+            foreach (var result in _bibles.SearchText(PrimaryVersion.Id, BibleQuery.Trim()))
+                BibleSearchResults.Add(result);
 
-        foreach (var result in _bibles.SearchText(SelectedBibleVersion.Id, BibleQuery.Trim()))
-            BibleSearchResults.Add(result);
+            BibleStatusText = BibleSearchResults.Count == 0
+                ? "Sin resultados."
+                : $"{BibleSearchResults.Count} resultado(s). Doble clic proyecta.";
+        }
 
-        BibleStatusText = BibleSearchResults.Count == 0
-            ? "Sin resultados."
-            : $"{BibleSearchResults.Count} resultado(s). Doble clic proyecta.";
+        UpdateBibleViewState();
     }
 
     private void LoadBiblePassage(BibleReference reference)
     {
-        if (SelectedBibleVersion is null)
+        var primary = PrimaryVersion;
+        if (primary is null)
             return;
 
-        var verses = _bibles.GetPassage(SelectedBibleVersion.Id, reference);
+        var verses = _bibles.GetPassage(primary.Id, reference);
         if (verses.Count == 0)
         {
             BibleStatusText = "No se encontraron versículos para esa referencia.";
             return;
         }
 
+        var secondary = SecondaryVersion;
+        Dictionary<(int Chapter, int Verse), string>? secondaryTexts = null;
+        if (secondary is not null)
+        {
+            secondaryTexts = _bibles.GetPassage(secondary.Id, reference)
+                .ToDictionary(v => (v.Chapter, v.Verse), v => v.Text);
+        }
+
+        _currentPassage = reference;
         Slides.Clear();
         LiveSlideIndex = -1;
 
         foreach (var v in verses)
         {
-            var caption = $"{v.Reference} · {SelectedBibleVersion.Abbreviation}";
-            Slides.Add(new SlideItemViewModel(Slides.Count, $"{v.Chapter}:{v.Verse}", new SlideContent(v.Text, caption)));
+            var caption = secondary is null
+                ? $"{v.Reference} · {primary.Abbreviation}"
+                : $"{v.Reference} · {primary.Abbreviation} / {secondary.Abbreviation}";
+
+            string? secondaryText = null;
+            secondaryTexts?.TryGetValue((v.Chapter, v.Verse), out secondaryText);
+
+            Slides.Add(new SlideItemViewModel(
+                Slides.Count,
+                $"{v.Chapter}:{v.Verse}",
+                new SlideContent(v.Text, caption, secondaryText)));
         }
 
         PreviewSlide = Slides.FirstOrDefault()?.Slide;
         BibleStatusText = $"{verses.Count} versículo(s). Clic en una diapositiva para proyectar.";
     }
+
+    // ── Resaltado en vivo ────────────────────────────────────────
+
+    partial void OnHighlightTextChanged(string value) => _presentation.SetHighlight(value);
+
+    [RelayCommand]
+    private void ClearHighlight() => HighlightText = string.Empty;
 
     [RelayCommand]
     private void ProjectBibleResult(BibleVerseResult? result)
@@ -457,6 +563,43 @@ public sealed partial class MainViewModel : ObservableObject
         var index = Slides.ToList().FindIndex(s => s.Label == $"{result.Chapter}:{result.Verse}");
         if (index >= 0)
             GoLiveSlide(index);
+    }
+
+    private void LoadBibleVersions()
+    {
+        _suppressVersionEvents = true;
+
+        var keepSelectedId = SelectedBibleVersionOption?.Info.Id;
+        foreach (var option in BibleVersionOptions)
+            option.PropertyChanged -= OnVersionOptionChanged;
+        BibleVersionOptions.Clear();
+
+        foreach (var version in _bibles.GetVersions())
+        {
+            var option = new BibleVersionOption(version)
+            {
+                IsSelected = _checkedVersionIds.Contains(version.Id),
+            };
+            option.PropertyChanged += OnVersionOptionChanged;
+            BibleVersionOptions.Add(option);
+        }
+
+        // Drop checked ids whose version no longer exists.
+        _checkedVersionIds.RemoveAll(id => BibleVersionOptions.All(o => o.Info.Id != id));
+
+        // Something must be projectable: default to the first version.
+        if (_checkedVersionIds.Count == 0 && BibleVersionOptions.Count > 0)
+        {
+            BibleVersionOptions[0].IsSelected = true;
+            _checkedVersionIds.Add(BibleVersionOptions[0].Info.Id);
+        }
+
+        SelectedBibleVersionOption =
+            BibleVersionOptions.FirstOrDefault(o => o.Info.Id == keepSelectedId)
+            ?? BibleVersionOptions.FirstOrDefault();
+
+        _suppressVersionEvents = false;
+        LoadBibleBooksAvailable();
     }
 
     [RelayCommand]
@@ -502,7 +645,15 @@ public sealed partial class MainViewModel : ObservableObject
 
         var saved = _bibles.Import(metadata.Name, metadata.Abbreviation, metadata.Language, parsed);
         LoadBibleVersions();
-        SelectedBibleVersion = BibleVersions.FirstOrDefault(v => v.Id == saved.Id);
+
+        // Leave the freshly imported version active for projection.
+        var imported = BibleVersionOptions.FirstOrDefault(o => o.Info.Id == saved.Id);
+        if (imported is not null)
+        {
+            SelectedBibleVersionOption = imported;
+            if (!imported.IsSelected)
+                imported.IsSelected = true;
+        }
 
         var message = $"\"{saved.Name}\" importada: {parsed.VerseCount} versículos.";
         if (parsed.MissingBookNumbers.Count > 0)
@@ -516,45 +667,36 @@ public sealed partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void RenameBibleVersion()
     {
-        if (SelectedBibleVersion is null)
+        var target = SelectedBibleVersionOption?.Info;
+        if (target is null)
             return;
 
-        var newName = _textPrompt.Ask("Renombrar versión", "Nuevo nombre:", SelectedBibleVersion.Name);
+        var newName = _textPrompt.Ask("Renombrar versión", "Nuevo nombre:", target.Name);
         if (string.IsNullOrWhiteSpace(newName))
             return;
 
-        _bibles.RenameVersion(SelectedBibleVersion.Id, newName.Trim());
-        var keepId = SelectedBibleVersion.Id;
+        _bibles.RenameVersion(target.Id, newName.Trim());
         LoadBibleVersions();
-        SelectedBibleVersion = BibleVersions.FirstOrDefault(v => v.Id == keepId);
         BibleStatusText = "Versión renombrada.";
     }
 
     [RelayCommand]
     private void DeleteBibleVersion()
     {
-        if (SelectedBibleVersion is null)
+        var target = SelectedBibleVersionOption?.Info;
+        if (target is null)
             return;
 
         var confirm = MessageBox.Show(
-            $"¿Eliminar la versión \"{SelectedBibleVersion.Name}\" y sus {SelectedBibleVersion.VerseCount} versículos?",
+            $"¿Eliminar la versión \"{target.Name}\" y sus {target.VerseCount} versículos?",
             "EcclesiaCast", MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (confirm != MessageBoxResult.Yes)
             return;
 
-        _bibles.DeleteVersion(SelectedBibleVersion.Id);
-        SelectedBibleVersion = null;
+        _bibles.DeleteVersion(target.Id);
+        SelectedBibleVersionOption = null;
         LoadBibleVersions();
         BibleStatusText = "Versión eliminada.";
-    }
-
-    private void LoadBibleVersions()
-    {
-        var keepId = SelectedBibleVersion?.Id;
-        BibleVersions.Clear();
-        foreach (var v in _bibles.GetVersions())
-            BibleVersions.Add(v);
-        SelectedBibleVersion = BibleVersions.FirstOrDefault(v => v.Id == keepId) ?? BibleVersions.FirstOrDefault();
     }
 
     // ── Proyección de slides ─────────────────────────────────────

@@ -8,16 +8,31 @@
 
             <!-- Capa de texto -->
             <Grid x:Name="TextLayer" Margin="110,80">
-                <TextBlock x:Name="MainText"
-                           FontFamily="Segoe UI"
-                           FontSize="92" FontWeight="SemiBold"
-                           Foreground="White"
-                           TextWrapping="Wrap" TextAlignment="Center"
-                           HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock.Effect>
-                        <DropShadowEffect BlurRadius="18" ShadowDepth="3" Opacity="0.75"/>
-                    </TextBlock.Effect>
-                </TextBlock>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock x:Name="MainText"
+                               FontFamily="Segoe UI"
+                               FontSize="92" FontWeight="SemiBold"
+                               Foreground="White"
+                               TextWrapping="Wrap" TextAlignment="Center"
+                               HorizontalAlignment="Center">
+                        <TextBlock.Effect>
+                            <DropShadowEffect BlurRadius="18" ShadowDepth="3" Opacity="0.75"/>
+                        </TextBlock.Effect>
+                    </TextBlock>
+                    <!-- Segunda versión bíblica, cuando hay dos seleccionadas -->
+                    <TextBlock x:Name="SecondaryText"
+                               FontFamily="Segoe UI"
+                               FontSize="58" FontStyle="Italic"
+                               Foreground="#C9D4E8"
+                               TextWrapping="Wrap" TextAlignment="Center"
+                               HorizontalAlignment="Center"
+                               Margin="0,54,0,0"
+                               Visibility="Collapsed">
+                        <TextBlock.Effect>
+                            <DropShadowEffect BlurRadius="14" ShadowDepth="2" Opacity="0.75"/>
+                        </TextBlock.Effect>
+                    </TextBlock>
+                </StackPanel>
                 <TextBlock x:Name="CaptionText"
                            FontFamily="Segoe UI"
                            FontSize="40"

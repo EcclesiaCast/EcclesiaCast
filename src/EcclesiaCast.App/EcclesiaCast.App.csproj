@@ -14,8 +14,9 @@
 
   <ItemGroup>
     <!-- WinForms is referenced only for Screen (monitor enumeration); its
-         implicit global using collides with WPF types, so remove it. -->
+         implicit global usings collide with WPF types, so remove them. -->
     <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
   </ItemGroup>
 
   <ItemGroup>
