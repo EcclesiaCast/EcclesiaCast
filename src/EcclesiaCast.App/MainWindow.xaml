@@ -635,7 +635,13 @@
                                         <DataTemplate>
                                             <Button Command="{Binding DataContext.ProjectSlideCommand, ElementName=SlideGrid}"
                                                     CommandParameter="{Binding}"
-                                                    Cursor="Hand">
+                                                    Cursor="Hand"
+                                                    ToolTip="Clic: proyectar · Clic derecho: diseñar esta diapositiva">
+                                                <Button.InputBindings>
+                                                    <MouseBinding MouseAction="RightClick"
+                                                                  Command="{Binding DataContext.EditSlideDesignCommand, ElementName=SlideGrid}"
+                                                                  CommandParameter="{Binding}"/>
+                                                </Button.InputBindings>
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="Button">
                                                         <Border x:Name="card" Width="180" Height="84" Margin="6"

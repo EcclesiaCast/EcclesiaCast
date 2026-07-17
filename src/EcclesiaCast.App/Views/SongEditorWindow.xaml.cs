@@ -10,6 +10,7 @@ public partial class SongEditorWindow : Window
     public sealed record ThemeChoice(int? Id, string Label);
 
     private readonly int _songId;
+    private readonly List<SongSection> _existingSections = [];
 
     public SongEditorWindow(Song? existing, IReadOnlyList<SlideTheme> themes)
     {
@@ -23,6 +24,7 @@ public partial class SongEditorWindow : Window
         if (existing is not null)
         {
             _songId = existing.Id;
+            _existingSections = existing.Sections;
             Title = "Editar canción";
             TitleBox.Text = existing.Title;
             ArtistBox.Text = existing.Artist;
@@ -56,6 +58,11 @@ public partial class SongEditorWindow : Window
             LyricsBox.Focus();
             return;
         }
+
+        // Best effort: los diseños por diapositiva sobreviven la edición de
+        // la letra emparejando por posición.
+        for (var i = 0; i < sections.Count && i < _existingSections.Count; i++)
+            sections[i].StyleJson = _existingSections[i].StyleJson;
 
         Result = new Song
         {

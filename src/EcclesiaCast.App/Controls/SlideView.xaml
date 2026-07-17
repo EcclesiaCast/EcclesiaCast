@@ -29,12 +29,20 @@
                                Margin="0,50,0,0"
                                Visibility="Collapsed"/>
                 </StackPanel>
+            </Grid>
+
+            <!-- Capa de leyenda: separada del texto para que nunca se pisen -->
+            <Grid x:Name="CaptionLayer" Margin="110,40" IsHitTestVisible="False">
                 <TextBlock x:Name="CaptionText"
                            FontFamily="Segoe UI"
                            FontSize="40"
                            Foreground="#B9C6DE"
                            HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                           Visibility="Collapsed"/>
+                           Visibility="Collapsed">
+                    <TextBlock.Effect>
+                        <DropShadowEffect BlurRadius="12" ShadowDepth="2" Opacity="0.75"/>
+                    </TextBlock.Effect>
+                </TextBlock>
             </Grid>
 
             <!-- Capa de logo -->

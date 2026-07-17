@@ -14,8 +14,8 @@ namespace EcclesiaCast.App.Controls;
 
 /// <summary>
 /// Renders a slide (text + optional caption and secondary version) styled by
-/// its theme, with the current output state. Used at full size by the output
-/// window and scaled down by the previews.
+/// its theme and per-slide overrides, with the current output state. Used at
+/// full size by the output window and scaled down by the previews.
 /// </summary>
 public partial class SlideView : UserControl
 {
@@ -45,6 +45,7 @@ public partial class SlideView : UserControl
     private const double CanvasHeight = 1080;
     private const double SecondaryRatio = 0.62;
     private const double SecondarySpacing = 50;
+    private const double CaptionBandFactor = 1.7;
 
     private string? _lastBackgroundImagePath;
 
@@ -90,6 +91,15 @@ public partial class SlideView : UserControl
 
     private SlideTheme CurrentTheme => Slide?.Theme ?? SlideTheme.Fallback;
 
+    // ── Estilo efectivo: tema + overrides del slide ──────────────
+
+    private double EffectiveMaxFontSize => Slide?.Override?.FontSize ?? CurrentTheme.MaxFontSize;
+    private bool EffectiveBold => Slide?.Override?.Bold ?? CurrentTheme.Bold;
+    private bool EffectiveItalic => Slide?.Override?.Italic ?? CurrentTheme.Italic;
+    private string EffectiveTextColor => Slide?.Override?.TextColor ?? CurrentTheme.TextColor;
+    private HAlign EffectiveAlignH => Slide?.Override?.AlignH ?? CurrentTheme.AlignH;
+    private VAlign EffectiveAlignV => Slide?.Override?.AlignV ?? CurrentTheme.AlignV;
+
     private void OnSlideChanged()
     {
         ApplyTheme();
@@ -109,16 +119,13 @@ public partial class SlideView : UserControl
         ApplyBackgroundImage(theme.BackgroundImagePath);
         DimLayer.Opacity = Math.Clamp(theme.BackgroundDim, 0, 1);
 
-        TextLayer.Margin = new Thickness(theme.MarginHorizontal, theme.MarginVertical,
-            theme.MarginHorizontal, theme.MarginVertical);
-
-        TextStack.HorizontalAlignment = theme.AlignH switch
+        TextStack.HorizontalAlignment = EffectiveAlignH switch
         {
             HAlign.Left => HorizontalAlignment.Left,
             HAlign.Right => HorizontalAlignment.Right,
             _ => HorizontalAlignment.Center,
         };
-        TextStack.VerticalAlignment = theme.AlignV switch
+        TextStack.VerticalAlignment = EffectiveAlignV switch
         {
             VAlign.Top => VerticalAlignment.Top,
             VAlign.Bottom => VerticalAlignment.Bottom,
@@ -126,20 +133,20 @@ public partial class SlideView : UserControl
         };
 
         var fontFamily = new FontFamily(theme.FontFamily);
-        var alignment = theme.AlignH switch
+        var alignment = EffectiveAlignH switch
         {
             HAlign.Left => TextAlignment.Left,
             HAlign.Right => TextAlignment.Right,
             _ => TextAlignment.Center,
         };
-        var foreground = BrushFromHex(theme.TextColor, "#FFFFFF");
+        var foreground = BrushFromHex(EffectiveTextColor, "#FFFFFF");
         var effect = theme.Shadow
             ? new DropShadowEffect { BlurRadius = 18, ShadowDepth = 3, Opacity = 0.75 }
             : null;
 
         MainText.FontFamily = fontFamily;
-        MainText.FontWeight = theme.Bold ? FontWeights.SemiBold : FontWeights.Normal;
-        MainText.FontStyle = theme.Italic ? FontStyles.Italic : FontStyles.Normal;
+        MainText.FontWeight = EffectiveBold ? FontWeights.SemiBold : FontWeights.Normal;
+        MainText.FontStyle = EffectiveItalic ? FontStyles.Italic : FontStyles.Normal;
         MainText.Foreground = foreground;
         MainText.TextAlignment = alignment;
         MainText.Effect = effect;
@@ -149,6 +156,8 @@ public partial class SlideView : UserControl
         SecondaryText.Effect = effect;
         SecondaryText.Margin = new Thickness(0, SecondarySpacing, 0, 0);
 
+        CaptionLayer.Margin = new Thickness(theme.MarginHorizontal, theme.MarginVertical * 0.5,
+            theme.MarginHorizontal, theme.MarginVertical * 0.5);
         CaptionText.FontFamily = fontFamily;
         CaptionText.FontSize = theme.CaptionFontSize;
         CaptionText.HorizontalAlignment = theme.CaptionPosition switch
@@ -157,13 +166,13 @@ public partial class SlideView : UserControl
             CaptionPosition.TopCenter or CaptionPosition.BottomCenter => HorizontalAlignment.Center,
             _ => HorizontalAlignment.Right,
         };
-        CaptionText.VerticalAlignment = theme.CaptionPosition switch
-        {
-            CaptionPosition.TopLeft or CaptionPosition.TopCenter or CaptionPosition.TopRight
-                => VerticalAlignment.Top,
-            _ => VerticalAlignment.Bottom,
-        };
+        CaptionText.VerticalAlignment = IsCaptionOnTop(theme.CaptionPosition)
+            ? VerticalAlignment.Top
+            : VerticalAlignment.Bottom;
     }
+
+    private static bool IsCaptionOnTop(CaptionPosition position) =>
+        position is CaptionPosition.TopLeft or CaptionPosition.TopCenter or CaptionPosition.TopRight;
 
     private void ApplyBackgroundImage(string? path)
     {
@@ -208,6 +217,43 @@ public partial class SlideView : UserControl
         }
     }
 
+    // ── Área de texto ────────────────────────────────────────────
+
+    /// <summary>
+    /// Where the main text lives: the slide's own box if it has one, or the
+    /// theme margins minus a reserved band for the caption so they never
+    /// overlap.
+    /// </summary>
+    private (Thickness Margin, double Width, double Height) ComputeTextArea(bool hasCaption)
+    {
+        var theme = CurrentTheme;
+        var over = Slide?.Override;
+
+        if (over?.HasBox == true)
+        {
+            var x = Math.Clamp(over.BoxX!.Value, 0, CanvasWidth - 100);
+            var y = Math.Clamp(over.BoxY!.Value, 0, CanvasHeight - 60);
+            var w = Math.Clamp(over.BoxWidth!.Value, 100, CanvasWidth - x);
+            var h = Math.Clamp(over.BoxHeight!.Value, 60, CanvasHeight - y);
+            return (new Thickness(x, y, CanvasWidth - x - w, CanvasHeight - y - h), w, h);
+        }
+
+        var top = theme.MarginVertical;
+        var bottom = theme.MarginVertical;
+        if (hasCaption && theme.ShowCaption)
+        {
+            var band = theme.CaptionFontSize * CaptionBandFactor;
+            if (IsCaptionOnTop(theme.CaptionPosition))
+                top += band;
+            else
+                bottom += band;
+        }
+
+        var width = Math.Max(200, CanvasWidth - 2 * theme.MarginHorizontal);
+        var height = Math.Max(150, CanvasHeight - top - bottom);
+        return (new Thickness(theme.MarginHorizontal, top, theme.MarginHorizontal, bottom), width, height);
+    }
+
     // ── Texto ────────────────────────────────────────────────────
 
     private void RenderText()
@@ -216,7 +262,11 @@ public partial class SlideView : UserControl
         var main = Transform(Slide?.MainText, theme);
         var secondary = Transform(Slide?.SecondaryText, theme);
 
-        var fontSize = FitFontSize(main, secondary, theme);
+        var hasCaption = !string.IsNullOrEmpty(Slide?.Caption);
+        var (margin, areaWidth, areaHeight) = ComputeTextArea(hasCaption);
+        TextLayer.Margin = margin;
+
+        var fontSize = FitFontSize(main, secondary, theme, areaWidth, areaHeight);
         MainText.FontSize = fontSize;
         SecondaryText.FontSize = Math.Max(20, fontSize * SecondaryRatio);
 
@@ -227,7 +277,7 @@ public partial class SlideView : UserControl
             : Visibility.Visible;
 
         CaptionText.Text = Slide?.Caption ?? string.Empty;
-        CaptionText.Visibility = theme.ShowCaption && !string.IsNullOrEmpty(Slide?.Caption)
+        CaptionText.Visibility = theme.ShowCaption && hasCaption
             ? Visibility.Visible
             : Visibility.Collapsed;
     }
@@ -236,36 +286,36 @@ public partial class SlideView : UserControl
         text is null ? null : theme.Uppercase ? text.ToUpper(CultureInfo.CurrentCulture) : text;
 
     /// <summary>
-    /// Starts at the theme's preferred size and shrinks until the whole text
-    /// fits inside the margins (never below the theme's minimum).
+    /// Starts at the preferred size and shrinks until the whole text fits
+    /// the available area (never below the theme's minimum).
     /// </summary>
-    private double FitFontSize(string? main, string? secondary, SlideTheme theme)
+    private double FitFontSize(string? main, string? secondary, SlideTheme theme, double width, double height)
     {
+        var maxSize = EffectiveMaxFontSize;
         if (string.IsNullOrEmpty(main))
-            return theme.MaxFontSize;
+            return maxSize;
 
-        var availableWidth = Math.Max(200, CanvasWidth - 2 * theme.MarginHorizontal);
-        var availableHeight = Math.Max(150, CanvasHeight - 2 * theme.MarginVertical);
+        var minSize = Math.Min(theme.MinFontSize, maxSize);
 
-        for (var size = theme.MaxFontSize; size >= theme.MinFontSize; size -= 3)
+        for (var size = maxSize; size >= minSize; size -= 3)
         {
-            var height = MeasureHeight(main, size, theme, availableWidth);
+            var total = MeasureHeight(main, size, theme, width);
             if (!string.IsNullOrEmpty(secondary))
-                height += SecondarySpacing + MeasureHeight(secondary, size * SecondaryRatio, theme, availableWidth);
+                total += SecondarySpacing + MeasureHeight(secondary, size * SecondaryRatio, theme, width);
 
-            if (height <= availableHeight)
+            if (total <= height)
                 return size;
         }
 
-        return theme.MinFontSize;
+        return minSize;
     }
 
     private double MeasureHeight(string text, double fontSize, SlideTheme theme, double maxWidth)
     {
         var typeface = new Typeface(
             new FontFamily(theme.FontFamily),
-            theme.Italic ? FontStyles.Italic : FontStyles.Normal,
-            theme.Bold ? FontWeights.SemiBold : FontWeights.Normal,
+            EffectiveItalic ? FontStyles.Italic : FontStyles.Normal,
+            EffectiveBold ? FontWeights.SemiBold : FontWeights.Normal,
             FontStretches.Normal);
 
         var formatted = new FormattedText(
@@ -323,7 +373,9 @@ public partial class SlideView : UserControl
 
     private void OnStateChanged()
     {
-        TextLayer.Visibility = State == OutputState.Content ? Visibility.Visible : Visibility.Hidden;
+        var contentVisible = State == OutputState.Content ? Visibility.Visible : Visibility.Hidden;
+        TextLayer.Visibility = contentVisible;
+        CaptionLayer.Visibility = contentVisible;
         LogoLayer.Visibility = State == OutputState.Logo ? Visibility.Visible : Visibility.Collapsed;
 
         var blackTarget = State == OutputState.Black ? 1d : 0d;

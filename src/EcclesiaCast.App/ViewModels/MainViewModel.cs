@@ -34,6 +34,7 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly ITextPrompt _textPrompt;
     private readonly IThemeRepository _themes;
     private readonly IThemeManagerDialog _themeManager;
+    private readonly ISlideDesigner _slideDesigner;
 
     /// <summary>What the projector is showing; the Live box binds to it.</summary>
     public ProjectionViewModel Projection { get; }
@@ -153,6 +154,7 @@ public sealed partial class MainViewModel : ObservableObject
         ITextPrompt textPrompt,
         IThemeRepository themes,
         IThemeManagerDialog themeManager,
+        ISlideDesigner slideDesigner,
         ProjectionViewModel projectionViewModel)
     {
         _displayProvider = displayProvider;
@@ -166,6 +168,7 @@ public sealed partial class MainViewModel : ObservableObject
         _textPrompt = textPrompt;
         _themes = themes;
         _themeManager = themeManager;
+        _slideDesigner = slideDesigner;
         Projection = projectionViewModel;
 
         _presentation.Changed += (_, _) => UpdateStateFlags();
@@ -292,10 +295,41 @@ public sealed partial class MainViewModel : ObservableObject
             Slides.Add(new SlideItemViewModel(
                 Slides.Count,
                 section.Label,
-                new SlideContent(section.Text, caption, Theme: theme)));
+                new SlideContent(section.Text, caption, Theme: theme, Override: section.GetOverride()),
+                sectionId: section.Id));
         }
 
         PreviewSlide = Slides.FirstOrDefault()?.Slide;
+    }
+
+    /// <summary>Opens the ProPresenter-style designer for one song slide (right-click on its card).</summary>
+    [RelayCommand]
+    private void EditSlideDesign(SlideItemViewModel? item)
+    {
+        if (item is null)
+            return;
+
+        if (SelectedSong is null || item.SectionId == 0)
+        {
+            StatusText = "El diseño por diapositiva es para canciones; la Biblia usa su tema global (🎨 Temas).";
+            return;
+        }
+
+        var section = SelectedSong.Sections.FirstOrDefault(s => s.Id == item.SectionId);
+        if (section is null)
+            return;
+
+        var theme = ResolveSongTheme(SelectedSong);
+        var (saved, result) = _slideDesigner.Edit(section.Text, theme, section.GetOverride());
+        if (!saved)
+            return;
+
+        section.SetOverride(result);
+        _songs.Save(SelectedSong);
+        RebuildSlidesPreservingLive(LoadSongs);
+        StatusText = result is null
+            ? "Diseño restablecido: la diapositiva vuelve a seguir el tema."
+            : "Diseño de la diapositiva guardado.";
     }
 
     [RelayCommand]

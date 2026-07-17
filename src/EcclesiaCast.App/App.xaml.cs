@@ -64,6 +64,7 @@ public partial class App : Application
         services.AddSingleton<ITextPrompt, TextPromptService>();
         services.AddSingleton<IThemeRepository>(_ => new ThemeRepository(dbPath));
         services.AddSingleton<IThemeManagerDialog, ThemeManagerDialogService>();
+        services.AddSingleton<ISlideDesigner, SlideDesignerService>();
         services.AddSingleton<MainViewModel>();
         _services = services.BuildServiceProvider();
 

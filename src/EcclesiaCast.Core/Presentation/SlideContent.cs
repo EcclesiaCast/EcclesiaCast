@@ -12,4 +12,5 @@ public sealed record SlideContent(
     string MainText,
     string? Caption = null,
     string? SecondaryText = null,
-    SlideTheme? Theme = null);
+    SlideTheme? Theme = null,
+    SlideOverride? Override = null);

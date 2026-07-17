@@ -7,12 +7,15 @@ namespace EcclesiaCast.App.ViewModels;
 /// <summary>One card in the slide grid.</summary>
 public sealed partial class SlideItemViewModel(
     int index, string label, SlideContent slide,
-    BibleReference? jumpTarget = null, bool jumpToEnd = false)
+    BibleReference? jumpTarget = null, bool jumpToEnd = false, int sectionId = 0)
     : ObservableObject
 {
     public int Index { get; } = index;
     public string Label { get; } = label;
     public SlideContent Slide { get; } = slide;
+
+    /// <summary>Song section behind this slide (0 for Bible/quick-text slides).</summary>
+    public int SectionId { get; } = sectionId;
 
     /// <summary>
     /// When set, activating this card doesn't project it: it loads this

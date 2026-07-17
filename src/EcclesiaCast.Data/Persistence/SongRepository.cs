@@ -55,7 +55,13 @@ public sealed class SongRepository(string dbPath) : ISongRepository
 
         db.SongSections.RemoveRange(existing.Sections);
         existing.Sections = song.Sections
-            .Select(x => new SongSection { Order = x.Order, Label = x.Label, Text = x.Text })
+            .Select(x => new SongSection
+            {
+                Order = x.Order,
+                Label = x.Label,
+                Text = x.Text,
+                StyleJson = x.StyleJson,
+            })
             .ToList();
 
         db.SaveChanges();
