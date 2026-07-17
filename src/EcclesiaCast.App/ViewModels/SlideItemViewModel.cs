@@ -14,4 +14,8 @@ public sealed partial class SlideItemViewModel(int index, string label, SlideCon
 
     [ObservableProperty]
     private bool _isLive;
+
+    /// <summary>Selected as "next up" (e.g. the verse a reference points to), not live yet.</summary>
+    [ObservableProperty]
+    private bool _isPreviewed;
 }

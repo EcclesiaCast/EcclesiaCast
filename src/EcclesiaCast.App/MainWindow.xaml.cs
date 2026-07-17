@@ -1,6 +1,8 @@
+using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 using EcclesiaCast.App.ViewModels;
 
 namespace EcclesiaCast.App;
@@ -11,27 +13,46 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        // Keep the live slide card visible when navigating with the arrows.
         DataContextChanged += (_, _) =>
         {
             if (DataContext is not MainViewModel vm)
                 return;
 
+            // Keep the relevant slide card visible: the live one while
+            // navigating with the arrows, the previewed one after a search.
             vm.PropertyChanged += (_, args) =>
             {
                 if (args.PropertyName == nameof(MainViewModel.LiveSlideIndex))
-                    ScrollLiveSlideIntoView(vm.LiveSlideIndex);
+                    ScrollSlideIntoView(vm.LiveSlideIndex);
+                else if (args.PropertyName == nameof(MainViewModel.PreviewSlideIndex))
+                    ScrollSlideIntoView(vm.PreviewSlideIndex);
+            };
+
+            // A fresh chapter or passage always starts at the top.
+            vm.Slides.CollectionChanged += (_, args) =>
+            {
+                if (args.Action == NotifyCollectionChangedAction.Reset)
+                    SlidesScroll.ScrollToTop();
+            };
+            vm.BibleChapters.CollectionChanged += (_, args) =>
+            {
+                if (args.Action == NotifyCollectionChangedAction.Reset)
+                    ChaptersScroll.ScrollToTop();
             };
         };
     }
 
-    private void ScrollLiveSlideIntoView(int index)
+    private void ScrollSlideIntoView(int index)
     {
         if (index < 0)
             return;
 
-        if (SlideGrid.ItemContainerGenerator.ContainerFromIndex(index) is FrameworkElement container)
-            container.BringIntoView();
+        // Defer until the cards have been laid out (they may have just been added).
+        Dispatcher.InvokeAsync(() =>
+        {
+            if (SlideGrid.ItemContainerGenerator.ContainerFromIndex(index) is FrameworkElement container)
+                container.BringIntoView();
+        }, DispatcherPriority.Background);
     }
 
     // Arrow keys must be intercepted before WPF's directional focus

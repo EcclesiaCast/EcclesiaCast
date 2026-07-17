@@ -310,7 +310,11 @@
                                          CaretBrush="White"
                                          FontSize="13"
                                          Text="{Binding BibleQuery, UpdateSourceTrigger=PropertyChanged}"
-                                         ToolTip="Ej: Juan 3:16 · jn 3:16-18 · sal 23 · o una palabra"/>
+                                         ToolTip="Ej: Juan 3:16 · jn 3:16-18 · sal 23 · o una palabra. Enter proyecta el versículo.">
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Key="Enter" Command="{Binding ProjectReferenceCommand}"/>
+                                    </TextBox.InputBindings>
+                                </TextBox>
                                 <TextBlock DockPanel.Dock="Bottom"
                                            Text="{Binding BibleStatusText}"
                                            FontSize="10" Foreground="{StaticResource FaintBrush}"
@@ -367,7 +371,7 @@
                                                        Margin="10,0,0,0" VerticalAlignment="Center"
                                                        TextTrimming="CharacterEllipsis"/>
                                         </DockPanel>
-                                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                        <ScrollViewer x:Name="ChaptersScroll" VerticalScrollBarVisibility="Auto">
                                             <ItemsControl x:Name="ChaptersGrid"
                                                           ItemsSource="{Binding BibleChapters}"
                                                           Margin="8,0">
@@ -595,7 +599,7 @@
                                     </Style>
                                 </TextBlock.Style>
                             </TextBlock>
-                            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="6">
+                            <ScrollViewer x:Name="SlidesScroll" VerticalScrollBarVisibility="Auto" Padding="6">
                                 <ItemsControl x:Name="SlideGrid" ItemsSource="{Binding Slides}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -629,6 +633,10 @@
                                                             <Trigger Property="IsMouseOver" Value="True">
                                                                 <Setter TargetName="card" Property="Background" Value="#1A2030"/>
                                                             </Trigger>
+                                                            <DataTrigger Binding="{Binding IsPreviewed}" Value="True">
+                                                                <Setter TargetName="card" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                                                <Setter TargetName="card" Property="BorderThickness" Value="2"/>
+                                                            </DataTrigger>
                                                             <DataTrigger Binding="{Binding IsLive}" Value="True">
                                                                 <Setter TargetName="card" Property="BorderBrush" Value="{StaticResource LiveBrush}"/>
                                                                 <Setter TargetName="card" Property="BorderThickness" Value="2"/>

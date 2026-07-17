@@ -133,6 +133,10 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private int _liveSlideIndex = -1;
 
+    /// <summary>Slide marked as "next up" by a reference search; -1 when none.</summary>
+    [ObservableProperty]
+    private int _previewSlideIndex = -1;
+
     public MainViewModel(
         IDisplayProvider displayProvider,
         IProjectionWindowService projection,
@@ -215,6 +219,8 @@ public sealed partial class MainViewModel : ObservableObject
     {
         Slides.Clear();
         LiveSlideIndex = -1;
+        PreviewSlideIndex = -1;
+        _currentPassage = null;
 
         if (SelectedSong is null)
             return;
@@ -398,13 +404,30 @@ public sealed partial class MainViewModel : ObservableObject
             _checkedVersionIds.Remove(option.Info.Id);
         }
 
+        // Refresh the grid and — if a verse is live — re-project it right away,
+        // so checking/unchecking a version updates the output in real time.
+        var liveLabel = LiveSlideIndex >= 0 && LiveSlideIndex < Slides.Count
+            ? Slides[LiveSlideIndex].Label
+            : null;
+
         LoadBibleBooksAvailable();
+
         if (_currentPassage is not null)
+        {
             LoadBiblePassage(_currentPassage);
+
+            if (liveLabel is not null)
+            {
+                var index = Slides.ToList().FindIndex(s => s.Label == liveLabel);
+                if (index >= 0)
+                    GoLiveSlide(index);
+            }
+        }
     }
 
     private void LoadBibleBooksAvailable()
     {
+        var keepNumber = SelectedBibleBook?.Number;
         BibleBooksAvailable.Clear();
         SelectedBibleBook = null;
 
@@ -420,6 +443,9 @@ public sealed partial class MainViewModel : ObservableObject
             if (info is not null)
                 BibleBooksAvailable.Add(info);
         }
+
+        if (keepNumber is int n)
+            SelectedBibleBook = BibleBooksAvailable.FirstOrDefault(b => b.Number == n);
 
         UpdateBibleViewState();
     }
@@ -485,7 +511,26 @@ public sealed partial class MainViewModel : ObservableObject
         if (reference is not null)
         {
             UpdateBibleViewState();
-            LoadBiblePassage(reference);
+
+            // Park the left panel on the referenced book (chapter grid view).
+            if (SelectedBibleBook?.Number != reference.BookNumber)
+                SelectedBibleBook = BibleBooksAvailable.FirstOrDefault(b => b.Number == reference.BookNumber);
+
+            // Always load the whole chapter; the referenced verse becomes
+            // the "next up" selection, projected with Enter.
+            LoadBiblePassage(new BibleReference(reference.BookNumber, reference.Chapter, null, null));
+
+            if (reference.VerseStart is int verse)
+            {
+                var index = Slides.ToList().FindIndex(s => s.Label == $"{reference.Chapter}:{verse}");
+                SetPreviewIndex(index);
+                if (index >= 0)
+                    BibleStatusText = $"Versículo {verse} seleccionado — Enter lo proyecta.";
+            }
+            else
+            {
+                SetPreviewIndex(Slides.Count > 0 ? 0 : -1);
+            }
             return;
         }
 
@@ -544,6 +589,27 @@ public sealed partial class MainViewModel : ObservableObject
 
         PreviewSlide = Slides.FirstOrDefault()?.Slide;
         BibleStatusText = $"{verses.Count} versículo(s). Clic en una diapositiva para proyectar.";
+    }
+
+    /// <summary>Marks a slide as "next up": accent border, preview box, and scroll-into-view.</summary>
+    private void SetPreviewIndex(int index)
+    {
+        foreach (var slide in Slides)
+            slide.IsPreviewed = slide.Index == index;
+
+        PreviewSlideIndex = index;
+        if (index >= 0 && index < Slides.Count)
+            PreviewSlide = Slides[index].Slide;
+    }
+
+    /// <summary>Projects the verse a typed reference points to (Enter in the search box).</summary>
+    [RelayCommand]
+    private void ProjectReference()
+    {
+        if (PreviewSlideIndex >= 0)
+            GoLiveSlide(PreviewSlideIndex);
+        else if (Slides.Count > 0)
+            GoLiveSlide(0);
     }
 
     // ── Resaltado en vivo ────────────────────────────────────────
@@ -735,8 +801,12 @@ public sealed partial class MainViewModel : ObservableObject
         IsProjecting = true;
 
         LiveSlideIndex = index;
+        PreviewSlideIndex = -1;
         foreach (var slide in Slides)
+        {
             slide.IsLive = slide.Index == index;
+            slide.IsPreviewed = false;
+        }
 
         PreviewSlide = index + 1 < Slides.Count ? Slides[index + 1].Slide : null;
         Log.Debug("Slide {Index} en vivo: {Label}", index, item.Label);
