@@ -35,6 +35,7 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly IThemeRepository _themes;
     private readonly IThemeManagerDialog _themeManager;
     private readonly ISongDesigner _songDesigner;
+    private readonly IQuickTextEditor _quickTextEditor;
 
     /// <summary>Copied slide (label + text + style) for paste/duplicate.</summary>
     private (string Label, string Text, string? StyleJson)? _clipboardSlide;
@@ -158,6 +159,7 @@ public sealed partial class MainViewModel : ObservableObject
         IThemeRepository themes,
         IThemeManagerDialog themeManager,
         ISongDesigner songDesigner,
+        IQuickTextEditor quickTextEditor,
         ProjectionViewModel projectionViewModel)
     {
         _displayProvider = displayProvider;
@@ -172,6 +174,7 @@ public sealed partial class MainViewModel : ObservableObject
         _themes = themes;
         _themeManager = themeManager;
         _songDesigner = songDesigner;
+        _quickTextEditor = quickTextEditor;
         Projection = projectionViewModel;
 
         _presentation.Changed += (_, _) => UpdateStateFlags();
@@ -345,6 +348,34 @@ public sealed partial class MainViewModel : ObservableObject
     {
         if (SelectedSong is not null)
             EditSong();
+    }
+
+    /// <summary>Right-click on a slide → "Edición rápida": corrects just this slide's text.</summary>
+    [RelayCommand]
+    private void QuickEditSlide(SlideItemViewModel? item)
+    {
+        var section = SectionOf(item);
+        if (section is null)
+            return;
+
+        var edited = _quickTextEditor.Edit(section.Text);
+        if (edited is null || edited == section.Text)
+            return;
+
+        if (edited.Length == 0)
+        {
+            StatusText = "El texto no puede quedar vacío.";
+            return;
+        }
+
+        section.Text = edited;
+        var saved = _songs.Save(SelectedSong!);
+        RebuildSlidesPreservingLive(() =>
+        {
+            LoadSongs();
+            SelectedSong = Songs.FirstOrDefault(s => s.Id == saved.Id);
+        });
+        StatusText = "Texto de la diapositiva corregido.";
     }
 
     // ── Copiar / pegar / duplicar / eliminar diapositivas ────────

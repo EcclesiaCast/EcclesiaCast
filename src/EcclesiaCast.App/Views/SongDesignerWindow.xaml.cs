@@ -5,6 +5,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
+using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Core.Songs;
 using EcclesiaCast.Core.Themes;
@@ -35,11 +36,14 @@ public partial class SongDesignerWindow : Window
     private readonly Song _song;
     private readonly SlideTheme _theme;
     private readonly List<SlideOverride?> _overrides;
+    private readonly List<string> _texts;
     private readonly List<Thumb> _thumbs = [];
 
     private bool _loading;
     private bool _dragging;
     private Point _dragOffset;
+    private double _zoom = 1;
+    private bool _fitMode = true;
 
     public SongDesignerWindow(Song song, SlideTheme theme, int selectIndex)
     {
@@ -47,6 +51,7 @@ public partial class SongDesignerWindow : Window
         _song = song;
         _theme = theme;
         _overrides = song.Sections.Select(s => s.GetOverride()).ToList();
+        _texts = song.Sections.Select(s => s.Text).ToList();
 
         FontCombo.ItemsSource = Fonts.SystemFontFamilies.Select(f => f.Source).OrderBy(n => n).ToList();
 
@@ -66,7 +71,7 @@ public partial class SongDesignerWindow : Window
     private SlideContent BuildSlide(int index)
     {
         // Caption omitted in the editor so the box uses the full canvas.
-        return new SlideContent(_song.Sections[index].Text, null, null, _theme, _overrides[index]);
+        return new SlideContent(_texts[index], null, null, _theme, _overrides[index]);
     }
 
     private SlideOverride EnsureBox(SlideOverride? over)
@@ -98,6 +103,7 @@ public partial class SongDesignerWindow : Window
     {
         _loading = true;
 
+        TextEditor.Text = _texts[Selected];
         FontCombo.Text = over.FontFamily ?? _theme.FontFamily;
         SizeSlider.Value = over.FontSize ?? _theme.MaxFontSize;
         BoldToggle.IsChecked = over.Bold ?? _theme.Bold;
@@ -164,7 +170,82 @@ public partial class SongDesignerWindow : Window
             return;
         Preview.Slide = BuildSlide(Selected);
         _thumbs[Selected].Slide = BuildSlide(Selected);
+        UpdateColorSwatch();
         UpdateBoxInfo();
+    }
+
+    private void UpdateColorSwatch()
+    {
+        try
+        {
+            ColorSwatch.Background = new SolidColorBrush(
+                (Color)ColorConverter.ConvertFromString(ColorBox.Text.Trim()));
+        }
+        catch
+        {
+            ColorSwatch.Background = Brushes.White;
+        }
+    }
+
+    private void TextEditor_Changed(object sender, TextChangedEventArgs e)
+    {
+        if (_loading || Selected < 0)
+            return;
+        _texts[Selected] = TextEditor.Text;
+        RefreshSelected();
+    }
+
+    private void PickColor_Click(object sender, RoutedEventArgs e)
+    {
+        var picked = ColorPickerHelper.Pick(ColorBox.Text.Trim());
+        if (picked is not null)
+            ColorBox.Text = picked; // dispara Style_Changed
+    }
+
+    // ── Zoom ─────────────────────────────────────────────────────
+
+    private void CanvasScroll_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (_fitMode)
+            FitZoom();
+    }
+
+    private void FitZoom()
+    {
+        var availW = CanvasScroll.ViewportWidth > 0 ? CanvasScroll.ViewportWidth : CanvasScroll.ActualWidth;
+        var availH = CanvasScroll.ViewportHeight > 0 ? CanvasScroll.ViewportHeight : CanvasScroll.ActualHeight;
+        if (availW <= 0 || availH <= 0)
+            return;
+
+        _zoom = Math.Max(0.1, Math.Min(availW / CanvasW, availH / CanvasH) * 0.97);
+        ApplyZoom();
+    }
+
+    private void ApplyZoom()
+    {
+        ZoomTransform.ScaleX = _zoom;
+        ZoomTransform.ScaleY = _zoom;
+        ZoomLabel.Text = $"{_zoom * 100:0}%";
+    }
+
+    private void ZoomFit_Click(object sender, RoutedEventArgs e)
+    {
+        _fitMode = true;
+        FitZoom();
+    }
+
+    private void ZoomIn_Click(object sender, RoutedEventArgs e)
+    {
+        _fitMode = false;
+        _zoom = Math.Min(3, _zoom + 0.1);
+        ApplyZoom();
+    }
+
+    private void ZoomOut_Click(object sender, RoutedEventArgs e)
+    {
+        _fitMode = false;
+        _zoom = Math.Max(0.2, _zoom - 0.1);
+        ApplyZoom();
     }
 
     // ── Caja: colocar, arrastrar, redimensionar ──────────────────
@@ -315,7 +396,12 @@ public partial class SongDesignerWindow : Window
     private void Save_Click(object sender, RoutedEventArgs e)
     {
         for (var i = 0; i < _song.Sections.Count; i++)
+        {
+            var text = _texts[i].Trim();
+            if (text.Length > 0)
+                _song.Sections[i].Text = text;
             _song.Sections[i].SetOverride(Normalize(_overrides[i]));
+        }
 
         Saved = true;
         DialogResult = true;

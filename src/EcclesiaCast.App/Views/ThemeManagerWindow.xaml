@@ -156,8 +156,12 @@
                             <CheckBox Content="Sombra" IsChecked="{Binding Shadow}"/>
                         </WrapPanel>
 
-                        <TextBlock Text="Color del texto (hex)" Style="{StaticResource FieldLabel}"/>
-                        <TextBox Style="{StaticResource Field}" Text="{Binding TextColor, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="Color del texto" Style="{StaticResource FieldLabel}"/>
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Content="Paleta…" FontSize="11" Padding="8,3" Margin="6,0,0,0"
+                                    Style="{StaticResource DarkButton}" Command="{Binding PickTextColorCommand}"/>
+                            <TextBox Style="{StaticResource Field}" Text="{Binding TextColor, UpdateSourceTrigger=PropertyChanged}"/>
+                        </DockPanel>
 
                         <TextBlock Text="Alineación horizontal" Style="{StaticResource FieldLabel}"/>
                         <ComboBox SelectedIndex="{Binding AlignHIndex}" FontSize="12">
@@ -186,8 +190,12 @@
                         </TextBlock>
                         <Slider Minimum="0" Maximum="400" Value="{Binding MarginVertical}"/>
 
-                        <TextBlock Text="Color de fondo (hex)" Style="{StaticResource FieldLabel}"/>
-                        <TextBox Style="{StaticResource Field}" Text="{Binding BackgroundColor, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="Color de fondo" Style="{StaticResource FieldLabel}"/>
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Content="Paleta…" FontSize="11" Padding="8,3" Margin="6,0,0,0"
+                                    Style="{StaticResource DarkButton}" Command="{Binding PickBackgroundColorCommand}"/>
+                            <TextBox Style="{StaticResource Field}" Text="{Binding BackgroundColor, UpdateSourceTrigger=PropertyChanged}"/>
+                        </DockPanel>
 
                         <TextBlock Text="Imagen de fondo" Style="{StaticResource FieldLabel}"/>
                         <DockPanel>
@@ -224,11 +232,13 @@
                         </TextBlock>
                         <Slider Minimum="20" Maximum="70" Value="{Binding CaptionFontSize}"/>
 
-                        <TextBlock Text="Solo Biblia" Style="{StaticResource FieldLabel}"/>
-                        <WrapPanel>
-                            <CheckBox Content="Mostrar versión en la referencia" IsChecked="{Binding ShowVersionName}"/>
-                            <CheckBox Content="Número de versículo en el texto" IsChecked="{Binding ShowVerseNumbers}"/>
-                        </WrapPanel>
+                        <StackPanel Visibility="{Binding IsBibleKind, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="Solo Biblia" Style="{StaticResource FieldLabel}"/>
+                            <WrapPanel>
+                                <CheckBox Content="Mostrar versión en la referencia" IsChecked="{Binding ShowVersionName}"/>
+                                <CheckBox Content="Número de versículo en el texto" IsChecked="{Binding ShowVerseNumbers}"/>
+                            </WrapPanel>
+                        </StackPanel>
                     </StackPanel>
                 </Grid>
             </ScrollViewer>

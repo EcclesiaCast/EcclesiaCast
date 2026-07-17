@@ -143,34 +143,70 @@
         <!-- ── Lienzo de edición ── -->
         <DockPanel Grid.Row="0" Grid.Column="2">
             <Border DockPanel.Dock="Top" Style="{StaticResource Panel}" Padding="8,6" Margin="0,0,0,8">
-                <TextBlock Text="Arrastrá la caja para moverla · esquina inferior derecha para el tamaño · usá el panel derecho para alinear y dar formato."
+                <TextBlock Text="Arrastrá la caja para moverla · esquina inferior derecha para el tamaño · el panel derecho da formato · la caja de texto de abajo corrige la letra."
                            FontSize="11" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap"/>
             </Border>
+
+            <!-- Texto editable de la diapositiva -->
+            <Border DockPanel.Dock="Bottom" Style="{StaticResource Panel}" Padding="8" Margin="0,8,0,0">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="TEXTO DE LA DIAPOSITIVA" Style="{StaticResource PanelTitle}" Margin="2,0,0,4"/>
+                    <TextBox x:Name="TextEditor" Height="70"
+                             AcceptsReturn="True" TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Auto"
+                             Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                             BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
+                             Padding="8,6" FontSize="14"
+                             TextChanged="TextEditor_Changed"/>
+                </DockPanel>
+            </Border>
+
+            <!-- Barra de zoom -->
+            <Border DockPanel.Dock="Bottom" Padding="0,6,0,0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Ajustar" Style="{StaticResource DarkButton}" FontSize="11" Padding="10,4"
+                            Click="ZoomFit_Click"/>
+                    <Button Content="−" Style="{StaticResource DarkButton}" FontSize="13" Width="30" Padding="0,4" Margin="6,0,0,0"
+                            Click="ZoomOut_Click"/>
+                    <TextBlock x:Name="ZoomLabel" Text="100%" FontSize="11" Foreground="{StaticResource MutedBrush}"
+                               VerticalAlignment="Center" Width="46" TextAlignment="Center"/>
+                    <Button Content="+" Style="{StaticResource DarkButton}" FontSize="13" Width="30" Padding="0,4"
+                            Click="ZoomIn_Click"/>
+                </StackPanel>
+            </Border>
+
             <Border Background="#0B0D12" CornerRadius="6"
                     BorderBrush="{StaticResource LineBrush}" BorderThickness="1">
-                <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <Grid x:Name="CanvasRoot" Width="960" Height="540" ClipToBounds="True">
-                        <controls:SlideView x:Name="Preview"/>
-                        <Canvas x:Name="Overlay" Background="Transparent">
-                            <Border x:Name="BoxBorder"
-                                    BorderBrush="{StaticResource AccentBrush}" BorderThickness="1.5"
-                                    Background="#11FFFFFF" Cursor="SizeAll"
-                                    MouseLeftButtonDown="Box_MouseDown"
-                                    MouseMove="Box_MouseMove"
-                                    MouseLeftButtonUp="Box_MouseUp">
-                                <Thumb x:Name="BoxResize" Width="16" Height="16"
-                                       HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                                       Cursor="SizeNWSE" DragDelta="BoxResize_DragDelta">
-                                    <Thumb.Template>
-                                        <ControlTemplate TargetType="Thumb">
-                                            <Border Background="{StaticResource AccentBrush}" CornerRadius="3"/>
-                                        </ControlTemplate>
-                                    </Thumb.Template>
-                                </Thumb>
-                            </Border>
-                        </Canvas>
+                <ScrollViewer x:Name="CanvasScroll"
+                              HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                              SizeChanged="CanvasScroll_SizeChanged">
+                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Grid x:Name="CanvasRoot" Width="960" Height="540" ClipToBounds="True">
+                            <Grid.LayoutTransform>
+                                <ScaleTransform x:Name="ZoomTransform" ScaleX="1" ScaleY="1"/>
+                            </Grid.LayoutTransform>
+                            <controls:SlideView x:Name="Preview"/>
+                            <Canvas x:Name="Overlay" Background="Transparent">
+                                <Border x:Name="BoxBorder"
+                                        BorderBrush="{StaticResource AccentBrush}" BorderThickness="1.5"
+                                        Background="#11FFFFFF" Cursor="SizeAll"
+                                        MouseLeftButtonDown="Box_MouseDown"
+                                        MouseMove="Box_MouseMove"
+                                        MouseLeftButtonUp="Box_MouseUp">
+                                    <Thumb x:Name="BoxResize" Width="16" Height="16"
+                                           HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                           Cursor="SizeNWSE" DragDelta="BoxResize_DragDelta">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Border Background="{StaticResource AccentBrush}" CornerRadius="3"/>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Border>
+                            </Canvas>
+                        </Grid>
                     </Grid>
-                </Grid>
+                </ScrollViewer>
             </Border>
         </DockPanel>
 
@@ -213,8 +249,16 @@
                                     <ComboBoxItem Content="Mayúscula inicial"/>
                                 </ComboBox>
 
-                                <TextBlock Text="Color del texto (hex)" Style="{StaticResource FieldLabel}"/>
-                                <TextBox x:Name="ColorBox" Style="{StaticResource Field}" TextChanged="Style_Changed"/>
+                                <TextBlock Text="Color del texto" Style="{StaticResource FieldLabel}"/>
+                                <DockPanel>
+                                    <Button DockPanel.Dock="Right" Width="34" Padding="0,4" Margin="6,0,0,0"
+                                            Style="{StaticResource DarkButton}"
+                                            Click="PickColor_Click" ToolTip="Elegir de una paleta">
+                                        <Border x:Name="ColorSwatch" Width="16" Height="16" CornerRadius="3"
+                                                Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="1"/>
+                                    </Button>
+                                    <TextBox x:Name="ColorBox" Style="{StaticResource Field}" TextChanged="Style_Changed"/>
+                                </DockPanel>
 
                                 <TextBlock Text="Alineación horizontal" Style="{StaticResource FieldLabel}"/>
                                 <StackPanel Orientation="Horizontal">

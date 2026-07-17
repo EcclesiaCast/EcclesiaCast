@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Core.Themes;
@@ -32,6 +33,9 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     public bool ChangesMade { get; private set; }
 
     // ── Campos del editor ────────────────────────────────────────
+
+    /// <summary>True when the theme is a Bible theme — gates the Bible-only fields.</summary>
+    public bool IsBibleKind => KindIndex == 1;
 
     [ObservableProperty] private string _themeName = string.Empty;
     [ObservableProperty] private int _kindIndex;                       // 0 Canciones · 1 Biblia
@@ -69,8 +73,11 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
 
         // Cualquier cambio de campo refresca la vista previa en vivo.
         if (!_loading
-            && e.PropertyName is not (nameof(PreviewSlide) or nameof(SelectedTheme) or nameof(DefaultsText)))
+            && e.PropertyName is not (nameof(PreviewSlide) or nameof(SelectedTheme) or nameof(DefaultsText) or nameof(IsBibleKind)))
             UpdatePreview();
+
+        if (e.PropertyName == nameof(KindIndex))
+            OnPropertyChanged(nameof(IsBibleKind));
     }
 
     partial void OnSelectedThemeChanged(SlideTheme? value)
@@ -265,4 +272,20 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
 
     [RelayCommand]
     private void ClearBackgroundImage() => BackgroundImagePath = null;
+
+    [RelayCommand]
+    private void PickTextColor()
+    {
+        var picked = ColorPickerHelper.Pick(TextColor);
+        if (picked is not null)
+            TextColor = picked;
+    }
+
+    [RelayCommand]
+    private void PickBackgroundColor()
+    {
+        var picked = ColorPickerHelper.Pick(BackgroundColor);
+        if (picked is not null)
+            BackgroundColor = picked;
+    }
 }

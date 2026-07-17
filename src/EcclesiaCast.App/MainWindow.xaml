@@ -665,7 +665,10 @@
                                                         <MenuItem Header="Editar canción (diseño)"
                                                                   Command="{Binding PlacementTarget.Tag.EditSongDesignCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                                   CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
-                                                        <MenuItem Header="Editar como texto plano"
+                                                        <MenuItem Header="Edición rápida (solo texto)"
+                                                                  Command="{Binding PlacementTarget.Tag.QuickEditSlideCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                        <MenuItem Header="Editar como texto plano (canción)"
                                                                   Command="{Binding PlacementTarget.Tag.EditSongAsTextCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                                   CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                                         <Separator/>

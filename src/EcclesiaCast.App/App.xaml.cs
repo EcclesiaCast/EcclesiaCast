@@ -65,6 +65,7 @@ public partial class App : Application
         services.AddSingleton<IThemeRepository>(_ => new ThemeRepository(dbPath));
         services.AddSingleton<IThemeManagerDialog, ThemeManagerDialogService>();
         services.AddSingleton<ISongDesigner, SongDesignerService>();
+        services.AddSingleton<IQuickTextEditor, QuickTextEditorService>();
         services.AddSingleton<MainViewModel>();
         _services = services.BuildServiceProvider();
 
