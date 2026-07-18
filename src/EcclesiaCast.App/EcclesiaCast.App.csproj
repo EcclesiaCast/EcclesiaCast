@@ -8,6 +8,8 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- Regenerate with installer\make-icon.ps1 -->
+    <ApplicationIcon>app.ico</ApplicationIcon>
     <AssemblyTitle>EcclesiaCast</AssemblyTitle>
     <Product>EcclesiaCast</Product>
   </PropertyGroup>
