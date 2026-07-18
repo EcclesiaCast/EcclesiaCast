@@ -173,7 +173,14 @@ public partial class YouTubeSurface : UserControl
                   playerVars: {
                     origin: location.origin,
                     autoplay: 1, controls: 0, rel: 0, modestbranding: 1,
-                    iv_load_policy: 3, playsinline: 1, fs: 0, disablekb: 1
+                    iv_load_policy: 3, playsinline: 1, fs: 0, disablekb: 1,
+                    // Asks for captions off. Note this only expresses a
+                    // preference: when the signed-in account has "always show
+                    // captions" set, the embedded player shows them anyway and
+                    // neither unloadModule('captions') nor setOption(...,'track',{})
+                    // overrides it (both verified against the real player). The
+                    // fix is to turn captions off in the YouTube account itself.
+                    cc_load_policy: 0
                   },
                   events: {
                     onReady: function (e) {
