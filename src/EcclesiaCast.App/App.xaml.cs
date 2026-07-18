@@ -87,6 +87,7 @@ public partial class App : Application
         services.AddSingleton<IQuickTextEditor, QuickTextEditorService>();
         services.AddSingleton<IMediaRepository>(_ => new MediaRepository(dbPath));
         services.AddSingleton<IMediaInspector, MediaInspectorService>();
+        services.AddSingleton<IPlaylistRepository>(_ => new PlaylistRepository(dbPath));
         services.AddSingleton<MainViewModel>();
         _services = services.BuildServiceProvider();
 

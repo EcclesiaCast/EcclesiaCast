@@ -9,6 +9,7 @@ using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Bible;
 using EcclesiaCast.Core.Displays;
 using EcclesiaCast.Core.Media;
+using EcclesiaCast.Core.Playlists;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Core.Songs;
 using EcclesiaCast.Core.Themes;
@@ -39,6 +40,7 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly IQuickTextEditor _quickTextEditor;
     private readonly IMediaRepository _media;
     private readonly IMediaInspector _mediaInspector;
+    private readonly IPlaylistRepository _playlists;
 
     /// <summary>Copied slide (label + text + style) for paste/duplicate.</summary>
     private (string Label, string Text, string? StyleJson)? _clipboardSlide;
@@ -165,6 +167,7 @@ public sealed partial class MainViewModel : ObservableObject
         IQuickTextEditor quickTextEditor,
         IMediaRepository media,
         IMediaInspector mediaInspector,
+        IPlaylistRepository playlists,
         ProjectionViewModel projectionViewModel)
     {
         _displayProvider = displayProvider;
@@ -182,6 +185,7 @@ public sealed partial class MainViewModel : ObservableObject
         _quickTextEditor = quickTextEditor;
         _media = media;
         _mediaInspector = mediaInspector;
+        _playlists = playlists;
         Projection = projectionViewModel;
 
         _presentation.Changed += (_, _) => UpdateStateFlags();
@@ -192,6 +196,279 @@ public sealed partial class MainViewModel : ObservableObject
         LoadSongs();
         LoadBibleVersions();
         LoadMedia();
+        LoadPlaylists(null);
+    }
+
+    // ── Playlist del servicio ────────────────────────────────────
+
+    public ObservableCollection<Playlist> Playlists { get; } = [];
+    public ObservableCollection<PlaylistItem> PlaylistItems { get; } = [];
+
+    [ObservableProperty]
+    private Playlist? _selectedPlaylist;
+
+    [ObservableProperty]
+    private PlaylistItem? _selectedPlaylistItem;
+
+    private void LoadPlaylists(int? keepId)
+    {
+        keepId ??= SelectedPlaylist?.Id;
+        Playlists.Clear();
+        foreach (var playlist in _playlists.GetAll())
+            Playlists.Add(playlist);
+        SelectedPlaylist = Playlists.FirstOrDefault(p => p.Id == keepId) ?? Playlists.FirstOrDefault();
+    }
+
+    partial void OnSelectedPlaylistChanged(Playlist? value)
+    {
+        PlaylistItems.Clear();
+        if (value is null)
+            return;
+        foreach (var item in value.Items.OrderBy(i => i.Order))
+            PlaylistItems.Add(item);
+    }
+
+    private void SavePlaylist()
+    {
+        if (SelectedPlaylist is null)
+            return;
+
+        for (var i = 0; i < PlaylistItems.Count; i++)
+            PlaylistItems[i].Order = i;
+        SelectedPlaylist.Items = PlaylistItems.ToList();
+        var saved = _playlists.Save(SelectedPlaylist);
+        LoadPlaylists(saved.Id);
+    }
+
+    [RelayCommand]
+    private void NewPlaylist()
+    {
+        var name = _textPrompt.Ask("Nueva playlist", "Nombre (ej. Domingo 20/7):");
+        if (string.IsNullOrWhiteSpace(name))
+            return;
+        var saved = _playlists.Save(new Playlist { Name = name.Trim() });
+        LoadPlaylists(saved.Id);
+        StatusText = $"Playlist \"{saved.Name}\" creada.";
+    }
+
+    [RelayCommand]
+    private void RenamePlaylist()
+    {
+        if (SelectedPlaylist is null)
+            return;
+        var name = _textPrompt.Ask("Renombrar playlist", "Nuevo nombre:", SelectedPlaylist.Name);
+        if (string.IsNullOrWhiteSpace(name))
+            return;
+        SelectedPlaylist.Name = name.Trim();
+        SavePlaylist();
+    }
+
+    [RelayCommand]
+    private void DuplicatePlaylist()
+    {
+        if (SelectedPlaylist is null)
+            return;
+        var copy = new Playlist
+        {
+            Name = $"{SelectedPlaylist.Name} (copia)",
+            Items = SelectedPlaylist.Items
+                .Select(i => new PlaylistItem
+                {
+                    Order = i.Order, Type = i.Type, Caption = i.Caption,
+                    SongId = i.SongId, BibleVersionId = i.BibleVersionId,
+                    BookNumber = i.BookNumber, Chapter = i.Chapter,
+                    VerseStart = i.VerseStart, VerseEnd = i.VerseEnd, MediaId = i.MediaId,
+                })
+                .ToList(),
+        };
+        var saved = _playlists.Save(copy);
+        LoadPlaylists(saved.Id);
+        StatusText = $"Playlist duplicada: \"{saved.Name}\".";
+    }
+
+    [RelayCommand]
+    private void DeletePlaylist()
+    {
+        if (SelectedPlaylist is null)
+            return;
+        var confirm = MessageBox.Show(
+            $"¿Eliminar la playlist \"{SelectedPlaylist.Name}\"?",
+            "EcclesiaCast", MessageBoxButton.YesNo, MessageBoxImage.Question);
+        if (confirm != MessageBoxResult.Yes)
+            return;
+        _playlists.Delete(SelectedPlaylist.Id);
+        SelectedPlaylist = null;
+        LoadPlaylists(null);
+        StatusText = "Playlist eliminada.";
+    }
+
+    private bool EnsurePlaylist()
+    {
+        if (SelectedPlaylist is not null)
+            return true;
+        NewPlaylist();
+        return SelectedPlaylist is not null;
+    }
+
+    [RelayCommand]
+    private void AddSongToPlaylist(Song? song)
+    {
+        if (song is null || !EnsurePlaylist())
+            return;
+        PlaylistItems.Add(new PlaylistItem
+        {
+            Type = PlaylistItemType.Song,
+            Caption = string.IsNullOrWhiteSpace(song.Artist) ? song.Title : $"{song.Title} — {song.Artist}",
+            SongId = song.Id,
+        });
+        SavePlaylist();
+        StatusText = $"\"{song.Title}\" agregada a la playlist.";
+    }
+
+    [RelayCommand]
+    private void AddCurrentPassageToPlaylist()
+    {
+        if (_currentPassage is null || PrimaryVersion is null || !EnsurePlaylist())
+        {
+            if (_currentPassage is null)
+                StatusText = "Cargá un pasaje primero (libro y capítulo, o una referencia).";
+            return;
+        }
+
+        var reference = _currentPassage;
+        var bookName = BibleBookCatalog.FindByNumber(reference.BookNumber)?.Name ?? $"Libro {reference.BookNumber}";
+        var verses = reference.VerseStart is int vs
+            ? reference.VerseEnd is int ve && ve != vs ? $":{vs}-{ve}" : $":{vs}"
+            : string.Empty;
+
+        PlaylistItems.Add(new PlaylistItem
+        {
+            Type = PlaylistItemType.BiblePassage,
+            Caption = $"{bookName} {reference.Chapter}{verses} ({PrimaryVersion.Abbreviation})",
+            BibleVersionId = PrimaryVersion.Id,
+            BookNumber = reference.BookNumber,
+            Chapter = reference.Chapter,
+            VerseStart = reference.VerseStart,
+            VerseEnd = reference.VerseEnd,
+        });
+        SavePlaylist();
+        StatusText = "Pasaje agregado a la playlist.";
+    }
+
+    [RelayCommand]
+    private void AddMediaToPlaylist(MediaItem? item)
+    {
+        if (item is null || !EnsurePlaylist())
+            return;
+        PlaylistItems.Add(new PlaylistItem
+        {
+            Type = PlaylistItemType.Media,
+            Caption = item.Name,
+            MediaId = item.Id,
+        });
+        SavePlaylist();
+        StatusText = $"\"{item.Name}\" agregado a la playlist.";
+    }
+
+    [RelayCommand]
+    private void RemovePlaylistItem(PlaylistItem? item)
+    {
+        if (item is null)
+            return;
+        PlaylistItems.Remove(item);
+        SavePlaylist();
+    }
+
+    [RelayCommand]
+    private void MovePlaylistItemUp(PlaylistItem? item)
+    {
+        if (item is null)
+            return;
+        var index = PlaylistItems.IndexOf(item);
+        if (index <= 0)
+            return;
+        PlaylistItems.Move(index, index - 1);
+        SavePlaylist();
+        SelectedPlaylistItem = PlaylistItems.FirstOrDefault(i => i.Caption == item.Caption && i.Order == index - 1);
+    }
+
+    [RelayCommand]
+    private void MovePlaylistItemDown(PlaylistItem? item)
+    {
+        if (item is null)
+            return;
+        var index = PlaylistItems.IndexOf(item);
+        if (index < 0 || index >= PlaylistItems.Count - 1)
+            return;
+        PlaylistItems.Move(index, index + 1);
+        SavePlaylist();
+    }
+
+    /// <summary>Loads the item into the operator (no projection).</summary>
+    [RelayCommand]
+    private void OpenPlaylistItem(PlaylistItem? item)
+    {
+        if (item is null)
+            return;
+
+        switch (item.Type)
+        {
+            case PlaylistItemType.Song:
+                IsBibleTabActive = false;
+                var song = Songs.FirstOrDefault(s => s.Id == item.SongId);
+                if (song is null)
+                {
+                    StatusText = $"La canción \"{item.Caption}\" ya no está en la biblioteca.";
+                    return;
+                }
+                SelectedSong = song;
+                break;
+
+            case PlaylistItemType.BiblePassage:
+                IsBibleTabActive = true;
+                var option = BibleVersionOptions.FirstOrDefault(o => o.Info.Id == item.BibleVersionId);
+                if (option is not null && PrimaryVersion?.Id != option.Info.Id)
+                    SelectSoloVersion(option);
+                if (item.BookNumber is int book && item.Chapter is int chapter)
+                {
+                    SelectedBibleBook = BibleBooksAvailable.FirstOrDefault(b => b.Number == book);
+                    LoadBiblePassage(new BibleReference(book, chapter, null, null));
+                    if (item.VerseStart is int verse)
+                    {
+                        var index = Slides.ToList().FindIndex(s => s.Label == $"{chapter}:{verse}");
+                        SetPreviewIndex(index);
+                    }
+                }
+                break;
+
+            case PlaylistItemType.Media:
+                var media = _allMedia.FirstOrDefault(m => m.Id == item.MediaId);
+                if (media is null)
+                {
+                    StatusText = $"El medio \"{item.Caption}\" ya no está en la biblioteca.";
+                    return;
+                }
+                ApplyBackground(media);
+                break;
+        }
+    }
+
+    /// <summary>Double-click: load the item AND put it live.</summary>
+    [RelayCommand]
+    private void ProjectPlaylistItem(PlaylistItem? item)
+    {
+        if (item is null)
+            return;
+
+        OpenPlaylistItem(item);
+
+        if (item.Type is PlaylistItemType.Song or PlaylistItemType.BiblePassage)
+        {
+            if (item.Type == PlaylistItemType.BiblePassage && PreviewSlideIndex >= 0)
+                GoLiveSlide(PreviewSlideIndex);
+            else if (Slides.FirstOrDefault(s => s.JumpTarget is null) is { } first)
+                GoLiveSlide(first.Index);
+        }
     }
 
     // ── Medios (biblioteca con tabs por categoría) ───────────────

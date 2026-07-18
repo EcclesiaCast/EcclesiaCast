@@ -211,6 +211,10 @@
                                                                   Command="{Binding PlacementTarget.Tag.EditSongTextForCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                                   CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                                         <Separator/>
+                                                        <MenuItem Header="Agregar a la playlist"
+                                                                  Command="{Binding PlacementTarget.Tag.AddSongToPlaylistCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                        <Separator/>
                                                         <MenuItem Header="Duplicar canción"
                                                                   Command="{Binding PlacementTarget.Tag.DuplicateSongCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                                   CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
@@ -261,6 +265,10 @@
                                 <!-- Versiones (hasta 2 tildadas a la vez, estilo BibleShow) -->
                                 <DockPanel DockPanel.Dock="Top" Margin="12,0,12,4">
                                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Button Content="▶➕" FontSize="11" Padding="7,4" Margin="0,0,4,0"
+                                                Style="{StaticResource DarkButton}"
+                                                Command="{Binding AddCurrentPassageToPlaylistCommand}"
+                                                ToolTip="Agregar el pasaje actual a la playlist"/>
                                         <Button Content="📥" FontSize="11" Padding="7,4"
                                                 Style="{StaticResource DarkButton}"
                                                 Command="{Binding ImportBibleCommand}"
@@ -503,9 +511,119 @@
 
                 <Border Grid.Row="2" Style="{StaticResource Panel}">
                     <DockPanel>
-                        <TextBlock DockPanel.Dock="Top" Text="PLAYLIST DEL SERVICIO" Style="{StaticResource PanelTitle}"/>
-                        <TextBlock Style="{StaticResource PlaceholderText}"
-                                   Text="El orden del culto — canciones, pasajes y medios — se arma acá. (sprint 6)"/>
+                        <DockPanel DockPanel.Dock="Top">
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
+                                        VerticalAlignment="Center" Margin="0,8,10,4">
+                                <Button Content="➕" FontSize="11" Padding="6,3"
+                                        Style="{StaticResource DarkButton}"
+                                        Command="{Binding NewPlaylistCommand}" ToolTip="Nueva playlist"/>
+                                <Button Content="✏️" FontSize="11" Padding="6,3" Margin="4,0,0,0"
+                                        Style="{StaticResource DarkButton}"
+                                        Command="{Binding RenamePlaylistCommand}" ToolTip="Renombrar"/>
+                                <Button Content="⧉" FontSize="11" Padding="6,3" Margin="4,0,0,0"
+                                        Style="{StaticResource DarkButton}"
+                                        Command="{Binding DuplicatePlaylistCommand}" ToolTip="Duplicar (ej. el domingo pasado)"/>
+                                <Button Content="🗑" FontSize="11" Padding="6,3" Margin="4,0,0,0"
+                                        Style="{StaticResource DarkButton}"
+                                        Command="{Binding DeletePlaylistCommand}" ToolTip="Eliminar"/>
+                            </StackPanel>
+                            <TextBlock Text="PLAYLIST" Style="{StaticResource PanelTitle}"/>
+                        </DockPanel>
+                        <ComboBox DockPanel.Dock="Top" Margin="12,0,12,6"
+                                  ItemsSource="{Binding Playlists}"
+                                  SelectedItem="{Binding SelectedPlaylist}"
+                                  DisplayMemberPath="Name" FontSize="12"/>
+                        <Grid>
+                            <TextBlock Text="Agregá canciones (clic derecho), pasajes (botón ▶➕ en Biblia)&#10;y medios (clic derecho) · doble clic proyecta.">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource PlaceholderText}">
+                                        <Setter Property="FontSize" Value="10"/>
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding PlaylistItems.Count}" Value="0">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <ListBox x:Name="PlaylistList"
+                                     ItemsSource="{Binding PlaylistItems}"
+                                     SelectedItem="{Binding SelectedPlaylistItem}"
+                                     Background="Transparent" BorderThickness="0"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                     ToolTip="Clic: cargar · doble clic: proyectar">
+                                <ListBox.InputBindings>
+                                    <MouseBinding MouseAction="LeftDoubleClick"
+                                                  Command="{Binding ProjectPlaylistItemCommand}"
+                                                  CommandParameter="{Binding SelectedItem, ElementName=PlaylistList}"/>
+                                    <KeyBinding Key="Enter"
+                                                Command="{Binding ProjectPlaylistItemCommand}"
+                                                CommandParameter="{Binding SelectedItem, ElementName=PlaylistList}"/>
+                                </ListBox.InputBindings>
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="ListBoxItem">
+                                        <Setter Property="Padding" Value="8,4"/>
+                                        <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+                                        <Setter Property="ContextMenu">
+                                            <Setter.Value>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Cargar (sin proyectar)"
+                                                              Command="{Binding PlacementTarget.Tag.OpenPlaylistItemCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                    <Separator/>
+                                                    <MenuItem Header="Subir"
+                                                              Command="{Binding PlacementTarget.Tag.MovePlaylistItemUpCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                    <MenuItem Header="Bajar"
+                                                              Command="{Binding PlacementTarget.Tag.MovePlaylistItemDownCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                    <Separator/>
+                                                    <MenuItem Header="Quitar de la playlist"
+                                                              Command="{Binding PlacementTarget.Tag.RemovePlaylistItemCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                </ContextMenu>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ListBoxItem">
+                                                    <Border x:Name="bd" Background="Transparent" CornerRadius="4"
+                                                            Margin="6,1" Padding="{TemplateBinding Padding}">
+                                                        <ContentPresenter/>
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="bd" Property="Background" Value="#20242F"/>
+                                                        </Trigger>
+                                                        <Trigger Property="IsSelected" Value="True">
+                                                            <Setter TargetName="bd" Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <DockPanel>
+                                            <TextBlock x:Name="icon" Text="🎵" FontSize="11" Margin="0,0,6,0"/>
+                                            <TextBlock Text="{Binding Caption}" FontSize="12" Foreground="White"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                        </DockPanel>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding Type}" Value="BiblePassage">
+                                                <Setter TargetName="icon" Property="Text" Value="📖"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Type}" Value="Media">
+                                                <Setter TargetName="icon" Property="Text" Value="🎞"/>
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
                     </DockPanel>
                 </Border>
             </Grid>
@@ -865,6 +983,10 @@
                                             ToolTip="{Binding Name}">
                                         <Button.ContextMenu>
                                             <ContextMenu>
+                                                <MenuItem Header="Agregar a la playlist"
+                                                          Command="{Binding PlacementTarget.Tag.AddMediaToPlaylistCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                <Separator/>
                                                 <MenuItem Header="Propiedades (Inspector)…"
                                                           Command="{Binding PlacementTarget.Tag.InspectMediaCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                           CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>

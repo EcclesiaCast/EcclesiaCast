@@ -1,5 +1,6 @@
 using EcclesiaCast.Core.Bible;
 using EcclesiaCast.Core.Media;
+using EcclesiaCast.Core.Playlists;
 using EcclesiaCast.Core.Songs;
 using EcclesiaCast.Core.Themes;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,8 @@ public sealed class AppDbContext : DbContext
     public DbSet<BibleVerse> BibleVerses => Set<BibleVerse>();
     public DbSet<SlideTheme> Themes => Set<SlideTheme>();
     public DbSet<MediaItem> MediaItems => Set<MediaItem>();
+    public DbSet<Playlist> Playlists => Set<Playlist>();
+    public DbSet<PlaylistItem> PlaylistItems => Set<PlaylistItem>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseSqlite($"Data Source={_dbPath}");
@@ -83,5 +86,17 @@ public sealed class AppDbContext : DbContext
             media.HasKey(m => m.Id);
             media.Property(m => m.Path).IsRequired();
         });
+
+        modelBuilder.Entity<Playlist>(playlist =>
+        {
+            playlist.HasKey(p => p.Id);
+            playlist.Property(p => p.Name).IsRequired();
+            playlist.HasMany(p => p.Items)
+                .WithOne()
+                .HasForeignKey(i => i.PlaylistId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<PlaylistItem>(item => item.HasKey(i => i.Id));
     }
 }
