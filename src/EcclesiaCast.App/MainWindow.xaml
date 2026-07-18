@@ -117,11 +117,11 @@
         <!-- ══ Zona central: biblioteca | slides | preview/live ══ -->
         <Grid Grid.Row="1" Margin="10,10,10,0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="270" MinWidth="200"/>
+                <ColumnDefinition x:Name="LibraryColumn" Width="270" MinWidth="200"/>
                 <ColumnDefinition Width="6"/>
                 <ColumnDefinition Width="*" MinWidth="360"/>
                 <ColumnDefinition Width="6"/>
-                <ColumnDefinition Width="320" MinWidth="260"/>
+                <ColumnDefinition x:Name="PreviewColumn" Width="320" MinWidth="260"/>
             </Grid.ColumnDefinitions>
 
             <!-- Panel izquierdo: biblioteca + playlist -->
@@ -129,8 +129,10 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="10"/>
-                    <RowDefinition Height="240"/>
+                    <RowDefinition x:Name="PlaylistRow" Height="240" MinHeight="120"/>
                 </Grid.RowDefinitions>
+                <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                              Height="6" Background="Transparent"/>
 
                 <Border Grid.Row="0" Style="{StaticResource Panel}">
                     <DockPanel>

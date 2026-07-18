@@ -210,6 +210,12 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private PlaylistItem? _selectedPlaylistItem;
 
+    /// <summary>Index in <see cref="PlaylistItems"/> of the item currently driving the grid; -1 if none.</summary>
+    private int _currentPlaylistIndex = -1;
+
+    /// <summary>True while OpenPlaylistItem loads content, so trackers aren't reset.</summary>
+    private bool _openingPlaylistItem;
+
     private void LoadPlaylists(int? keepId)
     {
         keepId ??= SelectedPlaylist?.Id;
@@ -411,6 +417,22 @@ public sealed partial class MainViewModel : ObservableObject
         if (item is null)
             return;
 
+        _openingPlaylistItem = true;
+        try
+        {
+            OpenPlaylistItemCore(item);
+        }
+        finally
+        {
+            _openingPlaylistItem = false;
+        }
+
+        _currentPlaylistIndex = PlaylistItems.IndexOf(item);
+        SelectedPlaylistItem = item;
+    }
+
+    private void OpenPlaylistItemCore(PlaylistItem item)
+    {
         switch (item.Type)
         {
             case PlaylistItemType.Song:
@@ -753,6 +775,8 @@ public sealed partial class MainViewModel : ObservableObject
         LiveSlideIndex = -1;
         PreviewSlideIndex = -1;
         _currentPassage = null;
+        if (!_openingPlaylistItem)
+            _currentPlaylistIndex = -1;
 
         if (SelectedSong is null)
             return;
@@ -1624,10 +1648,51 @@ public sealed partial class MainViewModel : ObservableObject
     private void ProjectFirstSlide() => GoLiveSlide(0);
 
     [RelayCommand]
-    private void NextSlide() => GoLiveSlide(LiveSlideIndex < 0 ? 0 : LiveSlideIndex + 1);
+    private void NextSlide()
+    {
+        var next = LiveSlideIndex < 0 ? 0 : LiveSlideIndex + 1;
+
+        // At the end of the item, the arrow continues to the next playlist
+        // item (songs and media; Bible chapters have their own jump card).
+        if (next >= Slides.Count && TryAdvancePlaylist(+1))
+            return;
+
+        GoLiveSlide(next);
+    }
 
     [RelayCommand]
-    private void PreviousSlide() => GoLiveSlide(LiveSlideIndex - 1);
+    private void PreviousSlide()
+    {
+        var previous = LiveSlideIndex - 1;
+
+        if (previous < 0 && TryAdvancePlaylist(-1))
+            return;
+
+        GoLiveSlide(previous);
+    }
+
+    /// <summary>Moves to the adjacent playlist item and projects it. False if not applicable.</summary>
+    private bool TryAdvancePlaylist(int direction)
+    {
+        if (_currentPlaylistIndex < 0)
+            return false;
+
+        var target = _currentPlaylistIndex + direction;
+        if (target < 0 || target >= PlaylistItems.Count)
+            return false;
+
+        var item = PlaylistItems[target];
+        OpenPlaylistItem(item);
+
+        // Forward lands on the first slide, backward on the last, so reading
+        // through the service is continuous in both directions.
+        var projectable = Slides.Where(s => s.JumpTarget is null).ToList();
+        if (projectable.Count > 0)
+            GoLiveSlide(direction > 0 ? projectable[0].Index : projectable[^1].Index);
+
+        StatusText = $"Playlist: {item.Caption}";
+        return true;
+    }
 
     private void GoLiveSlide(int index)
     {

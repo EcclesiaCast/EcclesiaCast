@@ -95,6 +95,7 @@ public partial class App : Application
         {
             DataContext = _services.GetRequiredService<MainViewModel>()
         };
+        mainWindow.AttachLayoutPersistence(_services.GetRequiredService<ISettingsStore>());
         MainWindow = mainWindow;
         mainWindow.Show();
     }
