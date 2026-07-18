@@ -25,6 +25,9 @@ public sealed partial class MainViewModel : ObservableObject
 {
     private const string OutputDisplayKey = "output.display";
 
+    /// <summary>Marks that video posters were rebuilt with the VLC fallback (see RefreshVideoThumbnailsAsync).</summary>
+    private const string VideoThumbnailsRebuiltKey = "media.video-thumbnails.rebuilt";
+
     private readonly IDisplayProvider _displayProvider;
     private readonly IProjectionWindowService _projection;
     private readonly ISettingsStore _settings;
@@ -201,6 +204,7 @@ public sealed partial class MainViewModel : ObservableObject
         LoadBibleVersions();
         LoadMedia();
         LoadPlaylists(null);
+        _ = RefreshVideoThumbnailsAsync();
     }
 
     // ── Playlist del servicio ────────────────────────────────────
@@ -579,14 +583,14 @@ public sealed partial class MainViewModel : ObservableObject
             if (type is null)
                 continue;
 
-            var thumbnail = ShellThumbnail.Save(path) ?? (type == MediaType.Image ? path : null);
-
+            // Videos the shell can't decode get their poster from VLC afterwards,
+            // in the background, so a batch import doesn't freeze the window.
             _media.Add(new MediaItem
             {
                 Name = Path.GetFileNameWithoutExtension(path),
                 Path = path,
                 Type = type.Value,
-                ThumbnailPath = thumbnail,
+                ThumbnailPath = MediaThumbnails.Create(path, type.Value, videoEngine: null),
                 Category = SelectedMediaTab,
                 // Videos with audio default to a foreground announcement; silent
                 // ones and images to a background — the operator can change it.
@@ -597,6 +601,64 @@ public sealed partial class MainViewModel : ObservableObject
 
         LoadMedia();
         StatusText = $"{added} medio(s) agregado(s) a «{SelectedMediaTab}».";
+        _ = RefreshVideoThumbnailsAsync();
+    }
+
+    /// <summary>
+    /// Fills in the video posters the Windows shell couldn't produce, decoding a
+    /// frame with VLC instead. Runs off the UI thread because each file costs a
+    /// couple hundred milliseconds.
+    /// </summary>
+    /// <remarks>
+    /// Until this existed, those videos showed the generic player icon (the VLC
+    /// cone). The first run after the fix therefore rebuilds every video poster
+    /// once, since we can't tell an old icon from a real frame after the fact.
+    /// </remarks>
+    private async Task RefreshVideoThumbnailsAsync()
+    {
+        var engine = App.VideoEngine;
+        if (engine is null)
+            return;
+
+        var rebuildAll = _settings.Get(VideoThumbnailsRebuiltKey) is null;
+
+        var pending = _media.GetAll()
+            .Where(m => m.Type == MediaType.Video && !string.IsNullOrWhiteSpace(m.Path))
+            .Where(m => rebuildAll
+                        || string.IsNullOrWhiteSpace(m.ThumbnailPath)
+                        || !File.Exists(m.ThumbnailPath))
+            .ToList();
+
+        if (pending.Count > 0)
+        {
+            var rebuilt = await Task.Run(() =>
+            {
+                var count = 0;
+                foreach (var item in pending)
+                {
+                    if (rebuildAll)
+                        MediaThumbnails.Delete(item.ThumbnailPath);
+
+                    var thumbnail = MediaThumbnails.Create(item.Path, item.Type, engine);
+                    if (thumbnail is null)
+                        continue;
+
+                    item.ThumbnailPath = thumbnail;
+                    _media.Update(item);
+                    count++;
+                }
+                return count;
+            });
+
+            if (rebuilt > 0)
+                LoadMedia();
+        }
+
+        _settings.Set(VideoThumbnailsRebuiltKey, "1");
+
+        // Sweep posters left behind by earlier rebuilds.
+        var current = _media.GetAll().Select(m => m.ThumbnailPath).ToList();
+        await Task.Run(() => MediaThumbnails.DeleteOrphans(current));
     }
 
     /// <summary>Click a media: background layers behind the text, foreground takes the screen.</summary>

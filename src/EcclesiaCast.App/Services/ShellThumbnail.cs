@@ -1,57 +1,37 @@
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
+using Serilog;
 
 namespace EcclesiaCast.App.Services;
 
 /// <summary>
-/// Generates a poster thumbnail for a media file using the Windows shell
-/// (the same image Explorer shows for videos and pictures) and saves it as
-/// a PNG in the app's thumbnails folder.
+/// Asks the Windows shell for the poster image it shows in Explorer.
 /// </summary>
 public static class ShellThumbnail
 {
-    private static string ThumbsDir => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "EcclesiaCast", "thumbnails");
-
-    /// <summary>Returns the saved thumbnail path, or null if it couldn't be generated.</summary>
-    public static string? Save(string sourcePath, int width = 320, int height = 180)
+    /// <summary>
+    /// Returns the shell's thumbnail, or null when it has none. Note this never
+    /// falls back to the file-type icon: a picture of the VLC cone is worse than
+    /// no thumbnail at all, and <see cref="VideoThumbnail"/> can usually decode
+    /// the frame the shell couldn't.
+    /// </summary>
+    public static BitmapSource? TryGet(string path, int width, int height)
     {
-        try
-        {
-            var source = GetThumbnail(sourcePath, width, height);
-            if (source is null)
-                return null;
-
-            Directory.CreateDirectory(ThumbsDir);
-            var target = Path.Combine(ThumbsDir, $"{Guid.NewGuid():N}.png");
-
-            using var stream = File.Create(target);
-            var encoder = new PngBitmapEncoder();
-            encoder.Frames.Add(BitmapFrame.Create(source));
-            encoder.Save(stream);
-            return target;
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
-    private static BitmapSource? GetThumbnail(string path, int width, int height)
-    {
-        var riid = typeof(IShellItemImageFactory).GUID;
-        SHCreateItemFromParsingName(path, IntPtr.Zero, ref riid, out var factory);
-        if (factory is null)
-            return null;
-
+        IShellItemImageFactory? factory = null;
         var hbitmap = IntPtr.Zero;
         try
         {
-            factory.GetImage(new SIZE { cx = width, cy = height }, SIIGBF.ResizeToFit, out hbitmap);
+            var riid = typeof(IShellItemImageFactory).GUID;
+            SHCreateItemFromParsingName(path, IntPtr.Zero, ref riid, out factory);
+            if (factory is null)
+                return null;
+
+            factory.GetImage(
+                new SIZE { cx = width, cy = height },
+                SIIGBF.ResizeToFit | SIIGBF.ThumbnailOnly,
+                out hbitmap);
             if (hbitmap == IntPtr.Zero)
                 return null;
 
@@ -60,11 +40,19 @@ public static class ShellThumbnail
             source.Freeze();
             return source;
         }
+        catch (Exception ex)
+        {
+            // Expected for formats Windows can't decode (QuickTime-branded mp4,
+            // ProRes...); the caller falls back to LibVLC.
+            Log.Debug(ex, "El shell no tiene miniatura para {Path}", path);
+            return null;
+        }
         finally
         {
             if (hbitmap != IntPtr.Zero)
                 DeleteObject(hbitmap);
-            Marshal.ReleaseComObject(factory);
+            if (factory is not null)
+                Marshal.ReleaseComObject(factory);
         }
     }
 
