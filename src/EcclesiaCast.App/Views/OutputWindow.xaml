@@ -15,6 +15,9 @@
         <!-- Video de fondo (frames a WriteableBitmap), detrás de todo -->
         <controls:VlcVideoSurface x:Name="Video"/>
 
+        <!-- YouTube a pantalla completa (solo visible mientras se proyecta) -->
+        <controls:YouTubeSurface x:Name="YouTube" Visibility="Collapsed"/>
+
         <!-- Fondo de imagen + texto + estados, compuesto encima -->
         <controls:ProjectedView x:Name="Projected"
                                 Slide="{Binding Slide}"

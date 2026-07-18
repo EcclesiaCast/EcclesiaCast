@@ -62,6 +62,7 @@
                 <ComboBox x:Name="EndBox">
                     <ComboBoxItem Content="Repetir en bucle"/>
                     <ComboBoxItem Content="Detener al final"/>
+                    <ComboBoxItem Content="Al terminar, mostrar el logo"/>
                 </ComboBox>
 
                 <CheckBox x:Name="MuteCheck" Content="Silenciar audio" Margin="0,14,0,0"/>

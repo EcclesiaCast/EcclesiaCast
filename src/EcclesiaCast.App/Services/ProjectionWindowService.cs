@@ -13,6 +13,8 @@ public sealed class ProjectionWindowService(ProjectionViewModel projectionViewMo
 
     public event EventHandler? VisibilityChanged;
 
+    public event EventHandler? VideoEnded;
+
     public void EnsureVisible(DisplayInfo display)
     {
         if (_window is null || !_window.IsLoaded)
@@ -20,6 +22,7 @@ public sealed class ProjectionWindowService(ProjectionViewModel projectionViewMo
             _window = new OutputWindow { DataContext = projectionViewModel };
             _window.IsVisibleChanged += (_, _) =>
                 VisibilityChanged?.Invoke(this, EventArgs.Empty);
+            _window.VideoEnded += (_, _) => VideoEnded?.Invoke(this, EventArgs.Empty);
         }
 
         _window.ShowOn(display);

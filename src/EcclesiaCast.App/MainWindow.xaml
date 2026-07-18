@@ -914,6 +914,14 @@
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding ImportMediaCommand}"
                                 ToolTip="Agregar imágenes o videos a la pestaña actual"/>
+                        <Button Content="▶ YouTube" FontSize="11" Padding="8,4" Margin="6,0,0,0"
+                                Style="{StaticResource DarkButton}"
+                                Command="{Binding OpenYouTubeCommand}"
+                                ToolTip="Buscar en YouTube e iniciar sesión con tu cuenta (Premium: sin anuncios)"/>
+                        <Button Content="🔗" FontSize="11" Padding="8,4" Margin="4,0,0,0"
+                                Style="{StaticResource DarkButton}"
+                                Command="{Binding AddYouTubeLinkCommand}"
+                                ToolTip="Agregar un video de YouTube pegando el link"/>
                         <Button Content="Sin fondo" FontSize="11" Padding="8,4" Margin="6,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding ClearBackgroundCommand}"

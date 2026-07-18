@@ -110,7 +110,7 @@ public partial class ProjectedView : UserControl
         // this control) shows through.
         var path = media?.Type == MediaType.Image
             ? media.Path
-            : IsLiveOutput ? null : media?.ThumbnailPath;
+            : IsLiveOutput ? null : media?.ThumbnailPath; // póster de video/YouTube en los previews
 
         BackgroundImage.Stretch = media?.Scaling switch
         {
@@ -123,7 +123,10 @@ public partial class ProjectedView : UserControl
             return;
         _lastImagePath = path;
 
-        if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
+        // YouTube posters are remote URLs; local media are files on disk.
+        var isRemote = path?.StartsWith("http", StringComparison.OrdinalIgnoreCase) == true;
+
+        if (!string.IsNullOrWhiteSpace(path) && (isRemote || File.Exists(path)))
         {
             try
             {

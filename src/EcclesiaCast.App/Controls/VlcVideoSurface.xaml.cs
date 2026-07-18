@@ -44,6 +44,9 @@ public partial class VlcVideoSurface : UserControl
         Unloaded += (_, _) => Stop();
     }
 
+    /// <summary>Raised when a non-looping video reaches its end.</summary>
+    public event EventHandler? Ended;
+
     /// <summary>Shows/loops the given video, or stops if it's not a video.</summary>
     public void Show(MediaItem? media)
     {
@@ -80,6 +83,9 @@ public partial class VlcVideoSurface : UserControl
         _displayCb = OnDisplay;
         player.SetVideoFormatCallbacks(_formatCb, _cleanupCb);
         player.SetVideoCallbacks(_lockCb, null, _displayCb);
+
+        if (media.EndBehavior != VideoEndBehavior.Loop)
+            player.EndReached += (_, _) => Dispatcher.BeginInvoke(() => Ended?.Invoke(this, EventArgs.Empty));
 
         _player = player;
 

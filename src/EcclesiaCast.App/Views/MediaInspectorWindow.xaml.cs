@@ -15,8 +15,18 @@ public partial class MediaInspectorWindow : Window
         _item = item;
 
         NameBox.Text = item.Name;
-        TypeText.Text = item.Type == MediaType.Video ? "Video" : "Imagen";
-        VideoOptions.Visibility = item.Type == MediaType.Video ? Visibility.Visible : Visibility.Collapsed;
+        TypeText.Text = item.Type switch
+        {
+            MediaType.Video => "Video",
+            MediaType.YouTube => $"YouTube · {item.YouTubeId}",
+            _ => "Imagen",
+        };
+        VideoOptions.Visibility = item.Type is MediaType.Video or MediaType.YouTube
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+
+        // YouTube always fills the screen with its own player.
+        ScalingBox.IsEnabled = item.Type != MediaType.YouTube;
 
         CategoryBox.ItemsSource = categories;
         CategoryBox.Text = item.Category;

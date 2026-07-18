@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Interop;
 using EcclesiaCast.App.ViewModels;
 using EcclesiaCast.Core.Displays;
+using EcclesiaCast.Core.Media;
 
 namespace EcclesiaCast.App.Views;
 
@@ -15,7 +16,12 @@ public partial class OutputWindow : Window
     {
         InitializeComponent();
         DataContextChanged += OnDataContextChanged;
+        YouTube.Ended += (_, _) => VideoEnded?.Invoke(this, EventArgs.Empty);
+        Video.Ended += (_, _) => VideoEnded?.Invoke(this, EventArgs.Empty);
     }
+
+    /// <summary>Raised when the projected video finishes and shouldn't loop.</summary>
+    public event EventHandler? VideoEnded;
 
     /// <summary>Shows this window fullscreen on the given display.</summary>
     public void ShowOn(DisplayInfo display)
@@ -40,8 +46,23 @@ public partial class OutputWindow : Window
             UpdateVideo();
     }
 
-    private void UpdateVideo() =>
-        Video.Show((DataContext as ProjectionViewModel)?.Background);
+    private void UpdateVideo()
+    {
+        var background = (DataContext as ProjectionViewModel)?.Background;
+
+        if (background is { Type: MediaType.YouTube })
+        {
+            Video.Show(null);
+            YouTube.Visibility = Visibility.Visible;
+            YouTube.Play(background);
+        }
+        else
+        {
+            YouTube.Clear();
+            YouTube.Visibility = Visibility.Collapsed;
+            Video.Show(background);
+        }
+    }
 
     // ── Posición en el monitor de salida ─────────────────────────
 
@@ -59,6 +80,7 @@ public partial class OutputWindow : Window
     protected override void OnClosed(EventArgs e)
     {
         Video.Stop();
+        YouTube.Clear();
         base.OnClosed(e);
     }
 

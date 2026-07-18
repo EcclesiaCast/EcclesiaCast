@@ -41,6 +41,7 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly IMediaRepository _media;
     private readonly IMediaInspector _mediaInspector;
     private readonly IPlaylistRepository _playlists;
+    private readonly IYouTubeBrowser _youTube;
 
     /// <summary>Copied slide (label + text + style) for paste/duplicate.</summary>
     private (string Label, string Text, string? StyleJson)? _clipboardSlide;
@@ -168,6 +169,7 @@ public sealed partial class MainViewModel : ObservableObject
         IMediaRepository media,
         IMediaInspector mediaInspector,
         IPlaylistRepository playlists,
+        IYouTubeBrowser youTube,
         ProjectionViewModel projectionViewModel)
     {
         _displayProvider = displayProvider;
@@ -186,10 +188,12 @@ public sealed partial class MainViewModel : ObservableObject
         _media = media;
         _mediaInspector = mediaInspector;
         _playlists = playlists;
+        _youTube = youTube;
         Projection = projectionViewModel;
 
         _presentation.Changed += (_, _) => UpdateStateFlags();
         _projection.VisibilityChanged += (_, _) => IsProjecting = _projection.IsOutputVisible;
+        _projection.VideoEnded += (_, _) => OnProjectedVideoEnded();
         Slides.CollectionChanged += (_, _) => HasSlides = Slides.Count > 0;
         UpdateStateFlags();
         RefreshDisplays();
@@ -520,9 +524,9 @@ public sealed partial class MainViewModel : ObservableObject
         var keepTab = SelectedMediaTab;
         MediaTabs.Clear();
         foreach (var tab in _allMedia.Select(m => m.Category)
-                     .Prepend("Fondos").Prepend("Anuncios")
+                     .Prepend("YouTube").Prepend("Anuncios").Prepend("Fondos")
                      .Distinct(StringComparer.OrdinalIgnoreCase)
-                     .OrderBy(t => t == "Fondos" ? 0 : t == "Anuncios" ? 1 : 2))
+                     .OrderBy(t => t == "Fondos" ? 0 : t == "Anuncios" ? 1 : t == "YouTube" ? 2 : 3))
             MediaTabs.Add(tab);
 
         SelectedMediaTab = MediaTabs.Contains(keepTab) ? keepTab : MediaTabs.FirstOrDefault() ?? "Fondos";
@@ -627,6 +631,99 @@ public sealed partial class MainViewModel : ObservableObject
     {
         _presentation.SetBackground(null);
         StatusText = "Fondo quitado.";
+    }
+
+    /// <summary>A non-looping video finished: honour its end behaviour.</summary>
+    private void OnProjectedVideoEnded()
+    {
+        var background = _presentation.Background;
+        if (background is null || background.EndBehavior == VideoEndBehavior.Loop)
+            return;
+
+        if (background.EndBehavior == VideoEndBehavior.Logo)
+        {
+            _presentation.SetBackground(null);
+            if (!IsLogoActive)
+                _presentation.ToggleLogo();
+            StatusText = $"\"{background.Name}\" terminó → logo.";
+        }
+        else
+        {
+            StatusText = $"\"{background.Name}\" terminó.";
+        }
+    }
+
+    // ── YouTube ──────────────────────────────────────────────────
+
+    /// <summary>Opens the embedded browser: sign in with the church account and pick videos.</summary>
+    [RelayCommand]
+    private void OpenYouTube()
+    {
+        if (!WebViewProfile.IsRuntimeAvailable())
+        {
+            MessageBox.Show(
+                "Falta el runtime de WebView2 (Microsoft Edge WebView2), que EcclesiaCast usa para YouTube.\n\n" +
+                "Se descarga gratis desde el sitio de Microsoft; en Windows 11 suele venir instalado.",
+                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var ids = _youTube.Browse();
+        AddYouTubeVideos(ids, "desde el navegador");
+    }
+
+    /// <summary>Adds a video from a pasted link.</summary>
+    [RelayCommand]
+    private void AddYouTubeLink()
+    {
+        var text = _textPrompt.Ask("Agregar de YouTube", "Pegá el link del video:");
+        if (string.IsNullOrWhiteSpace(text))
+            return;
+
+        var id = YouTubeUrl.TryParseVideoId(text);
+        if (id is null)
+        {
+            StatusText = "Ese link no parece un video de YouTube.";
+            return;
+        }
+
+        AddYouTubeVideos([id], "por link");
+    }
+
+    private void AddYouTubeVideos(IReadOnlyList<string> videoIds, string source)
+    {
+        if (videoIds.Count == 0)
+            return;
+
+        var tab = MediaTabs.Contains("YouTube", StringComparer.OrdinalIgnoreCase) ? "YouTube" : "YouTube";
+        var added = 0;
+
+        foreach (var id in videoIds)
+        {
+            if (_allMedia.Any(m => m.Type == MediaType.YouTube && m.YouTubeId == id))
+                continue;
+
+            _media.Add(new MediaItem
+            {
+                Name = $"YouTube {id}",
+                Path = YouTubeUrl.WatchUrl(id),
+                YouTubeId = id,
+                Type = MediaType.YouTube,
+                ThumbnailPath = YouTubeUrl.ThumbnailUrl(id),
+                Category = tab,
+                // Announcement videos play full screen with sound.
+                Behavior = MediaBehavior.Foreground,
+                EndBehavior = VideoEndBehavior.Logo,
+                Muted = false,
+            });
+            added++;
+        }
+
+        LoadMedia();
+        SelectedMediaTab = tab;
+        StatusText = added > 0
+            ? $"{added} video(s) de YouTube agregado(s) {source}. Renombralos en Propiedades."
+            : "Ese video ya estaba en la biblioteca.";
     }
 
     [RelayCommand]

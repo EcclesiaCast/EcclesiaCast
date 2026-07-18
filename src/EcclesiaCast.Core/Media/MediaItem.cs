@@ -4,6 +4,9 @@ public enum MediaType
 {
     Image,
     Video,
+
+    /// <summary>A YouTube video, played in the embedded browser with the operator's own session.</summary>
+    YouTube,
 }
 
 /// <summary>How a non-16:9 asset is fitted to the 16:9 output.</summary>
@@ -36,6 +39,9 @@ public enum VideoEndBehavior
 
     /// <summary>Play once and stop (last frame / black).</summary>
     Stop,
+
+    /// <summary>Play once and switch the output to the church logo.</summary>
+    Logo,
 }
 
 /// <summary>A background asset in the media library (an image or a video).</summary>
@@ -44,8 +50,11 @@ public sealed class MediaItem
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
 
-    /// <summary>Absolute path to the source file.</summary>
+    /// <summary>Absolute path to the source file, or the watch URL for YouTube.</summary>
     public string Path { get; set; } = string.Empty;
+
+    /// <summary>YouTube video id when <see cref="Type"/> is YouTube.</summary>
+    public string? YouTubeId { get; set; }
 
     public MediaType Type { get; set; }
 
