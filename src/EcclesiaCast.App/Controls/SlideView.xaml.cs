@@ -89,6 +89,26 @@ public partial class SlideView : UserControl
     /// <summary>Re-reads the slide's theme and re-renders. Call after editing themes.</summary>
     public void Refresh() => OnSlideChanged();
 
+    private bool _overMedia;
+
+    /// <summary>
+    /// True while a media background (image or video) is showing behind this
+    /// view. The theme's own background colour then has to stay transparent or
+    /// it paints straight over the media: that is what hid a background applied
+    /// while no slide was live, since the fallback theme is opaque.
+    /// </summary>
+    public bool IsOverMedia
+    {
+        get => _overMedia;
+        set
+        {
+            if (_overMedia == value)
+                return;
+            _overMedia = value;
+            ApplyTheme();
+        }
+    }
+
     private SlideTheme CurrentTheme => Slide?.Theme ?? SlideTheme.Fallback;
 
     // ── Estilo efectivo: tema + overrides del slide ──────────────
@@ -124,7 +144,7 @@ public partial class SlideView : UserControl
     {
         var theme = CurrentTheme;
 
-        RootCanvas.Background = theme.TransparentBackground
+        RootCanvas.Background = theme.TransparentBackground || _overMedia
             ? Brushes.Transparent
             : BrushFromHex(theme.BackgroundColor, "#10141E");
         ApplyBackgroundImage(theme.BackgroundImagePath);
@@ -223,7 +243,9 @@ public partial class SlideView : UserControl
                 bitmap.CacheOption = BitmapCacheOption.OnLoad;
                 bitmap.DecodePixelWidth = 1920;
                 bitmap.EndInit();
-                bitmap.Freeze();
+                // Remote posters (YouTube) are still downloading and can't be frozen.
+                if (bitmap.CanFreeze)
+                    bitmap.Freeze();
                 BackgroundImage.Source = bitmap;
                 BackgroundImage.Visibility = Visibility.Visible;
                 return;

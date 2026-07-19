@@ -105,6 +105,10 @@ public partial class ProjectedView : UserControl
     {
         var media = BackgroundMedia;
 
+        // Let the slide layer know it is sitting on top of media, so the
+        // theme's background colour doesn't paint over it.
+        SlideRenderer.IsOverMedia = media is not null;
+
         // Images render directly. Videos show their poster in previews, but
         // in the live output the poster is hidden so the moving video (behind
         // this control) shows through.
@@ -136,7 +140,11 @@ public partial class ProjectedView : UserControl
                 bitmap.CacheOption = BitmapCacheOption.OnLoad;
                 bitmap.DecodePixelWidth = 1920;
                 bitmap.EndInit();
-                bitmap.Freeze();
+                // A remote poster (YouTube) is still downloading here, and
+                // freezing it would throw and drop us into the black fallback.
+                // WPF fills the Image in once the download finishes.
+                if (bitmap.CanFreeze)
+                    bitmap.Freeze();
                 BackgroundImage.Source = bitmap;
                 BackgroundImage.Visibility = Visibility.Visible;
                 if (AnimateTransitions)

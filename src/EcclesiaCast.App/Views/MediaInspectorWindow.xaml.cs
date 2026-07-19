@@ -48,7 +48,9 @@ public partial class MediaInspectorWindow : Window
                 bmp.CacheOption = BitmapCacheOption.OnLoad;
                 bmp.DecodePixelWidth = 240;
                 bmp.EndInit();
-                bmp.Freeze();
+                // Remote posters (YouTube) are still downloading and can't be frozen.
+                if (bmp.CanFreeze)
+                    bmp.Freeze();
                 Poster.Source = bmp;
             }
             catch { /* ignore */ }
