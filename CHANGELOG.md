@@ -3,7 +3,7 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
-## [1.0.0] — sin publicar
+## [1.0.0-beta.1] — 2026-07-19
 
 Primera versión instalable de EcclesiaCast.
 
