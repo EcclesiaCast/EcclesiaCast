@@ -64,3 +64,6 @@ jobs:
         with:
           files: dist/*.exe
           generate_release_notes: true
+          # A version with a suffix (v1.0.0-beta.1, -rc.2...) is a pre-release,
+          # so it doesn't get announced as the latest stable download.
+          prerelease: ${{ contains(github.ref_name, '-') }}
