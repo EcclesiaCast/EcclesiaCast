@@ -1640,8 +1640,26 @@ public sealed partial class MainViewModel : ObservableObject
     private void ProjectReference()
     {
         if (PreviewSlideIndex >= 0)
+        {
             GoLiveSlide(PreviewSlideIndex);
-        else if (Slides.FirstOrDefault(s => s.JumpTarget is null) is { } first)
+            return;
+        }
+
+        // Going live consumed the preview, so a second Enter lands here.
+        // Re-derive the verse from the typed reference: without this it fell
+        // back to the chapter's first verse (Enter, Enter projected 3:1).
+        var reference = BibleReferenceParser.TryParse(BibleQuery ?? string.Empty);
+        if (reference?.VerseStart is int verse)
+        {
+            var index = Slides.ToList().FindIndex(s => s.Label == $"{reference.Chapter}:{verse}");
+            if (index >= 0)
+            {
+                GoLiveSlide(index);
+                return;
+            }
+        }
+
+        if (Slides.FirstOrDefault(s => s.JumpTarget is null) is { } first)
             GoLiveSlide(first.Index);
     }
 
@@ -1809,11 +1827,22 @@ public sealed partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void NextSlide()
     {
+        // A media item has no slides of its own: the arrows move between
+        // playlist items (the slide grid still shows the previous item).
+        if (CurrentPlaylistItemIsMedia)
+        {
+            TryAdvancePlaylist(+1);
+            return;
+        }
+
         var next = LiveSlideIndex < 0 ? 0 : LiveSlideIndex + 1;
 
         // At the end of the item, the arrow continues to the next playlist
-        // item (songs and media; Bible chapters have their own jump card).
-        if (next >= Slides.Count && TryAdvancePlaylist(+1))
+        // item. For a Bible passage the item ends at its last planned verse,
+        // not at the chapter's end (the whole chapter is loaded around it).
+        // When there is no next item, fall through: the operator can keep
+        // reading past the passage.
+        if ((next >= Slides.Count || LeavesPassage(+1)) && TryAdvancePlaylist(+1))
             return;
 
         GoLiveSlide(next);
@@ -1822,12 +1851,39 @@ public sealed partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void PreviousSlide()
     {
+        if (CurrentPlaylistItemIsMedia)
+        {
+            TryAdvancePlaylist(-1);
+            return;
+        }
+
         var previous = LiveSlideIndex - 1;
 
-        if (previous < 0 && TryAdvancePlaylist(-1))
+        if ((previous < 0 || LeavesPassage(-1)) && TryAdvancePlaylist(-1))
             return;
 
         GoLiveSlide(previous);
+    }
+
+    private bool CurrentPlaylistItemIsMedia =>
+        _currentPlaylistIndex >= 0
+        && _currentPlaylistIndex < PlaylistItems.Count
+        && PlaylistItems[_currentPlaylistIndex].Type == PlaylistItemType.Media;
+
+    /// <summary>
+    /// True when the live slide sits on the edge of the current playlist
+    /// item's verse range and the next arrow press in this direction would
+    /// step outside the planned passage.
+    /// </summary>
+    private bool LeavesPassage(int direction)
+    {
+        if (_currentPlaylistIndex < 0 || _currentPlaylistIndex >= PlaylistItems.Count)
+            return false;
+
+        // The edge in this direction is where entering from the opposite
+        // direction would land (forward exit = VerseEnd, backward = VerseStart).
+        var edge = PassageBoundarySlideIndex(PlaylistItems[_currentPlaylistIndex], -direction);
+        return edge is int index && LiveSlideIndex == index;
     }
 
     /// <summary>Moves to the adjacent playlist item and projects it. False if not applicable.</summary>
@@ -1843,14 +1899,43 @@ public sealed partial class MainViewModel : ObservableObject
         var item = PlaylistItems[target];
         OpenPlaylistItem(item);
 
-        // Forward lands on the first slide, backward on the last, so reading
-        // through the service is continuous in both directions.
-        var projectable = Slides.Where(s => s.JumpTarget is null).ToList();
-        if (projectable.Count > 0)
-            GoLiveSlide(direction > 0 ? projectable[0].Index : projectable[^1].Index);
+        // A media item projects itself when opened (ApplyBackground); putting a
+        // slide live on top of it would paint the previous item's text over it.
+        if (item.Type != PlaylistItemType.Media)
+        {
+            // Forward lands on the first slide, backward on the last, so
+            // reading through the service is continuous in both directions. A
+            // Bible passage bounds that to its own verse range (its item loads
+            // the whole chapter; landing on verse 1 would be wrong).
+            var projectable = Slides.Where(s => s.JumpTarget is null).ToList();
+            var landing = PassageBoundarySlideIndex(item, direction)
+                ?? (projectable.Count > 0
+                    ? (direction > 0 ? projectable[0].Index : projectable[^1].Index)
+                    : null);
+            if (landing is int index)
+                GoLiveSlide(index);
+        }
 
         StatusText = $"Playlist: {item.Caption}";
         return true;
+    }
+
+    /// <summary>
+    /// The slide to land on when arrowing into a Bible-passage playlist item:
+    /// its first verse going forward, its last verse going backward. Null for
+    /// other item types (or when the verse isn't in the loaded chapter).
+    /// </summary>
+    private int? PassageBoundarySlideIndex(PlaylistItem item, int direction)
+    {
+        if (item.Type != PlaylistItemType.BiblePassage || item.Chapter is not int chapter)
+            return null;
+
+        var verse = direction > 0 ? item.VerseStart : item.VerseEnd ?? item.VerseStart;
+        if (verse is not int number)
+            return null;
+
+        var index = Slides.ToList().FindIndex(s => s.Label == $"{chapter}:{number}");
+        return index >= 0 ? index : null;
     }
 
     private void GoLiveSlide(int index)
