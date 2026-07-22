@@ -73,10 +73,11 @@ porque tu hardware y tu proyector son otros.
 - [ ] **Aviso al pie** sobre un video, y los botones Clear / Black / Logo (F1,
       F2, F3) con un video de fondo.
 
-### Del Inspector de medios (esto **no** lo pude probar yo)
+### Del Inspector de medios
 
-Automaticé el cambio de estos valores por debajo, pero **no** pude probar la
-ventana del Inspector en sí. Que guarde bien es justamente lo que falta:
+Ya verifiqué que el Inspector abre y **guarda** (cambié la escala por la UI y
+quedó en la base), y que cada valor hace lo suyo en la salida. Lo que queda es
+confirmarlo con tu proyector y tus ojos:
 
 - [ ] Clic derecho en un medio → *Propiedades (Inspector)*.
 - [ ] Cambiar la **escala** (Rellenar / Ajustar / Estirar), guardar, aplicar el
@@ -85,7 +86,8 @@ ventana del Inspector en sí. Que guarde bien es justamente lo que falta:
 - [ ] Cambiar **fin de video** a "Logo", proyectar un video corto y ver que al
       terminar pasa al logo.
 - [ ] Cambiar **Fondo / Primer plano** y ver que Primer plano tapa la letra.
-- [ ] Cambiar el **volumen** y el silencio de un video con audio.
+- [ ] Cambiar el **volumen** y el silencio de un video con audio (esto es lo
+      único que no pude escuchar yo).
 
 ---
 
