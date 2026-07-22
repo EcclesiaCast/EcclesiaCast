@@ -96,10 +96,13 @@ punta a punta.
 
 - [ ] Armar una **playlist** con canciones, pasajes bíblicos y medios.
 - [ ] Navegar toda la playlist con las **flechas ← →**, incluido el salto de un
-      elemento al siguiente.
+      elemento al siguiente. Con un pasaje (ej. `Juan 3:16-18`): al entrar cae
+      en el 16, al llegar al 18 la flecha sigue al próximo elemento, y volviendo
+      desde el elemento siguiente aterriza en el 18. Si el pasaje es el último
+      elemento, la flecha sigue de largo por el capítulo (a propósito).
 - [ ] **Biblia**: tipear una referencia (ej. `Juan 3:16`) y proyectarla con
-      Enter. Ojo: con **un** Enter proyecta el versículo que pediste; apretando
-      Enter dos veces salta al versículo 1 del capítulo.
+      Enter. Apretar Enter de nuevo tiene que dejar el mismo versículo (hubo un
+      bug que saltaba al versículo 1; está corregido).
 - [ ] Biblia con **dos versiones a la vez**.
 - [ ] **Resaltado en vivo** sobre un versículo proyectado.
 - [ ] Importar una canción desde `.txt` y desde un archivo de ProPresenter.

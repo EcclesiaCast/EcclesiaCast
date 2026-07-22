@@ -3,6 +3,18 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
+## [Sin publicar]
+
+### Corregido
+
+- Al navegar la playlist con las flechas, entrar a un pasaje bíblico caía en
+  el versículo 1 del capítulo en vez del primer versículo del pasaje, el
+  pasaje no terminaba nunca (la flecha seguía de largo por el capítulo y hasta
+  cruzaba de capítulo en vez de pasar al siguiente elemento), y entrar a un
+  medio proyectaba encima el texto del elemento anterior.
+- Apretar Enter dos veces sobre una referencia tipeada ("Juan 3:16")
+  proyectaba el versículo 1 del capítulo; ahora repite el versículo pedido.
+
 ## [1.0.0-beta.1] — 2026-07-19
 
 Primera versión instalable de EcclesiaCast.
