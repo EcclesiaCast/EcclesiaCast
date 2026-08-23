@@ -37,6 +37,9 @@ public enum TextCase
     Upper,
     Title,
     Sentence,
+
+    /// <summary>Everything in lower case.</summary>
+    Lower,
 }
 
 /// <summary>
@@ -60,8 +63,25 @@ public sealed class SlideTheme
 
     public bool Bold { get; set; } = true;
     public bool Italic { get; set; }
-    public bool Uppercase { get; set; }
+    /// <summary>Casing applied to the projected text (none, ALL CAPS, Title, Sentence, lower).</summary>
+    public TextCase TextCase { get; set; }
+
     public bool Shadow { get; set; } = true;
+
+    /// <summary>How dark the drop shadow is, 0–1. Only used when <see cref="Shadow"/> is on.</summary>
+    public double ShadowOpacity { get; set; } = 0.75;
+
+    /// <summary>How far the drop shadow spreads, in canvas pixels.</summary>
+    public double ShadowBlur { get; set; } = 18;
+
+    /// <summary>
+    /// Halo drawn around every letter, in canvas pixels; 0 turns it off. It is
+    /// what keeps white text readable over a white background.
+    /// </summary>
+    public double OutlineWidth { get; set; }
+
+    public string OutlineColor { get; set; } = "#000000";
+
     public string TextColor { get; set; } = "#FFFFFF";
     public HAlign AlignH { get; set; } = HAlign.Center;
     public VAlign AlignV { get; set; } = VAlign.Center;

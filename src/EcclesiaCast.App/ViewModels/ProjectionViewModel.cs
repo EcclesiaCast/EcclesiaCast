@@ -25,20 +25,43 @@ public sealed partial class ProjectionViewModel : ObservableObject
     [ObservableProperty]
     private EcclesiaCast.Core.Media.MediaItem? _background;
 
+    /// <summary>
+    /// How blurred the background is right now, 0–100. It lives here rather
+    /// than only on the media item so the operator can turn the dial mid-song
+    /// and see both previews and the projector follow immediately.
+    /// </summary>
+    [ObservableProperty]
+    private double _backgroundBlur;
+
+    /// <summary>The logo the Logo state shows right now.</summary>
+    [ObservableProperty]
+    private EcclesiaCast.Core.Logos.Logo? _activeLogo;
+
+    /// <summary>
+    /// The slide after the live one. The stage display shows it so the singers
+    /// know what is coming; the operator sets it as the grid moves.
+    /// </summary>
+    [ObservableProperty]
+    private SlideContent? _nextSlide;
+
+    /// <summary>Label of the live slide ("Coro", "3:16"), for the stage display.</summary>
+    [ObservableProperty]
+    private string? _slideLabel;
+
     public ProjectionViewModel(IPresentationService presentation)
     {
-        presentation.Changed += (_, _) =>
-        {
-            Slide = presentation.CurrentSlide;
-            State = presentation.State;
-            Overlay = presentation.OverlayMessage;
-            Highlight = presentation.HighlightTerm;
-            Background = presentation.Background;
-        };
+        presentation.Changed += (_, _) => Sync(presentation);
+        Sync(presentation);
+    }
+
+    private void Sync(IPresentationService presentation)
+    {
         Slide = presentation.CurrentSlide;
         State = presentation.State;
         Overlay = presentation.OverlayMessage;
         Highlight = presentation.HighlightTerm;
         Background = presentation.Background;
+        BackgroundBlur = presentation.Background?.Blur ?? 0;
+        ActiveLogo = presentation.ActiveLogo;
     }
 }

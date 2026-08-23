@@ -108,6 +108,8 @@ public partial class YouTubeSurface : UserControl
             return;
 
         _currentId = media.YouTubeId;
+        _blur = media.Blur;
+        _blurApplied = false;
         var loop = media.EndBehavior == VideoEndBehavior.Loop ? "1" : "0";
         var muted = media.Muted ? "1" : "0";
         Browser.CoreWebView2.Navigate(
@@ -119,13 +121,109 @@ public partial class YouTubeSurface : UserControl
     {
         _pending = null;
         _currentId = null;
+        _state = PlaybackState.None;
+        _pausedForHiddenOutput = false;
         if (_ready)
             Browser.NavigateToString("<html><body style='margin:0;background:#000'></body></html>");
+    }
+
+    // ── Transporte (barra de reproducción del operador) ──────────
+
+    private PlaybackState _state = PlaybackState.None;
+    private bool _pausedForHiddenOutput;
+
+    /// <summary>Last position the page reported; it posts one every 300 ms.</summary>
+    public PlaybackState State => _currentId is null ? PlaybackState.None : _state;
+
+    public void Pause() => Run("pause()");
+
+    public void Resume() => Run("play()");
+
+    public void TogglePlayPause() => Run(_state.IsPlaying ? "pause()" : "play()");
+
+    public void PauseForHiddenOutput()
+    {
+        if (_currentId is null || !_state.IsPlaying)
+            return;
+
+        _pausedForHiddenOutput = true;
+        Pause();
+    }
+
+    public void ResumeAfterHiddenOutput()
+    {
+        if (!_pausedForHiddenOutput)
+            return;
+
+        _pausedForHiddenOutput = false;
+        Resume();
+    }
+
+    public void SeekTo(TimeSpan position) =>
+        Run($"seek({Math.Max(0, position.TotalSeconds).ToString(System.Globalization.CultureInfo.InvariantCulture)})");
+
+    public void Skip(TimeSpan delta) => SeekTo(_state.Position + delta);
+
+    /// <summary>
+    /// Blurs the video, 0–100. WebView2 hosts a native window, so a WPF effect
+    /// can't touch it — the blur is applied as a CSS filter inside the page.
+    /// </summary>
+    public void SetBlur(double amount)
+    {
+        _blur = Math.Clamp(amount, 0, 100);
+        Run($"blur({(_blur * 0.6).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)})");
+    }
+
+    private double _blur;
+    private bool _blurApplied;
+
+    /// <summary>Calls one of the page's helper functions; ignored if it isn't ready.</summary>
+    private void Run(string call)
+    {
+        if (!_ready || _currentId is null)
+            return;
+
+        try
+        {
+            _ = Browser.CoreWebView2.ExecuteScriptAsync($"window.ec && window.ec.{call};");
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "No se pudo controlar el reproductor de YouTube ({Call})", call);
+        }
     }
 
     private void OnWebMessage(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
     {
         var message = e.TryGetWebMessageAsString();
+
+        // The page posts "t <position>;<duration>;<playing>" a few times a
+        // second — it is the only way to know where an embedded video is.
+        if (message?.StartsWith("t ") == true)
+        {
+            var parts = message[2..].Split(';');
+            if (parts.Length == 3
+                && double.TryParse(parts[0], System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture, out var position)
+                && double.TryParse(parts[1], System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture, out var duration))
+            {
+                _state = new PlaybackState(
+                    HasVideo: true,
+                    IsPlaying: parts[2] == "1",
+                    Position: TimeSpan.FromSeconds(Math.Max(0, position)),
+                    Duration: TimeSpan.FromSeconds(Math.Max(0, duration)));
+            }
+
+            // The first report means the page is alive: now the blur sticks
+            // (calls made while it was still loading went nowhere).
+            if (!_blurApplied)
+            {
+                _blurApplied = true;
+                SetBlur(_blur);
+            }
+            return;
+        }
 
         // The page posts "ended" when playback finishes without looping.
         if (message == "ended")
@@ -186,6 +284,7 @@ public partial class YouTubeSurface : UserControl
                     onReady: function (e) {
                       if (muted) { e.target.mute(); } else { e.target.unMute(); e.target.setVolume(volume); }
                       e.target.playVideo();
+                      startReporting();
                     },
                     onStateChange: function (e) {
                       if (e.data === YT.PlayerState.ENDED) {
@@ -197,6 +296,31 @@ public partial class YouTubeSurface : UserControl
                   }
                 });
               }
+
+              // The host has no other way to know where the video is, so the
+              // page reports its position a few times a second, and exposes
+              // the transport controls the operator's play bar drives.
+              function startReporting() {
+                setInterval(function () {
+                  try {
+                    var playing = player.getPlayerState() === YT.PlayerState.PLAYING;
+                    post('t ' + player.getCurrentTime() + ';' + player.getDuration() + ';' + (playing ? '1' : '0'));
+                  } catch (e) {}
+                }, 300);
+              }
+
+              window.ec = {
+                play: function () { try { player.playVideo(); } catch (e) {} },
+                pause: function () { try { player.pauseVideo(); } catch (e) {} },
+                seek: function (seconds) { try { player.seekTo(seconds, true); } catch (e) {} },
+                // Blurring shrinks the picture at the edges, so scale it up a
+                // little to keep the screen covered.
+                blur: function (px) {
+                  var box = document.getElementById('player');
+                  box.style.filter = px > 0 ? 'blur(' + px + 'px)' : '';
+                  box.style.transform = px > 0 ? 'scale(1.08)' : '';
+                }
+              };
             </script>
           </body>
         </html>

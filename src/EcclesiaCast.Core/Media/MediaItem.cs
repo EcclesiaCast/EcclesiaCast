@@ -75,4 +75,13 @@ public sealed class MediaItem
 
     /// <summary>Playback volume 0–100 when not muted.</summary>
     public int Volume { get; set; } = 100;
+
+    /// <summary>
+    /// How blurred this background is on the output, 0–100. Blurring a busy
+    /// video or photo is what makes the lyrics on top readable; the operator
+    /// can also change it live from the media bar.
+    /// </summary>
+    public double Blur { get; set; }
+
+    public MediaItem Clone() => (MediaItem)MemberwiseClone();
 }

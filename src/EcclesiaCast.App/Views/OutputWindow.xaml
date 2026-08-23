@@ -18,6 +18,9 @@
         <!-- YouTube a pantalla completa (solo visible mientras se proyecta) -->
         <controls:YouTubeSurface x:Name="YouTube" Visibility="Collapsed"/>
 
+        <!-- Video del logo: encima del fondo, debajo del texto y del aviso al pie -->
+        <controls:VlcVideoSurface x:Name="LogoVideo" Visibility="Collapsed"/>
+
         <!-- Fondo de imagen + texto + estados, compuesto encima -->
         <controls:ProjectedView x:Name="Projected"
                                 Slide="{Binding Slide}"
@@ -25,6 +28,7 @@
                                 Overlay="{Binding Overlay}"
                                 Highlight="{Binding Highlight}"
                                 BackgroundMedia="{Binding Background}"
+                                Logo="{Binding ActiveLogo}"
                                 IsLiveOutput="True"
                                 AnimateTransitions="True"/>
     </Grid>

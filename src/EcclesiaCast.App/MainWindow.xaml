@@ -2,6 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:EcclesiaCast.App.Controls"
+        xmlns:services="clr-namespace:EcclesiaCast.App.Services"
         Title="EcclesiaCast — Operador"
         Width="1280" Height="800"
         MinWidth="1000" MinHeight="640"
@@ -12,6 +13,7 @@
         <KeyBinding Key="F1" Command="{Binding ToggleClearCommand}"/>
         <KeyBinding Key="F2" Command="{Binding ToggleBlackCommand}"/>
         <KeyBinding Key="F3" Command="{Binding ToggleLogoCommand}"/>
+        <KeyBinding Key="F4" Command="{Binding ClearBackgroundCommand}"/>
         <KeyBinding Key="Escape" Command="{Binding HideOutputCommand}"/>
     </Window.InputBindings>
 
@@ -19,7 +21,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
@@ -37,7 +38,8 @@
 
                 <StackPanel DockPanel.Dock="Left" Orientation="Horizontal"
                             VerticalAlignment="Center" Margin="24,0,0,0">
-                    <Button Content="Clear  (F1)" Command="{Binding ToggleClearCommand}">
+                    <Button Content="Clear  (F1)" Command="{Binding ToggleClearCommand}"
+                            ToolTip="Saca la letra de la pantalla y deja el fondo (imagen o video) a la vista. Se vuelve a apretar para traer la letra de nuevo.">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
                                 <Style.Triggers>
@@ -49,7 +51,8 @@
                             </Style>
                         </Button.Style>
                     </Button>
-                    <Button Content="Black  (F2)" Command="{Binding ToggleBlackCommand}" Margin="6,0,0,0">
+                    <Button Content="Black  (F2)" Command="{Binding ToggleBlackCommand}" Margin="6,0,0,0"
+                            ToolTip="Pantalla en negro: tapa todo (letra y fondo) sin apagar la salida.">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
                                 <Style.Triggers>
@@ -61,7 +64,9 @@
                             </Style>
                         </Button.Style>
                     </Button>
-                    <Button Content="Logo  (F3)" Command="{Binding ToggleLogoCommand}" Margin="6,0,0,0">
+                    <!-- Logo: el botón lo prende/apaga, la flecha elige cuál -->
+                    <Button Content="Logo  (F3)" Command="{Binding ToggleLogoCommand}" Margin="6,0,0,0"
+                            ToolTip="{Binding ActiveLogoName, StringFormat='Muestra el logo a pantalla completa. Ahora está elegido: {0}'}">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
                                 <Style.Triggers>
@@ -73,10 +78,60 @@
                             </Style>
                         </Button.Style>
                     </Button>
+                    <Button x:Name="LogoPickerButton" Content="▾" Padding="8,7" Margin="2,0,0,0"
+                            Style="{StaticResource DarkButton}"
+                            Click="LogoPicker_Click"
+                            ToolTip="Elegir qué logo se muestra (general, jóvenes, mujeres…)"/>
+                    <Button Content="🖼▦" Padding="8,7" Margin="2,0,0,0"
+                            Style="{StaticResource DarkButton}"
+                            Command="{Binding UseLogoAsBackgroundCommand}"
+                            IsEnabled="{Binding CanUseLogoAsBackground}"
+                            ToolTip="Poner el logo de fondo, detrás de la letra, con el desenfoque que tenga configurado"/>
+                    <Button Content="Sin fondo  (F4)" Margin="6,0,0,0"
+                            Style="{StaticResource DarkButton}"
+                            Command="{Binding ClearBackgroundCommand}"
+                            IsEnabled="{Binding HasBackground}"
+                            ToolTip="Quita la imagen o el video de fondo y deja la letra sola sobre el fondo del tema"/>
                     <Button Content="🎨 Temas" Margin="14,0,0,0"
                             Style="{StaticResource DarkButton}"
                             Command="{Binding OpenThemesCommand}"
                             ToolTip="Tipografía, colores, márgenes y fondos"/>
+
+                    <!-- Escenario: la pantalla que miran los músicos -->
+                    <Button Content="🎭 Escenario" Margin="14,0,0,0"
+                            Command="{Binding ToggleStageCommand}"
+                            ToolTip="Prende la pantalla para los músicos: la letra que está en vivo, la que sigue, la hora y el cronómetro">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsStageVisible}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Content="▾" Padding="8,7" Margin="2,0,0,0"
+                            Style="{StaticResource DarkButton}"
+                            Click="StageOptions_Click"
+                            ToolTip="En qué pantalla va el escenario y qué muestra"/>
+
+                    <!-- Celular: control remoto por la red de la iglesia -->
+                    <Button Content="📱" Padding="9,7" Margin="8,0,0,0"
+                            Command="{Binding OpenRemoteCommand}"
+                            ToolTip="Controlar la proyección desde el celular, por la red de la iglesia">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsRemoteRunning}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
                 </StackPanel>
 
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
@@ -86,13 +141,15 @@
                               ItemsSource="{Binding Displays}"
                               SelectedItem="{Binding SelectedDisplay}"
                               DisplayMemberPath="Label"
-                              VerticalAlignment="Center"/>
+                              VerticalAlignment="Center"
+                              ToolTip="Monitor o proyector donde sale la imagen"/>
                     <Button Content="↻"
                             Style="{StaticResource DarkButton}"
                             Command="{Binding RefreshDisplaysCommand}"
                             ToolTip="Actualizar pantallas"
                             Padding="9,6" Margin="6,0,14,0"/>
-                    <Button Command="{Binding ToggleOutputCommand}">
+                    <Button Command="{Binding ToggleOutputCommand}"
+                            ToolTip="Prende o apaga la ventana de salida en la pantalla elegida.">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
                                 <Setter Property="Content" Value="🔴  Poner en vivo"/>
@@ -114,8 +171,15 @@
             </DockPanel>
         </Border>
 
-        <!-- ══ Zona central: biblioteca | slides | preview/live ══ -->
+        <!-- ══ Zona central: biblioteca | slides | preview/live ══
+             La barra de medios va abajo de las dos primeras columnas; la
+             columna derecha (preview, live y texto rápido) baja entera. -->
         <Grid Grid.Row="1" Margin="10,10,10,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="8"/>
+                <RowDefinition x:Name="MediaRow" Height="150" MinHeight="86"/>
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition x:Name="LibraryColumn" Width="270" MinWidth="200"/>
                 <ColumnDefinition Width="6"/>
@@ -154,10 +218,14 @@
                                 <DockPanel DockPanel.Dock="Top">
                                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
                                                 VerticalAlignment="Center" Margin="0,0,10,8">
-                                        <Button Content="📥" FontSize="11" Padding="7,4"
+                                        <Button Content="🅿" FontSize="11" Padding="7,4"
+                                                Style="{StaticResource DarkButton}"
+                                                Command="{Binding ImportFromProPresenterCommand}"
+                                                ToolTip="Traer todas las canciones de ProPresenter: busca solo dónde están y las importa de una vez"/>
+                                        <Button Content="📥" FontSize="11" Padding="7,4" Margin="4,0,0,0"
                                                 Style="{StaticResource DarkButton}"
                                                 Command="{Binding ImportSongsCommand}"
-                                                ToolTip="Importar canciones (.txt o ProPresenter .pro)"/>
+                                                ToolTip="Importar archivos sueltos (.txt o ProPresenter .pro)"/>
                                         <Button Content="➕" FontSize="11" Padding="7,4" Margin="4,0,0,0"
                                                 Style="{StaticResource DarkButton}"
                                                 Command="{Binding NewSongCommand}"
@@ -182,10 +250,6 @@
                                          FontSize="13"
                                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                                          ToolTip="Buscar por título, artista o letra"/>
-                                <TextBlock DockPanel.Dock="Bottom"
-                                           Text="🖼 Medios (sprints 4–5)"
-                                           FontSize="10" Foreground="{StaticResource FaintBrush}"
-                                           Margin="12,4,12,10"/>
                                 <ListBox x:Name="SongsList" ItemsSource="{Binding Songs}"
                                          SelectedItem="{Binding SelectedSong}"
                                          Background="Transparent"
@@ -534,7 +598,8 @@
                         <ComboBox DockPanel.Dock="Top" Margin="12,0,12,6"
                                   ItemsSource="{Binding Playlists}"
                                   SelectedItem="{Binding SelectedPlaylist}"
-                                  DisplayMemberPath="Name" FontSize="12"/>
+                                  DisplayMemberPath="Name" FontSize="12"
+                                  ToolTip="Orden de la reunión: elegí la playlist que vas a usar hoy"/>
                         <Grid>
                             <TextBlock Text="Agregá canciones (clic derecho), pasajes (botón ▶➕ en Biblia)&#10;y medios (clic derecho) · doble clic proyecta.">
                                 <TextBlock.Style>
@@ -631,7 +696,13 @@
             </Grid>
 
             <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Background="Transparent"/>
-            <GridSplitter Grid.Column="3" HorizontalAlignment="Stretch" Background="Transparent"/>
+            <GridSplitter Grid.Column="3" Grid.RowSpan="3" HorizontalAlignment="Stretch" Background="Transparent"/>
+
+            <!-- Alto de la barra de medios, ajustable por el operador -->
+            <GridSplitter Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
+                          HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                          Height="8" Background="Transparent"
+                          ToolTip="Arrastrá para agrandar o achicar la barra de medios"/>
 
             <!-- Panel central: texto rápido + futura grilla de slides -->
             <Border Grid.Column="2" Style="{StaticResource Panel}">
@@ -639,39 +710,10 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Text="TEXTO RÁPIDO — anuncios al momento" Style="{StaticResource PanelTitle}"/>
-
-                    <Grid Grid.Row="1" Margin="12,0,12,12">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox Height="96"
-                                 AcceptsReturn="True" TextWrapping="Wrap"
-                                 VerticalScrollBarVisibility="Auto"
-                                 Text="{Binding QuickText, UpdateSourceTrigger=PropertyChanged}"
-                                 Background="{StaticResource SurfaceAltBrush}"
-                                 Foreground="White"
-                                 BorderBrush="{StaticResource LineBrush}"
-                                 CaretBrush="White"
-                                 Padding="8,6" FontSize="14">
-                            <TextBox.InputBindings>
-                                <KeyBinding Key="Enter" Modifiers="Control" Command="{Binding GoLiveCommand}"/>
-                            </TextBox.InputBindings>
-                        </TextBox>
-                        <Button Grid.Column="1"
-                                Content="Proyectar ▶&#10;(Ctrl+Enter)"
-                                Style="{StaticResource AccentButton}"
-                                Command="{Binding GoLiveCommand}"
-                                Margin="10,0,0,0"/>
-                    </Grid>
-
-                    <Grid Grid.Row="2" Margin="0,0,0,0">
+                    <Grid Grid.Row="0" Margin="0,0,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="3*"/>
                             <ColumnDefinition Width="2*"/>
@@ -683,7 +725,7 @@
                                    Style="{StaticResource PanelTitle}"/>
                     </Grid>
 
-                    <Grid Grid.Row="3" Margin="12,0,12,12">
+                    <Grid Grid.Row="1" Margin="12,0,12,12">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="3*"/>
                             <ColumnDefinition Width="12"/>
@@ -702,7 +744,8 @@
                                      BorderBrush="{StaticResource LineBrush}"
                                      CaretBrush="White"
                                      Padding="8,6" FontSize="14"
-                                     VerticalContentAlignment="Center">
+                                     VerticalContentAlignment="Center"
+                                     services:SpellChecking.Enabled="True">
                                 <TextBox.InputBindings>
                                     <KeyBinding Key="Enter" Command="{Binding ShowOverlayCommand}"/>
                                 </TextBox.InputBindings>
@@ -710,7 +753,8 @@
                             <Button Grid.Column="1"
                                     Content="Mostrar"
                                     Command="{Binding ShowOverlayCommand}"
-                                    Margin="8,0,0,0">
+                                    Margin="8,0,0,0"
+                                    ToolTip="Pone el aviso en una franja al pie de la pantalla, encima de todo (sirve con el Black puesto)">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
                                         <Style.Triggers>
@@ -726,7 +770,8 @@
                                     Content="Quitar"
                                     Style="{StaticResource DarkButton}"
                                     Command="{Binding HideOverlayCommand}"
-                                    Margin="6,0,0,0"/>
+                                    Margin="6,0,0,0"
+                                    ToolTip="Saca la franja del aviso"/>
                         </Grid>
 
                         <Grid Grid.Column="2">
@@ -746,11 +791,12 @@
                                     Content="Quitar"
                                     Style="{StaticResource DarkButton}"
                                     Command="{Binding ClearHighlightCommand}"
-                                    Margin="6,0,0,0"/>
+                                    Margin="6,0,0,0"
+                                    ToolTip="Saca el resaltado amarillo del texto proyectado"/>
                         </Grid>
                     </Grid>
 
-                    <Border Grid.Row="4"
+                    <Border Grid.Row="2"
                             BorderBrush="{StaticResource LineBrush}"
                             BorderThickness="0,1,0,0">
                         <Grid>
@@ -851,13 +897,14 @@
                 </Grid>
             </Border>
 
-            <!-- Panel derecho: preview y live -->
-            <Grid Grid.Column="4">
+            <!-- Panel derecho: preview, live y texto rápido (llega hasta abajo) -->
+            <Grid Grid.Column="4" Grid.RowSpan="3">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="10"/>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="*" MinHeight="130"/>
                 </Grid.RowDefinitions>
 
                 <Border Grid.Row="0" Style="{StaticResource Panel}">
@@ -866,7 +913,9 @@
                         <Border Height="165" Margin="12,0,12,12"
                                 Background="#0B0D12" CornerRadius="4">
                             <controls:ProjectedView Slide="{Binding PreviewSlide}"
-                                                    BackgroundMedia="{Binding Projection.Background}"/>
+                                                    BackgroundMedia="{Binding Projection.Background}"
+                                                    BackgroundBlur="{Binding Projection.BackgroundBlur}"
+                                                    Logo="{Binding Projection.ActiveLogo}"/>
                         </Border>
                     </StackPanel>
                 </Border>
@@ -898,15 +947,46 @@
                                                     State="{Binding Projection.State}"
                                                     Overlay="{Binding Projection.Overlay}"
                                                     Highlight="{Binding Projection.Highlight}"
-                                                    BackgroundMedia="{Binding Projection.Background}"/>
+                                                    BackgroundMedia="{Binding Projection.Background}"
+                                                    BackgroundBlur="{Binding Projection.BackgroundBlur}"
+                                                    Logo="{Binding Projection.ActiveLogo}"/>
                         </Border>
                     </StackPanel>
                 </Border>
-            </Grid>
-        </Grid>
 
-        <!-- ══ Barra de medios ══ -->
-        <Border Grid.Row="2" Style="{StaticResource Panel}" Margin="10,10,10,0" Height="108">
+                <!-- Texto rápido: baja desde abajo del Live hasta el pie -->
+                <Border Grid.Row="4" Style="{StaticResource Panel}">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top" Text="TEXTO RÁPIDO — anuncios al momento"
+                                   Style="{StaticResource PanelTitle}"/>
+                        <Button DockPanel.Dock="Bottom"
+                                Content="Proyectar ▶  (Ctrl+Enter)"
+                                Style="{StaticResource AccentButton}"
+                                Command="{Binding GoLiveCommand}"
+                                Margin="12,8,12,12" Padding="10,8"
+                                ToolTip="Manda lo escrito a la pantalla, con el tema de las canciones"/>
+                        <TextBox AcceptsReturn="True" TextWrapping="Wrap"
+                                 VerticalScrollBarVisibility="Auto"
+                                 Text="{Binding QuickText, UpdateSourceTrigger=PropertyChanged}"
+                                 Background="{StaticResource SurfaceAltBrush}"
+                                 Foreground="White"
+                                 BorderBrush="{StaticResource LineBrush}"
+                                 CaretBrush="White"
+                                 Margin="12,0,12,0"
+                                 Padding="8,6" FontSize="14"
+                                 services:SpellChecking.Enabled="True"
+                                 ToolTip="Escribí un aviso y proyectalo al instante · Enter hace un renglón nuevo, Ctrl+Enter proyecta">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Modifiers="Control" Command="{Binding GoLiveCommand}"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
+                    </DockPanel>
+                </Border>
+            </Grid>
+
+            <!-- ══ Barra de medios ══ -->
+            <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+                    Style="{StaticResource Panel}">
             <DockPanel>
                 <DockPanel DockPanel.Dock="Top">
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,6,10,2">
@@ -922,10 +1002,11 @@
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding AddYouTubeLinkCommand}"
                                 ToolTip="Agregar un video de YouTube pegando el link"/>
-                        <Button Content="Sin fondo" FontSize="11" Padding="8,4" Margin="6,0,0,0"
+                        <Button Content="Sin fondo  (F4)" FontSize="11" Padding="8,4" Margin="6,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding ClearBackgroundCommand}"
-                                ToolTip="Quitar el fondo (queda negro/transparente)"/>
+                                IsEnabled="{Binding HasBackground}"
+                                ToolTip="Quita la imagen o el video de fondo sin tocar la letra que está proyectada"/>
                     </StackPanel>
                     <TextBlock Text="MEDIOS" Style="{StaticResource PanelTitle}" Margin="12,8,10,4" VerticalAlignment="Center"/>
                     <!-- Pestañas por categoría -->
@@ -962,7 +1043,75 @@
                             Style="{StaticResource DarkButton}"
                             Command="{Binding NewMediaTabCommand}"
                             ToolTip="Nueva pestaña (categoría)"/>
+                    <CheckBox Content="▶▶ continua" FontSize="11" Foreground="{StaticResource MutedBrush}"
+                              VerticalAlignment="Center" Margin="12,0,0,0"
+                              IsChecked="{Binding ContinuousPlayback}"
+                              ToolTip="En esta pestaña, al terminar un video arranca el siguiente, y al final vuelve al primero. Sirve para dejar un bucle de avisos antes de la reunión."/>
                 </DockPanel>
+
+                <!-- ── Controles del fondo que está en pantalla ── -->
+                <Border DockPanel.Dock="Bottom"
+                        BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0"
+                        Padding="12,6,12,8"
+                        Visibility="{Binding HasBackground, Converter={StaticResource BoolToVis}}">
+                    <DockPanel>
+                        <!-- Desenfoque: sirve para imágenes y para videos -->
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center"
+                                    Margin="14,0,0,0">
+                            <TextBlock Text="Desenfoque" FontSize="11" VerticalAlignment="Center"
+                                       Foreground="{StaticResource MutedBrush}" Margin="0,0,6,0"/>
+                            <controls:NumericField Minimum="0" Maximum="100" Step="5" Decimals="0"
+                                                   Value="{Binding BackgroundBlur}"
+                                                   ToolTip="Difumina el fondo en vivo para que la letra se lea. 0 = nítido."/>
+                            <Button Content="✕" FontSize="11" Padding="7,3" Margin="4,0,0,0"
+                                    Style="{StaticResource DarkButton}"
+                                    Command="{Binding ClearBlurCommand}"
+                                    ToolTip="Volver el fondo nítido"/>
+                        </StackPanel>
+
+                        <!-- Transporte: sólo con video (archivo o YouTube) -->
+                        <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center"
+                                    Visibility="{Binding HasVideoPlayback, Converter={StaticResource BoolToVis}}">
+                            <Button Content="⏮" FontSize="12" Padding="8,3"
+                                    Style="{StaticResource DarkButton}"
+                                    Command="{Binding RestartVideoCommand}"
+                                    ToolTip="Volver al principio del video"/>
+                            <Button Content="⏪ 10s" FontSize="11" Padding="8,3" Margin="4,0,0,0"
+                                    Style="{StaticResource DarkButton}"
+                                    Command="{Binding SkipBackwardCommand}"
+                                    ToolTip="Retroceder 10 segundos"/>
+                            <Button FontSize="12" Padding="10,3" Margin="4,0,0,0"
+                                    Command="{Binding TogglePlayPauseCommand}"
+                                    ToolTip="Reproducir o pausar el video que está en pantalla">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                        <Setter Property="Content" Value="▶"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsVideoPlaying}" Value="True">
+                                                <Setter Property="Content" Value="⏸"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                            <Button Content="10s ⏩" FontSize="11" Padding="8,3" Margin="4,0,0,0"
+                                    Style="{StaticResource DarkButton}"
+                                    Command="{Binding SkipForwardCommand}"
+                                    ToolTip="Adelantar 10 segundos"/>
+                            <TextBlock Text="{Binding PlaybackTimeText}" FontSize="11" VerticalAlignment="Center"
+                                       Foreground="{StaticResource MutedBrush}" Margin="10,0,0,0"
+                                       MinWidth="86"/>
+                        </StackPanel>
+
+                        <!-- Barra de progreso, arrastrable -->
+                        <Slider Minimum="0" Maximum="{Binding PlaybackDurationSeconds}"
+                                Value="{Binding PlaybackPositionSeconds}"
+                                IsMoveToPointEnabled="True"
+                                VerticalAlignment="Center" Margin="12,0,0,0"
+                                Visibility="{Binding HasVideoPlayback, Converter={StaticResource BoolToVis}}"
+                                ToolTip="Arrastrá para moverte dentro del video"/>
+                    </DockPanel>
+                </Border>
 
                 <Grid>
                     <TextBlock Margin="16,0,16,8"
@@ -979,10 +1128,10 @@
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
-                    <ScrollViewer x:Name="MediaScroll" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                        <ItemsControl ItemsSource="{Binding MediaItems}">
+                    <ScrollViewer x:Name="MediaScroll" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding MediaItems}" Margin="0,0,0,6">
                             <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                                <ItemsPanelTemplate><WrapPanel Orientation="Horizontal"/></ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -996,6 +1145,11 @@
                                                 <MenuItem Header="Agregar a la playlist"
                                                           Command="{Binding PlacementTarget.Tag.AddMediaToPlaylistCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                           CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                <Separator/>
+                                                <MenuItem Header="Descargar para uso local (YouTube)"
+                                                          Command="{Binding PlacementTarget.Tag.DownloadYouTubeCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                          ToolTip="Guarda el video en la computadora para no depender de internet durante la reunión"/>
                                                 <Separator/>
                                                 <MenuItem Header="Propiedades (Inspector)…"
                                                           Command="{Binding PlacementTarget.Tag.InspectMediaCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
@@ -1043,10 +1197,11 @@
                     </ScrollViewer>
                 </Grid>
             </DockPanel>
-        </Border>
+            </Border>
+        </Grid>
 
         <!-- ══ Barra de estado ══ -->
-        <TextBlock Grid.Row="3"
+        <TextBlock Grid.Row="2"
                    Text="{Binding StatusText}"
                    FontSize="12" Foreground="{StaticResource MutedBrush}"
                    Margin="14,8,14,10" TextWrapping="Wrap"/>

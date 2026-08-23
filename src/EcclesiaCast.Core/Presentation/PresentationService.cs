@@ -53,6 +53,14 @@ public sealed class PresentationService : IPresentationService
         OnChanged();
     }
 
+    public Logos.Logo? ActiveLogo { get; private set; }
+
+    public void SetActiveLogo(Logos.Logo? logo)
+    {
+        ActiveLogo = logo;
+        OnChanged();
+    }
+
     public Media.MediaItem? Background { get; private set; }
 
     public void SetBackground(Media.MediaItem? background)

@@ -1,5 +1,6 @@
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.App.ViewModels;
 using EcclesiaCast.Core.Abstractions;
@@ -24,6 +25,13 @@ public partial class App : Application
         // Dark title bar for every window (main and dialogs).
         EventManager.RegisterClassHandler(typeof(Window), Window.LoadedEvent,
             new RoutedEventHandler((s, _) => DarkTitleBar.Apply((Window)s)));
+
+        // Tooltips explain what each button does, so they have to stay up long
+        // enough to actually read them (WPF hides them after five seconds).
+        ToolTipService.ShowDurationProperty.OverrideMetadata(
+            typeof(DependencyObject), new FrameworkPropertyMetadata(30000));
+        ToolTipService.InitialShowDelayProperty.OverrideMetadata(
+            typeof(DependencyObject), new FrameworkPropertyMetadata(350));
 
         var appDataDir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -89,6 +97,10 @@ public partial class App : Application
         services.AddSingleton<IMediaInspector, MediaInspectorService>();
         services.AddSingleton<IPlaylistRepository>(_ => new PlaylistRepository(dbPath));
         services.AddSingleton<IYouTubeBrowser, YouTubeBrowserService>();
+        services.AddSingleton<ILogoRepository>(_ => new LogoRepository(dbPath));
+        services.AddSingleton<ILogoManagerDialog, LogoManagerDialogService>();
+        services.AddSingleton<IProPresenterImportDialog, ProPresenterImportDialogService>();
+        services.AddSingleton<IStageWindowService, StageWindowService>();
         services.AddSingleton<MainViewModel>();
         _services = services.BuildServiceProvider();
 
@@ -104,6 +116,9 @@ public partial class App : Application
     protected override void OnExit(ExitEventArgs e)
     {
         Log.Information("EcclesiaCast exiting");
+
+        // Stop listening on the network before the process goes away.
+        _services?.GetService<MainViewModel>()?.StopRemote();
         Log.CloseAndFlush();
         _services?.Dispose();
         base.OnExit(e);

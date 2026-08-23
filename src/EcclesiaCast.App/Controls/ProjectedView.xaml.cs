@@ -47,7 +47,23 @@ public partial class ProjectedView : UserControl
     /// </summary>
     public static readonly DependencyProperty IsLiveOutputProperty =
         DependencyProperty.Register(nameof(IsLiveOutput), typeof(bool), typeof(ProjectedView),
-            new PropertyMetadata(false, (d, _) => ((ProjectedView)d).OnBackgroundChanged()));
+            new PropertyMetadata(false, (d, e) =>
+            {
+                var view = (ProjectedView)d;
+                view.SlideView.IsLiveOutput = (bool)e.NewValue;
+                view.OnBackgroundChanged();
+            }));
+
+    /// <summary>The logo shown in the Logo state.</summary>
+    public static readonly DependencyProperty LogoProperty =
+        DependencyProperty.Register(nameof(Logo), typeof(EcclesiaCast.Core.Logos.Logo), typeof(ProjectedView),
+            new PropertyMetadata(null, (d, e) =>
+                ((ProjectedView)d).SlideView.Logo = (EcclesiaCast.Core.Logos.Logo?)e.NewValue));
+
+    /// <summary>Blur applied to the background image layer, 0–100.</summary>
+    public static readonly DependencyProperty BackgroundBlurProperty =
+        DependencyProperty.Register(nameof(BackgroundBlur), typeof(double), typeof(ProjectedView),
+            new PropertyMetadata(0d, (d, e) => ((ProjectedView)d).ApplyBlur((double)e.NewValue)));
 
     private string? _lastImagePath;
 
@@ -99,6 +115,31 @@ public partial class ProjectedView : UserControl
     {
         get => (bool)GetValue(IsLiveOutputProperty);
         set => SetValue(IsLiveOutputProperty, value);
+    }
+
+    public double BackgroundBlur
+    {
+        get => (double)GetValue(BackgroundBlurProperty);
+        set => SetValue(BackgroundBlurProperty, value);
+    }
+
+    public EcclesiaCast.Core.Logos.Logo? Logo
+    {
+        get => (EcclesiaCast.Core.Logos.Logo?)GetValue(LogoProperty);
+        set => SetValue(LogoProperty, value);
+    }
+
+    private void ApplyBlur(double amount)
+    {
+        var radius = Math.Clamp(amount, 0, 100) * 0.6;
+        BackgroundImage.Effect = radius <= 0
+            ? null
+            : new System.Windows.Media.Effects.BlurEffect
+            {
+                Radius = radius,
+                KernelType = System.Windows.Media.Effects.KernelType.Gaussian,
+                RenderingBias = System.Windows.Media.Effects.RenderingBias.Performance,
+            };
     }
 
     private void OnBackgroundChanged()

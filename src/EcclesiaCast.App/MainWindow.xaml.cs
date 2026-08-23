@@ -14,6 +14,7 @@ public partial class MainWindow : Window
     private const string LayoutLibraryKey = "layout.library.width";
     private const string LayoutPreviewKey = "layout.preview.width";
     private const string LayoutPlaylistKey = "layout.playlist.height";
+    private const string LayoutMediaKey = "layout.media.height";
     private const string LayoutWindowKey = "layout.window";
 
     private ISettingsStore? _settings;
@@ -62,6 +63,8 @@ public partial class MainWindow : Window
             PreviewColumn.Width = new GridLength(preview);
         if (ReadDouble(LayoutPlaylistKey) is double playlist)
             PlaylistRow.Height = new GridLength(playlist);
+        if (ReadDouble(LayoutMediaKey) is double media)
+            MediaRow.Height = new GridLength(media);
 
         if (settings.Get(LayoutWindowKey)?.Split(';') is [var w, var h, var state]
             && double.TryParse(w, out var width) && double.TryParse(h, out var height))
@@ -88,6 +91,7 @@ public partial class MainWindow : Window
             _settings.Set(LayoutLibraryKey, LibraryColumn.Width.Value.ToString("0"));
             _settings.Set(LayoutPreviewKey, PreviewColumn.Width.Value.ToString("0"));
             _settings.Set(LayoutPlaylistKey, PlaylistRow.Height.Value.ToString("0"));
+            _settings.Set(LayoutMediaKey, MediaRow.Height.Value.ToString("0"));
 
             var size = WindowState == WindowState.Maximized
                 ? $"{RestoreBounds.Width:0};{RestoreBounds.Height:0};max"
@@ -97,6 +101,108 @@ public partial class MainWindow : Window
         catch
         {
             // El layout es cosmético: nunca debe impedir cerrar la app.
+        }
+    }
+
+    /// <summary>
+    /// Drops the logo list under the ▾ button: one entry per logo (the active
+    /// one ticked), then the way into the manager. Built here rather than in
+    /// XAML so the fixed entries and the list can live in the same menu.
+    /// </summary>
+    private void LogoPicker_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm || sender is not FrameworkElement anchor)
+            return;
+
+        var menu = new ContextMenu
+        {
+            PlacementTarget = anchor,
+            Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom,
+        };
+
+        foreach (var logo in vm.Logos)
+        {
+            menu.Items.Add(new MenuItem
+            {
+                Header = logo.Name,
+                IsCheckable = true,
+                IsChecked = logo.Id == vm.SelectedLogo?.Id,
+                Command = vm.SelectLogoCommand,
+                CommandParameter = logo,
+            });
+        }
+
+        if (vm.Logos.Count == 0)
+            menu.Items.Add(new MenuItem { Header = "(todavía no hay logos)", IsEnabled = false });
+
+        menu.Items.Add(new Separator());
+        menu.Items.Add(new MenuItem
+        {
+            Header = "Administrar logos…",
+            Command = vm.OpenLogosCommand,
+        });
+
+        menu.IsOpen = true;
+    }
+
+    /// <summary>Screen picker and switches for the stage display, under its ▾ button.</summary>
+    private void StageOptions_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm || sender is not FrameworkElement anchor)
+            return;
+
+        var menu = new ContextMenu
+        {
+            PlacementTarget = anchor,
+            Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom,
+        };
+
+        menu.Items.Add(new MenuItem { Header = "Pantalla del escenario", IsEnabled = false });
+        foreach (var display in vm.StageDisplays)
+        {
+            var item = new MenuItem
+            {
+                Header = display.Label,
+                IsCheckable = true,
+                IsChecked = display.Info.DeviceName == vm.SelectedStageDisplay?.Info.DeviceName,
+            };
+            item.Click += (_, _) => vm.SelectedStageDisplay = display;
+            menu.Items.Add(item);
+        }
+
+        menu.Items.Add(new Separator());
+        menu.Items.Add(Toggle("Mostrar la hora", vm.StageShowClock, v => vm.StageShowClock = v));
+        menu.Items.Add(Toggle("Mostrar el cronómetro", vm.StageShowTimer, v => vm.StageShowTimer = v));
+        menu.Items.Add(Toggle("Mostrar la diapositiva siguiente", vm.StageShowNext, v => vm.StageShowNext = v));
+
+        menu.Items.Add(new Separator());
+        foreach (var size in new[] { 72d, 96d, 120d, 150d })
+        {
+            var item = new MenuItem
+            {
+                Header = $"Letra {size:0}",
+                IsCheckable = true,
+                IsChecked = Math.Abs(vm.StageTextScale - size) < 1,
+            };
+            item.Click += (_, _) => vm.StageTextScale = size;
+            menu.Items.Add(item);
+        }
+
+        menu.Items.Add(new Separator());
+        menu.Items.Add(new MenuItem
+        {
+            Header = "⟲  Poner el cronómetro en cero",
+            Command = vm.ResetStageTimerCommand,
+        });
+
+        menu.IsOpen = true;
+        return;
+
+        static MenuItem Toggle(string header, bool isChecked, Action<bool> set)
+        {
+            var item = new MenuItem { Header = header, IsCheckable = true, IsChecked = isChecked };
+            item.Click += (s, _) => set(((MenuItem)s).IsChecked);
+            return item;
         }
     }
 

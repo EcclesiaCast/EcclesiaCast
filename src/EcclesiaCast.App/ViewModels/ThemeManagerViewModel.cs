@@ -47,8 +47,12 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     [ObservableProperty] private double _minFontSize = 36;
     [ObservableProperty] private bool _bold = true;
     [ObservableProperty] private bool _italic;
-    [ObservableProperty] private bool _uppercase;
+    [ObservableProperty] private int _caseIndex;                       // orden de TextCase
     [ObservableProperty] private bool _shadow = true;
+    [ObservableProperty] private double _shadowOpacityPercent = 75;    // 0–100
+    [ObservableProperty] private double _shadowBlur = 18;
+    [ObservableProperty] private double _outlineWidth;
+    [ObservableProperty] private string _outlineColor = "#000000";
     [ObservableProperty] private string _textColor = "#FFFFFF";
     [ObservableProperty] private int _alignHIndex = 1;                 // 0 Izq · 1 Centro · 2 Der
     [ObservableProperty] private int _alignVIndex = 1;                 // 0 Arriba · 1 Centro · 2 Abajo
@@ -124,8 +128,12 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         MinFontSize = theme.MinFontSize;
         Bold = theme.Bold;
         Italic = theme.Italic;
-        Uppercase = theme.Uppercase;
+        CaseIndex = (int)theme.TextCase;
         Shadow = theme.Shadow;
+        ShadowOpacityPercent = theme.ShadowOpacity * 100;
+        ShadowBlur = theme.ShadowBlur;
+        OutlineWidth = theme.OutlineWidth;
+        OutlineColor = theme.OutlineColor;
         TextColor = theme.TextColor;
         AlignHIndex = (int)theme.AlignH;
         AlignVIndex = (int)theme.AlignV;
@@ -168,8 +176,12 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         MinFontSize = Math.Min(MinFontSize, MaxFontSize),
         Bold = Bold,
         Italic = Italic,
-        Uppercase = Uppercase,
+        TextCase = (TextCase)Math.Clamp(CaseIndex, 0, 4),
         Shadow = Shadow,
+        ShadowOpacity = Math.Clamp(ShadowOpacityPercent / 100, 0, 1),
+        ShadowBlur = Math.Clamp(ShadowBlur, 0, 80),
+        OutlineWidth = Math.Clamp(OutlineWidth, 0, 40),
+        OutlineColor = string.IsNullOrWhiteSpace(OutlineColor) ? "#000000" : OutlineColor.Trim(),
         TextColor = TextColor,
         AlignH = (HAlign)Math.Clamp(AlignHIndex, 0, 2),
         AlignV = (VAlign)Math.Clamp(AlignVIndex, 0, 2),
@@ -359,6 +371,14 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
             TransparentBackground = false;
             BackgroundColor = picked;
         }
+    }
+
+    [RelayCommand]
+    private void PickOutlineColor()
+    {
+        var picked = ColorPickerHelper.Pick(OutlineColor);
+        if (picked is not null)
+            OutlineColor = picked;
     }
 
     [RelayCommand]

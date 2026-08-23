@@ -36,6 +36,7 @@ public partial class MediaInspectorWindow : Window
         EndBox.SelectedIndex = (int)item.EndBehavior;
         MuteCheck.IsChecked = item.Muted;
         VolSlider.Value = item.Volume;
+        BlurField.SetSilently(item.Blur);
 
         var poster = item.ThumbnailPath ?? (item.Type == MediaType.Image ? item.Path : null);
         if (!string.IsNullOrWhiteSpace(poster) && File.Exists(poster))
@@ -83,6 +84,7 @@ public partial class MediaInspectorWindow : Window
         _item.EndBehavior = (VideoEndBehavior)Math.Max(0, EndBox.SelectedIndex);
         _item.Muted = MuteCheck.IsChecked == true;
         _item.Volume = (int)VolSlider.Value;
+        _item.Blur = BlurField.Value;
         Saved = true;
         DialogResult = true;
     }

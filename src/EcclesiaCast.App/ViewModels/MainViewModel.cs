@@ -4,10 +4,12 @@ using System.Text;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using EcclesiaCast.App.Remote;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Bible;
 using EcclesiaCast.Core.Displays;
+using EcclesiaCast.Core.Logos;
 using EcclesiaCast.Core.Media;
 using EcclesiaCast.Core.Playlists;
 using EcclesiaCast.Core.Presentation;
@@ -21,7 +23,7 @@ namespace EcclesiaCast.App.ViewModels;
 /// <summary>A display plus the label shown to the operator.</summary>
 public sealed record DisplayOption(DisplayInfo Info, string Label);
 
-public sealed partial class MainViewModel : ObservableObject
+public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 {
     private const string OutputDisplayKey = "output.display";
 
@@ -45,6 +47,10 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly IMediaInspector _mediaInspector;
     private readonly IPlaylistRepository _playlists;
     private readonly IYouTubeBrowser _youTube;
+    private readonly ILogoRepository _logos;
+    private readonly ILogoManagerDialog _logoManager;
+    private readonly IProPresenterImportDialog _proPresenterImport;
+    private readonly IStageWindowService _stage;
 
     /// <summary>Copied slide (label + text + style) for paste/duplicate.</summary>
     private (string Label, string Text, string? StyleJson)? _clipboardSlide;
@@ -107,6 +113,10 @@ public sealed partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _isLogoActive;
+
+    /// <summary>True while a media background is applied — gates "Sin fondo".</summary>
+    [ObservableProperty]
+    private bool _hasBackground;
 
     [ObservableProperty]
     private bool _hasSlides;
@@ -173,6 +183,10 @@ public sealed partial class MainViewModel : ObservableObject
         IMediaInspector mediaInspector,
         IPlaylistRepository playlists,
         IYouTubeBrowser youTube,
+        ILogoRepository logos,
+        ILogoManagerDialog logoManager,
+        IProPresenterImportDialog proPresenterImport,
+        IStageWindowService stage,
         ProjectionViewModel projectionViewModel)
     {
         _displayProvider = displayProvider;
@@ -192,18 +206,27 @@ public sealed partial class MainViewModel : ObservableObject
         _mediaInspector = mediaInspector;
         _playlists = playlists;
         _youTube = youTube;
+        _logos = logos;
+        _logoManager = logoManager;
+        _proPresenterImport = proPresenterImport;
+        _stage = stage;
         Projection = projectionViewModel;
 
         _presentation.Changed += (_, _) => UpdateStateFlags();
+        _playbackTimer.Tick += OnPlaybackTick;
         _projection.VisibilityChanged += (_, _) => IsProjecting = _projection.IsOutputVisible;
         _projection.VideoEnded += (_, _) => OnProjectedVideoEnded();
+        _stage.VisibilityChanged += (_, _) => IsStageVisible = _stage.IsVisible;
+        _stageOptions = StageOptions.Load(settings);
         Slides.CollectionChanged += (_, _) => HasSlides = Slides.Count > 0;
         UpdateStateFlags();
         RefreshDisplays();
         LoadSongs();
         LoadBibleVersions();
         LoadMedia();
+        LoadLogos(null);
         LoadPlaylists(null);
+        RestoreRemote();
         _ = RefreshVideoThumbnailsAsync();
     }
 
@@ -515,6 +538,46 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string _selectedMediaTab = "Fondos";
 
+    /// <summary>
+    /// When on, finishing a video in this tab starts the next one, looping
+    /// round at the end — the tab behaves like a playlist. Kept per tab in the
+    /// settings, since tabs are just the media's category.
+    /// </summary>
+    [ObservableProperty]
+    private bool _continuousPlayback;
+
+    private static string ContinuousKey(string tab) => $"media.tab.{tab.ToLowerInvariant()}.continuous";
+
+    private bool IsContinuousTab(string? tab) =>
+        !string.IsNullOrWhiteSpace(tab) && _settings.Get(ContinuousKey(tab)) == "1";
+
+    partial void OnContinuousPlaybackChanged(bool value)
+    {
+        if (_loadingMediaTab)
+            return;
+
+        _settings.Set(ContinuousKey(SelectedMediaTab), value ? "1" : "0");
+        StatusText = value
+            ? $"«{SelectedMediaTab}»: los videos se reproducen uno atrás del otro."
+            : $"«{SelectedMediaTab}»: reproducción continua desactivada.";
+    }
+
+    /// <summary>True while the tab's own setting is being read into the checkbox.</summary>
+    private bool _loadingMediaTab;
+
+    /// <summary>The item after this one in its tab, wrapping around at the end.</summary>
+    private MediaItem? NextInTab(MediaItem current)
+    {
+        var siblings = _allMedia
+            .Where(m => string.Equals(m.Category, current.Category, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+        if (siblings.Count <= 1)
+            return null;
+
+        var index = siblings.FindIndex(m => m.Id == current.Id);
+        return index < 0 ? siblings[0] : siblings[(index + 1) % siblings.Count];
+    }
+
     private static readonly HashSet<string> ImageExtensions =
         new(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png", ".bmp", ".webp", ".gif" };
     private static readonly HashSet<string> VideoExtensions =
@@ -537,7 +600,14 @@ public sealed partial class MainViewModel : ObservableObject
         FilterMediaByTab();
     }
 
-    partial void OnSelectedMediaTabChanged(string value) => FilterMediaByTab();
+    partial void OnSelectedMediaTabChanged(string value)
+    {
+        FilterMediaByTab();
+
+        _loadingMediaTab = true;
+        ContinuousPlayback = IsContinuousTab(value);
+        _loadingMediaTab = false;
+    }
 
     private void FilterMediaByTab()
     {
@@ -668,6 +738,17 @@ public sealed partial class MainViewModel : ObservableObject
         if (item is null)
             return;
 
+        // A tab set to play through can't have its videos looping, or they
+        // would never reach the end that triggers the next one. The change is
+        // made on a copy so the item's own setting stays as the operator left it.
+        if (item.Type != MediaType.Image
+            && item.EndBehavior == VideoEndBehavior.Loop
+            && IsContinuousTab(item.Category))
+        {
+            item = item.Clone();
+            item.EndBehavior = VideoEndBehavior.Stop;
+        }
+
         _presentation.SetBackground(item);
 
         // Foreground = the media alone (no text). Background with no live slide
@@ -688,11 +769,20 @@ public sealed partial class MainViewModel : ObservableObject
             : $"Fondo: {item.Name}.";
     }
 
+    /// <summary>
+    /// Takes the image/video off the output and leaves the text where it was.
+    /// Applying a background parks the output on "background only", so without
+    /// this the lyrics stayed hidden after the background was removed.
+    /// </summary>
     [RelayCommand]
     private void ClearBackground()
     {
         _presentation.SetBackground(null);
-        StatusText = "Fondo quitado.";
+
+        if (_presentation.State == OutputState.Clear && _presentation.CurrentSlide is not null)
+            _presentation.ToggleClear();
+
+        StatusText = "Fondo quitado; la letra sigue en pantalla.";
     }
 
     /// <summary>A non-looping video finished: honour its end behaviour.</summary>
@@ -701,6 +791,14 @@ public sealed partial class MainViewModel : ObservableObject
         var background = _presentation.Background;
         if (background is null || background.EndBehavior == VideoEndBehavior.Loop)
             return;
+
+        // The tab plays through: hand over to the next item in it.
+        if (IsContinuousTab(background.Category) && NextInTab(background) is { } next)
+        {
+            ApplyBackground(next);
+            StatusText = $"Reproducción continua en «{background.Category}» → {next.Name}.";
+            return;
+        }
 
         if (background.EndBehavior == VideoEndBehavior.Logo)
         {
@@ -714,6 +812,253 @@ public sealed partial class MainViewModel : ObservableObject
             StatusText = $"\"{background.Name}\" terminó.";
         }
     }
+
+    // ── Logos ────────────────────────────────────────────────────
+
+    private const string ActiveLogoKey = "logo.active";
+
+    /// <summary>The church's logos, in the order set in the manager.</summary>
+    public ObservableCollection<Logo> Logos { get; } = [];
+
+    [ObservableProperty]
+    private Logo? _selectedLogo;
+
+    /// <summary>Name shown next to the Logo button; falls back when none is set up.</summary>
+    public string ActiveLogoName => SelectedLogo?.Name ?? "sin logo";
+
+    /// <summary>True when the active logo is a file that can go behind the lyrics.</summary>
+    public bool CanUseLogoAsBackground => SelectedLogo?.CanBeBackground == true;
+
+    /// <summary>Marks that the starter logo was created, so deleting it sticks.</summary>
+    private const string LogosSeededKey = "logo.seeded";
+
+    private void LoadLogos(int? keepId)
+    {
+        keepId ??= SelectedLogo?.Id
+            ?? (int.TryParse(_settings.Get(ActiveLogoKey), out var saved) ? saved : null);
+
+        // First run: leave one text logo in place so F3 shows something, and
+        // so the manager opens with an example instead of an empty list.
+        if (_settings.Get(LogosSeededKey) is null)
+        {
+            _settings.Set(LogosSeededKey, "1");
+            if (_logos.GetAll().Count == 0)
+            {
+                var starter = _logos.Save(new Logo
+                {
+                    Name = "Reunión general",
+                    Kind = LogoKind.Text,
+                    Text = "Bienvenidos",
+                    Order = 0,
+                });
+                keepId ??= starter.Id;
+            }
+        }
+
+        Logos.Clear();
+        foreach (var logo in _logos.GetAll())
+            Logos.Add(logo);
+
+        SelectedLogo = Logos.FirstOrDefault(l => l.Id == keepId) ?? Logos.FirstOrDefault();
+    }
+
+    partial void OnSelectedLogoChanged(Logo? value)
+    {
+        _presentation.SetActiveLogo(value);
+        OnPropertyChanged(nameof(ActiveLogoName));
+        OnPropertyChanged(nameof(CanUseLogoAsBackground));
+
+        if (value is not null)
+            _settings.Set(ActiveLogoKey, value.Id.ToString());
+    }
+
+    /// <summary>Picks a logo from the button's dropdown and shows it right away.</summary>
+    [RelayCommand]
+    private void SelectLogo(Logo? logo)
+    {
+        if (logo is null)
+            return;
+
+        SelectedLogo = logo;
+
+        // Already on the logo? Switching one for the other is the whole point.
+        if (!IsLogoActive)
+            ToggleLogo();
+        else
+            StatusText = $"Logo: {logo.Name}.";
+    }
+
+    [RelayCommand]
+    private void OpenLogos()
+    {
+        if (!_logoManager.Show())
+            return;
+
+        LoadLogos(null);
+        // Re-apply so the output picks up an edited logo without a toggle.
+        _presentation.SetActiveLogo(SelectedLogo);
+        StatusText = "Logos actualizados.";
+    }
+
+    /// <summary>
+    /// Puts the active logo behind the lyrics as a background, blurred by the
+    /// amount set for it — the usual "our logo, softened, under the words".
+    /// </summary>
+    [RelayCommand]
+    private void UseLogoAsBackground()
+    {
+        if (SelectedLogo is not { CanBeBackground: true } logo)
+        {
+            StatusText = "Para usarlo de fondo, el logo tiene que ser una imagen o un video.";
+            return;
+        }
+
+        _presentation.SetBackground(LogoBackground(logo));
+        BackgroundBlur = logo.BackgroundBlur;
+
+        // The logo is a background now, not the Logo state.
+        if (IsLogoActive)
+            _presentation.ToggleLogo();
+
+        EnsureOutputOn();
+        StatusText = $"«{logo.Name}» de fondo, con {logo.BackgroundBlur:0} % de desenfoque.";
+    }
+
+    /// <summary>
+    /// Wraps a logo as a background media item. Its id is negative so the rest
+    /// of the app can tell it apart from a real library item and never tries
+    /// to write it back to the media table.
+    /// </summary>
+    private static MediaItem LogoBackground(Logo logo) => new()
+    {
+        Id = -1000 - logo.Id,
+        Name = logo.Name,
+        Path = logo.Path!,
+        Type = logo.Kind == LogoKind.Video ? MediaType.Video : MediaType.Image,
+        ThumbnailPath = logo.Kind == LogoKind.Video ? logo.PosterPath : logo.Path,
+        Scaling = logo.Scaling,
+        Behavior = MediaBehavior.Background,
+        EndBehavior = VideoEndBehavior.Loop,
+        Muted = true,
+        Blur = logo.BackgroundBlur,
+    };
+
+    // ── Reproducción del fondo (barra de transporte) ─────────────
+
+    /// <summary>Polls the output while a video plays; the transport bar binds to the result.</summary>
+    private readonly System.Windows.Threading.DispatcherTimer _playbackTimer = new()
+    {
+        Interval = TimeSpan.FromMilliseconds(300),
+    };
+
+    /// <summary>True while the timer writes the position, so it isn't read back as a seek.</summary>
+    private bool _updatingPlayback;
+
+    [ObservableProperty]
+    private bool _hasVideoPlayback;
+
+    [ObservableProperty]
+    private bool _isVideoPlaying;
+
+    [ObservableProperty]
+    private double _playbackPositionSeconds;
+
+    [ObservableProperty]
+    private double _playbackDurationSeconds;
+
+    [ObservableProperty]
+    private string _playbackTimeText = "0:00 / 0:00";
+
+    /// <summary>Blur over the background, 0–100; applies live and sticks to the media.</summary>
+    [ObservableProperty]
+    private double _backgroundBlur;
+
+    private void OnPlaybackTick(object? sender, EventArgs e)
+    {
+        var state = _projection.Playback;
+
+        HasVideoPlayback = state.HasVideo;
+        IsVideoPlaying = state.IsPlaying;
+
+        _updatingPlayback = true;
+        PlaybackDurationSeconds = Math.Max(state.Duration.TotalSeconds, 0.001);
+        PlaybackPositionSeconds = Math.Clamp(state.Position.TotalSeconds, 0, PlaybackDurationSeconds);
+        _updatingPlayback = false;
+
+        PlaybackTimeText = state.CanSeek
+            ? $"{Clock(state.Position)} / {Clock(state.Duration)}"
+            : state.HasVideo ? Clock(state.Position) : "0:00 / 0:00";
+    }
+
+    private static string Clock(TimeSpan value) =>
+        value.TotalHours >= 1 ? value.ToString(@"h\:mm\:ss") : value.ToString(@"m\:ss");
+
+    /// <summary>Starts polling when a video goes on the output (and stops when none is left).</summary>
+    private void SyncPlaybackTimer()
+    {
+        var isVideo = _presentation.Background?.Type is MediaType.Video or MediaType.YouTube;
+        if (isVideo && !_playbackTimer.IsEnabled)
+            _playbackTimer.Start();
+        else if (!isVideo && _playbackTimer.IsEnabled)
+        {
+            _playbackTimer.Stop();
+            HasVideoPlayback = false;
+            PlaybackTimeText = "0:00 / 0:00";
+        }
+    }
+
+    partial void OnPlaybackPositionSecondsChanged(double value)
+    {
+        if (_updatingPlayback)
+            return;
+        _projection.SeekTo(TimeSpan.FromSeconds(value));
+    }
+
+    partial void OnBackgroundBlurChanged(double value)
+    {
+        var amount = Math.Clamp(value, 0, 100);
+        Projection.BackgroundBlur = amount;
+
+        // Remember it, so the same background comes back blurred. A negative id
+        // means the background is really a logo, which owns its own setting.
+        if (_presentation.Background is not { } background || Math.Abs(background.Blur - amount) <= 0.01)
+            return;
+
+        background.Blur = amount;
+
+        if (background.Id > 0)
+        {
+            _media.Update(background);
+        }
+        else if (Logos.FirstOrDefault(l => -1000 - l.Id == background.Id) is { } logo)
+        {
+            logo.BackgroundBlur = amount;
+            _logos.Save(logo);
+        }
+    }
+
+    [RelayCommand]
+    private void TogglePlayPause()
+    {
+        // Pressing play with the output off would send sound to a dark screen.
+        if (!IsVideoPlaying && !IsProjecting && !EnsureOutputOn())
+            return;
+
+        _projection.TogglePlayPause();
+        OnPlaybackTick(null, EventArgs.Empty);
+    }
+
+    [RelayCommand]
+    private void SkipBackward() => _projection.Skip(TimeSpan.FromSeconds(-10));
+
+    [RelayCommand]
+    private void SkipForward() => _projection.Skip(TimeSpan.FromSeconds(10));
+
+    [RelayCommand]
+    private void RestartVideo() => _projection.SeekTo(TimeSpan.Zero);
+
+    [RelayCommand]
+    private void ClearBlur() => BackgroundBlur = 0;
 
     // ── YouTube ──────────────────────────────────────────────────
 
@@ -788,6 +1133,88 @@ public sealed partial class MainViewModel : ObservableObject
             : "Ese video ya estaba en la biblioteca.";
     }
 
+    /// <summary>Tab the locally downloaded copies land in.</summary>
+    private const string DownloadedTab = "Descargados";
+
+    /// <summary>
+    /// Saves a YouTube video as a local file, so the service doesn't depend on
+    /// the connection holding up (and the quality stops being YouTube's call).
+    /// The copy is added to its own tab and the original entry is kept.
+    /// </summary>
+    [RelayCommand]
+    private void DownloadYouTube(MediaItem? item)
+    {
+        if (item is not { Type: MediaType.YouTube } || string.IsNullOrWhiteSpace(item.YouTubeId))
+        {
+            StatusText = "Elegí un video de YouTube para descargar.";
+            return;
+        }
+
+        if (YtDlp.FindExecutable() is null && !OfferToInstallYtDlp())
+            return;
+
+        var window = new Views.YouTubeDownloadWindow(item.YouTubeId!, item.Name)
+        {
+            Owner = Application.Current.MainWindow,
+        };
+
+        if (window.ShowDialog() != true || window.DownloadedPath is not { } path)
+        {
+            StatusText = "La descarga no se completó.";
+            return;
+        }
+
+        var name = Path.GetFileNameWithoutExtension(path);
+        _media.Add(new MediaItem
+        {
+            Name = name,
+            Path = path,
+            Type = MediaType.Video,
+            ThumbnailPath = MediaThumbnails.Create(path, MediaType.Video, App.VideoEngine),
+            Category = DownloadedTab,
+            // A downloaded announcement behaves like the YouTube one did.
+            Behavior = item.Behavior,
+            EndBehavior = item.EndBehavior,
+            Muted = item.Muted,
+            Volume = item.Volume,
+        });
+
+        LoadMedia();
+        SelectedMediaTab = DownloadedTab;
+        StatusText = $"«{name}» descargado y agregado a «{DownloadedTab}».";
+    }
+
+    /// <summary>
+    /// yt-dlp is a separate program and is not bundled. Explain where it goes
+    /// and open the folder, rather than pulling an executable off the internet
+    /// on the operator's behalf.
+    /// </summary>
+    private bool OfferToInstallYtDlp()
+    {
+        var answer = MessageBox.Show(
+            "Para descargar videos, EcclesiaCast usa yt-dlp, un programa aparte y gratuito "
+            + "que no viene incluido.\n\n"
+            + "Instalalo de una de estas dos formas:\n"
+            + "  • En una terminal:  winget install yt-dlp\n"
+            + $"  • O bajá yt-dlp.exe de github.com/yt-dlp/yt-dlp/releases y ponelo en:\n    {YtDlp.ToolsFolder}\n\n"
+            + "Con ffmpeg instalado además (winget install ffmpeg) se baja hasta 1080p.\n\n"
+            + "¿Abro esa carpeta ahora?",
+            "EcclesiaCast", MessageBoxButton.YesNo, MessageBoxImage.Information);
+
+        if (answer == MessageBoxResult.Yes)
+        {
+            Directory.CreateDirectory(YtDlp.ToolsFolder);
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = YtDlp.ToolsFolder,
+                UseShellExecute = true,
+            });
+        }
+
+        StatusText = "Instalá yt-dlp y volvé a intentar la descarga.";
+        return false;
+    }
+
     [RelayCommand]
     private void InspectMedia(MediaItem? item)
     {
@@ -833,20 +1260,264 @@ public sealed partial class MainViewModel : ObservableObject
         LoadMedia();
     }
 
+    // ── Control desde el celular ─────────────────────────────────
+
+    private const string RemotePinKey = "remote.pin";
+    private const string RemotePortKey = "remote.port";
+    private const string RemoteEnabledKey = "remote.enabled";
+
+    private RemoteControlServer? _remote;
+
+    [ObservableProperty]
+    private bool _isRemoteRunning;
+
+    /// <summary>
+    /// Starts listening. Left on between sessions on purpose: whoever set the
+    /// phone up on Sunday shouldn't have to do it again next Sunday.
+    /// </summary>
+    private bool StartRemote()
+    {
+        _remote ??= new RemoteControlServer(this);
+        if (_remote.IsRunning)
+            return true;
+
+        var pin = _settings.Get(RemotePinKey);
+        if (string.IsNullOrWhiteSpace(pin) || pin.Length != 4)
+        {
+            pin = Random.Shared.Next(1000, 10000).ToString();
+            _settings.Set(RemotePinKey, pin);
+        }
+
+        var port = int.TryParse(_settings.Get(RemotePortKey), out var saved) ? saved : 8080;
+
+        if (!_remote.Start(port, pin))
+            return false;
+
+        _settings.Set(RemotePortKey, _remote.Port.ToString());
+        _settings.Set(RemoteEnabledKey, "1");
+        IsRemoteRunning = true;
+        return true;
+    }
+
+    /// <summary>Brings the remote back up when it was left on last time.</summary>
+    private void RestoreRemote()
+    {
+        if (_settings.Get(RemoteEnabledKey) != "1")
+            return;
+
+        if (StartRemote())
+            Log.Information("Control remoto restaurado en {Address}", _remote!.Address);
+    }
+
+    /// <summary>Turns the phone remote on and shows how to connect to it.</summary>
+    [RelayCommand]
+    private void OpenRemote()
+    {
+        if (!StartRemote())
+        {
+            MessageBox.Show(
+                "No se pudo abrir ningún puerto para el control remoto. "
+                + "Puede que otro programa los esté usando.",
+                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var window = new Views.RemoteControlWindow(_remote!)
+        {
+            Owner = Application.Current.MainWindow,
+        };
+        window.ShowDialog();
+
+        if (window.StopRequested)
+        {
+            _remote!.Stop();
+            _settings.Set(RemoteEnabledKey, "0");
+            IsRemoteRunning = false;
+            StatusText = "Control desde el celular apagado.";
+        }
+        else
+        {
+            StatusText = $"Control desde el celular activo en {_remote!.Address}.";
+        }
+    }
+
+    /// <summary>Shuts the server down when the app closes.</summary>
+    public void StopRemote()
+    {
+        _remote?.Dispose();
+        _remote = null;
+        IsRemoteRunning = false;
+    }
+
+    RemoteState IRemoteHost.GetState()
+    {
+        var slides = Slides
+            .Where(s => s.JumpTarget is null)
+            .Select(s => new RemoteSlide(s.Index, s.Label, Shorten(s.Slide.MainText), s.IsLive))
+            .ToList();
+
+        var playlist = PlaylistItems
+            .Select((item, index) => new RemotePlaylistItem(
+                index,
+                item.Caption,
+                item.Type switch
+                {
+                    PlaylistItemType.BiblePassage => "📖",
+                    PlaylistItemType.Media => "🎞",
+                    _ => "🎵",
+                }))
+            .ToList();
+
+        return new RemoteState(
+            IsProjecting: IsProjecting,
+            OutputState: _presentation.State.ToString(),
+            SlideLabel: Projection.SlideLabel ?? "En vivo",
+            LiveText: Projection.Slide?.MainText ?? string.Empty,
+            NextText: Projection.NextSlide?.MainText ?? string.Empty,
+            Status: StatusText,
+            Slides: slides,
+            Playlist: playlist,
+            SongTitle: SelectedSong?.Title ?? (IsBibleTabActive ? "Biblia" : "EcclesiaCast"));
+    }
+
+    void IRemoteHost.Execute(string action, int? index)
+    {
+        switch (action)
+        {
+            case "next": NextSlide(); break;
+            case "prev": PreviousSlide(); break;
+            case "clear": ToggleClear(); break;
+            case "black": ToggleBlack(); break;
+            case "logo": ToggleLogo(); break;
+            case "output": ToggleOutput(); break;
+            case "nobackground": ClearBackground(); break;
+            case "slide" when index is int slide: GoLiveSlide(slide); break;
+            case "playlist" when index is int item && item >= 0 && item < PlaylistItems.Count:
+                ProjectPlaylistItem(PlaylistItems[item]);
+                break;
+            default:
+                Log.Debug("El celular pidió una acción desconocida: {Action}", action);
+                break;
+        }
+    }
+
+    /// <summary>Slide previews travel on every poll, so they are kept short.</summary>
+    private static string Shorten(string text)
+    {
+        var single = text.Replace('\n', ' ').Replace('\r', ' ').Trim();
+        return single.Length <= 70 ? single : single[..70] + "…";
+    }
+
+    // ── Pantalla de escenario ────────────────────────────────────
+
+    private const string StageDisplayKey = "stage.display";
+
+    /// <summary>Displays offered for the stage screen, plus a "no usar" entry.</summary>
+    public ObservableCollection<DisplayOption> StageDisplays { get; } = [];
+
+    [ObservableProperty]
+    private DisplayOption? _selectedStageDisplay;
+
+    [ObservableProperty]
+    private bool _isStageVisible;
+
+    private StageOptions _stageOptions = new();
+
+    public bool StageShowClock
+    {
+        get => _stageOptions.ShowClock;
+        set => SetStageOption(o => o.ShowClock = value);
+    }
+
+    public bool StageShowTimer
+    {
+        get => _stageOptions.ShowTimer;
+        set => SetStageOption(o => o.ShowTimer = value);
+    }
+
+    public bool StageShowNext
+    {
+        get => _stageOptions.ShowNext;
+        set => SetStageOption(o => o.ShowNext = value);
+    }
+
+    public double StageTextScale
+    {
+        get => _stageOptions.TextScale;
+        set => SetStageOption(o => o.TextScale = Math.Clamp(value, 20, 400));
+    }
+
+    private void SetStageOption(Action<StageOptions> change)
+    {
+        change(_stageOptions);
+        _stageOptions.Save(_settings);
+        _stage.ApplyOptions(_stageOptions);
+        OnPropertyChanged(nameof(StageShowClock));
+        OnPropertyChanged(nameof(StageShowTimer));
+        OnPropertyChanged(nameof(StageShowNext));
+        OnPropertyChanged(nameof(StageTextScale));
+    }
+
+    /// <summary>
+    /// Turns the stage display on or off. It must not land on the same screen
+    /// as the congregation's output — that would replace the projection with
+    /// the musicians' view.
+    /// </summary>
+    [RelayCommand]
+    private void ToggleStage()
+    {
+        if (IsStageVisible)
+        {
+            _stage.Hide();
+            StatusText = "Pantalla de escenario apagada.";
+            return;
+        }
+
+        if (SelectedStageDisplay is null)
+        {
+            StatusText = "Elegí en qué pantalla va el escenario.";
+            return;
+        }
+
+        if (SelectedStageDisplay.Info.DeviceName == SelectedDisplay?.Info.DeviceName)
+        {
+            MessageBox.Show(
+                "El escenario y la salida no pueden ir en la misma pantalla: la vista de los "
+                + "músicos taparía lo que ve la congregación.\n\n"
+                + "Elegí otro monitor para el escenario.",
+                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        _stage.ShowOn(SelectedStageDisplay.Info, _stageOptions);
+        _settings.Set(StageDisplayKey, SelectedStageDisplay.Info.DeviceName);
+        StatusText = $"Escenario en {SelectedStageDisplay.Label}.";
+    }
+
+    [RelayCommand]
+    private void ResetStageTimer()
+    {
+        _stage.ResetTimer();
+        StatusText = "Cronómetro del escenario en cero.";
+    }
+
     // ── Pantallas ────────────────────────────────────────────────
 
     [RelayCommand]
     private void RefreshDisplays()
     {
         var saved = SelectedDisplay?.Info.DeviceName ?? _settings.Get(OutputDisplayKey);
+        var savedStage = SelectedStageDisplay?.Info.DeviceName ?? _settings.Get(StageDisplayKey);
 
         Displays.Clear();
+        StageDisplays.Clear();
         var all = _displayProvider.GetDisplays();
         for (var i = 0; i < all.Count; i++)
         {
             var d = all[i];
             var label = $"Pantalla {i + 1} · {d.Width}×{d.Height}{(d.IsPrimary ? " (principal)" : string.Empty)}";
             Displays.Add(new DisplayOption(d, label));
+            StageDisplays.Add(new DisplayOption(d, label));
         }
 
         // Prefer the remembered display, then the first secondary one.
@@ -854,6 +1525,11 @@ public sealed partial class MainViewModel : ObservableObject
             Displays.FirstOrDefault(o => o.Info.DeviceName == saved)
             ?? Displays.FirstOrDefault(o => !o.Info.IsPrimary)
             ?? Displays.FirstOrDefault();
+
+        // The stage goes anywhere but the congregation's screen.
+        SelectedStageDisplay =
+            StageDisplays.FirstOrDefault(o => o.Info.DeviceName == savedStage)
+            ?? StageDisplays.FirstOrDefault(o => o.Info.DeviceName != SelectedDisplay?.Info.DeviceName);
     }
 
     // ── Temas ────────────────────────────────────────────────────
@@ -1201,6 +1877,17 @@ public sealed partial class MainViewModel : ObservableObject
         SelectedSong = null;
         LoadSongs();
         StatusText = "Canción eliminada.";
+    }
+
+    /// <summary>Brings the whole ProPresenter library over in one step.</summary>
+    [RelayCommand]
+    private void ImportFromProPresenter()
+    {
+        if (_proPresenterImport.Show() is not { } summary)
+            return;
+
+        LoadSongs();
+        StatusText = summary;
     }
 
     [RelayCommand]
@@ -1989,6 +2676,14 @@ public sealed partial class MainViewModel : ObservableObject
         }
 
         PreviewSlide = index + 1 < Slides.Count ? Slides[index + 1].Slide : null;
+
+        // The stage display needs the label of what is live and the text of
+        // what follows, skipping the Bible's chapter-jump cards.
+        Projection.SlideLabel = item.Label;
+        Projection.NextSlide = Slides
+            .Skip(index + 1)
+            .FirstOrDefault(s => s.JumpTarget is null)?.Slide;
+
         Log.Debug("Slide {Index} en vivo: {Label}", index, item.Label);
         StatusText = $"En vivo: diapositiva {index + 1} de {Slides.Count}. Flechas ←→ para navegar · F1 Clear · F2 Black · F3 Logo.";
     }
@@ -2015,6 +2710,10 @@ public sealed partial class MainViewModel : ObservableObject
         LiveSlideIndex = -1;
         foreach (var slide in Slides)
             slide.IsLive = false;
+
+        // Quick text stands alone: nothing follows it on the stage display.
+        Projection.SlideLabel = "Texto rápido";
+        Projection.NextSlide = null;
 
         StatusText = "Texto rápido en vivo. F1 Clear · F2 Black · F3 Logo · Esc apaga la salida.";
     }
@@ -2106,5 +2805,13 @@ public sealed partial class MainViewModel : ObservableObject
         IsBlackActive = _presentation.State == OutputState.Black;
         IsLogoActive = _presentation.State == OutputState.Logo;
         IsOverlayActive = _presentation.OverlayMessage is not null;
+        HasBackground = _presentation.Background is not null;
+
+        // Show the blur the current background carries, without saving it back.
+        var blur = _presentation.Background?.Blur ?? 0;
+        if (Math.Abs(BackgroundBlur - blur) > 0.01)
+            BackgroundBlur = blur;
+
+        SyncPlaybackTimer();
     }
 }

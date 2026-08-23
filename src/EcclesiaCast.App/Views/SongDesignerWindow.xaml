@@ -2,6 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:EcclesiaCast.App.Controls"
+        xmlns:services="clr-namespace:EcclesiaCast.App.Services"
         Title="Diseño de la canción"
         Width="1320" Height="780"
         MinWidth="1120" MinHeight="640"
@@ -189,6 +190,7 @@
                                                  Background="Transparent" BorderThickness="0"
                                                  AcceptsReturn="True" TextWrapping="Wrap"
                                                  Foreground="White" CaretBrush="White"
+                                                 services:SpellChecking.Enabled="True"
                                                  LostFocus="InlineEditor_LostFocus"
                                                  PreviewKeyDown="InlineEditor_KeyDown"/>
                                         <Thumb Style="{StaticResource BoxHandle}" Tag="NW" Cursor="SizeNWSE"
@@ -229,11 +231,10 @@
                                 <ComboBox x:Name="FontCombo" IsEditable="True" FontSize="12"
                                           SelectionChanged="Style_Changed" LostFocus="Style_Changed"/>
 
-                                <TextBlock Style="{StaticResource FieldLabel}">
-                                    <Run Text="Tamaño de letra: "/><Run x:Name="SizeValue" Text="92"/>
-                                </TextBlock>
-                                <Slider x:Name="SizeSlider" Minimum="24" Maximum="200"
-                                        ValueChanged="Style_Changed"/>
+                                <TextBlock Text="Tamaño de letra (puntos)" Style="{StaticResource FieldLabel}"/>
+                                <controls:NumericField x:Name="SizeField" HorizontalAlignment="Left"
+                                                       Minimum="8" Maximum="400" Step="1" Decimals="0"
+                                                       ValueChanged="Style_Changed"/>
 
                                 <TextBlock Text="Estilo" Style="{StaticResource FieldLabel}"/>
                                 <StackPanel Orientation="Horizontal">
@@ -253,6 +254,7 @@
                                     <ComboBoxItem Content="Todas mayúsculas"/>
                                     <ComboBoxItem Content="Mayúscula en cada palabra"/>
                                     <ComboBoxItem Content="Mayúscula inicial"/>
+                                    <ComboBoxItem Content="Todas minúsculas"/>
                                 </ComboBox>
 
                                 <TextBlock Text="Color del texto" Style="{StaticResource FieldLabel}"/>
@@ -280,15 +282,49 @@
                                     <RadioButton x:Name="VBottom" GroupName="V" Content="⬓ Abajo" Style="{StaticResource SegRadio}" Checked="Style_Changed"/>
                                 </StackPanel>
 
-                                <TextBlock Style="{StaticResource FieldLabel}">
-                                    <Run Text="Interlineado: "/><Run x:Name="LineValue" Text="1.0"/>
-                                </TextBlock>
-                                <Slider x:Name="LineSlider" Minimum="0.8" Maximum="2" Value="1"
-                                        ValueChanged="Style_Changed"/>
+                                <TextBlock Text="Interlineado (1,00 = normal)" Style="{StaticResource FieldLabel}"/>
+                                <controls:NumericField x:Name="LineField" HorizontalAlignment="Left"
+                                                       Minimum="0.5" Maximum="3" Step="0.05" Decimals="2"
+                                                       Value="1"
+                                                       ValueChanged="Style_Changed"/>
 
                                 <CheckBox x:Name="ShadowCheck" Content="Sombra" Margin="0,12,0,0"
                                           Checked="Style_Changed" Unchecked="Style_Changed"/>
-                                <CheckBox x:Name="FitWidthCheck" Content="Ajustar a una línea" Margin="0,4,0,0"
+                                <StackPanel Orientation="Horizontal" Margin="0,2,0,0"
+                                            IsEnabled="{Binding IsChecked, ElementName=ShadowCheck}">
+                                    <TextBlock Text="Intensidad" FontSize="11" VerticalAlignment="Center" Width="66"
+                                               Foreground="{StaticResource MutedBrush}"/>
+                                    <controls:NumericField x:Name="ShadowField"
+                                                           Minimum="0" Maximum="100" Step="5" Decimals="0"
+                                                           Value="75" ValueChanged="Style_Changed"/>
+                                    <TextBlock Text="%" FontSize="11" VerticalAlignment="Center" Margin="6,0,0,0"
+                                               Foreground="{StaticResource FaintBrush}"/>
+                                </StackPanel>
+
+                                <TextBlock Text="Contorno de la letra" Style="{StaticResource FieldLabel}"
+                                           ToolTip="Un borde alrededor de cada letra: sirve cuando la letra blanca cae sobre un fondo blanco"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Grosor" FontSize="11" VerticalAlignment="Center" Width="66"
+                                               Foreground="{StaticResource MutedBrush}"/>
+                                    <controls:NumericField x:Name="OutlineField"
+                                                           Minimum="0" Maximum="40" Step="1" Decimals="0"
+                                                           Value="0" ValueChanged="Style_Changed"
+                                                           ToolTip="0 = sin contorno"/>
+                                </StackPanel>
+                                <DockPanel Margin="0,6,0,0" IsEnabled="{Binding Value, ElementName=OutlineField, Converter={StaticResource NonZeroToBool}}">
+                                    <TextBlock DockPanel.Dock="Left" Text="Color" FontSize="11" VerticalAlignment="Center" Width="66"
+                                               Foreground="{StaticResource MutedBrush}"/>
+                                    <Button DockPanel.Dock="Right" Width="34" Padding="0,4" Margin="6,0,0,0"
+                                            Style="{StaticResource DarkButton}"
+                                            Click="PickOutlineColor_Click" ToolTip="Elegir el color del contorno">
+                                        <Border x:Name="OutlineSwatch" Width="16" Height="16" CornerRadius="3"
+                                                Background="Black" BorderBrush="{StaticResource LineBrush}" BorderThickness="1"/>
+                                    </Button>
+                                    <TextBox x:Name="OutlineColorBox" Style="{StaticResource Field}" Text="#000000"
+                                             TextChanged="Style_Changed"/>
+                                </DockPanel>
+
+                                <CheckBox x:Name="FitWidthCheck" Content="Ajustar a una línea" Margin="0,12,0,0"
                                           Checked="Style_Changed" Unchecked="Style_Changed"
                                           ToolTip="Achica el texto hasta que cada renglón entre en una sola línea"/>
                             </StackPanel>
@@ -297,42 +333,67 @@
 
                     <TabItem Header="Caja">
                         <StackPanel Margin="0,4,6,0">
-                            <TextBlock Text="Tamaño de la caja (16:9, centrada)" Style="{StaticResource FieldLabel}"/>
+                            <TextBlock Text="Tamaño de la caja (% de la pantalla)" Style="{StaticResource FieldLabel}"/>
                             <StackPanel Orientation="Horizontal">
-                                <ComboBox x:Name="SizePercentCombo" Width="90" FontSize="12"
-                                          SelectionChanged="SizePercent_Changed">
-                                    <ComboBoxItem Content="50 %"/>
-                                    <ComboBoxItem Content="60 %"/>
-                                    <ComboBoxItem Content="70 %"/>
-                                    <ComboBoxItem Content="75 %"/>
-                                    <ComboBoxItem Content="80 %"/>
-                                    <ComboBoxItem Content="90 %"/>
-                                    <ComboBoxItem Content="100 %"/>
-                                </ComboBox>
-                                <TextBlock Text="aplica al instante" FontSize="11" VerticalAlignment="Center"
+                                <controls:NumericField x:Name="BoxPercentField"
+                                                       Minimum="10" Maximum="100" Step="1" Decimals="0"
+                                                       Value="100"
+                                                       ValueChanged="SizePercent_Changed"/>
+                                <TextBlock Text="%  · aplica al instante" FontSize="11" VerticalAlignment="Center"
                                            Foreground="{StaticResource FaintBrush}" Margin="8,0,0,0"/>
                             </StackPanel>
 
-                            <TextBlock Text="Alinear la caja en la pantalla" Style="{StaticResource FieldLabel}"/>
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                <Button Content="◧" Style="{StaticResource DarkButton}" Width="34" Padding="0,6"
-                                        Tag="HL" Click="AlignBox_Click" ToolTip="Pegar a la izquierda"/>
-                                <Button Content="▣" Style="{StaticResource DarkButton}" Width="34" Padding="0,6" Margin="4,0,0,0"
-                                        Tag="HC" Click="AlignBox_Click" ToolTip="Centrar horizontal"/>
-                                <Button Content="◨" Style="{StaticResource DarkButton}" Width="34" Padding="0,6" Margin="4,0,0,0"
-                                        Tag="HR" Click="AlignBox_Click" ToolTip="Pegar a la derecha"/>
-                                <Button Content="⬒" Style="{StaticResource DarkButton}" Width="34" Padding="0,6" Margin="12,0,0,0"
-                                        Tag="VT" Click="AlignBox_Click" ToolTip="Pegar arriba"/>
-                                <Button Content="▤" Style="{StaticResource DarkButton}" Width="34" Padding="0,6" Margin="4,0,0,0"
-                                        Tag="VC" Click="AlignBox_Click" ToolTip="Centrar vertical"/>
-                                <Button Content="⬓" Style="{StaticResource DarkButton}" Width="34" Padding="0,6" Margin="4,0,0,0"
-                                        Tag="VB" Click="AlignBox_Click" ToolTip="Pegar abajo"/>
+                            <TextBlock Text="Posición horizontal (izquierda ↔ derecha)" Style="{StaticResource FieldLabel}"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="⭰  Izquierda" Style="{StaticResource DarkButton}" Padding="10,6" FontSize="11"
+                                        Tag="HL" Click="AlignBox_Click" ToolTip="Pegar la caja al borde izquierdo"/>
+                                <Button Content="⭤  Centro" Style="{StaticResource DarkButton}" Padding="10,6" FontSize="11" Margin="4,0,0,0"
+                                        Tag="HC" Click="AlignBox_Click" ToolTip="Centrar la caja entre los bordes izquierdo y derecho"/>
+                                <Button Content="⭲  Derecha" Style="{StaticResource DarkButton}" Padding="10,6" FontSize="11" Margin="4,0,0,0"
+                                        Tag="HR" Click="AlignBox_Click" ToolTip="Pegar la caja al borde derecho"/>
                             </StackPanel>
-                            <Button Content="Centrar en la pantalla" Style="{StaticResource DarkButton}"
-                                    Tag="CC" Click="AlignBox_Click" Margin="0,4,0,0" HorizontalAlignment="Left" Padding="12,6"/>
 
-                            <TextBlock Text="Posición y tamaño (px sobre 1920×1080)" Style="{StaticResource FieldLabel}"/>
-                            <TextBlock x:Name="BoxInfo" FontSize="11" Foreground="{StaticResource MutedBrush}"/>
+                            <TextBlock Text="Posición vertical (arriba ↕ abajo)" Style="{StaticResource FieldLabel}"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="⭱  Arriba" Style="{StaticResource DarkButton}" Padding="10,6" FontSize="11"
+                                        Tag="VT" Click="AlignBox_Click" ToolTip="Pegar la caja al borde de arriba"/>
+                                <Button Content="⭥  Centro" Style="{StaticResource DarkButton}" Padding="10,6" FontSize="11" Margin="4,0,0,0"
+                                        Tag="VC" Click="AlignBox_Click" ToolTip="Centrar la caja entre arriba y abajo"/>
+                                <Button Content="⭳  Abajo" Style="{StaticResource DarkButton}" Padding="10,6" FontSize="11" Margin="4,0,0,0"
+                                        Tag="VB" Click="AlignBox_Click" ToolTip="Pegar la caja al borde de abajo"/>
+                            </StackPanel>
+
+                            <Button Content="Centrar en toda la pantalla" Style="{StaticResource DarkButton}"
+                                    Tag="CC" Click="AlignBox_Click" Margin="0,12,0,0" HorizontalAlignment="Left" Padding="12,6"
+                                    ToolTip="Centra la caja horizontal y verticalmente de una vez"/>
+
+                            <TextBlock Text="Posición y tamaño exactos (px sobre 1920×1080)" Style="{StaticResource FieldLabel}"/>
+                            <UniformGrid Columns="2" Rows="2">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,8,6">
+                                    <TextBlock Text="X" FontSize="11" Width="34" VerticalAlignment="Center"
+                                               Foreground="{StaticResource MutedBrush}"/>
+                                    <controls:NumericField x:Name="BoxXField" Minimum="0" Maximum="1920" Step="1"
+                                                           ValueChanged="BoxField_Changed"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <TextBlock Text="Y" FontSize="11" Width="34" VerticalAlignment="Center"
+                                               Foreground="{StaticResource MutedBrush}"/>
+                                    <controls:NumericField x:Name="BoxYField" Minimum="0" Maximum="1080" Step="1"
+                                                           ValueChanged="BoxField_Changed"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,8,0">
+                                    <TextBlock Text="Ancho" FontSize="11" Width="34" VerticalAlignment="Center"
+                                               Foreground="{StaticResource MutedBrush}"/>
+                                    <controls:NumericField x:Name="BoxWField" Minimum="100" Maximum="1920" Step="1"
+                                                           ValueChanged="BoxField_Changed"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Alto" FontSize="11" Width="34" VerticalAlignment="Center"
+                                               Foreground="{StaticResource MutedBrush}"/>
+                                    <controls:NumericField x:Name="BoxHField" Minimum="60" Maximum="1080" Step="1"
+                                                           ValueChanged="BoxField_Changed"/>
+                                </StackPanel>
+                            </UniformGrid>
                         </StackPanel>
                     </TabItem>
                 </TabControl>

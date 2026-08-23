@@ -180,23 +180,66 @@
                         <ComboBox x:Name="FontCombo" IsEditable="True" FontSize="12"
                                   Text="{Binding FontFamily, UpdateSourceTrigger=LostFocus}"/>
 
-                        <TextBlock Style="{StaticResource FieldLabel}">
-                            <Run Text="Tamaño máximo: "/><Run Text="{Binding MaxFontSize, StringFormat={}{0:0}}"/>
-                        </TextBlock>
-                        <Slider Minimum="30" Maximum="160" Value="{Binding MaxFontSize}"/>
+                        <TextBlock Text="Tamaño máximo de letra (puntos)" Style="{StaticResource FieldLabel}"/>
+                        <controls:NumericField Minimum="10" Maximum="400" Step="1" HorizontalAlignment="Left"
+                                               Value="{Binding MaxFontSize}"/>
 
-                        <TextBlock Style="{StaticResource FieldLabel}">
-                            <Run Text="Tamaño mínimo (auto-ajuste): "/><Run Text="{Binding MinFontSize, StringFormat={}{0:0}}"/>
-                        </TextBlock>
-                        <Slider Minimum="16" Maximum="100" Value="{Binding MinFontSize}"/>
+                        <TextBlock Text="Tamaño mínimo (hasta acá achica el auto-ajuste)" Style="{StaticResource FieldLabel}"/>
+                        <controls:NumericField Minimum="8" Maximum="200" Step="1" HorizontalAlignment="Left"
+                                               Value="{Binding MinFontSize}"/>
 
                         <TextBlock Text="Estilo" Style="{StaticResource FieldLabel}"/>
                         <WrapPanel>
                             <CheckBox Content="Negrita" IsChecked="{Binding Bold}"/>
                             <CheckBox Content="Cursiva" IsChecked="{Binding Italic}"/>
-                            <CheckBox Content="Mayúsculas" IsChecked="{Binding Uppercase}"/>
-                            <CheckBox Content="Sombra" IsChecked="{Binding Shadow}"/>
                         </WrapPanel>
+
+                        <TextBlock Text="Uso de mayúsculas" Style="{StaticResource FieldLabel}"/>
+                        <ComboBox SelectedIndex="{Binding CaseIndex}" FontSize="12"
+                                  ToolTip="Cómo se proyecta la letra, sin tocar el texto guardado">
+                            <ComboBoxItem Content="Como está escrito"/>
+                            <ComboBoxItem Content="TODAS MAYÚSCULAS"/>
+                            <ComboBoxItem Content="Mayúscula En Cada Palabra"/>
+                            <ComboBoxItem Content="Mayúscula inicial (como oración)"/>
+                            <ComboBoxItem Content="todas minúsculas"/>
+                        </ComboBox>
+
+                        <TextBlock Text="Sombra" Style="{StaticResource FieldLabel}"/>
+                        <CheckBox Content="Sombra bajo la letra" IsChecked="{Binding Shadow}"/>
+                        <StackPanel Orientation="Horizontal" IsEnabled="{Binding Shadow}" Margin="0,4,0,0">
+                            <TextBlock Text="Intensidad" FontSize="11" Width="70" VerticalAlignment="Center"
+                                       Foreground="{StaticResource MutedBrush}"/>
+                            <controls:NumericField Minimum="0" Maximum="100" Step="5"
+                                                   Value="{Binding ShadowOpacityPercent}"
+                                                   ToolTip="0 % = invisible · 100 % = negro pleno"/>
+                            <TextBlock Text="%" FontSize="11" VerticalAlignment="Center" Margin="6,0,0,0"
+                                       Foreground="{StaticResource FaintBrush}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" IsEnabled="{Binding Shadow}" Margin="0,4,0,0">
+                            <TextBlock Text="Difusión" FontSize="11" Width="70" VerticalAlignment="Center"
+                                       Foreground="{StaticResource MutedBrush}"/>
+                            <controls:NumericField Minimum="0" Maximum="80" Step="1"
+                                                   Value="{Binding ShadowBlur}"
+                                                   ToolTip="Chico = sombra dura y marcada · grande = difuminada"/>
+                        </StackPanel>
+
+                        <TextBlock Text="Contorno de la letra" Style="{StaticResource FieldLabel}"
+                                   ToolTip="Un borde alrededor de cada letra: la salva cuando el fondo tiene el mismo color que el texto"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Grosor" FontSize="11" Width="70" VerticalAlignment="Center"
+                                       Foreground="{StaticResource MutedBrush}"/>
+                            <controls:NumericField Minimum="0" Maximum="40" Step="1"
+                                                   Value="{Binding OutlineWidth}"
+                                                   ToolTip="0 = sin contorno"/>
+                        </StackPanel>
+                        <DockPanel Margin="0,6,0,0"
+                                   IsEnabled="{Binding OutlineWidth, Converter={StaticResource NonZeroToBool}}">
+                            <TextBlock DockPanel.Dock="Left" Text="Color" FontSize="11" Width="70" VerticalAlignment="Center"
+                                       Foreground="{StaticResource MutedBrush}"/>
+                            <Button DockPanel.Dock="Right" Content="Paleta…" FontSize="11" Padding="8,3" Margin="6,0,0,0"
+                                    Style="{StaticResource DarkButton}" Command="{Binding PickOutlineColorCommand}"/>
+                            <TextBox Style="{StaticResource Field}" Text="{Binding OutlineColor, UpdateSourceTrigger=PropertyChanged}"/>
+                        </DockPanel>
 
                         <TextBlock Text="Color del texto" Style="{StaticResource FieldLabel}"/>
                         <DockPanel>
@@ -250,10 +293,10 @@
                                      Text="{Binding BackgroundImagePath, Mode=OneWay}"/>
                         </DockPanel>
 
-                        <TextBlock Style="{StaticResource FieldLabel}">
-                            <Run Text="Oscurecedor del fondo: "/><Run Text="{Binding BackgroundDimPercent, StringFormat={}{0:0} %}"/>
-                        </TextBlock>
-                        <Slider Minimum="0" Maximum="100" Value="{Binding BackgroundDimPercent}"/>
+                        <TextBlock Text="Oscurecedor del fondo (%)" Style="{StaticResource FieldLabel}"/>
+                        <controls:NumericField Minimum="0" Maximum="100" Step="5" HorizontalAlignment="Left"
+                                               Value="{Binding BackgroundDimPercent}"
+                                               ToolTip="Capa negra sobre el fondo para que la letra se lea mejor"/>
 
                         <TextBlock Text="Leyenda (canciones: título y artista · Biblia: referencia)" Style="{StaticResource FieldLabel}"/>
                         <CheckBox Content="Mostrar leyenda" IsChecked="{Binding ShowCaption}"/>
@@ -268,10 +311,9 @@
                             <ComboBoxItem Content="Abajo a la derecha"/>
                         </ComboBox>
 
-                        <TextBlock Style="{StaticResource FieldLabel}">
-                            <Run Text="Tamaño de la leyenda: "/><Run Text="{Binding CaptionFontSize, StringFormat={}{0:0}}"/>
-                        </TextBlock>
-                        <Slider Minimum="20" Maximum="70" Value="{Binding CaptionFontSize}"/>
+                        <TextBlock Text="Tamaño de la leyenda (puntos)" Style="{StaticResource FieldLabel}"/>
+                        <controls:NumericField Minimum="10" Maximum="160" Step="1" HorizontalAlignment="Left"
+                                               Value="{Binding CaptionFontSize}"/>
 
                         <TextBlock Text="Tipografía de la leyenda" Style="{StaticResource FieldLabel}"/>
                         <ComboBox x:Name="CaptionFontCombo" IsEditable="True" FontSize="12"
@@ -295,10 +337,9 @@
                             <CheckBox Content="Usa el mismo estilo que la primera"
                                       IsChecked="{Binding SecondaryMatchesPrimary}"/>
                             <StackPanel Visibility="{Binding SecondaryMatchesPrimary, Converter={StaticResource InverseBoolToVis}}">
-                                <TextBlock Style="{StaticResource FieldLabel}">
-                                    <Run Text="Tamaño de la 2ª versión: "/><Run Text="{Binding SecondaryScalePercent, StringFormat={}{0:0} %}"/>
-                                </TextBlock>
-                                <Slider Minimum="30" Maximum="120" Value="{Binding SecondaryScalePercent}"/>
+                                <TextBlock Text="Tamaño de la 2ª versión (% del texto principal)" Style="{StaticResource FieldLabel}"/>
+                                <controls:NumericField Minimum="20" Maximum="150" Step="1" HorizontalAlignment="Left"
+                                                       Value="{Binding SecondaryScalePercent}"/>
                                 <CheckBox Content="Cursiva" IsChecked="{Binding SecondaryItalic}" Margin="0,6,0,0"/>
                                 <TextBlock Text="Color de la 2ª versión" Style="{StaticResource FieldLabel}"/>
                                 <DockPanel>

@@ -30,8 +30,18 @@ public interface IPresentationService
     /// </summary>
     Media.MediaItem? Background { get; }
 
+    /// <summary>
+    /// The logo shown in <see cref="OutputState.Logo"/>. Churches keep one per
+    /// kind of meeting, so the operator switches it instead of editing it.
+    /// Null falls back to the app's built-in wordmark.
+    /// </summary>
+    Logos.Logo? ActiveLogo { get; }
+
     /// <summary>Raised whenever the slide, the output state or the overlay changes.</summary>
     event EventHandler? Changed;
+
+    /// <summary>Chooses which logo the Logo state shows.</summary>
+    void SetActiveLogo(Logos.Logo? logo);
 
     /// <summary>Puts a slide live and switches the output to content.</summary>
     void GoLive(SlideContent slide);

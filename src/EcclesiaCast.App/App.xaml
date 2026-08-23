@@ -8,6 +8,7 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         <converters:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVis"/>
         <converters:InverseBooleanConverter x:Key="InverseBool"/>
+        <converters:NonZeroToBooleanConverter x:Key="NonZeroToBool"/>
 
         <!-- Dark theme palette -->
         <SolidColorBrush x:Key="BgBrush" Color="#14161C"/>

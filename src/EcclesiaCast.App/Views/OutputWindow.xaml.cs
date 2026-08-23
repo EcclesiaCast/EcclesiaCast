@@ -4,7 +4,10 @@ using System.Windows;
 using System.Windows.Interop;
 using EcclesiaCast.App.ViewModels;
 using EcclesiaCast.Core.Displays;
+using EcclesiaCast.Core.Logos;
 using EcclesiaCast.Core.Media;
+using EcclesiaCast.Core.Presentation;
+using MediaType = EcclesiaCast.Core.Media.MediaType;
 
 namespace EcclesiaCast.App.Views;
 
@@ -38,13 +41,47 @@ public partial class OutputWindow : Window
         if (e.NewValue is INotifyPropertyChanged newVm)
             newVm.PropertyChanged += OnProjectionChanged;
         UpdateVideo();
+        UpdateLogoVideo();
     }
 
     private void OnProjectionChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(ProjectionViewModel.Background))
             UpdateVideo();
+        else if (e.PropertyName == nameof(ProjectionViewModel.BackgroundBlur))
+            SetBlur((DataContext as ProjectionViewModel)?.BackgroundBlur ?? 0);
+        else if (e.PropertyName is nameof(ProjectionViewModel.ActiveLogo) or nameof(ProjectionViewModel.State))
+            UpdateLogoVideo();
     }
+
+    /// <summary>
+    /// A video logo plays on its own surface, above the background and below
+    /// the text — so the lower-third announcement still shows over it.
+    /// </summary>
+    private void UpdateLogoVideo()
+    {
+        var vm = DataContext as ProjectionViewModel;
+        var logo = vm?.ActiveLogo;
+        var showing = vm?.State == OutputState.Logo
+            && logo is { Kind: LogoKind.Video }
+            && !string.IsNullOrWhiteSpace(logo.Path);
+
+        LogoVideo.Visibility = showing ? Visibility.Visible : Visibility.Collapsed;
+        LogoVideo.Show(showing ? AsLoopingVideo(logo!) : null);
+    }
+
+    /// <summary>Wraps a video logo as a media item so the VLC surface can play it.</summary>
+    private static MediaItem AsLoopingVideo(Logo logo) => new()
+    {
+        // Negative ids never collide with the media library's own rows.
+        Id = -1000 - logo.Id,
+        Name = logo.Name,
+        Path = logo.Path!,
+        Type = MediaType.Video,
+        Scaling = logo.Scaling,
+        Muted = logo.Muted,
+        EndBehavior = VideoEndBehavior.Loop,
+    };
 
     private void UpdateVideo()
     {
@@ -62,6 +99,62 @@ public partial class OutputWindow : Window
             YouTube.Visibility = Visibility.Collapsed;
             Video.Show(background);
         }
+
+        SetBlur((DataContext as ProjectionViewModel)?.BackgroundBlur ?? 0);
+    }
+
+    // ── Transporte y desenfoque del fondo ────────────────────────
+
+    private bool IsYouTubeShowing => YouTube.Visibility == Visibility.Visible;
+
+    /// <summary>Where the projected video is, whichever player is showing it.</summary>
+    public PlaybackState PlaybackState => IsYouTubeShowing ? YouTube.State : Video.State;
+
+    public void TogglePlayPause()
+    {
+        if (IsYouTubeShowing)
+            YouTube.TogglePlayPause();
+        else
+            Video.TogglePlayPause();
+    }
+
+    public void SeekTo(TimeSpan position)
+    {
+        if (IsYouTubeShowing)
+            YouTube.SeekTo(position);
+        else
+            Video.SeekTo(position);
+    }
+
+    public void Skip(TimeSpan delta)
+    {
+        if (IsYouTubeShowing)
+            YouTube.Skip(delta);
+        else
+            Video.Skip(delta);
+    }
+
+    /// <summary>Switching the output off must stop the sound and the picture too.</summary>
+    public void PauseForHiddenOutput()
+    {
+        YouTube.PauseForHiddenOutput();
+        Video.PauseForHiddenOutput();
+        LogoVideo.PauseForHiddenOutput();
+    }
+
+    public void ResumeAfterHiddenOutput()
+    {
+        YouTube.ResumeAfterHiddenOutput();
+        Video.ResumeAfterHiddenOutput();
+        LogoVideo.ResumeAfterHiddenOutput();
+    }
+
+    /// <summary>Blurs the background layer (video, YouTube or image), 0–100.</summary>
+    public void SetBlur(double amount)
+    {
+        Video.SetBlur(amount);
+        YouTube.SetBlur(amount);
+        Projected.BackgroundBlur = amount;
     }
 
     // ── Posición en el monitor de salida ─────────────────────────
@@ -80,6 +173,7 @@ public partial class OutputWindow : Window
     protected override void OnClosed(EventArgs e)
     {
         Video.Stop();
+        LogoVideo.Stop();
         YouTube.Clear();
         base.OnClosed(e);
     }

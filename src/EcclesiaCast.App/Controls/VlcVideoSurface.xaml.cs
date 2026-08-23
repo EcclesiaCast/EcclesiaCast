@@ -75,10 +75,13 @@ public partial class VlcVideoSurface : UserControl
         player.Mute = media.Muted;
         player.Volume = Math.Clamp(media.Volume, 0, 100);
 
-        if (media.Id == _currentId && player.IsPlaying)
+        // Re-applying the same background must not restart it — the operator
+        // may have paused it on purpose, and changing slides re-applies it.
+        if (media.Id == _currentId)
             return;
 
         _currentId = media.Id;
+        _pausedForHiddenOutput = false;
         _scaling = media.Scaling;
         ApplyStretch();
 
@@ -103,6 +106,7 @@ public partial class VlcVideoSurface : UserControl
     public void Stop()
     {
         _currentId = -1;
+        _pausedForHiddenOutput = false;
 
         var player = _player;
         if (player is not null && player.IsPlaying)
@@ -112,6 +116,101 @@ public partial class VlcVideoSurface : UserControl
         }
 
         ClearSurface();
+    }
+
+    // ── Transporte (barra de reproducción del operador) ──────────
+
+    /// <summary>Set while the output was switched off with a video playing.</summary>
+    private bool _pausedForHiddenOutput;
+
+    public PlaybackState State
+    {
+        get
+        {
+            var player = _player;
+            if (player is null || _currentId < 0)
+                return PlaybackState.None;
+
+            var length = player.Length;   // ms, −1 mientras VLC abre el archivo
+            var time = player.Time;
+            return new PlaybackState(
+                HasVideo: true,
+                IsPlaying: player.IsPlaying,
+                Position: TimeSpan.FromMilliseconds(Math.Max(0, time)),
+                Duration: TimeSpan.FromMilliseconds(Math.Max(0, length)));
+        }
+    }
+
+    public void Pause() => SetPaused(true);
+
+    public void Resume() => SetPaused(false);
+
+    public void TogglePlayPause() => SetPaused(_player?.IsPlaying == true);
+
+    private void SetPaused(bool paused)
+    {
+        var player = _player;
+        if (player is null || _currentId < 0 || !player.CanPause)
+            return;
+
+        try { player.SetPause(paused); } catch { /* ignore */ }
+    }
+
+    /// <summary>Pauses because the output was switched off, remembering to resume later.</summary>
+    public void PauseForHiddenOutput()
+    {
+        if (_player?.IsPlaying != true)
+            return;
+
+        _pausedForHiddenOutput = true;
+        Pause();
+    }
+
+    /// <summary>Resumes only a video this control paused when the output went off.</summary>
+    public void ResumeAfterHiddenOutput()
+    {
+        if (!_pausedForHiddenOutput)
+            return;
+
+        _pausedForHiddenOutput = false;
+        Resume();
+    }
+
+    public void SeekTo(TimeSpan position)
+    {
+        var player = _player;
+        if (player is null || _currentId < 0 || !player.IsSeekable)
+            return;
+
+        try { player.Time = (long)Math.Max(0, position.TotalMilliseconds); } catch { /* ignore */ }
+    }
+
+    public void Skip(TimeSpan delta)
+    {
+        var player = _player;
+        if (player is null || _currentId < 0)
+            return;
+
+        var target = TimeSpan.FromMilliseconds(player.Time) + delta;
+        var length = player.Length;
+        if (length > 0)
+            target = TimeSpan.FromMilliseconds(Math.Min(target.TotalMilliseconds, length - 500));
+
+        SeekTo(target < TimeSpan.Zero ? TimeSpan.Zero : target);
+    }
+
+    /// <summary>Live blur over the moving picture, 0–100.</summary>
+    public void SetBlur(double amount)
+    {
+        var radius = Math.Clamp(amount, 0, 100) * 0.6;
+        Surface.Effect = radius <= 0
+            ? null
+            : new System.Windows.Media.Effects.BlurEffect
+            {
+                Radius = radius,
+                KernelType = System.Windows.Media.Effects.KernelType.Gaussian,
+                RenderingBias = System.Windows.Media.Effects.RenderingBias.Performance,
+            };
     }
 
     private MediaPlayer? EnsurePlayer(LibVLC engine)

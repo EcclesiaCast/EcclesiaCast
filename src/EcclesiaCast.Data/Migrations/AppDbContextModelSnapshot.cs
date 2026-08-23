@@ -90,6 +90,64 @@ namespace EcclesiaCast.Data.Migrations
                     b.ToTable("BibleVersions");
                 });
 
+            modelBuilder.Entity("EcclesiaCast.Core.Logos.Logo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<double>("BackgroundBlur")
+                        .HasColumnType("REAL");
+
+                    b.Property<string>("BackgroundColor")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("Bold")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("FontFamily")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<double>("FontSize")
+                        .HasColumnType("REAL");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Muted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Path")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PosterPath")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Scaling")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TextColor")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Logos");
+                });
+
             modelBuilder.Entity("EcclesiaCast.Core.Media.MediaItem", b =>
                 {
                     b.Property<int>("Id")
@@ -98,6 +156,9 @@ namespace EcclesiaCast.Data.Migrations
 
                     b.Property<int>("Behavior")
                         .HasColumnType("INTEGER");
+
+                    b.Property<double>("Blur")
+                        .HasColumnType("REAL");
 
                     b.Property<string>("Category")
                         .IsRequired()
@@ -335,6 +396,13 @@ namespace EcclesiaCast.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("OutlineColor")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<double>("OutlineWidth")
+                        .HasColumnType("REAL");
+
                     b.Property<string>("SecondaryColor")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -351,6 +419,12 @@ namespace EcclesiaCast.Data.Migrations
                     b.Property<bool>("Shadow")
                         .HasColumnType("INTEGER");
 
+                    b.Property<double>("ShadowBlur")
+                        .HasColumnType("REAL");
+
+                    b.Property<double>("ShadowOpacity")
+                        .HasColumnType("REAL");
+
                     b.Property<bool>("ShowCaption")
                         .HasColumnType("INTEGER");
 
@@ -360,14 +434,14 @@ namespace EcclesiaCast.Data.Migrations
                     b.Property<bool>("ShowVersionName")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("TextCase")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("TextColor")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("TransparentBackground")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("Uppercase")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");

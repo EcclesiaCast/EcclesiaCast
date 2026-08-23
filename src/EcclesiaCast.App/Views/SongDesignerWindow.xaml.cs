@@ -109,15 +109,18 @@ public partial class SongDesignerWindow : Window
         _loading = true;
 
         FontCombo.Text = over.FontFamily ?? _theme.FontFamily;
-        SizeSlider.Value = over.FontSize ?? _theme.MaxFontSize;
+        SizeField.SetSilently(over.FontSize ?? _theme.MaxFontSize);
         BoldToggle.IsChecked = over.Bold ?? _theme.Bold;
         ItalicToggle.IsChecked = over.Italic ?? _theme.Italic;
         UnderlineToggle.IsChecked = over.Underline ?? false;
         StrikeToggle.IsChecked = over.Strikethrough ?? false;
         ShadowCheck.IsChecked = over.Shadow ?? _theme.Shadow;
+        ShadowField.SetSilently((over.ShadowOpacity ?? _theme.ShadowOpacity) * 100);
+        OutlineField.SetSilently(over.OutlineWidth ?? _theme.OutlineWidth);
+        OutlineColorBox.Text = over.OutlineColor ?? _theme.OutlineColor;
         ColorBox.Text = over.TextColor ?? _theme.TextColor;
-        CaseCombo.SelectedIndex = (int)(over.Case ?? (_theme.Uppercase ? TextCase.Upper : TextCase.None));
-        LineSlider.Value = over.LineSpacing is > 0 ? over.LineSpacing.Value : 1;
+        CaseCombo.SelectedIndex = (int)(over.Case ?? _theme.TextCase);
+        LineField.SetSilently(over.LineSpacing is > 0 ? over.LineSpacing.Value : 1);
         FitWidthCheck.IsChecked = over.FitToWidth ?? _theme.FitToWidth;
 
         var alignH = over.AlignH ?? _theme.AlignH;
@@ -141,9 +144,6 @@ public partial class SongDesignerWindow : Window
         if (_loading || Selected < 0)
             return;
 
-        SizeValue.Text = $"{SizeSlider.Value:0}";
-        LineValue.Text = $"{LineSlider.Value:0.0}";
-
         var alignH = HRight.IsChecked == true ? HAlign.Right
             : HLeft.IsChecked == true ? HAlign.Left : HAlign.Center;
         var alignV = VTop.IsChecked == true ? VAlign.Top
@@ -153,17 +153,20 @@ public partial class SongDesignerWindow : Window
         _overrides[Selected] = box with
         {
             FontFamily = string.IsNullOrWhiteSpace(FontCombo.Text) ? _theme.FontFamily : FontCombo.Text.Trim(),
-            FontSize = Math.Round(SizeSlider.Value),
+            FontSize = Math.Round(SizeField.Value),
             Bold = BoldToggle.IsChecked == true,
             Italic = ItalicToggle.IsChecked == true,
             Underline = UnderlineToggle.IsChecked == true,
             Strikethrough = StrikeToggle.IsChecked == true,
             Shadow = ShadowCheck.IsChecked == true,
+            ShadowOpacity = ShadowField.Value / 100,
+            OutlineWidth = OutlineField.Value,
+            OutlineColor = OutlineColorBox.Text.Trim(),
             TextColor = ColorBox.Text.Trim(),
             AlignH = alignH,
             AlignV = alignV,
-            Case = (TextCase)Math.Clamp(CaseCombo.SelectedIndex, 0, 3),
-            LineSpacing = LineSlider.Value,
+            Case = (TextCase)Math.Clamp(CaseCombo.SelectedIndex, 0, 4),
+            LineSpacing = LineField.Value,
             FitToWidth = FitWidthCheck.IsChecked == true,
         };
 
@@ -182,15 +185,8 @@ public partial class SongDesignerWindow : Window
 
     private void UpdateColorSwatch()
     {
-        try
-        {
-            ColorSwatch.Background = new SolidColorBrush(
-                (Color)ColorConverter.ConvertFromString(ColorBox.Text.Trim()));
-        }
-        catch
-        {
-            ColorSwatch.Background = Brushes.White;
-        }
+        ColorSwatch.Background = BrushFromHex(ColorBox.Text.Trim());
+        OutlineSwatch.Background = BrushFromHex(OutlineColorBox.Text.Trim());
     }
 
     // ── Edición del texto sobre la propia diapositiva ────────────
@@ -260,7 +256,7 @@ public partial class SongDesignerWindow : Window
         }
     }
 
-    private static Brush BrushFromHex(string hex)
+    private static Brush BrushFromHex(string? hex)
     {
         try
         {
@@ -277,6 +273,13 @@ public partial class SongDesignerWindow : Window
         var picked = ColorPickerHelper.Pick(ColorBox.Text.Trim());
         if (picked is not null)
             ColorBox.Text = picked; // dispara Style_Changed
+    }
+
+    private void PickOutlineColor_Click(object sender, RoutedEventArgs e)
+    {
+        var picked = ColorPickerHelper.Pick(OutlineColorBox.Text.Trim());
+        if (picked is not null)
+            OutlineColorBox.Text = picked;
     }
 
     // ── Zoom ─────────────────────────────────────────────────────
@@ -435,32 +438,64 @@ public partial class SongDesignerWindow : Window
         e.Handled = true;
     }
 
+    /// <summary>Mirrors the box the canvas shows into the numeric fields.</summary>
     private void UpdateBoxInfo()
     {
-        BoxInfo.Text = $"X {Canvas.GetLeft(BoxBorder) / Scale:0} · Y {Canvas.GetTop(BoxBorder) / Scale:0} · " +
-                       $"Ancho {BoxBorder.Width / Scale:0} · Alto {BoxBorder.Height / Scale:0}";
+        var x = Canvas.GetLeft(BoxBorder) / Scale;
+        var y = Canvas.GetTop(BoxBorder) / Scale;
+        var w = BoxBorder.Width / Scale;
+        var h = BoxBorder.Height / Scale;
+
+        _syncingBox = true;
+        BoxXField.SetSilently(Math.Round(x));
+        BoxYField.SetSilently(Math.Round(y));
+        BoxWField.SetSilently(Math.Round(w));
+        BoxHField.SetSilently(Math.Round(h));
+        BoxPercentField.SetSilently(Math.Round(w / CanvasW * Scale * 100));
+        _syncingBox = false;
     }
+
+    /// <summary>True while the box fields are being written from the canvas.</summary>
+    private bool _syncingBox;
 
     // ── Tamaño porcentual y alineación de la caja ────────────────
 
-    private void SizePercent_Changed(object sender, SelectionChangedEventArgs e)
+    /// <summary>
+    /// Resizes the box to a percentage of the screen, keeping its current
+    /// centre so stepping 80 → 81 → 82 % grows it in place instead of
+    /// snapping back to the middle of the slide.
+    /// </summary>
+    private void SizePercent_Changed(object sender, RoutedEventArgs e)
     {
-        if (_loading || Selected < 0 || SizePercentCombo.SelectedItem is not ComboBoxItem item)
+        if (_loading || _syncingBox || Selected < 0)
             return;
 
-        var percent = item.Content?.ToString()?.Replace("%", "").Trim() switch
-        {
-            "50" => 0.50, "60" => 0.60, "70" => 0.70, "75" => 0.75,
-            "80" => 0.80, "90" => 0.90, _ => 1.0,
-        };
+        var percent = Math.Clamp(BoxPercentField.Value / 100, 0.1, 1);
+        var w = CanvasW * percent;
+        var h = CanvasH * percent;
+        var centerX = Canvas.GetLeft(BoxBorder) + BoxBorder.Width / 2;
+        var centerY = Canvas.GetTop(BoxBorder) + BoxBorder.Height / 2;
 
-        var w = 1920 * percent;
-        var h = 1080 * percent;
-        var x = (1920 - w) / 2;
-        var y = (1080 - h) / 2;
-        _overrides[Selected] = _overrides[Selected]! with { BoxX = x, BoxY = y, BoxWidth = w, BoxHeight = h };
-        PlaceBox(_overrides[Selected]!);
-        RefreshSelected();
+        Canvas.SetLeft(BoxBorder, Math.Clamp(centerX - w / 2, 0, CanvasW - w));
+        Canvas.SetTop(BoxBorder, Math.Clamp(centerY - h / 2, 0, CanvasH - h));
+        BoxBorder.Width = w;
+        BoxBorder.Height = h;
+        CommitBox();
+    }
+
+    /// <summary>Typing an exact X / Y / width / height moves the box on the canvas.</summary>
+    private void BoxField_Changed(object sender, RoutedEventArgs e)
+    {
+        if (_loading || _syncingBox || Selected < 0)
+            return;
+
+        var w = Math.Clamp(BoxWField.Value * Scale, 20, CanvasW);
+        var h = Math.Clamp(BoxHField.Value * Scale, 20, CanvasH);
+        Canvas.SetLeft(BoxBorder, Math.Clamp(BoxXField.Value * Scale, 0, CanvasW - w));
+        Canvas.SetTop(BoxBorder, Math.Clamp(BoxYField.Value * Scale, 0, CanvasH - h));
+        BoxBorder.Width = w;
+        BoxBorder.Height = h;
+        CommitBox();
     }
 
     private void AlignBox_Click(object sender, RoutedEventArgs e)
@@ -546,10 +581,15 @@ public partial class SongDesignerWindow : Window
             Underline = over.Underline == true ? true : null,
             Strikethrough = over.Strikethrough == true ? true : null,
             Shadow = over.Shadow == _theme.Shadow ? null : over.Shadow,
+            ShadowOpacity = over.ShadowOpacity is double so && Math.Abs(so - _theme.ShadowOpacity) < 0.005
+                ? null : over.ShadowOpacity,
+            OutlineWidth = over.OutlineWidth is double ow && Math.Abs(ow - _theme.OutlineWidth) < 0.5
+                ? null : over.OutlineWidth,
+            OutlineColor = Same(over.OutlineColor, _theme.OutlineColor) ? null : over.OutlineColor,
             TextColor = Same(over.TextColor, _theme.TextColor) ? null : over.TextColor,
             AlignH = over.AlignH == _theme.AlignH ? null : over.AlignH,
             AlignV = over.AlignV == _theme.AlignV ? null : over.AlignV,
-            Case = over.Case == (_theme.Uppercase ? TextCase.Upper : TextCase.None) ? null : over.Case,
+            Case = over.Case == _theme.TextCase ? null : over.Case,
             LineSpacing = over.LineSpacing is double ls && Math.Abs(ls - 1) < 0.01 ? null : over.LineSpacing,
             FitToWidth = over.FitToWidth == _theme.FitToWidth ? null : over.FitToWidth,
         };

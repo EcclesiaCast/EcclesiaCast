@@ -3,6 +3,66 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
+## [Sin publicar]
+
+### Agregado
+
+- Varios logos de iglesia, uno por tipo de reunión: cada uno puede ser una
+  imagen, un video en bucle o texto libre con su tipografía, tamaño y colores.
+  La flecha al lado de Logo (F3) los lista y cambia al vuelo; se administran
+  en su propia ventana con vista previa.
+- El logo se puede poner de fondo, detrás de la letra, con el desenfoque que
+  tenga configurado.
+- Importación nativa desde ProPresenter: busca sola dónde está instalado
+  (incluida la carpeta de OneDrive), muestra sus bibliotecas con cuántas
+  canciones tiene cada una y las trae todas de una vez, salteando las que ya
+  están. También se puede señalar una carpeta a mano.
+- Corrector ortográfico en español al escribir letras, avisos y textos de
+  logo: subraya las palabras dudosas y ofrece sugerencias con el clic derecho.
+  Trae un diccionario propio con vocabulario bíblico, al que se le pueden
+  agregar palabras desde el mismo menú.
+- Reproducción continua por pestaña de medios: al terminar un video arranca
+  el siguiente y al final vuelve al primero, para dejar un bucle de avisos.
+- Descarga de videos de YouTube para uso local (requiere yt-dlp instalado
+  aparte), que quedan en su propia pestaña «Descargados».
+- Pantalla de escenario: un tercer monitor para los músicos y el predicador,
+  con la letra que está proyectada, la que sigue, la hora y un cronómetro del
+  servicio. Muestra la letra incluso con Clear o Black puestos, y avisa cuál
+  de los dos está activo. Se elige qué mostrar y de qué tamaño.
+- Control desde el celular por la red de la iglesia: flechas, Clear / Black /
+  Logo, sin fondo, prender y apagar la salida, saltar a cualquier diapositiva
+  y a cualquier elemento de la playlist. Se entra escaneando un código QR y
+  con un PIN de cuatro dígitos, y queda encendido para el próximo servicio.
+
+- Los tamaños se escriben como número, con botones − y + de a un punto (Shift
+  salta de a diez): tamaño de letra, interlineado, tamaño de la caja en
+  porcentaje y su posición exacta en píxeles.
+- Contorno de la letra (grosor y color) e intensidad y difusión de la sombra,
+  tanto en el tema como diapositiva por diapositiva. Resuelve la letra blanca
+  sobre fondo blanco.
+- El tema elige el uso de mayúsculas: como está escrito, TODAS MAYÚSCULAS,
+  Cada Palabra, como oración o todas minúsculas.
+- Barra de reproducción del fondo: volver al principio, ±10 segundos,
+  reproducir/pausar y una barra de progreso arrastrable, para videos de
+  archivo y de YouTube.
+- Desenfoque del fondo (imagen, video o YouTube) ajustable en vivo desde la
+  barra de medios, y guardado con cada medio en el Inspector.
+- "Sin fondo" pasó a la barra de arriba con la tecla F4.
+
+### Cambiado
+
+- El texto rápido ocupa la columna derecha, desde abajo del Live hasta el pie.
+- La barra de medios se ubica abajo a la izquierda, se agranda arrastrando
+  (el alto queda guardado) y los medios se recorren en vertical.
+- Los botones explican qué hacen al pasar el mouse, y los globos duran 30 s.
+
+### Corregido
+
+- Apagar la salida dejaba el video sonando y avanzando; ahora se pausa y
+  retoma donde estaba cuando la salida vuelve.
+- Quitar el fondo dejaba la pantalla vacía cuando el fondo se había aplicado
+  sin diapositiva en vivo; ahora la letra vuelve sola.
+
 ## [1.0.0-beta.2] — 2026-07-20
 
 ### Corregido

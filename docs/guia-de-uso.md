@@ -18,10 +18,18 @@ En la pestaña **Canciones**:
 - **➕** crea una canción. Pegá la letra: **cada párrafo** (bloque separado por
   una línea en blanco) es una diapositiva. Opcionalmente, una línea `[Coro]` o
   `[Verso 1]` no se proyecta, solo le pone nombre a los párrafos que siguen.
-- **📥** importa canciones desde archivos `.txt` o desde archivos **`.pro` de
-  ProPresenter 7**. Para migrar, copiá la carpeta
-  `Documentos\ProPresenter\Libraries` y seleccioná todos los `.pro`.
+- **🅿** trae **todas** las canciones de ProPresenter de una vez: busca sola
+  dónde está instalado (también en la carpeta de OneDrive), te muestra sus
+  bibliotecas con cuántas canciones tiene cada una y las importa. Las que ya
+  estén en la biblioteca se saltean. Si tus canciones están en otro lado (un
+  disco externo, una copia de otra máquina), usá **Elegir carpeta…**.
+- **📥** importa archivos sueltos `.txt` o `.pro`.
 - El buscador filtra por título, artista o texto de la letra.
+
+Al escribir la letra, las palabras dudosas se **subrayan en rojo**. El clic
+derecho ofrece las correcciones y también **agregar la palabra al diccionario**
+de la iglesia, que ya viene con vocabulario bíblico. (Necesita el corrector de
+español de Windows, que viene instalado con el idioma.)
 
 **Proyectar:** clic en una diapositiva, o doble clic en la canción para empezar
 desde la primera. Las flechas **←→** navegan en vivo.
@@ -57,7 +65,22 @@ En la barra **MEDIOS**, abajo:
   - **Escala**: *Rellenar* (recorta), *Ajustar* (con barras) o *Estirar*.
   - **Al terminar el video**: repetir en bucle o detenerse.
   - **Audio**: silenciar o volumen.
-- **Sin fondo** lo quita.
+  - **Desenfoque**: difumina el fondo para que la letra se lea encima.
+- **Sin fondo (F4)**, arriba, lo quita **sin sacar la letra**.
+- Con un video en pantalla aparece la **barra de reproducción**: volver al
+  principio, ±10 segundos, reproducir/pausar y una barra para moverte. Al lado
+  está el **desenfoque**, que se ajusta en vivo y queda guardado en ese medio.
+- **▶▶ continua** hace que la pestaña funcione como playlist: al terminar un
+  video arranca el siguiente, y al final vuelve al primero. Ideal para dejar un
+  bucle de avisos antes de la reunión.
+- **Clic derecho → Descargar para uso local** guarda un video de YouTube en la
+  computadora, para no depender de internet durante el servicio. Queda en la
+  pestaña **Descargados**. Necesita [yt-dlp](https://github.com/yt-dlp/yt-dlp)
+  instalado aparte (`winget install yt-dlp`); con ffmpeg además se baja hasta
+  1080p. Descargá solo videos propios o con licencia que lo permita.
+
+> Al apagar la salida, el video se **pausa** y retoma donde estaba cuando la
+> volvés a prender.
 
 > Para que el texto se vea *sobre* el fondo, el tema tiene que tener el fondo
 > transparente (los temas nuevos ya vienen así).
@@ -67,8 +90,14 @@ En la barra **MEDIOS**, abajo:
 Botón **🎨 Temas** en la barra superior:
 
 - Editás tipografía, tamaño (con **auto-ajuste**: si un versículo no entra, se
-  achica solo), negrita/cursiva/mayúsculas, color, alineación, márgenes,
-  interlineado y sombra.
+  achica solo), negrita/cursiva, color, alineación, márgenes e interlineado.
+- **Uso de mayúsculas**: como está escrito, TODAS MAYÚSCULAS, Cada Palabra,
+  como oración o todas minúsculas — cambia lo proyectado sin tocar el texto
+  guardado.
+- **Sombra** con intensidad y difusión, y **contorno** de la letra con grosor y
+  color: es lo que salva la letra blanca sobre un fondo blanco.
+- Los tamaños se escriben como número y se ajustan de a un punto con **−** y
+  **+** (con Shift, de a diez).
 - La **caja de texto** se arrastra sobre el lienzo, se redimensiona desde
   cualquiera de sus 8 manijas y se ajusta fino con las flechas.
 - La **leyenda** (título y artista en canciones, referencia en la Biblia) tiene
@@ -99,14 +128,59 @@ En el panel **PLAYLIST**:
 | **F1** | *Clear* — oculta el texto, deja el fondo |
 | **F2** | *Black* — pantalla negra |
 | **F3** | *Logo* |
+| **F4** | Quita el fondo, dejando la letra |
 | **Esc** | Apaga la salida |
 | **Ctrl+Enter** | Proyecta el texto rápido |
+
+- **Logos**: la flecha **▾** al lado de *Logo (F3)* elige cuál se muestra —
+  podés tener uno para la reunión general, otro para jóvenes, otro para
+  mujeres. Cada logo puede ser una **imagen**, un **video en bucle** o un
+  **texto libre** con su tipografía y colores; se arman en *Administrar
+  logos…*. El botón **🖼▦** de al lado pone el logo **de fondo**, detrás de la
+  letra, con el desenfoque que le hayas puesto.
 
 - **Texto rápido**: escribí un anuncio y proyectalo al momento.
 - **Aviso al pie**: un mensaje que aparece sobre todo lo demás (ideal para
   "el auto ABC 123 está mal estacionado"). Se quita con **Quitar**.
 - **Resaltar en vivo**: escribí una palabra y se pinta como con marcador sobre
   el texto proyectado.
+
+## 8. Pantalla de escenario
+
+Botón **🎭 Escenario** en la barra superior. Es un tercer monitor, de cara a la
+plataforma, para que los músicos y quien predica vean:
+
+- la **letra que está proyectada**, en grande y blanco sobre negro;
+- la **diapositiva que sigue**, para llegar preparados al cambio;
+- la **hora** y un **cronómetro** de cuánto lleva la reunión;
+- el **aviso al pie**, si hay uno puesto.
+
+Con **Clear** o **Black** la congregación deja de ver la letra, pero el
+escenario **la sigue mostrando** y avisa cuál de los dos estados está activo —
+que es justamente para lo que sirve.
+
+La flecha **▾** de al lado elige en qué pantalla va, qué se muestra (hora,
+cronómetro, siguiente), el tamaño de la letra y **⟲ pone el cronómetro en
+cero**. No te deja elegir la misma pantalla que la salida.
+
+## 9. Controlar desde el celular
+
+Botón **📱** en la barra superior. Abre una ventana con un **código QR**, la
+dirección y un **PIN de cuatro dígitos**.
+
+- El celular tiene que estar en la **misma red wifi** que la computadora.
+- Escaneás el QR (o escribís la dirección, tipo `http://192.168.1.40:8080`),
+  ponés el PIN una vez y listo — el celular lo recuerda.
+- Desde ahí manejás: **◀ ▶** para las diapositivas, **Clear / Black / Logo**,
+  **Sin fondo**, prender y apagar la **salida**, tocar cualquier **diapositiva**
+  y cualquier ítem de la **playlist**. Arriba se ve la letra en vivo y la que
+  sigue.
+- La primera vez, **Windows pregunta si permitís el acceso a la red**: aceptá
+  para *redes privadas*.
+- Queda encendido para el próximo servicio. Se apaga desde la misma ventana.
+
+> El PIN existe porque cualquiera conectado a la wifi podría, si no, manejar la
+> proyección. Cambiá de PIN apagando y volviendo a prender el control remoto.
 
 ## Dónde quedan tus datos
 

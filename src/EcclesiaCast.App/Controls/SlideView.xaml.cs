@@ -7,6 +7,8 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
+using EcclesiaCast.Core.Logos;
+using EcclesiaCast.Core.Media;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Core.Themes;
 
@@ -34,6 +36,20 @@ public partial class SlideView : UserControl
     public static readonly DependencyProperty OverlayProperty =
         DependencyProperty.Register(nameof(Overlay), typeof(string), typeof(SlideView),
             new PropertyMetadata(null, (d, _) => ((SlideView)d).OnOverlayChanged()));
+
+    /// <summary>The logo shown in the Logo state; null uses the built-in wordmark.</summary>
+    public static readonly DependencyProperty LogoProperty =
+        DependencyProperty.Register(nameof(Logo), typeof(Logo), typeof(SlideView),
+            new PropertyMetadata(null, (d, _) => ((SlideView)d).RenderLogo()));
+
+    /// <summary>
+    /// True in the output window, where a video logo plays on its own surface
+    /// behind this control — the logo layer then stays transparent so it
+    /// shows through, exactly like a video background.
+    /// </summary>
+    public static readonly DependencyProperty IsLiveOutputProperty =
+        DependencyProperty.Register(nameof(IsLiveOutput), typeof(bool), typeof(SlideView),
+            new PropertyMetadata(false, (d, _) => ((SlideView)d).RenderLogo()));
 
     public static readonly DependencyProperty HighlightProperty =
         DependencyProperty.Register(nameof(Highlight), typeof(string), typeof(SlideView),
@@ -86,6 +102,18 @@ public partial class SlideView : UserControl
         set => SetValue(HighlightProperty, value);
     }
 
+    public Logo? Logo
+    {
+        get => (Logo?)GetValue(LogoProperty);
+        set => SetValue(LogoProperty, value);
+    }
+
+    public bool IsLiveOutput
+    {
+        get => (bool)GetValue(IsLiveOutputProperty);
+        set => SetValue(IsLiveOutputProperty, value);
+    }
+
     /// <summary>Re-reads the slide's theme and re-renders. Call after editing themes.</summary>
     public void Refresh() => OnSlideChanged();
 
@@ -120,6 +148,9 @@ public partial class SlideView : UserControl
     private bool EffectiveUnderline => Slide?.Override?.Underline ?? false;
     private bool EffectiveStrikethrough => Slide?.Override?.Strikethrough ?? false;
     private bool EffectiveShadow => Slide?.Override?.Shadow ?? CurrentTheme.Shadow;
+    private double EffectiveShadowOpacity => Slide?.Override?.ShadowOpacity ?? CurrentTheme.ShadowOpacity;
+    private double EffectiveOutlineWidth => Slide?.Override?.OutlineWidth ?? CurrentTheme.OutlineWidth;
+    private string EffectiveOutlineColor => Slide?.Override?.OutlineColor ?? CurrentTheme.OutlineColor;
     private string EffectiveTextColor => Slide?.Override?.TextColor ?? CurrentTheme.TextColor;
     private HAlign EffectiveAlignH => Slide?.Override?.AlignH ?? CurrentTheme.AlignH;
     private VAlign EffectiveAlignV => Slide?.Override?.AlignV ?? CurrentTheme.AlignV;
@@ -127,7 +158,7 @@ public partial class SlideView : UserControl
     private bool EffectiveFitToWidth => Slide?.Override?.FitToWidth ?? CurrentTheme.FitToWidth;
 
     private TextCase EffectiveCase =>
-        Slide?.Override?.Case ?? (CurrentTheme.Uppercase ? TextCase.Upper : TextCase.None);
+        Slide?.Override?.Case ?? CurrentTheme.TextCase;
 
     private void OnSlideChanged()
     {
@@ -171,9 +202,8 @@ public partial class SlideView : UserControl
             _ => TextAlignment.Center,
         };
         var foreground = BrushFromHex(EffectiveTextColor, "#FFFFFF");
-        var effect = EffectiveShadow
-            ? new DropShadowEffect { BlurRadius = 18, ShadowDepth = 3, Opacity = 0.75 }
-            : null;
+        var shadow = BuildShadow();
+        var outline = BuildOutline();
         var decorations = BuildDecorations();
 
         MainText.FontFamily = fontFamily;
@@ -182,7 +212,8 @@ public partial class SlideView : UserControl
         MainText.Foreground = foreground;
         MainText.TextAlignment = alignment;
         MainText.TextDecorations = decorations;
-        MainText.Effect = effect;
+        MainText.Effect = outline;
+        MainTextShadow.Effect = shadow;
 
         // La 2ª versión bíblica: mismo estilo que la principal, o el suyo.
         var matches = theme.SecondaryMatchesPrimary;
@@ -192,8 +223,9 @@ public partial class SlideView : UserControl
             ? FontStyles.Italic : FontStyles.Normal;
         SecondaryText.Foreground = matches ? foreground : BrushFromHex(theme.SecondaryColor, "#C9D4E8");
         SecondaryText.TextAlignment = alignment;
-        SecondaryText.Effect = effect;
-        SecondaryText.Margin = new Thickness(0, SecondarySpacing, 0, 0);
+        SecondaryText.Effect = BuildOutline();
+        SecondaryTextShadow.Effect = BuildShadow();
+        SecondaryTextShadow.Margin = new Thickness(0, SecondarySpacing, 0, 0);
 
         CaptionLayer.Margin = new Thickness(theme.MarginHorizontal, theme.MarginVertical * 0.5,
             theme.MarginHorizontal, theme.MarginVertical * 0.5);
@@ -213,6 +245,43 @@ public partial class SlideView : UserControl
 
     private static bool IsCaptionOnTop(CaptionPosition position) =>
         position is CaptionPosition.TopLeft or CaptionPosition.TopCenter or CaptionPosition.TopRight;
+
+    /// <summary>The drop shadow behind the text, at the configured strength.</summary>
+    private DropShadowEffect? BuildShadow()
+    {
+        var opacity = Math.Clamp(EffectiveShadowOpacity, 0, 1);
+        if (!EffectiveShadow || opacity <= 0)
+            return null;
+
+        return new DropShadowEffect
+        {
+            BlurRadius = Math.Clamp(CurrentTheme.ShadowBlur, 0, 80),
+            ShadowDepth = 3,
+            Opacity = opacity,
+        };
+    }
+
+    /// <summary>
+    /// The outline: a tight, fully opaque halo of the outline colour hugging
+    /// every letter. Rendered as a zero-depth shadow because WPF text has no
+    /// stroke of its own — and unlike stroking the glyphs, this keeps the
+    /// highlighted runs intact.
+    /// </summary>
+    private DropShadowEffect? BuildOutline()
+    {
+        var width = Math.Clamp(EffectiveOutlineWidth, 0, 40);
+        if (width <= 0)
+            return null;
+
+        return new DropShadowEffect
+        {
+            Color = ColorFromHex(EffectiveOutlineColor, "#000000"),
+            BlurRadius = width,
+            ShadowDepth = 0,
+            Opacity = 1,
+            RenderingBias = RenderingBias.Quality,
+        };
+    }
 
     private TextDecorationCollection? BuildDecorations()
     {
@@ -260,15 +329,18 @@ public partial class SlideView : UserControl
         BackgroundImage.Visibility = Visibility.Collapsed;
     }
 
-    private static Brush BrushFromHex(string hex, string fallback)
+    private static Brush BrushFromHex(string hex, string fallback) =>
+        new SolidColorBrush(ColorFromHex(hex, fallback));
+
+    private static Color ColorFromHex(string? hex, string fallback)
     {
         try
         {
-            return new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex));
+            return (Color)ColorConverter.ConvertFromString(hex ?? fallback);
         }
         catch
         {
-            return new SolidColorBrush((Color)ColorConverter.ConvertFromString(fallback));
+            return (Color)ColorConverter.ConvertFromString(fallback);
         }
     }
 
@@ -370,6 +442,7 @@ public partial class SlideView : UserControl
             TextCase.Upper => text.ToUpper(culture),
             TextCase.Title => culture.TextInfo.ToTitleCase(text.ToLower(culture)),
             TextCase.Sentence => ToSentenceCase(text, culture),
+            TextCase.Lower => text.ToLower(culture),
             _ => text,
         };
     }
@@ -501,6 +574,99 @@ public partial class SlideView : UserControl
 
             position = index + term.Length;
         }
+    }
+
+    // ── Logo ─────────────────────────────────────────────────────
+
+    private string? _lastLogoImagePath;
+
+    /// <summary>
+    /// Paints the Logo state: a colour, plus an image (or the frame of a video
+    /// logo in the previews) or free text. In the live output a video logo
+    /// leaves this layer transparent, since the moving picture plays behind.
+    /// </summary>
+    private void RenderLogo()
+    {
+        var logo = Logo;
+
+        if (logo is null)
+        {
+            LogoLayer.Background = BrushFromHex("#10141E", "#10141E");
+            LogoImage.Visibility = Visibility.Collapsed;
+            LogoImage.Source = null;
+            _lastLogoImagePath = null;
+            LogoText.Text = "EcclesiaCast";
+            LogoText.FontFamily = new FontFamily("Segoe UI");
+            LogoText.FontSize = 120;
+            LogoText.FontWeight = FontWeights.SemiBold;
+            LogoText.Foreground = Brushes.White;
+            LogoText.Visibility = Visibility.Visible;
+            return;
+        }
+
+        var isLiveVideo = logo.Kind == LogoKind.Video && IsLiveOutput;
+
+        // The video surface behind paints the whole screen, so anything drawn
+        // here (even the background colour) would cover it.
+        LogoLayer.Background = isLiveVideo
+            ? Brushes.Transparent
+            : BrushFromHex(logo.BackgroundColor, "#10141E");
+
+        LogoText.Visibility = logo.Kind == LogoKind.Text ? Visibility.Visible : Visibility.Collapsed;
+        if (logo.Kind == LogoKind.Text)
+        {
+            LogoText.Text = logo.Text;
+            LogoText.FontFamily = new FontFamily(
+                string.IsNullOrWhiteSpace(logo.FontFamily) ? "Segoe UI" : logo.FontFamily);
+            LogoText.FontSize = Math.Clamp(logo.FontSize, 10, 400);
+            LogoText.FontWeight = logo.Bold ? FontWeights.SemiBold : FontWeights.Normal;
+            LogoText.Foreground = BrushFromHex(logo.TextColor, "#FFFFFF");
+        }
+
+        LogoImage.Stretch = logo.Scaling switch
+        {
+            MediaScaling.Fill => Stretch.UniformToFill,
+            MediaScaling.Stretch => Stretch.Fill,
+            _ => Stretch.Uniform,
+        };
+
+        // An image logo shows its file; a video logo shows its poster, but only
+        // in the previews (live, the real video is playing behind this layer).
+        var path = logo.Kind switch
+        {
+            LogoKind.Image => logo.Path,
+            LogoKind.Video when !IsLiveOutput => logo.PosterPath,
+            _ => null,
+        };
+
+        if (path == _lastLogoImagePath)
+            return;
+        _lastLogoImagePath = path;
+
+        if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
+        {
+            try
+            {
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri(path);
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.DecodePixelWidth = 1920;
+                bitmap.EndInit();
+                if (bitmap.CanFreeze)
+                    bitmap.Freeze();
+                LogoImage.Source = bitmap;
+                LogoImage.Visibility = Visibility.Visible;
+                return;
+            }
+            catch
+            {
+                // Ilegible: queda el color de fondo del logo.
+            }
+        }
+
+        LogoImage.Source = null;
+        LogoImage.Visibility = Visibility.Collapsed;
     }
 
     // ── Estados ──────────────────────────────────────────────────
