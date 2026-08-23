@@ -25,6 +25,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   el siguiente y al final vuelve al primero, para dejar un bucle de avisos.
 - Descarga de videos de YouTube para uso local (requiere yt-dlp instalado
   aparte), que quedan en su propia pestaña «Descargados».
+- Fondo al azar: un botón que sortea uno de la pestaña que estés viendo, y una
+  opción para que cada canción se lleve un fondo distinto al proyectarla. El
+  sorteo no repite hasta agotar la pestaña ni da el mismo dos veces seguidas.
 - Pantalla de escenario: un tercer monitor para los músicos y el predicador,
   con la letra que está proyectada, la que sigue, la hora y un cronómetro del
   servicio. Muestra la letra incluso con Clear o Black puestos, y avisa cuál

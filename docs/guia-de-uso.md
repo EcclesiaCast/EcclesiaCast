@@ -73,6 +73,15 @@ En la barra **MEDIOS**, abajo:
 - **▶▶ continua** hace que la pestaña funcione como playlist: al terminar un
   video arranca el siguiente, y al final vuelve al primero. Ideal para dejar un
   bucle de avisos antes de la reunión.
+- **🎲** pone un fondo al azar de la pestaña que estés viendo, en el momento.
+- **🎲 al azar por canción** hace que **cada canción que proyectás se lleve un
+  fondo distinto** de esa pestaña. Marcalo en *Fondos* y esa pasa a ser la
+  pestaña de la que sortea (por eso la casilla sólo se ve tildada ahí).
+
+> El sorteo **no repite** ningún fondo hasta haber usado todos, y nunca te da
+> el mismo dos canciones seguidas. Si en medio de una canción aplicás un fondo
+> a mano, se respeta hasta la canción siguiente. Sólo entran los medios
+> marcados como *Fondo*: los de *Primer plano* taparían la letra.
 - **Clic derecho → Descargar para uso local** guarda un video de YouTube en la
   computadora, para no depender de internet durante el servicio. Queda en la
   pestaña **Descargados**. Necesita [yt-dlp](https://github.com/yt-dlp/yt-dlp)

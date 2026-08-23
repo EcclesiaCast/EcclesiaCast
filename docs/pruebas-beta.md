@@ -152,6 +152,22 @@ Probado con la computadora hablándose a sí misma, **nunca desde un teléfono**
 - [ ] Aplicar otro fondo y volver al primero: tiene que acordarse del
       desenfoque.
 
+### Fondo al azar
+
+- [ ] Botón **🎲** en la barra de medios: aplica un fondo distinto cada vez.
+- [ ] Apretalo tantas veces como fondos tengas y **anotá si alguno se repite
+      antes de que salgan todos** — no debería.
+- [ ] Marcá **🎲 al azar por canción** estando en *Fondos*. Cambiá de pestaña:
+      la casilla tiene que verse destildada ahí (marca de dónde sortea).
+- [ ] Proyectá tres o cuatro canciones seguidas: cada una tiene que salir con
+      un fondo distinto.
+- [ ] Andá y volvé entre versos de la misma canción: **el fondo no tiene que
+      cambiar** dentro de la canción.
+- [ ] En medio de una canción, aplicá un fondo a mano: tiene que quedarse hasta
+      la canción siguiente.
+- [ ] Proyectá un pasaje de la Biblia: **no** tiene que sortear nada.
+- [ ] Cerrá y abrí la app: la casilla tiene que seguir marcada en *Fondos*.
+
 ### Reproducción continua
 
 - [ ] Poner tres o cuatro videos en una pestaña y tildar **▶▶ continua**.

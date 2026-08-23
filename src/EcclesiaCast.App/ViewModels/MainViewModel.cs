@@ -565,6 +565,101 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     /// <summary>True while the tab's own setting is being read into the checkbox.</summary>
     private bool _loadingMediaTab;
 
+    // ── Fondo al azar ────────────────────────────────────────────
+
+    private const string RandomEnabledKey = "media.random.enabled";
+    private const string RandomTabKey = "media.random.tab";
+
+    /// <summary>Draws backgrounds without repeating; see <see cref="ShuffleBag"/>.</summary>
+    private readonly ShuffleBag _backgroundBag = new();
+
+    /// <summary>The song the current random background was drawn for; 0 when none.</summary>
+    private int _randomBackgroundSongId;
+
+    /// <summary>
+    /// When on, every song that goes live gets a different background from the
+    /// chosen tab. The tab is the one the box was ticked in, so no extra
+    /// setting is needed to say where the backgrounds come from.
+    /// </summary>
+    [ObservableProperty]
+    private bool _randomBackgroundPerSong;
+
+    /// <summary>Tab the automatic draw takes from ("Fondos" unless changed).</summary>
+    private string RandomTab => _settings.Get(RandomTabKey) ?? "Fondos";
+
+    partial void OnRandomBackgroundPerSongChanged(bool value)
+    {
+        if (_loadingMediaTab)
+            return;
+
+        _settings.Set(RandomEnabledKey, value ? "1" : "0");
+        if (value)
+            _settings.Set(RandomTabKey, SelectedMediaTab);
+
+        _backgroundBag.Reset();
+        _randomBackgroundSongId = 0;
+
+        StatusText = value
+            ? $"Cada canción se lleva un fondo distinto de «{SelectedMediaTab}»."
+            : "Fondo al azar por canción desactivado.";
+    }
+
+    /// <summary>
+    /// Backgrounds worth drawing from a tab: the ones that sit behind the text.
+    /// A foreground item would cover the lyrics, which is never what someone
+    /// asking for a random background wants.
+    /// </summary>
+    private List<MediaItem> BackgroundPool(string tab) =>
+        _allMedia
+            .Where(m => string.Equals(m.Category, tab, StringComparison.OrdinalIgnoreCase))
+            .Where(m => m.Behavior == MediaBehavior.Background)
+            .ToList();
+
+    /// <summary>Applies a background drawn at random from the tab on screen.</summary>
+    [RelayCommand]
+    private void RandomBackground()
+    {
+        var pool = BackgroundPool(SelectedMediaTab);
+        if (pool.Count == 0)
+        {
+            StatusText = $"«{SelectedMediaTab}» no tiene fondos para sortear.";
+            return;
+        }
+
+        var id = _backgroundBag.Take(pool.Select(m => m.Id).ToList(), Random.Shared);
+        if (pool.FirstOrDefault(m => m.Id == id) is not { } picked)
+            return;
+
+        ApplyBackground(picked);
+        StatusText = $"Fondo al azar: {picked.Name}.";
+    }
+
+    /// <summary>
+    /// Gives a song its own background when the feature is on. Called as a
+    /// slide goes live, but it only draws once per song: moving back and forth
+    /// through the verses must not keep changing the background.
+    /// </summary>
+    private void ApplyRandomBackgroundForSong()
+    {
+        if (!RandomBackgroundPerSong || SelectedSong is not { } song)
+            return;
+
+        if (song.Id == _randomBackgroundSongId)
+            return;
+
+        var pool = BackgroundPool(RandomTab);
+        if (pool.Count == 0)
+            return;
+
+        // Mark it drawn even if nothing lands, so an empty tab doesn't retry
+        // on every single slide.
+        _randomBackgroundSongId = song.Id;
+
+        var id = _backgroundBag.Take(pool.Select(m => m.Id).ToList(), Random.Shared);
+        if (pool.FirstOrDefault(m => m.Id == id) is { } picked)
+            ApplyBackground(picked);
+    }
+
     /// <summary>The item after this one in its tab, wrapping around at the end.</summary>
     private MediaItem? NextInTab(MediaItem current)
     {
@@ -598,14 +693,29 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         SelectedMediaTab = MediaTabs.Contains(keepTab) ? keepTab : MediaTabs.FirstOrDefault() ?? "Fondos";
         FilterMediaByTab();
+        SyncMediaTabOptions();
     }
 
     partial void OnSelectedMediaTabChanged(string value)
     {
         FilterMediaByTab();
+        SyncMediaTabOptions();
+    }
 
+    /// <summary>
+    /// Reads the current tab's own switches into the checkboxes. Called from
+    /// <see cref="LoadMedia"/> too: on startup the tab is assigned its existing
+    /// value, so the property-changed hook never fires and the boxes would
+    /// stay blank while the settings said otherwise.
+    /// </summary>
+    private void SyncMediaTabOptions()
+    {
         _loadingMediaTab = true;
-        ContinuousPlayback = IsContinuousTab(value);
+        ContinuousPlayback = IsContinuousTab(SelectedMediaTab);
+        // The box is ticked only on the tab the draw actually takes from, so
+        // walking the tabs shows at a glance where the backgrounds come from.
+        RandomBackgroundPerSong = _settings.Get(RandomEnabledKey) == "1"
+            && string.Equals(SelectedMediaTab, RandomTab, StringComparison.OrdinalIgnoreCase);
         _loadingMediaTab = false;
     }
 
@@ -2666,6 +2776,12 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _projection.EnsureVisible(SelectedDisplay.Info);
         _settings.Set(OutputDisplayKey, SelectedDisplay.Info.DeviceName);
         IsProjecting = true;
+
+        // A song reaching the screen may draw its own background. Done after
+        // going live so the slide already exists and the output doesn't dip
+        // into "background only" on the way.
+        if (item.SectionId != 0)
+            ApplyRandomBackgroundForSong();
 
         LiveSlideIndex = index;
         PreviewSlideIndex = -1;

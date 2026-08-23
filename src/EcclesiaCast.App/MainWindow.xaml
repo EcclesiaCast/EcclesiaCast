@@ -1002,7 +1002,11 @@
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding AddYouTubeLinkCommand}"
                                 ToolTip="Agregar un video de YouTube pegando el link"/>
-                        <Button Content="Sin fondo  (F4)" FontSize="11" Padding="8,4" Margin="6,0,0,0"
+                        <Button Content="🎲" FontSize="12" Padding="8,4" Margin="6,0,0,0"
+                                Style="{StaticResource DarkButton}"
+                                Command="{Binding RandomBackgroundCommand}"
+                                ToolTip="Poner un fondo al azar de esta pestaña. No repite ninguno hasta haberlos usado a todos."/>
+                        <Button Content="Sin fondo  (F4)" FontSize="11" Padding="8,4" Margin="4,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding ClearBackgroundCommand}"
                                 IsEnabled="{Binding HasBackground}"
@@ -1047,6 +1051,10 @@
                               VerticalAlignment="Center" Margin="12,0,0,0"
                               IsChecked="{Binding ContinuousPlayback}"
                               ToolTip="En esta pestaña, al terminar un video arranca el siguiente, y al final vuelve al primero. Sirve para dejar un bucle de avisos antes de la reunión."/>
+                    <CheckBox Content="🎲 al azar por canción" FontSize="11" Foreground="{StaticResource MutedBrush}"
+                              VerticalAlignment="Center" Margin="10,0,0,0"
+                              IsChecked="{Binding RandomBackgroundPerSong}"
+                              ToolTip="Cada canción que proyectás se lleva un fondo distinto de esta pestaña, sin repetir hasta usarlos todos. Si ponés un fondo a mano, se respeta hasta la canción siguiente."/>
                 </DockPanel>
 
                 <!-- ── Controles del fondo que está en pantalla ── -->
