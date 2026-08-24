@@ -61,6 +61,44 @@ public static partial class YtDlp
     private static partial Regex ProgressLine();
 
     /// <summary>
+    /// The embedded browser's profile, which holds the church's YouTube
+    /// session. Handing its cookies to yt-dlp downloads as the signed-in
+    /// account — the same account whose Premium subscription the player
+    /// already uses — instead of as an anonymous stranger.
+    /// </summary>
+    private static string? CookieProfile()
+    {
+        var profile = Path.Combine(WebViewProfile.UserDataFolder, "EBWebView");
+        return Directory.Exists(Path.Combine(profile, "Default")) ? profile : null;
+    }
+
+    /// <summary>
+    /// Turns yt-dlp's own words into something an operator can act on. A 403
+    /// almost always means the copy of yt-dlp is older than YouTube's latest
+    /// change, which is frequent and fixed by updating it.
+    /// </summary>
+    public static string Explain(string error)
+    {
+        if (error.Contains("403", StringComparison.Ordinal))
+            return "YouTube rechazó la descarga (error 403).\n\n"
+                 + "Casi siempre es que yt-dlp quedó viejo: YouTube cambia seguido y hay que "
+                 + "actualizarlo. Abrí una terminal y ejecutá:\n\n"
+                 + "    winget upgrade yt-dlp\n\n"
+                 + "Después volvé a intentar la descarga.";
+
+        if (error.Contains("Sign in", StringComparison.OrdinalIgnoreCase)
+            || error.Contains("age", StringComparison.OrdinalIgnoreCase))
+            return "YouTube pide iniciar sesión para este video.\n\n"
+                 + "Entrá con la cuenta de la iglesia desde el botón «▶ YouTube» y volvé a intentar.";
+
+        if (error.Contains("Private video", StringComparison.OrdinalIgnoreCase)
+            || error.Contains("unavailable", StringComparison.OrdinalIgnoreCase))
+            return "El video es privado o no está disponible para esta cuenta.";
+
+        return error;
+    }
+
+    /// <summary>
     /// Downloads one video and returns the file it produced. Reports progress
     /// as (percentage 0–100 or -1 when unknown, message).
     /// </summary>
@@ -94,6 +132,15 @@ public static partial class YtDlp
             arguments.Add("--merge-output-format");
             arguments.Add("mp4");
         }
+
+        if (CookieProfile() is { } profile)
+        {
+            // WebView2 stores its profile in Chromium's own layout, so yt-dlp
+            // reads it with the chrome backend pointed at that folder.
+            arguments.Add("--cookies-from-browser");
+            arguments.Add($"chrome:{profile}");
+        }
+
         arguments.Add($"https://www.youtube.com/watch?v={videoId}");
 
         var info = new ProcessStartInfo(executable)

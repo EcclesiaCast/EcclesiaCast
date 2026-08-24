@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.App.ViewModels;
@@ -60,12 +61,37 @@ public partial class StageWindow : Window
         UpdateClocks();
     }
 
+    /// <summary>Raised when the operator double-clicks the stage screen to close it.</summary>
+    public event EventHandler? CloseRequested;
+
     public void ShowOn(DisplayInfo display)
     {
         _display = display;
         Show();
         MoveToDisplay();
+        ShowHelpHint();
     }
+
+    /// <summary>
+    /// Flashes the way out for a few seconds. The window takes no keyboard
+    /// focus by design, so Esc from the operator panel can't reach it; a
+    /// double click can, and it works even when this window covers the panel.
+    /// </summary>
+    private void ShowHelpHint()
+    {
+        HelpHint.Visibility = Visibility.Visible;
+        HelpHint.Opacity = 1;
+
+        var fade = new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(700))
+        {
+            BeginTime = TimeSpan.FromSeconds(6),
+        };
+        fade.Completed += (_, _) => HelpHint.Visibility = Visibility.Collapsed;
+        HelpHint.BeginAnimation(OpacityProperty, fade);
+    }
+
+    private void Stage_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) =>
+        CloseRequested?.Invoke(this, EventArgs.Empty);
 
     // ── Contenido ────────────────────────────────────────────────
 

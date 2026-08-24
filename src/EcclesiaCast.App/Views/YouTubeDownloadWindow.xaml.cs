@@ -70,7 +70,9 @@ public partial class YouTubeDownloadWindow : Window
         }
         catch (Exception ex)
         {
-            StatusText.Text = $"No se pudo descargar: {ex.Message}";
+            // yt-dlp's own message is written for developers; turn the common
+            // failures into something the operator can actually do.
+            StatusText.Text = YtDlp.Explain(ex.Message);
             Log.Error(ex, "Falló la descarga de {Id} ({Name})", _videoId, _name);
             Finish(success: false);
         }

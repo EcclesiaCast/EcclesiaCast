@@ -1599,9 +1599,38 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             return;
         }
 
+        // With only two screens the stage can only land on the operator's own,
+        // covering the panel it was started from. Say so, and say how to get
+        // out, before it happens.
+        if (IsOperatorDisplay(SelectedStageDisplay.Info))
+        {
+            var answer = MessageBox.Show(
+                "El escenario va a ocupar esta misma pantalla y va a tapar el panel del operador.\n\n"
+                + "Para cerrarlo, hacé doble clic sobre él.\n\n"
+                + "¿Lo prendo igual?",
+                "EcclesiaCast", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No);
+            if (answer != MessageBoxResult.Yes)
+                return;
+        }
+
         _stage.ShowOn(SelectedStageDisplay.Info, _stageOptions);
         _settings.Set(StageDisplayKey, SelectedStageDisplay.Info.DeviceName);
         StatusText = $"Escenario en {SelectedStageDisplay.Label}.";
+    }
+
+    /// <summary>True when that display is the one holding the operator window.</summary>
+    private static bool IsOperatorDisplay(DisplayInfo display)
+    {
+        var window = Application.Current?.MainWindow;
+        if (window is null)
+            return false;
+
+        var handle = new System.Windows.Interop.WindowInteropHelper(window).Handle;
+        if (handle == IntPtr.Zero)
+            return false;
+
+        var screen = System.Windows.Forms.Screen.FromHandle(handle);
+        return string.Equals(screen.DeviceName, display.DeviceName, StringComparison.Ordinal);
     }
 
     [RelayCommand]
@@ -2751,6 +2780,16 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         }
 
         var item = Slides[index];
+
+        // A foreground media takes the whole screen and hides the text: it is
+        // an announcement, not a background. Projecting lyrics on top of one
+        // means the operator is done with it, so it comes off.
+        if (_presentation.Background is { Behavior: MediaBehavior.Foreground } foreground
+            && item.JumpTarget is null)
+        {
+            _presentation.SetBackground(null);
+            Log.Debug("Fondo de primer plano «{Name}» retirado al proyectar texto", foreground.Name);
+        }
 
         // Chapter jump cards never project themselves: they load the target
         // passage and go live on its first verse (next) or its last verse

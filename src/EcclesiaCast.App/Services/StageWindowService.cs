@@ -18,6 +18,9 @@ public sealed class StageWindowService(ProjectionViewModel projectionViewModel) 
         {
             _window = new StageWindow { DataContext = projectionViewModel };
             _window.IsVisibleChanged += (_, _) => VisibilityChanged?.Invoke(this, EventArgs.Empty);
+            // Double-clicking the stage screen is the way out when it covers
+            // the operator's own panel.
+            _window.CloseRequested += (_, _) => Hide();
         }
 
         _window.ApplyOptions(options);

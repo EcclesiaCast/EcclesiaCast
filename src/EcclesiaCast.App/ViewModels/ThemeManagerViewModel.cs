@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Presentation;
+using EcclesiaCast.Core.Songs;
 using EcclesiaCast.Core.Themes;
 using EcclesiaCast.Data.Persistence;
 
@@ -16,6 +17,7 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
 {
     private readonly IThemeRepository _themes;
     private readonly ISettingsStore _settings;
+    private readonly ISongRepository _songs;
     private bool _loading;
 
     public ObservableCollection<SlideTheme> Themes { get; } = [];
@@ -81,10 +83,11 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     [ObservableProperty] private string _secondaryColor = "#C9D4E8";
     [ObservableProperty] private bool _secondaryItalic = true;
 
-    public ThemeManagerViewModel(IThemeRepository themes, ISettingsStore settings)
+    public ThemeManagerViewModel(IThemeRepository themes, ISettingsStore settings, ISongRepository songs)
     {
         _themes = themes;
         _settings = settings;
+        _songs = songs;
         LoadThemes(null);
     }
 
@@ -261,9 +264,70 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         if (SelectedTheme is null)
             return;
 
-        _themes.Save(BuildTheme(SelectedTheme.Id));
+        var saved = _themes.Save(BuildTheme(SelectedTheme.Id));
         ChangesMade = true;
+        OfferToReplaceOwnDesigns(saved);
         CloseRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// A song designed by hand keeps its own typeface, size and colours, so a
+    /// theme change leaves it untouched — which is right, and also surprising
+    /// when the operator meant "make everything look like this". Rather than
+    /// pick one behaviour, ask, and only when there is actually something to
+    /// overwrite.
+    /// </summary>
+    private void OfferToReplaceOwnDesigns(SlideTheme theme)
+    {
+        if (theme.Kind != ThemeKind.Song)
+            return;
+
+        var designed = SongsUsing(theme)
+            .Where(song => song.Sections.Any(s => !string.IsNullOrEmpty(s.StyleJson)))
+            .ToList();
+
+        if (designed.Count == 0)
+            return;
+
+        var names = string.Join("\n", designed.Take(6).Select(s => $"  • {s.Title}"));
+        if (designed.Count > 6)
+            names += $"\n  • …y {designed.Count - 6} más";
+
+        var answer = MessageBox.Show(
+            $"{designed.Count} canción(es) que usan «{theme.Name}» tienen diseño propio "
+            + "(tipografía, tamaño, colores o caja cambiados a mano):\n\n"
+            + names
+            + "\n\n¿Querés que también tomen este tema?\n\n"
+            + "Sí — pierden su diseño propio y siguen el tema.\n"
+            + "No — quedan como las dejaste.",
+            "EcclesiaCast", MessageBoxButton.YesNo, MessageBoxImage.Question,
+            MessageBoxResult.No);
+
+        if (answer != MessageBoxResult.Yes)
+            return;
+
+        foreach (var song in designed)
+        {
+            foreach (var section in song.Sections)
+                section.StyleJson = null;
+            _songs.Save(song);
+        }
+
+        StatusText = $"{designed.Count} canción(es) vuelven a seguir el tema.";
+    }
+
+    /// <summary>
+    /// Songs a theme governs: the ones pointing at it, plus — when it is the
+    /// default for songs — every song that never chose one.
+    /// </summary>
+    private IEnumerable<Song> SongsUsing(SlideTheme theme)
+    {
+        var isDefault = ThemeSeeder.GetDefaultId(_settings, ThemeSeeder.DefaultSongThemeKey) == theme.Id;
+
+        return _songs.Search(string.Empty)
+            .Select(s => _songs.Get(s.Id))
+            .OfType<Song>()
+            .Where(song => song.ThemeId == theme.Id || (isDefault && song.ThemeId is null));
     }
 
     [RelayCommand]

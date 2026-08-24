@@ -19,7 +19,9 @@ public partial class ProPresenterImportWindow : Window
     {
         public ProPresenterLibrary Library { get; } = library;
 
-        public string Name => $"{Library.Name}  ·  {Library.SongCount} canción(es)";
+        public string Name => Library.CloudOnlyCount > 0
+            ? $"{Library.Name}  ·  {Library.SongCount} canción(es)  ·  ☁ {Library.CloudOnlyCount} sin descargar"
+            : $"{Library.Name}  ·  {Library.SongCount} canción(es)";
 
         public string Detail => Library.Path;
 
@@ -76,6 +78,31 @@ public partial class ProPresenterImportWindow : Window
             : "Encontré ProPresenter, pero sus bibliotecas están vacías.";
         RootText.Text = string.Join("\n", roots);
         ImportButton.IsEnabled = total > 0;
+        ShowCloudWarning();
+    }
+
+    /// <summary>
+    /// Warns when the songs are OneDrive placeholders. Without this the import
+    /// looks like it works — the files are listed, the progress bar runs — and
+    /// every single read fails, which is exactly what happened the first time
+    /// this was used for real.
+    /// </summary>
+    private void ShowCloudWarning()
+    {
+        var cloudOnly = _rows.Sum(r => r.Library.CloudOnlyCount);
+        if (cloudOnly == 0)
+        {
+            CloudWarning.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        CloudWarning.Visibility = Visibility.Visible;
+        CloudWarningText.Text =
+            $"{cloudOnly} de esas canciones están en OneDrive y todavía no bajaron a esta computadora. "
+            + "Así como están no se pueden leer.\n\n"
+            + "Abrí la carpeta en el Explorador, hacé clic derecho sobre ella y elegí "
+            + "«Conservar siempre en este dispositivo». Esperá a que termine de bajar "
+            + "(el ícono pasa de nube ☁ a tilde verde ✓) y volvé a intentar.";
     }
 
     /// <summary>
@@ -149,6 +176,21 @@ public partial class ProPresenterImportWindow : Window
         ImportButton.IsEnabled = total > 0;
     }
 
+    /// <summary>Opens the first library that has undownloaded songs.</summary>
+    private void OpenFolder_Click(object sender, RoutedEventArgs e)
+    {
+        var folder = _rows.FirstOrDefault(r => r.Library.CloudOnlyCount > 0)?.Library.Path
+            ?? _rows.FirstOrDefault()?.Library.Path;
+        if (folder is null || !Directory.Exists(folder))
+            return;
+
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = folder,
+            UseShellExecute = true,
+        });
+    }
+
     private void CheckAll_Click(object sender, RoutedEventArgs e) => SetAll(true);
 
     private void CheckNone_Click(object sender, RoutedEventArgs e) => SetAll(false);
@@ -185,7 +227,7 @@ public partial class ProPresenterImportWindow : Window
             _songs.Search(string.Empty).Select(s => s.Title),
             StringComparer.OrdinalIgnoreCase);
 
-        int imported = 0, skipped = 0, failed = 0;
+        int imported = 0, skipped = 0, failed = 0, cloudOnly = 0;
 
         for (var i = 0; i < files.Count; i++)
         {
@@ -218,6 +260,13 @@ public partial class ProPresenterImportWindow : Window
                 _songs.Save(song);
                 imported++;
             }
+            catch (IOException ex) when (ProPresenterLocator.IsCloudOnly(path))
+            {
+                // The file is a OneDrive placeholder and nothing downloaded it.
+                Log.Warning(ex, "Canción sólo en la nube: {Path}", path);
+                cloudOnly++;
+                failed++;
+            }
             catch (Exception ex)
             {
                 Log.Error(ex, "Falló la importación de {Path}", path);
@@ -234,8 +283,26 @@ public partial class ProPresenterImportWindow : Window
             parts.Add($"{failed} con error (ver el log)");
         Summary = string.Join(" · ", parts) + ".";
 
-        Log.Information("Importación de ProPresenter: {Imported} importadas, {Skipped} omitidas, {Failed} con error",
-            imported, skipped, failed);
+        Log.Information(
+            "Importación de ProPresenter: {Imported} importadas, {Skipped} omitidas, {Failed} con error ({Cloud} sólo en la nube)",
+            imported, skipped, failed, cloudOnly);
+
+        // Nothing came through: say so out loud instead of leaving a line in
+        // the status bar that is easy to miss and looks like success.
+        if (imported == 0)
+        {
+            var reason = cloudOnly > 0
+                ? $"Las {cloudOnly} canciones están en OneDrive y todavía no bajaron a esta computadora.\n\n"
+                  + "Abrí la carpeta en el Explorador, clic derecho sobre ella → «Conservar siempre en "
+                  + "este dispositivo», esperá a que termine de bajar y volvé a intentar."
+                : skipped == files.Count
+                    ? "Todas ya estaban en tu biblioteca."
+                    : "No se pudo leer ninguna. El detalle está en el registro de la aplicación.";
+
+            MessageBox.Show(
+                $"No se importó ninguna canción.\n\n{reason}",
+                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
 
         DialogResult = true;
     }

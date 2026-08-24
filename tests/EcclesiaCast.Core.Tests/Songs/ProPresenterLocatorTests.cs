@@ -102,4 +102,47 @@ public class ProPresenterLocatorTests : IDisposable
     {
         Assert.Empty(ProPresenterLocator.ReadLibraries(Path.Combine(_temp, "no-existe")));
     }
+
+    [Fact]
+    public void Ordinary_files_are_not_cloud_only()
+    {
+        var folder = MakeLibrary("ProPresenter", "Canciones", "Una.pro");
+
+        var library = ProPresenterLocator.ReadFolder(folder);
+
+        Assert.Equal(0, library.CloudOnlyCount);
+        Assert.False(library.IsFullyCloudOnly);
+    }
+
+    [Fact]
+    public void Files_marked_offline_are_counted_as_cloud_only()
+    {
+        // How OneDrive leaves a placeholder: the entry is there, the bytes
+        // are not, and reading it fails unless OneDrive downloads it first.
+        var folder = MakeLibrary("ProPresenter", "Canciones", "Nube.pro", "Local.pro");
+        var placeholder = Path.Combine(folder, "Nube.pro");
+        File.SetAttributes(placeholder, File.GetAttributes(placeholder) | FileAttributes.Offline);
+
+        var library = ProPresenterLocator.ReadFolder(folder);
+
+        Assert.Equal(1, library.CloudOnlyCount);
+        Assert.False(library.IsFullyCloudOnly);
+        Assert.True(ProPresenterLocator.IsCloudOnly(placeholder));
+    }
+
+    [Fact]
+    public void A_library_entirely_in_the_cloud_says_so()
+    {
+        var folder = MakeLibrary("ProPresenter", "Canciones", "Una.pro", "Otra.pro");
+        foreach (var file in Directory.GetFiles(folder))
+            File.SetAttributes(file, File.GetAttributes(file) | FileAttributes.Offline);
+
+        Assert.True(ProPresenterLocator.ReadFolder(folder).IsFullyCloudOnly);
+    }
+
+    [Fact]
+    public void A_missing_file_is_not_reported_as_cloud_only()
+    {
+        Assert.False(ProPresenterLocator.IsCloudOnly(Path.Combine(_temp, "no-existe.pro")));
+    }
 }

@@ -145,6 +145,38 @@ public partial class MainWindow : Window
         menu.IsOpen = true;
     }
 
+    /// <summary>
+    /// Ways to bring songs in, behind one button. Importing happens once when a
+    /// church moves in and then hardly ever, so it doesn't deserve permanent
+    /// buttons in a panel used every Sunday.
+    /// </summary>
+    private void ImportMenu_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm || sender is not FrameworkElement anchor)
+            return;
+
+        var menu = new ContextMenu
+        {
+            PlacementTarget = anchor,
+            Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom,
+        };
+
+        menu.Items.Add(new MenuItem
+        {
+            Header = "Traer todo de ProPresenter…",
+            Command = vm.ImportFromProPresenterCommand,
+            ToolTip = "Busca solo dónde está instalado ProPresenter y trae sus bibliotecas enteras",
+        });
+        menu.Items.Add(new MenuItem
+        {
+            Header = "Importar archivos (.txt, .pro)…",
+            Command = vm.ImportSongsCommand,
+            ToolTip = "Elegir archivos sueltos de texto o de ProPresenter",
+        });
+
+        menu.IsOpen = true;
+    }
+
     /// <summary>Screen picker and switches for the stage display, under its ▾ button.</summary>
     private void StageOptions_Click(object sender, RoutedEventArgs e)
     {

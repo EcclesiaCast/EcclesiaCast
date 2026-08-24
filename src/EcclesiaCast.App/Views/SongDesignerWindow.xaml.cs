@@ -39,6 +39,16 @@ public partial class SongDesignerWindow : Window
     private readonly List<string> _texts;
     private readonly List<Thumb> _thumbs = [];
 
+    /// <summary>
+    /// Slides the operator actually changed in this session. Only these get
+    /// their format written out in full; the rest keep whatever they had.
+    ///
+    /// Selecting a slide is not editing it — opening the designer gives every
+    /// slide a box so it can be dragged, and treating that as an edit would
+    /// freeze the whole song against its theme.
+    /// </summary>
+    private readonly HashSet<int> _touched = [];
+
     private bool _loading;
     private bool _dragging;
     private Point _dragOffset;
@@ -143,6 +153,8 @@ public partial class SongDesignerWindow : Window
     {
         if (_loading || Selected < 0)
             return;
+
+        _touched.Add(Selected);
 
         var alignH = HRight.IsChecked == true ? HAlign.Right
             : HLeft.IsChecked == true ? HAlign.Left : HAlign.Center;
@@ -344,6 +356,7 @@ public partial class SongDesignerWindow : Window
         if (Selected < 0)
             return;
 
+        _touched.Add(Selected);
         _overrides[Selected] = _overrides[Selected]! with
         {
             BoxX = Math.Round(Canvas.GetLeft(BoxBorder) / Scale),
@@ -534,17 +547,20 @@ public partial class SongDesignerWindow : Window
         for (var i = 0; i < _overrides.Count; i++)
         {
             _overrides[i] = source;
+            _touched.Add(i);
             _thumbs[i].Slide = BuildSlide(i);
         }
         RefreshSelected();
     }
 
+    /// <summary>Puts the slide back under the theme's control, dropping its own design.</summary>
     private void ResetSlide_Click(object sender, RoutedEventArgs e)
     {
         if (Selected < 0)
             return;
 
         _overrides[Selected] = EnsureBox(null);
+        _touched.Remove(Selected);
         LoadControls(_overrides[Selected]!);
         RefreshSelected();
     }
@@ -559,44 +575,38 @@ public partial class SongDesignerWindow : Window
             var text = _texts[i].Trim();
             if (text.Length > 0)
                 _song.Sections[i].Text = text;
-            _song.Sections[i].SetOverride(Normalize(_overrides[i]));
+
+            // Slides the operator worked on keep exactly what the panel shows;
+            // the rest are left alone so they keep following the theme.
+            if (_touched.Contains(i))
+                _song.Sections[i].SetOverride(Clean(_overrides[i]));
         }
 
         Saved = true;
         DialogResult = true;
     }
 
-    /// <summary>Drops the box and nulls any format field that matches the theme, so only real changes persist.</summary>
-    private SlideOverride? Normalize(SlideOverride? over)
+    /// <summary>
+    /// Tidies an edited slide's design without second-guessing it. It used to
+    /// null out every field matching the theme, which quietly threw away
+    /// deliberate choices that happened to agree with it — pick the theme's own
+    /// typeface in the designer and the slide was left with none, so changing
+    /// the theme later moved a song that had been designed by hand.
+    ///
+    /// Only decorations that are off are dropped, since false and "not set"
+    /// mean the same thing for them.
+    /// </summary>
+    private static SlideOverride? Clean(SlideOverride? over)
     {
         if (over is null)
             return null;
 
         var result = over with
         {
-            FontFamily = Same(over.FontFamily, _theme.FontFamily) ? null : over.FontFamily,
-            FontSize = over.FontSize is double fs && Math.Abs(fs - _theme.MaxFontSize) < 0.5 ? null : over.FontSize,
-            Bold = over.Bold == _theme.Bold ? null : over.Bold,
-            Italic = over.Italic == _theme.Italic ? null : over.Italic,
             Underline = over.Underline == true ? true : null,
             Strikethrough = over.Strikethrough == true ? true : null,
-            Shadow = over.Shadow == _theme.Shadow ? null : over.Shadow,
-            ShadowOpacity = over.ShadowOpacity is double so && Math.Abs(so - _theme.ShadowOpacity) < 0.005
-                ? null : over.ShadowOpacity,
-            OutlineWidth = over.OutlineWidth is double ow && Math.Abs(ow - _theme.OutlineWidth) < 0.5
-                ? null : over.OutlineWidth,
-            OutlineColor = Same(over.OutlineColor, _theme.OutlineColor) ? null : over.OutlineColor,
-            TextColor = Same(over.TextColor, _theme.TextColor) ? null : over.TextColor,
-            AlignH = over.AlignH == _theme.AlignH ? null : over.AlignH,
-            AlignV = over.AlignV == _theme.AlignV ? null : over.AlignV,
-            Case = over.Case == _theme.TextCase ? null : over.Case,
-            LineSpacing = over.LineSpacing is double ls && Math.Abs(ls - 1) < 0.01 ? null : over.LineSpacing,
-            FitToWidth = over.FitToWidth == _theme.FitToWidth ? null : over.FitToWidth,
         };
 
         return result.IsEmpty ? null : result;
     }
-
-    private static bool Same(string? a, string? b) =>
-        string.Equals(a?.Trim(), b?.Trim(), StringComparison.OrdinalIgnoreCase);
 }

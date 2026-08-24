@@ -10,7 +10,9 @@
         Topmost="True"
         Cursor="None"
         Background="Black"
-        FontFamily="Segoe UI">
+        FontFamily="Segoe UI"
+        MouseDoubleClick="Stage_MouseDoubleClick">
+    <Grid>
     <Grid Margin="28,20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -76,6 +78,18 @@
             <TextBlock x:Name="OverlayText"
                        FontSize="34" Foreground="White"
                        TextWrapping="Wrap" TextAlignment="Center"/>
+        </Border>
+    </Grid>
+
+        <!-- Cómo salir. Se muestra al abrir y se desvanece sola: con una sola
+             pantalla libre, el escenario tapa el panel del operador y sin esto
+             no hay forma evidente de recuperarlo. -->
+        <Border x:Name="HelpHint"
+                VerticalAlignment="Top" HorizontalAlignment="Center"
+                Background="#CC2F63C9" CornerRadius="0,0,10,10"
+                Padding="26,12">
+            <TextBlock Text="Doble clic en esta pantalla para cerrar el escenario"
+                       FontSize="20" Foreground="White"/>
         </Border>
     </Grid>
 </Window>

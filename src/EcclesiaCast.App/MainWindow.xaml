@@ -218,14 +218,10 @@
                                 <DockPanel DockPanel.Dock="Top">
                                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
                                                 VerticalAlignment="Center" Margin="0,0,10,8">
-                                        <Button Content="🅿" FontSize="11" Padding="7,4"
+                                        <Button Content="📥 ▾" FontSize="11" Padding="7,4"
                                                 Style="{StaticResource DarkButton}"
-                                                Command="{Binding ImportFromProPresenterCommand}"
-                                                ToolTip="Traer todas las canciones de ProPresenter: busca solo dónde están y las importa de una vez"/>
-                                        <Button Content="📥" FontSize="11" Padding="7,4" Margin="4,0,0,0"
-                                                Style="{StaticResource DarkButton}"
-                                                Command="{Binding ImportSongsCommand}"
-                                                ToolTip="Importar archivos sueltos (.txt o ProPresenter .pro)"/>
+                                                Click="ImportMenu_Click"
+                                                ToolTip="Importar canciones de otros programas o de archivos"/>
                                         <Button Content="➕" FontSize="11" Padding="7,4" Margin="4,0,0,0"
                                                 Style="{StaticResource DarkButton}"
                                                 Command="{Binding NewSongCommand}"
@@ -704,99 +700,14 @@
                           Height="8" Background="Transparent"
                           ToolTip="Arrastrá para agrandar o achicar la barra de medios"/>
 
-            <!-- Panel central: texto rápido + futura grilla de slides -->
+            <!-- Panel central: la grilla de diapositivas -->
             <Border Grid.Column="2" Style="{StaticResource Panel}">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <Grid Grid.Row="0" Margin="0,0,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="3*"/>
-                            <ColumnDefinition Width="2*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="AVISO AL PIE — sobre todo lo demás"
-                                   Style="{StaticResource PanelTitle}"/>
-                        <TextBlock Grid.Column="1"
-                                   Text="RESALTAR EN VIVO"
-                                   Style="{StaticResource PanelTitle}"/>
-                    </Grid>
-
-                    <Grid Grid.Row="1" Margin="12,0,12,12">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="3*"/>
-                            <ColumnDefinition Width="12"/>
-                            <ColumnDefinition Width="2*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Grid Grid.Column="0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBox Text="{Binding OverlayText, UpdateSourceTrigger=PropertyChanged}"
-                                     Background="{StaticResource SurfaceAltBrush}"
-                                     Foreground="White"
-                                     BorderBrush="{StaticResource LineBrush}"
-                                     CaretBrush="White"
-                                     Padding="8,6" FontSize="14"
-                                     VerticalContentAlignment="Center"
-                                     services:SpellChecking.Enabled="True">
-                                <TextBox.InputBindings>
-                                    <KeyBinding Key="Enter" Command="{Binding ShowOverlayCommand}"/>
-                                </TextBox.InputBindings>
-                            </TextBox>
-                            <Button Grid.Column="1"
-                                    Content="Mostrar"
-                                    Command="{Binding ShowOverlayCommand}"
-                                    Margin="8,0,0,0"
-                                    ToolTip="Pone el aviso en una franja al pie de la pantalla, encima de todo (sirve con el Black puesto)">
-                                <Button.Style>
-                                    <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsOverlayActive}" Value="True">
-                                                <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
-                                                <Setter Property="BorderThickness" Value="0"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Button.Style>
-                            </Button>
-                            <Button Grid.Column="2"
-                                    Content="Quitar"
-                                    Style="{StaticResource DarkButton}"
-                                    Command="{Binding HideOverlayCommand}"
-                                    Margin="6,0,0,0"
-                                    ToolTip="Saca la franja del aviso"/>
-                        </Grid>
-
-                        <Grid Grid.Column="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBox Text="{Binding HighlightText, UpdateSourceTrigger=PropertyChanged}"
-                                     Background="{StaticResource SurfaceAltBrush}"
-                                     Foreground="White"
-                                     BorderBrush="{StaticResource LineBrush}"
-                                     CaretBrush="White"
-                                     Padding="8,6" FontSize="14"
-                                     VerticalContentAlignment="Center"
-                                     ToolTip="Escribí una palabra o frase y se pinta al instante sobre lo proyectado"/>
-                            <Button Grid.Column="1"
-                                    Content="Quitar"
-                                    Style="{StaticResource DarkButton}"
-                                    Command="{Binding ClearHighlightCommand}"
-                                    Margin="6,0,0,0"
-                                    ToolTip="Saca el resaltado amarillo del texto proyectado"/>
-                        </Grid>
-                    </Grid>
-
-                    <Border Grid.Row="2"
+                    <Border Grid.Row="0"
                             BorderBrush="{StaticResource LineBrush}"
                             BorderThickness="0,1,0,0">
                         <Grid>
@@ -954,32 +865,113 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Texto rápido: baja desde abajo del Live hasta el pie -->
+                <!-- Las tres formas de escribir sobre lo proyectado, en pestañas -->
                 <Border Grid.Row="4" Style="{StaticResource Panel}">
                     <DockPanel>
-                        <TextBlock DockPanel.Dock="Top" Text="TEXTO RÁPIDO — anuncios al momento"
-                                   Style="{StaticResource PanelTitle}"/>
-                        <Button DockPanel.Dock="Bottom"
-                                Content="Proyectar ▶  (Ctrl+Enter)"
-                                Style="{StaticResource AccentButton}"
-                                Command="{Binding GoLiveCommand}"
-                                Margin="12,8,12,12" Padding="10,8"
-                                ToolTip="Manda lo escrito a la pantalla, con el tema de las canciones"/>
-                        <TextBox AcceptsReturn="True" TextWrapping="Wrap"
-                                 VerticalScrollBarVisibility="Auto"
-                                 Text="{Binding QuickText, UpdateSourceTrigger=PropertyChanged}"
-                                 Background="{StaticResource SurfaceAltBrush}"
-                                 Foreground="White"
-                                 BorderBrush="{StaticResource LineBrush}"
-                                 CaretBrush="White"
-                                 Margin="12,0,12,0"
-                                 Padding="8,6" FontSize="14"
-                                 services:SpellChecking.Enabled="True"
-                                 ToolTip="Escribí un aviso y proyectalo al instante · Enter hace un renglón nuevo, Ctrl+Enter proyecta">
-                            <TextBox.InputBindings>
-                                <KeyBinding Key="Enter" Modifiers="Control" Command="{Binding GoLiveCommand}"/>
-                            </TextBox.InputBindings>
-                        </TextBox>
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10,10,10,8">
+                            <RadioButton x:Name="TabQuick" Content="Texto rápido"
+                                         Style="{StaticResource TabButton}" GroupName="WriteTab"
+                                         IsChecked="True"
+                                         ToolTip="Un anuncio a pantalla completa, con el tema de las canciones"/>
+                            <RadioButton x:Name="TabOverlay" Content="Aviso al pie"
+                                         Style="{StaticResource TabButton}" GroupName="WriteTab" Margin="4,0,0,0"
+                                         ToolTip="Una franja al pie de la pantalla, encima de todo lo demás"/>
+                            <RadioButton x:Name="TabHighlight" Content="Resaltar"
+                                         Style="{StaticResource TabButton}" GroupName="WriteTab" Margin="4,0,0,0"
+                                         ToolTip="Pinta una palabra como con marcador sobre lo que está proyectado"/>
+                        </StackPanel>
+
+                        <Grid>
+                            <!-- ── Texto rápido ── -->
+                            <DockPanel Visibility="{Binding IsChecked, ElementName=TabQuick, Converter={StaticResource BoolToVis}}">
+                                <Button DockPanel.Dock="Bottom"
+                                        Content="Proyectar ▶  (Ctrl+Enter)"
+                                        Style="{StaticResource AccentButton}"
+                                        Command="{Binding GoLiveCommand}"
+                                        Margin="12,8,12,12" Padding="10,8"
+                                        ToolTip="Manda lo escrito a la pantalla, con el tema de las canciones"/>
+                                <TextBox AcceptsReturn="True" TextWrapping="Wrap"
+                                         VerticalScrollBarVisibility="Auto"
+                                         Text="{Binding QuickText, UpdateSourceTrigger=PropertyChanged}"
+                                         Background="{StaticResource SurfaceAltBrush}"
+                                         Foreground="White"
+                                         BorderBrush="{StaticResource LineBrush}"
+                                         CaretBrush="White"
+                                         Margin="12,0,12,0"
+                                         Padding="8,6" FontSize="14"
+                                         services:SpellChecking.Enabled="True"
+                                         ToolTip="Escribí un aviso y proyectalo al instante · Enter hace un renglón nuevo, Ctrl+Enter proyecta">
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Key="Enter" Modifiers="Control" Command="{Binding GoLiveCommand}"/>
+                                    </TextBox.InputBindings>
+                                </TextBox>
+                            </DockPanel>
+
+                            <!-- ── Aviso al pie ── -->
+                            <DockPanel Visibility="{Binding IsChecked, ElementName=TabOverlay, Converter={StaticResource BoolToVis}}">
+                                <TextBlock DockPanel.Dock="Top"
+                                           Text="Aparece en una franja abajo, por encima de todo — incluso con Black puesto."
+                                           FontSize="11" Foreground="{StaticResource FaintBrush}"
+                                           TextWrapping="Wrap" Margin="12,0,12,8"/>
+                                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="12,8,12,12">
+                                    <Button Content="Mostrar" Command="{Binding ShowOverlayCommand}" Padding="16,8"
+                                            ToolTip="Pone la franja en pantalla">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsOverlayActive}" Value="True">
+                                                        <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                                        <Setter Property="BorderThickness" Value="0"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button Content="Quitar" Style="{StaticResource DarkButton}" Padding="16,8" Margin="6,0,0,0"
+                                            Command="{Binding HideOverlayCommand}"
+                                            ToolTip="Saca la franja del aviso"/>
+                                </StackPanel>
+                                <TextBox AcceptsReturn="True" TextWrapping="Wrap"
+                                         VerticalScrollBarVisibility="Auto"
+                                         Text="{Binding OverlayText, UpdateSourceTrigger=PropertyChanged}"
+                                         Background="{StaticResource SurfaceAltBrush}"
+                                         Foreground="White"
+                                         BorderBrush="{StaticResource LineBrush}"
+                                         CaretBrush="White"
+                                         Margin="12,0,12,0"
+                                         Padding="8,6" FontSize="14"
+                                         services:SpellChecking.Enabled="True"
+                                         ToolTip="Ej: «el auto ABC 123 está con las luces prendidas»">
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Key="Enter" Modifiers="Control" Command="{Binding ShowOverlayCommand}"/>
+                                    </TextBox.InputBindings>
+                                </TextBox>
+                            </DockPanel>
+
+                            <!-- ── Resaltar en vivo ── -->
+                            <DockPanel Visibility="{Binding IsChecked, ElementName=TabHighlight, Converter={StaticResource BoolToVis}}">
+                                <TextBlock DockPanel.Dock="Top"
+                                           Text="Escribí una palabra o frase y se pinta al instante sobre el texto proyectado."
+                                           FontSize="11" Foreground="{StaticResource FaintBrush}"
+                                           TextWrapping="Wrap" Margin="12,0,12,8"/>
+                                <TextBox DockPanel.Dock="Top"
+                                         Text="{Binding HighlightText, UpdateSourceTrigger=PropertyChanged}"
+                                         Background="{StaticResource SurfaceAltBrush}"
+                                         Foreground="White"
+                                         BorderBrush="{StaticResource LineBrush}"
+                                         CaretBrush="White"
+                                         Margin="12,0,12,0"
+                                         Padding="8,6" FontSize="14"
+                                         VerticalContentAlignment="Center"/>
+                                <Button DockPanel.Dock="Top" Content="Quitar el resaltado"
+                                        Style="{StaticResource DarkButton}"
+                                        Command="{Binding ClearHighlightCommand}"
+                                        HorizontalAlignment="Left"
+                                        Margin="12,10,12,0" Padding="14,7"
+                                        ToolTip="Saca el resaltado amarillo del texto proyectado"/>
+                                <Grid/>
+                            </DockPanel>
+                        </Grid>
                     </DockPanel>
                 </Border>
             </Grid>

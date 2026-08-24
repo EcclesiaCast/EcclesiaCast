@@ -1,9 +1,23 @@
 namespace EcclesiaCast.Core.Songs;
 
 /// <summary>One of ProPresenter's libraries: a folder full of <c>.pro</c> songs.</summary>
-public sealed record ProPresenterLibrary(string Name, string Path, IReadOnlyList<string> SongFiles)
+/// <param name="CloudOnlyCount">
+/// How many of those files only exist in the cloud. OneDrive's "Files
+/// On-Demand" leaves placeholders on disk that look like normal files —
+/// right size, right name — but reading one fails unless OneDrive is running
+/// and downloads it first. A church library synced to OneDrive is the normal
+/// case, so this is counted up front instead of failing song by song.
+/// </param>
+public sealed record ProPresenterLibrary(
+    string Name,
+    string Path,
+    IReadOnlyList<string> SongFiles,
+    int CloudOnlyCount = 0)
 {
     public int SongCount => SongFiles.Count;
+
+    /// <summary>True when none of the files can be read without downloading first.</summary>
+    public bool IsFullyCloudOnly => SongCount > 0 && CloudOnlyCount == SongCount;
 }
 
 /// <summary>
@@ -66,15 +80,46 @@ public static class ProPresenterLocator
             if (ReservedNames.Contains(name, StringComparer.OrdinalIgnoreCase))
                 continue;
 
-            libraries.Add(new ProPresenterLibrary(name, folder, ReadSongFiles(folder)));
+            var files = ReadSongFiles(folder);
+            libraries.Add(new ProPresenterLibrary(name, folder, files, CountCloudOnly(files)));
         }
 
         return libraries;
     }
 
     /// <summary>Reads a single folder as a library (for a manually chosen one).</summary>
-    public static ProPresenterLibrary ReadFolder(string folder) =>
-        new(Path.GetFileName(folder.TrimEnd(Path.DirectorySeparatorChar)), folder, ReadSongFiles(folder));
+    public static ProPresenterLibrary ReadFolder(string folder)
+    {
+        var files = ReadSongFiles(folder);
+        return new ProPresenterLibrary(
+            Path.GetFileName(folder.TrimEnd(Path.DirectorySeparatorChar)),
+            folder,
+            files,
+            CountCloudOnly(files));
+    }
+
+    /// <summary>
+    /// True when the file is a cloud placeholder that has to be downloaded
+    /// before it can be read. Windows marks these with Offline and, for
+    /// OneDrive's on-demand files, RecallOnDataAccess.
+    /// </summary>
+    public static bool IsCloudOnly(string path)
+    {
+        // Not in the FileAttributes enum, so the documented value is used.
+        const FileAttributes RecallOnDataAccess = (FileAttributes)0x400000;
+
+        try
+        {
+            var attributes = File.GetAttributes(path);
+            return (attributes & (FileAttributes.Offline | RecallOnDataAccess)) != 0;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return false;
+        }
+    }
+
+    private static int CountCloudOnly(IReadOnlyList<string> files) => files.Count(IsCloudOnly);
 
     private static IReadOnlyList<string> ReadSongFiles(string folder)
     {
