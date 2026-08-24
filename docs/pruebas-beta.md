@@ -18,8 +18,29 @@ Esto sólo se puede verificar en la PC del proyector. Es lo más importante.
 
 ### Instalación desde cero
 
-- [ ] Descargar el instalador de la
-      [página de releases](https://github.com/EcclesiaCast/EcclesiaCast/releases).
+> **Ojo con la versión.** Lo que hay que probar es la **beta.3**, que todavía
+> **no está publicada en GitHub**: la página de releases sigue mostrando la
+> beta.2 del 20/7, que no trae nada de esto. El instalador de la beta.3 se
+> genera en la máquina de desarrollo y queda en la carpeta `dist` del
+> proyecto:
+>
+> ```
+> dist\EcclesiaCast-1.0.0-beta.3-setup.exe
+> ```
+>
+> Se recompila cuando haga falta con:
+>
+> ```
+> dotnet publish src\EcclesiaCast.App\EcclesiaCast.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=false -p:Version=1.0.0-beta.3 -o publish
+> "%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe" /DAppVersion=1.0.0-beta.3 installer\EcclesiaCast.iss
+> ```
+>
+> Se publica en GitHub recién **después** de esta prueba: mergear `beta3` a
+> `main` y taguear `v1.0.0-beta.3` dispara el workflow de release.
+
+- [ ] Copiar `dist\EcclesiaCast-1.0.0-beta.3-setup.exe` a la PC del proyector.
+- [ ] Confirmar que estás instalando la **beta.3** y no la beta.2 ni el
+      `EcclesiaCast-1.0.0-setup.exe` viejo que también está en `dist`.
 - [ ] Windows va a avisar que el programa no tiene firma digital ("Windows
       protegió tu PC"). Es esperable: hay que elegir *Más información* →
       *Ejecutar de todas formas*. **Anotá si el aviso asusta o confunde.**
@@ -27,6 +48,15 @@ Esto sólo se puede verificar en la PC del proyector. Es lo más importante.
 - [ ] Si esa PC no tiene WebView2, el instalador lo descarga e instala solo.
       Necesita internet. **Verificá que no se cuelgue ni tire error.**
 - [ ] Queda el acceso directo con el ícono nuevo y la app abre.
+- [ ] La versión instalada es la correcta: clic derecho en
+      `EcclesiaCast.App.exe` → Propiedades → Detalles tiene que decir
+      **1.0.0-beta.3**.
+
+> Instalar encima de la beta.2 **conserva tus canciones, Biblias, temas y
+> medios**: la base vive aparte, en `%APPDATA%\EcclesiaCast`. Al primer
+> arranque corren tres migraciones (contorno de letra, desenfoque de medios y
+> la tabla de logos). Si querés dormir tranquilo, copiá
+> `%APPDATA%\EcclesiaCast\ecclesiacast.db` antes de instalar.
 
 ### El proyector
 
