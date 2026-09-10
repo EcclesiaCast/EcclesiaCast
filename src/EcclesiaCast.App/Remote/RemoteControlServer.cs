@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Windows;
+using EcclesiaCast.Core.Remote;
 using Serilog;
 
 namespace EcclesiaCast.App.Remote;
@@ -28,6 +29,12 @@ public sealed class RemoteControlServer : IDisposable
     };
 
     private readonly IRemoteHost _host;
+
+    // Requests are served in parallel, so the limiter — which is plain
+    // single-threaded logic — is only ever touched under this lock.
+    private readonly PinAttemptLimiter _limiter = new();
+    private readonly object _limiterLock = new();
+
     private TcpListener? _listener;
     private CancellationTokenSource? _cancellation;
 
@@ -50,6 +57,11 @@ public sealed class RemoteControlServer : IDisposable
             return true;
 
         Pin = pin;
+
+        // Turning the remote off and on again is the way out for a volunteer
+        // who locked their own phone out: it hands out a new PIN anyway.
+        lock (_limiterLock)
+            _limiter.Clear();
 
         // If the preferred port is taken (another copy, another program),
         // walk a few up rather than failing outright.
@@ -127,6 +139,11 @@ public sealed class RemoteControlServer : IDisposable
                 client.ReceiveTimeout = 5000;
                 client.SendTimeout = 5000;
 
+                // Wrong PINs are counted per phone, so the address has to come
+                // from the socket: anything the request itself claims could be
+                // made up by whoever is guessing.
+                var caller = (client.Client.RemoteEndPoint as IPEndPoint)?.Address.ToString() ?? "?";
+
                 await using var stream = client.GetStream();
                 using var reader = new StreamReader(stream, Encoding.UTF8, false, 1024, leaveOpen: true);
 
@@ -157,7 +174,7 @@ public sealed class RemoteControlServer : IDisposable
                     body = new string(buffer, 0, read);
                 }
 
-                await RespondAsync(stream, method, target, body, cancellation);
+                await RespondAsync(stream, method, target, body, caller, cancellation);
             }
             catch (Exception ex)
             {
@@ -167,7 +184,8 @@ public sealed class RemoteControlServer : IDisposable
     }
 
     private async Task RespondAsync(
-        NetworkStream stream, string method, string target, string body, CancellationToken cancellation)
+        NetworkStream stream, string method, string target, string body, string caller,
+        CancellationToken cancellation)
     {
         var path = target.Split('?')[0];
 
@@ -179,9 +197,10 @@ public sealed class RemoteControlServer : IDisposable
 
         if (path == "/api/state" && method == "GET")
         {
-            if (!CheckPin(QueryValue(target, "pin")))
+            var check = CheckPin(QueryValue(target, "pin"), caller);
+            if (!check.Ok)
             {
-                await WriteAsync(stream, 403, "application/json", """{"error":"pin"}""", cancellation);
+                await WriteDeniedAsync(stream, check, cancellation);
                 return;
             }
 
@@ -209,9 +228,10 @@ public sealed class RemoteControlServer : IDisposable
                 return;
             }
 
-            if (!CheckPin(command.Pin))
+            var check = CheckPin(command.Pin, caller);
+            if (!check.Ok)
             {
-                await WriteAsync(stream, 403, "application/json", """{"error":"pin"}""", cancellation);
+                await WriteDeniedAsync(stream, check, cancellation);
                 return;
             }
 
@@ -231,9 +251,51 @@ public sealed class RemoteControlServer : IDisposable
 
     private sealed record Command(string? Pin, string? Action, int? Index);
 
-    /// <summary>Constant-time-ish comparison; the PIN is short and the network is local.</summary>
-    private bool CheckPin(string? candidate) =>
-        !string.IsNullOrEmpty(Pin) && string.Equals(candidate, Pin, StringComparison.Ordinal);
+    /// <summary>
+    /// Checks the PIN and keeps score. A phone that keeps missing is turned
+    /// away for a few minutes, which is what stops someone on the church wifi
+    /// from walking through all ten thousand combinations.
+    /// </summary>
+    private PinCheck CheckPin(string? candidate, string caller)
+    {
+        var now = DateTimeOffset.UtcNow;
+
+        lock (_limiterLock)
+        {
+            if (_limiter.RetryAfter(caller, now) is { } wait)
+                return new PinCheck(false, (int)Math.Ceiling(wait.TotalSeconds));
+
+            // Constant-time-ish comparison; the PIN is short and the network is local.
+            var ok = !string.IsNullOrEmpty(Pin) && string.Equals(candidate, Pin, StringComparison.Ordinal);
+            if (ok)
+            {
+                _limiter.RecordSuccess(caller);
+                return new PinCheck(true, 0);
+            }
+
+            _limiter.RecordFailure(caller, now);
+
+            if (_limiter.RetryAfter(caller, now) is { } lockout)
+            {
+                Log.Warning(
+                    "Control remoto: {Caller} erró el PIN demasiadas veces; bloqueado por {Minutes} minutos",
+                    caller, Math.Ceiling(lockout.TotalMinutes));
+                return new PinCheck(false, (int)Math.Ceiling(lockout.TotalSeconds));
+            }
+
+            return new PinCheck(false, 0);
+        }
+    }
+
+    /// <summary>A wrong PIN (<c>RetryAfterSeconds</c> 0) or a client serving its wait.</summary>
+    private readonly record struct PinCheck(bool Ok, int RetryAfterSeconds);
+
+    private static Task WriteDeniedAsync(NetworkStream stream, PinCheck check, CancellationToken cancellation) =>
+        check.RetryAfterSeconds > 0
+            ? WriteAsync(stream, 429, "application/json",
+                $$"""{"error":"lockout","retryAfter":{{check.RetryAfterSeconds}}}""", cancellation,
+                $"Retry-After: {check.RetryAfterSeconds}\r\n")
+            : WriteAsync(stream, 403, "application/json", """{"error":"pin"}""", cancellation);
 
     private static string? QueryValue(string target, string key)
     {
@@ -261,7 +323,8 @@ public sealed class RemoteControlServer : IDisposable
             : Task.FromResult(function());
 
     private static async Task WriteAsync(
-        NetworkStream stream, int status, string contentType, string content, CancellationToken cancellation)
+        NetworkStream stream, int status, string contentType, string content, CancellationToken cancellation,
+        string? extraHeaders = null)
     {
         var payload = Encoding.UTF8.GetBytes(content);
         var reason = status switch
@@ -269,6 +332,7 @@ public sealed class RemoteControlServer : IDisposable
             200 => "OK",
             400 => "Bad Request",
             403 => "Forbidden",
+            429 => "Too Many Requests",
             _ => "Not Found",
         };
 
@@ -277,6 +341,7 @@ public sealed class RemoteControlServer : IDisposable
             + $"Content-Type: {contentType}\r\n"
             + $"Content-Length: {payload.Length}\r\n"
             + "Cache-Control: no-store\r\n"
+            + extraHeaders
             + "Connection: close\r\n\r\n");
 
         await stream.WriteAsync(header, cancellation);

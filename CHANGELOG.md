@@ -7,6 +7,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- Límite de intentos del PIN en el control remoto: cinco PINes equivocados
+  desde el mismo teléfono lo dejan afuera cinco minutos, con la espera a la
+  vista y contando. Cada teléfono cuenta por su cuenta, así que uno bloqueado
+  no deja afuera al resto del equipo, y apagar y prender el control remoto
+  destraba a quien se bloqueó solo.
 - Varios logos de iglesia, uno por tipo de reunión: cada uno puede ser una
   imagen, un video en bucle o texto libre con su tipografía, tamaño y colores.
   La flecha al lado de Logo (F3) los lista y cambia al vuelo; se administran

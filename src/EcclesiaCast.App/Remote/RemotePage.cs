@@ -146,6 +146,18 @@ internal static class RemotePage
 
         function poll(first) {
           fetch('/api/state?pin=' + encodeURIComponent(pin)).then(function (r) {
+            if (r.status === 429) {
+              // Too many wrong PINs from this phone: the computer is making
+              // it wait. Keep counting the wait down so nobody is left
+              // wondering whether the app died.
+              show(false);
+              return r.json().then(function (e) {
+                var left = Math.ceil(((e && e.retryAfter) || 0) / 60);
+                document.getElementById('pinError').textContent =
+                  'Demasiados intentos. Probá de nuevo en ' + (left > 1 ? left + ' minutos.' : 'un minuto.');
+                return null;
+              }).catch(function () { return null; });
+            }
             if (r.status === 403) {
               show(false);
               if (first) document.getElementById('pinError').textContent = 'PIN incorrecto.';

@@ -23,8 +23,6 @@ lado. Al cerrar un punto, borralo y anotalo en el [CHANGELOG](../CHANGELOG.md).
 - [ ] **Respaldo y restauración** de la biblioteca desde el programa. Hoy es
       copiar `%APPDATA%\EcclesiaCast\ecclesiacast.db` a mano.
 - [ ] **Transiciones** entre diapositivas más allá del fundido actual.
-- [ ] **Límite de intentos del PIN** en el control remoto. Hoy se puede probar
-      PIN tras PIN sin freno; son 10.000 combinaciones.
 - [ ] Múltiples cuadros de texto por diapositiva (diferido desde el sprint 4).
 - [ ] Recorte de entrada/salida de video y efectos de color (diferido desde el
       sprint 5).
