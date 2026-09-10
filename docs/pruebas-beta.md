@@ -263,6 +263,45 @@ subraya nada, avisame**: significa que hay que instalarlo o buscar otro camino.
 
 ---
 
+### Cuenta regresiva (nuevo)
+
+- [ ] Botón **⏱**: poner **2 minutos** y **Proyectar**. Tiene que arrancar en
+      2:00 (no en 1:59) y bajar parejo.
+- [ ] Mirarla **desde el fondo del salón**: ¿se lee el número? ¿y el texto de
+      arriba?
+- [ ] Con un **fondo de video** puesto: la cuenta va encima y el video sigue.
+- [ ] Dejarla llegar a **cero**: tiene que quedarse con «¡Bienvenidos!» hasta
+      que la detengas, sin números en negativo.
+- [ ] Con la **pantalla de escenario** prendida: los músicos ven el mismo
+      número.
+- [ ] **F2 (Black)** y volver: la cuenta sigue en hora, no se atrasa.
+- [ ] Probar la opción **a las HH:MM** con la hora de tu reunión.
+- [ ] Cerrar y abrir el programa: los textos que escribiste tienen que seguir
+      ahí.
+- [ ] Detenerla desde el mismo botón ⏱ → **Detener la que corre**.
+
+### Copia de seguridad (nuevo)
+
+- [ ] Botón **💾** → *Guardar una copia*. **Con el programa abierto y
+      proyectando**, que es como se va a usar. Anotá cuánto tarda y cuánto pesa.
+- [ ] Copiar ese archivo a un **pendrive**.
+- [ ] Probar **restaurar**: elegí la copia, mirá que los números que muestra
+      sean los tuyos, aceptá y dejá que el programa se cierre y abra solo.
+- [ ] Después de restaurar: **tus canciones, Biblias, medios y temas siguen
+      todos ahí**.
+- [ ] Probar elegir **un archivo cualquiera** (una foto, un .txt): tiene que
+      avisar que no es una copia, sin romperse.
+
+### Límite de intentos del PIN (nuevo)
+
+- [ ] Desde el celular, poner el **PIN equivocado cinco veces**: a la quinta
+      tiene que avisar «Demasiados intentos» y no dejar entrar ni con el PIN
+      bueno.
+- [ ] Con **otro celular**, entrar con el PIN correcto: ese tiene que entrar
+      igual.
+- [ ] Apagar y prender el control remoto desde la computadora: el celular
+      bloqueado puede volver a entrar (con el PIN nuevo).
+
 ## 3. Cosas que ya verifiqué yo, pero conviene confirmar en tu PC
 
 Todo esto lo probé proyectando en un segundo monitor y anda. Lo repito acá

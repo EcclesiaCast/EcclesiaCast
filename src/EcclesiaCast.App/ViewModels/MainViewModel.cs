@@ -26,6 +26,10 @@ public sealed record DisplayOption(DisplayInfo Info, string Label);
 public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 {
     private const string OutputDisplayKey = "output.display";
+    private const string CountdownMinutesKey = "countdown.minutes";
+    private const string CountdownClockKey = "countdown.clock";
+    private const string CountdownHeadingKey = "countdown.heading";
+    private const string CountdownFinishedKey = "countdown.finished";
 
     /// <summary>Marks that video posters were rebuilt with the VLC fallback (see RefreshVideoThumbnailsAsync).</summary>
     private const string VideoThumbnailsRebuiltKey = "media.video-thumbnails.rebuilt";
@@ -52,6 +56,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private readonly IProPresenterImportDialog _proPresenterImport;
     private readonly IStageWindowService _stage;
     private readonly IBackupDialog _backup;
+    private readonly ICountdownDialog _countdownDialog;
 
     /// <summary>Copied slide (label + text + style) for paste/duplicate.</summary>
     private (string Label, string Text, string? StyleJson)? _clipboardSlide;
@@ -105,6 +110,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
     [ObservableProperty]
     private bool _isOverlayActive;
+
+    /// <summary>True while the pre-service countdown is on the output.</summary>
+    [ObservableProperty]
+    private bool _isCountdownRunning;
 
     [ObservableProperty]
     private bool _isClearActive;
@@ -189,6 +198,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         IProPresenterImportDialog proPresenterImport,
         IStageWindowService stage,
         IBackupDialog backup,
+        ICountdownDialog countdownDialog,
         ProjectionViewModel projectionViewModel)
     {
         _displayProvider = displayProvider;
@@ -213,6 +223,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _proPresenterImport = proPresenterImport;
         _stage = stage;
         _backup = backup;
+        _countdownDialog = countdownDialog;
         Projection = projectionViewModel;
 
         _presentation.Changed += (_, _) => UpdateStateFlags();
@@ -999,6 +1010,45 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             ToggleLogo();
         else
             StatusText = $"Logo: {logo.Name}.";
+    }
+
+    /// <summary>
+    /// The screen that counts down to the start of the service. What the
+    /// operator typed is remembered, because a church starts at the same time
+    /// every Sunday and nobody should retype "Empezamos en" every week.
+    /// </summary>
+    [RelayCommand]
+    private void OpenCountdown()
+    {
+        var saved = new CountdownSettings(
+            int.TryParse(_settings.Get(CountdownMinutesKey), out var minutes) && minutes > 0
+                ? minutes
+                : CountdownSettings.Default.Minutes,
+            _settings.Get(CountdownClockKey) ?? CountdownSettings.Default.Clock,
+            _settings.Get(CountdownHeadingKey) ?? CountdownSettings.Default.Heading,
+            _settings.Get(CountdownFinishedKey) ?? CountdownSettings.Default.FinishedMessage);
+
+        var choice = _countdownDialog.Show(saved, _presentation.Countdown is not null);
+        if (choice is null)
+            return;
+
+        if (choice.Stop)
+        {
+            _presentation.StopCountdown();
+            StatusText = "Cuenta regresiva detenida.";
+            return;
+        }
+
+        _settings.Set(CountdownMinutesKey, choice.Settings.Minutes.ToString());
+        _settings.Set(CountdownClockKey, choice.Settings.Clock);
+        _settings.Set(CountdownHeadingKey, choice.Settings.Heading);
+        _settings.Set(CountdownFinishedKey, choice.Settings.FinishedMessage);
+
+        if (choice.Countdown is not { } countdown)
+            return;
+
+        _presentation.StartCountdown(countdown);
+        StatusText = $"Cuenta regresiva: {countdown.Format(DateTimeOffset.Now)}.";
     }
 
     /// <summary>
@@ -2973,6 +3023,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         IsBlackActive = _presentation.State == OutputState.Black;
         IsLogoActive = _presentation.State == OutputState.Logo;
         IsOverlayActive = _presentation.OverlayMessage is not null;
+        IsCountdownRunning = _presentation.Countdown is not null;
         HasBackground = _presentation.Background is not null;
 
         // Show the blur the current background carries, without saving it back.

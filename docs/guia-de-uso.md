@@ -191,7 +191,22 @@ dirección y un **PIN de cuatro dígitos**.
 > El PIN existe porque cualquiera conectado a la wifi podría, si no, manejar la
 > proyección. Cambiá de PIN apagando y volviendo a prender el control remoto.
 
-## 10. Copia de seguridad
+## 10. Cuenta regresiva
+
+Botón **⏱** en la barra de arriba, para el rato antes de empezar.
+
+- Elegís **en cuántos minutos** empieza (con atajos de 5, 10, 15 y 30) o **a
+  qué hora del reloj** (10:30, 19:00). Si la hora ya pasó, se entiende que es
+  la de mañana.
+- El **texto de arriba** («Empezamos en») y el de **cuando llega a cero**
+  («¡Bienvenidos!») los escribís vos, y quedan guardados para la próxima.
+- Se proyecta **encima del fondo** que tengas puesto, y también aparece en la
+  **pantalla de escenario**, para que los músicos sepan cuánto falta.
+- Al llegar a cero se queda con el mensaje final hasta que la detengas: el
+  botón ⏱ queda encendido mientras corre, y adentro está **Detener la que
+  corre**.
+
+## 11. Copia de seguridad
 
 Botón **💾** en la barra de arriba:
 

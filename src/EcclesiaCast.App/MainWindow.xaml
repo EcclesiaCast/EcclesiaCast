@@ -133,8 +133,24 @@
                         </Button.Style>
                     </Button>
 
+                    <!-- Cuenta regresiva antes del servicio -->
+                    <Button Content="⏱" Padding="9,7" Margin="8,0,0,0"
+                            Command="{Binding OpenCountdownCommand}"
+                            ToolTip="Proyectar una cuenta regresiva antes de empezar («Empezamos en 5:00»)">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsCountdownRunning}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
                     <!-- Copia de seguridad de toda la biblioteca -->
-                    <Button Content="💾" Padding="9,7" Margin="8,0,0,0"
+                    <Button Content="💾" Padding="9,7" Margin="2,0,0,0"
                             Style="{StaticResource DarkButton}"
                             Click="Backup_Click"
                             ToolTip="Guardar una copia de toda la biblioteca, o restaurar una copia guardada"/>
@@ -863,6 +879,7 @@
                             <controls:ProjectedView Slide="{Binding Projection.Slide}"
                                                     State="{Binding Projection.State}"
                                                     Overlay="{Binding Projection.Overlay}"
+                                                    Countdown="{Binding Projection.Countdown}"
                                                     Highlight="{Binding Projection.Highlight}"
                                                     BackgroundMedia="{Binding Projection.Background}"
                                                     BackgroundBlur="{Binding Projection.BackgroundBlur}"

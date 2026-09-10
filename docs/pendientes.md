@@ -16,8 +16,6 @@ lado. Al cerrar un punto, borralo y anotalo en el [CHANGELOG](../CHANGELOG.md).
 
 ## 2. Funciones que faltan
 
-- [ ] **Cuenta regresiva** antes del servicio ("empezamos en 5:00"), en la
-      salida y en el escenario.
 - [ ] **Notas del predicador** en la pantalla de escenario: hoy muestra la
       letra de la canción, no un guion aparte.
 - [ ] **Transiciones** entre diapositivas más allá del fundido actual.

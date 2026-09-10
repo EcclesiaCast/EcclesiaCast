@@ -28,6 +28,11 @@ public partial class ProjectedView : UserControl
         DependencyProperty.Register(nameof(State), typeof(OutputState), typeof(ProjectedView),
             new PropertyMetadata(OutputState.Content, (d, e) => ((ProjectedView)d).SlideView.State = (OutputState)e.NewValue));
 
+    /// <summary>The pre-service countdown, handed straight to the slide view.</summary>
+    public static readonly DependencyProperty CountdownProperty =
+        DependencyProperty.Register(nameof(Countdown), typeof(Countdown), typeof(ProjectedView),
+            new PropertyMetadata(null, (d, e) => ((ProjectedView)d).SlideView.Countdown = (Countdown?)e.NewValue));
+
     public static readonly DependencyProperty OverlayProperty =
         DependencyProperty.Register(nameof(Overlay), typeof(string), typeof(ProjectedView),
             new PropertyMetadata(null, (d, e) => ((ProjectedView)d).SlideView.Overlay = (string?)e.NewValue));
@@ -91,6 +96,12 @@ public partial class ProjectedView : UserControl
     {
         get => (OutputState)GetValue(StateProperty);
         set => SetValue(StateProperty, value);
+    }
+
+    public Countdown? Countdown
+    {
+        get => (Countdown?)GetValue(CountdownProperty);
+        set => SetValue(CountdownProperty, value);
     }
 
     public string? Overlay

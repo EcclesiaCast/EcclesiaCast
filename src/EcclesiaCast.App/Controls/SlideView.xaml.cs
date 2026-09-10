@@ -7,6 +7,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using EcclesiaCast.Core.Logos;
 using EcclesiaCast.Core.Media;
 using EcclesiaCast.Core.Presentation;
@@ -51,6 +52,20 @@ public partial class SlideView : UserControl
         DependencyProperty.Register(nameof(IsLiveOutput), typeof(bool), typeof(SlideView),
             new PropertyMetadata(false, (d, _) => ((SlideView)d).RenderLogo()));
 
+    /// <summary>
+    /// The "we start in 5:00" screen. Null while there is no countdown, which
+    /// is most of the time.
+    /// </summary>
+    public static readonly DependencyProperty CountdownProperty =
+        DependencyProperty.Register(nameof(Countdown), typeof(Countdown), typeof(SlideView),
+            new PropertyMetadata(null, (d, _) => ((SlideView)d).OnCountdownChanged()));
+
+    public Countdown? Countdown
+    {
+        get => (Countdown?)GetValue(CountdownProperty);
+        set => SetValue(CountdownProperty, value);
+    }
+
     public static readonly DependencyProperty HighlightProperty =
         DependencyProperty.Register(nameof(Highlight), typeof(string), typeof(SlideView),
             new PropertyMetadata(null, (d, _) => ((SlideView)d).RenderText()));
@@ -64,6 +79,7 @@ public partial class SlideView : UserControl
     private const double CaptionBandFactor = 1.7;
 
     private string? _lastBackgroundImagePath;
+    private DispatcherTimer? _countdownTicker;
 
     public SlideView()
     {
@@ -690,6 +706,61 @@ public partial class SlideView : UserControl
         {
             BlackLayer.Opacity = blackTarget;
         }
+    }
+
+    /// <summary>
+    /// The countdown redraws once a second while it is up, and the timer is
+    /// only alive during that time — every preview box on the operator's
+    /// screen is one of these controls, and none of them should be waking up
+    /// every second for a screen nobody asked for.
+    /// </summary>
+    private void OnCountdownChanged()
+    {
+        _countdownTicker ??= new DispatcherTimer(
+            TimeSpan.FromMilliseconds(250), DispatcherPriority.Normal, (_, _) => RenderCountdown(), Dispatcher);
+
+        if (Countdown is null)
+        {
+            _countdownTicker.Stop();
+            CountdownLayer.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        // Quarter-second ticks rather than one-second ones: on a full second
+        // the displayed number and the clock drift apart just enough to make
+        // the last seconds stutter.
+        _countdownTicker.Start();
+        RenderCountdown();
+
+        if (AnimateTransitions)
+            FadeIn(CountdownLayer);
+    }
+
+    private void RenderCountdown()
+    {
+        if (Countdown is not { } countdown)
+            return;
+
+        CountdownLayer.Visibility = Visibility.Visible;
+
+        var finished = countdown.HasFinished(DateTimeOffset.Now);
+
+        // Once it hits zero the heading has nothing left to introduce, and
+        // leaving it up reads as one sentence: "Empezamos en ¡Bienvenidos!".
+        CountdownHeading.Text = countdown.Heading ?? string.Empty;
+        CountdownHeading.Visibility = finished || string.IsNullOrWhiteSpace(countdown.Heading)
+            ? Visibility.Collapsed
+            : Visibility.Visible;
+
+        var text = countdown.Format(DateTimeOffset.Now);
+        if (CountdownClock.Text != text)
+            CountdownClock.Text = text;
+
+        // A closing message ("¡Bienvenidos!") is words, not digits: at the
+        // clock's size it would run off both sides of the screen.
+        CountdownClock.FontSize = finished ? 150 : 260;
+        CountdownClock.TextWrapping = finished ? TextWrapping.Wrap : TextWrapping.NoWrap;
+        CountdownClock.MaxWidth = finished ? CanvasWidth - 220 : double.PositiveInfinity;
     }
 
     private void OnOverlayChanged()

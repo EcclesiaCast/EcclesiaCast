@@ -7,6 +7,12 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- Cuenta regresiva antes del servicio, en el botón ⏱ de la barra de arriba:
+  se proyecta sobre el fondo que tengas puesto, contando los minutos que
+  faltan o hasta una hora del reloj, con un texto arriba («Empezamos en») y
+  otro para cuando llega a cero («¡Bienvenidos!»). También se ve en la
+  pantalla de escenario, para que la banda sepa cuánto falta. Lo que escribís
+  queda guardado para el domingo siguiente.
 - Respaldo y restauración de la biblioteca desde el programa, en el botón 💾
   de la barra de arriba: guarda todo (canciones, Biblias, temas, medios y
   playlists) en un solo archivo `.ecbackup` con el programa abierto, y lo

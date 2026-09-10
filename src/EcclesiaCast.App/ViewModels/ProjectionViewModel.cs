@@ -33,6 +33,10 @@ public sealed partial class ProjectionViewModel : ObservableObject
     [ObservableProperty]
     private double _backgroundBlur;
 
+    /// <summary>The countdown running before the service, if any.</summary>
+    [ObservableProperty]
+    private Countdown? _countdown;
+
     /// <summary>The logo the Logo state shows right now.</summary>
     [ObservableProperty]
     private EcclesiaCast.Core.Logos.Logo? _activeLogo;
@@ -63,5 +67,6 @@ public sealed partial class ProjectionViewModel : ObservableObject
         Background = presentation.Background;
         BackgroundBlur = presentation.Background?.Blur ?? 0;
         ActiveLogo = presentation.ActiveLogo;
+        Countdown = presentation.Countdown;
     }
 }

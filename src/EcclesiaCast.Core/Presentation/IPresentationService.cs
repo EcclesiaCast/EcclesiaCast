@@ -37,6 +37,12 @@ public interface IPresentationService
     /// </summary>
     Logos.Logo? ActiveLogo { get; }
 
+    /// <summary>
+    /// The "we start in 5:00" screen, counting down over the background.
+    /// Null when there is none running.
+    /// </summary>
+    Countdown? Countdown { get; }
+
     /// <summary>Raised whenever the slide, the output state or the overlay changes.</summary>
     event EventHandler? Changed;
 
@@ -68,4 +74,10 @@ public interface IPresentationService
 
     /// <summary>Hides the text so only the background shows (for image/video-only slides).</summary>
     void ShowBackgroundOnly();
+
+    /// <summary>Puts a countdown on the output, replacing any earlier one.</summary>
+    void StartCountdown(Countdown countdown);
+
+    /// <summary>Takes the countdown off the output.</summary>
+    void StopCountdown();
 }

@@ -116,6 +116,15 @@ public partial class StageWindow : Window
         var text = vm.Slide?.MainText ?? string.Empty;
         CurrentText.Text = Transform(text, vm.Slide?.Theme);
 
+        // While a countdown runs it is what the congregation sees, so it is
+        // what the band and whoever is preaching need to see too — they are
+        // the ones who have to be in place when it hits zero.
+        if (vm.Countdown is not null)
+        {
+            RenderCountdown(vm);
+            return;
+        }
+
         LabelText.Text = vm.State switch
         {
             OutputState.Black => "⏸  PANTALLA EN NEGRO",
@@ -127,6 +136,24 @@ public partial class StageWindow : Window
         NextText.Text = vm.NextSlide is { } next
             ? Transform(next.MainText, next.Theme)
             : "—";
+
+        var hasOverlay = !string.IsNullOrWhiteSpace(vm.Overlay);
+        OverlayPanel.Visibility = hasOverlay ? Visibility.Visible : Visibility.Collapsed;
+        OverlayText.Text = vm.Overlay ?? string.Empty;
+    }
+
+    private void RenderCountdown(ProjectionViewModel vm)
+    {
+        if (vm.Countdown is not { } countdown)
+            return;
+
+        var finished = countdown.HasFinished(DateTimeOffset.Now);
+
+        LabelText.Text = "⏱  CUENTA REGRESIVA";
+        CurrentText.Text = countdown.Format(DateTimeOffset.Now);
+        NextText.Text = finished || string.IsNullOrWhiteSpace(countdown.Heading)
+            ? "—"
+            : countdown.Heading;
 
         var hasOverlay = !string.IsNullOrWhiteSpace(vm.Overlay);
         OverlayPanel.Visibility = hasOverlay ? Visibility.Visible : Visibility.Collapsed;
@@ -150,6 +177,11 @@ public partial class StageWindow : Window
     private void UpdateClocks()
     {
         ClockText.Text = DateTime.Now.ToString("HH:mm", CultureInfo.CurrentCulture);
+
+        // The countdown ticks on its own; the clock timer is already running
+        // every second, so it does the redrawing rather than a second timer.
+        if (DataContext is ProjectionViewModel { Countdown: not null } counting)
+            RenderCountdown(counting);
 
         var elapsed = DateTime.Now - _timerStart;
         TimerText.Text = elapsed.TotalHours >= 1

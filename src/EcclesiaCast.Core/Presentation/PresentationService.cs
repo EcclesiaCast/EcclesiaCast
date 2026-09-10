@@ -72,6 +72,23 @@ public sealed class PresentationService : IPresentationService
         OnChanged();
     }
 
+    public Countdown? Countdown { get; private set; }
+
+    public void StartCountdown(Countdown countdown)
+    {
+        Countdown = countdown;
+        OnChanged();
+    }
+
+    public void StopCountdown()
+    {
+        if (Countdown is null)
+            return;
+
+        Countdown = null;
+        OnChanged();
+    }
+
     public void ShowBackgroundOnly() => SetState(OutputState.Clear);
 
     private void SetState(OutputState state)
