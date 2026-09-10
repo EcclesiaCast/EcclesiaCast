@@ -43,6 +43,12 @@ public interface IPresentationService
     /// </summary>
     Countdown? Countdown { get; }
 
+    /// <summary>
+    /// Notes only the stage display shows — an outline for whoever is
+    /// preaching, or a reminder for the band. Never reaches the congregation.
+    /// </summary>
+    string? StageNotes { get; }
+
     /// <summary>Raised whenever the slide, the output state or the overlay changes.</summary>
     event EventHandler? Changed;
 
@@ -74,6 +80,9 @@ public interface IPresentationService
 
     /// <summary>Hides the text so only the background shows (for image/video-only slides).</summary>
     void ShowBackgroundOnly();
+
+    /// <summary>Sets the notes the stage display shows; null or blank clears them.</summary>
+    void SetStageNotes(string? notes);
 
     /// <summary>Puts a countdown on the output, replacing any earlier one.</summary>
     void StartCountdown(Countdown countdown);

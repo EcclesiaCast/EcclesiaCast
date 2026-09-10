@@ -105,11 +105,6 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Drops the logo list under the ▾ button: one entry per logo (the active
-    /// one ticked), then the way into the manager. Built here rather than in
-    /// XAML so the fixed entries and the list can live in the same menu.
-    /// </summary>
-    /// <summary>
     /// Backups behind one button: saving is done now and then, restoring
     /// hopefully never, so neither earns a permanent spot on the bar.
     /// </summary>
@@ -138,6 +133,11 @@ public partial class MainWindow : Window
         menu.IsOpen = true;
     }
 
+    /// <summary>
+    /// Drops the logo list under the ▾ button: one entry per logo (the active
+    /// one ticked), then the way into the manager. Built here rather than in
+    /// XAML so the fixed entries and the list can live in the same menu.
+    /// </summary>
     private void LogoPicker_Click(object sender, RoutedEventArgs e)
     {
         if (DataContext is not MainViewModel vm || sender is not FrameworkElement anchor)
@@ -235,6 +235,7 @@ public partial class MainWindow : Window
         menu.Items.Add(Toggle("Mostrar la hora", vm.StageShowClock, v => vm.StageShowClock = v));
         menu.Items.Add(Toggle("Mostrar el cronómetro", vm.StageShowTimer, v => vm.StageShowTimer = v));
         menu.Items.Add(Toggle("Mostrar la diapositiva siguiente", vm.StageShowNext, v => vm.StageShowNext = v));
+        menu.Items.Add(Toggle("Mostrar las notas", vm.StageShowNotes, v => vm.StageShowNotes = v));
 
         menu.Items.Add(new Separator());
         foreach (var size in new[] { 72d, 96d, 120d, 150d })

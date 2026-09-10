@@ -26,6 +26,7 @@ public sealed record DisplayOption(DisplayInfo Info, string Label);
 public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 {
     private const string OutputDisplayKey = "output.display";
+    private const string StageNotesKey = "stage.notes.text";
     private const string CountdownMinutesKey = "countdown.minutes";
     private const string CountdownClockKey = "countdown.clock";
     private const string CountdownHeadingKey = "countdown.heading";
@@ -110,6 +111,14 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
     [ObservableProperty]
     private bool _isOverlayActive;
+
+    /// <summary>Notes the operator wrote for the platform.</summary>
+    [ObservableProperty]
+    private string _stageNotesText = string.Empty;
+
+    /// <summary>True while those notes are up on the stage display.</summary>
+    [ObservableProperty]
+    private bool _isStageNotesActive;
 
     /// <summary>True while the pre-service countdown is on the output.</summary>
     [ObservableProperty]
@@ -240,6 +249,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         LoadMedia();
         LoadLogos(null);
         LoadPlaylists(null);
+        StageNotesText = _settings.Get(StageNotesKey) ?? string.Empty;
         RestoreRemote();
         _ = RefreshVideoThumbnailsAsync();
     }
@@ -1614,6 +1624,12 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         set => SetStageOption(o => o.ShowNext = value);
     }
 
+    public bool StageShowNotes
+    {
+        get => _stageOptions.ShowNotes;
+        set => SetStageOption(o => o.ShowNotes = value);
+    }
+
     public double StageTextScale
     {
         get => _stageOptions.TextScale;
@@ -1628,6 +1644,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         OnPropertyChanged(nameof(StageShowClock));
         OnPropertyChanged(nameof(StageShowTimer));
         OnPropertyChanged(nameof(StageShowNext));
+        OnPropertyChanged(nameof(StageShowNotes));
         OnPropertyChanged(nameof(StageTextScale));
     }
 
@@ -2936,6 +2953,34 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         StatusText = "Texto rápido en vivo. F1 Clear · F2 Black · F3 Logo · Esc apaga la salida.";
     }
 
+    // ── Notas para la plataforma ─────────────────────────────────
+
+    /// <summary>
+    /// The preacher's outline. It only ever reaches the stage display, so
+    /// unlike everything else in this panel it does not need the projector on.
+    /// </summary>
+    [RelayCommand]
+    private void ShowStageNotes()
+    {
+        if (string.IsNullOrWhiteSpace(StageNotesText))
+            return;
+
+        var notes = StageNotesText.Trim();
+        _presentation.SetStageNotes(notes);
+        _settings.Set(StageNotesKey, notes);
+
+        StatusText = IsStageVisible
+            ? "Notas en la pantalla de escenario."
+            : "Notas guardadas. Se ven al prender la pantalla de escenario (🎭).";
+    }
+
+    [RelayCommand]
+    private void HideStageNotes()
+    {
+        _presentation.SetStageNotes(null);
+        StatusText = "Notas fuera del escenario.";
+    }
+
     // ── Aviso al pie ─────────────────────────────────────────────
 
     [RelayCommand]
@@ -3024,6 +3069,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         IsLogoActive = _presentation.State == OutputState.Logo;
         IsOverlayActive = _presentation.OverlayMessage is not null;
         IsCountdownRunning = _presentation.Countdown is not null;
+        IsStageNotesActive = _presentation.StageNotes is not null;
         HasBackground = _presentation.Background is not null;
 
         // Show the blur the current background carries, without saving it back.

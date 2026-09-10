@@ -7,6 +7,10 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- Notas para la plataforma, en la pestaña «Notas» de la columna derecha: se
+  ven sólo en la pantalla de escenario — el guion de quien predica, un aviso
+  para la banda — y nunca llegan a la congregación. Si son muchas, se achican
+  para entrar enteras, y quedan guardadas para la próxima vez.
 - Cuenta regresiva antes del servicio, en el botón ⏱ de la barra de arriba:
   se proyecta sobre el fondo que tengas puesto, contando los minutos que
   faltan o hasta una hora del reloj, con un texto arriba («Empezamos en») y

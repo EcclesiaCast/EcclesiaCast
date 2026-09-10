@@ -280,6 +280,19 @@ subraya nada, avisame**: significa que hay que instalarlo o buscar otro camino.
       ahí.
 - [ ] Detenerla desde el mismo botón ⏱ → **Detener la que corre**.
 
+### Notas para la plataforma (nuevo)
+
+- [ ] Pestaña **Notas** (columna derecha) → escribir el guion del domingo y
+      **Mostrar**.
+- [ ] Con el **escenario prendido**: aparecen abajo, y **no** salen en el
+      proyector. Confirmalo mirando las dos pantallas.
+- [ ] Pegar un guion **largo** (diez líneas o más): tiene que entrar entero,
+      achicado, sin cortarse.
+- [ ] **Quitar** las saca del escenario.
+- [ ] Cerrar y abrir el programa: el texto sigue escrito.
+- [ ] En la flecha **▾** del escenario, *Mostrar las notas* las apaga y
+      prende.
+
 ### Copia de seguridad (nuevo)
 
 - [ ] Botón **💾** → *Guardar una copia*. **Con el programa abierto y

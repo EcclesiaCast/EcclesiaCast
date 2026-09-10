@@ -168,6 +168,11 @@ Con **Clear** o **Black** la congregación deja de ver la letra, pero el
 escenario **la sigue mostrando** y avisa cuál de los dos estados está activo —
 que es justamente para lo que sirve.
 
+Abajo de todo aparecen las **notas**: las escribís en la pestaña **Notas** de
+la columna derecha y tocás *Mostrar*. Se ven sólo acá — el guion de quien
+predica, «cantamos el coro dos veces» — y nunca llegan a la congregación. Si
+son muchas, se achican para entrar enteras.
+
 La flecha **▾** de al lado elige en qué pantalla va, qué se muestra (hora,
 cronómetro, siguiente), el tamaño de la letra y **⟲ pone el cronómetro en
 cero**. No te deja elegir la misma pantalla que la salida.

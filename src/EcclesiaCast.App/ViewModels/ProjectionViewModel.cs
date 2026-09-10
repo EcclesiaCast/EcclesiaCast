@@ -33,6 +33,10 @@ public sealed partial class ProjectionViewModel : ObservableObject
     [ObservableProperty]
     private double _backgroundBlur;
 
+    /// <summary>Notes for the platform, shown only on the stage display.</summary>
+    [ObservableProperty]
+    private string? _stageNotes;
+
     /// <summary>The countdown running before the service, if any.</summary>
     [ObservableProperty]
     private Countdown? _countdown;
@@ -68,5 +72,6 @@ public sealed partial class ProjectionViewModel : ObservableObject
         BackgroundBlur = presentation.Background?.Blur ?? 0;
         ActiveLogo = presentation.ActiveLogo;
         Countdown = presentation.Countdown;
+        StageNotes = presentation.StageNotes;
     }
 }

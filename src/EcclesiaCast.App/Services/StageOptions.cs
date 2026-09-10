@@ -13,12 +13,16 @@ public sealed class StageOptions
     /// <summary>The slide after the live one, so the singers can prepare.</summary>
     public bool ShowNext { get; set; } = true;
 
+    /// <summary>Notes for whoever is preaching, written by the operator.</summary>
+    public bool ShowNotes { get; set; } = true;
+
     /// <summary>Size of the live text, in points over the stage screen.</summary>
     public double TextScale { get; set; } = 96;
 
     private const string ClockKey = "stage.clock";
     private const string TimerKey = "stage.timer";
     private const string NextKey = "stage.next";
+    private const string NotesKey = "stage.notes";
     private const string ScaleKey = "stage.scale";
 
     public static StageOptions Load(ISettingsStore settings) => new()
@@ -26,6 +30,7 @@ public sealed class StageOptions
         ShowClock = settings.Get(ClockKey) != "0",
         ShowTimer = settings.Get(TimerKey) != "0",
         ShowNext = settings.Get(NextKey) != "0",
+        ShowNotes = settings.Get(NotesKey) != "0",
         TextScale = double.TryParse(settings.Get(ScaleKey), out var scale) && scale > 0 ? scale : 96,
     };
 
@@ -34,6 +39,7 @@ public sealed class StageOptions
         settings.Set(ClockKey, ShowClock ? "1" : "0");
         settings.Set(TimerKey, ShowTimer ? "1" : "0");
         settings.Set(NextKey, ShowNext ? "1" : "0");
+        settings.Set(NotesKey, ShowNotes ? "1" : "0");
         settings.Set(ScaleKey, TextScale.ToString("0"));
     }
 }

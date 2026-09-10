@@ -19,6 +19,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- ══ Barra: reloj · cronómetro · referencia ══ -->
@@ -70,8 +71,31 @@
             </DockPanel>
         </Border>
 
+        <!-- ══ Notas de quien predica: sólo se ven acá ══ -->
+        <Border Grid.Row="3" x:Name="NotesPanel"
+                BorderBrush="#252A36" BorderThickness="0,1,0,0"
+                Padding="0,14,0,0" Margin="0,10,0,0"
+                Visibility="Collapsed">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Left" Text="NOTAS"
+                           FontSize="18" FontWeight="SemiBold" Foreground="#4A5266"
+                           VerticalAlignment="Top" Margin="0,6,20,0"/>
+                <!-- Nadie puede desplazar esta pantalla: no toma foco ni tiene
+                     mouse. Un guion largo se achica para entrar entero, que es
+                     mejor que quedar cortado sin que nadie lo note. -->
+                <Viewbox Stretch="Uniform" StretchDirection="DownOnly"
+                         MaxHeight="300" HorizontalAlignment="Left">
+                    <TextBlock x:Name="NotesText"
+                               FontSize="34"
+                               Foreground="#C9D4E8"
+                               TextWrapping="Wrap"
+                               MaxWidth="1500"/>
+                </Viewbox>
+            </DockPanel>
+        </Border>
+
         <!-- ══ Aviso al pie (lo mismo que ve la congregación) ══ -->
-        <Border Grid.Row="3" x:Name="OverlayPanel"
+        <Border Grid.Row="4" x:Name="OverlayPanel"
                 Background="#1B2436" BorderBrush="#2F63C9" BorderThickness="0,3,0,0"
                 Padding="20,12" Margin="0,14,0,0"
                 Visibility="Collapsed">

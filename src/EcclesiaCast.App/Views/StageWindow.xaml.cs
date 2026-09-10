@@ -140,6 +140,8 @@ public partial class StageWindow : Window
         var hasOverlay = !string.IsNullOrWhiteSpace(vm.Overlay);
         OverlayPanel.Visibility = hasOverlay ? Visibility.Visible : Visibility.Collapsed;
         OverlayText.Text = vm.Overlay ?? string.Empty;
+
+        RenderNotes(vm);
     }
 
     private void RenderCountdown(ProjectionViewModel vm)
@@ -158,6 +160,19 @@ public partial class StageWindow : Window
         var hasOverlay = !string.IsNullOrWhiteSpace(vm.Overlay);
         OverlayPanel.Visibility = hasOverlay ? Visibility.Visible : Visibility.Collapsed;
         OverlayText.Text = vm.Overlay ?? string.Empty;
+
+        RenderNotes(vm);
+    }
+
+    /// <summary>
+    /// The outline for whoever is preaching. It shows up only here — the
+    /// congregation never sees it, which is the whole reason it exists.
+    /// </summary>
+    private void RenderNotes(ProjectionViewModel vm)
+    {
+        var hasNotes = Options.ShowNotes && !string.IsNullOrWhiteSpace(vm.StageNotes);
+        NotesPanel.Visibility = hasNotes ? Visibility.Visible : Visibility.Collapsed;
+        NotesText.Text = vm.StageNotes ?? string.Empty;
     }
 
     /// <summary>

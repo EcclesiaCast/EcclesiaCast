@@ -72,6 +72,18 @@ public sealed class PresentationService : IPresentationService
         OnChanged();
     }
 
+    public string? StageNotes { get; private set; }
+
+    public void SetStageNotes(string? notes)
+    {
+        notes = string.IsNullOrWhiteSpace(notes) ? null : notes;
+        if (notes == StageNotes)
+            return;
+
+        StageNotes = notes;
+        OnChanged();
+    }
+
     public Countdown? Countdown { get; private set; }
 
     public void StartCountdown(Countdown countdown)

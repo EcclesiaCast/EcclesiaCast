@@ -902,6 +902,9 @@
                             <RadioButton x:Name="TabHighlight" Content="Resaltar"
                                          Style="{StaticResource TabButton}" GroupName="WriteTab" Margin="4,0,0,0"
                                          ToolTip="Pinta una palabra como con marcador sobre lo que está proyectado"/>
+                            <RadioButton x:Name="TabNotes" Content="Notas"
+                                         Style="{StaticResource TabButton}" GroupName="WriteTab" Margin="4,0,0,0"
+                                         ToolTip="Notas para quien predica: se ven sólo en la pantalla de escenario"/>
                         </StackPanel>
 
                         <Grid>
@@ -993,6 +996,47 @@
                                         Margin="12,10,12,0" Padding="14,7"
                                         ToolTip="Saca el resaltado amarillo del texto proyectado"/>
                                 <Grid/>
+                            </DockPanel>
+
+                            <!-- ── Notas para la plataforma ── -->
+                            <DockPanel Visibility="{Binding IsChecked, ElementName=TabNotes, Converter={StaticResource BoolToVis}}">
+                                <TextBlock DockPanel.Dock="Top"
+                                           Text="Sólo se ven en la pantalla de escenario: el guion del predicador, un aviso para la banda. La congregación nunca las ve."
+                                           FontSize="11" Foreground="{StaticResource FaintBrush}"
+                                           TextWrapping="Wrap" Margin="12,0,12,8"/>
+                                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="12,8,12,12">
+                                    <Button Content="Mostrar" Command="{Binding ShowStageNotesCommand}" Padding="16,8"
+                                            ToolTip="Manda las notas a la pantalla de escenario">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsStageNotesActive}" Value="True">
+                                                        <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                                        <Setter Property="BorderThickness" Value="0"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button Content="Quitar" Style="{StaticResource DarkButton}" Padding="16,8" Margin="6,0,0,0"
+                                            Command="{Binding HideStageNotesCommand}"
+                                            ToolTip="Saca las notas del escenario"/>
+                                </StackPanel>
+                                <TextBox AcceptsReturn="True" TextWrapping="Wrap"
+                                         VerticalScrollBarVisibility="Auto"
+                                         Text="{Binding StageNotesText, UpdateSourceTrigger=PropertyChanged}"
+                                         Background="{StaticResource SurfaceAltBrush}"
+                                         Foreground="White"
+                                         BorderBrush="{StaticResource LineBrush}"
+                                         CaretBrush="White"
+                                         Margin="12,0,12,0"
+                                         Padding="8,6" FontSize="14"
+                                         services:SpellChecking.Enabled="True"
+                                         ToolTip="Ej: los puntos del mensaje, o «cantamos el coro dos veces»">
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Key="Enter" Modifiers="Control" Command="{Binding ShowStageNotesCommand}"/>
+                                    </TextBox.InputBindings>
+                                </TextBox>
                             </DockPanel>
                         </Grid>
                     </DockPanel>
