@@ -204,6 +204,25 @@
                             <ComboBoxItem Content="todas minúsculas"/>
                         </ComboBox>
 
+                        <TextBlock Text="Cómo entra la diapositiva" Style="{StaticResource FieldLabel}"/>
+                        <ComboBox SelectedIndex="{Binding TransitionIndex}" FontSize="12"
+                                  ToolTip="Cada tema tiene la suya: las canciones pueden fundir y la Biblia cortar">
+                            <ComboBoxItem Content="Sin transición (corte)"/>
+                            <ComboBoxItem Content="Fundido"/>
+                            <ComboBoxItem Content="Entra desde la derecha"/>
+                            <ComboBoxItem Content="Sube desde abajo"/>
+                            <ComboBoxItem Content="Se acomoda (zoom)"/>
+                        </ComboBox>
+                        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                            <TextBlock Text="Duración" FontSize="11" Width="70" VerticalAlignment="Center"
+                                       Foreground="{StaticResource MutedBrush}"/>
+                            <controls:NumericField Minimum="0" Maximum="1500" Step="20"
+                                                   Value="{Binding TransitionMs}"
+                                                   ToolTip="En milisegundos. 280 es el fundido de siempre; más de 500 se siente lento"/>
+                            <TextBlock Text="ms" FontSize="11" VerticalAlignment="Center" Margin="6,0,0,0"
+                                       Foreground="{StaticResource MutedBrush}"/>
+                        </StackPanel>
+
                         <TextBlock Text="Sombra" Style="{StaticResource FieldLabel}"/>
                         <CheckBox Content="Sombra bajo la letra" IsChecked="{Binding Shadow}"/>
                         <StackPanel Orientation="Horizontal" IsEnabled="{Binding Shadow}" Margin="0,4,0,0">

@@ -50,6 +50,8 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     [ObservableProperty] private bool _bold = true;
     [ObservableProperty] private bool _italic;
     [ObservableProperty] private int _caseIndex;                       // orden de TextCase
+    [ObservableProperty] private int _transitionIndex = 1;             // orden de SlideTransition
+    [ObservableProperty] private double _transitionMs = 280;
     [ObservableProperty] private bool _shadow = true;
     [ObservableProperty] private double _shadowOpacityPercent = 75;    // 0–100
     [ObservableProperty] private double _shadowBlur = 18;
@@ -132,6 +134,8 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         Bold = theme.Bold;
         Italic = theme.Italic;
         CaseIndex = (int)theme.TextCase;
+        TransitionIndex = (int)theme.Transition;
+        TransitionMs = theme.TransitionMs;
         Shadow = theme.Shadow;
         ShadowOpacityPercent = theme.ShadowOpacity * 100;
         ShadowBlur = theme.ShadowBlur;
@@ -180,6 +184,8 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         Bold = Bold,
         Italic = Italic,
         TextCase = (TextCase)Math.Clamp(CaseIndex, 0, 4),
+        Transition = (SlideTransition)Math.Clamp(TransitionIndex, 0, 4),
+        TransitionMs = Math.Clamp(TransitionMs, 0, 1500),
         Shadow = Shadow,
         ShadowOpacity = Math.Clamp(ShadowOpacityPercent / 100, 0, 1),
         ShadowBlur = Math.Clamp(ShadowBlur, 0, 80),

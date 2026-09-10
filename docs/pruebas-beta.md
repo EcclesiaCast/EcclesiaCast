@@ -280,6 +280,17 @@ subraya nada, avisame**: significa que hay que instalarlo o buscar otro camino.
       ahí.
 - [ ] Detenerla desde el mismo botón ⏱ → **Detener la que corre**.
 
+### Transiciones (nuevo)
+
+- [ ] En **🎨 Temas**, probar cada una de las cinco opciones de *Cómo entra la
+      diapositiva* proyectando una canción y pasando con las flechas.
+- [ ] Con **280 ms** (lo de siempre) tiene que verse igual que antes.
+- [ ] **Mirala desde lejos**: ¿ayuda o marea? Es la pregunta que importa.
+- [ ] Con un **video de fondo** puesto: la transición es sólo de la letra, el
+      video no salta.
+- [ ] Poner la **Biblia en corte** y las **canciones en fundido**, y confirmar
+      que cada una se comporta como su tema dice.
+
 ### Notas para la plataforma (nuevo)
 
 - [ ] Pestaña **Notas** (columna derecha) → escribir el guion del domingo y

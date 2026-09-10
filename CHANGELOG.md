@@ -7,6 +7,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- Transiciones por tema: además del fundido de siempre, la diapositiva puede
+  entrar desde la derecha, subir desde abajo, acomodarse con un zoom suave o
+  no tener transición (corte). Se elige en el editor de temas, con su
+  duración, así las canciones pueden fundir y la Biblia cortar. Los temas que
+  ya existen se quedan con el fundido que venían haciendo.
 - Notas para la plataforma, en la pestaña «Notas» de la columna derecha: se
   ven sólo en la pantalla de escenario — el guion de quien predica, un aviso
   para la banda — y nunca llegan a la congregación. Si son muchas, se achican

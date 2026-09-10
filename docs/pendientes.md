@@ -16,7 +16,6 @@ lado. Al cerrar un punto, borralo y anotalo en el [CHANGELOG](../CHANGELOG.md).
 
 ## 2. Funciones que faltan
 
-- [ ] **Transiciones** entre diapositivas más allá del fundido actual.
 - [ ] Múltiples cuadros de texto por diapositiva (diferido desde el sprint 4).
 - [ ] Recorte de entrada/salida de video y efectos de color (diferido desde el
       sprint 5).

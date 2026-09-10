@@ -43,6 +43,28 @@ public enum TextCase
 }
 
 /// <summary>
+/// How one slide gives way to the next. Churches differ on this: some want
+/// the words to appear without ceremony, others want a soft fade so the
+/// change is not jarring on a big screen.
+/// </summary>
+public enum SlideTransition
+{
+    /// <summary>Cut. The next slide is simply there.</summary>
+    None,
+
+    Fade,
+
+    /// <summary>The new text comes in from the right, like turning a page.</summary>
+    SlideLeft,
+
+    /// <summary>The new text rises from below.</summary>
+    SlideUp,
+
+    /// <summary>The text settles in from slightly larger.</summary>
+    Zoom,
+}
+
+/// <summary>
 /// Everything configurable about how a slide looks. Sizes and margins are
 /// in pixels over the virtual 1920×1080 canvas that <c>SlideView</c> renders.
 /// </summary>
@@ -137,6 +159,16 @@ public sealed class SlideTheme
 
     /// <summary>Prefix each verse's text with its number.</summary>
     public bool ShowVerseNumbers { get; set; }
+
+    // ── Transición entre diapositivas ────────────────────────────
+    /// <summary>How the text arrives when the slide changes.</summary>
+    public SlideTransition Transition { get; set; } = SlideTransition.Fade;
+
+    /// <summary>
+    /// How long the transition takes, in milliseconds. Kept short on purpose:
+    /// anything slow enough to admire is slow enough to lose the singers.
+    /// </summary>
+    public double TransitionMs { get; set; } = 280;
 
     /// <summary>Built-in look used when nothing is configured yet.</summary>
     public static SlideTheme Fallback { get; } = new() { Name = "(integrado)" };

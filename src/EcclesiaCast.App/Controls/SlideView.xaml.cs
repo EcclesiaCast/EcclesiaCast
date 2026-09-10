@@ -182,7 +182,7 @@ public partial class SlideView : UserControl
         RenderText();
 
         if (AnimateTransitions && State == OutputState.Content)
-            FadeIn(TextLayer);
+            TransitionIn(TextLayer);
     }
 
     // ── Tema ─────────────────────────────────────────────────────
@@ -700,7 +700,7 @@ public partial class SlideView : UserControl
             BlackLayer.BeginAnimation(OpacityProperty,
                 new DoubleAnimation(blackTarget, TimeSpan.FromMilliseconds(250)));
             if (State == OutputState.Content)
-                FadeIn(TextLayer);
+                TransitionIn(TextLayer);
         }
         else
         {
@@ -779,4 +779,71 @@ public partial class SlideView : UserControl
             {
                 EasingFunction = new QuadraticEase()
             });
+
+    // ── Transición entre diapositivas ────────────────────────────
+
+    private SlideTransition EffectiveTransition => CurrentTheme.Transition;
+
+    /// <summary>Clamped: a transition longer than a second outlasts the change it covers.</summary>
+    private double EffectiveTransitionMs => Math.Clamp(CurrentTheme.TransitionMs, 0, 1500);
+
+    /// <summary>
+    /// Brings the words in the way the theme asks. Each theme carries its own,
+    /// so a church can have the songs fade and the Bible cut — reading a verse
+    /// is a different act from following a lyric.
+    /// </summary>
+    private void TransitionIn(FrameworkElement element)
+    {
+        var duration = TimeSpan.FromMilliseconds(EffectiveTransitionMs);
+        var transition = EffectiveTransition;
+
+        // Whatever an earlier transition left behind has to go, or a theme
+        // switched mid-service would keep sliding a slide that should cut.
+        element.BeginAnimation(OpacityProperty, null);
+        element.RenderTransform = System.Windows.Media.Transform.Identity;
+        element.Opacity = 1;
+
+        if (transition == SlideTransition.None || EffectiveTransitionMs <= 0)
+            return;
+
+        var ease = new QuadraticEase { EasingMode = EasingMode.EaseOut };
+        element.BeginAnimation(OpacityProperty,
+            new DoubleAnimation(0, 1, duration) { EasingFunction = ease });
+
+        if (transition == SlideTransition.Fade)
+            return;
+
+        element.RenderTransformOrigin = new Point(0.5, 0.5);
+
+        switch (transition)
+        {
+            case SlideTransition.SlideLeft:
+            {
+                var move = new TranslateTransform();
+                element.RenderTransform = move;
+                move.BeginAnimation(TranslateTransform.XProperty,
+                    new DoubleAnimation(CanvasWidth * 0.06, 0, duration) { EasingFunction = ease });
+                break;
+            }
+
+            case SlideTransition.SlideUp:
+            {
+                var move = new TranslateTransform();
+                element.RenderTransform = move;
+                move.BeginAnimation(TranslateTransform.YProperty,
+                    new DoubleAnimation(CanvasHeight * 0.06, 0, duration) { EasingFunction = ease });
+                break;
+            }
+
+            case SlideTransition.Zoom:
+            {
+                var scale = new ScaleTransform(1.06, 1.06);
+                element.RenderTransform = scale;
+                var settle = new DoubleAnimation(1.06, 1, duration) { EasingFunction = ease };
+                scale.BeginAnimation(ScaleTransform.ScaleXProperty, settle);
+                scale.BeginAnimation(ScaleTransform.ScaleYProperty, settle);
+                break;
+            }
+        }
+    }
 }

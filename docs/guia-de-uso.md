@@ -100,6 +100,10 @@ Botón **🎨 Temas** en la barra superior:
 
 - Editás tipografía, tamaño (con **auto-ajuste**: si un versículo no entra, se
   achica solo), negrita/cursiva, color, alineación, márgenes e interlineado.
+- **Cómo entra la diapositiva**: sin transición (corte), fundido, desde la
+  derecha, desde abajo o con un zoom suave, con su duración en milisegundos.
+  Como es parte del tema, podés tener las canciones con fundido y la Biblia
+  con corte seco.
 - **Uso de mayúsculas**: como está escrito, TODAS MAYÚSCULAS, Cada Palabra,
   como oración o todas minúsculas — cambia lo proyectado sin tocar el texto
   guardado.
