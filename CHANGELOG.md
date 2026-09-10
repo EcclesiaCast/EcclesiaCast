@@ -7,6 +7,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- Respaldo y restauración de la biblioteca desde el programa, en el botón 💾
+  de la barra de arriba: guarda todo (canciones, Biblias, temas, medios y
+  playlists) en un solo archivo `.ecbackup` con el programa abierto, y lo
+  vuelve a poner cuando hace falta. La restauración se aplica al reabrir el
+  programa y deja guardada la biblioteca anterior por las dudas.
 - Límite de intentos del PIN en el control remoto: cinco PINes equivocados
   desde el mismo teléfono lo dejan afuera cinco minutos, con la espera a la
   vista y contando. Cada teléfono cuenta por su cuenta, así que uno bloqueado

@@ -109,6 +109,35 @@ public partial class MainWindow : Window
     /// one ticked), then the way into the manager. Built here rather than in
     /// XAML so the fixed entries and the list can live in the same menu.
     /// </summary>
+    /// <summary>
+    /// Backups behind one button: saving is done now and then, restoring
+    /// hopefully never, so neither earns a permanent spot on the bar.
+    /// </summary>
+    private void Backup_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm || sender is not FrameworkElement anchor)
+            return;
+
+        var menu = new ContextMenu
+        {
+            PlacementTarget = anchor,
+            Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom,
+        };
+
+        menu.Items.Add(new MenuItem
+        {
+            Header = "Guardar una copia de la biblioteca…",
+            Command = vm.SaveBackupCommand,
+        });
+        menu.Items.Add(new MenuItem
+        {
+            Header = "Restaurar desde una copia…",
+            Command = vm.RestoreBackupCommand,
+        });
+
+        menu.IsOpen = true;
+    }
+
     private void LogoPicker_Click(object sender, RoutedEventArgs e)
     {
         if (DataContext is not MainViewModel vm || sender is not FrameworkElement anchor)

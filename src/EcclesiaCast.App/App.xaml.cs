@@ -58,6 +58,31 @@ public partial class App : Application
 
         var dbPath = Path.Combine(appDataDir, "ecclesiacast.db");
         Directory.CreateDirectory(appDataDir);
+
+        // A restore chosen in the previous run is swapped in here, before
+        // anything opens the database — that is the only moment nothing holds
+        // it. Migrations then bring an older library up to date by themselves.
+        var restore = DatabaseBackup.ApplyPendingRestore(dbPath);
+        if (restore.Restored)
+        {
+            Log.Information("Biblioteca restaurada desde una copia de seguridad");
+            MessageBox.Show(
+                "Se restauró la copia de seguridad.\n\n"
+                + "Por las dudas, la biblioteca que tenías antes quedó guardada en:\n\n"
+                + DatabaseBackup.ReplacedLibraryPath(dbPath),
+                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        else if (restore.WasStaged)
+        {
+            Log.Error("No se pudo aplicar la restauración pendiente: {Error}", restore.Error);
+            MessageBox.Show(
+                "No se pudo restaurar la copia: algo está usando la biblioteca.\n\n"
+                + "Suele ser otra ventana de EcclesiaCast abierta. Cerralas todas y volvé a abrir el "
+                + "programa; la copia sigue esperando y se restaura sola.\n\n"
+                + $"Detalle: {restore.Error}",
+                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+
         using (var db = new AppDbContext(dbPath))
             db.Database.Migrate();
 
@@ -101,6 +126,7 @@ public partial class App : Application
         services.AddSingleton<ILogoManagerDialog, LogoManagerDialogService>();
         services.AddSingleton<IProPresenterImportDialog, ProPresenterImportDialogService>();
         services.AddSingleton<IStageWindowService, StageWindowService>();
+        services.AddSingleton<IBackupDialog>(_ => new BackupDialogService(dbPath));
         services.AddSingleton<MainViewModel>();
         _services = services.BuildServiceProvider();
 

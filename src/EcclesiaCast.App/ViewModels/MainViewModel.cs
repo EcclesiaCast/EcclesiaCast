@@ -51,6 +51,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private readonly ILogoManagerDialog _logoManager;
     private readonly IProPresenterImportDialog _proPresenterImport;
     private readonly IStageWindowService _stage;
+    private readonly IBackupDialog _backup;
 
     /// <summary>Copied slide (label + text + style) for paste/duplicate.</summary>
     private (string Label, string Text, string? StyleJson)? _clipboardSlide;
@@ -187,6 +188,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         ILogoManagerDialog logoManager,
         IProPresenterImportDialog proPresenterImport,
         IStageWindowService stage,
+        IBackupDialog backup,
         ProjectionViewModel projectionViewModel)
     {
         _displayProvider = displayProvider;
@@ -210,6 +212,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _logoManager = logoManager;
         _proPresenterImport = proPresenterImport;
         _stage = stage;
+        _backup = backup;
         Projection = projectionViewModel;
 
         _presentation.Changed += (_, _) => UpdateStateFlags();
@@ -997,6 +1000,16 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         else
             StatusText = $"Logo: {logo.Name}.";
     }
+
+    /// <summary>
+    /// The whole library is one file, so a backup is one file too. Volunteers
+    /// were being told to go find it in AppData; now it is a menu item.
+    /// </summary>
+    [RelayCommand]
+    private void SaveBackup() => _backup.SaveBackup();
+
+    [RelayCommand]
+    private void RestoreBackup() => _backup.RestoreBackup();
 
     [RelayCommand]
     private void OpenLogos()

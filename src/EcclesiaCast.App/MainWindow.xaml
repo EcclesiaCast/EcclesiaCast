@@ -132,6 +132,12 @@
                             </Style>
                         </Button.Style>
                     </Button>
+
+                    <!-- Copia de seguridad de toda la biblioteca -->
+                    <Button Content="💾" Padding="9,7" Margin="8,0,0,0"
+                            Style="{StaticResource DarkButton}"
+                            Click="Backup_Click"
+                            ToolTip="Guardar una copia de toda la biblioteca, o restaurar una copia guardada"/>
                 </StackPanel>
 
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">

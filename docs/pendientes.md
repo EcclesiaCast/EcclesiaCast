@@ -20,8 +20,6 @@ lado. Al cerrar un punto, borralo y anotalo en el [CHANGELOG](../CHANGELOG.md).
       salida y en el escenario.
 - [ ] **Notas del predicador** en la pantalla de escenario: hoy muestra la
       letra de la canción, no un guion aparte.
-- [ ] **Respaldo y restauración** de la biblioteca desde el programa. Hoy es
-      copiar `%APPDATA%\EcclesiaCast\ecclesiacast.db` a mano.
 - [ ] **Transiciones** entre diapositivas más allá del fundido actual.
 - [ ] Múltiples cuadros de texto por diapositiva (diferido desde el sprint 4).
 - [ ] Recorte de entrada/salida de video y efectos de color (diferido desde el

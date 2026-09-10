@@ -191,6 +191,22 @@ dirección y un **PIN de cuatro dígitos**.
 > El PIN existe porque cualquiera conectado a la wifi podría, si no, manejar la
 > proyección. Cambiá de PIN apagando y volviendo a prender el control remoto.
 
+## 10. Copia de seguridad
+
+Botón **💾** en la barra de arriba:
+
+- **Guardar una copia de la biblioteca…** escribe un archivo `.ecbackup` con
+  **todo**: canciones, Biblias, temas, medios y playlists. Se puede hacer con
+  el programa abierto, incluso proyectando. Guardalo fuera de la computadora
+  (un pendrive, la nube): si se rompe el disco, la copia se va con él.
+- **Restaurar desde una copia…** te muestra qué trae la copia (cuántas
+  canciones, Biblias, medios y playlists) antes de tocar nada. Si aceptás,
+  EcclesiaCast se cierra y se vuelve a abrir solo, y arranca con esa
+  biblioteca. La que tenías queda guardada al lado, como
+  `ecclesiacast.db.before-restore`, por si te arrepentís.
+
+> Restaurar **reemplaza todo** lo que tengas ahora, no lo mezcla.
+
 ## Dónde quedan tus datos
 
 Todo (canciones, Biblias, temas, medios y playlists) vive en un solo archivo:
