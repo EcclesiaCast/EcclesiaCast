@@ -22,6 +22,8 @@ Muchas iglesias necesitan dos programas a la vez (uno para canciones, otro para 
 
 📖 **[Guía de uso completa](docs/guia-de-uso.md)**
 
+📝 **[Pendientes](docs/pendientes.md)** — lo que falta, en un solo lugar.
+
 ## Stack
 
 C# / .NET 8 · WPF (MVVM) · SQLite + EF Core · LibVLCSharp
