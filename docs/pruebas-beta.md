@@ -305,6 +305,15 @@ subraya nada, avisame**: significa que hay que instalarlo o buscar otro camino.
 - [ ] Buscar mientras hay algo **proyectado**: la salida no se toca hasta que
       elegís.
 
+### Pasajes y playlist (nuevo arreglo)
+
+- [ ] Con una playlist que tenga un pasaje (ej. Juan 3:16-18): entrar por la
+      playlist y pasar con las flechas — al terminar el rango tiene que saltar
+      al elemento siguiente, como antes.
+- [ ] Ahora buscá **ese mismo capítulo a mano** (escribí «Juan 3») y recorrelo
+      con las flechas: al pasar el 3:18 tiene que seguir al 3:19, **sin**
+      irse al elemento siguiente de la playlist.
+
 ### Panel LIVE con el video en movimiento (nuevo)
 
 - [ ] Proyectar un **video de fondo** y mirar el panel **LIVE** del operador:

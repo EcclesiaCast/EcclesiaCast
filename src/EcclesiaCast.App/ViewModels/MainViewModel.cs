@@ -2725,6 +2725,13 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         Slides.Clear();
         LiveSlideIndex = -1;
 
+        // Loading a passage by hand steps out of the service order, the same
+        // way choosing a song does. Otherwise the end of the playlist's verse
+        // range kept jumping to the next item while the operator was just
+        // reading through the chapter on their own.
+        if (!_openingPlaylistItem)
+            _currentPlaylistIndex = -1;
+
         var theme = DefaultBibleTheme;
 
         // Opening card: jump back to the previous chapter (crossing into the

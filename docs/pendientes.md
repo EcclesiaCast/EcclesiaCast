@@ -55,5 +55,3 @@ Cosas que ya sabemos y decidimos bancar por ahora. No son bugs nuevos.
   - El navegador de YouTube (WebView2, que son cientos de MB) **no se crea**
     salvo que proyectes un YouTube: verificado, 0 procesos con la salida
     encendida y un video local corriendo.
-- Navegando a mano el mismo capítulo de un pasaje de la playlist, el borde del
-  rango dispara el salto al ítem siguiente. Solo en esa diapositiva exacta.

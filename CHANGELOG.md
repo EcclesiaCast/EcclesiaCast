@@ -122,6 +122,10 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Corregido
 
+- Leer un capítulo a mano ya no salta al siguiente elemento de la playlist:
+  antes, si la playlist tenía un pasaje (ej. Juan 3:16-18) y el operador
+  recorría ese mismo capítulo por su cuenta, al llegar al final del rango la
+  flecha se iba al elemento siguiente.
 - El panel LIVE del operador muestra el video de fondo **en movimiento**, no
   una foto fija: dibuja el mismo cuadro que está en el proyector, sin
   decodificar nada dos veces (+32 MB y la misma CPU). Los videos de YouTube
