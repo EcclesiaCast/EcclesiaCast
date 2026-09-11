@@ -7,6 +7,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- Recorte y color de los medios, en el Inspector: elegís desde qué segundo
+  arranca un video y hasta cuál llega (para saltear la cortina con que
+  arrancan muchos videos, y que el bucle respete el recorte), y ajustás el
+  brillo —oscurecer un fondo cargado es lo que hace legible la letra— y un
+  tinte de color.
 - Varios cuadros de texto por diapositiva, desde el diseñador: además de la
   letra, podés agregar los que quieras (el nombre de la serie, la cita, una
   traducción), moverlos y redimensionarlos igual que la caja de siempre, y

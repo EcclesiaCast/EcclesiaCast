@@ -12,6 +12,7 @@ public partial class MediaInspectorWindow : Window
     private readonly MediaItem _item;
 
     private string _fillColor = "#000000";
+    private string _tint = "#2F63C9";
 
     public MediaInspectorWindow(MediaItem item, IReadOnlyList<string> categories, IReadOnlyList<MediaItem> library)
     {
@@ -31,6 +32,15 @@ public partial class MediaInspectorWindow : Window
 
         _fillColor = string.IsNullOrWhiteSpace(item.FillColor) ? "#000000" : item.FillColor;
         UpdateFillSwatch();
+
+        // Color y recorte.
+        BrightnessField.SetSilently(item.Brightness);
+        _tint = string.IsNullOrWhiteSpace(item.Tint) ? "#2F63C9" : item.Tint;
+        TintField.SetSilently(item.TintStrength);
+        UpdateTintSwatch();
+        TrimStartField.SetSilently(item.TrimStart);
+        TrimEndField.SetSilently(item.TrimEnd);
+        TrimOptions.Visibility = item.Type == MediaType.Video ? Visibility.Visible : Visibility.Collapsed;
 
         // "Sin nada" first, then everything except this very item — filling a
         // background with itself would be a mirror facing a mirror.
@@ -148,6 +158,30 @@ public partial class MediaInspectorWindow : Window
         }
     }
 
+    private void PickTintColor_Click(object sender, RoutedEventArgs e)
+    {
+        if (ColorPickerHelper.Pick(_tint) is { } picked)
+        {
+            _tint = picked;
+            UpdateTintSwatch();
+        }
+    }
+
+    private void UpdateTintSwatch() => TintSwatch.Background = SwatchBrush(_tint);
+
+    private static System.Windows.Media.Brush SwatchBrush(string hex)
+    {
+        try
+        {
+            return new System.Windows.Media.SolidColorBrush(
+                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(hex));
+        }
+        catch (FormatException)
+        {
+            return System.Windows.Media.Brushes.Black;
+        }
+    }
+
     private void UpdateFillSwatch()
     {
         try
@@ -186,6 +220,12 @@ public partial class MediaInspectorWindow : Window
             _item.FrameWidth = null;
             _item.FrameHeight = null;
         }
+
+        _item.Brightness = Math.Clamp(BrightnessField.Value, -100, 100);
+        _item.Tint = TintField.Value > 0 ? _tint : null;
+        _item.TintStrength = Math.Clamp(TintField.Value, 0, 100);
+        _item.TrimStart = Math.Max(0, TrimStartField.Value);
+        _item.TrimEnd = Math.Max(0, TrimEndField.Value);
 
         _item.FillColor = _fillColor;
         _item.FillMediaId = (FillMediaBox.SelectedItem as MediaItem)?.Id is int fillId and > 0 ? fillId : null;

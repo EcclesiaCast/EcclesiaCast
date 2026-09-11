@@ -118,6 +118,30 @@ public sealed class MediaItem
     /// </summary>
     public int? FillMediaId { get; set; }
 
+    // ── Recorte y color ──────────────────────────────────────────
+
+    /// <summary>
+    /// Second the video starts at, skipping whatever comes before — the
+    /// countdown or the logo sting so many stock loops open with. 0 plays
+    /// from the beginning.
+    /// </summary>
+    public double TrimStart { get; set; }
+
+    /// <summary>Second the video stops at; 0 plays to the end.</summary>
+    public double TrimEnd { get; set; }
+
+    /// <summary>
+    /// -100 to 100: darkens or lightens the picture. Darkening a busy loop is
+    /// the other half of blurring it — it is what makes lyrics readable.
+    /// </summary>
+    public double Brightness { get; set; }
+
+    /// <summary>Colour laid over the picture; null or blank for none.</summary>
+    public string? Tint { get; set; }
+
+    /// <summary>How much of the tint shows, 0-100.</summary>
+    public double TintStrength { get; set; }
+
     /// <summary>True when the picture does not cover the whole output on its own.</summary>
     public bool HasFrame => FrameWidth is > 0 && FrameHeight is > 0;
 

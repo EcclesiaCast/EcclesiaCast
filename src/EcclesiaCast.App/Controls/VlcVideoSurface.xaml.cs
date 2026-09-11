@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
@@ -99,6 +100,14 @@ public partial class VlcVideoSurface : UserControl
             if (media.EndBehavior == VideoEndBehavior.Loop)
                 m.AddOption(":input-repeat=65535");
             m.AddOption(":file-caching=1500");
+
+            // Trimming is handed to VLC rather than watched for in code: a
+            // loop then restarts at the trimmed start, which is the whole
+            // point of cutting a sting off the front of a stock loop.
+            if (media.TrimStart > 0)
+                m.AddOption($":start-time={media.TrimStart.ToString("0.###", CultureInfo.InvariantCulture)}");
+            if (media.TrimEnd > 0 && media.TrimEnd > media.TrimStart)
+                m.AddOption($":stop-time={media.TrimEnd.ToString("0.###", CultureInfo.InvariantCulture)}");
             player.Play(m);
             Log.Information("Video de fondo: {Name} ({Path})", media.Name, media.Path);
         }

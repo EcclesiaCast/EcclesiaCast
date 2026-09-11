@@ -1,6 +1,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using EcclesiaCast.App.Services;
@@ -267,6 +268,48 @@ public partial class ProjectedView : UserControl
 
         FillColorLayer.Visibility = needsFill && !showFillImage ? Visibility.Visible : Visibility.Collapsed;
         FillColorLayer.Fill = MediaFraming.FillBrush(media);
+
+        ApplyColourAdjustments(media);
+    }
+
+    /// <summary>
+    /// Darkening and tinting ride on this layer, which sits above both the
+    /// image drawn here and the video playing behind the control — so one
+    /// implementation covers photos, loops and YouTube alike.
+    /// </summary>
+    private void ApplyColourAdjustments(MediaItem? media)
+    {
+        var brightness = Math.Clamp(media?.Brightness ?? 0, -100, 100);
+        if (brightness == 0)
+        {
+            BrightnessLayer.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            // Black to darken, white to lighten. Capped short of full cover:
+            // the point is to adjust the picture, not to replace it.
+            BrightnessLayer.Fill = brightness < 0 ? Brushes.Black : Brushes.White;
+            BrightnessLayer.Opacity = Math.Abs(brightness) / 100 * 0.85;
+            BrightnessLayer.Visibility = Visibility.Visible;
+        }
+
+        var strength = Math.Clamp(media?.TintStrength ?? 0, 0, 100);
+        if (strength <= 0 || string.IsNullOrWhiteSpace(media?.Tint))
+        {
+            TintLayer.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        try
+        {
+            TintLayer.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(media.Tint));
+            TintLayer.Opacity = strength / 100 * 0.85;
+            TintLayer.Visibility = Visibility.Visible;
+        }
+        catch (FormatException)
+        {
+            TintLayer.Visibility = Visibility.Collapsed;
+        }
     }
 
     private static BitmapImage? LoadBitmap(string? path)

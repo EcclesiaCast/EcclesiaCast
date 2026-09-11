@@ -126,6 +126,49 @@
                 </StackPanel>
             </Border>
 
+            <!-- ── Color: oscurecer, aclarar, teñir ── -->
+            <Border Background="{StaticResource SurfaceAltBrush}" CornerRadius="4"
+                    Padding="12,4,12,12" Margin="0,10,0,0">
+                <StackPanel>
+                    <TextBlock Text="Color" Style="{StaticResource L}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Brillo" FontSize="11" Width="64" VerticalAlignment="Center"
+                                   Foreground="{StaticResource MutedBrush}"/>
+                        <controls:NumericField x:Name="BrightnessField" Minimum="-100" Maximum="100" Step="5" Decimals="0"
+                                               ToolTip="Negativo oscurece (ayuda a leer la letra encima), positivo aclara"/>
+                        <TextBlock Text="%" FontSize="11" VerticalAlignment="Center" Margin="6,0,0,0"
+                                   Foreground="{StaticResource MutedBrush}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <TextBlock Text="Tinte" FontSize="11" Width="64" VerticalAlignment="Center"
+                                   Foreground="{StaticResource MutedBrush}"/>
+                        <Border x:Name="TintSwatch" Width="28" Height="24" CornerRadius="3"
+                                BorderBrush="{StaticResource LineBrush}" BorderThickness="1"/>
+                        <Button Content="Color…" Style="{StaticResource DarkButton}" FontSize="11"
+                                Padding="10,3" Margin="8,0,0,0" Click="PickTintColor_Click"/>
+                        <controls:NumericField x:Name="TintField" Minimum="0" Maximum="100" Step="5" Decimals="0"
+                                               Margin="8,0,0,0"
+                                               ToolTip="Cuánto pesa el tinte. 0 = sin tinte."/>
+                        <TextBlock Text="%" FontSize="11" VerticalAlignment="Center" Margin="6,0,0,0"
+                                   Foreground="{StaticResource MutedBrush}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <StackPanel x:Name="TrimOptions">
+                <TextBlock Text="Recorte del video (segundos)" Style="{StaticResource L}"/>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Desde" FontSize="11" Width="44" VerticalAlignment="Center"
+                               Foreground="{StaticResource MutedBrush}"/>
+                    <controls:NumericField x:Name="TrimStartField" Minimum="0" Maximum="36000" Step="1" Decimals="1"
+                                           ToolTip="Saltea el principio: la cortina o el logo con que arrancan muchos videos"/>
+                    <TextBlock Text="hasta" FontSize="11" VerticalAlignment="Center" Margin="10,0,6,0"
+                               Foreground="{StaticResource MutedBrush}"/>
+                    <controls:NumericField x:Name="TrimEndField" Minimum="0" Maximum="36000" Step="1" Decimals="1"
+                                           ToolTip="0 = hasta el final"/>
+                </StackPanel>
+            </StackPanel>
+
             <TextBlock Text="Desenfoque del fondo" Style="{StaticResource L}"/>
             <StackPanel Orientation="Horizontal">
                 <controls:NumericField x:Name="BlurField" Minimum="0" Maximum="100" Step="5" Decimals="0"

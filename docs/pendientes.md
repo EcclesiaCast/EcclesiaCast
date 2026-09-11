@@ -16,8 +16,6 @@ lado. Al cerrar un punto, borralo y anotalo en el [CHANGELOG](../CHANGELOG.md).
 
 ## 2. Funciones que faltan
 
-- [ ] Recorte de entrada/salida de video y efectos de color (diferido desde el
-      sprint 5).
 - [ ] Playlists inteligentes (diferido desde el sprint 5).
 
 ## 3. Ideas tomadas de Spresenter (10/9/2026)

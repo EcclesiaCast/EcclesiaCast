@@ -71,6 +71,12 @@ En la barra **MEDIOS**, abajo:
     pantalla** le das una medida exacta (1280×720, cuadrado, vertical…), para
     cuando la pantalla de la iglesia no tiene la forma de lo que tira el
     proyector.
+  - **Color**: **brillo** para oscurecer (negativo) o aclarar (positivo) el
+    fondo, y un **tinte** de color con su intensidad. Oscurecer es, junto con
+    el desenfoque, lo que hace que la letra se lea sobre un fondo cargado.
+  - **Recorte del video**: desde qué segundo arranca y hasta cuál llega. Sirve
+    para saltear la cortina o el logo del principio; el bucle respeta el
+    recorte y vuelve al segundo que marcaste, no al cero.
   - **Los bordes se rellenan con**: un color, o **otra imagen o video** de la
     biblioteca detrás. El truco de siempre es poner una copia desenfocada del
     mismo video como relleno.

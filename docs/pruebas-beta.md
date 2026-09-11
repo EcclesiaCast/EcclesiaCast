@@ -280,6 +280,17 @@ subraya nada, avisame**: significa que hay que instalarlo o buscar otro camino.
       ahí.
 - [ ] Detenerla desde el mismo botón ⏱ → **Detener la que corre**.
 
+### Recorte y color de los medios (nuevo)
+
+- [ ] En *Propiedades* de un video, **Recorte**: poner *desde 5* y *hasta 12*.
+      Tiene que arrancar en el segundo 5 y, al llegar a 12, volver al 5 (no al
+      cero).
+- [ ] Usarlo de verdad con un video que tenga **cortina al principio**.
+- [ ] **Brillo −40** en un fondo cargado y proyectar una canción encima:
+      ¿ahora se lee la letra?
+- [ ] **Tinte** con el color de la iglesia, al 30-40 %.
+- [ ] Con **brillo y desenfoque juntos**, mirá si la PC sigue yendo fluida.
+
 ### Cuadros de texto por diapositiva (nuevo)
 
 - [ ] Clic derecho en una canción → *Editar canción (diseño)* → **➕ Cuadro de
