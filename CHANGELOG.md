@@ -122,6 +122,10 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Corregido
 
+- Un lector de pantalla ahora dice qué es cada cosa: las canciones, las
+  diapositivas, los pasajes y los ítems de la playlist se anuncian por su
+  nombre en vez del nombre interno del tipo, y los botones que son sólo un
+  ícono llevan su nombre escrito.
 - Apagar la salida dejaba el video sonando y avanzando; ahora se pausa y
   retoma donde estaba cuando la salida vuelve.
 - Quitar el fondo dejaba la pantalla vacía cuando el fondo se había aplicado

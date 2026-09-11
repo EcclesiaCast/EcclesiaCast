@@ -81,12 +81,16 @@
                             </Style>
                         </Button.Style>
                     </Button>
+                    <!-- Los botones que son sólo un ícono llevan su nombre escrito:
+                         un lector de pantalla, si no, anuncia el nombre del emoji. -->
                     <Button x:Name="LogoPickerButton" Content="▾" Padding="8,7" Margin="2,0,0,0"
                             Style="{StaticResource DarkButton}"
+                            AutomationProperties.Name="Elegir logo"
                             Click="LogoPicker_Click"
                             ToolTip="Elegir qué logo se muestra (general, jóvenes, mujeres…)"/>
                     <Button Content="🖼▦" Padding="8,7" Margin="2,0,0,0"
                             Style="{StaticResource DarkButton}"
+                            AutomationProperties.Name="Logo de fondo"
                             Command="{Binding UseLogoAsBackgroundCommand}"
                             IsEnabled="{Binding CanUseLogoAsBackground}"
                             ToolTip="Poner el logo de fondo, detrás de la letra, con el desenfoque que tenga configurado"/>
@@ -117,11 +121,13 @@
                     </Button>
                     <Button Content="▾" Padding="8,7" Margin="2,0,0,0"
                             Style="{StaticResource DarkButton}"
+                            AutomationProperties.Name="Ajustes del escenario"
                             Click="StageOptions_Click"
                             ToolTip="En qué pantalla va el escenario y qué muestra"/>
 
                     <!-- Celular: control remoto por la red de la iglesia -->
                     <Button Content="📱" Padding="9,7" Margin="8,0,0,0"
+                            AutomationProperties.Name="Controlar desde el celular"
                             Command="{Binding OpenRemoteCommand}"
                             ToolTip="Controlar la proyección desde el celular, por la red de la iglesia">
                         <Button.Style>
@@ -139,11 +145,13 @@
                     <!-- Buscar en todo: canciones, versículos y medios -->
                     <Button Content="🔍" Padding="9,7" Margin="8,0,0,0"
                             Style="{StaticResource DarkButton}"
+                            AutomationProperties.Name="Buscar en canciones, versículos y medios"
                             Command="{Binding SearchEverythingCommand}"
                             ToolTip="Buscar en canciones, versículos y medios a la vez (Ctrl+K)"/>
 
                     <!-- Cuenta regresiva antes del servicio -->
                     <Button Content="⏱" Padding="9,7" Margin="8,0,0,0"
+                            AutomationProperties.Name="Cuenta regresiva"
                             Command="{Binding OpenCountdownCommand}"
                             ToolTip="Proyectar una cuenta regresiva antes de empezar («Empezamos en 5:00»)">
                         <Button.Style>
@@ -161,6 +169,7 @@
                     <!-- Copia de seguridad de toda la biblioteca -->
                     <Button Content="💾" Padding="9,7" Margin="2,0,0,0"
                             Style="{StaticResource DarkButton}"
+                            AutomationProperties.Name="Copia de seguridad de la biblioteca"
                             Click="Backup_Click"
                             ToolTip="Guardar una copia de toda la biblioteca, o restaurar una copia guardada"/>
                 </StackPanel>
@@ -176,6 +185,7 @@
                               ToolTip="Monitor o proyector donde sale la imagen"/>
                     <Button Content="↻"
                             Style="{StaticResource DarkButton}"
+                            AutomationProperties.Name="Actualizar pantallas"
                             Command="{Binding RefreshDisplaysCommand}"
                             ToolTip="Actualizar pantallas"
                             Padding="9,6" Margin="6,0,14,0"/>
@@ -251,19 +261,23 @@
                                                 VerticalAlignment="Center" Margin="0,0,10,8">
                                         <Button Content="📥 ▾" FontSize="11" Padding="7,4"
                                                 Style="{StaticResource DarkButton}"
+                                                AutomationProperties.Name="Importar canciones"
                                                 Click="ImportMenu_Click"
                                                 ToolTip="Importar canciones de otros programas o de archivos"/>
                                         <Button Content="➕" FontSize="11" Padding="7,4" Margin="4,0,0,0"
                                                 Style="{StaticResource DarkButton}"
                                                 Command="{Binding NewSongCommand}"
+                                                AutomationProperties.Name="Nueva canción"
                                                 ToolTip="Nueva canción"/>
                                         <Button Content="✏️" FontSize="11" Padding="7,4" Margin="4,0,0,0"
                                                 Style="{StaticResource DarkButton}"
                                                 Command="{Binding EditSongCommand}"
+                                                AutomationProperties.Name="Editar canción"
                                                 ToolTip="Editar canción"/>
                                         <Button Content="🗑" FontSize="11" Padding="7,4" Margin="4,0,0,0"
                                                 Style="{StaticResource DarkButton}"
                                                 Command="{Binding DeleteSongCommand}"
+                                                AutomationProperties.Name="Eliminar canción"
                                                 ToolTip="Eliminar canción"/>
                                     </StackPanel>
                                     <TextBlock Text="CANCIONES" Style="{StaticResource PanelTitle}" Margin="12,0,12,0"/>
@@ -292,6 +306,10 @@
                                     <ListBox.ItemContainerStyle>
                                         <Style TargetType="ListBoxItem">
                                             <Setter Property="Padding" Value="10,6"/>
+                                            <!-- Sin un nombre explícito, un lector de pantalla lee el
+                                                 nombre del tipo en vez del de la canción. -->
+                                            <Setter Property="AutomationProperties.Name" Value="{Binding Title}"/>
+                                            <Setter Property="AutomationProperties.HelpText" Value="{Binding Artist}"/>
                                             <Setter Property="Tag"
                                                     Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
                                             <Setter Property="ContextMenu">
@@ -369,10 +387,12 @@
                                         <Button Content="✏️" FontSize="11" Padding="7,4" Margin="4,0,0,0"
                                                 Style="{StaticResource DarkButton}"
                                                 Command="{Binding RenameBibleVersionCommand}"
+                                                AutomationProperties.Name="Renombrar versión"
                                                 ToolTip="Renombrar versión"/>
                                         <Button Content="🗑" FontSize="11" Padding="7,4" Margin="4,0,0,0"
                                                 Style="{StaticResource DarkButton}"
                                                 Command="{Binding DeleteBibleVersionCommand}"
+                                                AutomationProperties.Name="Eliminar versión"
                                                 ToolTip="Eliminar versión"/>
                                     </StackPanel>
                                     <TextBlock Text="VERSIONES — hasta 2 a la vez"
@@ -561,6 +581,8 @@
                                     <ListBox.ItemContainerStyle>
                                         <Style TargetType="ListBoxItem">
                                             <Setter Property="Padding" Value="10,6"/>
+                                            <Setter Property="AutomationProperties.Name" Value="{Binding Reference}"/>
+                                            <Setter Property="AutomationProperties.HelpText" Value="{Binding Text}"/>
                                             <Setter Property="Template">
                                                 <Setter.Value>
                                                     <ControlTemplate TargetType="ListBoxItem">
@@ -609,20 +631,26 @@
                                         VerticalAlignment="Center" Margin="0,8,10,4">
                                 <Button Content="➕" FontSize="11" Padding="6,3"
                                         Style="{StaticResource DarkButton}"
-                                        Command="{Binding NewPlaylistCommand}" ToolTip="Nueva playlist"/>
+                                        Command="{Binding NewPlaylistCommand}"
+                                        AutomationProperties.Name="Nueva playlist" ToolTip="Nueva playlist"/>
                                 <Button Content="✨" FontSize="11" Padding="6,3" Margin="4,0,0,0"
                                         Style="{StaticResource DarkButton}"
                                         Command="{Binding EditSmartPlaylistCommand}"
+                                        AutomationProperties.Name="Lista inteligente"
                                         ToolTip="Lista inteligente: se arma sola (lo que agregaste hace poco, lo que hace rato no cantás, un artista, una palabra)"/>
                                 <Button Content="✏️" FontSize="11" Padding="6,3" Margin="4,0,0,0"
                                         Style="{StaticResource DarkButton}"
-                                        Command="{Binding RenamePlaylistCommand}" ToolTip="Renombrar"/>
+                                        Command="{Binding RenamePlaylistCommand}"
+                                        AutomationProperties.Name="Renombrar playlist" ToolTip="Renombrar"/>
                                 <Button Content="⧉" FontSize="11" Padding="6,3" Margin="4,0,0,0"
                                         Style="{StaticResource DarkButton}"
-                                        Command="{Binding DuplicatePlaylistCommand}" ToolTip="Duplicar (ej. el domingo pasado)"/>
+                                        Command="{Binding DuplicatePlaylistCommand}"
+                                        AutomationProperties.Name="Duplicar playlist"
+                                        ToolTip="Duplicar (ej. el domingo pasado)"/>
                                 <Button Content="🗑" FontSize="11" Padding="6,3" Margin="4,0,0,0"
                                         Style="{StaticResource DarkButton}"
-                                        Command="{Binding DeletePlaylistCommand}" ToolTip="Eliminar"/>
+                                        Command="{Binding DeletePlaylistCommand}"
+                                        AutomationProperties.Name="Eliminar playlist" ToolTip="Eliminar"/>
                             </StackPanel>
                             <TextBlock Text="PLAYLIST" Style="{StaticResource PanelTitle}"/>
                         </DockPanel>
@@ -662,6 +690,7 @@
                                 <ListBox.ItemContainerStyle>
                                     <Style TargetType="ListBoxItem">
                                         <Setter Property="Padding" Value="8,4"/>
+                                        <Setter Property="AutomationProperties.Name" Value="{Binding Caption}"/>
                                         <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
                                         <Setter Property="ContextMenu">
                                             <Setter.Value>
@@ -772,6 +801,8 @@
                                                     Cursor="Hand"
                                                     Tag="{Binding DataContext, ElementName=SlideGrid}"
                                                     ContextMenuOpening="SlideCard_ContextMenuOpening"
+                                                    AutomationProperties.Name="{Binding Label}"
+                                                    AutomationProperties.HelpText="{Binding PreviewText}"
                                                     ToolTip="Clic: proyectar · Clic derecho: más opciones">
                                                 <Button.ContextMenu>
                                                     <ContextMenu>
@@ -1221,6 +1252,7 @@
                                             CommandParameter="{Binding}"
                                             Cursor="Hand" Margin="6,2"
                                             Tag="{Binding DataContext, ElementName=MediaScroll}"
+                                            AutomationProperties.Name="{Binding Name}"
                                             ToolTip="{Binding Name}">
                                         <Button.ContextMenu>
                                             <ContextMenu>

@@ -46,7 +46,5 @@ Cosas que ya sabemos y decidimos bancar por ahora. No son bugs nuevos.
   trivial.
 - **~810 MB de RAM** con video 1080p de fondo. Es mucho para una PC de
   proyección modesta; la salida sería bajar el buffer a 720p.
-- **Los nombres de playlist no se leen bien** con lector de pantalla (el combo
-  expone el nombre del tipo). Cosmético, pero es accesibilidad.
 - Navegando a mano el mismo capítulo de un pasaje de la playlist, el borde del
   rango dispara el salto al ítem siguiente. Solo en esa diapositiva exacta.
