@@ -280,6 +280,21 @@ subraya nada, avisame**: significa que hay que instalarlo o buscar otro camino.
       ahí.
 - [ ] Detenerla desde el mismo botón ⏱ → **Detener la que corre**.
 
+### Cuadros de texto por diapositiva (nuevo)
+
+- [ ] Clic derecho en una canción → *Editar canción (diseño)* → **➕ Cuadro de
+      texto**.
+- [ ] Escribir en el cuadro nuevo con **doble clic**, moverlo y estirarlo.
+- [ ] Cambiarle **tipografía, tamaño, color y alineación**; los ajustes que no
+      le corresponden quedan apagados.
+- [ ] **Guardar** y proyectar: el cuadro sale en el proyector donde lo dejaste.
+- [ ] Cerrar y abrir el programa: el cuadro sigue ahí.
+- [ ] El selector de arriba vuelve a **Letra de la canción** y la caja de la
+      letra se sigue moviendo como siempre.
+- [ ] La **papelera** quita el cuadro elegido.
+- [ ] Canciones **sin** cuadros extra tienen que verse exactamente igual que
+      antes.
+
 ### Encuadre de medios (nuevo)
 
 - [ ] Clic derecho en un fondo → *Propiedades* → **Encuadre**.

@@ -7,6 +7,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- Varios cuadros de texto por diapositiva, desde el diseñador: además de la
+  letra, podés agregar los que quieras (el nombre de la serie, la cita, una
+  traducción), moverlos y redimensionarlos igual que la caja de siempre, y
+  darle a cada uno su tipografía, tamaño, color y alineación. Se escriben con
+  doble clic sobre la diapositiva.
 - Encuadre de imágenes y videos en el Inspector de medios: zoom hacia adentro
   y hacia afuera, correrlo a los lados o arriba y abajo, y un tamaño fijo en
   pantalla (con medidas comunes a mano) para cuando la pantalla de la iglesia

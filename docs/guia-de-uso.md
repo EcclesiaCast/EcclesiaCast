@@ -125,6 +125,13 @@ Botón **🎨 Temas** en la barra superior:
   su propia tipografía, color, tamaño y posición; podés ocultarla.
 - **Usar en canciones / Usar en Biblia** fija el tema por defecto de cada uno.
 
+En el diseñador, arriba del panel de formato hay un selector: **Letra de la
+canción** o **Cuadro 1, 2, 3…**. Con **➕ Cuadro de texto** agregás otro cuadro
+a esa diapositiva — el nombre de la serie, la cita del pasaje, una traducción —
+y lo movés, lo estirás y lo escribís (doble clic) igual que la caja de la letra.
+Cada cuadro lleva su tipografía, tamaño, color y alineación; la papelera lo
+quita.
+
 Cada **canción puede tener su propio tema**, y cada **diapositiva** su propio
 diseño (clic derecho sobre la canción → *Editar canción (diseño)*).
 

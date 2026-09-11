@@ -223,6 +223,21 @@
             <DockPanel Margin="10">
                 <TextBlock DockPanel.Dock="Top" Text="{Binding ElementName=SlidesList, Path=SelectedItem.Label, StringFormat='FORMATO — {0}'}"
                            Style="{StaticResource PanelTitle}" Margin="2,0,0,6"/>
+
+                <!-- Qué se está editando: la letra o uno de los cuadros extra -->
+                <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                    <ComboBox x:Name="BoxPicker" FontSize="12"
+                              SelectionChanged="BoxPicker_Changed"
+                              ToolTip="Lo que edita la caja del lienzo: la letra de la canción o uno de los cuadros agregados"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                        <Button Content="➕ Cuadro de texto" Style="{StaticResource DarkButton}" FontSize="11"
+                                Padding="10,4" Click="AddTextBox_Click"
+                                ToolTip="Agrega otro cuadro a esta diapositiva: un título, una referencia, una traducción"/>
+                        <Button x:Name="RemoveBoxButton" Content="🗑" Style="{StaticResource DarkButton}" FontSize="11"
+                                Padding="10,4" Margin="6,0,0,0" IsEnabled="False" Click="RemoveTextBox_Click"
+                                ToolTip="Quita el cuadro elegido"/>
+                    </StackPanel>
+                </StackPanel>
                 <TabControl DockPanel.Dock="Top" Background="Transparent" BorderThickness="0">
                     <TabItem Header="Texto">
                         <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,4,6,0">

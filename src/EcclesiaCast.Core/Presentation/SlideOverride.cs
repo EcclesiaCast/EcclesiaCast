@@ -28,10 +28,24 @@ public sealed record SlideOverride(
     VAlign? AlignV = null,
     TextCase? Case = null,
     double? LineSpacing = null,
-    bool? FitToWidth = null)
+    bool? FitToWidth = null,
+
+    /// <summary>
+    /// Extra text boxes drawn over this slide. Null or empty on almost every
+    /// slide, which is why they hang off the slide's own design rather than
+    /// off the theme.
+    /// </summary>
+    IReadOnlyList<SlideTextBox>? Boxes = null)
 {
     public bool HasBox => BoxX is not null && BoxY is not null && BoxWidth is not null && BoxHeight is not null;
 
-    /// <summary>True when nothing is overridden (equivalent to null).</summary>
-    public bool IsEmpty => this == new SlideOverride();
+    /// <summary>The extra boxes, never null.</summary>
+    public IReadOnlyList<SlideTextBox> TextBoxes => Boxes ?? [];
+
+    /// <summary>
+    /// True when nothing is overridden (equivalent to null). The boxes are
+    /// checked by hand: a record compares lists by reference, and an empty
+    /// list means the same as none at all.
+    /// </summary>
+    public bool IsEmpty => TextBoxes.Count == 0 && (this with { Boxes = null }) == new SlideOverride();
 }

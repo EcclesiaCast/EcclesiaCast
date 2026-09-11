@@ -176,10 +176,78 @@ public partial class SlideView : UserControl
     private TextCase EffectiveCase =>
         Slide?.Override?.Case ?? CurrentTheme.TextCase;
 
+    /// <summary>
+    /// Draws the slide's extra text boxes. They are part of the slide's own
+    /// design rather than the theme, so they are rebuilt whenever the slide
+    /// changes; most slides have none and this does nothing.
+    /// </summary>
+    private void RenderExtraBoxes()
+    {
+        ExtraBoxLayer.Children.Clear();
+
+        foreach (var box in Slide?.Override?.TextBoxes ?? [])
+        {
+            var text = new TextBlock
+            {
+                Text = Transform(box.Text) ?? string.Empty,
+                FontFamily = new FontFamily(string.IsNullOrWhiteSpace(box.FontFamily)
+                    ? EffectiveFontFamily
+                    : box.FontFamily),
+                FontSize = Math.Max(8, box.FontSize),
+                FontWeight = box.Bold ? FontWeights.Bold : FontWeights.Normal,
+                FontStyle = box.Italic ? FontStyles.Italic : FontStyles.Normal,
+                Foreground = BrushFrom(box.Color, Brushes.White),
+                TextWrapping = TextWrapping.Wrap,
+                TextAlignment = box.AlignH switch
+                {
+                    HAlign.Left => TextAlignment.Left,
+                    HAlign.Right => TextAlignment.Right,
+                    _ => TextAlignment.Center,
+                },
+            };
+
+            // The box is a frame the text sits inside, exactly like the main
+            // one: the vertical alignment decides where within it.
+            var holder = new Grid
+            {
+                Width = Math.Max(20, box.Width),
+                Height = Math.Max(20, box.Height),
+            };
+            text.VerticalAlignment = box.AlignV switch
+            {
+                VAlign.Top => VerticalAlignment.Top,
+                VAlign.Bottom => VerticalAlignment.Bottom,
+                _ => VerticalAlignment.Center,
+            };
+            text.HorizontalAlignment = HorizontalAlignment.Stretch;
+            holder.Children.Add(text);
+
+            Canvas.SetLeft(holder, box.X);
+            Canvas.SetTop(holder, box.Y);
+            ExtraBoxLayer.Children.Add(holder);
+        }
+    }
+
+    private static Brush BrushFrom(string? hex, Brush fallback)
+    {
+        if (string.IsNullOrWhiteSpace(hex))
+            return fallback;
+
+        try
+        {
+            return new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex));
+        }
+        catch (FormatException)
+        {
+            return fallback;
+        }
+    }
+
     private void OnSlideChanged()
     {
         ApplyTheme();
         RenderText();
+        RenderExtraBoxes();
 
         if (AnimateTransitions && State == OutputState.Content)
             TransitionIn(TextLayer);

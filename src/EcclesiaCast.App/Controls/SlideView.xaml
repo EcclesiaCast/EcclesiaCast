@@ -35,6 +35,9 @@
                 </StackPanel>
             </Grid>
 
+            <!-- Cuadros de texto extra del diseño de esta diapositiva -->
+            <Canvas x:Name="ExtraBoxLayer" IsHitTestVisible="False"/>
+
             <!-- Capa de leyenda: separada del texto para que nunca se pisen -->
             <Grid x:Name="CaptionLayer" Margin="110,40" IsHitTestVisible="False">
                 <TextBlock x:Name="CaptionText"
