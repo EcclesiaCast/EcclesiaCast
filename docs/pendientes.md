@@ -24,11 +24,8 @@ todavía en un servicio real.
 ## 3. Ideas tomadas de Spresenter (10/9/2026)
 
 Comparación completa contra [spresenter.com](https://spresenter.com) hecha el
-10/9/2026. Las tres que valen la pena, en orden de resultado por esfuerzo:
-
-- [ ] **Soporte de PowerPoint (.pptx) y PDF** como contenido proyectable. Es lo
-      que más se pide en una iglesia real de todo lo que ellos tienen y
-      nosotros no.
+10/9/2026. Las tres que valían la pena están hechas: salida web para OBS y
+vMix, buscador único y soporte de PDF y PowerPoint.
 
 Fuera de alcance a propósito (es otro producto: iglesias grandes con equipo
 técnico): edge blending y warp entre proyectores, display slices para paneles

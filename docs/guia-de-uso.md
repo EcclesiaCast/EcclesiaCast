@@ -56,7 +56,11 @@ En la barra **MEDIOS**, abajo:
 
 - Las **pestañas** (Fondos, Anuncios, y las que agregues con **＋**) organizan
   los medios.
-- **📥 Agregar** importa imágenes y videos a la pestaña activa.
+- **📥 Agregar** importa imágenes y videos a la pestaña activa, y también
+  **PDF** y **presentaciones de PowerPoint**: cada página entra como un medio
+  de pantalla completa, numerado y en orden. El PDF lo dibuja Windows sin
+  instalar nada; el `.pptx` lo convierte el PowerPoint de la máquina (si no
+  tenés PowerPoint, exportá la presentación a PDF y entra igual).
 - **Clic** en una miniatura la aplica al instante. El fondo **persiste entre
   diapositivas**: cambiar de verso no reinicia el video.
 - **Clic derecho → Propiedades** abre el Inspector:

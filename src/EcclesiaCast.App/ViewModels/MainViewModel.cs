@@ -904,18 +904,32 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         var dialog = new Microsoft.Win32.OpenFileDialog
         {
             Title = $"Agregar a «{SelectedMediaTab}»",
-            Filter = "Imágenes y videos|*.jpg;*.jpeg;*.png;*.bmp;*.webp;*.gif;*.mp4;*.mov;*.m4v;*.avi;*.mkv;*.wmv;*.webm"
+            Filter = "Imágenes, videos y documentos"
+                   + "|*.jpg;*.jpeg;*.png;*.bmp;*.webp;*.gif;*.mp4;*.mov;*.m4v;*.avi;*.mkv;*.wmv;*.webm;*.pdf;*.pptx;*.ppt"
                    + "|Imágenes|*.jpg;*.jpeg;*.png;*.bmp;*.webp;*.gif"
-                   + "|Videos|*.mp4;*.mov;*.m4v;*.avi;*.mkv;*.wmv;*.webm",
+                   + "|Videos|*.mp4;*.mov;*.m4v;*.avi;*.mkv;*.wmv;*.webm"
+                   + "|PDF y PowerPoint|*.pdf;*.pptx;*.ppt",
             Multiselect = true,
         };
         if (dialog.ShowDialog() != true)
             return;
 
         var added = 0;
+        var documents = new List<string>();
+
         foreach (var path in dialog.FileNames)
         {
             var ext = Path.GetExtension(path);
+
+            // A PDF or a deck becomes one image per page, but drawing them
+            // takes a moment, so they are done after this loop rather than
+            // freezing the window in the middle of an import.
+            if (DocumentImporter.IsDocument(path))
+            {
+                documents.Add(path);
+                continue;
+            }
+
             MediaType? type = ImageExtensions.Contains(ext) ? MediaType.Image
                 : VideoExtensions.Contains(ext) ? MediaType.Video
                 : null;
@@ -939,8 +953,59 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         }
 
         LoadMedia();
-        StatusText = $"{added} medio(s) agregado(s) a «{SelectedMediaTab}».";
+        StatusText = documents.Count > 0
+            ? $"{added} medio(s) agregado(s). Preparando {documents.Count} documento(s)…"
+            : $"{added} medio(s) agregado(s) a «{SelectedMediaTab}».";
         _ = RefreshVideoThumbnailsAsync();
+
+        if (documents.Count > 0)
+            _ = ImportDocumentsAsync(documents);
+    }
+
+    /// <summary>
+    /// Brings in a PDF or a PowerPoint deck as one background per page, in
+    /// order. The pages are ordinary images from then on: they go in the
+    /// playlist, take a theme's text over them, and need nothing installed to
+    /// show — which is the point of rendering them now rather than on Sunday.
+    /// </summary>
+    private async Task ImportDocumentsAsync(IReadOnlyList<string> paths)
+    {
+        var tab = SelectedMediaTab;
+        var pagesAdded = 0;
+        string? failure = null;
+
+        foreach (var path in paths)
+        {
+            var name = Path.GetFileNameWithoutExtension(path);
+            var result = await DocumentImporter.ImportAsync(path);
+
+            if (result.Error is not null)
+            {
+                failure = result.Error;
+                continue;
+            }
+
+            for (var page = 0; page < result.Pages.Count; page++)
+            {
+                _media.Add(new MediaItem
+                {
+                    // Numbered so the pages sort and read in order in the tab.
+                    Name = $"{name} · {page + 1}",
+                    Path = result.Pages[page],
+                    Type = MediaType.Image,
+                    ThumbnailPath = MediaThumbnails.Create(result.Pages[page], MediaType.Image, videoEngine: null),
+                    Category = tab,
+                    Behavior = MediaBehavior.Foreground,
+                });
+                pagesAdded++;
+            }
+        }
+
+        LoadMedia();
+
+        StatusText = failure is not null
+            ? failure
+            : $"{pagesAdded} página(s) agregada(s) a «{tab}». Cada una es un fondo: arrastralas a la playlist para pasarlas con las flechas.";
     }
 
     /// <summary>

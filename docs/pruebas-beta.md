@@ -280,6 +280,19 @@ subraya nada, avisame**: significa que hay que instalarlo o buscar otro camino.
       ahí.
 - [ ] Detenerla desde el mismo botón ⏱ → **Detener la que corre**.
 
+### PDF y PowerPoint (nuevo)
+
+- [ ] **📥 Agregar** → elegir un **PDF** de varias páginas. Anotá **cuánto
+      tarda**: se dibujan todas las páginas de una vez.
+- [ ] Las páginas entran numeradas y **en orden** en la pestaña.
+- [ ] Proyectar una: tiene que verse **a pantalla completa** y nítida.
+- [ ] Agregar las páginas a la **playlist** y pasarlas con las flechas.
+- [ ] Probar con una **presentación .pptx** de la iglesia: se convierte sola
+      si tenés PowerPoint (tarda más la primera vez).
+- [ ] Probar en la PC del proyector, que **puede no tener PowerPoint**: ahí
+      tiene que avisar que la exportes a PDF, sin romperse.
+- [ ] Mirá el espacio en disco: las páginas se guardan como imágenes.
+
 ### Buscador único (nuevo)
 
 - [ ] **Ctrl+K** (o el botón 🔍) y escribir una palabra que esté en una

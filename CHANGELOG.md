@@ -7,6 +7,12 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- PDF y PowerPoint: al agregar medios ahora se pueden elegir archivos `.pdf`
+  y `.pptx`. Cada página entra como un fondo de pantalla completa, en orden,
+  listo para poner en la playlist y pasar con las flechas. El PDF lo dibuja
+  el propio Windows (no hace falta instalar nada) y las presentaciones las
+  convierte el PowerPoint que tengas; si no tenés PowerPoint, el programa te
+  dice que la exportes a PDF.
 - Buscador único (botón 🔍 o **Ctrl+K**): una sola caja que busca al mismo
   tiempo en canciones, en la Biblia activa y en los medios. Las flechas
   recorren los resultados sin sacar el cursor de la caja y Enter carga el que
