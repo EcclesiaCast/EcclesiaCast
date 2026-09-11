@@ -5,6 +5,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+## [1.0.0-beta.4] — 2026-09-11
+
 ### Agregado
 
 - PDF y PowerPoint: al agregar medios ahora se pueden elegir archivos `.pdf`
