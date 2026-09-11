@@ -99,7 +99,10 @@ public partial class VlcVideoSurface : UserControl
             using var m = new Media(engine, new Uri(media.Path));
             if (media.EndBehavior == VideoEndBehavior.Loop)
                 m.AddOption(":input-repeat=65535");
-            m.AddOption(":file-caching=1500");
+            // Medio segundo de cache alcanza para un archivo local y deja
+            // varios cientos de megas menos en juego que el segundo y medio
+            // que traía: el video de fondo se lee del disco de la misma PC.
+            m.AddOption(":file-caching=500");
 
             // Trimming is handed to VLC rather than watched for in code: a
             // loop then restarts at the trimmed start, which is the whole

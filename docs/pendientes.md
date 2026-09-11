@@ -44,7 +44,16 @@ Cosas que ya sabemos y decidimos bancar por ahora. No son bugs nuevos.
 - **El panel LIVE muestra un póster fijo**, no el video en movimiento: el
   operador no ve avanzar el video ni el YouTube. Duplicar el WebView2 no es
   trivial.
-- **~810 MB de RAM** con video 1080p de fondo. Es mucho para una PC de
-  proyección modesta; la salida sería bajar el buffer a 720p.
+- **~650 MB de RAM** con un video 1080p de fondo (medido el 11/9/2026: 275 MB
+  con el programa abierto, 331 MB proyectando texto, 649 MB con video, estable
+  a los 20 s). Sigue siendo mucho para una PC de proyección modesta, pero ya no
+  hay una salida obvia:
+  - El buffer **no** es el problema: decodificar a 720p ahorra 75 MB de 742 y
+    se pierde nitidez, así que se descartó.
+  - Bajar el cache de VLC de 1500 a 500 ms sí bajó de 742 a 649 MB, y es lo
+    que está puesto. Si en la PC del proyector el video tironea, subilo.
+  - El navegador de YouTube (WebView2, que son cientos de MB) **no se crea**
+    salvo que proyectes un YouTube: verificado, 0 procesos con la salida
+    encendida y un video local corriendo.
 - Navegando a mano el mismo capítulo de un pasaje de la playlist, el borde del
   rango dispara el salto al ítem siguiente. Solo en esa diapositiva exacta.

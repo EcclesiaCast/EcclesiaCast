@@ -122,6 +122,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Corregido
 
+- El video de fondo usa casi 100 MB menos de memoria (742 → 649 MB con un
+  1080p): el colchón de lectura de VLC pasó de segundo y medio a medio
+  segundo, que para un archivo del disco de la misma PC alcanza.
 - Un lector de pantalla ahora dice qué es cada cosa: las canciones, las
   diapositivas, los pasajes y los ítems de la playlist se anuncian por su
   nombre en vez del nombre interno del tipo, y los botones que son sólo un
