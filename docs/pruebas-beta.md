@@ -280,6 +280,18 @@ subraya nada, avisame**: significa que hay que instalarlo o buscar otro camino.
       ahí.
 - [ ] Detenerla desde el mismo botón ⏱ → **Detener la que corre**.
 
+### Buscador único (nuevo)
+
+- [ ] **Ctrl+K** (o el botón 🔍) y escribir una palabra que esté en una
+      canción **y** en la Biblia: tienen que aparecer las dos cosas juntas.
+- [ ] **↑↓** para moverte por los resultados **sin** sacar el cursor de la
+      caja, y **Enter** para cargar.
+- [ ] Elegir una **canción**: queda cargada, lista para proyectar.
+- [ ] Elegir un **versículo**: se carga en la pestaña Biblia.
+- [ ] Elegir un **medio**: se aplica de fondo.
+- [ ] Buscar mientras hay algo **proyectado**: la salida no se toca hasta que
+      elegís.
+
 ### Salida para transmisión (nuevo)
 
 - [ ] Botón **📱** → copiar la dirección **para la transmisión**.

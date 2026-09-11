@@ -15,6 +15,9 @@
         <KeyBinding Key="F3" Command="{Binding ToggleLogoCommand}"/>
         <KeyBinding Key="F4" Command="{Binding ClearBackgroundCommand}"/>
         <KeyBinding Key="Escape" Command="{Binding HideOutputCommand}"/>
+        <!-- Una sola caja para buscar en canciones, versículos y medios -->
+        <KeyBinding Key="K" Modifiers="Control" Command="{Binding SearchEverythingCommand}"/>
+        <KeyBinding Key="F" Modifiers="Control" Command="{Binding SearchEverythingCommand}"/>
     </Window.InputBindings>
 
     <Grid>
@@ -132,6 +135,12 @@
                             </Style>
                         </Button.Style>
                     </Button>
+
+                    <!-- Buscar en todo: canciones, versículos y medios -->
+                    <Button Content="🔍" Padding="9,7" Margin="8,0,0,0"
+                            Style="{StaticResource DarkButton}"
+                            Command="{Binding SearchEverythingCommand}"
+                            ToolTip="Buscar en canciones, versículos y medios a la vez (Ctrl+K)"/>
 
                     <!-- Cuenta regresiva antes del servicio -->
                     <Button Content="⏱" Padding="9,7" Margin="8,0,0,0"

@@ -161,7 +161,15 @@ En el panel **PLAYLIST**:
 - Con la playlist en uso, las flechas **←→** siguen de largo: al terminar una
   canción, la flecha derecha pasa al siguiente ítem del culto.
 
-## 7. Durante el servicio
+## 7. Buscar en todo de una vez
+
+Botón **🔍** de la barra de arriba, o **Ctrl+K**. Una sola caja que busca a la
+vez en las **canciones**, en la **Biblia** que tengas activa y en los **medios**.
+Las flechas **↑↓** recorren los resultados sin sacar el cursor de la caja, y
+**Enter** carga el que elijas: la canción queda lista para proyectar, el
+versículo se carga en la pestaña Biblia y el medio se aplica de fondo.
+
+## 8. Durante el servicio
 
 | Atajo | Qué hace |
 |---|---|
@@ -186,7 +194,7 @@ En el panel **PLAYLIST**:
 - **Resaltar en vivo**: escribí una palabra y se pinta como con marcador sobre
   el texto proyectado.
 
-## 8. Pantalla de escenario
+## 9. Pantalla de escenario
 
 Botón **🎭 Escenario** en la barra superior. Es un tercer monitor, de cara a la
 plataforma, para que los músicos y quien predica vean:
@@ -209,7 +217,7 @@ La flecha **▾** de al lado elige en qué pantalla va, qué se muestra (hora,
 cronómetro, siguiente), el tamaño de la letra y **⟲ pone el cronómetro en
 cero**. No te deja elegir la misma pantalla que la salida.
 
-## 9. Controlar desde el celular
+## 10. Controlar desde el celular
 
 Botón **📱** en la barra superior. Abre una ventana con un **código QR**, la
 dirección y un **PIN de cuatro dígitos**.
@@ -243,7 +251,7 @@ poner encima de la cámara. No hace falta placa capturadora ni otra computadora.
 > El PIN existe porque cualquiera conectado a la wifi podría, si no, manejar la
 > proyección. Cambiá de PIN apagando y volviendo a prender el control remoto.
 
-## 10. Cuenta regresiva
+## 11. Cuenta regresiva
 
 Botón **⏱** en la barra de arriba, para el rato antes de empezar.
 
@@ -258,7 +266,7 @@ Botón **⏱** en la barra de arriba, para el rato antes de empezar.
   botón ⏱ queda encendido mientras corre, y adentro está **Detener la que
   corre**.
 
-## 11. Copia de seguridad
+## 12. Copia de seguridad
 
 Botón **💾** en la barra de arriba:
 

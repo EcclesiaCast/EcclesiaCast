@@ -129,6 +129,7 @@ public partial class App : Application
         services.AddSingleton<IBackupDialog>(_ => new BackupDialogService(dbPath));
         services.AddSingleton<ICountdownDialog, CountdownDialogService>();
         services.AddSingleton<ISmartPlaylistDialog, SmartPlaylistDialogService>();
+        services.AddSingleton<IGlobalSearchDialog, GlobalSearchDialogService>();
         services.AddSingleton<MainViewModel>();
         _services = services.BuildServiceProvider();
 

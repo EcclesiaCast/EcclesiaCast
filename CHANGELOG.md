@@ -7,6 +7,10 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- Buscador único (botón 🔍 o **Ctrl+K**): una sola caja que busca al mismo
+  tiempo en canciones, en la Biblia activa y en los medios. Las flechas
+  recorren los resultados sin sacar el cursor de la caja y Enter carga el que
+  elijas.
 - Salida para la transmisión: la ventana del control remoto (📱) ahora trae
   una dirección para pegar en el «Browser Source» de OBS o el «Web Input» de
   vMix. Sale la letra que está proyectada, sola y con el fondo transparente,

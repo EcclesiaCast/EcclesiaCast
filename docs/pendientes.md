@@ -26,9 +26,6 @@ todavía en un servicio real.
 Comparación completa contra [spresenter.com](https://spresenter.com) hecha el
 10/9/2026. Las tres que valen la pena, en orden de resultado por esfuerzo:
 
-- [ ] **Búsqueda global unificada.** Una sola barra que busque a la vez en
-      canciones, versículos y medios, estilo Spotlight, en vez de un buscador
-      por pestaña.
 - [ ] **Soporte de PowerPoint (.pptx) y PDF** como contenido proyectable. Es lo
       que más se pide en una iglesia real de todo lo que ellos tienen y
       nosotros no.

@@ -59,6 +59,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private readonly IBackupDialog _backup;
     private readonly ICountdownDialog _countdownDialog;
     private readonly ISmartPlaylistDialog _smartPlaylistDialog;
+    private readonly IGlobalSearchDialog _globalSearch;
 
     /// <summary>Copied slide (label + text + style) for paste/duplicate.</summary>
     private (string Label, string Text, string? StyleJson)? _clipboardSlide;
@@ -76,7 +77,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     /// <summary>Books present in the primary version, in Bible order.</summary>
     public ObservableCollection<BibleBookInfo> BibleBooksAvailable { get; } = [];
 
-    /// <summary>Chapters available for the selected book — the numbered button grid.</summary>
+    /// <summary>Chapters available for the selected book â the numbered button grid.</summary>
     public ObservableCollection<ChapterOption> BibleChapters { get; } = [];
 
     /// <summary>Ids of the checked versions, oldest first; index 0 is the primary.</summary>
@@ -87,7 +88,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     /// <summary>The passage currently shown in the grid, to re-render when versions change.</summary>
     private BibleReference? _currentPassage;
 
-    /// <summary>The center slide grid — filled from either a song or a Bible passage.</summary>
+    /// <summary>The center slide grid â filled from either a song or a Bible passage.</summary>
     public ObservableCollection<SlideItemViewModel> Slides { get; } = [];
 
     [ObservableProperty]
@@ -95,7 +96,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
     [ObservableProperty]
     private string _statusText =
-        "Creá una canción con ➕, o escribí un texto rápido y presioná Ctrl+Enter.";
+        "CreÃ¡ una canciÃ³n con â, o escribÃ­ un texto rÃ¡pido y presionÃ¡ Ctrl+Enter.";
 
     [ObservableProperty]
     private bool _isProjecting;
@@ -134,7 +135,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     [ObservableProperty]
     private bool _isLogoActive;
 
-    /// <summary>True while a media background is applied — gates "Sin fondo".</summary>
+    /// <summary>True while a media background is applied â gates "Sin fondo".</summary>
     [ObservableProperty]
     private bool _hasBackground;
 
@@ -176,7 +177,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private string _bibleQuery = string.Empty;
 
     [ObservableProperty]
-    private string _bibleStatusText = "Escribí una referencia (ej. \"Juan 3:16\", \"sal 23\") o una palabra.";
+    private string _bibleStatusText = "EscribÃ­ una referencia (ej. \"Juan 3:16\", \"sal 23\") o una palabra.";
 
     [ObservableProperty]
     private int _liveSlideIndex = -1;
@@ -210,6 +211,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         IBackupDialog backup,
         ICountdownDialog countdownDialog,
         ISmartPlaylistDialog smartPlaylistDialog,
+        IGlobalSearchDialog globalSearch,
         ProjectionViewModel projectionViewModel)
     {
         _displayProvider = displayProvider;
@@ -236,6 +238,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _backup = backup;
         _countdownDialog = countdownDialog;
         _smartPlaylistDialog = smartPlaylistDialog;
+        _globalSearch = globalSearch;
         Projection = projectionViewModel;
 
         _presentation.Changed += (_, _) => UpdateStateFlags();
@@ -257,7 +260,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _ = RefreshVideoThumbnailsAsync();
     }
 
-    // ── Playlist del servicio ────────────────────────────────────
+    // ââ Playlist del servicio ââââââââââââââââââââââââââââââââââââ
 
     public ObservableCollection<Playlist> Playlists { get; } = [];
     public ObservableCollection<PlaylistItem> PlaylistItems { get; } = [];
@@ -322,14 +325,14 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 Order = order++,
                 Type = PlaylistItemType.Song,
                 SongId = song.Id,
-                Caption = string.IsNullOrWhiteSpace(song.Artist) ? song.Title : $"{song.Title} · {song.Artist}",
+                Caption = string.IsNullOrWhiteSpace(song.Artist) ? song.Title : $"{song.Title} Â· {song.Artist}",
             });
         }
 
         var described = Core.Playlists.SmartPlaylist.Describe(playlist.Rule, playlist.RuleValue);
         StatusText = chosen.Count == 0
-            ? $"«{playlist.Name}»: ninguna canción cumple ahora ({described})."
-            : $"«{playlist.Name}»: {chosen.Count} {described}.";
+            ? $"Â«{playlist.Name}Â»: ninguna canciÃ³n cumple ahora ({described})."
+            : $"Â«{playlist.Name}Â»: {chosen.Count} {described}.";
     }
 
     private void SavePlaylist()
@@ -396,7 +399,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             OnSelectedPlaylistChanged(SelectedPlaylist);
 
         var described = Core.Playlists.SmartPlaylist.Describe(saved.Rule, saved.RuleValue);
-        StatusText = $"Lista inteligente «{saved.Name}»: {described}.";
+        StatusText = $"Lista inteligente Â«{saved.Name}Â»: {described}.";
     }
 
     [RelayCommand]
@@ -449,7 +452,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (SelectedPlaylist is null)
             return;
         var confirm = MessageBox.Show(
-            $"¿Eliminar la playlist \"{SelectedPlaylist.Name}\"?",
+            $"Â¿Eliminar la playlist \"{SelectedPlaylist.Name}\"?",
             "EcclesiaCast", MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (confirm != MessageBoxResult.Yes)
             return;
@@ -465,7 +468,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         // worked out again, so say so instead of pretending it worked.
         if (SelectedPlaylist is { IsSmart: true } smart)
         {
-            StatusText = $"«{smart.Name}» se arma sola: elegí otra lista para agregar cosas a mano.";
+            StatusText = $"Â«{smart.Name}Â» se arma sola: elegÃ­ otra lista para agregar cosas a mano.";
             return false;
         }
 
@@ -483,7 +486,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         PlaylistItems.Add(new PlaylistItem
         {
             Type = PlaylistItemType.Song,
-            Caption = string.IsNullOrWhiteSpace(song.Artist) ? song.Title : $"{song.Title} — {song.Artist}",
+            Caption = string.IsNullOrWhiteSpace(song.Artist) ? song.Title : $"{song.Title} â {song.Artist}",
             SongId = song.Id,
         });
         SavePlaylist();
@@ -496,7 +499,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (_currentPassage is null || PrimaryVersion is null || !EnsurePlaylist())
         {
             if (_currentPassage is null)
-                StatusText = "Cargá un pasaje primero (libro y capítulo, o una referencia).";
+                StatusText = "CargÃ¡ un pasaje primero (libro y capÃ­tulo, o una referencia).";
             return;
         }
 
@@ -600,7 +603,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 var song = Songs.FirstOrDefault(s => s.Id == item.SongId);
                 if (song is null)
                 {
-                    StatusText = $"La canción \"{item.Caption}\" ya no está en la biblioteca.";
+                    StatusText = $"La canciÃ³n \"{item.Caption}\" ya no estÃ¡ en la biblioteca.";
                     return;
                 }
                 SelectedSong = song;
@@ -627,7 +630,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 var media = _allMedia.FirstOrDefault(m => m.Id == item.MediaId);
                 if (media is null)
                 {
-                    StatusText = $"El medio \"{item.Caption}\" ya no está en la biblioteca.";
+                    StatusText = $"El medio \"{item.Caption}\" ya no estÃ¡ en la biblioteca.";
                     return;
                 }
                 ApplyBackground(media);
@@ -653,7 +656,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         }
     }
 
-    // ── Medios (biblioteca con tabs por categoría) ───────────────
+    // ââ Medios (biblioteca con tabs por categorÃ­a) âââââââââââââââ
 
     /// <summary>All media, unfiltered; the bar shows the current tab's items.</summary>
     private readonly List<MediaItem> _allMedia = [];
@@ -669,7 +672,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
     /// <summary>
     /// When on, finishing a video in this tab starts the next one, looping
-    /// round at the end — the tab behaves like a playlist. Kept per tab in the
+    /// round at the end â the tab behaves like a playlist. Kept per tab in the
     /// settings, since tabs are just the media's category.
     /// </summary>
     [ObservableProperty]
@@ -687,14 +690,14 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         _settings.Set(ContinuousKey(SelectedMediaTab), value ? "1" : "0");
         StatusText = value
-            ? $"«{SelectedMediaTab}»: los videos se reproducen uno atrás del otro."
-            : $"«{SelectedMediaTab}»: reproducción continua desactivada.";
+            ? $"Â«{SelectedMediaTab}Â»: los videos se reproducen uno atrÃ¡s del otro."
+            : $"Â«{SelectedMediaTab}Â»: reproducciÃ³n continua desactivada.";
     }
 
     /// <summary>True while the tab's own setting is being read into the checkbox.</summary>
     private bool _loadingMediaTab;
 
-    // ── Fondo al azar ────────────────────────────────────────────
+    // ââ Fondo al azar ââââââââââââââââââââââââââââââââââââââââââââ
 
     private const string RandomEnabledKey = "media.random.enabled";
     private const string RandomTabKey = "media.random.tab";
@@ -729,8 +732,8 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _randomBackgroundSongId = 0;
 
         StatusText = value
-            ? $"Cada canción se lleva un fondo distinto de «{SelectedMediaTab}»."
-            : "Fondo al azar por canción desactivado.";
+            ? $"Cada canciÃ³n se lleva un fondo distinto de Â«{SelectedMediaTab}Â»."
+            : "Fondo al azar por canciÃ³n desactivado.";
     }
 
     /// <summary>
@@ -751,7 +754,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         var pool = BackgroundPool(SelectedMediaTab);
         if (pool.Count == 0)
         {
-            StatusText = $"«{SelectedMediaTab}» no tiene fondos para sortear.";
+            StatusText = $"Â«{SelectedMediaTab}Â» no tiene fondos para sortear.";
             return;
         }
 
@@ -789,7 +792,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         catch (Exception ex)
         {
             // Bookkeeping must never take the projection down mid-service.
-            Log.Warning(ex, "No se pudo anotar el uso de la canción {Song}", song.Title);
+            Log.Warning(ex, "No se pudo anotar el uso de la canciÃ³n {Song}", song.Title);
         }
     }
 
@@ -886,7 +889,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     [RelayCommand]
     private void NewMediaTab()
     {
-        var name = _textPrompt.Ask("Nueva pestaña", "Nombre de la pestaña (ej. Jóvenes):");
+        var name = _textPrompt.Ask("Nueva pestaÃ±a", "Nombre de la pestaÃ±a (ej. JÃ³venes):");
         if (string.IsNullOrWhiteSpace(name))
             return;
         name = name.Trim();
@@ -900,9 +903,9 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     {
         var dialog = new Microsoft.Win32.OpenFileDialog
         {
-            Title = $"Agregar a «{SelectedMediaTab}»",
-            Filter = "Imágenes y videos|*.jpg;*.jpeg;*.png;*.bmp;*.webp;*.gif;*.mp4;*.mov;*.m4v;*.avi;*.mkv;*.wmv;*.webm"
-                   + "|Imágenes|*.jpg;*.jpeg;*.png;*.bmp;*.webp;*.gif"
+            Title = $"Agregar a Â«{SelectedMediaTab}Â»",
+            Filter = "ImÃ¡genes y videos|*.jpg;*.jpeg;*.png;*.bmp;*.webp;*.gif;*.mp4;*.mov;*.m4v;*.avi;*.mkv;*.wmv;*.webm"
+                   + "|ImÃ¡genes|*.jpg;*.jpeg;*.png;*.bmp;*.webp;*.gif"
                    + "|Videos|*.mp4;*.mov;*.m4v;*.avi;*.mkv;*.wmv;*.webm",
             Multiselect = true,
         };
@@ -929,14 +932,14 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 ThumbnailPath = MediaThumbnails.Create(path, type.Value, videoEngine: null),
                 Category = SelectedMediaTab,
                 // Videos with audio default to a foreground announcement; silent
-                // ones and images to a background — the operator can change it.
+                // ones and images to a background â the operator can change it.
                 Behavior = MediaBehavior.Background,
             });
             added++;
         }
 
         LoadMedia();
-        StatusText = $"{added} medio(s) agregado(s) a «{SelectedMediaTab}».";
+        StatusText = $"{added} medio(s) agregado(s) a Â«{SelectedMediaTab}Â».";
         _ = RefreshVideoThumbnailsAsync();
     }
 
@@ -1062,7 +1065,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (IsContinuousTab(background.Category) && NextInTab(background) is { } next)
         {
             ApplyBackground(next);
-            StatusText = $"Reproducción continua en «{background.Category}» → {next.Name}.";
+            StatusText = $"ReproducciÃ³n continua en Â«{background.Category}Â» â {next.Name}.";
             return;
         }
 
@@ -1071,15 +1074,15 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             _presentation.SetBackground(null);
             if (!IsLogoActive)
                 _presentation.ToggleLogo();
-            StatusText = $"\"{background.Name}\" terminó → logo.";
+            StatusText = $"\"{background.Name}\" terminÃ³ â logo.";
         }
         else
         {
-            StatusText = $"\"{background.Name}\" terminó.";
+            StatusText = $"\"{background.Name}\" terminÃ³.";
         }
     }
 
-    // ── Logos ────────────────────────────────────────────────────
+    // ââ Logos ââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
     private const string ActiveLogoKey = "logo.active";
 
@@ -1112,7 +1115,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             {
                 var starter = _logos.Save(new Logo
                 {
-                    Name = "Reunión general",
+                    Name = "ReuniÃ³n general",
                     Kind = LogoKind.Text,
                     Text = "Bienvenidos",
                     Order = 0,
@@ -1152,6 +1155,76 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             ToggleLogo();
         else
             StatusText = $"Logo: {logo.Name}.";
+    }
+
+    // ââ BÃºsqueda global ââââââââââââââââââââââââââââââââââââââââââ
+
+    /// <summary>
+    /// One box over the whole library. Each panel had its own search, so
+    /// finding a word meant first guessing whether it was a song, a verse or
+    /// a video â and mid-service there is no time to guess.
+    /// </summary>
+    [RelayCommand]
+    private void SearchEverything()
+    {
+        var hit = _globalSearch.Show(SearchEverywhere, SearchText);
+        if (hit is null)
+            return;
+
+        switch (hit.Kind)
+        {
+            case SearchHitKind.Song when Songs.FirstOrDefault(s => s.Id == hit.Id) is { } song:
+                IsBibleTabActive = false;
+                SelectedSong = song;
+                StatusText = $"Â«{song.Title}Â» cargada. Doble clic o Enter para proyectar.";
+                break;
+
+            case SearchHitKind.Verse:
+                IsBibleTabActive = true;
+                BibleQuery = hit.Title;
+                StatusText = $"{hit.Title} cargado.";
+                break;
+
+            case SearchHitKind.Media when MediaItems.FirstOrDefault(m => m.Id == hit.Id) is { } media:
+                SelectedMediaTab = media.Category;
+                ApplyBackground(media);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Looks through songs, the active Bible version and the media library at
+    /// once. Capped per kind so one enormous group cannot bury the others.
+    /// </summary>
+    private IReadOnlyList<SearchHit> SearchEverywhere(string query)
+    {
+        var hits = new List<SearchHit>();
+
+        foreach (var song in _songs.Search(query).Take(12))
+        {
+            hits.Add(new SearchHit(
+                SearchHitKind.Song, song.Id, "♪", song.Title,
+                string.IsNullOrWhiteSpace(song.Artist) ? "CanciÃ³n" : song.Artist));
+        }
+
+        if (SelectedBibleVersionOption?.Info.Id is { } versionId)
+        {
+            foreach (var verse in _bibles.SearchText(versionId, query, 12))
+            {
+                hits.Add(new SearchHit(
+                    SearchHitKind.Verse, versionId, "†", verse.Reference, Shorten(verse.Text),
+                    verse.BookNumber, verse.Chapter, verse.Verse));
+            }
+        }
+
+        foreach (var media in MediaItems.Where(m => m.Name.Contains(query, StringComparison.OrdinalIgnoreCase)).Take(8))
+        {
+            hits.Add(new SearchHit(
+                SearchHitKind.Media, media.Id,
+                media.Type == MediaType.Image ? "▣" : "▶", media.Name, media.Category));
+        }
+
+        return hits;
     }
 
     /// <summary>
@@ -1217,7 +1290,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
     /// <summary>
     /// Puts the active logo behind the lyrics as a background, blurred by the
-    /// amount set for it — the usual "our logo, softened, under the words".
+    /// amount set for it â the usual "our logo, softened, under the words".
     /// </summary>
     [RelayCommand]
     private void UseLogoAsBackground()
@@ -1236,7 +1309,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             _presentation.ToggleLogo();
 
         EnsureOutputOn();
-        StatusText = $"«{logo.Name}» de fondo, con {logo.BackgroundBlur:0} % de desenfoque.";
+        StatusText = $"Â«{logo.Name}Â» de fondo, con {logo.BackgroundBlur:0} % de desenfoque.";
     }
 
     /// <summary>
@@ -1258,7 +1331,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         Blur = logo.BackgroundBlur,
     };
 
-    // ── Reproducción del fondo (barra de transporte) ─────────────
+    // ââ ReproducciÃ³n del fondo (barra de transporte) âââââââââââââ
 
     /// <summary>Polls the output while a video plays; the transport bar binds to the result.</summary>
     private readonly System.Windows.Threading.DispatcherTimer _playbackTimer = new()
@@ -1284,7 +1357,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     [ObservableProperty]
     private string _playbackTimeText = "0:00 / 0:00";
 
-    /// <summary>Blur over the background, 0–100; applies live and sticks to the media.</summary>
+    /// <summary>Blur over the background, 0â100; applies live and sticks to the media.</summary>
     [ObservableProperty]
     private double _backgroundBlur;
 
@@ -1375,7 +1448,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     [RelayCommand]
     private void ClearBlur() => BackgroundBlur = 0;
 
-    // ── YouTube ──────────────────────────────────────────────────
+    // ââ YouTube ââââââââââââââââââââââââââââââââââââââââââââââââââ
 
     /// <summary>Opens the embedded browser: sign in with the church account and pick videos.</summary>
     [RelayCommand]
@@ -1398,7 +1471,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     [RelayCommand]
     private void AddYouTubeLink()
     {
-        var text = _textPrompt.Ask("Agregar de YouTube", "Pegá el link del video:");
+        var text = _textPrompt.Ask("Agregar de YouTube", "PegÃ¡ el link del video:");
         if (string.IsNullOrWhiteSpace(text))
             return;
 
@@ -1461,7 +1534,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     {
         if (item is not { Type: MediaType.YouTube } || string.IsNullOrWhiteSpace(item.YouTubeId))
         {
-            StatusText = "Elegí un video de YouTube para descargar.";
+            StatusText = "ElegÃ­ un video de YouTube para descargar.";
             return;
         }
 
@@ -1475,7 +1548,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         if (window.ShowDialog() != true || window.DownloadedPath is not { } path)
         {
-            StatusText = "La descarga no se completó.";
+            StatusText = "La descarga no se completÃ³.";
             return;
         }
 
@@ -1496,7 +1569,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         LoadMedia();
         SelectedMediaTab = DownloadedTab;
-        StatusText = $"«{name}» descargado y agregado a «{DownloadedTab}».";
+        StatusText = $"Â«{name}Â» descargado y agregado a Â«{DownloadedTab}Â».";
     }
 
     /// <summary>
@@ -1510,10 +1583,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             "Para descargar videos, EcclesiaCast usa yt-dlp, un programa aparte y gratuito "
             + "que no viene incluido.\n\n"
             + "Instalalo de una de estas dos formas:\n"
-            + "  • En una terminal:  winget install yt-dlp\n"
-            + $"  • O bajá yt-dlp.exe de github.com/yt-dlp/yt-dlp/releases y ponelo en:\n    {YtDlp.ToolsFolder}\n\n"
-            + "Con ffmpeg instalado además (winget install ffmpeg) se baja hasta 1080p.\n\n"
-            + "¿Abro esa carpeta ahora?",
+            + "  â¢ En una terminal:  winget install yt-dlp\n"
+            + $"  â¢ O bajÃ¡ yt-dlp.exe de github.com/yt-dlp/yt-dlp/releases y ponelo en:\n    {YtDlp.ToolsFolder}\n\n"
+            + "Con ffmpeg instalado ademÃ¡s (winget install ffmpeg) se baja hasta 1080p.\n\n"
+            + "Â¿Abro esa carpeta ahora?",
             "EcclesiaCast", MessageBoxButton.YesNo, MessageBoxImage.Information);
 
         if (answer == MessageBoxResult.Yes)
@@ -1526,7 +1599,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             });
         }
 
-        StatusText = "Instalá yt-dlp y volvé a intentar la descarga.";
+        StatusText = "InstalÃ¡ yt-dlp y volvÃ© a intentar la descarga.";
         return false;
     }
 
@@ -1549,7 +1622,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             LoadMedia();
             if (_presentation.Background?.Id == item.Id)
                 _presentation.SetBackground(item, ResolveFill(item)); // re-aplica con las nuevas opciones
-            StatusText = $"«{item.Name}» actualizado.";
+            StatusText = $"Â«{item.Name}Â» actualizado.";
         }
     }
 
@@ -1582,7 +1655,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         LoadMedia();
     }
 
-    // ── Control desde el celular ─────────────────────────────────
+    // ââ Control desde el celular âââââââââââââââââââââââââââââââââ
 
     private const string RemotePinKey = "remote.pin";
     private const string RemotePortKey = "remote.port";
@@ -1638,8 +1711,8 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (!StartRemote())
         {
             MessageBox.Show(
-                "No se pudo abrir ningún puerto para el control remoto. "
-                + "Puede que otro programa los esté usando.",
+                "No se pudo abrir ningÃºn puerto para el control remoto. "
+                + "Puede que otro programa los estÃ© usando.",
                 "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
@@ -1684,9 +1757,9 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 item.Caption,
                 item.Type switch
                 {
-                    PlaylistItemType.BiblePassage => "📖",
-                    PlaylistItemType.Media => "🎞",
-                    _ => "🎵",
+                    PlaylistItemType.BiblePassage => "ð",
+                    PlaylistItemType.Media => "ð",
+                    _ => "ðµ",
                 }))
             .ToList();
 
@@ -1705,7 +1778,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     /// <summary>
     /// What the streaming page draws: the words as the congregation sees
     /// them, with the theme's styling, and nothing else. Clear, Black and
-    /// Logo all mean "no words on screen" here — a clean feed follows the
+    /// Logo all mean "no words on screen" here â a clean feed follows the
     /// projector rather than second-guessing it.
     /// </summary>
     RemoteOutput IRemoteHost.GetOutput()
@@ -1752,7 +1825,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 ProjectPlaylistItem(PlaylistItems[item]);
                 break;
             default:
-                Log.Debug("El celular pidió una acción desconocida: {Action}", action);
+                Log.Debug("El celular pidiÃ³ una acciÃ³n desconocida: {Action}", action);
                 break;
         }
     }
@@ -1761,10 +1834,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private static string Shorten(string text)
     {
         var single = text.Replace('\n', ' ').Replace('\r', ' ').Trim();
-        return single.Length <= 70 ? single : single[..70] + "…";
+        return single.Length <= 70 ? single : single[..70] + "â¦";
     }
 
-    // ── Pantalla de escenario ────────────────────────────────────
+    // ââ Pantalla de escenario ââââââââââââââââââââââââââââââââââââ
 
     private const string StageDisplayKey = "stage.display";
 
@@ -1823,7 +1896,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
     /// <summary>
     /// Turns the stage display on or off. It must not land on the same screen
-    /// as the congregation's output — that would replace the projection with
+    /// as the congregation's output â that would replace the projection with
     /// the musicians' view.
     /// </summary>
     [RelayCommand]
@@ -1838,7 +1911,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         if (SelectedStageDisplay is null)
         {
-            StatusText = "Elegí en qué pantalla va el escenario.";
+            StatusText = "ElegÃ­ en quÃ© pantalla va el escenario.";
             return;
         }
 
@@ -1846,8 +1919,8 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         {
             MessageBox.Show(
                 "El escenario y la salida no pueden ir en la misma pantalla: la vista de los "
-                + "músicos taparía lo que ve la congregación.\n\n"
-                + "Elegí otro monitor para el escenario.",
+                + "mÃºsicos taparÃ­a lo que ve la congregaciÃ³n.\n\n"
+                + "ElegÃ­ otro monitor para el escenario.",
                 "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
@@ -1859,8 +1932,8 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         {
             var answer = MessageBox.Show(
                 "El escenario va a ocupar esta misma pantalla y va a tapar el panel del operador.\n\n"
-                + "Para cerrarlo, hacé doble clic sobre él.\n\n"
-                + "¿Lo prendo igual?",
+                + "Para cerrarlo, hacÃ© doble clic sobre Ã©l.\n\n"
+                + "Â¿Lo prendo igual?",
                 "EcclesiaCast", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No);
             if (answer != MessageBoxResult.Yes)
                 return;
@@ -1890,10 +1963,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private void ResetStageTimer()
     {
         _stage.ResetTimer();
-        StatusText = "Cronómetro del escenario en cero.";
+        StatusText = "CronÃ³metro del escenario en cero.";
     }
 
-    // ── Pantallas ────────────────────────────────────────────────
+    // ââ Pantallas ââââââââââââââââââââââââââââââââââââââââââââââââ
 
     [RelayCommand]
     private void RefreshDisplays()
@@ -1907,7 +1980,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         for (var i = 0; i < all.Count; i++)
         {
             var d = all[i];
-            var label = $"Pantalla {i + 1} · {d.Width}×{d.Height}{(d.IsPrimary ? " (principal)" : string.Empty)}";
+            var label = $"Pantalla {i + 1} Â· {d.Width}Ã{d.Height}{(d.IsPrimary ? " (principal)" : string.Empty)}";
             Displays.Add(new DisplayOption(d, label));
             StageDisplays.Add(new DisplayOption(d, label));
         }
@@ -1924,7 +1997,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             ?? StageDisplays.FirstOrDefault(o => o.Info.DeviceName != SelectedDisplay?.Info.DeviceName);
     }
 
-    // ── Temas ────────────────────────────────────────────────────
+    // ââ Temas ââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
     private SlideTheme DefaultSongTheme =>
         Resolve(ThemeSeeder.GetDefaultId(_settings, ThemeSeeder.DefaultSongThemeKey));
@@ -1973,7 +2046,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         }
     }
 
-    // ── Pestañas de biblioteca ───────────────────────────────────
+    // ââ PestaÃ±as de biblioteca âââââââââââââââââââââââââââââââââââ
 
     [RelayCommand]
     private void ShowSongsTab() => IsBibleTabActive = false;
@@ -1981,7 +2054,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     [RelayCommand]
     private void ShowBibleTab() => IsBibleTabActive = true;
 
-    // ── Canciones ────────────────────────────────────────────────
+    // ââ Canciones ââââââââââââââââââââââââââââââââââââââââââââââââ
 
     partial void OnSearchTextChanged(string value) => LoadSongs();
 
@@ -2011,7 +2084,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         var theme = ResolveSongTheme(SelectedSong);
         var caption = string.IsNullOrWhiteSpace(SelectedSong.Artist)
             ? SelectedSong.Title
-            : $"{SelectedSong.Title} — {SelectedSong.Artist}";
+            : $"{SelectedSong.Title} â {SelectedSong.Artist}";
 
         foreach (var section in SelectedSong.Sections)
         {
@@ -2030,13 +2103,13 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             ? null
             : SelectedSong.Sections.FirstOrDefault(s => s.Id == item.SectionId);
 
-    /// <summary>Opens the full-song ProPresenter-style designer (right-click → Editar canción / Diseñar).</summary>
+    /// <summary>Opens the full-song ProPresenter-style designer (right-click â Editar canciÃ³n / DiseÃ±ar).</summary>
     [RelayCommand]
     private void EditSongDesign(SlideItemViewModel? item)
     {
         if (SelectedSong is null || (item is not null && item.SectionId == 0))
         {
-            StatusText = "El diseño es para canciones; la Biblia usa su tema global (🎨 Temas).";
+            StatusText = "El diseÃ±o es para canciones; la Biblia usa su tema global (ð¨ Temas).";
             return;
         }
 
@@ -2056,10 +2129,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             LoadSongs();
             SelectedSong = Songs.FirstOrDefault(s => s.Id == saved.Id);
         });
-        StatusText = "Diseño de la canción guardado.";
+        StatusText = "DiseÃ±o de la canciÃ³n guardado.";
     }
 
-    /// <summary>Right-click → "Editar como texto plano": the lyrics editor.</summary>
+    /// <summary>Right-click â "Editar como texto plano": the lyrics editor.</summary>
     [RelayCommand]
     private void EditSongAsText(SlideItemViewModel? item)
     {
@@ -2067,7 +2140,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             EditSong();
     }
 
-    /// <summary>Right-click on a slide → "Edición rápida": corrects just this slide's text.</summary>
+    /// <summary>Right-click on a slide â "EdiciÃ³n rÃ¡pida": corrects just this slide's text.</summary>
     [RelayCommand]
     private void QuickEditSlide(SlideItemViewModel? item)
     {
@@ -2081,7 +2154,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         if (edited.Length == 0)
         {
-            StatusText = "El texto no puede quedar vacío.";
+            StatusText = "El texto no puede quedar vacÃ­o.";
             return;
         }
 
@@ -2095,7 +2168,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         StatusText = "Texto de la diapositiva corregido.";
     }
 
-    // ── Copiar / pegar / duplicar / eliminar diapositivas ────────
+    // ââ Copiar / pegar / duplicar / eliminar diapositivas ââââââââ
 
     [RelayCommand]
     private void CopySlide(SlideItemViewModel? item)
@@ -2147,7 +2220,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         if (SelectedSong.Sections.Count <= 1)
         {
-            StatusText = "La canción debe tener al menos una diapositiva.";
+            StatusText = "La canciÃ³n debe tener al menos una diapositiva.";
             return;
         }
 
@@ -2169,7 +2242,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         StatusText = status;
     }
 
-    // ── Menú contextual de la lista de canciones ─────────────────
+    // ââ MenÃº contextual de la lista de canciones âââââââââââââââââ
 
     [RelayCommand]
     private void EditSongDesignFor(Song? song)
@@ -2210,7 +2283,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         var saved = _songs.Save(copy);
         LoadSongs();
         SelectedSong = Songs.FirstOrDefault(s => s.Id == saved.Id);
-        StatusText = $"Canción duplicada: \"{saved.Title}\".";
+        StatusText = $"CanciÃ³n duplicada: \"{saved.Title}\".";
     }
 
     [RelayCommand]
@@ -2232,7 +2305,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         var saved = _songs.Save(created);
         LoadSongs();
         SelectedSong = Songs.FirstOrDefault(s => s.Id == saved.Id);
-        StatusText = $"Canción \"{saved.Title}\" guardada.";
+        StatusText = $"CanciÃ³n \"{saved.Title}\" guardada.";
     }
 
     [RelayCommand]
@@ -2248,7 +2321,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         var saved = _songs.Save(edited);
         LoadSongs();
         SelectedSong = Songs.FirstOrDefault(s => s.Id == saved.Id);
-        StatusText = $"Canción \"{saved.Title}\" actualizada.";
+        StatusText = $"CanciÃ³n \"{saved.Title}\" actualizada.";
     }
 
     [RelayCommand]
@@ -2258,7 +2331,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             return;
 
         var confirm = MessageBox.Show(
-            $"¿Eliminar \"{SelectedSong.Title}\" de la biblioteca?",
+            $"Â¿Eliminar \"{SelectedSong.Title}\" de la biblioteca?",
             "EcclesiaCast",
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
@@ -2268,7 +2341,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _songs.Delete(SelectedSong.Id);
         SelectedSong = null;
         LoadSongs();
-        StatusText = "Canción eliminada.";
+        StatusText = "CanciÃ³n eliminada.";
     }
 
     /// <summary>Brings the whole ProPresenter library over in one step.</summary>
@@ -2306,7 +2379,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
                 if (song.Sections.Count == 0)
                 {
-                    Log.Warning("Importación sin texto: {Path}", path);
+                    Log.Warning("ImportaciÃ³n sin texto: {Path}", path);
                     skipped++;
                     continue;
                 }
@@ -2324,7 +2397,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Falló la importación de {Path}", path);
+                Log.Error(ex, "FallÃ³ la importaciÃ³n de {Path}", path);
                 failed++;
             }
         }
@@ -2333,10 +2406,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         var parts = new List<string> { $"{imported} canciones importadas" };
         if (skipped > 0)
-            parts.Add($"{skipped} omitidas (vacías o ya existentes)");
+            parts.Add($"{skipped} omitidas (vacÃ­as o ya existentes)");
         if (failed > 0)
             parts.Add($"{failed} con error (ver log)");
-        StatusText = string.Join(" · ", parts) + ".";
+        StatusText = string.Join(" Â· ", parts) + ".";
     }
 
     /// <summary>Reads a text file as UTF-8, falling back to Latin-1.</summary>
@@ -2353,7 +2426,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         }
     }
 
-    // ── Biblia ───────────────────────────────────────────────────
+    // ââ Biblia âââââââââââââââââââââââââââââââââââââââââââââââââââ
 
     /// <summary>The version projected as main text (the first one checked).</summary>
     private BibleVersionInfo? PrimaryVersion =>
@@ -2421,7 +2494,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     }
 
     /// <summary>
-    /// Refreshes the grid and — if a verse is live — re-projects it right
+    /// Refreshes the grid and â if a verse is live â re-projects it right
     /// away, so version changes update the output in real time.
     /// </summary>
     private void RefreshAfterVersionChange()
@@ -2510,7 +2583,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         if (PrimaryVersion is null)
         {
-            BibleStatusText = "Importá una Biblia con 📥 y marcá su casilla.";
+            BibleStatusText = "ImportÃ¡ una Biblia con ð¥ y marcÃ¡ su casilla.";
             UpdateBibleViewState();
             return;
         }
@@ -2540,7 +2613,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 var index = Slides.ToList().FindIndex(s => s.Label == $"{reference.Chapter}:{verse}");
                 SetPreviewIndex(index);
                 if (index >= 0)
-                    BibleStatusText = $"Versículo {verse} seleccionado — Enter lo proyecta.";
+                    BibleStatusText = $"VersÃ­culo {verse} seleccionado â Enter lo proyecta.";
             }
             else
             {
@@ -2571,7 +2644,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         var verses = _bibles.GetPassage(primary.Id, reference);
         if (verses.Count == 0)
         {
-            BibleStatusText = "No se encontraron versículos para esa referencia.";
+            BibleStatusText = "No se encontraron versÃ­culos para esa referencia.";
             return;
         }
 
@@ -2596,7 +2669,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             Slides.Add(new SlideItemViewModel(
                 Slides.Count,
                 "ANTERIOR",
-                new SlideContent($"◀  {prevName} {prevChapter}", "Volver al capítulo anterior", Theme: theme),
+                new SlideContent($"â  {prevName} {prevChapter}", "Volver al capÃ­tulo anterior", Theme: theme),
                 new BibleReference(prevBook, prevChapter, null, null),
                 jumpToEnd: true));
         }
@@ -2620,7 +2693,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             }
             else
             {
-                caption = theme.ShowVersionName ? $"{v.Reference} · {primary.Abbreviation}" : v.Reference;
+                caption = theme.ShowVersionName ? $"{v.Reference} Â· {primary.Abbreviation}" : v.Reference;
             }
 
             Slides.Add(new SlideItemViewModel(
@@ -2636,7 +2709,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             Slides.Add(new SlideItemViewModel(
                 Slides.Count,
                 "SIGUIENTE",
-                new SlideContent($"▶  {nextName} {nextChapter}", "Pasar al siguiente capítulo", Theme: theme),
+                new SlideContent($"â¶  {nextName} {nextChapter}", "Pasar al siguiente capÃ­tulo", Theme: theme),
                 new BibleReference(nextBook, nextChapter, null, null)));
         }
 
@@ -2644,7 +2717,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             MarkChapterSelected(reference.Chapter);
 
         PreviewSlide = Slides.FirstOrDefault(s => s.JumpTarget is null)?.Slide;
-        BibleStatusText = $"{verses.Count} versículo(s). Clic en una diapositiva para proyectar.";
+        BibleStatusText = $"{verses.Count} versÃ­culo(s). Clic en una diapositiva para proyectar.";
     }
 
     /// <summary>Previous chapter before a reference: within the book, or the previous book's last chapter.</summary>
@@ -2742,7 +2815,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             GoLiveSlide(first.Index);
     }
 
-    // ── Resaltado en vivo ────────────────────────────────────────
+    // ââ Resaltado en vivo ââââââââââââââââââââââââââââââââââââââââ
 
     partial void OnHighlightTextChanged(string value) => _presentation.SetHighlight(value);
 
@@ -2819,7 +2892,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Falló el análisis de la Biblia {Path}", dialog.FileName);
+            Log.Error(ex, "FallÃ³ el anÃ¡lisis de la Biblia {Path}", dialog.FileName);
             MessageBox.Show(
                 $"No se pudo leer el archivo:\n\n{ex.Message}",
                 "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -2829,7 +2902,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (parsed.VerseCount == 0)
         {
             MessageBox.Show(
-                "El archivo no contiene versículos reconocibles.",
+                "El archivo no contiene versÃ­culos reconocibles.",
                 "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
@@ -2851,12 +2924,12 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 imported.IsSelected = true;
         }
 
-        var message = $"\"{saved.Name}\" importada: {parsed.VerseCount} versículos.";
+        var message = $"\"{saved.Name}\" importada: {parsed.VerseCount} versÃ­culos.";
         if (parsed.MissingBookNumbers.Count > 0)
             message += $" Faltan {parsed.MissingBookNumbers.Count} de los 66 libros.";
         BibleStatusText = message;
         Log.Information(
-            "Biblia importada: {Name} ({Abbreviation}), {Verses} versículos, {Missing} libros faltantes",
+            "Biblia importada: {Name} ({Abbreviation}), {Verses} versÃ­culos, {Missing} libros faltantes",
             saved.Name, saved.Abbreviation, parsed.VerseCount, parsed.MissingBookNumbers.Count);
     }
 
@@ -2867,13 +2940,13 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (target is null)
             return;
 
-        var newName = _textPrompt.Ask("Renombrar versión", "Nuevo nombre:", target.Name);
+        var newName = _textPrompt.Ask("Renombrar versiÃ³n", "Nuevo nombre:", target.Name);
         if (string.IsNullOrWhiteSpace(newName))
             return;
 
         _bibles.RenameVersion(target.Id, newName.Trim());
         LoadBibleVersions();
-        BibleStatusText = "Versión renombrada.";
+        BibleStatusText = "VersiÃ³n renombrada.";
     }
 
     [RelayCommand]
@@ -2884,7 +2957,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             return;
 
         var confirm = MessageBox.Show(
-            $"¿Eliminar la versión \"{target.Name}\" y sus {target.VerseCount} versículos?",
+            $"Â¿Eliminar la versiÃ³n \"{target.Name}\" y sus {target.VerseCount} versÃ­culos?",
             "EcclesiaCast", MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (confirm != MessageBoxResult.Yes)
             return;
@@ -2892,10 +2965,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _bibles.DeleteVersion(target.Id);
         SelectedBibleVersionOption = null;
         LoadBibleVersions();
-        BibleStatusText = "Versión eliminada.";
+        BibleStatusText = "VersiÃ³n eliminada.";
     }
 
-    // ── Proyección de slides ─────────────────────────────────────
+    // ââ ProyecciÃ³n de slides âââââââââââââââââââââââââââââââââââââ
 
     [RelayCommand]
     private void ProjectSlide(SlideItemViewModel item) => GoLiveSlide(item.Index);
@@ -3041,7 +3114,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             && item.JumpTarget is null)
         {
             _presentation.SetBackground(null);
-            Log.Debug("Fondo de primer plano «{Name}» retirado al proyectar texto", foreground.Name);
+            Log.Debug("Fondo de primer plano Â«{Name}Â» retirado al proyectar texto", foreground.Name);
         }
 
         // Chapter jump cards never project themselves: they load the target
@@ -3096,10 +3169,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             .FirstOrDefault(s => s.JumpTarget is null)?.Slide;
 
         Log.Debug("Slide {Index} en vivo: {Label}", index, item.Label);
-        StatusText = $"En vivo: diapositiva {index + 1} de {Slides.Count}. Flechas ←→ para navegar · F1 Clear · F2 Black · F3 Logo.";
+        StatusText = $"En vivo: diapositiva {index + 1} de {Slides.Count}. Flechas ââ para navegar Â· F1 Clear Â· F2 Black Â· F3 Logo.";
     }
 
-    // ── Texto rápido ─────────────────────────────────────────────
+    // ââ Texto rÃ¡pido âââââââââââââââââââââââââââââââââââââââââââââ
 
     partial void OnQuickTextChanged(string value)
     {
@@ -3123,13 +3196,13 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             slide.IsLive = false;
 
         // Quick text stands alone: nothing follows it on the stage display.
-        Projection.SlideLabel = "Texto rápido";
+        Projection.SlideLabel = "Texto rÃ¡pido";
         Projection.NextSlide = null;
 
-        StatusText = "Texto rápido en vivo. F1 Clear · F2 Black · F3 Logo · Esc apaga la salida.";
+        StatusText = "Texto rÃ¡pido en vivo. F1 Clear Â· F2 Black Â· F3 Logo Â· Esc apaga la salida.";
     }
 
-    // ── Notas para la plataforma ─────────────────────────────────
+    // ââ Notas para la plataforma âââââââââââââââââââââââââââââââââ
 
     /// <summary>
     /// The preacher's outline. It only ever reaches the stage display, so
@@ -3147,7 +3220,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         StatusText = IsStageVisible
             ? "Notas en la pantalla de escenario."
-            : "Notas guardadas. Se ven al prender la pantalla de escenario (🎭).";
+            : "Notas guardadas. Se ven al prender la pantalla de escenario (ð­).";
     }
 
     [RelayCommand]
@@ -3157,7 +3230,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         StatusText = "Notas fuera del escenario.";
     }
 
-    // ── Aviso al pie ─────────────────────────────────────────────
+    // ââ Aviso al pie âââââââââââââââââââââââââââââââââââââââââââââ
 
     [RelayCommand]
     private void ShowOverlay()
@@ -3178,7 +3251,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         StatusText = "Aviso al pie retirado.";
     }
 
-    // ── Estados de salida ────────────────────────────────────────
+    // ââ Estados de salida ââââââââââââââââââââââââââââââââââââââââ
 
     /// <summary>Turns the output window on (if a display is selected).</summary>
     private bool EnsureOutputOn()

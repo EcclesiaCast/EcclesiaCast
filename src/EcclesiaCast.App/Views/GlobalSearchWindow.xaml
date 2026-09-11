@@ -1,0 +1,63 @@
+<Window x:Class="EcclesiaCast.App.Views.GlobalSearchWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Buscar"
+        Width="720" Height="520"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="SingleBorderWindow"
+        Background="{StaticResource BgBrush}"
+        FontFamily="Segoe UI">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBox Grid.Row="0" x:Name="QueryBox"
+                 Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                 BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
+                 FontSize="20" Padding="12,10"
+                 TextChanged="Query_Changed" PreviewKeyDown="Query_KeyDown"/>
+
+        <TextBlock Grid.Row="1" Text="Canciones, versículos y medios, todo junto. ↑↓ para elegir, Enter para cargarlo."
+                   FontSize="11" Foreground="{StaticResource FaintBrush}" Margin="2,6,0,8"/>
+
+        <ListBox Grid.Row="2" x:Name="ResultsList"
+                 Background="Transparent" BorderThickness="0"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 MouseDoubleClick="Results_DoubleClick"
+                 PreviewKeyDown="Results_KeyDown">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <DockPanel Margin="0,4">
+                        <!-- La tipografía de emoji va explícita: heredando la
+                             del panel, el libro y la película salen como
+                             cuadraditos vacíos. -->
+                        <TextBlock DockPanel.Dock="Left" Text="{Binding Icon}" FontSize="18"
+                                   FontFamily="Segoe UI Emoji"
+                                   Width="34" VerticalAlignment="Top" Margin="0,2,6,0"/>
+                        <StackPanel>
+                            <TextBlock Text="{Binding Title}" Foreground="White" FontSize="14"
+                                       TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Text="{Binding Detail}" Foreground="{StaticResource MutedBrush}"
+                                       FontSize="11" TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+                    </DockPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <DockPanel Grid.Row="3" Margin="0,10,0,0">
+            <TextBlock x:Name="SummaryText" DockPanel.Dock="Left" VerticalAlignment="Center"
+                       FontSize="11" Foreground="{StaticResource FaintBrush}"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Cargar" Style="{StaticResource AccentButton}" Padding="20,8"
+                        IsDefault="True" Click="Open_Click"/>
+                <Button Content="Cerrar" Style="{StaticResource DarkButton}" Padding="18,8"
+                        Margin="8,0,0,0" IsCancel="True"/>
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</Window>
