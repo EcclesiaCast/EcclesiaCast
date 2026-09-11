@@ -10,8 +10,10 @@ lado. Al cerrar un punto, borralo y anotalo en el [CHANGELOG](../CHANGELOG.md).
       verdad. El instalador ya está armado en
       `dist\EcclesiaCast-1.0.0-beta.4-setup.exe` (rearmado el 11/9/2026, con
       la revisión de código de las nueve funciones nuevas ya adentro).
-- [ ] Mergear `beta3` a `main` una vez que la prueba salga bien, y publicar
-      la beta.4 en GitHub (taguear `v1.0.0-beta.4`).
+- [ ] Publicar la beta.4 en GitHub: falta `git push origin main --follow-tags`
+      y subir el instalador al release. El merge de `beta3` a `main` y el tag
+      `v1.0.0-beta.4` ya están hechos en local (11/9/2026), antes de la prueba
+      con proyector, por decisión de Alexis.
 - [ ] Actualizar README y CHANGELOG (hoy dicen "Beta") y taguear `v1.0.0`.
 - [ ] **Firma digital del instalador.** Hoy Windows muestra "Editor
       desconocido" y hay que darle a "Más información → Ejecutar de todas
