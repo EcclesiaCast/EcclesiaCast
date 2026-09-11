@@ -6,9 +6,11 @@ lado. Al cerrar un punto, borralo y anotalo en el [CHANGELOG](../CHANGELOG.md).
 ## 1. Para llegar a la v1.0.0
 
 - [ ] **Correr la [guía de pruebas](pruebas-beta.md) en la PC del proyector.**
-      Es el bloqueante real: casi nada de la beta.3 se probó con proyector de
-      verdad.
-- [ ] Mergear `beta3` a `main` una vez que la prueba salga bien.
+      Es el bloqueante real: nada de la beta.4 se probó con proyector de
+      verdad. El instalador ya está armado en
+      `dist\EcclesiaCast-1.0.0-beta.4-setup.exe`.
+- [ ] Mergear `beta3` a `main` una vez que la prueba salga bien, y publicar
+      la beta.4 en GitHub (taguear `v1.0.0-beta.4`).
 - [ ] Actualizar README y CHANGELOG (hoy dicen "Beta") y taguear `v1.0.0`.
 - [ ] **Firma digital del instalador.** Hoy Windows muestra "Editor
       desconocido" y hay que darle a "Más información → Ejecutar de todas

@@ -18,28 +18,28 @@ Esto sólo se puede verificar en la PC del proyector. Es lo más importante.
 
 ### Instalación desde cero
 
-> **Ojo con la versión.** Lo que hay que probar es la **beta.3**, que todavía
+> **Ojo con la versión.** Lo que hay que probar es la **beta.4**, que todavía
 > **no está publicada en GitHub**: la página de releases sigue mostrando la
-> beta.2 del 20/7, que no trae nada de esto. El instalador de la beta.3 se
+> beta.2 del 20/7, que no trae nada de esto. El instalador de la beta.4 se
 > genera en la máquina de desarrollo y queda en la carpeta `dist` del
 > proyecto:
 >
 > ```
-> dist\EcclesiaCast-1.0.0-beta.3-setup.exe
+> dist\EcclesiaCast-1.0.0-beta.4-setup.exe
 > ```
 >
 > Se recompila cuando haga falta con:
 >
 > ```
-> dotnet publish src\EcclesiaCast.App\EcclesiaCast.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=false -p:Version=1.0.0-beta.3 -o publish
-> "%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe" /DAppVersion=1.0.0-beta.3 installer\EcclesiaCast.iss
+> dotnet publish src\EcclesiaCast.App\EcclesiaCast.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=false -p:Version=1.0.0-beta.4 -o publish
+> "%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe" /DAppVersion=1.0.0-beta.4 installer\EcclesiaCast.iss
 > ```
 >
 > Se publica en GitHub recién **después** de esta prueba: mergear `beta3` a
-> `main` y taguear `v1.0.0-beta.3` dispara el workflow de release.
+> `main` y taguear `v1.0.0-beta.4` dispara el workflow de release.
 
-- [ ] Copiar `dist\EcclesiaCast-1.0.0-beta.3-setup.exe` a la PC del proyector.
-- [ ] Confirmar que estás instalando la **beta.3** y no la beta.2 ni el
+- [ ] Copiar `dist\EcclesiaCast-1.0.0-beta.4-setup.exe` a la PC del proyector.
+- [ ] Confirmar que estás instalando la **beta.4** y no la beta.2 ni el
       `EcclesiaCast-1.0.0-setup.exe` viejo que también está en `dist`.
 - [ ] Windows va a avisar que el programa no tiene firma digital ("Windows
       protegió tu PC"). Es esperable: hay que elegir *Más información* →
