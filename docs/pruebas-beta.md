@@ -280,6 +280,20 @@ subraya nada, avisame**: significa que hay que instalarlo o buscar otro camino.
       ahí.
 - [ ] Detenerla desde el mismo botón ⏱ → **Detener la que corre**.
 
+### Salida para transmisión (nuevo)
+
+- [ ] Botón **📱** → copiar la dirección **para la transmisión**.
+- [ ] Pegarla en un **Browser Source de OBS** (o el Web Input de vMix) y
+      confirmar que aparece la letra con **fondo transparente** sobre la
+      cámara.
+- [ ] Pasar de diapositiva: la transmisión sigue al proyector con menos de un
+      segundo de retraso.
+- [ ] **F1 Clear** y **F2 Black**: la letra sale de la transmisión también.
+- [ ] El **aviso al pie** y la **cuenta regresiva** aparecen en la transmisión.
+- [ ] Probar `&fondo=negro` al final de la dirección.
+- [ ] Dejarlo andando **toda la reunión** y mirar si la PC aguanta las dos
+      cosas a la vez (proyección + transmisión).
+
 ### Listas inteligentes (nuevo)
 
 - [ ] Botón **✨** del panel PLAYLIST → *Canciones que hace rato no cantamos*,

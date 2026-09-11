@@ -47,6 +47,27 @@
             </StackPanel>
         </Border>
 
+        <!-- Salida limpia para el que transmite -->
+        <Border Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
+                CornerRadius="6" Padding="14,10" Margin="0,14,0,0">
+            <StackPanel>
+                <TextBlock Text="Para la transmisión (OBS o vMix)"
+                           FontSize="12" FontWeight="SemiBold" Foreground="White"/>
+                <TextBlock Text="Pegá esta dirección en un «Browser Source» de OBS o en un «Web Input» de vMix: sale la letra sola, con el fondo transparente, para ponerla encima de la cámara."
+                           FontSize="11" Foreground="{StaticResource FaintBrush}"
+                           TextWrapping="Wrap" Margin="0,4,0,6"/>
+                <TextBox x:Name="BroadcastBox" IsReadOnly="True"
+                         Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                         BorderBrush="{StaticResource LineBrush}"
+                         FontSize="12" Padding="8,6" TextWrapping="Wrap"
+                         ToolTip="Agregale «&amp;fondo=negro» al final si tu programa no maneja transparencia"/>
+                <Button Content="Copiar la dirección" Style="{StaticResource DarkButton}"
+                        FontSize="11" Padding="10,4" Margin="0,8,0,0"
+                        HorizontalAlignment="Left" Click="CopyBroadcast_Click"/>
+            </StackPanel>
+        </Border>
+
         <TextBlock x:Name="FirewallNote"
                    Text="La primera vez, Windows puede preguntar si permitís que EcclesiaCast use la red: aceptá para redes privadas."
                    FontSize="11" Foreground="{StaticResource FaintBrush}"

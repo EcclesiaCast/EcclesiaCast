@@ -26,10 +26,6 @@ todavía en un servicio real.
 Comparación completa contra [spresenter.com](https://spresenter.com) hecha el
 10/9/2026. Las tres que valen la pena, en orden de resultado por esfuerzo:
 
-- [ ] **Salida web para transmisión.** Que cada salida se publique como una URL
-      HTTP para pegar en el Browser Source de OBS o el Web Input de vMix, sin
-      hardware extra. Es la más barata de las tres: ya tenemos el servidor HTTP
-      andando para el control por celular.
 - [ ] **Búsqueda global unificada.** Una sola barra que busque a la vez en
       canciones, versículos y medios, estilo Spotlight, en vez de un buscador
       por pestaña.

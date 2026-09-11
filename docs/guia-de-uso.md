@@ -225,6 +225,21 @@ dirección y un **PIN de cuatro dígitos**.
   para *redes privadas*.
 - Queda encendido para el próximo servicio. Se apaga desde la misma ventana.
 
+### Para la transmisión (OBS o vMix)
+
+En la misma ventana del 📱 está la dirección **para la transmisión**. Copiala y
+pegala en un **Browser Source** de OBS o en un **Web Input** de vMix: vas a ver
+la letra que está proyectada, sola, con el **fondo transparente**, lista para
+poner encima de la cámara. No hace falta placa capturadora ni otra computadora.
+
+- Se actualiza sola, tres veces por segundo.
+- Respeta el tema: tipografía, color, contorno y alineación.
+- Con **Clear**, **Black** o **Logo** la letra desaparece de la transmisión,
+  igual que en el proyector.
+- El **aviso al pie** y la **cuenta regresiva** también salen.
+- Si tu programa no maneja transparencia, agregale `&fondo=negro` al final de
+  la dirección.
+
 > El PIN existe porque cualquiera conectado a la wifi podría, si no, manejar la
 > proyección. Cambiá de PIN apagando y volviendo a prender el control remoto.
 

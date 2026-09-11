@@ -50,6 +50,13 @@ public sealed class RemoteControlServer : IDisposable
     /// <summary>The address to type into the phone, e.g. http://192.168.1.40:8080.</summary>
     public string Address => $"http://{LocalAddress()}:{Port}";
 
+    /// <summary>
+    /// The URL to paste into OBS or vMix: the projected words over
+    /// transparency, with the PIN carried along because a browser source has
+    /// no way to ask for one.
+    /// </summary>
+    public string BroadcastAddress => $"{Address}/salida?pin={Pin}";
+
     /// <summary>Starts listening. Returns false when no port could be opened.</summary>
     public bool Start(int preferredPort, string pin)
     {
@@ -192,6 +199,30 @@ public sealed class RemoteControlServer : IDisposable
         if (method == "GET" && path is "/" or "/index.html")
         {
             await WriteAsync(stream, 200, "text/html; charset=utf-8", RemotePage.Html, cancellation);
+            return;
+        }
+
+        // The streaming page and its data. It is the same PIN, carried in the
+        // URL the operator copies into OBS, because a Browser Source has
+        // nowhere to type one.
+        if (method == "GET" && path is "/salida" or "/output")
+        {
+            await WriteAsync(stream, 200, "text/html; charset=utf-8", OutputPage.Html, cancellation);
+            return;
+        }
+
+        if (path == "/api/output" && method == "GET")
+        {
+            var check = CheckPin(QueryValue(target, "pin"), caller);
+            if (!check.Ok)
+            {
+                await WriteDeniedAsync(stream, check, cancellation);
+                return;
+            }
+
+            var output = await OnUiThread(() => _host.GetOutput());
+            await WriteAsync(stream, 200, "application/json; charset=utf-8",
+                JsonSerializer.Serialize(output, Json), cancellation);
             return;
         }
 

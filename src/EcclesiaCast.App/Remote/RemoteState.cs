@@ -29,6 +29,35 @@ public interface IRemoteHost
 {
     RemoteState GetState();
 
+    /// <summary>The words on the projector, for the broadcast page.</summary>
+    RemoteOutput GetOutput();
+
     /// <summary>Runs one action; <paramref name="index"/> is used by the ones that take a target.</summary>
     void Execute(string action, int? index);
 }
+
+/// <summary>
+/// What a broadcast page needs to draw the words the congregation is seeing,
+/// with no operator interface around them: the text, the way the theme
+/// styles it, and the announcements that ride over everything.
+///
+/// It carries style rather than a picture because that is what a stream
+/// wants — clean text over transparency, to sit on top of the camera.
+/// </summary>
+public sealed record RemoteOutput(
+    bool ShowText,
+    string MainText,
+    string SecondaryText,
+    string Caption,
+    string Overlay,
+    string Countdown,
+    string CountdownHeading,
+    string FontFamily,
+    double FontSize,
+    bool Bold,
+    bool Italic,
+    string Color,
+    string OutlineColor,
+    double OutlineWidth,
+    string AlignH,
+    string AlignV);

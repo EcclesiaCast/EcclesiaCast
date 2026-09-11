@@ -1702,6 +1702,40 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             SongTitle: SelectedSong?.Title ?? (IsBibleTabActive ? "Biblia" : "EcclesiaCast"));
     }
 
+    /// <summary>
+    /// What the streaming page draws: the words as the congregation sees
+    /// them, with the theme's styling, and nothing else. Clear, Black and
+    /// Logo all mean "no words on screen" here — a clean feed follows the
+    /// projector rather than second-guessing it.
+    /// </summary>
+    RemoteOutput IRemoteHost.GetOutput()
+    {
+        var slide = Projection.Slide;
+        var theme = slide?.Theme ?? SlideTheme.Fallback;
+        var over = slide?.Override;
+        var countdown = _presentation.Countdown;
+
+        return new RemoteOutput(
+            ShowText: IsProjecting && _presentation.State == OutputState.Content && slide is not null,
+            MainText: slide?.MainText ?? string.Empty,
+            SecondaryText: slide?.SecondaryText ?? string.Empty,
+            Caption: theme.ShowCaption ? slide?.Caption ?? string.Empty : string.Empty,
+            Overlay: _presentation.OverlayMessage ?? string.Empty,
+            Countdown: countdown?.Format(DateTimeOffset.Now) ?? string.Empty,
+            CountdownHeading: countdown is null || countdown.HasFinished(DateTimeOffset.Now)
+                ? string.Empty
+                : countdown.Heading,
+            FontFamily: over?.FontFamily ?? theme.FontFamily,
+            FontSize: over?.FontSize ?? theme.MaxFontSize,
+            Bold: over?.Bold ?? theme.Bold,
+            Italic: over?.Italic ?? theme.Italic,
+            Color: over?.TextColor ?? theme.TextColor,
+            OutlineColor: over?.OutlineColor ?? theme.OutlineColor,
+            OutlineWidth: over?.OutlineWidth ?? theme.OutlineWidth,
+            AlignH: (over?.AlignH ?? theme.AlignH).ToString().ToLowerInvariant(),
+            AlignV: (over?.AlignV ?? theme.AlignV).ToString().ToLowerInvariant());
+    }
+
     void IRemoteHost.Execute(string action, int? index)
     {
         switch (action)

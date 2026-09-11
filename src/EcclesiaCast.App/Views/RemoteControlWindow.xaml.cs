@@ -20,7 +20,21 @@ public partial class RemoteControlWindow : Window
 
         AddressBox.Text = server.Address;
         PinText.Text = server.Pin;
+        BroadcastBox.Text = server.BroadcastAddress;
         ShowQr(server.Address);
+    }
+
+    private void CopyBroadcast_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            Clipboard.SetText(BroadcastBox.Text);
+        }
+        catch (Exception ex)
+        {
+            // El portapapeles lo puede tener tomado otro programa.
+            Log.Debug(ex, "No se pudo copiar la dirección de transmisión");
+        }
     }
 
     /// <summary>True when the operator asked to switch the remote off.</summary>
