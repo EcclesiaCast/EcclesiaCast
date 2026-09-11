@@ -137,15 +137,28 @@ public static class OutputPage
               caption.style.bottom = s.overlay ? '13vh' : '4vh';
             }
 
+            // Se pregunta tres veces por segundo mientras todo va bien. Si la
+            // dirección quedó con un PIN viejo, insistir a ese ritmo hace que
+            // la computadora bloquee a este equipo por golpear la puerta: ante
+            // un rechazo se espera cada vez más, hasta diez segundos.
+            var espera = 300;
+
             function poll() {
               fetch('/api/output?pin=' + encodeURIComponent(pin))
-                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (r) {
+                  if (r.status === 403 || r.status === 429) {
+                    espera = Math.min(espera * 2, 10000);
+                    return null;
+                  }
+                  espera = 300;
+                  return r.ok ? r.json() : null;
+                })
                 .then(function (s) { if (s) paint(s); })
-                .catch(function () { /* la computadora se fue: dejamos lo último en pantalla */ });
+                .catch(function () { /* la computadora se fue: dejamos lo último en pantalla */ })
+                .then(function () { setTimeout(poll, espera); });
             }
 
             poll();
-            setInterval(poll, 300);
           </script>
         </body>
         </html>

@@ -133,6 +133,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 - El video de fondo usa casi 100 MB menos de memoria (742 → 649 MB con un
   1080p): el colchón de lectura de VLC pasó de segundo y medio a medio
   segundo, que para un archivo del disco de la misma PC alcanza.
+- La página para la transmisión ya no se bloquea sola: si la dirección pegada
+  en OBS tiene un PIN viejo, el programa la rechaza pero **no** deja afuera a
+  esa computadora, y al corregir la dirección entra en el acto. Antes se
+  bloqueaba a segundo y medio de insistir, y quedaba cinco minutos afuera aun
+  con la dirección ya corregida.
 - Un lector de pantalla ahora dice qué es cada cosa: las canciones, las
   diapositivas, los pasajes y los ítems de la playlist se anuncian por su
   nombre en vez del nombre interno del tipo, y los botones que son sólo un

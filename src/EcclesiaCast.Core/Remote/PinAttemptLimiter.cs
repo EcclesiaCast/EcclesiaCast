@@ -18,6 +18,7 @@ public sealed class PinAttemptLimiter
     private readonly int _maxAttempts;
     private readonly TimeSpan _lockout;
     private readonly TimeSpan _window;
+    private readonly TimeSpan _betweenFailures;
 
     /// <param name="maxAttempts">Misses allowed before the lockout starts.</param>
     /// <param name="lockout">How long a locked-out client has to wait.</param>
@@ -25,11 +26,23 @@ public sealed class PinAttemptLimiter
     /// Misses further apart than this are treated as unrelated, so a wrong PIN
     /// on three different Sundays never adds up to a lockout.
     /// </param>
-    public PinAttemptLimiter(int maxAttempts = 5, TimeSpan? lockout = null, TimeSpan? window = null)
+    /// <param name="betweenFailures">
+    /// How much has to pass before the same client's next miss counts again.
+    /// Not everything that asks is a person typing: the streaming page polls
+    /// several times a second, and a stale address in OBS would otherwise lock
+    /// the machine out in a second and a half. Counting one miss at a time
+    /// still leaves a guesser needing days for ten thousand PINs.
+    /// </param>
+    public PinAttemptLimiter(
+        int maxAttempts = 5,
+        TimeSpan? lockout = null,
+        TimeSpan? window = null,
+        TimeSpan? betweenFailures = null)
     {
         _maxAttempts = Math.Max(1, maxAttempts);
         _lockout = lockout ?? TimeSpan.FromMinutes(5);
         _window = window ?? TimeSpan.FromMinutes(5);
+        _betweenFailures = betweenFailures ?? TimeSpan.FromSeconds(2);
     }
 
     /// <summary>
@@ -58,7 +71,14 @@ public sealed class PinAttemptLimiter
         if (!_byClient.TryGetValue(client, out var attempts) || now - attempts.LastFailure > _window)
             attempts = new Attempts();
 
-        attempts = attempts with { Count = attempts.Count + 1, LastFailure = now };
+        // A client hammering away only earns one miss per interval; the rest
+        // are the same mistake repeating, not new guesses.
+        var counts = attempts.Count == 0 || now - attempts.LastFailure >= _betweenFailures;
+        attempts = attempts with
+        {
+            Count = counts ? attempts.Count + 1 : attempts.Count,
+            LastFailure = now,
+        };
 
         if (attempts.Count >= _maxAttempts)
             attempts = attempts with { LockedUntil = now + _lockout };
