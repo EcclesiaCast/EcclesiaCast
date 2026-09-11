@@ -7,6 +7,10 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- Listas inteligentes (botón ✨ del panel PLAYLIST): listas que se arman
+  solas con la biblioteca — lo que agregaste hace poco, lo que hace rato que
+  no cantás, todo lo de un artista o todo lo que diga una palabra. Para que
+  la segunda funcione, ahora se anota cuándo se proyectó cada canción.
 - Recorte y color de los medios, en el Inspector: elegís desde qué segundo
   arranca un video y hasta cuál llega (para saltear la cortina con que
   arrancan muchos videos, y que el bucle respete el recorte), y ajustás el

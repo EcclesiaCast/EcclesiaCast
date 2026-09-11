@@ -68,6 +68,17 @@ public sealed class SongRepository(string dbPath) : ISongRepository
         return Get(song.Id)!;
     }
 
+    public void MarkProjected(int songId, DateTime when)
+    {
+        using var db = new AppDbContext(dbPath);
+        var song = db.Songs.FirstOrDefault(s => s.Id == songId);
+        if (song is null)
+            return;
+
+        song.LastProjectedAt = when;
+        db.SaveChanges();
+    }
+
     public void Delete(int id)
     {
         using var db = new AppDbContext(dbPath);

@@ -16,7 +16,10 @@ lado. Al cerrar un punto, borralo y anotalo en el [CHANGELOG](../CHANGELOG.md).
 
 ## 2. Funciones que faltan
 
-- [ ] Playlists inteligentes (diferido desde el sprint 5).
+Vacío: todo lo que había acá se implementó el 10/9/2026 — transiciones,
+encuadre y color de medios, recorte de video, cuadros de texto por diapositiva
+y listas inteligentes. Está en el [CHANGELOG](../CHANGELOG.md), sin probar
+todavía en un servicio real.
 
 ## 3. Ideas tomadas de Spresenter (10/9/2026)
 

@@ -128,6 +128,7 @@ public partial class App : Application
         services.AddSingleton<IStageWindowService, StageWindowService>();
         services.AddSingleton<IBackupDialog>(_ => new BackupDialogService(dbPath));
         services.AddSingleton<ICountdownDialog, CountdownDialogService>();
+        services.AddSingleton<ISmartPlaylistDialog, SmartPlaylistDialogService>();
         services.AddSingleton<MainViewModel>();
         _services = services.BuildServiceProvider();
 

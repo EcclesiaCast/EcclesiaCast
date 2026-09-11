@@ -16,4 +16,10 @@ public interface ISongRepository
     Song Save(Song song);
 
     void Delete(int id);
+
+    /// <summary>
+    /// Notes that a song went on the projector. Called every time a slide of
+    /// it goes live, so it stays cheap: one column, no sections.
+    /// </summary>
+    void MarkProjected(int songId, DateTime when);
 }

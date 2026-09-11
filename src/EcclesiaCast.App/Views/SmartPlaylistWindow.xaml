@@ -1,0 +1,58 @@
+<Window x:Class="EcclesiaCast.App.Views.SmartPlaylistWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Lista inteligente"
+        Width="480" SizeToContent="Height"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BgBrush}"
+        FontFamily="Segoe UI">
+    <StackPanel Margin="18">
+
+        <TextBlock Text="Una lista que se arma sola con las canciones de la biblioteca. No se edita a mano: cambia cuando cambia la biblioteca."
+                   FontSize="12" Foreground="{StaticResource MutedBrush}"
+                   TextWrapping="Wrap" Margin="0,0,0,14"/>
+
+        <TextBlock Text="Nombre" FontSize="11" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,4"/>
+        <TextBox x:Name="NameBox"
+                 Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                 BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
+                 Padding="10,7" FontSize="14"/>
+
+        <TextBlock Text="Qué junta" FontSize="11" Foreground="{StaticResource MutedBrush}" Margin="0,14,0,4"/>
+        <ComboBox x:Name="RuleBox" FontSize="12" SelectionChanged="Rule_Changed">
+            <ComboBoxItem Content="Canciones agregadas hace poco"/>
+            <ComboBoxItem Content="Canciones que hace rato no cantamos"/>
+            <ComboBoxItem Content="Canciones de un artista"/>
+            <ComboBoxItem Content="Canciones que dicen una palabra"/>
+        </ComboBox>
+
+        <StackPanel x:Name="DaysRow" Orientation="Horizontal" Margin="0,12,0,0">
+            <TextBlock Text="En los últimos" VerticalAlignment="Center" Foreground="White" FontSize="13"/>
+            <TextBox x:Name="DaysBox" Text="30" Width="64" Margin="8,0"
+                     Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                     BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
+                     Padding="8,5" TextAlignment="Center"/>
+            <TextBlock Text="días" VerticalAlignment="Center" Foreground="White" FontSize="13"/>
+        </StackPanel>
+
+        <StackPanel x:Name="TextRow" Orientation="Horizontal" Margin="0,12,0,0" Visibility="Collapsed">
+            <TextBlock x:Name="TextLabel" Text="Artista" VerticalAlignment="Center" Width="60"
+                       Foreground="White" FontSize="13"/>
+            <TextBox x:Name="TextBoxValue" Width="300" Margin="8,0,0,0"
+                     Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                     BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
+                     Padding="8,5"/>
+        </StackPanel>
+
+        <TextBlock x:Name="ErrorText" Foreground="#E86A6A" FontSize="12"
+                   Margin="0,10,0,0" Visibility="Collapsed" TextWrapping="Wrap"/>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
+            <Button Content="Guardar" Style="{StaticResource AccentButton}" Padding="22,8"
+                    IsDefault="True" Click="Save_Click"/>
+            <Button Content="Cancelar" Style="{StaticResource DarkButton}" Padding="20,8"
+                    Margin="8,0,0,0" IsCancel="True"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

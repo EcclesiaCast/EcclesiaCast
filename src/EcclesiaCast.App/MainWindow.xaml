@@ -601,6 +601,10 @@
                                 <Button Content="➕" FontSize="11" Padding="6,3"
                                         Style="{StaticResource DarkButton}"
                                         Command="{Binding NewPlaylistCommand}" ToolTip="Nueva playlist"/>
+                                <Button Content="✨" FontSize="11" Padding="6,3" Margin="4,0,0,0"
+                                        Style="{StaticResource DarkButton}"
+                                        Command="{Binding EditSmartPlaylistCommand}"
+                                        ToolTip="Lista inteligente: se arma sola (lo que agregaste hace poco, lo que hace rato no cantás, un artista, una palabra)"/>
                                 <Button Content="✏️" FontSize="11" Padding="6,3" Margin="4,0,0,0"
                                         Style="{StaticResource DarkButton}"
                                         Command="{Binding RenamePlaylistCommand}" ToolTip="Renombrar"/>

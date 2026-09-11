@@ -280,6 +280,20 @@ subraya nada, avisame**: significa que hay que instalarlo o buscar otro camino.
       ahí.
 - [ ] Detenerla desde el mismo botón ⏱ → **Detener la que corre**.
 
+### Listas inteligentes (nuevo)
+
+- [ ] Botón **✨** del panel PLAYLIST → *Canciones que hace rato no cantamos*,
+      90 días. Tiene que aparecer la lista llena (al principio, **todas**: las
+      canciones que ya tenías no traen fecha de uso).
+- [ ] Proyectar una canción y volver a la lista: esa canción **ya no está**.
+- [ ] Probar *Canciones de un artista* con uno de los tuyos.
+- [ ] Probar *Canciones que dicen una palabra* (ej. «santo»): tiene que mirar
+      también **dentro de la letra**.
+- [ ] Intentar **agregarle una canción a mano**: tiene que avisar que esa lista
+      se arma sola, sin romper nada.
+- [ ] El botón **✏️** sobre una lista inteligente abre su regla para cambiarla.
+- [ ] Las playlists **normales** siguen funcionando igual que siempre.
+
 ### Recorte y color de los medios (nuevo)
 
 - [ ] En *Propiedades* de un video, **Recorte**: poner *desde 5* y *hasta 12*.

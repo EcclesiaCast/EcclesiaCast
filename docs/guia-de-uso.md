@@ -146,6 +146,13 @@ diseño (clic derecho sobre la canción → *Editar canción (diseño)*).
 En el panel **PLAYLIST**:
 
 - **➕** crea la playlist del domingo; **⧉** duplica la del domingo pasado.
+- **✨** crea una **lista inteligente**: en vez de armarla vos, se llena sola
+  con las canciones que **agregaste hace poco**, las que **hace rato que no
+  cantás**, las de **un artista** o las que **dicen una palabra**. Cambia sola
+  cuando cambia la biblioteca, así que no se le agregan ni quitan cosas a
+  mano; con **✏️** cambiás su regla. Para saber qué hace rato no cantás, el
+  programa anota la fecha cada vez que proyectás una canción (las que ya
+  tenías arrancan sin fecha, así que al principio salen todas).
 - Agregá contenido: clic derecho en una canción → *Agregar a la playlist*; en
   la Biblia, cargá un pasaje y tocá **▶➕**; clic derecho en un medio →
   *Agregar a la playlist*.
