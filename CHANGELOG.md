@@ -36,7 +36,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   letra, podés agregar los que quieras (el nombre de la serie, la cita, una
   traducción), moverlos y redimensionarlos igual que la caja de siempre, y
   darle a cada uno su tipografía, tamaño, color y alineación. Se escriben con
-  doble clic sobre la diapositiva.
+  doble clic sobre la diapositiva. «Aplicar formato a todas» reparte el
+  formato, no las palabras: cada diapositiva conserva sus propios cuadros.
 - Encuadre de imágenes y videos en el Inspector de medios: zoom hacia adentro
   y hacia afuera, correrlo a los lados o arriba y abajo, y un tamaño fijo en
   pantalla (con medidas comunes a mano) para cuando la pantalla de la iglesia

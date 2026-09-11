@@ -156,7 +156,9 @@ En el panel **PLAYLIST**:
   cuando cambia la biblioteca, así que no se le agregan ni quitan cosas a
   mano; con **✏️** cambiás su regla. Para saber qué hace rato no cantás, el
   programa anota la fecha cada vez que proyectás una canción (las que ya
-  tenías arrancan sin fecha, así que al principio salen todas).
+  tenías arrancan sin fecha, así que al principio salen todas). Si la duplicás
+  con **⧉**, la copia deja fijo lo que la lista muestra en ese momento: ahí sí
+  podés sacar lo que no vas a cantar y ordenar el resto.
 - Agregá contenido: clic derecho en una canción → *Agregar a la playlist*; en
   la Biblia, cargá un pasaje y tocá **▶➕**; clic derecho en un medio →
   *Agregar a la playlist*.
