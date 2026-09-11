@@ -41,9 +41,9 @@ Cosas que ya sabemos y decidimos bancar por ahora. No son bugs nuevos.
 - **Subtítulos automáticos de YouTube** se proyectan sobre el video. Vienen de
   la preferencia de la cuenta con sesión iniciada; se comprobó que no se pueden
   apagar desde el reproductor. Hay que desactivarlos en la cuenta de YouTube.
-- **El panel LIVE muestra un póster fijo**, no el video en movimiento: el
-  operador no ve avanzar el video ni el YouTube. Duplicar el WebView2 no es
-  trivial.
+- **El panel LIVE muestra el YouTube como póster fijo.** Los videos comunes ya
+  se ven moverse ahí (el preview dibuja el mismo cuadro que el proyector), pero
+  para YouTube haría falta un segundo WebView2, que no es trivial ni barato.
 - **~650 MB de RAM** con un video 1080p de fondo (medido el 11/9/2026: 275 MB
   con el programa abierto, 331 MB proyectando texto, 649 MB con video, estable
   a los 20 s). Sigue siendo mucho para una PC de proyección modesta, pero ya no

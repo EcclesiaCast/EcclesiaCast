@@ -305,6 +305,15 @@ subraya nada, avisame**: significa que hay que instalarlo o buscar otro camino.
 - [ ] Buscar mientras hay algo **proyectado**: la salida no se toca hasta que
       elegís.
 
+### Panel LIVE con el video en movimiento (nuevo)
+
+- [ ] Proyectar un **video de fondo** y mirar el panel **LIVE** del operador:
+      tiene que verse avanzar, igual que en el proyector.
+- [ ] Pasar de diapositiva con el video puesto: el preview sigue andando.
+- [ ] Apagar la salida (Esc) y volver a prenderla: el preview retoma.
+- [ ] Con la reunión larga, mirá si la PC se pone lenta (es dibujar el video
+      dos veces, una en cada pantalla).
+
 ### Salida para transmisión (nuevo)
 
 - [ ] Botón **📱** → copiar la dirección **para la transmisión**.

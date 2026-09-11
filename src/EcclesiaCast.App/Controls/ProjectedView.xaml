@@ -14,6 +14,11 @@
         <Image x:Name="BackgroundImage" Stretch="UniformToFill" Visibility="Collapsed"
                RenderTransformOrigin="0.5,0.5"/>
 
+        <!-- En los previews del operador: el mismo cuadro que está dibujando
+             el proyector, así el video se ve avanzar y no como una foto -->
+        <Image x:Name="LiveVideo" Stretch="UniformToFill" Visibility="Collapsed"
+               RenderTransformOrigin="0.5,0.5"/>
+
         <!-- Ajustes de imagen del medio: se aplican tanto a la imagen de acá
              como al video que corre detrás, porque esta capa va encima -->
         <Rectangle x:Name="BrightnessLayer" Visibility="Collapsed" IsHitTestVisible="False"/>

@@ -24,6 +24,11 @@ public sealed class ProjectionWindowService(ProjectionViewModel projectionViewMo
             _window.IsVisibleChanged += (_, _) =>
                 VisibilityChanged?.Invoke(this, EventArgs.Empty);
             _window.VideoEnded += (_, _) => VideoEnded?.Invoke(this, EventArgs.Empty);
+
+            // The operator's Live panel draws the very picture the projector
+            // is drawing, so the video moves there too instead of sitting on
+            // a still poster — and nothing is decoded twice.
+            _window.VideoFrameChanged += (_, frame) => projectionViewModel.LiveFrame = frame;
         }
 
         var wasHidden = !_window.IsVisible;

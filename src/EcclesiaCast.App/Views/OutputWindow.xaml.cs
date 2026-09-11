@@ -22,10 +22,14 @@ public partial class OutputWindow : Window
         DataContextChanged += OnDataContextChanged;
         YouTube.Ended += (_, _) => VideoEnded?.Invoke(this, EventArgs.Empty);
         Video.Ended += (_, _) => VideoEnded?.Invoke(this, EventArgs.Empty);
+        Video.FrameSourceChanged += (_, frame) => VideoFrameChanged?.Invoke(this, frame);
     }
 
     /// <summary>Raised when the projected video finishes and shouldn't loop.</summary>
     public event EventHandler? VideoEnded;
+
+    /// <summary>Raised when the picture the video draws into changes.</summary>
+    public event EventHandler<System.Windows.Media.ImageSource?>? VideoFrameChanged;
 
     /// <summary>Shows this window fullscreen on the given display.</summary>
     public void ShowOn(DisplayInfo display)

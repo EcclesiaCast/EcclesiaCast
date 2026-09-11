@@ -122,6 +122,10 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Corregido
 
+- El panel LIVE del operador muestra el video de fondo **en movimiento**, no
+  una foto fija: dibuja el mismo cuadro que está en el proyector, sin
+  decodificar nada dos veces (+32 MB y la misma CPU). Los videos de YouTube
+  siguen mostrándose como póster.
 - El video de fondo usa casi 100 MB menos de memoria (742 → 649 MB con un
   1080p): el colchón de lectura de VLC pasó de segundo y medio a medio
   segundo, que para un archivo del disco de la misma PC alcanza.

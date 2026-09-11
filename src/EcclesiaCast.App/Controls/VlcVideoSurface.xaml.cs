@@ -66,6 +66,16 @@ public partial class VlcVideoSurface : UserControl
     /// <summary>Raised when a non-looping video reaches its end.</summary>
     public event EventHandler? Ended;
 
+    /// <summary>
+    /// Raised when the picture this surface draws into is replaced (a new
+    /// video, a new size) or cleared. The operator's preview listens so it
+    /// can draw the same frames without a second decoder.
+    /// </summary>
+    public event EventHandler<ImageSource?>? FrameSourceChanged;
+
+    /// <summary>The picture being drawn right now, or null when nothing plays.</summary>
+    public ImageSource? FrameSource => Surface.Source;
+
     /// <summary>Shows/loops the given video, or stops if it's not a video.</summary>
     public void Show(MediaItem? media)
     {
@@ -295,6 +305,7 @@ public partial class VlcVideoSurface : UserControl
             Surface.Source = null;
             _bitmap = null;
             _bitmapWidth = _bitmapHeight = 0;
+            FrameSourceChanged?.Invoke(this, null);
         });
 
     /// <summary>
@@ -388,6 +399,11 @@ public partial class VlcVideoSurface : UserControl
                         _bitmapWidth = _width;
                         _bitmapHeight = _height;
                         Surface.Source = _bitmap;
+
+                        // The operator's Live panel draws this very bitmap, so
+                        // it shows the video moving instead of a still poster
+                        // without decoding anything twice.
+                        FrameSourceChanged?.Invoke(this, _bitmap);
                     }
 
                     _bitmap.Lock();

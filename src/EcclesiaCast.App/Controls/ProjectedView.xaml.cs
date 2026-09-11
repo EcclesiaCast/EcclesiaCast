@@ -236,6 +236,36 @@ public partial class ProjectedView : UserControl
     private string? _lastFillImagePath;
 
     /// <summary>
+    /// The picture the projector is drawing right now. Set on the operator's
+    /// previews so a video background moves there too; the output window
+    /// leaves it null, since it draws the real thing behind this control.
+    /// </summary>
+    public static readonly DependencyProperty LiveVideoFrameProperty =
+        DependencyProperty.Register(nameof(LiveVideoFrame), typeof(ImageSource), typeof(ProjectedView),
+            new PropertyMetadata(null, (d, _) => ((ProjectedView)d).ApplyLiveVideo()));
+
+    public ImageSource? LiveVideoFrame
+    {
+        get => (ImageSource?)GetValue(LiveVideoFrameProperty);
+        set => SetValue(LiveVideoFrameProperty, value);
+    }
+
+    private void ApplyLiveVideo()
+    {
+        var frame = IsLiveOutput ? null : LiveVideoFrame;
+        LiveVideo.Source = frame;
+        LiveVideo.Visibility = frame is null ? Visibility.Collapsed : Visibility.Visible;
+
+        // The framing (zoom, size, shift) applies to the preview exactly as it
+        // does on the projector, so what the operator sees is what goes out.
+        MediaFraming.Apply(LiveVideo, frame is null ? null : BackgroundMedia, ActualWidth, ActualHeight);
+
+        // A poster underneath a live frame is just an older copy of it.
+        if (frame is not null)
+            BackgroundImage.Visibility = Visibility.Collapsed;
+    }
+
+    /// <summary>
     /// Places the picture and paints whatever it leaves uncovered. Re-run on
     /// resize too: the framing is expressed over the 1920×1080 canvas, so it
     /// depends on how big this control currently is.
@@ -270,6 +300,7 @@ public partial class ProjectedView : UserControl
         FillColorLayer.Fill = MediaFraming.FillBrush(media);
 
         ApplyColourAdjustments(media);
+        ApplyLiveVideo();
     }
 
     /// <summary>

@@ -929,6 +929,7 @@
                                                     BackgroundMedia="{Binding Projection.Background}"
                                                     FillMedia="{Binding Projection.BackgroundFill}"
                                                     BackgroundBlur="{Binding Projection.BackgroundBlur}"
+                                                    LiveVideoFrame="{Binding Projection.LiveFrame}"
                                                     Logo="{Binding Projection.ActiveLogo}"/>
                         </Border>
                     </StackPanel>

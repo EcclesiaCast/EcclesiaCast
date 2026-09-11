@@ -33,6 +33,14 @@ public sealed partial class ProjectionViewModel : ObservableObject
     [ObservableProperty]
     private double _backgroundBlur;
 
+    /// <summary>
+    /// The picture the projector is drawing right now, shared with the
+    /// operator's Live panel so the video moves there too. Null for images,
+    /// for YouTube and when nothing is playing.
+    /// </summary>
+    [ObservableProperty]
+    private System.Windows.Media.ImageSource? _liveFrame;
+
     /// <summary>What fills the screen behind a framed background.</summary>
     [ObservableProperty]
     private EcclesiaCast.Core.Media.MediaItem? _backgroundFill;
