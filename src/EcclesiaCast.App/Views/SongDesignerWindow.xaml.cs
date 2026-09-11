@@ -767,7 +767,12 @@ public partial class SongDesignerWindow : Window
         var source = _overrides[Selected];
         for (var i = 0; i < _overrides.Count; i++)
         {
-            _overrides[i] = source;
+            // The button applies format. The extra boxes are words belonging to
+            // one slide — copying them everywhere would stamp "Serie: …" across
+            // the whole song — so each slide keeps its own.
+            // A slide under the theme has no format to hand out; the button
+            // then means "put them all back under the theme".
+            _overrides[i] = source is null ? null : source with { Boxes = _overrides[i]?.Boxes };
             _touched.Add(i);
             _thumbs[i].Slide = BuildSlide(i);
         }

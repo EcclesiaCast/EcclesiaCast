@@ -428,10 +428,17 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     {
         if (SelectedPlaylist is null)
             return;
+
+        // A smart list keeps no items of its own, so copying its rule would
+        // hand back an empty list. Duplicating one freezes what it is showing
+        // right now into an ordinary list — which is the point: the list
+        // suggests the forgotten songs, and Sunday is built from some of them.
+        var source = SelectedPlaylist.IsSmart ? PlaylistItems.ToList() : SelectedPlaylist.Items;
+
         var copy = new Playlist
         {
             Name = $"{SelectedPlaylist.Name} (copia)",
-            Items = SelectedPlaylist.Items
+            Items = source
                 .Select(i => new PlaylistItem
                 {
                     Order = i.Order, Type = i.Type, Caption = i.Caption,
