@@ -8,7 +8,8 @@ lado. Al cerrar un punto, borralo y anotalo en el [CHANGELOG](../CHANGELOG.md).
 - [ ] **Correr la [guía de pruebas](pruebas-beta.md) en la PC del proyector.**
       Es el bloqueante real: nada de la beta.4 se probó con proyector de
       verdad. El instalador ya está armado en
-      `dist\EcclesiaCast-1.0.0-beta.4-setup.exe`.
+      `dist\EcclesiaCast-1.0.0-beta.4-setup.exe` (rearmado el 11/9/2026, con
+      la revisión de código de las nueve funciones nuevas ya adentro).
 - [ ] Mergear `beta3` a `main` una vez que la prueba salga bien, y publicar
       la beta.4 en GitHub (taguear `v1.0.0-beta.4`).
 - [ ] Actualizar README y CHANGELOG (hoy dicen "Beta") y taguear `v1.0.0`.
