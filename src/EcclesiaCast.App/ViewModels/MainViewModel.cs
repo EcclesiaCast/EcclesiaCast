@@ -1717,6 +1717,12 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (_presentation.Background?.Id == item.Id)
             _presentation.SetBackground(null);
         _media.Delete(item.Id);
+
+        // A page of a PDF or a deck is a file this program made; taking the
+        // item out of the library has to take the image with it.
+        if (DocumentImporter.IsRenderedPage(item.Path))
+            DocumentImporter.Forget(item.Path);
+
         LoadMedia();
     }
 

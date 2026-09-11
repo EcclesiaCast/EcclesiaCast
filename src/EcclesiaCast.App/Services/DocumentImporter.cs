@@ -41,7 +41,10 @@ public static class DocumentImporter
 
             if (Path.GetExtension(path).ToLowerInvariant() is ".pptx" or ".ppt")
             {
-                if (PowerPointConverter.ToPdf(path) is not { } converted)
+                // PowerPoint takes its time with a big deck, and it is driven
+                // through COM, which blocks whoever calls it. Off the UI
+                // thread, so the operator's window keeps answering.
+                if (await Task.Run(() => PowerPointConverter.ToPdf(path)) is not { } converted)
                 {
                     return new DocumentPages([],
                         "Para traer una presentación de PowerPoint hace falta tener PowerPoint instalado en esta "
@@ -93,21 +96,35 @@ public static class DocumentImporter
         }
     }
 
-    /// <summary>Deletes the rendered pages of a document that is being removed.</summary>
+    /// <summary>
+    /// Deletes the image of a page the operator removed from the library, and
+    /// the document's folder once its last page is gone. Rendered pages are
+    /// EcclesiaCast's own files — unlike the church's videos, which are only
+    /// ever pointed at — so removing the item has to remove them too or they
+    /// pile up in AppData for good.
+    /// </summary>
     public static void Forget(string pagePath)
     {
+        var folder = Path.GetDirectoryName(pagePath);
+        if (folder is null || !folder.StartsWith(Root, StringComparison.OrdinalIgnoreCase))
+            return;
+
         try
         {
-            var folder = Path.GetDirectoryName(pagePath);
-            if (folder is not null && folder.StartsWith(Root, StringComparison.OrdinalIgnoreCase)
-                && Directory.Exists(folder) && Directory.GetFiles(folder).Length <= 1)
-            {
-                Directory.Delete(folder, recursive: true);
-            }
+            if (File.Exists(pagePath))
+                File.Delete(pagePath);
+
+            if (Directory.Exists(folder) && Directory.GetFileSystemEntries(folder).Length == 0)
+                Directory.Delete(folder);
         }
-        catch (IOException ex)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            Log.Debug(ex, "No se pudo borrar la carpeta de páginas de {Path}", pagePath);
+            // A page still open somewhere stays on disk; nothing breaks.
+            Log.Debug(ex, "No se pudo borrar la página {Path}", pagePath);
         }
     }
+
+    /// <summary>True when this file is a page EcclesiaCast rendered itself.</summary>
+    public static bool IsRenderedPage(string path) =>
+        path.StartsWith(Root, StringComparison.OrdinalIgnoreCase);
 }
