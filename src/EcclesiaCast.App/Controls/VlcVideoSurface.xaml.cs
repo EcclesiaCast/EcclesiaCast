@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Media;
 using LibVLCSharp.Shared;
 using Serilog;
@@ -40,7 +41,8 @@ public partial class VlcVideoSurface : UserControl
     private WriteableBitmap? _bitmap;
     private int _bitmapWidth, _bitmapHeight;
 
-    private MediaScaling _scaling = MediaScaling.Fill;
+    /// <summary>The item being played, kept for its framing (zoom, size, offset).</summary>
+    private MediaItem? _framing;
     private int _currentId = -1;
     private int _framePending;
 
@@ -54,6 +56,10 @@ public partial class VlcVideoSurface : UserControl
     {
         InitializeComponent();
         Unloaded += (_, _) => Dispose();
+
+        // The framing is given over a 1920×1080 canvas: a different window
+        // size means different numbers.
+        SizeChanged += (_, _) => MediaFraming.Apply(Surface, _framing, ActualWidth, ActualHeight);
     }
 
     /// <summary>Raised when a non-looping video reaches its end.</summary>
@@ -82,7 +88,7 @@ public partial class VlcVideoSurface : UserControl
 
         _currentId = media.Id;
         _pausedForHiddenOutput = false;
-        _scaling = media.Scaling;
+        _framing = media;
         ApplyStretch();
 
         try
@@ -279,14 +285,13 @@ public partial class VlcVideoSurface : UserControl
             _bitmapWidth = _bitmapHeight = 0;
         });
 
+    /// <summary>
+    /// Sizes and places the picture the way the operator framed it. Runs on
+    /// the UI thread: VLC calls in from its own decoding thread.
+    /// </summary>
     private void ApplyStretch() =>
         Dispatcher.BeginInvoke(() =>
-            Surface.Stretch = _scaling switch
-            {
-                MediaScaling.Fit => Stretch.Uniform,
-                MediaScaling.Stretch => Stretch.Fill,
-                _ => Stretch.UniformToFill,
-            });
+            MediaFraming.Apply(Surface, _framing, ActualWidth, ActualHeight));
 
     // ── Callbacks de VLC (hilo de decodificación) ────────────────
 

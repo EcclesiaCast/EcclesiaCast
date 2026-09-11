@@ -12,6 +12,12 @@
         Cursor="None"
         Background="Black">
     <Grid>
+        <!-- Relleno: se ve donde el fondo no llega (zoom hacia afuera, un
+             tamaño fijo más chico, o barras por la proporción) -->
+        <Rectangle x:Name="FillColorLayer" Visibility="Collapsed"/>
+        <Image x:Name="FillImage" Stretch="UniformToFill" Visibility="Collapsed"/>
+        <controls:VlcVideoSurface x:Name="FillVideo" Visibility="Collapsed"/>
+
         <!-- Video de fondo (frames a WriteableBitmap), detrás de todo -->
         <controls:VlcVideoSurface x:Name="Video"/>
 
@@ -29,6 +35,7 @@
                                 Countdown="{Binding Countdown}"
                                 Highlight="{Binding Highlight}"
                                 BackgroundMedia="{Binding Background}"
+                                FillMedia="{Binding BackgroundFill}"
                                 Logo="{Binding ActiveLogo}"
                                 IsLiveOutput="True"
                                 AnimateTransitions="True"/>

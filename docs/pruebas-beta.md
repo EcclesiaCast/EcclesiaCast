@@ -280,6 +280,23 @@ subraya nada, avisame**: significa que hay que instalarlo o buscar otro camino.
       ahí.
 - [ ] Detenerla desde el mismo botón ⏱ → **Detener la que corre**.
 
+### Encuadre de medios (nuevo)
+
+- [ ] Clic derecho en un fondo → *Propiedades* → **Encuadre**.
+- [ ] **Zoom 120 %** en un video: tiene que acercarse y recortar. Ideal para
+      sacar de cuadro una marca de agua.
+- [ ] **Zoom 70 %** con un **color** de relleno: el video se ve más chico y el
+      color llena alrededor.
+- [ ] **Correr** la imagen a los lados y arriba/abajo.
+- [ ] **Tamaño fijo** 1280×720: el medio queda en un recuadro centrado.
+- [ ] Relleno con **otra imagen o video** de la biblioteca: se ve detrás,
+      llenando. Probá con dos videos a la vez y **mirá si la PC aguanta**
+      (Administrador de tareas: CPU y memoria) — es lo que más me preocupa de
+      esta función.
+- [ ] Lo que ves en el **preview del operador** tiene que ser lo mismo que sale
+      en el proyector.
+- [ ] *Reencuadrar* vuelve todo a como estaba.
+
 ### Transiciones (nuevo)
 
 - [ ] En **🎨 Temas**, probar cada una de las cinco opciones de *Cómo entra la

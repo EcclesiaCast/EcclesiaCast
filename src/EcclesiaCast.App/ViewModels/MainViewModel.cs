@@ -883,7 +883,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             item.EndBehavior = VideoEndBehavior.Stop;
         }
 
-        _presentation.SetBackground(item);
+        _presentation.SetBackground(item, ResolveFill(item));
 
         // Foreground = the media alone (no text). Background with no live slide
         // also shows alone; Black/Logo would hide it, so drop back to showing
@@ -1398,18 +1398,25 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         return false;
     }
 
+    /// <summary>
+    /// The item chosen to fill the screen behind this one. Looked up here
+    /// because the presentation layer knows nothing about the library.
+    /// </summary>
+    private MediaItem? ResolveFill(MediaItem? item) =>
+        item?.FillMediaId is { } id ? _media.GetAll().FirstOrDefault(m => m.Id == id) : null;
+
     [RelayCommand]
     private void InspectMedia(MediaItem? item)
     {
         if (item is null)
             return;
 
-        if (_mediaInspector.Edit(item, MediaTabs.ToList()))
+        if (_mediaInspector.Edit(item, MediaTabs.ToList(), _media.GetAll()))
         {
             _media.Update(item);
             LoadMedia();
             if (_presentation.Background?.Id == item.Id)
-                _presentation.SetBackground(item); // re-aplica con las nuevas opciones
+                _presentation.SetBackground(item, ResolveFill(item)); // re-aplica con las nuevas opciones
             StatusText = $"«{item.Name}» actualizado.";
         }
     }

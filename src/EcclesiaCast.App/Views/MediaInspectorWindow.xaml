@@ -58,6 +58,74 @@
                 <ComboBoxItem Content="Estirar (deforma)"/>
             </ComboBox>
 
+            <!-- ── Encuadre: zoom, tamaño y relleno ── -->
+            <Border Background="{StaticResource SurfaceAltBrush}" CornerRadius="4"
+                    Padding="12,4,12,12" Margin="0,14,0,0">
+                <StackPanel>
+                    <TextBlock Text="Encuadre" Style="{StaticResource L}"/>
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Zoom" FontSize="11" Width="64" VerticalAlignment="Center"
+                                   Foreground="{StaticResource MutedBrush}"/>
+                        <controls:NumericField x:Name="ZoomField" Minimum="10" Maximum="400" Step="5" Decimals="0"
+                                               ToolTip="100 % es como está. Más acerca y recorta; menos aleja y deja ver el relleno."/>
+                        <TextBlock Text="%" FontSize="11" VerticalAlignment="Center" Margin="6,0,0,0"
+                                   Foreground="{StaticResource MutedBrush}"/>
+                        <Button Content="Reencuadrar" Style="{StaticResource DarkButton}" FontSize="11"
+                                Padding="10,3" Margin="12,0,0,0" Click="ResetFraming_Click"
+                                ToolTip="Vuelve a 100 %, centrado y a pantalla completa"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                        <TextBlock Text="Correr" FontSize="11" Width="64" VerticalAlignment="Center"
+                                   Foreground="{StaticResource MutedBrush}"/>
+                        <controls:NumericField x:Name="OffsetXField" Minimum="-100" Maximum="100" Step="2" Decimals="0"
+                                               ToolTip="Hacia los lados, en % de la pantalla"/>
+                        <TextBlock Text="↔" FontSize="12" VerticalAlignment="Center" Margin="6,0,10,0"
+                                   Foreground="{StaticResource MutedBrush}"/>
+                        <controls:NumericField x:Name="OffsetYField" Minimum="-100" Maximum="100" Step="2" Decimals="0"
+                                               ToolTip="Hacia arriba y abajo, en % de la pantalla"/>
+                        <TextBlock Text="↕" FontSize="12" VerticalAlignment="Center" Margin="6,0,0,0"
+                                   Foreground="{StaticResource MutedBrush}"/>
+                    </StackPanel>
+
+                    <CheckBox x:Name="FixedSizeCheck" Content="Tamaño fijo en pantalla" Margin="0,12,0,0"
+                              Checked="FixedSize_Changed" Unchecked="FixedSize_Changed"
+                              ToolTip="Para cuando la pantalla de la iglesia no tiene la forma de la imagen del proyector"/>
+                    <StackPanel x:Name="SizeRow" Orientation="Horizontal" Margin="0,6,0,0" IsEnabled="False">
+                        <TextBlock Text="Medida" FontSize="11" Width="64" VerticalAlignment="Center"
+                                   Foreground="{StaticResource MutedBrush}"/>
+                        <controls:NumericField x:Name="FrameWidthField" Minimum="16" Maximum="1920" Step="16" Decimals="0"/>
+                        <TextBlock Text="×" FontSize="12" VerticalAlignment="Center" Margin="6,0,6,0"
+                                   Foreground="{StaticResource MutedBrush}"/>
+                        <controls:NumericField x:Name="FrameHeightField" Minimum="16" Maximum="1080" Step="16" Decimals="0"/>
+                        <TextBlock Text="px" FontSize="11" VerticalAlignment="Center" Margin="6,0,0,0"
+                                   Foreground="{StaticResource MutedBrush}"/>
+                    </StackPanel>
+                    <ComboBox x:Name="PresetBox" Margin="64,6,0,0" FontSize="11"
+                              SelectionChanged="Preset_Changed"
+                              ToolTip="Medidas comunes, por si no querés escribirlas">
+                        <ComboBoxItem Content="Medidas comunes…"/>
+                        <ComboBoxItem Content="1920 × 1080 (16:9, toda la pantalla)"/>
+                        <ComboBoxItem Content="1280 × 720 (16:9 más chico)"/>
+                        <ComboBoxItem Content="1440 × 1080 (4:3)"/>
+                        <ComboBoxItem Content="1080 × 1080 (cuadrado)"/>
+                        <ComboBoxItem Content="1080 × 1920 (vertical, celular)"/>
+                    </ComboBox>
+
+                    <TextBlock Text="Los bordes se rellenan con" Style="{StaticResource L}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Border x:Name="FillSwatch" Width="28" Height="24" CornerRadius="3"
+                                BorderBrush="{StaticResource LineBrush}" BorderThickness="1"/>
+                        <Button Content="Color…" Style="{StaticResource DarkButton}" FontSize="11"
+                                Padding="10,3" Margin="8,0,0,0" Click="PickFillColor_Click"/>
+                        <ComboBox x:Name="FillMediaBox" Width="180" Margin="8,0,0,0" FontSize="11"
+                                  DisplayMemberPath="Name"
+                                  ToolTip="O una imagen o video de la biblioteca detrás: el truco de siempre es una copia desenfocada del mismo video"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
             <TextBlock Text="Desenfoque del fondo" Style="{StaticResource L}"/>
             <StackPanel Orientation="Horizontal">
                 <controls:NumericField x:Name="BlurField" Minimum="0" Maximum="100" Step="5" Decimals="0"

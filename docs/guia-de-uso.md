@@ -66,6 +66,14 @@ En la barra **MEDIOS**, abajo:
   - **Al terminar el video**: repetir en bucle o detenerse.
   - **Audio**: silenciar o volumen.
   - **Desenfoque**: difumina el fondo para que la letra se lea encima.
+  - **Encuadre**: **zoom** para acercar o alejar (100 % es como está), y
+    **correr** la imagen a los lados o arriba y abajo. Con **tamaño fijo en
+    pantalla** le das una medida exacta (1280×720, cuadrado, vertical…), para
+    cuando la pantalla de la iglesia no tiene la forma de lo que tira el
+    proyector.
+  - **Los bordes se rellenan con**: un color, o **otra imagen o video** de la
+    biblioteca detrás. El truco de siempre es poner una copia desenfocada del
+    mismo video como relleno.
 - **Sin fondo (F4)**, arriba, lo quita **sin sacar la letra**.
 - Con un video en pantalla aparece la **barra de reproducción**: volver al
   principio, ±10 segundos, reproducir/pausar y una barra para moverte. Al lado

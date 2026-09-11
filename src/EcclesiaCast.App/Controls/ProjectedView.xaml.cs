@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
+using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Media;
 using EcclesiaCast.Core.Presentation;
 
@@ -75,6 +76,11 @@ public partial class ProjectedView : UserControl
     public ProjectedView()
     {
         InitializeComponent();
+
+        // The framing is expressed over a 1920×1080 canvas, so it has to be
+        // recomputed whenever this control changes size — the same design
+        // shows in a small preview box and on the projector.
+        SizeChanged += (_, _) => ApplyFraming();
     }
 
     /// <summary>The underlying slide renderer, so callers can reach its members.</summary>
@@ -168,12 +174,7 @@ public partial class ProjectedView : UserControl
             ? media.Path
             : IsLiveOutput ? null : media?.ThumbnailPath; // póster de video/YouTube en los previews
 
-        BackgroundImage.Stretch = media?.Scaling switch
-        {
-            MediaScaling.Fit => System.Windows.Media.Stretch.Uniform,
-            MediaScaling.Stretch => System.Windows.Media.Stretch.Fill,
-            _ => System.Windows.Media.Stretch.UniformToFill,
-        };
+        ApplyFraming();
 
         if (path == _lastImagePath)
             return;
@@ -212,5 +213,82 @@ public partial class ProjectedView : UserControl
 
         BackgroundImage.Source = null;
         BackgroundImage.Visibility = Visibility.Collapsed;
+    }
+
+    // ── Encuadre y relleno ───────────────────────────────────────
+
+    /// <summary>
+    /// Another library item painted behind the background, for the churches
+    /// whose screen is not the shape of the projector's picture. Null leaves
+    /// the flat fill colour.
+    /// </summary>
+    public static readonly DependencyProperty FillMediaProperty =
+        DependencyProperty.Register(nameof(FillMedia), typeof(MediaItem), typeof(ProjectedView),
+            new PropertyMetadata(null, (d, _) => ((ProjectedView)d).ApplyFraming()));
+
+    public MediaItem? FillMedia
+    {
+        get => (MediaItem?)GetValue(FillMediaProperty);
+        set => SetValue(FillMediaProperty, value);
+    }
+
+    private string? _lastFillImagePath;
+
+    /// <summary>
+    /// Places the picture and paints whatever it leaves uncovered. Re-run on
+    /// resize too: the framing is expressed over the 1920×1080 canvas, so it
+    /// depends on how big this control currently is.
+    /// </summary>
+    private void ApplyFraming()
+    {
+        var media = BackgroundMedia;
+        MediaFraming.Apply(BackgroundImage, media, ActualWidth, ActualHeight);
+
+        // This layer sits ON TOP of the output window's video surface, so it
+        // may only paint the fill when it is the one drawing the picture —
+        // otherwise the fill covers the very video it is meant to sit behind.
+        var drawsMedia = media is not null && (media.Type == MediaType.Image || !IsLiveOutput);
+        var needsFill = drawsMedia && MediaFraming.NeedsFill(media);
+        var fill = needsFill ? FillMedia : null;
+
+        // A video used as fill can only play in the output window, which owns
+        // the VLC surfaces; here its poster stands in, exactly like the
+        // background video's poster does in the previews.
+        var fillPath = fill?.Type == MediaType.Image ? fill.Path : fill?.ThumbnailPath;
+
+        if (fillPath != _lastFillImagePath)
+        {
+            _lastFillImagePath = fillPath;
+            FillImage.Source = LoadBitmap(fillPath);
+        }
+
+        var showFillImage = needsFill && FillImage.Source is not null;
+        FillImage.Visibility = showFillImage ? Visibility.Visible : Visibility.Collapsed;
+
+        FillColorLayer.Visibility = needsFill && !showFillImage ? Visibility.Visible : Visibility.Collapsed;
+        FillColorLayer.Fill = MediaFraming.FillBrush(media);
+    }
+
+    private static BitmapImage? LoadBitmap(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+            return null;
+
+        try
+        {
+            var bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.UriSource = new Uri(path);
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.DecodePixelWidth = 1920;
+            bitmap.EndInit();
+            if (bitmap.CanFreeze)
+                bitmap.Freeze();
+            return bitmap;
+        }
+        catch
+        {
+            return null;
+        }
     }
 }

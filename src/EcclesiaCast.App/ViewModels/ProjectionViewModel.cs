@@ -33,6 +33,10 @@ public sealed partial class ProjectionViewModel : ObservableObject
     [ObservableProperty]
     private double _backgroundBlur;
 
+    /// <summary>What fills the screen behind a framed background.</summary>
+    [ObservableProperty]
+    private EcclesiaCast.Core.Media.MediaItem? _backgroundFill;
+
     /// <summary>Notes for the platform, shown only on the stage display.</summary>
     [ObservableProperty]
     private string? _stageNotes;
@@ -70,6 +74,7 @@ public sealed partial class ProjectionViewModel : ObservableObject
         Highlight = presentation.HighlightTerm;
         Background = presentation.Background;
         BackgroundBlur = presentation.Background?.Blur ?? 0;
+        BackgroundFill = presentation.BackgroundFill;
         ActiveLogo = presentation.ActiveLogo;
         Countdown = presentation.Countdown;
         StageNotes = presentation.StageNotes;

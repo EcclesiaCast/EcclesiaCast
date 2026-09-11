@@ -63,12 +63,17 @@ public sealed class PresentationService : IPresentationService
 
     public Media.MediaItem? Background { get; private set; }
 
-    public void SetBackground(Media.MediaItem? background)
+    public Media.MediaItem? BackgroundFill { get; private set; }
+
+    public void SetBackground(Media.MediaItem? background, Media.MediaItem? fill = null)
     {
-        if (background?.Id == Background?.Id)
+        // Re-applying the same background must not restart it, but the fill
+        // can have changed under it (the operator just edited the framing).
+        if (background?.Id == Background?.Id && fill?.Id == BackgroundFill?.Id)
             return;
 
         Background = background;
+        BackgroundFill = fill;
         OnChanged();
     }
 

@@ -17,6 +17,8 @@ lado. Al cerrar un punto, borralo y anotalo en el [CHANGELOG](../CHANGELOG.md).
 ## 2. Funciones que faltan
 
 - [ ] Múltiples cuadros de texto por diapositiva (diferido desde el sprint 4).
+      Requiere que el diseñador de diapositivas pase de una caja a varias
+      seleccionables; el modelo y el dibujo son la parte fácil.
 - [ ] Recorte de entrada/salida de video y efectos de color (diferido desde el
       sprint 5).
 - [ ] Playlists inteligentes (diferido desde el sprint 5).

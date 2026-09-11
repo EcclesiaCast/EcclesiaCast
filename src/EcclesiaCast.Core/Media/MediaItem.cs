@@ -83,5 +83,43 @@ public sealed class MediaItem
     /// </summary>
     public double Blur { get; set; }
 
+    // ── Encuadre ─────────────────────────────────────────────────
+
+    /// <summary>
+    /// Manual zoom over the framing, 1 = as the scaling mode left it. Above 1
+    /// crops in (useful to get a logo or a watermark out of the shot); below 1
+    /// pulls back and shows more of the fill behind.
+    /// </summary>
+    public double Zoom { get; set; } = 1;
+
+    /// <summary>Horizontal shift of the framing, as a fraction of the width (-1 to 1).</summary>
+    public double OffsetX { get; set; }
+
+    /// <summary>Vertical shift of the framing, as a fraction of the height (-1 to 1).</summary>
+    public double OffsetY { get; set; }
+
+    /// <summary>
+    /// Exact size of the picture on the output, in pixels over the virtual
+    /// 1920×1080 canvas. Null uses the whole screen. A church with a screen
+    /// that is not the shape of its projector uses this to place the picture
+    /// where the screen actually is.
+    /// </summary>
+    public int? FrameWidth { get; set; }
+
+    public int? FrameHeight { get; set; }
+
+    /// <summary>Colour painted wherever the picture does not reach.</summary>
+    public string FillColor { get; set; } = "#000000";
+
+    /// <summary>
+    /// Another item from the library shown behind, instead of the flat colour:
+    /// the classic trick of a blurred copy of the same video filling the bars.
+    /// Null uses <see cref="FillColor"/>.
+    /// </summary>
+    public int? FillMediaId { get; set; }
+
+    /// <summary>True when the picture does not cover the whole output on its own.</summary>
+    public bool HasFrame => FrameWidth is > 0 && FrameHeight is > 0;
+
     public MediaItem Clone() => (MediaItem)MemberwiseClone();
 }

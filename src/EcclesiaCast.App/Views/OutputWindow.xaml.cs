@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
+using EcclesiaCast.App.Services;
 using EcclesiaCast.App.ViewModels;
 using EcclesiaCast.Core.Displays;
 using EcclesiaCast.Core.Logos;
@@ -46,7 +47,7 @@ public partial class OutputWindow : Window
 
     private void OnProjectionChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(ProjectionViewModel.Background))
+        if (e.PropertyName is nameof(ProjectionViewModel.Background) or nameof(ProjectionViewModel.BackgroundFill))
             UpdateVideo();
         else if (e.PropertyName == nameof(ProjectionViewModel.BackgroundBlur))
             SetBlur((DataContext as ProjectionViewModel)?.BackgroundBlur ?? 0);
@@ -100,7 +101,77 @@ public partial class OutputWindow : Window
             Video.Show(background);
         }
 
+        UpdateFill();
         SetBlur((DataContext as ProjectionViewModel)?.BackgroundBlur ?? 0);
+    }
+
+    /// <summary>
+    /// Paints whatever the background does not cover. A church whose screen
+    /// is not the shape of the projector's picture frames the background to
+    /// the screen and fills the rest — with a colour, or with another item
+    /// from the library (the usual trick is a blurred copy of the same
+    /// video).
+    /// </summary>
+    private void UpdateFill()
+    {
+        var vm = DataContext as ProjectionViewModel;
+        var background = vm?.Background;
+        // Images are drawn by the layer above, which paints its own fill
+        // right behind them; here we cover what the video surface leaves.
+        var needsFill = background?.Type != MediaType.Image && MediaFraming.NeedsFill(background);
+        var fill = needsFill ? vm?.BackgroundFill : null;
+
+        FillColorLayer.Fill = MediaFraming.FillBrush(background);
+        FillColorLayer.Visibility = needsFill ? Visibility.Visible : Visibility.Collapsed;
+
+        var fillImage = fill?.Type == MediaType.Image ? fill.Path : null;
+        FillImage.Source = fillImage is null ? null : LoadFillBitmap(fillImage);
+        FillImage.Visibility = FillImage.Source is null ? Visibility.Collapsed : Visibility.Visible;
+
+        // A video fill runs on its own surface — one VLC player each, which is
+        // the arrangement that keeps them from tripping over one another.
+        var fillVideo = fill?.Type == MediaType.Video ? fill : null;
+        FillVideo.Visibility = fillVideo is null ? Visibility.Collapsed : Visibility.Visible;
+        FillVideo.Show(fillVideo is null ? null : AsFillVideo(fillVideo));
+    }
+
+    /// <summary>
+    /// The fill video always loops, is always silent and always covers the
+    /// screen: it is scenery behind the real background, not the background.
+    /// </summary>
+    private static MediaItem AsFillVideo(MediaItem fill)
+    {
+        var copy = fill.Clone();
+        copy.EndBehavior = VideoEndBehavior.Loop;
+        copy.Muted = true;
+        copy.Scaling = MediaScaling.Fill;
+        copy.Zoom = 1;
+        copy.OffsetX = copy.OffsetY = 0;
+        copy.FrameWidth = copy.FrameHeight = null;
+        return copy;
+    }
+
+    private static System.Windows.Media.Imaging.BitmapImage? LoadFillBitmap(string path)
+    {
+        if (!System.IO.File.Exists(path))
+            return null;
+
+        try
+        {
+            var bitmap = new System.Windows.Media.Imaging.BitmapImage();
+            bitmap.BeginInit();
+            bitmap.UriSource = new Uri(path);
+            bitmap.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad;
+            bitmap.DecodePixelWidth = 1920;
+            bitmap.EndInit();
+            if (bitmap.CanFreeze)
+                bitmap.Freeze();
+            return bitmap;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     // ── Transporte y desenfoque del fondo ────────────────────────
@@ -140,6 +211,7 @@ public partial class OutputWindow : Window
         YouTube.PauseForHiddenOutput();
         Video.PauseForHiddenOutput();
         LogoVideo.PauseForHiddenOutput();
+        FillVideo.PauseForHiddenOutput();
     }
 
     public void ResumeAfterHiddenOutput()
@@ -147,6 +219,7 @@ public partial class OutputWindow : Window
         YouTube.ResumeAfterHiddenOutput();
         Video.ResumeAfterHiddenOutput();
         LogoVideo.ResumeAfterHiddenOutput();
+        FillVideo.ResumeAfterHiddenOutput();
     }
 
     /// <summary>Blurs the background layer (video, YouTube or image), 0–100.</summary>

@@ -7,6 +7,12 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- Encuadre de imágenes y videos en el Inspector de medios: zoom hacia adentro
+  y hacia afuera, correrlo a los lados o arriba y abajo, y un tamaño fijo en
+  pantalla (con medidas comunes a mano) para cuando la pantalla de la iglesia
+  no tiene la forma de la imagen del proyector. Lo que el medio no cubre se
+  rellena con un color o con otra imagen o video de la biblioteca — el truco
+  de siempre es una copia desenfocada del mismo video.
 - Transiciones por tema: además del fundido de siempre, la diapositiva puede
   entrar desde la derecha, subir desde abajo, acomodarse con un zoom suave o
   no tener transición (corte). Se elige en el editor de temas, con su

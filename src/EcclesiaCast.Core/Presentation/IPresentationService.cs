@@ -24,6 +24,13 @@ public interface IPresentationService
     string? HighlightTerm { get; }
 
     /// <summary>
+    /// What shows behind the background where it does not reach — another
+    /// library item, resolved from the background's fill setting. Null means
+    /// the flat fill colour.
+    /// </summary>
+    Media.MediaItem? BackgroundFill { get; }
+
+    /// <summary>
     /// Background layer behind the text (image or looping video), independent
     /// of the slide and its theme. Null shows the plain background. Persists
     /// across slide changes, like ProPresenter's backgrounds.
@@ -75,8 +82,11 @@ public interface IPresentationService
     /// <summary>Highlights a word or phrase in the projected text; null or blank clears it.</summary>
     void SetHighlight(string? term);
 
-    /// <summary>Sets the background layer; null clears it.</summary>
-    void SetBackground(Media.MediaItem? background);
+    /// <summary>
+    /// Sets the background layer; null clears it. <paramref name="fill"/> is
+    /// the item that shows behind it, already looked up by the caller.
+    /// </summary>
+    void SetBackground(Media.MediaItem? background, Media.MediaItem? fill = null);
 
     /// <summary>Hides the text so only the background shows (for image/video-only slides).</summary>
     void ShowBackgroundOnly();

@@ -5,8 +5,14 @@
     <!-- Transparent root so the video (behind, in the output window) shows
          through where there is no image background. -->
     <Grid Background="Transparent" ClipToBounds="True">
+        <!-- Relleno: lo que se ve donde la imagen no llega, por zoom hacia
+             afuera o por un tamaño fijo más chico que la pantalla. -->
+        <Rectangle x:Name="FillColorLayer" Visibility="Collapsed"/>
+        <Image x:Name="FillImage" Stretch="UniformToFill" Visibility="Collapsed"/>
+
         <!-- Capa de fondo global (imagen; el video llega después) -->
-        <Image x:Name="BackgroundImage" Stretch="UniformToFill" Visibility="Collapsed"/>
+        <Image x:Name="BackgroundImage" Stretch="UniformToFill" Visibility="Collapsed"
+               RenderTransformOrigin="0.5,0.5"/>
 
         <!-- Texto, estados (Clear/Black/Logo), aviso al pie y resaltado -->
         <controls:SlideView x:Name="SlideRenderer"/>
