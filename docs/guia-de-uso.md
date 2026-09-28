@@ -180,8 +180,8 @@ versículo se carga en la pestaña Biblia y el medio se aplica de fondo.
 | Atajo | Qué hace |
 |---|---|
 | **←→** | Diapositiva anterior / siguiente (y salta al ítem contiguo de la playlist) |
-| **F1** | *Clear* — oculta el texto, deja el fondo |
-| **F2** | *Black* — pantalla negra |
+| **F1** | *Black* — pantalla negra |
+| **F2** | *Clear* — oculta el texto, deja el fondo |
 | **F3** | *Logo* |
 | **F4** | Quita el fondo, dejando la letra |
 | **Esc** | Apaga la salida |

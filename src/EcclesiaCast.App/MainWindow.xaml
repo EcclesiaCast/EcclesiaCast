@@ -10,8 +10,8 @@
         Background="{StaticResource BgBrush}"
         FontFamily="Segoe UI">
     <Window.InputBindings>
-        <KeyBinding Key="F1" Command="{Binding ToggleClearCommand}"/>
-        <KeyBinding Key="F2" Command="{Binding ToggleBlackCommand}"/>
+        <KeyBinding Key="F1" Command="{Binding ToggleBlackCommand}"/>
+        <KeyBinding Key="F2" Command="{Binding ToggleClearCommand}"/>
         <KeyBinding Key="F3" Command="{Binding ToggleLogoCommand}"/>
         <KeyBinding Key="F4" Command="{Binding ClearBackgroundCommand}"/>
         <KeyBinding Key="Escape" Command="{Binding HideOutputCommand}"/>
@@ -41,12 +41,12 @@
 
                 <StackPanel DockPanel.Dock="Left" Orientation="Horizontal"
                             VerticalAlignment="Center" Margin="24,0,0,0">
-                    <Button Content="Clear  (F1)" Command="{Binding ToggleClearCommand}"
-                            ToolTip="Saca la letra de la pantalla y deja el fondo (imagen o video) a la vista. Se vuelve a apretar para traer la letra de nuevo.">
+                    <Button Content="Black  (F1)" Command="{Binding ToggleBlackCommand}"
+                            ToolTip="Pantalla en negro: tapa todo (letra y fondo) sin apagar la salida.">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsClearActive}" Value="True">
+                                    <DataTrigger Binding="{Binding IsBlackActive}" Value="True">
                                         <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
                                         <Setter Property="BorderThickness" Value="0"/>
                                     </DataTrigger>
@@ -54,12 +54,12 @@
                             </Style>
                         </Button.Style>
                     </Button>
-                    <Button Content="Black  (F2)" Command="{Binding ToggleBlackCommand}" Margin="6,0,0,0"
-                            ToolTip="Pantalla en negro: tapa todo (letra y fondo) sin apagar la salida.">
+                    <Button Content="Clear  (F2)" Command="{Binding ToggleClearCommand}" Margin="6,0,0,0"
+                            ToolTip="Saca la letra de la pantalla y deja el fondo (imagen o video) a la vista. Se vuelve a apretar para traer la letra de nuevo.">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsBlackActive}" Value="True">
+                                    <DataTrigger Binding="{Binding IsClearActive}" Value="True">
                                         <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
                                         <Setter Property="BorderThickness" Value="0"/>
                                     </DataTrigger>
@@ -362,9 +362,23 @@
                                             <StackPanel>
                                                 <TextBlock Text="{Binding Title}" FontSize="13"
                                                            Foreground="White" TextTrimming="CharacterEllipsis"/>
+                                                <!-- Sin artista, el renglón no ocupa lugar -->
                                                 <TextBlock Text="{Binding Artist}" FontSize="11"
                                                            Foreground="{StaticResource MutedBrush}"
-                                                           TextTrimming="CharacterEllipsis"/>
+                                                           TextTrimming="CharacterEllipsis">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Artist}" Value="">
+                                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Artist}" Value="{x:Null}">
+                                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
                                             </StackPanel>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
@@ -678,7 +692,7 @@
                                      SelectedItem="{Binding SelectedPlaylistItem}"
                                      Background="Transparent" BorderThickness="0"
                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                     ToolTip="Clic: cargar · doble clic: proyectar">
+                                     ToolTip="Clic: cargar sin proyectar · doble clic: proyectar">
                                 <ListBox.InputBindings>
                                     <MouseBinding MouseAction="LeftDoubleClick"
                                                   Command="{Binding ProjectPlaylistItemCommand}"
@@ -692,13 +706,10 @@
                                         <Setter Property="Padding" Value="8,4"/>
                                         <Setter Property="AutomationProperties.Name" Value="{Binding Caption}"/>
                                         <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+                                        <EventSetter Event="PreviewMouseLeftButtonDown" Handler="PlaylistItem_PreviewMouseLeftButtonDown"/>
                                         <Setter Property="ContextMenu">
                                             <Setter.Value>
                                                 <ContextMenu>
-                                                    <MenuItem Header="Cargar (sin proyectar)"
-                                                              Command="{Binding PlacementTarget.Tag.OpenPlaylistItemCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
-                                                    <Separator/>
                                                     <MenuItem Header="Subir"
                                                               Command="{Binding PlacementTarget.Tag.MovePlaylistItemUpCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                               CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
@@ -833,7 +844,7 @@
                                                 </Button.ContextMenu>
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="Button">
-                                                        <Border x:Name="card" Width="180" Height="84" Margin="6"
+                                                        <Border x:Name="card" Width="220" Height="118" Margin="6"
                                                                 CornerRadius="6" Background="#10141E"
                                                                 BorderBrush="{StaticResource LineBrush}"
                                                                 BorderThickness="1" Padding="10">
@@ -842,11 +853,13 @@
                                                                            Text="{Binding Label}"
                                                                            FontSize="10" FontWeight="SemiBold"
                                                                            Foreground="{StaticResource MutedBrush}"/>
+                                                                <!-- Todas las tarjetas del mismo tamaño: la letra
+                                                                     se achica hasta que entra entera -->
                                                                 <TextBlock Text="{Binding PreviewText}"
-                                                                           FontSize="11" Foreground="White"
+                                                                           FontSize="12" Foreground="White"
                                                                            TextWrapping="Wrap"
-                                                                           TextTrimming="CharacterEllipsis"
-                                                                           Margin="0,5,0,0"/>
+                                                                           controls:TextFit.MaxFontSize="12"
+                                                                           Margin="0,4,0,0"/>
                                                             </DockPanel>
                                                         </Border>
                                                         <ControlTemplate.Triggers>
@@ -874,7 +887,8 @@
                 </Grid>
             </Border>
 
-            <!-- Panel derecho: preview, live y texto rápido (llega hasta abajo) -->
+            <!-- Panel derecho: live, preview y texto rápido (llega hasta abajo).
+                 Lo que está en pantalla va primero: es lo que más se mira. -->
             <Grid Grid.Column="4" Grid.RowSpan="3">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -884,7 +898,7 @@
                     <RowDefinition Height="*" MinHeight="130"/>
                 </Grid.RowDefinitions>
 
-                <Border Grid.Row="0" Style="{StaticResource Panel}">
+                <Border Grid.Row="2" Style="{StaticResource Panel}">
                     <StackPanel>
                         <TextBlock Text="PREVIEW · SIGUIENTE" Style="{StaticResource PanelTitle}"/>
                         <Border Height="165" Margin="12,0,12,12"
@@ -898,7 +912,7 @@
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Row="2" Style="{StaticResource Panel}">
+                <Border Grid.Row="0" Style="{StaticResource Panel}">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <Ellipse Width="9" Height="9"
@@ -932,6 +946,52 @@
                                                     LiveVideoFrame="{Binding Projection.LiveFrame}"
                                                     Logo="{Binding Projection.ActiveLogo}"/>
                         </Border>
+
+                        <!-- Transporte del video que está en pantalla, pegado a
+                             lo que muestra: sólo con video (archivo o YouTube) -->
+                        <StackPanel Margin="12,-4,12,12"
+                                    Visibility="{Binding HasVideoPlayback, Converter={StaticResource BoolToVis}}">
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Right" Text="{Binding PlaybackTimeText}" FontSize="11"
+                                           VerticalAlignment="Center" TextAlignment="Right"
+                                           Foreground="{StaticResource MutedBrush}" Margin="8,0,0,0"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="⏮" FontSize="12" Padding="8,3"
+                                            Style="{StaticResource DarkButton}"
+                                            AutomationProperties.Name="Volver al principio"
+                                            Command="{Binding RestartVideoCommand}"
+                                            ToolTip="Volver al principio del video"/>
+                                    <Button Content="⏪ 10s" FontSize="11" Padding="7,3" Margin="4,0,0,0"
+                                            Style="{StaticResource DarkButton}"
+                                            Command="{Binding SkipBackwardCommand}"
+                                            ToolTip="Retroceder 10 segundos"/>
+                                    <Button FontSize="12" Padding="10,3" Margin="4,0,0,0"
+                                            AutomationProperties.Name="Reproducir o pausar"
+                                            Command="{Binding TogglePlayPauseCommand}"
+                                            ToolTip="Reproducir o pausar el video que está en pantalla">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                                <Setter Property="Content" Value="▶"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsVideoPlaying}" Value="True">
+                                                        <Setter Property="Content" Value="⏸"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button Content="10s ⏩" FontSize="11" Padding="7,3" Margin="4,0,0,0"
+                                            Style="{StaticResource DarkButton}"
+                                            Command="{Binding SkipForwardCommand}"
+                                            ToolTip="Adelantar 10 segundos"/>
+                                </StackPanel>
+                            </DockPanel>
+                            <!-- Barra de progreso, arrastrable -->
+                            <Slider Minimum="0" Maximum="{Binding PlaybackDurationSeconds}"
+                                    Value="{Binding PlaybackPositionSeconds}"
+                                    IsMoveToPointEnabled="True" Margin="0,6,0,0"
+                                    ToolTip="Arrastrá para moverte dentro del video"/>
+                        </StackPanel>
                     </StackPanel>
                 </Border>
 
@@ -1160,7 +1220,7 @@
                     <CheckBox Content="🎲 al azar por canción" FontSize="11" Foreground="{StaticResource MutedBrush}"
                               VerticalAlignment="Center" Margin="10,0,0,0"
                               IsChecked="{Binding RandomBackgroundPerSong}"
-                              ToolTip="Cada canción que proyectás se lleva un fondo distinto de esta pestaña, sin repetir hasta usarlos todos. Si ponés un fondo a mano, se respeta hasta la canción siguiente."/>
+                              ToolTip="Cada canción que proyectás se lleva un fondo distinto de esta pestaña, sin repetir hasta usarlos todos. Si elegís un fondo a mano, se respeta: el sorteo sólo elige cuando no hay fondo o cuando el que está salió sorteado."/>
                 </DockPanel>
 
                 <!-- ── Controles del fondo que está en pantalla ── -->
@@ -1183,47 +1243,8 @@
                                     ToolTip="Volver el fondo nítido"/>
                         </StackPanel>
 
-                        <!-- Transporte: sólo con video (archivo o YouTube) -->
-                        <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center"
-                                    Visibility="{Binding HasVideoPlayback, Converter={StaticResource BoolToVis}}">
-                            <Button Content="⏮" FontSize="12" Padding="8,3"
-                                    Style="{StaticResource DarkButton}"
-                                    Command="{Binding RestartVideoCommand}"
-                                    ToolTip="Volver al principio del video"/>
-                            <Button Content="⏪ 10s" FontSize="11" Padding="8,3" Margin="4,0,0,0"
-                                    Style="{StaticResource DarkButton}"
-                                    Command="{Binding SkipBackwardCommand}"
-                                    ToolTip="Retroceder 10 segundos"/>
-                            <Button FontSize="12" Padding="10,3" Margin="4,0,0,0"
-                                    Command="{Binding TogglePlayPauseCommand}"
-                                    ToolTip="Reproducir o pausar el video que está en pantalla">
-                                <Button.Style>
-                                    <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
-                                        <Setter Property="Content" Value="▶"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsVideoPlaying}" Value="True">
-                                                <Setter Property="Content" Value="⏸"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Button.Style>
-                            </Button>
-                            <Button Content="10s ⏩" FontSize="11" Padding="8,3" Margin="4,0,0,0"
-                                    Style="{StaticResource DarkButton}"
-                                    Command="{Binding SkipForwardCommand}"
-                                    ToolTip="Adelantar 10 segundos"/>
-                            <TextBlock Text="{Binding PlaybackTimeText}" FontSize="11" VerticalAlignment="Center"
-                                       Foreground="{StaticResource MutedBrush}" Margin="10,0,0,0"
-                                       MinWidth="86"/>
-                        </StackPanel>
-
-                        <!-- Barra de progreso, arrastrable -->
-                        <Slider Minimum="0" Maximum="{Binding PlaybackDurationSeconds}"
-                                Value="{Binding PlaybackPositionSeconds}"
-                                IsMoveToPointEnabled="True"
-                                VerticalAlignment="Center" Margin="12,0,0,0"
-                                Visibility="{Binding HasVideoPlayback, Converter={StaticResource BoolToVis}}"
-                                ToolTip="Arrastrá para moverte dentro del video"/>
+                        <TextBlock Text="FONDO EN PANTALLA" FontSize="10" FontWeight="SemiBold"
+                                   Foreground="{StaticResource FaintBrush}" VerticalAlignment="Center"/>
                     </DockPanel>
                 </Border>
 

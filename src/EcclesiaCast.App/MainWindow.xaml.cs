@@ -268,6 +268,23 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>
+    /// One click on a playlist item loads it without projecting it, so the
+    /// operator can look ahead; the double click that projects it arrives as
+    /// a second press and is left to the list's own binding. A media item is
+    /// only selected: loading it would already put it on the screen.
+    /// </summary>
+    private void PlaylistItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ClickCount != 1
+            || DataContext is not MainViewModel vm
+            || sender is not FrameworkElement { DataContext: Core.Playlists.PlaylistItem item }
+            || item.Type == Core.Playlists.PlaylistItemType.Media)
+            return;
+
+        vm.OpenPlaylistItemCommand.Execute(item);
+    }
+
     // Bible slides have no per-slide actions, so suppress their context menu.
     private void SlideCard_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {

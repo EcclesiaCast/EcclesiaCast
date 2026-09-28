@@ -142,7 +142,7 @@ como escenario y sin proyector.
       avisarte).
 - [ ] Proyectar una canción: en el escenario se ve la letra actual y **la que
       sigue**.
-- [ ] Apretar **F1 (Clear)** y **F2 (Black)**: la congregación deja de ver la
+- [ ] Apretar **F1 (Black)** y **F2 (Clear)**: la congregación deja de ver la
       letra, pero **el escenario la sigue mostrando** y avisa cuál está puesto.
       Esto es lo más importante de esta pantalla.
 - [ ] La hora y el cronómetro andan; **⟲** pone el cronómetro en cero.
@@ -274,7 +274,7 @@ subraya nada, avisame**: significa que hay que instalarlo o buscar otro camino.
       que la detengas, sin números en negativo.
 - [ ] Con la **pantalla de escenario** prendida: los músicos ven el mismo
       número.
-- [ ] **F2 (Black)** y volver: la cuenta sigue en hora, no se atrasa.
+- [ ] **F1 (Black)** y volver: la cuenta sigue en hora, no se atrasa.
 - [ ] Probar la opción **a las HH:MM** con la hora de tu reunión.
 - [ ] Cerrar y abrir el programa: los textos que escribiste tienen que seguir
       ahí.
@@ -331,7 +331,7 @@ subraya nada, avisame**: significa que hay que instalarlo o buscar otro camino.
       cámara.
 - [ ] Pasar de diapositiva: la transmisión sigue al proyector con menos de un
       segundo de retraso.
-- [ ] **F1 Clear** y **F2 Black**: la letra sale de la transmisión también.
+- [ ] **F2 Clear** y **F1 Black**: la letra sale de la transmisión también.
 - [ ] El **aviso al pie** y la **cuenta regresiva** aparecen en la transmisión.
 - [ ] Probar `&fondo=negro` al final de la dirección.
 - [ ] Dejarlo andando **toda la reunión** y mirar si la PC aguanta las dos
@@ -452,7 +452,7 @@ porque tu hardware y tu proyector son otros.
 - [ ] **Miniaturas**: la primera vez que abras la app va a regenerar las
       miniaturas de los videos sola (tarda unos segundos). Verificá que se vean
       **fotogramas de los videos** y no el cono naranja de VLC.
-- [ ] **Aviso al pie** sobre un video, y los botones Clear / Black / Logo (F1,
+- [ ] **Aviso al pie** sobre un video, y los botones Black / Clear / Logo (F1,
       F2, F3) con un video de fondo.
 
 ### Del Inspector de medios

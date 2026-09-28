@@ -5,6 +5,47 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+Lo que salió del primer servicio en vivo (27/9/2026).
+
+### Cambiado
+
+- **F1 es Black y F2 es Clear** (antes al revés), y los botones de arriba
+  quedaron en ese orden.
+- El panel **LIVE va arriba** y el PREVIEW debajo: lo que está en pantalla es
+  lo que más se mira.
+- La **barra de reproducción del video** (reproducir, pausar, ±10 s y la
+  barra para moverse) pasó de la barra de medios a **debajo del LIVE**. Con el
+  logo puesto se oculta, porque el video que sigue corriendo detrás no es lo
+  que ve la congregación.
+- **Un clic en un ítem de la playlist lo carga sin proyectarlo** (antes hacía
+  falta el clic derecho). El doble clic lo proyecta, como siempre. En los
+  medios de la playlist el clic sólo lo marca, porque cargar un medio ya lo
+  pone en pantalla.
+- **Fondo al azar por canción**: si elegiste un fondo a mano, se respeta. El
+  sorteo sólo elige cuando no hay fondo o cuando el que está salió sorteado.
+- **Los versículos llenan la pantalla**: el tema de Biblia arranca en letra
+  120 (era 76). Un versículo corto ya no queda chico en el medio, y uno largo
+  se sigue achicando hasta entrar. Si ya habías cambiado ese tamaño a mano,
+  no se toca.
+- Las **tarjetas de las diapositivas** son un poco más grandes, todas iguales,
+  y muestran la letra entera: si no entra, se achica en vez de cortarse con
+  «…».
+- En la lista de canciones, las que no tienen artista ocupan un solo renglón.
+
+### Corregido
+
+- **Playlist que mostraba siempre lo primero**: si en el buscador de
+  canciones quedaba algo escrito, las canciones de la playlist que no
+  coincidían con esa búsqueda no se podían abrir. Ahora se borra el filtro.
+- **Volver de la Biblia a la misma canción** dejaba el capítulo en la
+  grilla, porque la canción «ya estaba elegida».
+- Enter en la caja de la Biblia, con una referencia escrita de antes y una
+  canción en la grilla, proyectaba una diapositiva de la canción.
+- **El video tironeaba con el ahorro de energía de Windows**: ahora lo
+  decodifica la placa de video. Medido con los loops HEVC de 1920×1280 de la
+  iglesia: cerca de la cuarta parte del procesador que antes, y 22 de 22 a 30
+  cuadros por segundo.
+
 ## [1.0.0-beta.4] — 2026-09-11
 
 ### Agregado

@@ -104,8 +104,8 @@ public partial class VlcVideoSurface : UserControl
 
         try
         {
-            // Switching media on the SAME player: VLC stops the previous
-            // input itself, so no player teardown and no delegate churn.
+            // Switching media on the SAME player: no player teardown and no
+            // delegate churn.
             using var m = new Media(engine, new Uri(media.Path));
             if (media.EndBehavior == VideoEndBehavior.Loop)
                 m.AddOption(":input-repeat=65535");
@@ -121,6 +121,13 @@ public partial class VlcVideoSurface : UserControl
                 m.AddOption($":start-time={media.TrimStart.ToString("0.###", CultureInfo.InvariantCulture)}");
             if (media.TrimEnd > 0 && media.TrimEnd > media.TrimStart)
                 m.AddOption($":stop-time={media.TrimEnd.ToString("0.###", CultureInfo.InvariantCulture)}");
+
+            // With hardware decoding on, handing the player a new input while
+            // the old one is still decoding corrupts the native heap within a
+            // few dozen switches (measured: 0xC0000374 every run). Stopping
+            // first made it survive 264 switches in a row. Safe to block here:
+            // no callback waits on the UI thread.
+            player.Stop();
             player.Play(m);
             Log.Information("Video de fondo: {Name} ({Path})", media.Name, media.Path);
         }
@@ -251,8 +258,13 @@ public partial class VlcVideoSurface : UserControl
             var player = new MediaPlayer(engine)
             {
                 Mute = true,
-                // Hardware decoding and memory callbacks don't mix reliably.
-                EnableHardwareDecoding = false,
+                // The graphics card decodes and VLC copies each frame back for
+                // the callbacks. Measured on the church's HEVC 1920×1280 loops:
+                // about a quarter of the CPU of decoding in software, which is
+                // what kept playback smooth once Windows' power saver throttled
+                // the processor. It is only safe because Play() always stops
+                // the previous input first (see Show).
+                EnableHardwareDecoding = true,
             };
 
             _formatCb = OnFormat;

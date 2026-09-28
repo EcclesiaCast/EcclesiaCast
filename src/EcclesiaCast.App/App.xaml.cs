@@ -33,9 +33,13 @@ public partial class App : Application
         ToolTipService.InitialShowDelayProperty.OverrideMetadata(
             typeof(DependencyObject), new FrameworkPropertyMetadata(350));
 
-        var appDataDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "EcclesiaCast");
+        // ECCLESIACAST_DATA_DIR points a test build at a copy of a library,
+        // so it can run next to the real one without touching it.
+        var appDataDir = Environment.GetEnvironmentVariable("ECCLESIACAST_DATA_DIR") is { Length: > 0 } dataDir
+            ? dataDir
+            : Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "EcclesiaCast");
 
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()

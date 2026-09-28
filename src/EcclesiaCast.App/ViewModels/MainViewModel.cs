@@ -608,12 +608,28 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             case PlaylistItemType.Song:
                 IsBibleTabActive = false;
                 var song = Songs.FirstOrDefault(s => s.Id == item.SongId);
+
+                // The song list may be filtered by whatever was searched last;
+                // the playlist is what the operator is following now, so drop
+                // the filter rather than report the song as missing.
+                if (song is null && !string.IsNullOrEmpty(SearchText))
+                {
+                    SearchText = string.Empty;
+                    song = Songs.FirstOrDefault(s => s.Id == item.SongId);
+                }
+
                 if (song is null)
                 {
                     StatusText = $"La canción \"{item.Caption}\" ya no está en la biblioteca.";
                     return;
                 }
-                SelectedSong = song;
+
+                // Choosing the song that is already selected changes nothing,
+                // so its slides have to be rebuilt by hand.
+                if (ReferenceEquals(SelectedSong, song))
+                    BuildSongSlides();
+                else
+                    SelectedSong = song;
                 break;
 
             case PlaylistItemType.BiblePassage:
@@ -716,6 +732,12 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private int _randomBackgroundSongId;
 
     /// <summary>
+    /// Id of the last background the draw put up; 0 when none. Anything else
+    /// on screen was chosen by hand, and the draw leaves it alone.
+    /// </summary>
+    private int _randomBackgroundId;
+
+    /// <summary>
     /// When on, every song that goes live gets a different background from the
     /// chosen tab. The tab is the one the box was ticked in, so no extra
     /// setting is needed to say where the backgrounds come from.
@@ -770,6 +792,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             return;
 
         ApplyBackground(picked);
+        _randomBackgroundId = picked.Id;
         StatusText = $"Fondo al azar: {picked.Name}.";
     }
 
@@ -813,6 +836,12 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (song.Id == _randomBackgroundSongId)
             return;
 
+        // A background picked from the media bar stays until the operator
+        // changes it: the draw only fills an empty screen, or replaces a
+        // background that was itself drawn.
+        if (_presentation.Background is { } current && current.Id != _randomBackgroundId)
+            return;
+
         var pool = BackgroundPool(RandomTab);
         if (pool.Count == 0)
             return;
@@ -823,7 +852,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         var id = _backgroundBag.Take(pool.Select(m => m.Id).ToList(), Random.Shared);
         if (pool.FirstOrDefault(m => m.Id == id) is { } picked)
+        {
             ApplyBackground(picked);
+            _randomBackgroundId = picked.Id;
+        }
     }
 
     /// <summary>The item after this one in its tab, wrapping around at the end.</summary>
@@ -1437,7 +1469,9 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     {
         var state = _projection.Playback;
 
-        HasVideoPlayback = state.HasVideo;
+        // With the logo up the background video keeps running behind it, but
+        // it isn't what the congregation sees, so its controls step aside.
+        HasVideoPlayback = state.HasVideo && !IsLogoActive;
         IsVideoPlaying = state.IsPlaying;
 
         _updatingPlayback = true;
@@ -2734,6 +2768,12 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 .ToDictionary(v => (v.Chapter, v.Verse), v => v.Text);
         }
 
+        // The grid stops showing the song, so the song list stops pointing at
+        // it: otherwise clicking that same song again changes nothing and the
+        // chapter stays on screen.
+        if (SelectedSong is not null)
+            SelectedSong = null;
+
         _currentPassage = reference;
         Slides.Clear();
         LiveSlideIndex = -1;
@@ -2876,6 +2916,15 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     [RelayCommand]
     private void ProjectReference()
     {
+        // The box can still hold a reference while the grid shows a song the
+        // operator went to since. Typing the same text again doesn't reload
+        // it, so Enter would have projected a slide of the song.
+        if (BibleReferenceParser.TryParse(BibleQuery ?? string.Empty) is { } typed
+            && (_currentPassage is null
+                || _currentPassage.BookNumber != typed.BookNumber
+                || _currentPassage.Chapter != typed.Chapter))
+            RunBibleQuery();
+
         if (PreviewSlideIndex >= 0)
         {
             GoLiveSlide(PreviewSlideIndex);
@@ -3254,7 +3303,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             .FirstOrDefault(s => s.JumpTarget is null)?.Slide;
 
         Log.Debug("Slide {Index} en vivo: {Label}", index, item.Label);
-        StatusText = $"En vivo: diapositiva {index + 1} de {Slides.Count}. Flechas ←→ para navegar · F1 Clear · F2 Black · F3 Logo.";
+        StatusText = $"En vivo: diapositiva {index + 1} de {Slides.Count}. Flechas ←→ para navegar · F1 Black · F2 Clear · F3 Logo.";
     }
 
     // ── Texto rápido ─────────────────────────────────────────────
@@ -3284,7 +3333,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         Projection.SlideLabel = "Texto rápido";
         Projection.NextSlide = null;
 
-        StatusText = "Texto rápido en vivo. F1 Clear · F2 Black · F3 Logo · Esc apaga la salida.";
+        StatusText = "Texto rápido en vivo. F1 Black · F2 Clear · F3 Logo · Esc apaga la salida.";
     }
 
     // ── Notas para la plataforma ─────────────────────────────────
