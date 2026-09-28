@@ -21,10 +21,29 @@ lado. Al cerrar un punto, borralo y anotalo en el [CHANGELOG](../CHANGELOG.md).
 
 ## 2. Funciones que faltan
 
-Vacío: todo lo que había acá se implementó el 10/9/2026 — transiciones,
-encuadre y color de medios, recorte de video, cuadros de texto por diapositiva
-y listas inteligentes. Está en el [CHANGELOG](../CHANGELOG.md), sin probar
-todavía en un servicio real.
+Pedidos del primer servicio en vivo (27/9/2026), ya charlados y aprobados:
+
+- [ ] **Buscador de la Biblia por libro primero**: al escribir letras se
+      filtran los libros («ju» → Jueces, Juan, Judas) y Enter abre el libro;
+      «juan 3» abre el capítulo y «juan 3 16» marca el versículo. La búsqueda
+      por contenido arranca con `?` («?paz»), y la caja recuerda que existe
+      Ctrl+K para buscar en todo.
+- [ ] **PREVIEW con dos vistas**: botones «Siguiente» y «Escenario» para
+      elegir si muestra la diapositiva que sigue o la pantalla de escenario.
+- [ ] **Reordenar diapositivas arrastrando** en la grilla (sólo canciones; el
+      orden nuevo queda guardado en la canción).
+- [ ] **Resaltar seleccionando el texto en el LIVE**, o de alguna forma más
+      directa que la pestaña «Resaltar».
+- [ ] **Reubicar los paneles** intercambiándolos de lugar (sin paneles
+      flotantes: AvalonDock es MS-PL, incompatible con la GPL), con el orden
+      guardado. Y **minimizar** la playlist o el buscador de canciones con un
+      clic en el título de la sección.
+- [ ] **Menú arriba** (Archivo, Edición…) para llevar ahí las opciones que
+      hoy son botones sueltos.
+
+Descartado: importar las Biblias de BibleShow. Sus archivos `.bib` son bases
+de Access protegidas con usuario y contraseña, y NTV, NVI y PDT son textos con
+derechos licenciados para usar dentro de BibleShow.
 
 ## 3. Ideas tomadas de Spresenter (10/9/2026)
 
