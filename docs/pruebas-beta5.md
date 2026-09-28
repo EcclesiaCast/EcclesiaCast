@@ -3,9 +3,14 @@
 Lo que cambió después del primer servicio en vivo (27/9/2026). Marcá cada
 punto al probarlo; si algo falla, anotá abajo qué hiciste y qué pasó.
 
-> **Antes de empezar:** cerrá la versión instalada (la beta.3) e instalá la
-> beta.5. Tu biblioteca no se toca: canciones, Biblias, medios y playlists
-> siguen ahí.
+> **Antes de empezar:** cerrá la versión instalada (la beta.3) e instalá
+> `dist\EcclesiaCast-1.0.0-beta.5-setup.exe`. Tu biblioteca no se toca:
+> canciones, Biblias, medios y playlists siguen ahí. Por las dudas, antes de
+> instalar hacé una copia con 💾 → «Guardar una copia de la biblioteca».
+>
+> Al abrirla por primera vez, el tema de Biblia pasa de letra 76 a 120 (salvo
+> que lo hayas cambiado a mano): es a propósito, para que el versículo llene
+> la pantalla.
 
 ## Lo que salió del servicio
 
