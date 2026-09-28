@@ -285,6 +285,16 @@ public partial class MainWindow : Window
         vm.OpenPlaylistItemCommand.Execute(item);
     }
 
+    /// <summary>
+    /// Enter on a half-typed book writes its full name into the box; putting
+    /// the caret after it lets the operator type the chapter straight on.
+    /// </summary>
+    private void BibleQueryBox_KeyUp(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+            BibleQueryBox.CaretIndex = BibleQueryBox.Text.Length;
+    }
+
     // Bible slides have no per-slide actions, so suppress their context menu.
     private void SlideCard_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {

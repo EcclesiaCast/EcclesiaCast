@@ -16,6 +16,11 @@ public sealed class StageWindowService(ProjectionViewModel projectionViewModel) 
     {
         if (_window is null || !_window.IsLoaded)
         {
+            // The service timer starts when the stage first comes on, as it
+            // always has; the operator's ⟲ restarts it from there.
+            if (_window is null)
+                ResetTimer();
+
             _window = new StageWindow { DataContext = projectionViewModel };
             _window.IsVisibleChanged += (_, _) => VisibilityChanged?.Invoke(this, EventArgs.Empty);
             // Double-clicking the stage screen is the way out when it covers
@@ -31,5 +36,5 @@ public sealed class StageWindowService(ProjectionViewModel projectionViewModel) 
 
     public void ApplyOptions(StageOptions options) => _window?.ApplyOptions(options);
 
-    public void ResetTimer() => _window?.ResetTimer();
+    public void ResetTimer() => projectionViewModel.StageTimerStart = DateTime.Now;
 }

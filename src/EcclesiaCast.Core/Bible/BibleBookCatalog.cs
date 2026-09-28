@@ -97,6 +97,21 @@ public static class BibleBookCatalog
             || b.Aliases.Any(a => Normalize(a) == normalized));
     }
 
+    /// <summary>
+    /// Whether what the operator has typed so far could be the start of this
+    /// book: "ju" fits Jueces, Juan and Judas; "1 jua" fits 1 Juan; "sal" fits
+    /// Salmos. Used to narrow the book list while typing.
+    /// </summary>
+    public static bool StartsWith(BibleBookInfo book, string typed)
+    {
+        var normalized = Normalize(typed);
+        if (normalized.Length == 0)
+            return true;
+
+        return Normalize(book.Name).StartsWith(normalized, StringComparison.Ordinal)
+            || book.Aliases.Any(a => Normalize(a).StartsWith(normalized, StringComparison.Ordinal));
+    }
+
     /// <summary>Lowercase, accent-free, space-free — so "1 Co", "1co" and "1 CORINTIOS" all compare equal.</summary>
     internal static string Normalize(string text)
     {

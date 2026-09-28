@@ -177,7 +177,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private string _bibleQuery = string.Empty;
 
     [ObservableProperty]
-    private string _bibleStatusText = "Escribí una referencia (ej. \"Juan 3:16\", \"sal 23\") o una palabra.";
+    private string _bibleStatusText = BibleHint;
 
     [ObservableProperty]
     private int _liveSlideIndex = -1;
@@ -256,6 +256,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         LoadLogos(null);
         LoadPlaylists(null);
         StageNotesText = _settings.Get(StageNotesKey) ?? string.Empty;
+        _previewShowsStage = _settings.Get(PreviewShowsStageKey) == "1";
         RestoreRemote();
         _ = RefreshVideoThumbnailsAsync();
     }
@@ -1994,11 +1995,37 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         set => SetStageOption(o => o.TextScale = Math.Clamp(value, 20, 400));
     }
 
+    /// <summary>
+    /// The stage options for the copy of the stage in the preview panel. A
+    /// fresh object each time, so the view notices the change.
+    /// </summary>
+    public StageOptions StageOptionsForPreview => new()
+    {
+        ShowClock = _stageOptions.ShowClock,
+        ShowTimer = _stageOptions.ShowTimer,
+        ShowNext = _stageOptions.ShowNext,
+        ShowNotes = _stageOptions.ShowNotes,
+        TextScale = _stageOptions.TextScale,
+    };
+
+    private const string PreviewShowsStageKey = "layout.preview.stage";
+
+    /// <summary>
+    /// What the PREVIEW panel shows: the next slide (false) or the stage
+    /// screen as the band sees it (true). Remembered between services.
+    /// </summary>
+    [ObservableProperty]
+    private bool _previewShowsStage;
+
+    partial void OnPreviewShowsStageChanged(bool value) =>
+        _settings.Set(PreviewShowsStageKey, value ? "1" : "0");
+
     private void SetStageOption(Action<StageOptions> change)
     {
         change(_stageOptions);
         _stageOptions.Save(_settings);
         _stage.ApplyOptions(_stageOptions);
+        OnPropertyChanged(nameof(StageOptionsForPreview));
         OnPropertyChanged(nameof(StageShowClock));
         OnPropertyChanged(nameof(StageShowTimer));
         OnPropertyChanged(nameof(StageShowNext));
@@ -2702,7 +2729,20 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         if (string.IsNullOrWhiteSpace(BibleQuery))
         {
-            BibleStatusText = "Referencia (\"Juan 3:16\", \"sal 23\") o palabra a buscar.";
+            FilterBooks(null);
+            BibleStatusText = BibleHint;
+            UpdateBibleViewState();
+            return;
+        }
+
+        // "?" asks for the words inside the verses. Everything else is taken
+        // as a book, chapter and verse: that is what gets typed nine times
+        // out of ten, and searching the text for "Juan" was never the point.
+        var query = BibleQuery.Trim();
+        if (query.StartsWith('?'))
+        {
+            FilterBooks(null);
+            SearchBibleText(query[1..].Trim());
             UpdateBibleViewState();
             return;
         }
@@ -2710,6 +2750,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         var reference = BibleReferenceParser.TryParse(BibleQuery);
         if (reference is not null)
         {
+            FilterBooks(null);
             UpdateBibleViewState();
 
             // Park the left panel on the referenced book (chapter grid view).
@@ -2734,17 +2775,77 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             return;
         }
 
-        if (BibleQuery.Trim().Length >= 3)
+        // Halfway through a reference ("juan 3:" before the verse): leave the
+        // chapter grid and the slides as they are, the next key finishes it.
+        if (System.Text.RegularExpressions.Regex.IsMatch(query, @"\p{L}.*\d"))
         {
-            foreach (var result in _bibles.SearchText(PrimaryVersion.Id, BibleQuery.Trim()))
-                BibleSearchResults.Add(result);
+            var bookPart = System.Text.RegularExpressions.Regex.Match(query, @"^\s*(\d\s*)?\p{L}[\p{L}\s.]*").Value;
+            BibleStatusText = BibleBookCatalog.FindByName(bookPart) is null
+                ? $"No reconozco el libro «{bookPart.Trim()}»."
+                : "Seguí escribiendo: «juan 3 16» o «juan 3:16».";
+            UpdateBibleViewState();
+            return;
+        }
 
-            BibleStatusText = BibleSearchResults.Count == 0
-                ? "Sin resultados."
-                : $"{BibleSearchResults.Count} resultado(s). Doble clic proyecta.";
+        // Not a full reference yet: narrow the book list to what fits. A
+        // single fit opens its chapters straight away, so "juan" already
+        // shows Juan's chapters before the number is typed.
+        var fits = FilterBooks(query);
+        if (fits.Count == 1)
+        {
+            if (SelectedBibleBook?.Number != fits[0].Number)
+                SelectedBibleBook = fits[0];
+            BibleStatusText = $"{fits[0].Name}: escribí el capítulo («{fits[0].Name} 3») o elegilo abajo.";
+        }
+        else
+        {
+            SelectedBibleBook = null;
+            BibleStatusText = fits.Count == 0
+                ? $"Ningún libro empieza con «{query}». Para buscar esa palabra en los versículos: ?{query} · Ctrl+K busca en todo."
+                : $"{fits.Count} libros · Enter abre {fits[0].Name}.";
         }
 
         UpdateBibleViewState();
+    }
+
+    private const string BibleHint =
+        "Libro, capítulo y versículo: «juan 3 16», «sal 23». Con ? adelante busca en el texto (?paz). Ctrl+K busca en todo.";
+
+    private void SearchBibleText(string words)
+    {
+        if (PrimaryVersion is null)
+            return;
+
+        if (words.Length < 3)
+        {
+            BibleStatusText = "Escribí al menos 3 letras después del ? para buscar en el texto.";
+            return;
+        }
+
+        foreach (var result in _bibles.SearchText(PrimaryVersion.Id, words))
+            BibleSearchResults.Add(result);
+
+        BibleStatusText = BibleSearchResults.Count == 0
+            ? $"Ningún versículo dice «{words}»."
+            : $"{BibleSearchResults.Count} versículo(s) con «{words}». Enter proyecta el primero, doble clic cualquiera.";
+    }
+
+    /// <summary>
+    /// Shows only the books that the typed text could be the start of; null
+    /// shows them all again. Returns the books that fit, in biblical order.
+    /// </summary>
+    private List<BibleBookInfo> FilterBooks(string? typed)
+    {
+        var view = System.Windows.Data.CollectionViewSource.GetDefaultView(BibleBooksAvailable);
+        if (string.IsNullOrWhiteSpace(typed))
+        {
+            if (view.Filter is not null)
+                view.Filter = null;
+            return BibleBooksAvailable.ToList();
+        }
+
+        view.Filter = item => item is BibleBookInfo book && BibleBookCatalog.StartsWith(book, typed);
+        return BibleBooksAvailable.Where(b => BibleBookCatalog.StartsWith(b, typed)).ToList();
     }
 
     private void LoadBiblePassage(BibleReference reference)
@@ -2916,6 +3017,26 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     [RelayCommand]
     private void ProjectReference()
     {
+        var query = (BibleQuery ?? string.Empty).Trim();
+
+        // "?words": Enter projects the first verse that says them.
+        if (query.StartsWith('?'))
+        {
+            if (BibleSearchResults.FirstOrDefault() is { } firstResult)
+                ProjectBibleResult(firstResult);
+            return;
+        }
+
+        // Only part of a book typed ("ju"): Enter opens the first book that
+        // fits and leaves its name in the box, ready for the chapter number.
+        if (query.Length > 0 && BibleReferenceParser.TryParse(query) is null)
+        {
+            var book = BibleBooksAvailable.FirstOrDefault(b => BibleBookCatalog.StartsWith(b, query));
+            if (book is not null)
+                BibleQuery = book.Name + " ";
+            return;
+        }
+
         // The box can still hold a reference while the grid shows a song the
         // operator went to since. Typing the same text again doesn't reload
         // it, so Enter would have projected a slide of the song.

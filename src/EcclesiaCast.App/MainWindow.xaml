@@ -473,7 +473,7 @@
                                     </ListBox>
                                 </Border>
 
-                                <TextBox DockPanel.Dock="Top"
+                                <TextBox x:Name="BibleQueryBox" DockPanel.Dock="Top"
                                          Margin="12,0,12,6" Padding="8,6"
                                          Background="{StaticResource SurfaceAltBrush}"
                                          Foreground="White"
@@ -481,7 +481,8 @@
                                          CaretBrush="White"
                                          FontSize="13"
                                          Text="{Binding BibleQuery, UpdateSourceTrigger=PropertyChanged}"
-                                         ToolTip="Ej: Juan 3:16 · jn 3:16-18 · sal 23 · o una palabra. Enter proyecta el versículo.">
+                                         KeyUp="BibleQueryBox_KeyUp"
+                                         ToolTip="Escribí el libro y se filtra la lista («ju» → Jueces, Juan, Judas; Enter abre el primero). «juan 3» abre el capítulo, «juan 3 16» marca el versículo y Enter lo proyecta. Con ? adelante busca palabras en los versículos (?paz). Ctrl+K busca en canciones, Biblia y medios a la vez.">
                                     <TextBox.InputBindings>
                                         <KeyBinding Key="Enter" Command="{Binding ProjectReferenceCommand}"/>
                                     </TextBox.InputBindings>
@@ -900,14 +901,37 @@
 
                 <Border Grid.Row="2" Style="{StaticResource Panel}">
                     <StackPanel>
-                        <TextBlock Text="PREVIEW · SIGUIENTE" Style="{StaticResource PanelTitle}"/>
+                        <!-- Qué muestra: la diapositiva que sigue, o la pantalla
+                             de escenario tal como la ven los músicos -->
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="0,6,10,4">
+                                <RadioButton Content="Siguiente" Style="{StaticResource TabButton}"
+                                             GroupName="PreviewMode" Padding="8,3" FontSize="11"
+                                             IsChecked="{Binding PreviewShowsStage, Converter={StaticResource InverseBool}}"
+                                             ToolTip="La diapositiva que va a salir después"/>
+                                <RadioButton Content="Escenario" Style="{StaticResource TabButton}"
+                                             GroupName="PreviewMode" Padding="8,3" FontSize="11" Margin="2,0,0,0"
+                                             IsChecked="{Binding PreviewShowsStage}"
+                                             ToolTip="Lo que ven los músicos y quien predica en la pantalla de escenario, aunque no esté prendida"/>
+                            </StackPanel>
+                            <TextBlock Text="PREVIEW" Style="{StaticResource PanelTitle}"/>
+                        </DockPanel>
                         <Border Height="165" Margin="12,0,12,12"
-                                Background="#0B0D12" CornerRadius="4">
-                            <controls:ProjectedView Slide="{Binding PreviewSlide}"
-                                                    BackgroundMedia="{Binding Projection.Background}"
-                                                    FillMedia="{Binding Projection.BackgroundFill}"
-                                                    BackgroundBlur="{Binding Projection.BackgroundBlur}"
-                                                    Logo="{Binding Projection.ActiveLogo}"/>
+                                Background="#0B0D12" CornerRadius="4" ClipToBounds="True">
+                            <Grid>
+                                <controls:ProjectedView Slide="{Binding PreviewSlide}"
+                                                        BackgroundMedia="{Binding Projection.Background}"
+                                                        FillMedia="{Binding Projection.BackgroundFill}"
+                                                        BackgroundBlur="{Binding Projection.BackgroundBlur}"
+                                                        Logo="{Binding Projection.ActiveLogo}"
+                                                        Visibility="{Binding PreviewShowsStage, Converter={StaticResource InverseBoolToVis}}"/>
+                                <Viewbox Stretch="Uniform"
+                                         Visibility="{Binding PreviewShowsStage, Converter={StaticResource BoolToVis}}">
+                                    <controls:StageView Width="1920" Height="1080"
+                                                        DataContext="{Binding Projection}"
+                                                        Options="{Binding DataContext.StageOptionsForPreview, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                </Viewbox>
+                            </Grid>
                         </Border>
                     </StackPanel>
                 </Border>

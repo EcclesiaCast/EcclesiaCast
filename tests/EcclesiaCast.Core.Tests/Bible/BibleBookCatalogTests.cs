@@ -49,4 +49,41 @@ public class BibleBookCatalogTests
         Assert.Equal(63, BibleBookCatalog.FindByName("2jn")!.Number);
         Assert.Equal(64, BibleBookCatalog.FindByName("3jn")!.Number);
     }
+
+    private static int[] Starting(string typed) =>
+        BibleBookCatalog.Books.Where(b => BibleBookCatalog.StartsWith(b, typed)).Select(b => b.Number).ToArray();
+
+    [Fact]
+    public void Typing_the_start_of_a_name_narrows_to_the_books_it_fits()
+    {
+        Assert.Equal([7, 43, 65], Starting("ju"));
+        Assert.Equal([43], Starting("juan"));
+        Assert.Equal([19], Starting("salm"));
+    }
+
+    [Fact]
+    public void The_start_ignores_accents_case_and_spaces()
+    {
+        Assert.Equal([1], Starting("GÉN"));
+        Assert.Equal([62], Starting("1 jua"));
+    }
+
+    [Fact]
+    public void Abbreviations_count_as_a_start_too()
+    {
+        // "jn" is how Juan is abbreviated, even though no name starts with it.
+        Assert.Contains(43, Starting("jn"));
+    }
+
+    [Fact]
+    public void Nothing_typed_fits_every_book()
+    {
+        Assert.Equal(66, Starting("  ").Length);
+    }
+
+    [Fact]
+    public void Text_that_starts_no_book_fits_none()
+    {
+        Assert.Empty(Starting("paz"));
+    }
 }

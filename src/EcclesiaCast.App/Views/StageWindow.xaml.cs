@@ -1,65 +1,28 @@
-using System.ComponentModel;
-using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Animation;
-using System.Windows.Threading;
 using EcclesiaCast.App.Services;
-using EcclesiaCast.App.ViewModels;
 using EcclesiaCast.Core.Displays;
-using EcclesiaCast.Core.Presentation;
-using EcclesiaCast.Core.Themes;
 
 namespace EcclesiaCast.App.Views;
 
 /// <summary>
-/// The monitor the musicians and the preacher look at: the words that are on
-/// the projector right now, what comes next, the time of day and how long the
-/// service has been running. Deliberately plain — white on black, no
-/// backgrounds — because it is read from a distance and under stage lights.
+/// The stage display, full screen on its own monitor. What it shows is the
+/// <see cref="Controls.StageView"/>; this window only places it, keeps it out
+/// of the way of the keyboard and offers the way out.
 /// </summary>
 public partial class StageWindow : Window
 {
-    private readonly DispatcherTimer _clock = new() { Interval = TimeSpan.FromSeconds(1) };
     private DisplayInfo? _display;
-
-    /// <summary>When the service timer was last reset.</summary>
-    private DateTime _timerStart = DateTime.Now;
 
     public StageWindow()
     {
         InitializeComponent();
-
-        _clock.Tick += (_, _) => UpdateClocks();
-        _clock.Start();
-        UpdateClocks();
-
-        DataContextChanged += OnDataContextChanged;
     }
 
     /// <summary>Which parts are shown; the operator picks them in Ajustes.</summary>
-    public StageOptions Options { get; private set; } = new();
-
-    public void ApplyOptions(StageOptions options)
-    {
-        Options = options;
-        TopBar.Visibility = options.ShowClock || options.ShowTimer
-            ? Visibility.Visible
-            : Visibility.Collapsed;
-        ClockText.Visibility = options.ShowClock ? Visibility.Visible : Visibility.Hidden;
-        TimerText.Visibility = options.ShowTimer ? Visibility.Visible : Visibility.Hidden;
-        NextPanel.Visibility = options.ShowNext ? Visibility.Visible : Visibility.Collapsed;
-        CurrentText.FontSize = Math.Clamp(options.TextScale, 20, 400);
-        Render();
-    }
-
-    /// <summary>Restarts the service timer (the operator's ⟲ button).</summary>
-    public void ResetTimer()
-    {
-        _timerStart = DateTime.Now;
-        UpdateClocks();
-    }
+    public void ApplyOptions(StageOptions options) => View.Options = options;
 
     /// <summary>Raised when the operator double-clicks the stage screen to close it.</summary>
     public event EventHandler? CloseRequested;
@@ -93,117 +56,6 @@ public partial class StageWindow : Window
     private void Stage_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) =>
         CloseRequested?.Invoke(this, EventArgs.Empty);
 
-    // ── Contenido ────────────────────────────────────────────────
-
-    private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
-    {
-        if (e.OldValue is INotifyPropertyChanged oldVm)
-            oldVm.PropertyChanged -= OnProjectionChanged;
-        if (e.NewValue is INotifyPropertyChanged newVm)
-            newVm.PropertyChanged += OnProjectionChanged;
-        Render();
-    }
-
-    private void OnProjectionChanged(object? sender, PropertyChangedEventArgs e) => Render();
-
-    private void Render()
-    {
-        if (DataContext is not ProjectionViewModel vm)
-            return;
-
-        // Black and Clear hide the words from the congregation, but the stage
-        // still needs to read them — that is the point of a stage display.
-        var text = vm.Slide?.MainText ?? string.Empty;
-        CurrentText.Text = Transform(text, vm.Slide?.Theme);
-
-        // While a countdown runs it is what the congregation sees, so it is
-        // what the band and whoever is preaching need to see too — they are
-        // the ones who have to be in place when it hits zero.
-        if (vm.Countdown is not null)
-        {
-            RenderCountdown(vm);
-            return;
-        }
-
-        LabelText.Text = vm.State switch
-        {
-            OutputState.Black => "⏸  PANTALLA EN NEGRO",
-            OutputState.Logo => "🖼  LOGO",
-            OutputState.Clear => vm.Slide is null ? "—" : "👁  SIN TEXTO EN PANTALLA",
-            _ => vm.SlideLabel ?? string.Empty,
-        };
-
-        NextText.Text = vm.NextSlide is { } next
-            ? Transform(next.MainText, next.Theme)
-            : "—";
-
-        var hasOverlay = !string.IsNullOrWhiteSpace(vm.Overlay);
-        OverlayPanel.Visibility = hasOverlay ? Visibility.Visible : Visibility.Collapsed;
-        OverlayText.Text = vm.Overlay ?? string.Empty;
-
-        RenderNotes(vm);
-    }
-
-    private void RenderCountdown(ProjectionViewModel vm)
-    {
-        if (vm.Countdown is not { } countdown)
-            return;
-
-        var finished = countdown.HasFinished(DateTimeOffset.Now);
-
-        LabelText.Text = "⏱  CUENTA REGRESIVA";
-        CurrentText.Text = countdown.Format(DateTimeOffset.Now);
-        NextText.Text = finished || string.IsNullOrWhiteSpace(countdown.Heading)
-            ? "—"
-            : countdown.Heading;
-
-        var hasOverlay = !string.IsNullOrWhiteSpace(vm.Overlay);
-        OverlayPanel.Visibility = hasOverlay ? Visibility.Visible : Visibility.Collapsed;
-        OverlayText.Text = vm.Overlay ?? string.Empty;
-
-        RenderNotes(vm);
-    }
-
-    /// <summary>
-    /// The outline for whoever is preaching. It shows up only here — the
-    /// congregation never sees it, which is the whole reason it exists.
-    /// </summary>
-    private void RenderNotes(ProjectionViewModel vm)
-    {
-        var hasNotes = Options.ShowNotes && !string.IsNullOrWhiteSpace(vm.StageNotes);
-        NotesPanel.Visibility = hasNotes ? Visibility.Visible : Visibility.Collapsed;
-        NotesText.Text = vm.StageNotes ?? string.Empty;
-    }
-
-    /// <summary>
-    /// Matches the projector's casing so the singers read what the
-    /// congregation reads; everything else about the look stays plain.
-    /// </summary>
-    private static string Transform(string text, SlideTheme? theme) =>
-        (theme?.TextCase ?? TextCase.None) switch
-        {
-            TextCase.Upper => text.ToUpper(CultureInfo.CurrentCulture),
-            TextCase.Lower => text.ToLower(CultureInfo.CurrentCulture),
-            TextCase.Title => CultureInfo.CurrentCulture.TextInfo
-                .ToTitleCase(text.ToLower(CultureInfo.CurrentCulture)),
-            _ => text,
-        };
-
-    private void UpdateClocks()
-    {
-        ClockText.Text = DateTime.Now.ToString("HH:mm", CultureInfo.CurrentCulture);
-
-        // The countdown ticks on its own; the clock timer is already running
-        // every second, so it does the redrawing rather than a second timer.
-        if (DataContext is ProjectionViewModel { Countdown: not null } counting)
-            RenderCountdown(counting);
-
-        var elapsed = DateTime.Now - _timerStart;
-        TimerText.Text = elapsed.TotalHours >= 1
-            ? elapsed.ToString(@"h\:mm\:ss")
-            : elapsed.ToString(@"m\:ss");
-    }
-
     // ── Posición en el monitor de escenario ──────────────────────
 
     protected override void OnSourceInitialized(EventArgs e)
@@ -213,12 +65,6 @@ public partial class StageWindow : Window
         var hwnd = new WindowInteropHelper(this).Handle;
         _ = SetWindowLong(hwnd, GWL_EXSTYLE, GetWindowLong(hwnd, GWL_EXSTYLE) | WS_EX_NOACTIVATE);
         MoveToDisplay();
-    }
-
-    protected override void OnClosed(EventArgs e)
-    {
-        _clock.Stop();
-        base.OnClosed(e);
     }
 
     private void MoveToDisplay()

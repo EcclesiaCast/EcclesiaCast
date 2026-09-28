@@ -10,7 +10,9 @@ namespace EcclesiaCast.Core.Bible;
 /// </summary>
 public static partial class BibleReferenceParser
 {
-    [GeneratedRegex(@"^\s*(?<book>.+?)\s+(?<chapter>\d{1,3})(?:\s*:\s*(?<vstart>\d{1,3})(?:\s*-\s*(?<vend>\d{1,3}))?)?\s*$")]
+    // The verse may follow the chapter after ":" or ".", or just a space
+    // ("juan 3 16"), which is the fastest to type without looking.
+    [GeneratedRegex(@"^\s*(?<book>.+?)\s+(?<chapter>\d{1,3})(?:(?:\s*[:.]\s*|\s+)(?<vstart>\d{1,3})(?:\s*-\s*(?<vend>\d{1,3}))?)?\s*$")]
     private static partial Regex Pattern();
 
     public static BibleReference? TryParse(string? input)

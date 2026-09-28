@@ -68,6 +68,13 @@ public sealed partial class ProjectionViewModel : ObservableObject
     [ObservableProperty]
     private string? _slideLabel;
 
+    /// <summary>
+    /// When the stage's service timer was last reset. Kept here so the stage
+    /// screen and its copy in the operator's preview count the same time.
+    /// </summary>
+    [ObservableProperty]
+    private DateTime _stageTimerStart = DateTime.Now;
+
     public ProjectionViewModel(IPresentationService presentation)
     {
         presentation.Changed += (_, _) => Sync(presentation);

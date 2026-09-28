@@ -61,6 +61,41 @@ public class BibleReferenceParserTests
     }
 
     [Theory]
+    [InlineData("juan 3 16")]
+    [InlineData("juan 3.16")]
+    [InlineData("Juan  3  16")]
+    public void A_space_or_a_dot_also_separates_the_verse(string input)
+    {
+        var reference = BibleReferenceParser.TryParse(input);
+
+        Assert.NotNull(reference);
+        Assert.Equal(43, reference!.BookNumber);
+        Assert.Equal(3, reference.Chapter);
+        Assert.Equal(16, reference.VerseStart);
+    }
+
+    [Fact]
+    public void A_space_separated_verse_works_after_a_numbered_book()
+    {
+        var reference = BibleReferenceParser.TryParse("1 juan 4 8");
+
+        Assert.NotNull(reference);
+        Assert.Equal(62, reference!.BookNumber);
+        Assert.Equal(4, reference.Chapter);
+        Assert.Equal(8, reference.VerseStart);
+    }
+
+    [Fact]
+    public void A_space_separated_range_parses()
+    {
+        var reference = BibleReferenceParser.TryParse("sal 23 1-3");
+
+        Assert.NotNull(reference);
+        Assert.Equal(1, reference!.VerseStart);
+        Assert.Equal(3, reference.VerseEnd);
+    }
+
+    [Theory]
     [InlineData("")]
     [InlineData("   ")]
     [InlineData("amor")]

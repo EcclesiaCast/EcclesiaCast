@@ -1,6 +1,7 @@
 <Window x:Class="EcclesiaCast.App.Views.StageWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:EcclesiaCast.App.Controls"
         Title="EcclesiaCast — Escenario"
         WindowStyle="None"
         ResizeMode="NoResize"
@@ -13,97 +14,7 @@
         FontFamily="Segoe UI"
         MouseDoubleClick="Stage_MouseDoubleClick">
     <Grid>
-    <Grid Margin="28,20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-
-        <!-- ══ Barra: reloj · cronómetro · referencia ══ -->
-        <Grid Grid.Row="0" x:Name="TopBar">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-
-            <TextBlock x:Name="ClockText" Grid.Column="0"
-                       Text="00:00" FontSize="44" FontWeight="Light"
-                       Foreground="#7F8CA8" VerticalAlignment="Center"/>
-
-            <TextBlock x:Name="LabelText" Grid.Column="1"
-                       Text="" FontSize="30" FontWeight="SemiBold"
-                       Foreground="#4E7FD6"
-                       HorizontalAlignment="Center" VerticalAlignment="Center"
-                       TextTrimming="CharacterEllipsis"/>
-
-            <TextBlock x:Name="TimerText" Grid.Column="2"
-                       Text="0:00" FontSize="44" FontWeight="Light"
-                       Foreground="#7F8CA8" VerticalAlignment="Center"/>
-        </Grid>
-
-        <!-- ══ Lo que está proyectado ══ -->
-        <Viewbox Grid.Row="1" Stretch="Uniform" StretchDirection="DownOnly" Margin="0,18">
-            <TextBlock x:Name="CurrentText"
-                       Text="EcclesiaCast"
-                       FontSize="96" FontWeight="SemiBold"
-                       Foreground="White"
-                       TextWrapping="Wrap" TextAlignment="Center"
-                       MaxWidth="1500"/>
-        </Viewbox>
-
-        <!-- ══ Lo que sigue ══ -->
-        <Border Grid.Row="2" x:Name="NextPanel"
-                BorderBrush="#252A36" BorderThickness="0,1,0,0"
-                Padding="0,14,0,0" Margin="0,6,0,0">
-            <DockPanel>
-                <TextBlock DockPanel.Dock="Left" Text="SIGUIENTE"
-                           FontSize="18" FontWeight="SemiBold" Foreground="#4A5266"
-                           VerticalAlignment="Top" Margin="0,6,20,0"/>
-                <TextBlock x:Name="NextText"
-                           Text="—" FontSize="40"
-                           Foreground="#9AA6BF"
-                           TextWrapping="Wrap" MaxHeight="180"
-                           TextTrimming="CharacterEllipsis"/>
-            </DockPanel>
-        </Border>
-
-        <!-- ══ Notas de quien predica: sólo se ven acá ══ -->
-        <Border Grid.Row="3" x:Name="NotesPanel"
-                BorderBrush="#252A36" BorderThickness="0,1,0,0"
-                Padding="0,14,0,0" Margin="0,10,0,0"
-                Visibility="Collapsed">
-            <DockPanel>
-                <TextBlock DockPanel.Dock="Left" Text="NOTAS"
-                           FontSize="18" FontWeight="SemiBold" Foreground="#4A5266"
-                           VerticalAlignment="Top" Margin="0,6,20,0"/>
-                <!-- Nadie puede desplazar esta pantalla: no toma foco ni tiene
-                     mouse. Un guion largo se achica para entrar entero, que es
-                     mejor que quedar cortado sin que nadie lo note. -->
-                <Viewbox Stretch="Uniform" StretchDirection="DownOnly"
-                         MaxHeight="300" HorizontalAlignment="Left">
-                    <TextBlock x:Name="NotesText"
-                               FontSize="34"
-                               Foreground="#C9D4E8"
-                               TextWrapping="Wrap"
-                               MaxWidth="1500"/>
-                </Viewbox>
-            </DockPanel>
-        </Border>
-
-        <!-- ══ Aviso al pie (lo mismo que ve la congregación) ══ -->
-        <Border Grid.Row="4" x:Name="OverlayPanel"
-                Background="#1B2436" BorderBrush="#2F63C9" BorderThickness="0,3,0,0"
-                Padding="20,12" Margin="0,14,0,0"
-                Visibility="Collapsed">
-            <TextBlock x:Name="OverlayText"
-                       FontSize="34" Foreground="White"
-                       TextWrapping="Wrap" TextAlignment="Center"/>
-        </Border>
-    </Grid>
+        <controls:StageView x:Name="View"/>
 
         <!-- Cómo salir. Se muestra al abrir y se desvanece sola: con una sola
              pantalla libre, el escenario tapa el panel del operador y sin esto
