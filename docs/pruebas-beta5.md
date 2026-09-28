@@ -84,6 +84,52 @@ punto al probarlo; si algo falla, anotá abajo qué hiciste y qué pasó.
 - [ ] Cerrá y abrí el programa: el PREVIEW recuerda si estaba en Siguiente o
       en Escenario.
 
+## Reordenar diapositivas arrastrando
+
+- [ ] Abrí una canción y **arrastrá una tarjeta sobre otra**: toma su lugar y
+      las demás se corren. Mientras arrastrás, la tarjeta donde va a caer se
+      marca con un borde azul.
+- [ ] Cerrá y abrí la canción (o el programa): el orden nuevo quedó guardado.
+- [ ] Un **clic normal** (sin arrastrar) sigue proyectando la diapositiva, y
+      arrastrar **no** la proyecta.
+- [ ] En la Biblia las tarjetas **no** se arrastran (los versículos tienen su
+      orden).
+- [ ] Probalo con la canción en vivo: el proyector sigue mostrando lo mismo.
+
+## Resaltar desde el LIVE
+
+- [ ] Con una canción o un versículo en pantalla, hacé **clic en una palabra
+      del LIVE**: se pinta de amarillo en el proyector.
+- [ ] **Arrastrá** sobre varias palabras del LIVE: se resalta la frase entera.
+- [ ] Clic otra vez sobre lo resaltado: se quita.
+- [ ] La pestaña «Resaltar» muestra lo mismo que resaltaste con el mouse.
+
+## Achicar paneles
+
+- [ ] **Clic en «PLAYLIST»** (el título): la playlist se achica a una línea y
+      las canciones ganan todo el alto. Otro clic la vuelve a abrir.
+- [ ] La **flechita ▾** al lado de Canciones/Biblia (o clic en el título
+      «CANCIONES») achica ese panel y la playlist ocupa el lugar.
+- [ ] Cerrá y abrí el programa: lo achicado sigue achicado.
+
+## Menú de arriba y diseño de la ventana
+
+- [ ] Hay un **menú**: Archivo, Edición, Ver, Proyección, Ayuda. Probá que
+      cada opción haga lo que dice (importar, copia de seguridad, temas,
+      Black/Clear/Logo, escenario, cuenta regresiva, celular…).
+- [ ] **Ver → Canciones y playlist a la derecha**: la columna de canciones
+      pasa a la derecha y el LIVE/PREVIEW a la izquierda.
+- [ ] **Ver → Playlist arriba de las canciones**.
+- [ ] **Ver → Medios arriba de las diapositivas**.
+- [ ] **Ver → Preview arriba del Live**.
+- [ ] Combiná varias, cerrá y abrí el programa: queda como lo dejaste,
+      con los anchos que tenían los paneles.
+- [ ] **Ver → Volver al diseño original** deja todo como viene de fábrica.
+- [ ] **Ayuda → Acerca de** muestra la versión; **Guía de uso** abre la
+      guía en el navegador.
+- [ ] Contame qué botones de la barra de arriba sacarías ahora que está el
+      menú (por ejemplo 💾, 📱 o ⏱ se usan poco).
+
 ## Anotaciones
 
 (Acá lo que falle o lo que quieras cambiar.)

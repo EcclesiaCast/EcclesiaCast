@@ -624,6 +624,65 @@ public partial class SlideView : UserControl
         return formatted;
     }
 
+    /// <summary>
+    /// The words of the main text between two points (in this control's
+    /// coordinates), widened to whole words: a click gives the word under it,
+    /// a drag the phrase it swept. Null when neither point is on the text.
+    /// Used to highlight by pointing at the Live preview.
+    /// </summary>
+    public string? PhraseBetween(Point from, Point to)
+    {
+        var text = string.Concat(MainText.Inlines.OfType<Run>().Select(r => r.Text));
+        if (text.Length == 0)
+            return null;
+
+        var a = OffsetAt(from);
+        var b = OffsetAt(to);
+        if (a is null && b is null)
+            return null;
+
+        var start = Math.Min(a ?? b!.Value, b ?? a!.Value);
+        var end = Math.Max(a ?? b!.Value, b ?? a!.Value);
+        start = Math.Clamp(start, 0, text.Length);
+        end = Math.Clamp(end, 0, text.Length);
+
+        // A click lands between two letters, or just after the last one.
+        if (start == end && start > 0 && (start == text.Length || !IsWordChar(text[start])))
+            start = end = start - 1;
+
+        while (start > 0 && IsWordChar(text[start - 1]))
+            start--;
+        while (end < text.Length && IsWordChar(text[end]))
+            end++;
+
+        var phrase = text[start..end].Trim();
+        return phrase.Length == 0 || !phrase.Any(char.IsLetterOrDigit) ? null : phrase;
+
+        static bool IsWordChar(char c) => char.IsLetterOrDigit(c) || c is '\'' or '’' or '-';
+    }
+
+    /// <summary>Character offset in the main text under a point, or null off the text.</summary>
+    private int? OffsetAt(Point point)
+    {
+        var local = TranslatePoint(point, MainText);
+        if (local.X < 0 || local.Y < 0 || local.X > MainText.ActualWidth || local.Y > MainText.ActualHeight)
+            return null;
+
+        var pointer = MainText.GetPositionFromPoint(local, snapToText: true);
+        if (pointer?.Parent is not Run run)
+            return null;
+
+        var offset = 0;
+        foreach (var inline in MainText.Inlines)
+        {
+            if (ReferenceEquals(inline, run))
+                return offset + run.ContentStart.GetOffsetToPosition(pointer);
+            if (inline is Run other)
+                offset += other.Text.Length;
+        }
+        return null;
+    }
+
     private void RenderWithHighlight(TextBlock target, string? text)
     {
         target.Inlines.Clear();

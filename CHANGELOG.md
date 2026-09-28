@@ -7,6 +7,30 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 Lo que salió del primer servicio en vivo (27/9/2026).
 
+### Agregado
+
+- **Buscador de la Biblia por libro**: al escribir se filtran los libros
+  («ju» → Jueces, Juan, Judas) y Enter completa el nombre para seguir con el
+  capítulo; un solo libro posible abre directo sus capítulos. «juan 3 16»
+  anda sin los dos puntos. Para buscar palabras dentro de los versículos se
+  empieza con **?** («?paz»); Ctrl+K sigue buscando en todo.
+- **PREVIEW con escenario**: dos botones, «Siguiente» y «Escenario», eligen
+  si el PREVIEW muestra la diapositiva que sigue o la pantalla de escenario
+  tal como la ven los músicos (aunque no esté prendida). Se recuerda.
+- **Reordenar diapositivas arrastrando** en la grilla: la que soltás toma el
+  lugar de la otra y el orden queda guardado en la canción.
+- **Resaltar desde el LIVE**: clic en una palabra del panel LIVE la resalta en
+  el proyector, arrastrar resalta una frase, y otro clic la saca.
+- **Achicar la playlist o el panel de canciones y Biblia** con un clic en su
+  título, para darle todo el alto al otro.
+- **Menú arriba** (Archivo, Edición, Ver, Proyección, Ayuda) con todo lo que
+  hoy son botones sueltos, más «Acerca de» y la guía de uso.
+- **Diseño de la ventana**, desde el menú Ver: canciones y playlist a la
+  derecha o a la izquierda, la playlist arriba o abajo de las canciones, los
+  medios arriba o abajo de las diapositivas, y el PREVIEW arriba o abajo del
+  LIVE. Todo queda guardado, con los anchos de cada panel, y «Volver al
+  diseño original» deshace todo.
+
 ### Cambiado
 
 - **F1 es Black y F2 es Clear** (antes al revés), y los botones de arriba

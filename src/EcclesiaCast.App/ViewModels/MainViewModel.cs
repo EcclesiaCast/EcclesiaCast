@@ -2367,6 +2367,32 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         ReindexAndSaveSong("Diapositiva eliminada.");
     }
 
+    /// <summary>
+    /// Drag and drop in the slide grid: the dragged slide takes the place of
+    /// the one it was dropped on, and the song keeps the new order. Only song
+    /// slides move — a chapter's verses have an order of their own.
+    /// </summary>
+    public void MoveSlide(SlideItemViewModel dragged, SlideItemViewModel target)
+    {
+        var from = SectionOf(dragged);
+        var to = SectionOf(target);
+        if (from is null || to is null || SelectedSong is null || from.Id == to.Id)
+            return;
+
+        var sections = SelectedSong.Sections;
+        var fromIndex = sections.FindIndex(s => s.Id == from.Id);
+        var toIndex = sections.FindIndex(s => s.Id == to.Id);
+        if (fromIndex < 0 || toIndex < 0)
+            return;
+
+        sections.RemoveAt(fromIndex);
+        sections.Insert(toIndex, from);
+        ReindexAndSaveSong($"«{from.Label}» pasó al lugar {toIndex + 1}.");
+    }
+
+    /// <summary>True for slides that can be dragged to a new place.</summary>
+    public bool CanMoveSlide(SlideItemViewModel? item) => SectionOf(item) is not null;
+
     private void ReindexAndSaveSong(string status)
     {
         if (SelectedSong is null)

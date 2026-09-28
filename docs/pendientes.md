@@ -21,25 +21,12 @@ lado. Al cerrar un punto, borralo y anotalo en el [CHANGELOG](../CHANGELOG.md).
 
 ## 2. Funciones que faltan
 
-Pedidos del primer servicio en vivo (27/9/2026), ya charlados y aprobados:
+Los pedidos del primer servicio en vivo (27/9/2026) están hechos en la rama
+`beta5` y se prueban con [pruebas-beta5.md](pruebas-beta5.md). Queda:
 
-- [ ] **Buscador de la Biblia por libro primero**: al escribir letras se
-      filtran los libros («ju» → Jueces, Juan, Judas) y Enter abre el libro;
-      «juan 3» abre el capítulo y «juan 3 16» marca el versículo. La búsqueda
-      por contenido arranca con `?` («?paz»), y la caja recuerda que existe
-      Ctrl+K para buscar en todo.
-- [ ] **PREVIEW con dos vistas**: botones «Siguiente» y «Escenario» para
-      elegir si muestra la diapositiva que sigue o la pantalla de escenario.
-- [ ] **Reordenar diapositivas arrastrando** en la grilla (sólo canciones; el
-      orden nuevo queda guardado en la canción).
-- [ ] **Resaltar seleccionando el texto en el LIVE**, o de alguna forma más
-      directa que la pestaña «Resaltar».
-- [ ] **Reubicar los paneles** intercambiándolos de lugar (sin paneles
-      flotantes: AvalonDock es MS-PL, incompatible con la GPL), con el orden
-      guardado. Y **minimizar** la playlist o el buscador de canciones con un
-      clic en el título de la sección.
-- [ ] **Menú arriba** (Archivo, Edición…) para llevar ahí las opciones que
-      hoy son botones sueltos.
+- [ ] **Decidir qué botones de la barra de arriba se van** ahora que está el
+      menú (se agregó sin sacar ninguno).
+- [ ] Armar el instalador de la beta.5 cuando la prueba dé bien.
 
 Descartado: importar las Biblias de BibleShow. Sus archivos `.bib` son bases
 de Access protegidas con usuario y contraseña, y NTV, NVI y PDT son textos con

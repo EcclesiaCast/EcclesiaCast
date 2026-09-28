@@ -2,6 +2,7 @@ using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using EcclesiaCast.App.ViewModels;
 using EcclesiaCast.Core.Abstractions;
@@ -57,14 +58,17 @@ public partial class MainWindow : Window
     {
         _settings = settings;
 
+        // The sizes belong to the blocks, not to the slots: a library moved to
+        // the right keeps the width it had on the left.
         if (ReadDouble(LayoutLibraryKey) is double library)
-            LibraryColumn.Width = new GridLength(library);
+            _libraryWidth = library;
         if (ReadDouble(LayoutPreviewKey) is double preview)
-            PreviewColumn.Width = new GridLength(preview);
+            _rightWidth = preview;
         if (ReadDouble(LayoutPlaylistKey) is double playlist)
-            PlaylistRow.Height = new GridLength(playlist);
+            _playlistHeight = playlist;
         if (ReadDouble(LayoutMediaKey) is double media)
-            MediaRow.Height = new GridLength(media);
+            _mediaHeight = media;
+        RestoreLayoutOptions();
 
         if (settings.Get(LayoutWindowKey)?.Split(';') is [var w, var h, var state]
             && double.TryParse(w, out var width) && double.TryParse(h, out var height))
@@ -88,10 +92,11 @@ public partial class MainWindow : Window
 
         try
         {
-            _settings.Set(LayoutLibraryKey, LibraryColumn.Width.Value.ToString("0"));
-            _settings.Set(LayoutPreviewKey, PreviewColumn.Width.Value.ToString("0"));
-            _settings.Set(LayoutPlaylistKey, PlaylistRow.Height.Value.ToString("0"));
-            _settings.Set(LayoutMediaKey, MediaRow.Height.Value.ToString("0"));
+            CaptureSizes();
+            _settings.Set(LayoutLibraryKey, _libraryWidth.ToString("0"));
+            _settings.Set(LayoutPreviewKey, _rightWidth.ToString("0"));
+            _settings.Set(LayoutPlaylistKey, _playlistHeight.ToString("0"));
+            _settings.Set(LayoutMediaKey, _mediaHeight.ToString("0"));
 
             var size = WindowState == WindowState.Maximized
                 ? $"{RestoreBounds.Width:0};{RestoreBounds.Height:0};max"
@@ -293,6 +298,120 @@ public partial class MainWindow : Window
     {
         if (e.Key == Key.Enter)
             BibleQueryBox.CaretIndex = BibleQueryBox.Text.Length;
+    }
+
+    // ── Resaltar señalando el Live ───────────────────────────────
+
+    private Point? _liveHighlightStart;
+
+    private void LiveView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        _liveHighlightStart = e.GetPosition(LiveView.SlideView);
+        LiveView.CaptureMouse();
+        e.Handled = true;
+    }
+
+    /// <summary>
+    /// Pointing at the words on the Live preview highlights them on the
+    /// screen: a click takes the word, a drag the phrase. Pointing at what is
+    /// already highlighted takes the highlight off again.
+    /// </summary>
+    private void LiveView_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        LiveView.ReleaseMouseCapture();
+        if (_liveHighlightStart is not Point start || DataContext is not MainViewModel vm)
+            return;
+        _liveHighlightStart = null;
+
+        var phrase = LiveView.SlideView.PhraseBetween(start, e.GetPosition(LiveView.SlideView));
+        if (phrase is null)
+            return;
+
+        vm.HighlightText = string.Equals(phrase, vm.HighlightText, StringComparison.CurrentCultureIgnoreCase)
+            ? string.Empty
+            : phrase;
+        e.Handled = true;
+    }
+
+    // ── Reordenar diapositivas arrastrando ───────────────────────
+
+    private Point? _slideDragStart;
+    private SlideItemViewModel? _slideDragItem;
+
+    private void SlideCard_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        _slideDragItem = (sender as FrameworkElement)?.DataContext as SlideItemViewModel;
+        _slideDragStart = e.GetPosition(this);
+    }
+
+    /// <summary>
+    /// A press that travels a few pixels becomes a drag. Until then it is an
+    /// ordinary click, which projects the slide on release; once the drag
+    /// takes the mouse, the button never sees its release and doesn't fire.
+    /// </summary>
+    private void SlideCard_PreviewMouseMove(object sender, MouseEventArgs e)
+    {
+        if (e.LeftButton != MouseButtonState.Pressed
+            || _slideDragStart is not Point start
+            || _slideDragItem is not { } item
+            || DataContext is not MainViewModel vm
+            || !vm.CanMoveSlide(item))
+            return;
+
+        var moved = e.GetPosition(this) - start;
+        if (Math.Abs(moved.X) < SystemParameters.MinimumHorizontalDragDistance * 2
+            && Math.Abs(moved.Y) < SystemParameters.MinimumVerticalDragDistance * 2)
+            return;
+
+        _slideDragStart = null;
+        DragDrop.DoDragDrop((DependencyObject)sender, new DataObject(typeof(SlideItemViewModel), item), DragDropEffects.Move);
+        _slideDragItem = null;
+    }
+
+    private static SlideItemViewModel? DraggedSlide(DragEventArgs e) =>
+        e.Data.GetData(typeof(SlideItemViewModel)) as SlideItemViewModel;
+
+    private void SlideCard_DragEnter(object sender, DragEventArgs e) => MarkDropTarget(sender, e, true);
+
+    private void SlideCard_DragOver(object sender, DragEventArgs e)
+    {
+        var target = (sender as FrameworkElement)?.DataContext as SlideItemViewModel;
+        var dragged = DraggedSlide(e);
+        e.Effects = dragged is not null && target is not null && !ReferenceEquals(dragged, target)
+            && DataContext is MainViewModel vm && vm.CanMoveSlide(target)
+            ? DragDropEffects.Move
+            : DragDropEffects.None;
+        e.Handled = true;
+    }
+
+    private void SlideCard_DragLeave(object sender, DragEventArgs e) => MarkDropTarget(sender, e, false);
+
+    private void SlideCard_Drop(object sender, DragEventArgs e)
+    {
+        MarkDropTarget(sender, e, false);
+        if (DataContext is MainViewModel vm
+            && DraggedSlide(e) is { } dragged
+            && (sender as FrameworkElement)?.DataContext is SlideItemViewModel target)
+            vm.MoveSlide(dragged, target);
+        e.Handled = true;
+    }
+
+    /// <summary>Outlines the card the dragged slide would land on.</summary>
+    private void MarkDropTarget(object sender, DragEventArgs e, bool on)
+    {
+        if (sender is not Button button || button.Template.FindName("card", button) is not Border card)
+            return;
+
+        if (on && DraggedSlide(e) is { } dragged && !ReferenceEquals(dragged, button.DataContext))
+        {
+            card.BorderBrush = (Brush)FindResource("AccentBrush");
+            card.BorderThickness = new Thickness(4, 1, 1, 1);
+        }
+        else
+        {
+            card.ClearValue(Border.BorderBrushProperty);
+            card.ClearValue(Border.BorderThicknessProperty);
+        }
     }
 
     // Bible slides have no per-slide actions, so suppress their context menu.

@@ -23,12 +23,96 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <!-- ══ Menú ══
+             Todo lo que se hace de vez en cuando (importar, copias de
+             seguridad, el diseño de la ventana) vive acá; los botones quedan
+             para lo que se usa en medio del servicio. -->
+        <Menu Grid.Row="0" Background="{StaticResource BgBrush}" Padding="6,2"
+              FontSize="12">
+            <Menu.ItemContainerStyle>
+                <Style TargetType="MenuItem">
+                    <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+                    <Setter Property="Padding" Value="8,3"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter Property="Foreground" Value="Black"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Menu.ItemContainerStyle>
+
+            <MenuItem Header="_Archivo">
+                <MenuItem Header="Traer canciones de ProPresenter…" Command="{Binding ImportFromProPresenterCommand}"/>
+                <MenuItem Header="Importar canciones (.txt, .pro)…" Command="{Binding ImportSongsCommand}"/>
+                <MenuItem Header="Importar una Biblia (JSON o Zefania XML)…" Command="{Binding ImportBibleCommand}"/>
+                <MenuItem Header="Agregar imágenes, videos, PDF o PowerPoint…" Command="{Binding ImportMediaCommand}"/>
+                <Separator/>
+                <MenuItem Header="Guardar una copia de la biblioteca…" Command="{Binding SaveBackupCommand}"/>
+                <MenuItem Header="Restaurar desde una copia…" Command="{Binding RestoreBackupCommand}"/>
+                <Separator/>
+                <MenuItem Header="Salir" Click="Exit_Click"/>
+            </MenuItem>
+
+            <MenuItem Header="_Edición">
+                <MenuItem Header="Nueva canción" Command="{Binding NewSongCommand}"/>
+                <MenuItem Header="Editar la canción elegida" Command="{Binding EditSongCommand}"/>
+                <Separator/>
+                <MenuItem Header="Nueva playlist" Command="{Binding NewPlaylistCommand}"/>
+                <MenuItem Header="Nueva lista inteligente…" Command="{Binding EditSmartPlaylistCommand}"/>
+                <Separator/>
+                <MenuItem Header="Temas…" Command="{Binding OpenThemesCommand}"/>
+                <MenuItem Header="Logos…" Command="{Binding OpenLogosCommand}"/>
+                <Separator/>
+                <MenuItem Header="Buscar en todo" InputGestureText="Ctrl+K" Command="{Binding SearchEverythingCommand}"/>
+            </MenuItem>
+
+            <MenuItem Header="_Ver" SubmenuOpened="ViewMenu_SubmenuOpened">
+                <MenuItem x:Name="LibraryRightItem" Header="Canciones y playlist a la derecha"
+                          IsCheckable="True" Click="LibraryRight_Click"/>
+                <MenuItem x:Name="PlaylistTopItem" Header="Playlist arriba de las canciones"
+                          IsCheckable="True" Click="PlaylistTop_Click"/>
+                <MenuItem x:Name="MediaTopItem" Header="Medios arriba de las diapositivas"
+                          IsCheckable="True" Click="MediaTop_Click"/>
+                <MenuItem x:Name="LiveBottomItem" Header="Preview arriba del Live"
+                          IsCheckable="True" Click="LiveBottom_Click"/>
+                <Separator/>
+                <MenuItem x:Name="LibraryCollapsedItem" Header="Achicar canciones y Biblia"
+                          IsCheckable="True" Click="LibraryCollapsedItem_Click"/>
+                <MenuItem x:Name="PlaylistCollapsedItem" Header="Achicar la playlist"
+                          IsCheckable="True" Click="PlaylistCollapsedItem_Click"/>
+                <Separator/>
+                <MenuItem Header="Volver al diseño original" Click="ResetLayout_Click"/>
+            </MenuItem>
+
+            <MenuItem Header="_Proyección">
+                <MenuItem Header="Poner en vivo / apagar la salida" Command="{Binding ToggleOutputCommand}"/>
+                <Separator/>
+                <MenuItem Header="Black" InputGestureText="F1" Command="{Binding ToggleBlackCommand}"/>
+                <MenuItem Header="Clear" InputGestureText="F2" Command="{Binding ToggleClearCommand}"/>
+                <MenuItem Header="Logo" InputGestureText="F3" Command="{Binding ToggleLogoCommand}"/>
+                <MenuItem Header="Sin fondo" InputGestureText="F4" Command="{Binding ClearBackgroundCommand}"/>
+                <Separator/>
+                <MenuItem Header="Pantalla de escenario" Command="{Binding ToggleStageCommand}"/>
+                <MenuItem Header="Poner el cronómetro del escenario en cero" Command="{Binding ResetStageTimerCommand}"/>
+                <MenuItem Header="Cuenta regresiva…" Command="{Binding OpenCountdownCommand}"/>
+                <MenuItem Header="Controlar desde el celular…" Command="{Binding OpenRemoteCommand}"/>
+                <Separator/>
+                <MenuItem Header="Actualizar la lista de pantallas" Command="{Binding RefreshDisplaysCommand}"/>
+            </MenuItem>
+
+            <MenuItem Header="A_yuda">
+                <MenuItem Header="Guía de uso (en internet)" Click="Guide_Click"/>
+                <MenuItem Header="Acerca de EcclesiaCast" Click="About_Click"/>
+            </MenuItem>
+        </Menu>
+
         <!-- ══ Barra superior ══ -->
-        <Border Grid.Row="0"
+        <Border Grid.Row="1"
                 Background="{StaticResource SurfaceBrush}"
                 BorderBrush="{StaticResource LineBrush}"
                 BorderThickness="0,0,0,1"
@@ -215,9 +299,9 @@
         <!-- ══ Zona central: biblioteca | slides | preview/live ══
              La barra de medios va abajo de las dos primeras columnas; la
              columna derecha (preview, live y texto rápido) baja entera. -->
-        <Grid Grid.Row="1" Margin="10,10,10,0">
+        <Grid x:Name="MainArea" Grid.Row="2" Margin="10,10,10,0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
+                <RowDefinition x:Name="ContentRow" Height="*"/>
                 <RowDefinition Height="8"/>
                 <RowDefinition x:Name="MediaRow" Height="150" MinHeight="86"/>
             </Grid.RowDefinitions>
@@ -230,30 +314,39 @@
             </Grid.ColumnDefinitions>
 
             <!-- Panel izquierdo: biblioteca + playlist -->
-            <Grid Grid.Column="0">
+            <Grid x:Name="LeftPanel" Grid.Column="0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition x:Name="LibraryRow" Height="*"/>
                     <RowDefinition Height="10"/>
                     <RowDefinition x:Name="PlaylistRow" Height="240" MinHeight="120"/>
                 </Grid.RowDefinitions>
-                <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                <GridSplitter x:Name="PlaylistSplitter" Grid.Row="1"
+                              HorizontalAlignment="Stretch" VerticalAlignment="Center"
                               Height="6" Background="Transparent"/>
 
-                <Border Grid.Row="0" Style="{StaticResource Panel}">
+                <Border x:Name="LibraryPanel" Grid.Row="0" Style="{StaticResource Panel}">
                     <DockPanel>
-                        <!-- Selector de pestaña -->
-                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10,10,10,8">
-                            <RadioButton Content="Canciones" Style="{StaticResource TabButton}"
-                                         GroupName="LibraryTab"
-                                         IsChecked="{Binding IsBibleTabActive, Converter={StaticResource InverseBool}}"
-                                         Command="{Binding ShowSongsTabCommand}"/>
-                            <RadioButton Content="Biblia" Style="{StaticResource TabButton}"
-                                         GroupName="LibraryTab" Margin="4,0,0,0"
-                                         IsChecked="{Binding IsBibleTabActive}"
-                                         Command="{Binding ShowBibleTabCommand}"/>
-                        </StackPanel>
+                        <!-- Selector de pestaña, y la flecha que achica el panel -->
+                        <DockPanel DockPanel.Dock="Top" Margin="10,10,10,8">
+                            <Button x:Name="LibraryCollapseButton" DockPanel.Dock="Right"
+                                    Content="▾" FontSize="11" Padding="7,2"
+                                    Style="{StaticResource DarkButton}"
+                                    AutomationProperties.Name="Achicar o agrandar canciones y Biblia"
+                                    Click="LibraryCollapse_Click"
+                                    ToolTip="Achicar este panel para darle lugar a la playlist (o volver a agrandarlo)"/>
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton Content="Canciones" Style="{StaticResource TabButton}"
+                                             GroupName="LibraryTab"
+                                             IsChecked="{Binding IsBibleTabActive, Converter={StaticResource InverseBool}}"
+                                             Command="{Binding ShowSongsTabCommand}"/>
+                                <RadioButton Content="Biblia" Style="{StaticResource TabButton}"
+                                             GroupName="LibraryTab" Margin="4,0,0,0"
+                                             IsChecked="{Binding IsBibleTabActive}"
+                                             Command="{Binding ShowBibleTabCommand}"/>
+                            </StackPanel>
+                        </DockPanel>
 
-                        <Grid>
+                        <Grid x:Name="LibraryBody">
                             <!-- ── Pestaña Canciones ── -->
                             <DockPanel Visibility="{Binding IsBibleTabActive, Converter={StaticResource InverseBoolToVis}}">
                                 <DockPanel DockPanel.Dock="Top">
@@ -280,7 +373,9 @@
                                                 AutomationProperties.Name="Eliminar canción"
                                                 ToolTip="Eliminar canción"/>
                                     </StackPanel>
-                                    <TextBlock Text="CANCIONES" Style="{StaticResource PanelTitle}" Margin="12,0,12,0"/>
+                                    <TextBlock Text="CANCIONES" Style="{StaticResource PanelTitle}" Margin="12,0,12,0"
+                                               Cursor="Hand" MouseLeftButtonUp="LibraryTitle_MouseLeftButtonUp"
+                                               ToolTip="Clic: achicar este panel para darle lugar a la playlist"/>
                                 </DockPanel>
                                 <TextBox DockPanel.Dock="Top"
                                          Margin="12,0,12,8" Padding="8,6"
@@ -639,10 +734,10 @@
                     </DockPanel>
                 </Border>
 
-                <Border Grid.Row="2" Style="{StaticResource Panel}">
+                <Border x:Name="PlaylistPanel" Grid.Row="2" Style="{StaticResource Panel}">
                     <DockPanel>
                         <DockPanel DockPanel.Dock="Top">
-                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
+                            <StackPanel x:Name="PlaylistTools" DockPanel.Dock="Right" Orientation="Horizontal"
                                         VerticalAlignment="Center" Margin="0,8,10,4">
                                 <Button Content="➕" FontSize="11" Padding="6,3"
                                         Style="{StaticResource DarkButton}"
@@ -667,14 +762,18 @@
                                         Command="{Binding DeletePlaylistCommand}"
                                         AutomationProperties.Name="Eliminar playlist" ToolTip="Eliminar"/>
                             </StackPanel>
-                            <TextBlock Text="PLAYLIST" Style="{StaticResource PanelTitle}"/>
+                            <!-- Clic en el título: achica la playlist a sólo esta línea -->
+                            <TextBlock x:Name="PlaylistTitle" Text="▾  PLAYLIST" Style="{StaticResource PanelTitle}"
+                                       Cursor="Hand" Background="Transparent"
+                                       MouseLeftButtonUp="PlaylistTitle_MouseLeftButtonUp"
+                                       ToolTip="Clic: achicar la playlist (o volver a agrandarla)"/>
                         </DockPanel>
-                        <ComboBox DockPanel.Dock="Top" Margin="12,0,12,6"
+                        <ComboBox x:Name="PlaylistPicker" DockPanel.Dock="Top" Margin="12,0,12,6"
                                   ItemsSource="{Binding Playlists}"
                                   SelectedItem="{Binding SelectedPlaylist}"
                                   DisplayMemberPath="Name" FontSize="12"
                                   ToolTip="Orden de la reunión: elegí la playlist que vas a usar hoy"/>
-                        <Grid>
+                        <Grid x:Name="PlaylistBody">
                             <TextBlock Text="Agregá canciones (clic derecho), pasajes (botón ▶➕ en Biblia)&#10;y medios (clic derecho) · doble clic proyecta.">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock" BasedOn="{StaticResource PlaceholderText}">
@@ -767,17 +866,17 @@
                 </Border>
             </Grid>
 
-            <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Background="Transparent"/>
-            <GridSplitter Grid.Column="3" Grid.RowSpan="3" HorizontalAlignment="Stretch" Background="Transparent"/>
+            <GridSplitter x:Name="LeftSplitter" Grid.Column="1" HorizontalAlignment="Stretch" Background="Transparent"/>
+            <GridSplitter x:Name="RightSplitter" Grid.Column="3" Grid.RowSpan="3" HorizontalAlignment="Stretch" Background="Transparent"/>
 
             <!-- Alto de la barra de medios, ajustable por el operador -->
-            <GridSplitter Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
+            <GridSplitter x:Name="MediaSplitter" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
                           HorizontalAlignment="Stretch" VerticalAlignment="Center"
                           Height="8" Background="Transparent"
                           ToolTip="Arrastrá para agrandar o achicar la barra de medios"/>
 
             <!-- Panel central: la grilla de diapositivas -->
-            <Border Grid.Column="2" Style="{StaticResource Panel}">
+            <Border x:Name="SlidesPanel" Grid.Column="2" Style="{StaticResource Panel}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
@@ -813,9 +912,16 @@
                                                     Cursor="Hand"
                                                     Tag="{Binding DataContext, ElementName=SlideGrid}"
                                                     ContextMenuOpening="SlideCard_ContextMenuOpening"
+                                                    AllowDrop="True"
+                                                    PreviewMouseLeftButtonDown="SlideCard_PreviewMouseLeftButtonDown"
+                                                    PreviewMouseMove="SlideCard_PreviewMouseMove"
+                                                    DragEnter="SlideCard_DragEnter"
+                                                    DragOver="SlideCard_DragOver"
+                                                    DragLeave="SlideCard_DragLeave"
+                                                    Drop="SlideCard_Drop"
                                                     AutomationProperties.Name="{Binding Label}"
                                                     AutomationProperties.HelpText="{Binding PreviewText}"
-                                                    ToolTip="Clic: proyectar · Clic derecho: más opciones">
+                                                    ToolTip="Clic: proyectar · Arrastrar: cambiarla de lugar · Clic derecho: más opciones">
                                                 <Button.ContextMenu>
                                                     <ContextMenu>
                                                         <MenuItem Header="Editar canción (diseño)"
@@ -890,7 +996,7 @@
 
             <!-- Panel derecho: live, preview y texto rápido (llega hasta abajo).
                  Lo que está en pantalla va primero: es lo que más se mira. -->
-            <Grid Grid.Column="4" Grid.RowSpan="3">
+            <Grid x:Name="RightPanel" Grid.Column="4" Grid.RowSpan="3">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="10"/>
@@ -899,7 +1005,7 @@
                     <RowDefinition Height="*" MinHeight="130"/>
                 </Grid.RowDefinitions>
 
-                <Border Grid.Row="2" Style="{StaticResource Panel}">
+                <Border x:Name="PreviewPanel" Grid.Row="2" Style="{StaticResource Panel}">
                     <StackPanel>
                         <!-- Qué muestra: la diapositiva que sigue, o la pantalla
                              de escenario tal como la ven los músicos -->
@@ -936,7 +1042,7 @@
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Row="0" Style="{StaticResource Panel}">
+                <Border x:Name="LivePanel" Grid.Row="0" Style="{StaticResource Panel}">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <Ellipse Width="9" Height="9"
@@ -959,7 +1065,12 @@
                                     </Style.Triggers>
                                 </Style>
                             </Border.Style>
-                            <controls:ProjectedView Slide="{Binding Projection.Slide}"
+                            <controls:ProjectedView x:Name="LiveView"
+                                                    Slide="{Binding Projection.Slide}"
+                                                    Cursor="IBeam"
+                                                    PreviewMouseLeftButtonDown="LiveView_PreviewMouseLeftButtonDown"
+                                                    PreviewMouseLeftButtonUp="LiveView_PreviewMouseLeftButtonUp"
+                                                    ToolTip="Clic en una palabra: se resalta en la pantalla · Arrastrá sobre varias: se resalta la frase · Clic otra vez: se quita"
                                                     State="{Binding Projection.State}"
                                                     Overlay="{Binding Projection.Overlay}"
                                                     Countdown="{Binding Projection.Countdown}"
@@ -1175,7 +1286,7 @@
             </Grid>
 
             <!-- ══ Barra de medios ══ -->
-            <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+            <Border x:Name="MediaPanel" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
                     Style="{StaticResource Panel}">
             <DockPanel>
                 <DockPanel DockPanel.Dock="Top">
@@ -1361,7 +1472,7 @@
         </Grid>
 
         <!-- ══ Barra de estado ══ -->
-        <TextBlock Grid.Row="2"
+        <TextBlock Grid.Row="3"
                    Text="{Binding StatusText}"
                    FontSize="12" Foreground="{StaticResource MutedBrush}"
                    Margin="14,8,14,10" TextWrapping="Wrap"/>
