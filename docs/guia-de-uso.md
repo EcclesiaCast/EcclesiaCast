@@ -23,7 +23,14 @@ En la pestaña **Canciones**:
   bibliotecas con cuántas canciones tiene cada una y las importa. Las que ya
   estén en la biblioteca se saltean. Si tus canciones están en otro lado (un
   disco externo, una copia de otra máquina), usá **Elegir carpeta…**.
-- **📥** importa archivos sueltos `.txt` o `.pro`.
+- **📥 → Buscar en internet…** (también en **Archivo**) trae una canción
+  nueva sin copiar y pegar: escribí el **nombre**, el **artista** o **una frase
+  de la letra** y apretá Enter. Busca en musica.com y, si no está ahí, en
+  lrclib.net. Al elegir un resultado ves la letra ya separada en diapositivas
+  (con [Coro], [Verso 1]… cuando la página los marca); corregila ahí mismo si
+  hace falta y apretá **Importar a la biblioteca**. Podés importar varias sin
+  cerrar la ventana. Necesita internet, claro.
+- **📥** también importa archivos sueltos `.txt` o `.pro`.
 - El buscador filtra por título, artista o texto de la letra.
 
 Al escribir la letra, las palabras dudosas se **subrayan en rojo**. El clic

@@ -129,6 +129,7 @@ public partial class App : Application
         services.AddSingleton<ILogoRepository>(_ => new LogoRepository(dbPath));
         services.AddSingleton<ILogoManagerDialog, LogoManagerDialogService>();
         services.AddSingleton<IProPresenterImportDialog, ProPresenterImportDialogService>();
+        services.AddSingleton<IWebSongSearchDialog, WebSongSearchDialogService>();
         services.AddSingleton<IStageWindowService, StageWindowService>();
         services.AddSingleton<IBackupDialog>(_ => new BackupDialogService(dbPath));
         services.AddSingleton<ICountdownDialog, CountdownDialogService>();

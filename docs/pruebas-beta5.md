@@ -135,6 +135,22 @@ punto al probarlo; si algo falla, anotá abajo qué hiciste y qué pasó.
 - [ ] Contame qué botones de la barra de arriba sacarías ahora que está el
       menú (por ejemplo 💾, 📱 o ⏱ se usan poco).
 
+## Buscar canciones en internet
+
+- [ ] **📥 → Buscar en internet…** abre la ventana (también desde Archivo).
+- [ ] Buscá por **nombre**: «renuevame». Aparecen resultados de musica.com
+      enseguida; al elegir uno se ve la letra separada en diapositivas.
+- [ ] Buscá por **artista**: «marcos witt».
+- [ ] Buscá por **una frase de la letra**: «mi corazón entona la canción».
+      Tarda unos segundos más y aparece «Cuán grande es Él».
+- [ ] Una canción con rótulos (por ejemplo «Cuán Grande Es Él» de Marcos
+      Witt) llega con [Verso 1], [Coro]… y esas palabras no se proyectan.
+- [ ] Corregí algo en la letra o el título y apretá **Importar**: la canción
+      queda en la biblioteca con tus cambios. Importá otra sin cerrar.
+- [ ] Importá una que ya tengas: te avisa antes de duplicarla.
+- [ ] Al cerrar, la última importada queda elegida en la lista de canciones.
+- [ ] Sin internet: te dice que no se pudo conectar, sin trabarse.
+
 ## Anotaciones
 
 (Acá lo que falle o lo que quieras cambiar.)

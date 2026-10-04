@@ -55,6 +55,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private readonly ILogoRepository _logos;
     private readonly ILogoManagerDialog _logoManager;
     private readonly IProPresenterImportDialog _proPresenterImport;
+    private readonly IWebSongSearchDialog _webSongSearch;
     private readonly IStageWindowService _stage;
     private readonly IBackupDialog _backup;
     private readonly ICountdownDialog _countdownDialog;
@@ -207,6 +208,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         ILogoRepository logos,
         ILogoManagerDialog logoManager,
         IProPresenterImportDialog proPresenterImport,
+        IWebSongSearchDialog webSongSearch,
         IStageWindowService stage,
         IBackupDialog backup,
         ICountdownDialog countdownDialog,
@@ -234,6 +236,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _logos = logos;
         _logoManager = logoManager;
         _proPresenterImport = proPresenterImport;
+        _webSongSearch = webSongSearch;
         _stage = stage;
         _backup = backup;
         _countdownDialog = countdownDialog;
@@ -2518,6 +2521,23 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         LoadSongs();
         StatusText = summary;
+    }
+
+    /// <summary>Finds songs on the internet (musica.com, LRCLIB) and imports them.</summary>
+    [RelayCommand]
+    private void SearchSongsOnline()
+    {
+        var imported = _webSongSearch.Show();
+        if (imported.Count == 0)
+            return;
+
+        // Clear the filter so the new song is in the list to be selected.
+        SearchText = string.Empty;
+        LoadSongs();
+        SelectedSong = Songs.FirstOrDefault(s => s.Id == imported[^1].Id) ?? SelectedSong;
+        StatusText = imported.Count == 1
+            ? $"«{imported[0].Title}» importada de internet."
+            : $"{imported.Count} canciones importadas de internet.";
     }
 
     [RelayCommand]

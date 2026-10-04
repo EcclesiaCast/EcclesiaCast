@@ -47,6 +47,7 @@
             </Menu.ItemContainerStyle>
 
             <MenuItem Header="_Archivo">
+                <MenuItem Header="Buscar canciones en internet…" Command="{Binding SearchSongsOnlineCommand}"/>
                 <MenuItem Header="Traer canciones de ProPresenter…" Command="{Binding ImportFromProPresenterCommand}"/>
                 <MenuItem Header="Importar canciones (.txt, .pro)…" Command="{Binding ImportSongsCommand}"/>
                 <MenuItem Header="Importar una Biblia (JSON o Zefania XML)…" Command="{Binding ImportBibleCommand}"/>
@@ -356,7 +357,7 @@
                                                 Style="{StaticResource DarkButton}"
                                                 AutomationProperties.Name="Importar canciones"
                                                 Click="ImportMenu_Click"
-                                                ToolTip="Importar canciones de otros programas o de archivos"/>
+                                                ToolTip="Buscar canciones en internet o importarlas de otros programas o de archivos"/>
                                         <Button Content="➕" FontSize="11" Padding="7,4" Margin="4,0,0,0"
                                                 Style="{StaticResource DarkButton}"
                                                 Command="{Binding NewSongCommand}"

@@ -197,6 +197,13 @@ public partial class MainWindow : Window
 
         menu.Items.Add(new MenuItem
         {
+            Header = "Buscar en internet…",
+            Command = vm.SearchSongsOnlineCommand,
+            ToolTip = "Por nombre, artista o una frase de la letra, en musica.com y lrclib.net",
+        });
+        menu.Items.Add(new Separator());
+        menu.Items.Add(new MenuItem
+        {
             Header = "Traer todo de ProPresenter…",
             Command = vm.ImportFromProPresenterCommand,
             ToolTip = "Busca solo dónde está instalado ProPresenter y trae sus bibliotecas enteras",

@@ -9,6 +9,13 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Buscar canciones en internet** (📥 → Buscar en internet…, o Archivo):
+  por nombre, artista o una frase de la letra. Busca en musica.com (su
+  búsqueda rápida y su buscador completo, que encuentra por frase) y usa
+  lrclib.net de respaldo. La letra llega separada en diapositivas, con los
+  rótulos de la página («Coro:», «Verso 1») pasados a [Coro]/[Verso 1] y los
+  párrafos largos partidos; se revisa y corrige antes de importar, y avisa si
+  ya hay una canción con ese título.
 - **Buscador de la Biblia por libro**: al escribir se filtran los libros
   («ju» → Jueces, Juan, Judas) y Enter completa el nombre para seguir con el
   capítulo; un solo libro posible abre directo sus capítulos. «juan 3 16»
