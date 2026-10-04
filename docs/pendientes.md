@@ -21,8 +21,8 @@ lado. Al cerrar un punto, borralo y anotalo en el [CHANGELOG](../CHANGELOG.md).
 
 ## 2. Funciones que faltan
 
-Los pedidos del primer servicio en vivo (27/9/2026) están hechos en la rama
-`beta5` y se prueban con [pruebas-beta5.md](pruebas-beta5.md). Queda:
+Los pedidos del primer servicio en vivo (27/9/2026) están hechos (ya en
+`main`) y se prueban con [pruebas-beta5.md](pruebas-beta5.md). Queda:
 
 - [ ] **Decidir qué botones de la barra de arriba se van** ahora que está el
       menú (se agregó sin sacar ninguno).
@@ -30,7 +30,6 @@ Los pedidos del primer servicio en vivo (27/9/2026) están hechos en la rama
       publicada como
       [pre-release en GitHub](https://github.com/EcclesiaCast/EcclesiaCast/releases/tag/v1.0.0-beta.5)
       (3/10/2026, con la búsqueda de canciones en internet adentro).
-- [ ] Cuando la prueba dé bien, mergear `beta5` a `main`.
 
 Descartado: importar las Biblias de BibleShow. Sus archivos `.bib` son bases
 de Access protegidas con usuario y contraseña, y NTV, NVI y PDT son textos con
