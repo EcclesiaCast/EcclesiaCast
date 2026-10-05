@@ -86,6 +86,28 @@ public class BibleReferenceParserTests
     }
 
     [Fact]
+    public void Three_digit_chapters_and_verses_parse()
+    {
+        var reference = BibleReferenceParser.TryParse("sal 119:105");
+
+        Assert.NotNull(reference);
+        Assert.Equal(19, reference!.BookNumber);
+        Assert.Equal(119, reference.Chapter);
+        Assert.Equal(105, reference.VerseStart);
+    }
+
+    [Theory]
+    [InlineData("jn. 3:16", 43)]
+    [InlineData("1 Co. 13", 46)]
+    public void A_dot_after_the_abbreviation_is_ignored(string input, int expectedBook)
+    {
+        var reference = BibleReferenceParser.TryParse(input);
+
+        Assert.NotNull(reference);
+        Assert.Equal(expectedBook, reference!.BookNumber);
+    }
+
+    [Fact]
     public void A_space_separated_range_parses()
     {
         var reference = BibleReferenceParser.TryParse("sal 23 1-3");
@@ -101,6 +123,8 @@ public class BibleReferenceParserTests
     [InlineData("amor")]
     [InlineData("Marciano 3:16")]
     [InlineData("Juan")]
+    [InlineData("juan 0")]
+    [InlineData("juan 3:0")]
     public void Non_references_return_null(string input)
     {
         Assert.Null(BibleReferenceParser.TryParse(input));

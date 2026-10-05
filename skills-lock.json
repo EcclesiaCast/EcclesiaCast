@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "test-gap-analysis": {
+      "source": "dotnet/skills",
+      "sourceType": "github",
+      "skillPath": "plugins/dotnet-test/skills/test-gap-analysis/SKILL.md",
+      "computedHash": "e85a56007b020a43e680aaa0377eedc15a2c5e06abe8077cd144e9ba9277e5e7"
+    }
+  }
+}
