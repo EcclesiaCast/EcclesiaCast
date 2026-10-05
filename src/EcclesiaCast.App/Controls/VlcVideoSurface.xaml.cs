@@ -47,6 +47,29 @@ public partial class VlcVideoSurface : UserControl
     private int _currentId = -1;
     private int _framePending;
 
+    /// <summary>
+    /// Bumped every time the input changes or stops. A frame queued for the
+    /// UI thread before that carries the old number and is dropped: without
+    /// it, the last frame of a video landed AFTER the surface was cleared and
+    /// stayed frozen in the operator's Live panel over the new image.
+    /// </summary>
+    private int _generation;
+
+    // ── Cuadro achicado para el panel LIVE del operador ──────────
+    // The Live panel is a box about 300 px wide. Handing it the projector's
+    // full 1920×1080 bitmap made the operator's window upload ~8 MB to the
+    // graphics card on every frame just to throw most of it away; on a
+    // modest PC on the balanced power plan that was what made it stutter.
+    // It now gets its own small copy, a few times a second.
+    private const int PreviewTargetWidth = 480;
+    private static readonly long PreviewInterval = System.Diagnostics.Stopwatch.Frequency / 15;
+    private readonly System.Diagnostics.Stopwatch _previewClock = System.Diagnostics.Stopwatch.StartNew();
+    private long _lastPreviewTicks = long.MinValue / 2;
+    private int[]? _previewPixels;
+    private int _previewWidth, _previewHeight;
+    private bool _previewReady;
+    private WriteableBitmap? _previewBitmap;
+
     // Assigned once and kept alive for as long as the player exists.
     private MediaPlayer.LibVLCVideoFormatCb? _formatCb;
     private MediaPlayer.LibVLCVideoCleanupCb? _cleanupCb;
@@ -67,14 +90,12 @@ public partial class VlcVideoSurface : UserControl
     public event EventHandler? Ended;
 
     /// <summary>
-    /// Raised when the picture this surface draws into is replaced (a new
-    /// video, a new size) or cleared. The operator's preview listens so it
-    /// can draw the same frames without a second decoder.
+    /// Raised when the small copy of the picture for the operator's preview
+    /// is replaced (a new video, a new size) or cleared. The preview listens
+    /// so it can show the video moving without a second decoder. Nothing is
+    /// shrunk while no one listens.
     /// </summary>
-    public event EventHandler<ImageSource?>? FrameSourceChanged;
-
-    /// <summary>The picture being drawn right now, or null when nothing plays.</summary>
-    public ImageSource? FrameSource => Surface.Source;
+    public event EventHandler<ImageSource?>? PreviewFrameChanged;
 
     /// <summary>Shows/loops the given video, or stops if it's not a video.</summary>
     public void Show(MediaItem? media)
@@ -106,7 +127,10 @@ public partial class VlcVideoSurface : UserControl
         {
             // Switching media on the SAME player: no player teardown and no
             // delegate churn.
-            using var m = new Media(engine, new Uri(media.Path));
+            // A heavy video (4K, 60 frames) plays from its light copy when
+            // one is ready; the item itself always keeps the original's path.
+            var playable = LightVideoCache.PlayablePath(media);
+            using var m = new Media(engine, new Uri(playable));
             if (media.EndBehavior == VideoEndBehavior.Loop)
                 m.AddOption(":input-repeat=65535");
             // Medio segundo de cache alcanza para un archivo local y deja
@@ -128,8 +152,15 @@ public partial class VlcVideoSurface : UserControl
             // first made it survive 264 switches in a row. Safe to block here:
             // no callback waits on the UI thread.
             player.Stop();
+            // After Stop returns VLC calls nothing more for the old input, so
+            // every frame of it still queued carries the old number.
+            Interlocked.Increment(ref _generation);
             player.Play(m);
-            Log.Information("Video de fondo: {Name} ({Path})", media.Name, media.Path);
+            if (playable == media.Path)
+                Log.Information("Video de fondo: {Name} ({Path})", media.Name, media.Path);
+            else
+                Log.Information("Video de fondo: {Name} ({Path}) desde su copia liviana {Copy}",
+                    media.Name, media.Path, playable);
         }
         catch (Exception ex)
         {
@@ -143,13 +174,18 @@ public partial class VlcVideoSurface : UserControl
         _currentId = -1;
         _pausedForHiddenOutput = false;
 
+        // A paused video counts too: left open, it kept its decoder and frame
+        // buffers alive behind the image that replaced it.
         var player = _player;
-        if (player is not null && player.IsPlaying)
+        if (player is not null && player.State is not (VLCState.Stopped or VLCState.NothingSpecial))
         {
             // Safe to block here: no callback waits on the UI thread.
             try { player.Stop(); } catch { /* ignore */ }
         }
 
+        // Frames already queued for the UI thread must not draw over the
+        // clear (see _generation).
+        Interlocked.Increment(ref _generation);
         ClearSurface();
     }
 
@@ -317,7 +353,8 @@ public partial class VlcVideoSurface : UserControl
             Surface.Source = null;
             _bitmap = null;
             _bitmapWidth = _bitmapHeight = 0;
-            FrameSourceChanged?.Invoke(this, null);
+            _previewBitmap = null;
+            PreviewFrameChanged?.Invoke(this, null);
         });
 
     /// <summary>
@@ -335,6 +372,9 @@ public partial class VlcVideoSurface : UserControl
     {
         try
         {
+            // Asking VLC for a smaller picture when the projector is smaller
+            // was measured and dropped: its scaler made a 1920×1280 loop cost
+            // 33–68 % of a core at 1024×768 against 18 % at full size.
             var w = (int)width;
             var h = (int)height;
 
@@ -394,12 +434,33 @@ public partial class VlcVideoSurface : UserControl
         if (Interlocked.CompareExchange(ref _framePending, 1, 0) != 0)
             return;
 
+        var generation = Volatile.Read(ref _generation);
+
+        // The shrinking happens here, on VLC's thread, so the operator's
+        // window only ever handles the small copy.
+        if (PreviewFrameChanged is not null)
+        {
+            var now = _previewClock.ElapsedTicks;
+            if (now - _lastPreviewTicks >= PreviewInterval)
+            {
+                _lastPreviewTicks = now;
+                lock (_sync)
+                    ShrinkForPreview();
+            }
+        }
+
         Dispatcher.BeginInvoke(DispatcherPriority.Render, () =>
         {
             try
             {
                 lock (_sync)
                 {
+                    if (generation != _generation)
+                    {
+                        _previewReady = false;
+                        return;
+                    }
+
                     if (_buffer == IntPtr.Zero || _width <= 0 || _height <= 0)
                         return;
 
@@ -411,17 +472,27 @@ public partial class VlcVideoSurface : UserControl
                         _bitmapWidth = _width;
                         _bitmapHeight = _height;
                         Surface.Source = _bitmap;
-
-                        // The operator's Live panel draws this very bitmap, so
-                        // it shows the video moving instead of a still poster
-                        // without decoding anything twice.
-                        FrameSourceChanged?.Invoke(this, _bitmap);
                     }
 
-                    _bitmap.Lock();
                     _bitmap.WritePixels(
                         new Int32Rect(0, 0, _width, _height), _buffer, _stride * _height, _stride);
-                    _bitmap.Unlock();
+
+                    if (_previewReady)
+                    {
+                        _previewReady = false;
+                        if (_previewBitmap is null
+                            || _previewBitmap.PixelWidth != _previewWidth
+                            || _previewBitmap.PixelHeight != _previewHeight)
+                        {
+                            _previewBitmap = new WriteableBitmap(
+                                _previewWidth, _previewHeight, 96, 96, PixelFormats.Bgr32, null);
+                            PreviewFrameChanged?.Invoke(this, _previewBitmap);
+                        }
+
+                        _previewBitmap.WritePixels(
+                            new Int32Rect(0, 0, _previewWidth, _previewHeight),
+                            _previewPixels!, _previewWidth * 4, 0);
+                    }
                 }
             }
             catch
@@ -433,5 +504,55 @@ public partial class VlcVideoSurface : UserControl
                 Interlocked.Exchange(ref _framePending, 0);
             }
         });
+    }
+
+    /// <summary>
+    /// Copies the current frame into the preview's small buffer, averaging
+    /// each 2×2 block at a step that lands near <see cref="PreviewTargetWidth"/>.
+    /// Call with <see cref="_sync"/> held.
+    /// </summary>
+    private unsafe void ShrinkForPreview()
+    {
+        if (_buffer == IntPtr.Zero || _width <= 0 || _height <= 0)
+            return;
+
+        var step = Math.Max(1, (int)Math.Round(_width / (double)PreviewTargetWidth));
+        var pw = Math.Max(1, _width / step);
+        var ph = Math.Max(1, _height / step);
+
+        if (_previewPixels is null || _previewPixels.Length != pw * ph)
+            _previewPixels = new int[pw * ph];
+        _previewWidth = pw;
+        _previewHeight = ph;
+
+        // The second sample of each pair; 0 when the frame is so small it is
+        // copied pixel for pixel.
+        var dx = step > 1 ? 1 : 0;
+        var dy = step > 1 ? _stride : 0;
+
+        var src = (byte*)_buffer;
+        fixed (int* dst = _previewPixels)
+        {
+            for (var y = 0; y < ph; y++)
+            {
+                var row = src + (long)y * step * _stride;
+                var outRow = (uint*)dst + y * pw;
+                for (var x = 0; x < pw; x++)
+                {
+                    var p = (uint*)(row + x * step * 4);
+                    var a = p[0];
+                    var b = p[dx];
+                    var c = *(uint*)((byte*)p + dy);
+                    var d = *(uint*)((byte*)p + dy + dx * 4);
+
+                    // Average the four pixels channel by channel (B, G, R).
+                    var lo = ((a & 0x00FF00FF) + (b & 0x00FF00FF) + (c & 0x00FF00FF) + (d & 0x00FF00FF)) >> 2;
+                    var mid = ((a & 0x0000FF00) + (b & 0x0000FF00) + (c & 0x0000FF00) + (d & 0x0000FF00)) >> 2;
+                    outRow[x] = (lo & 0x00FF00FF) | (mid & 0x0000FF00);
+                }
+            }
+        }
+
+        _previewReady = true;
     }
 }

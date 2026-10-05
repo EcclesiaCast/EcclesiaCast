@@ -116,6 +116,17 @@ En la barra **MEDIOS**, abajo:
 > Al apagar la salida, el video se **pausa** y retoma donde estaba cuando la
 > volvés a prender.
 
+> **Videos pesados (4K o de 60 cuadros por segundo):** si tenés ffmpeg
+> instalado (`winget install ffmpeg`), EcclesiaCast les hace solo una **copia
+> liviana** en 1080p y a 30 cuadros, que se ve igual en el proyector y le
+> cuesta varias veces menos a la computadora (un 4K a 60 bajó de 107 % a 20 %
+> de un núcleo). Tu biblioteca sigue apuntando siempre al archivo original:
+> la copia se usa en su lugar sólo al proyectar, y nunca si le pusiste zoom
+> para acercar. Las copias se hacen de a una, con la menor prioridad, y
+> **nunca empiezan con la salida prendida**; la barra de abajo avisa cuando
+> una está lista. Los videos que ya son livianos (como los loops de 1080p a
+> 30) se reproducen directo del original.
+
 > Para que el texto se vea *sobre* el fondo, el tema tiene que tener el fondo
 > transparente (los temas nuevos ya vienen así).
 
@@ -305,3 +316,9 @@ Todo (canciones, Biblias, temas, medios y playlists) vive en un solo archivo:
 
 **Copiar ese archivo es tu backup.** Los logs, por si algo falla, están en
 `%APPDATA%\EcclesiaCast\logs\`.
+
+Las copias livianas de los videos pesados están aparte, en
+`%LOCALAPPDATA%\EcclesiaCast\copias-livianas\`. No hace falta respaldarlas:
+si borrás esa carpeta, el programa vuelve a usar los originales y las rehace
+solo. Si cambiás un video original (por ejemplo, lo volvés a exportar), su
+copia vieja se descarta y se hace una nueva.

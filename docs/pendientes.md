@@ -35,6 +35,13 @@ Descartado: importar las Biblias de BibleShow. Sus archivos `.bib` son bases
 de Access protegidas con usuario y contraseña, y NTV, NVI y PDT son textos con
 derechos licenciados para usar dentro de BibleShow.
 
+Descartado: pasar a H.264 también los videos HEVC y AV1 (hoy sólo se copian
+los 4K o de 60 cuadros). La PC de la iglesia (i5-10400F, 16 GB, RTX 3050)
+decodifica HEVC por hardware, y el AV1 de YouTube lo resuelve el procesador
+con muy poco esfuerzo. Sólo serviría en una PC sin decodificación por
+hardware: ahí el HEVC cuesta 40 % menos en H.264 (medido el 4/10/2026). Si
+algún día hace falta, es sumar una condición a `LightCopyPolicy`.
+
 ## 3. Ideas tomadas de Spresenter (10/9/2026)
 
 Comparación completa contra [spresenter.com](https://spresenter.com) hecha el

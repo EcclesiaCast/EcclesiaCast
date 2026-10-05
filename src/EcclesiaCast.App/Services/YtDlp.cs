@@ -32,6 +32,12 @@ public static partial class YtDlp
     /// </summary>
     public static bool HasFfmpeg() => Find("ffmpeg.exe") is not null;
 
+    /// <summary>Full path to ffmpeg, or null; the light video copies use it too.</summary>
+    public static string? FindFfmpeg() => Find("ffmpeg.exe");
+
+    /// <summary>Full path to ffprobe, which ships next to ffmpeg; null when missing.</summary>
+    public static string? FindFfprobe() => Find("ffprobe.exe");
+
     private static string? Find(string fileName)
     {
         var local = Path.Combine(ToolsFolder, fileName);

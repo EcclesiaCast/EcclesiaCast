@@ -51,6 +51,8 @@ public partial class App : Application
 
         Log.Information("EcclesiaCast starting");
 
+        PowerThrottling.OptOut();
+
         DispatcherUnhandledException += (_, args) =>
         {
             Log.Error(args.Exception, "Unhandled exception");
@@ -150,6 +152,7 @@ public partial class App : Application
     protected override void OnExit(ExitEventArgs e)
     {
         Log.Information("EcclesiaCast exiting");
+        LightVideoCache.Shutdown();
 
         // Stop listening on the network before the process goes away.
         _services?.GetService<MainViewModel>()?.StopRemote();

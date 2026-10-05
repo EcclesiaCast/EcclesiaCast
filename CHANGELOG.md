@@ -9,6 +9,15 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Copias livianas de los videos pesados**: los videos 4K o de 60 cuadros
+  por segundo (importados, descargados de YouTube o de logo) tienen solos una
+  copia en 1080p a 30 cuadros, en H.264, guardada en
+  `%LOCALAPPDATA%\EcclesiaCast\copias-livianas`. La biblioteca sigue apuntando
+  al original; la copia se usa sólo al proyectar (y no con zoom para
+  acercar). Se ve igual (0,996 de similitud) y un 4K a 60 pasó de 107 % a
+  20 % de un núcleo y de 670 a 440 MB. Necesita ffmpeg; las copias se hacen
+  de a una, con la menor prioridad, y nunca empiezan con la salida prendida.
+
 - **Buscar canciones en internet** (📥 → Buscar en internet…, o Archivo):
   por nombre, artista o una frase de la letra. Busca en musica.com (su
   búsqueda rápida y su buscador completo, que encuentra por frase) y usa
@@ -76,6 +85,19 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   decodifica la placa de video. Medido con los loops HEVC de 1920×1280 de la
   iglesia: cerca de la cuarta parte del procesador que antes, y 22 de 22 a 30
   cuadros por segundo.
+- **Imagen después de un video quedaba trancada en el LIVE**: al poner una
+  imagen (la de la ofrenda) sobre un video, el panel LIVE del operador seguía
+  mostrando el último cuadro del video, y en el proyector ese cuadro quedaba
+  escondido detrás de la imagen. Un cuadro que ya estaba en camino se dibujaba
+  después de borrar la pantalla: pasaba en 19 de 20 cambios; ahora en 0.
+- **El panel LIVE ya no carga la PC con el video**: recibía el cuadro entero
+  del proyector (1920×1280, unos 10 MB) 30 veces por segundo para mostrarlo
+  en una cajita de 300 píxeles. Ahora recibe una copia chica, 15 veces por
+  segundo. Un video pausado y reemplazado por una imagen ya no queda abierto
+  ocupando memoria.
+- Windows ya no pone a EcclesiaCast en «modo eficiencia» cuando la ventana
+  del operador no está al frente (plan Equilibrado), que es lo que puede
+  hacer tironear el video si se hace clic en otro programa.
 
 ## [1.0.0-beta.4] — 2026-09-11
 

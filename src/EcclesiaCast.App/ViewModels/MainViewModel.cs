@@ -262,6 +262,12 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _previewShowsStage = _settings.Get(PreviewShowsStageKey) == "1";
         RestoreRemote();
         _ = RefreshVideoThumbnailsAsync();
+
+        // Light copies of the heavy videos, made in the background; the
+        // status bar says when one is being prepared or is ready.
+        LightVideoCache.StatusChanged += message =>
+            Application.Current?.Dispatcher.BeginInvoke(() => StatusText = message);
+        RefreshLightCopies();
     }
 
     // ── Playlist del servicio ────────────────────────────────────
@@ -1000,6 +1006,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             ? $"{added} medio(s) agregado(s). Preparando {documents.Count} documento(s)…"
             : $"{added} medio(s) agregado(s) a «{SelectedMediaTab}».";
         _ = RefreshVideoThumbnailsAsync();
+        RefreshLightCopies();
 
         if (documents.Count > 0)
             _ = ImportDocumentsAsync(documents);
@@ -1061,6 +1068,25 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     /// cone). The first run after the fix therefore rebuilds every video poster
     /// once, since we can't tell an old icon from a real frame after the fact.
     /// </remarks>
+    /// <summary>
+    /// Hands every video the program can project — the library, which holds
+    /// the YouTube downloads too, and the video logos — to the light-copy
+    /// cache. What is already done is skipped, so calling it after any
+    /// change to the library is cheap.
+    /// </summary>
+    private void RefreshLightCopies()
+    {
+        var videos = _media.GetAll()
+            .Where(m => m.Type == MediaType.Video)
+            .Select(m => m.Path)
+            .Concat(_logos.GetAll()
+                .Where(l => l.Kind == LogoKind.Video && !string.IsNullOrWhiteSpace(l.Path))
+                .Select(l => l.Path!));
+
+        // IsProjecting is a plain field read: the cache asks from its own thread.
+        LightVideoCache.Refresh(videos, () => IsProjecting);
+    }
+
     private async Task RefreshVideoThumbnailsAsync()
     {
         var engine = App.VideoEngine;
@@ -1391,6 +1417,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             return;
 
         LoadLogos(null);
+        RefreshLightCopies();
         // Re-apply so the output picks up an edited logo without a toggle.
         _presentation.SetActiveLogo(SelectedLogo);
         StatusText = "Logos actualizados.";
@@ -1679,6 +1706,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         LoadMedia();
         SelectedMediaTab = DownloadedTab;
+        RefreshLightCopies();
         StatusText = $"«{name}» descargado y agregado a «{DownloadedTab}».";
     }
 

@@ -252,7 +252,10 @@ public partial class ProjectedView : UserControl
 
     private void ApplyLiveVideo()
     {
-        var frame = IsLiveOutput ? null : LiveVideoFrame;
+        // Only a video background has frames to show. Anything else (an
+        // image, say the offering slide) must never sit under a leftover
+        // frame of the video that played before it.
+        var frame = IsLiveOutput || BackgroundMedia?.Type != MediaType.Video ? null : LiveVideoFrame;
         LiveVideo.Source = frame;
         LiveVideo.Visibility = frame is null ? Visibility.Collapsed : Visibility.Visible;
 
@@ -260,9 +263,11 @@ public partial class ProjectedView : UserControl
         // does on the projector, so what the operator sees is what goes out.
         MediaFraming.Apply(LiveVideo, frame is null ? null : BackgroundMedia, ActualWidth, ActualHeight);
 
-        // A poster underneath a live frame is just an older copy of it.
-        if (frame is not null)
-            BackgroundImage.Visibility = Visibility.Collapsed;
+        // A poster underneath a live frame is just an older copy of it; once
+        // the frames stop (output closed, video gone) the poster comes back.
+        BackgroundImage.Visibility = frame is null && BackgroundImage.Source is not null
+            ? Visibility.Visible
+            : Visibility.Collapsed;
     }
 
     /// <summary>

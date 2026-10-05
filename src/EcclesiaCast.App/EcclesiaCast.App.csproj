@@ -13,6 +13,9 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <!-- Regenerate with installer\make-icon.ps1 -->
     <ApplicationIcon>app.ico</ApplicationIcon>
+    <!-- Sólo para achicar el cuadro de video del panel LIVE sin copiarlo
+         entero (VlcVideoSurface). -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyTitle>EcclesiaCast</AssemblyTitle>
     <Product>EcclesiaCast</Product>
   </PropertyGroup>
