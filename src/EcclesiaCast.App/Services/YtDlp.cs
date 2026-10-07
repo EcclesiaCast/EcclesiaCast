@@ -85,6 +85,11 @@ public static partial class YtDlp
     /// </summary>
     public static string Explain(string error)
     {
+        if (IsCookieError(error))
+            return "No pude leer la sesión de YouTube del programa para descargar.\n\n"
+                 + "Cerrá EcclesiaCast, volvé a abrirlo y probá de nuevo. Si sigue pasando, "
+                 + "actualizá yt-dlp con «winget upgrade yt-dlp».";
+
         if (error.Contains("403", StringComparison.Ordinal))
             return "YouTube rechazó la descarga (error 403).\n\n"
                  + "Casi siempre es que yt-dlp quedó viejo: YouTube cambia seguido y hay que "
@@ -114,6 +119,43 @@ public static partial class YtDlp
         IProgress<(double Percent, string Message)> progress,
         CancellationToken cancellation)
     {
+        var profile = CookieProfile();
+        if (profile is null)
+            return await DownloadAsync(videoId, targetFolder, null, progress, cancellation);
+
+        // The browser sometimes holds its cookie file busy for a moment, so
+        // reading it fails now and works a second later. Try twice with the
+        // session; most videos don't need it at all, so then go anonymous.
+        for (var attempt = 1; ; attempt++)
+        {
+            try
+            {
+                return await DownloadAsync(videoId, targetFolder, profile, progress, cancellation);
+            }
+            catch (InvalidOperationException ex) when (IsCookieError(ex.Message))
+            {
+                Log.Warning("yt-dlp no pudo leer las cookies (intento {Attempt}): {Error}", attempt, ex.Message);
+                if (attempt == 2)
+                    break;
+                await Task.Delay(TimeSpan.FromSeconds(2), cancellation);
+            }
+        }
+
+        progress.Report((-1, "Reintentando sin la sesión de YouTube…"));
+        return await DownloadAsync(videoId, targetFolder, null, progress, cancellation);
+    }
+
+    /// <summary>yt-dlp's complaints about reading or decrypting the browser's cookies.</summary>
+    private static bool IsCookieError(string error) =>
+        error.Contains("cookie", StringComparison.OrdinalIgnoreCase);
+
+    private static async Task<string?> DownloadAsync(
+        string videoId,
+        string targetFolder,
+        string? cookieProfile,
+        IProgress<(double Percent, string Message)> progress,
+        CancellationToken cancellation)
+    {
         var executable = FindExecutable()
             ?? throw new InvalidOperationException("yt-dlp no está instalado.");
 
@@ -139,7 +181,7 @@ public static partial class YtDlp
             arguments.Add("mp4");
         }
 
-        if (CookieProfile() is { } profile)
+        if (cookieProfile is { } profile)
         {
             // WebView2 stores its profile in Chromium's own layout, so yt-dlp
             // reads it with the chrome backend pointed at that folder.
