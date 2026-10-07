@@ -1,0 +1,46 @@
+<Window x:Class="EcclesiaCast.App.Views.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Acerca de EcclesiaCast"
+        Width="460" SizeToContent="Height"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BgBrush}"
+        FontFamily="Segoe UI">
+    <StackPanel Margin="28,24,28,20">
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="EcclesiaCast" FontSize="26" FontWeight="SemiBold" Foreground="White"/>
+            <TextBlock x:Name="VersionText" FontSize="13" Foreground="{StaticResource MutedBrush}"
+                       VerticalAlignment="Bottom" Margin="10,0,0,5"/>
+        </StackPanel>
+
+        <TextBlock Text="Software libre de proyección para iglesias."
+                   FontSize="14" Foreground="{StaticResource MutedBrush}" Margin="0,6,0,0"/>
+
+        <Rectangle Height="1" Fill="{StaticResource LineBrush}" Margin="0,18"/>
+
+        <TextBlock FontSize="14" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap">
+            <Run Text="Desarrollado por "/><Run Text="Alexis Pérez" FontWeight="SemiBold" Foreground="White"/><Run Text=" · Montevideo, Uruguay."/>
+        </TextBlock>
+
+        <TextBlock Text="Hecho para bendecir a otras iglesias con lo que recibimos."
+                   FontSize="14" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap"
+                   Margin="0,8,0,0"/>
+
+        <TextBlock Text="«De gracia recibisteis, dad de gracia.»  — Mateo 10:8"
+                   FontSize="14" FontStyle="Italic" Foreground="White" TextWrapping="Wrap"
+                   Margin="0,14,0,0"/>
+
+        <Rectangle Height="1" Fill="{StaticResource LineBrush}" Margin="0,18"/>
+
+        <TextBlock FontSize="12" Foreground="{StaticResource FaintBrush}">
+            <Run Text="Licencia GPL-3.0  ·  "/>
+            <Hyperlink x:Name="GitHubLink" NavigateUri="https://github.com/EcclesiaCast"
+                       RequestNavigate="Link_Navigate" Foreground="{StaticResource AccentBrush}">github.com/EcclesiaCast</Hyperlink>
+        </TextBlock>
+
+        <Button Content="Cerrar" Style="{StaticResource AccentButton}" IsDefault="True" IsCancel="True"
+                HorizontalAlignment="Right" Padding="22,8" Margin="0,18,0,0"/>
+    </StackPanel>
+</Window>

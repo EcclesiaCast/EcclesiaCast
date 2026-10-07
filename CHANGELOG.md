@@ -89,6 +89,13 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Cambiado
 
+- **Menos botones arriba**: el ⏱ (cuenta regresiva) y el 💾 (copia de
+  seguridad) salieron de la barra, porque ya estaban en los menús. En
+  Proyección → Cuenta regresiva… el ítem lleva una tilde y dice «en marcha»
+  mientras la cuenta corre; guardar y restaurar copias siguen en Archivo.
+- **Ayuda → Acerca de** es una ventana propia, oscura como las demás: quién
+  desarrolló el programa, para qué se hizo, el versículo (Mateo 10:8), la
+  licencia y el enlace a GitHub, que se abre con un clic.
 - **Ctrl+K busca en todas las Biblias instaladas** y cada versículo dice de qué
   versión es («Salmos 55:22 · RVR1960»). Al elegirlo se abre en esa versión,
   no en la que estaba elegida. Cada versión aporta como mucho unos pocos

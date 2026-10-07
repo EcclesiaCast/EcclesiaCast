@@ -49,12 +49,8 @@ los pedidos nuevos:
 
 **Ventana**
 
-- [ ] **Sacar el ⏱ (cuenta regresiva) y el 💾 (copia de seguridad) de la
-      barra de arriba**: ya están en los menús. Era lo que faltaba decidir.
-- [ ] **Ayuda → Acerca de**: «Desarrollado por Alexis Pérez, Montevideo,
-      Uruguay», una frase sobre bendecir a otros y un versículo (propuesto
-      Mateo 10:8, «de gracia recibisteis, dad de gracia»). Más adelante, una
-      forma de colaborar.
+- [ ] **Acerca de: una forma de colaborar** (todavía no hay a dónde mandar a
+      la gente; se agrega cuando esté decidido).
 
 **Instalador**
 

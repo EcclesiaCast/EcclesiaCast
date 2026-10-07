@@ -100,7 +100,20 @@
                 <Separator/>
                 <MenuItem Header="Pantalla de escenario" Command="{Binding ToggleStageCommand}"/>
                 <MenuItem Header="Poner el cronómetro del escenario en cero" Command="{Binding ResetStageTimerCommand}"/>
-                <MenuItem Header="Cuenta regresiva…" Command="{Binding OpenCountdownCommand}"/>
+                <!-- Antes era un botón que se pintaba mientras la cuenta corre:
+                     ahora el ítem lo dice con una tilde. -->
+                <MenuItem Command="{Binding OpenCountdownCommand}">
+                    <MenuItem.Style>
+                        <Style TargetType="MenuItem">
+                            <Setter Property="Header" Value="Cuenta regresiva…"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsCountdownRunning}" Value="True">
+                                    <Setter Property="Header" Value="✔ Cuenta regresiva en marcha… (detener o cambiar)"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </MenuItem.Style>
+                </MenuItem>
                 <MenuItem Header="Controlar desde el celular…" Command="{Binding OpenRemoteCommand}"/>
                 <Separator/>
                 <MenuItem Header="Actualizar la lista de pantallas" Command="{Binding RefreshDisplaysCommand}"/>
@@ -233,30 +246,6 @@
                             AutomationProperties.Name="Buscar en canciones, versículos y medios"
                             Command="{Binding SearchEverythingCommand}"
                             ToolTip="Buscar en canciones, versículos y medios a la vez (Ctrl+K)"/>
-
-                    <!-- Cuenta regresiva antes del servicio -->
-                    <Button Content="⏱" Padding="9,7" Margin="8,0,0,0"
-                            AutomationProperties.Name="Cuenta regresiva"
-                            Command="{Binding OpenCountdownCommand}"
-                            ToolTip="Proyectar una cuenta regresiva antes de empezar («Empezamos en 5:00»)">
-                        <Button.Style>
-                            <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsCountdownRunning}" Value="True">
-                                        <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
-                                        <Setter Property="BorderThickness" Value="0"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-
-                    <!-- Copia de seguridad de toda la biblioteca -->
-                    <Button Content="💾" Padding="9,7" Margin="2,0,0,0"
-                            Style="{StaticResource DarkButton}"
-                            AutomationProperties.Name="Copia de seguridad de la biblioteca"
-                            Click="Backup_Click"
-                            ToolTip="Guardar una copia de toda la biblioteca, o restaurar una copia guardada"/>
                 </StackPanel>
 
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">

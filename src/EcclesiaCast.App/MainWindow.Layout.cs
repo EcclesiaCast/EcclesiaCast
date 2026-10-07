@@ -248,11 +248,7 @@ public partial class MainWindow
             .OfType<System.Reflection.AssemblyInformationalVersionAttribute>()
             .FirstOrDefault()?.InformationalVersion.Split('+')[0] ?? "?";
 
-        MessageBox.Show(
-            $"EcclesiaCast {version}\n\n"
-            + "Software libre de proyección para iglesias.\n"
-            + "Licencia GPL-3.0 · github.com/EcclesiaCast",
-            "Acerca de EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Information);
+        new Views.AboutWindow(version) { Owner = this }.ShowDialog();
     }
 
     /// <summary>Everything back where it comes out of the box.</summary>
