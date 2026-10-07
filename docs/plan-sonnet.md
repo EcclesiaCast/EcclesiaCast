@@ -53,7 +53,16 @@ hacerlos, dónde está cada cosa en el código y cómo probarlos.
 - Lo que sea lógica (filtros, búsquedas, normalización de texto, modelos)
   ponelo en `EcclesiaCast.Core` y escribile pruebas. Los nombres de las
   pruebas siguen el estilo `Una_frase_que_dice_lo_que_pasa`.
-- Para probar la aplicación de verdad:
+- **No abras la aplicación ni ninguna ventana.** Alexis está usando esta
+  misma PC para su trabajo y las ventanas que aparecen solas (la copia de
+  desarrollo, la salida a pantalla completa, clics automáticos) lo
+  confunden. Nada de computer-use ni de arrancar `EcclesiaCast.App.exe`.
+  Probá con `dotnet build`, `dotnet test` y, para lo visual, dibujando
+  controles a PNG sin mostrarlos (un programa de consola STA que crea el
+  control, le hace `Measure`/`Arrange` y lo renderiza con
+  `RenderTargetBitmap`; así se verificó `SlideView`). Lo que sólo se pueda
+  probar con la app abierta, anotalo en el informe como «para probar».
+- Lo que sigue queda para cuando Alexis diga que la PC está libre:
   - **Nunca uses los datos reales** de `%APPDATA%\EcclesiaCast`. Copiá
     `ecclesiacast.db` (y `-wal`/`-shm` si están) a una carpeta de trabajo
     temporal y arrancá la versión de desarrollo con la variable
