@@ -46,7 +46,7 @@ public partial class MainWindow
     private double _libraryWidth = 270;
     private double _rightWidth = 320;
     private double _playlistHeight = 240;
-    private double _mediaHeight = 150;
+    private double _mediaHeight = 170;
 
     private void RestoreLayoutOptions()
     {
@@ -259,7 +259,7 @@ public partial class MainWindow
         _libraryWidth = 270;
         _rightWidth = 320;
         _playlistHeight = 240;
-        _mediaHeight = 150;
+        _mediaHeight = 170;
         ApplyLayout();
         SaveLayoutOptions();
     }

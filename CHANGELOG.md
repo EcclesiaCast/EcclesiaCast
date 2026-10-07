@@ -9,6 +9,11 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Arrastrar y soltar archivos en la barra de medios**: soltá desde el
+  Explorador imágenes, videos, PDF o PowerPoint y se agregan a la pestaña
+  elegida, igual que con «Agregar». Mientras arrastrás, la barra se marca con
+  un borde de color; si soltás algo que no sirve, la barra de estado lo avisa.
+
 - **Las transiciones también sacan el texto**: la letra que se va sale con
   el mismo movimiento con que entra la nueva (se funde, se va por la
   izquierda, sube o se achica), también al hacer Clear o poner el logo.
@@ -89,6 +94,12 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Cambiado
 
+- **Las pestañas de medios van apiladas a la izquierda**, una debajo de la
+  otra y con la elegida resaltada, en vez de en fila arriba. El ＋ para
+  agregar una pestaña quedó junto al título MEDIOS. La barra de medios
+  arranca un poco más alta (170 en vez de 150) para que entren.
+- **Se fue el botón «Sin fondo» de la barra de medios**: queda el de la barra
+  de arriba, el menú Proyección y la tecla F4.
 - **Un solo ➕ para agregar canciones**: al tocarlo ofrece Crear desde cero,
   Buscar en internet…, Traer de ProPresenter… e Importar archivo (.txt,
   .pro)…. Desaparece el botón 📥 ▾ que estaba al lado.

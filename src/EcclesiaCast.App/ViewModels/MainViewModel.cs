@@ -1073,11 +1073,6 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         return index < 0 ? siblings[0] : siblings[(index + 1) % siblings.Count];
     }
 
-    private static readonly HashSet<string> ImageExtensions =
-        new(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png", ".bmp", ".webp", ".gif" };
-    private static readonly HashSet<string> VideoExtensions =
-        new(StringComparer.OrdinalIgnoreCase) { ".mp4", ".mov", ".m4v", ".avi", ".mkv", ".wmv", ".webm" };
-
     private void LoadMedia()
     {
         _allMedia.Clear();
@@ -1163,27 +1158,44 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (dialog.ShowDialog() != true)
             return;
 
+        ImportMediaFiles(dialog.FileNames);
+    }
+
+    /// <summary>
+    /// Brings files into the tab that is open: the part of «Agregar» that
+    /// starts from paths, so dropping files from Explorer onto the media bar
+    /// does exactly the same. Whatever the library does not take is counted
+    /// and said in the status bar instead of being skipped in silence.
+    /// </summary>
+    public void ImportMediaFiles(IEnumerable<string> paths)
+    {
         var added = 0;
+        var skipped = 0;
         var documents = new List<string>();
 
-        foreach (var path in dialog.FileNames)
+        foreach (var path in paths)
         {
-            var ext = Path.GetExtension(path);
-
             // A PDF or a deck becomes one image per page, but drawing them
             // takes a moment, so they are done after this loop rather than
             // freezing the window in the middle of an import.
-            if (DocumentImporter.IsDocument(path))
+            var kind = MediaFiles.Classify(path);
+            if (kind == MediaFileKind.Document && File.Exists(path))
             {
                 documents.Add(path);
                 continue;
             }
 
-            MediaType? type = ImageExtensions.Contains(ext) ? MediaType.Image
-                : VideoExtensions.Contains(ext) ? MediaType.Video
-                : null;
-            if (type is null)
+            MediaType? type = kind switch
+            {
+                MediaFileKind.Image => MediaType.Image,
+                MediaFileKind.Video => MediaType.Video,
+                _ => null,
+            };
+            if (type is null || !File.Exists(path))
+            {
+                skipped++;
                 continue;
+            }
 
             // Videos the shell can't decode get their poster from VLC afterwards,
             // in the background, so a batch import doesn't freeze the window.
@@ -1202,9 +1214,14 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         }
 
         LoadMedia();
+        var ignored = skipped > 0
+            ? $" {skipped} archivo(s) no se agregaron: sólo entran imágenes, videos, PDF y PowerPoint."
+            : string.Empty;
         StatusText = documents.Count > 0
-            ? $"{added} medio(s) agregado(s). Preparando {documents.Count} documento(s)…"
-            : $"{added} medio(s) agregado(s) a «{SelectedMediaTab}».";
+            ? $"{added} medio(s) agregado(s). Preparando {documents.Count} documento(s)…{ignored}"
+            : added == 0 && skipped > 0
+                ? $"No se agregó nada: sólo entran imágenes, videos, PDF y PowerPoint."
+                : $"{added} medio(s) agregado(s) a «{SelectedMediaTab}».{ignored}";
         _ = RefreshVideoThumbnailsAsync();
         RefreshLightCopies();
 

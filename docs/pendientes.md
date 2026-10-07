@@ -25,13 +25,6 @@ La beta.5 se probó el 6/10/2026: lo que anda bien quedó así (Biblia, achicar
 paneles, menú, buscar canciones en internet). Lo que salió de esa prueba y
 los pedidos nuevos:
 
-**Medios**
-
-- [ ] Sacar el botón **«sin fondo»**.
-- [ ] **Arrastrar y soltar** archivos.
-- [ ] **Pestañas apiladas a la izquierda**, como lista, en vez de arriba del
-      recuadro.
-
 **Pantalla de escenario**
 
 - [ ] **Editor de escenario** como el de Biblia y canciones: recuadros que

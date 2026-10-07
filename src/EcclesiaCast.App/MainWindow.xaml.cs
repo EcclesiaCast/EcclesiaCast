@@ -153,6 +153,47 @@ public partial class MainWindow : Window
         menu.IsOpen = true;
     }
 
+    // ── Soltar archivos en la barra de medios ────────────────────
+
+    /// <summary>
+    /// Files dragged in from Explorer. Only real files count: the slides and
+    /// songs the program drags around use their own formats and must pass
+    /// through untouched.
+    /// </summary>
+    private static string[]? DroppedFiles(DragEventArgs e) =>
+        e.Data.GetDataPresent(DataFormats.FileDrop) ? e.Data.GetData(DataFormats.FileDrop) as string[] : null;
+
+    private void MediaPanel_DragOver(object sender, DragEventArgs e)
+    {
+        if (DroppedFiles(e) is null)
+            return;
+
+        e.Effects = DragDropEffects.Copy;
+        e.Handled = true;
+
+        // A coloured border says "this is where they go" before letting go.
+        MediaPanel.BorderBrush = (Brush)FindResource("AccentBrush");
+        MediaPanel.BorderThickness = new Thickness(2);
+    }
+
+    private void MediaPanel_DragLeave(object sender, DragEventArgs e) => ClearMediaDropHighlight();
+
+    private void MediaPanel_Drop(object sender, DragEventArgs e)
+    {
+        ClearMediaDropHighlight();
+        if (DroppedFiles(e) is not { } files || DataContext is not MainViewModel vm)
+            return;
+
+        vm.ImportMediaFiles(files);
+        e.Handled = true;
+    }
+
+    private void ClearMediaDropHighlight()
+    {
+        MediaPanel.ClearValue(Border.BorderBrushProperty);
+        MediaPanel.ClearValue(Border.BorderThicknessProperty);
+    }
+
     /// <summary>
     /// Every way of getting a song into the library behind the one ➕: writing
     /// it, finding it online, bringing a whole ProPresenter library or loose

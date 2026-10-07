@@ -293,7 +293,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition x:Name="ContentRow" Height="*"/>
                 <RowDefinition Height="8"/>
-                <RowDefinition x:Name="MediaRow" Height="150" MinHeight="86"/>
+                <RowDefinition x:Name="MediaRow" Height="170" MinHeight="86"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition x:Name="LibraryColumn" Width="270" MinWidth="200"/>
@@ -1329,7 +1329,9 @@
 
             <!-- ══ Barra de medios ══ -->
             <Border x:Name="MediaPanel" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
-                    Style="{StaticResource Panel}">
+                    Style="{StaticResource Panel}"
+                    AllowDrop="True" DragEnter="MediaPanel_DragOver" DragOver="MediaPanel_DragOver"
+                    DragLeave="MediaPanel_DragLeave" Drop="MediaPanel_Drop">
             <DockPanel>
                 <DockPanel DockPanel.Dock="Top">
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,6,10,2">
@@ -1349,46 +1351,14 @@
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding RandomBackgroundCommand}"
                                 ToolTip="Poner un fondo al azar de esta pestaña. No repite ninguno hasta haberlos usado a todos."/>
-                        <Button Content="Sin fondo  (F4)" FontSize="11" Padding="8,4" Margin="4,0,0,0"
-                                Style="{StaticResource DarkButton}"
-                                Command="{Binding ClearBackgroundCommand}"
-                                IsEnabled="{Binding HasBackground}"
-                                ToolTip="Quita la imagen o el video de fondo sin tocar la letra que está proyectada"/>
                     </StackPanel>
-                    <TextBlock Text="MEDIOS" Style="{StaticResource PanelTitle}" Margin="12,8,10,4" VerticalAlignment="Center"/>
-                    <!-- Pestañas por categoría -->
-                    <ListBox ItemsSource="{Binding MediaTabs}" SelectedItem="{Binding SelectedMediaTab}"
-                             Background="Transparent" BorderThickness="0" VerticalAlignment="Center"
-                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
-                        <ListBox.ItemContainerStyle>
-                            <Style TargetType="ListBoxItem">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="ListBoxItem">
-                                            <Border x:Name="bd" CornerRadius="4" Margin="2,0" Padding="10,4" Background="Transparent">
-                                                <TextBlock Text="{Binding}" FontSize="12" FontWeight="SemiBold"
-                                                           Foreground="{StaticResource MutedBrush}"/>
-                                            </Border>
-                                            <ControlTemplate.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter TargetName="bd" Property="Background" Value="#20242F"/>
-                                                </Trigger>
-                                                <Trigger Property="IsSelected" Value="True">
-                                                    <Setter TargetName="bd" Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
-                                                </Trigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </ListBox.ItemContainerStyle>
-                    </ListBox>
-                    <Button Content="＋" FontSize="12" Padding="7,2" Margin="4,0,0,0"
+                    <TextBlock Text="MEDIOS" Style="{StaticResource PanelTitle}" Margin="12,8,6,4" VerticalAlignment="Center"/>
+                    <!-- Nueva pestaña: junto al título, para que la lista de pestañas
+                         use todo el alto de la barra -->
+                    <Button Content="＋" FontSize="12" Padding="7,2"
                             Style="{StaticResource DarkButton}"
                             Command="{Binding NewMediaTabCommand}"
+                            AutomationProperties.Name="Nueva pestaña de medios"
                             ToolTip="Nueva pestaña (categoría)"/>
                     <CheckBox Content="▶▶ continua" FontSize="11" Foreground="{StaticResource MutedBrush}"
                               VerticalAlignment="Center" Margin="12,0,0,0"
@@ -1424,6 +1394,41 @@
                                    Foreground="{StaticResource FaintBrush}" VerticalAlignment="Center"/>
                     </DockPanel>
                 </Border>
+
+                <!-- ── Pestañas por categoría, apiladas a la izquierda ──
+                     Una lista en vez de una fila: entran más nombres, y se
+                     lee cuál está elegida de un vistazo. -->
+                <DockPanel DockPanel.Dock="Left" Width="118" Margin="10,2,0,6">
+                    <ListBox x:Name="MediaTabsList" ItemsSource="{Binding MediaTabs}" SelectedItem="{Binding SelectedMediaTab}"
+                             Background="Transparent" BorderThickness="0"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border x:Name="bd" CornerRadius="4" Margin="0,1" Padding="10,5" Background="Transparent">
+                                                <TextBlock x:Name="label" Text="{Binding}" FontSize="12" FontWeight="SemiBold"
+                                                           Foreground="{StaticResource MutedBrush}"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="bd" Property="Background" Value="#20242F"/>
+                                                </Trigger>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="bd" Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+                                                    <Setter TargetName="label" Property="Foreground" Value="White"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                </DockPanel>
 
                 <Grid>
                     <TextBlock Margin="16,0,16,8"

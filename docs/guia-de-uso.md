@@ -64,13 +64,15 @@ En la pestaña **Biblia**:
 
 En la barra **MEDIOS**, abajo:
 
-- Las **pestañas** (Fondos, Anuncios, y las que agregues con **＋**) organizan
-  los medios.
+- Las **pestañas** (Fondos, Anuncios, y las que agregues con **＋**) van en
+  una lista a la izquierda y organizan los medios.
 - **📥 Agregar** importa imágenes y videos a la pestaña activa, y también
   **PDF** y **presentaciones de PowerPoint**: cada página entra como un medio
   de pantalla completa, numerado y en orden. El PDF lo dibuja Windows sin
   instalar nada; el `.pptx` lo convierte el PowerPoint de la máquina (si no
   tenés PowerPoint, exportá la presentación a PDF y entra igual).
+- También podés **arrastrar archivos desde el Explorador** a la barra: se
+  agregan a la pestaña elegida (el borde se marca mientras arrastrás).
 - **Clic** en una miniatura la aplica al instante. El fondo **persiste entre
   diapositivas**: cambiar de verso no reinicia el video.
 - **Clic derecho → Propiedades** abre el Inspector:
