@@ -956,19 +956,23 @@
                                                                 CornerRadius="6" Background="#10141E"
                                                                 BorderBrush="{StaticResource LineBrush}"
                                                                 BorderThickness="1" Padding="10">
-                                                            <DockPanel>
-                                                                <TextBlock DockPanel.Dock="Top"
-                                                                           Text="{Binding Label}"
-                                                                           FontSize="10" FontWeight="SemiBold"
-                                                                           Foreground="{StaticResource MutedBrush}"/>
+                                                            <Grid>
                                                                 <!-- Todas las tarjetas del mismo tamaño: la letra
                                                                      se achica hasta que entra entera -->
                                                                 <TextBlock Text="{Binding PreviewText}"
                                                                            FontSize="12" Foreground="White"
                                                                            TextWrapping="Wrap"
-                                                                           controls:TextFit.MaxFontSize="12"
-                                                                           Margin="0,4,0,0"/>
-                                                            </DockPanel>
+                                                                           controls:TextFit.MaxFontSize="12"/>
+                                                                <!-- El rótulo va en la esquina, encima del texto,
+                                                                     para no robarle un renglón arriba -->
+                                                                <Border HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                                        Margin="0,0,-6,-6" Padding="5,1"
+                                                                        CornerRadius="4" Background="#E6262D3D">
+                                                                    <TextBlock Text="{Binding Label}"
+                                                                               FontSize="10" FontWeight="SemiBold"
+                                                                               Foreground="{StaticResource MutedBrush}"/>
+                                                                </Border>
+                                                            </Grid>
                                                         </Border>
                                                         <ControlTemplate.Triggers>
                                                             <Trigger Property="IsMouseOver" Value="True">

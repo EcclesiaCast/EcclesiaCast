@@ -72,11 +72,9 @@ public partial class SlideView : UserControl
 
     private static readonly Brush HighlightBrush = new SolidColorBrush(Color.FromRgb(0xE8, 0xC3, 0x4A));
 
-    private const double CanvasWidth = 1920;
-    private const double CanvasHeight = 1080;
-    private const double SecondaryRatio = 0.62;
-    private const double SecondarySpacing = 50;
-    private const double CaptionBandFactor = 1.7;
+    private const double CanvasWidth = SlideTextFit.CanvasWidth;
+    private const double CanvasHeight = SlideTextFit.CanvasHeight;
+    private const double SecondarySpacing = SlideTextFit.SecondarySpacing;
 
     private string? _lastBackgroundImagePath;
     private DispatcherTimer? _countdownTicker;
@@ -157,7 +155,6 @@ public partial class SlideView : UserControl
 
     // ── Estilo efectivo: tema + overrides del slide ──────────────
 
-    private double EffectiveMaxFontSize => Slide?.Override?.FontSize ?? CurrentTheme.MaxFontSize;
     private string EffectiveFontFamily => Slide?.Override?.FontFamily ?? CurrentTheme.FontFamily;
     private bool EffectiveBold => Slide?.Override?.Bold ?? CurrentTheme.Bold;
     private bool EffectiveItalic => Slide?.Override?.Italic ?? CurrentTheme.Italic;
@@ -322,13 +319,10 @@ public partial class SlideView : UserControl
             CaptionPosition.TopCenter or CaptionPosition.BottomCenter => HorizontalAlignment.Center,
             _ => HorizontalAlignment.Right,
         };
-        CaptionText.VerticalAlignment = IsCaptionOnTop(theme.CaptionPosition)
+        CaptionText.VerticalAlignment = SlideTextFit.IsCaptionOnTop(theme.CaptionPosition)
             ? VerticalAlignment.Top
             : VerticalAlignment.Bottom;
     }
-
-    private static bool IsCaptionOnTop(CaptionPosition position) =>
-        position is CaptionPosition.TopLeft or CaptionPosition.TopCenter or CaptionPosition.TopRight;
 
     /// <summary>The drop shadow behind the text, at the configured strength.</summary>
     private DropShadowEffect? BuildShadow()
@@ -428,49 +422,6 @@ public partial class SlideView : UserControl
         }
     }
 
-    // ── Área de texto ────────────────────────────────────────────
-
-    /// <summary>
-    /// Where the main text lives: the slide's own box if it has one, or the
-    /// theme margins minus a reserved band for the caption so they never
-    /// overlap.
-    /// </summary>
-    private (Thickness Margin, double Width, double Height) ComputeTextArea(bool hasCaption)
-    {
-        var theme = CurrentTheme;
-        var over = Slide?.Override;
-
-        // Per-slide box wins; then the theme's default box; then margins.
-        double? bx = over?.BoxX ?? theme.BoxX;
-        double? by = over?.BoxY ?? theme.BoxY;
-        double? bw = over?.BoxWidth ?? theme.BoxWidth;
-        double? bh = over?.BoxHeight ?? theme.BoxHeight;
-
-        if (bx is not null && by is not null && bw is not null && bh is not null)
-        {
-            var x = Math.Clamp(bx.Value, 0, CanvasWidth - 100);
-            var y = Math.Clamp(by.Value, 0, CanvasHeight - 60);
-            var w = Math.Clamp(bw.Value, 100, CanvasWidth - x);
-            var h = Math.Clamp(bh.Value, 60, CanvasHeight - y);
-            return (new Thickness(x, y, CanvasWidth - x - w, CanvasHeight - y - h), w, h);
-        }
-
-        var top = theme.MarginVertical;
-        var bottom = theme.MarginVertical;
-        if (hasCaption && theme.ShowCaption)
-        {
-            var band = theme.CaptionFontSize * CaptionBandFactor;
-            if (IsCaptionOnTop(theme.CaptionPosition))
-                top += band;
-            else
-                bottom += band;
-        }
-
-        var width = Math.Max(200, CanvasWidth - 2 * theme.MarginHorizontal);
-        var height = Math.Max(150, CanvasHeight - top - bottom);
-        return (new Thickness(theme.MarginHorizontal, top, theme.MarginHorizontal, bottom), width, height);
-    }
-
     // ── Texto ────────────────────────────────────────────────────
 
     private void RenderText()
@@ -479,24 +430,21 @@ public partial class SlideView : UserControl
         var main = Transform(Slide?.MainText);
         var secondary = Transform(Slide?.SecondaryText);
 
-        var hasCaption = !string.IsNullOrEmpty(Slide?.Caption);
-        var (margin, areaWidth, areaHeight) = ComputeTextArea(hasCaption);
-        TextLayer.Margin = margin;
-
         // "Fit to width" keeps each written line unbroken; otherwise wrap.
         var wrapping = EffectiveFitToWidth ? TextWrapping.NoWrap : TextWrapping.Wrap;
         MainText.TextWrapping = wrapping;
         SecondaryText.TextWrapping = wrapping;
 
-        var fontSize = FitFontSize(main, secondary, theme, areaWidth, areaHeight);
-        MainText.FontSize = fontSize;
+        var fit = SlideTextFit.Fit(Slide, main, secondary, VisualTreeHelper.GetDpi(this).PixelsPerDip);
+        TextLayer.Margin = fit.Margin;
+        MainText.FontSize = fit.FontSize;
         var secondaryScale = theme.SecondaryMatchesPrimary ? 1.0 : theme.SecondaryScale;
-        SecondaryText.FontSize = Math.Max(20, fontSize * secondaryScale);
+        SecondaryText.FontSize = Math.Max(20, fit.FontSize * secondaryScale);
 
         if (EffectiveLineSpacing is double spacing && spacing > 0)
         {
             MainText.LineStackingStrategy = LineStackingStrategy.BlockLineHeight;
-            MainText.LineHeight = fontSize * spacing;
+            MainText.LineHeight = fit.FontSize * spacing;
         }
         else
         {
@@ -505,124 +453,22 @@ public partial class SlideView : UserControl
 
         RenderWithHighlight(MainText, main);
         RenderWithHighlight(SecondaryText, secondary);
-        SecondaryText.Visibility = string.IsNullOrEmpty(secondary)
-            ? Visibility.Collapsed
-            : Visibility.Visible;
 
+        // The holder goes too, not just the text: its top margin left a gap
+        // under every single-version verse that pushed it off centre and,
+        // on a long one, out of its box.
+        var hasSecondary = !string.IsNullOrEmpty(secondary);
+        SecondaryText.Visibility = hasSecondary ? Visibility.Visible : Visibility.Collapsed;
+        SecondaryTextShadow.Visibility = SecondaryText.Visibility;
+
+        var hasCaption = !string.IsNullOrEmpty(Slide?.Caption);
         CaptionText.Text = Slide?.Caption ?? string.Empty;
         CaptionText.Visibility = theme.ShowCaption && hasCaption
             ? Visibility.Visible
             : Visibility.Collapsed;
     }
 
-    private string? Transform(string? text)
-    {
-        if (text is null)
-            return null;
-
-        var culture = CultureInfo.CurrentCulture;
-        return EffectiveCase switch
-        {
-            TextCase.Upper => text.ToUpper(culture),
-            TextCase.Title => culture.TextInfo.ToTitleCase(text.ToLower(culture)),
-            TextCase.Sentence => ToSentenceCase(text, culture),
-            TextCase.Lower => text.ToLower(culture),
-            _ => text,
-        };
-    }
-
-    private static string ToSentenceCase(string text, CultureInfo culture)
-    {
-        var chars = text.ToCharArray();
-        var startOfSentence = true;
-        for (var i = 0; i < chars.Length; i++)
-        {
-            if (startOfSentence && char.IsLetter(chars[i]))
-            {
-                chars[i] = char.ToUpper(chars[i], culture);
-                startOfSentence = false;
-            }
-            else if (chars[i] is '.' or '!' or '?' or '\n')
-            {
-                startOfSentence = true;
-            }
-        }
-        return new string(chars);
-    }
-
-    /// <summary>
-    /// Starts at the preferred size and shrinks until the whole text fits
-    /// the available area (never below the theme's minimum).
-    /// </summary>
-    private double FitFontSize(string? main, string? secondary, SlideTheme theme, double width, double height)
-    {
-        var maxSize = EffectiveMaxFontSize;
-        if (string.IsNullOrEmpty(main))
-            return maxSize;
-
-        // Fit-to-width can shrink well below the theme minimum, since its
-        // whole point is to keep long lines unbroken.
-        var minSize = EffectiveFitToWidth ? 8 : Math.Min(theme.MinFontSize, maxSize);
-
-        for (var size = maxSize; size >= minSize; size -= 2)
-        {
-            var fits = EffectiveFitToWidth
-                ? WidestLine(main, size, theme) <= width && MeasureHeight(main, size, theme, width) <= height
-                : MeasureHeight(main, size, theme, width) <= height;
-
-            if (fits && !string.IsNullOrEmpty(secondary))
-            {
-                var secondarySize = size * (theme.SecondaryMatchesPrimary ? 1.0 : theme.SecondaryScale);
-                fits = MeasureHeight(secondary, secondarySize, theme, width) + SecondarySpacing
-                    <= height - MeasureHeight(main, size, theme, width);
-                if (EffectiveFitToWidth)
-                    fits = fits && WidestLine(secondary, secondarySize, theme) <= width;
-            }
-
-            if (fits)
-                return size;
-        }
-
-        return minSize;
-    }
-
-    /// <summary>Width of the longest line (split on hard breaks) at a given size, unwrapped.</summary>
-    private double WidestLine(string text, double fontSize, SlideTheme theme)
-    {
-        var widest = 0d;
-        foreach (var line in text.Split('\n'))
-        {
-            var formatted = FormatLine(line.Length == 0 ? " " : line, fontSize, theme, double.PositiveInfinity);
-            widest = Math.Max(widest, formatted.WidthIncludingTrailingWhitespace);
-        }
-        return widest;
-    }
-
-    private double MeasureHeight(string text, double fontSize, SlideTheme theme, double maxWidth) =>
-        FormatLine(text, fontSize, theme, maxWidth).Height;
-
-    private FormattedText FormatLine(string text, double fontSize, SlideTheme theme, double maxWidth)
-    {
-        var typeface = new Typeface(
-            new FontFamily(EffectiveFontFamily),
-            EffectiveItalic ? FontStyles.Italic : FontStyles.Normal,
-            EffectiveBold ? FontWeights.SemiBold : FontWeights.Normal,
-            FontStretches.Normal);
-
-        var formatted = new FormattedText(
-            text,
-            CultureInfo.CurrentCulture,
-            FlowDirection.LeftToRight,
-            typeface,
-            fontSize,
-            Brushes.White,
-            VisualTreeHelper.GetDpi(this).PixelsPerDip);
-
-        if (!double.IsPositiveInfinity(maxWidth))
-            formatted.MaxTextWidth = maxWidth;
-
-        return formatted;
-    }
+    private string? Transform(string? text) => SlideTextFit.ApplyCase(text, EffectiveCase);
 
     /// <summary>
     /// The words of the main text between two points (in this control's

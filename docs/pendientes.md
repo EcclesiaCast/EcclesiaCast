@@ -21,15 +21,90 @@ lado. Al cerrar un punto, borralo y anotalo en el [CHANGELOG](../CHANGELOG.md).
 
 ## 2. Funciones que faltan
 
-Los pedidos del primer servicio en vivo (27/9/2026) están hechos (ya en
-`main`) y se prueban con [pruebas-beta5.md](pruebas-beta5.md). Queda:
+La beta.5 se probó el 6/10/2026: lo que anda bien quedó así (Biblia, achicar
+paneles, menú, buscar canciones en internet). Lo que salió de esa prueba y
+los pedidos nuevos:
 
-- [ ] **Decidir qué botones de la barra de arriba se van** ahora que está el
-      menú (se agregó sin sacar ninguno).
-- [ ] **Probar la beta.5** con [pruebas-beta5.md](pruebas-beta5.md). Ya está
-      publicada como
-      [pre-release en GitHub](https://github.com/EcclesiaCast/EcclesiaCast/releases/tag/v1.0.0-beta.5)
-      (3/10/2026, con la búsqueda de canciones en internet adentro).
+**Biblia**
+
+- [ ] **Editar el nombre y la abreviatura** de cada Biblia.
+- [ ] **Pasajes en la playlist**: un versículo o un tramo (por ejemplo Juan
+      8:5-10). Hoy no queda claro cómo se agrega.
+
+**Playlist**
+
+- [ ] **Clic = vista previa en el centro, doble clic = proyectar**, para
+      todo lo que haya en la playlist. Hoy el doble clic sólo anda con
+      canciones (con un medio no hace nada útil).
+- [ ] **Nombre de lo que está en vivo** arriba del recuadro central.
+- [ ] **Suprimir** borra el ítem de la playlist.
+- [ ] **Arrastrar canciones** de la lista a la playlist.
+
+**Diapositivas**
+
+- [ ] **El resaltado se borra** al pasar a otra diapositiva o versículo.
+- [ ] **Resaltar desde el LIVE como en un cuadro de texto**: se ve la
+      selección mientras arrastrás y recién al soltar sale en pantalla.
+- [ ] **Reordenar arrastrando más visual**: que se vea la diapositiva que
+      llevás y una marca entre las dos donde va a caer (no un intercambio).
+- [ ] **Transiciones**: al elegir cómo entra, mostrar un ejemplo; y que
+      salga de la misma forma que entra.
+
+**Buscador (Ctrl+K)**
+
+- [ ] **Decir de qué versión es cada resultado** de la Biblia (buscar en
+      todas está bien). Prueba: «echa sobre» → Salmo 55:22.
+- [ ] **Que los saltos de línea no corten la búsqueda** en las letras.
+      Prueba: «las cadenas de la muerte» tiene que encontrar *Hay Libertad*
+      (IBI), que tiene un salto entre «cadenas» y «de la muerte».
+
+**Canciones**
+
+- [ ] **Un solo «+»** que ofrezca: crear desde cero, buscar en internet,
+      traer de ProPresenter o importar archivo (fusiona los dos primeros
+      botones).
+
+**Medios**
+
+- [ ] **Anuncios: no aparece la vista previa de las imágenes** después de
+      cerrar y abrir el programa. Es un bug.
+- [ ] Sacar el botón **«sin fondo»**.
+- [ ] **Arrastrar y soltar** archivos.
+- [ ] **Pestañas apiladas a la izquierda**, como lista, en vez de arriba del
+      recuadro.
+
+**Pantalla de escenario**
+
+- [ ] **Editor de escenario** como el de Biblia y canciones: recuadros que
+      uno ubica donde quiere, cada uno con lo que muestra (cronómetro,
+      temporizador, hora, letra en vivo, próxima diapositiva, etc.).
+- [ ] **Varias configuraciones** guardadas y cambio rápido entre ellas (por
+      ejemplo cantantes, predicador y una igual a la pantalla principal).
+      Reemplaza al cronómetro de la barra.
+
+**Ventana**
+
+- [ ] **Sacar guardar y cronómetro de la barra de arriba**: quedan en los
+      menús (el cronómetro pasa al escenario). Era lo que faltaba decidir.
+- [ ] **Ayuda → Acerca de**: «Desarrollado por Alexis Pérez, Montevideo,
+      Uruguay», una frase sobre bendecir a otros y un versículo (propuesto
+      Mateo 10:8, «de gracia recibisteis, dad de gracia»). Más adelante, una
+      forma de colaborar.
+
+**Instalador**
+
+- [ ] **Preguntar si se quiere la configuración para PC de bajo
+      rendimiento.** Hoy no existe ese modo como tal: primero hay que
+      definir qué cambia (por ejemplo copias livianas de todos los videos,
+      el LIVE sin video en movimiento, sin sombras ni desenfoques).
+
+**Para evaluar**
+
+- [ ] **Spotify en las pestañas de abajo** (junto a texto rápido, aviso,
+      etc.). Lo más liviano sería manejar el Spotify que ya está instalado
+      (play, pausa, siguiente, volumen) sin abrir otro navegador adentro.
+      Ojo: la cuenta común de Spotify es para uso personal; pasar música
+      en una reunión pública queda por cuenta de la iglesia.
 
 Descartado: importar las Biblias de BibleShow. Sus archivos `.bib` son bases
 de Access protegidas con usuario y contraseña, y NTV, NVI y PDT son textos con

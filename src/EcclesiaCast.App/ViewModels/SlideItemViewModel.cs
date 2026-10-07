@@ -18,6 +18,12 @@ public sealed partial class SlideItemViewModel(
     public int SectionId { get; } = sectionId;
 
     /// <summary>
+    /// Verses behind a Bible slide; null for everything else. Several slides
+    /// share it when a long verse is split over them.
+    /// </summary>
+    public VerseGroup? Verses { get; init; }
+
+    /// <summary>
     /// When set, activating this card doesn't project it: it loads this
     /// passage instead (the previous/next chapter cards).
     /// </summary>

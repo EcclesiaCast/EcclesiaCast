@@ -71,9 +71,31 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   y muestran la letra entera: si no entra, se achica en vez de cortarse con
   «…».
 - En la lista de canciones, las que no tienen artista ocupan un solo renglón.
+- **El texto nunca se sale del recuadro.** Si ni con la letra mínima del tema
+  entra, el versículo se reparte en dos o más diapositivas («2:2-18 (1/2)»),
+  cortando al final de una oración. Con dos versiones se reparten las dos
+  juntas. En las canciones, que no se parten, la letra se sigue achicando
+  por debajo del mínimo en vez de cortarse. Probado con el versículo más
+  largo (Ester 8:9) y uno de los más cortos (Juan 11:35).
+- **Los versículos que la TLA cuenta juntos van en una sola diapositiva**
+  («Génesis 32:3-4»), sin los números que la TLA pone al principio («3-4
+  (4-5)»). Antes el mismo párrafo se repetía en cada versículo: en 2 Crónicas
+  2 eran 17 diapositivas iguales de casi 3.000 letras.
+- **El texto ya no se pisa con la referencia**: si el recuadro del tema pasa
+  por encima de la referencia, el texto se acomoda en lo que queda libre.
+- El **número de la tarjeta** va abajo a la derecha, encima del texto, en vez
+  de ocupar un renglón arriba.
 
 ### Corregido
 
+- **Un versículo solo quedaba corrido hacia arriba**: el lugar de la segunda
+  versión se reservaba igual aunque no hubiera segunda versión, y en uno
+  largo eso sacaba la última línea del recuadro.
+- **Descargar de YouTube fallaba con «Could not copy Chrome cookie
+  database»**: el navegador del programa a veces tenía ocupado el archivo de
+  la sesión justo cuando yt-dlp lo quería leer. Ahora el navegador no lo
+  bloquea, la descarga reintenta una vez y, si igual no puede, baja el video
+  sin la sesión (la mayoría no la necesita).
 - **Playlist que mostraba siempre lo primero**: si en el buscador de
   canciones quedaba algo escrito, las canciones de la playlist que no
   coincidían con esa búsqueda no se podían abrir. Ahora se borra el filtro.

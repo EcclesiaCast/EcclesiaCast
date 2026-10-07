@@ -653,7 +653,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                     LoadBiblePassage(new BibleReference(book, chapter, null, null));
                     if (item.VerseStart is int verse)
                     {
-                        var index = Slides.ToList().FindIndex(s => s.Label == $"{chapter}:{verse}");
+                        var index = FindVerseSlide(chapter, verse);
                         SetPreviewIndex(index);
                     }
                 }
@@ -2202,18 +2202,37 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     /// <summary>Rebuilds the slide grid and re-projects the slide that was live.</summary>
     private void RebuildSlidesPreservingLive(Action rebuild)
     {
-        var liveLabel = LiveSlideIndex >= 0 && LiveSlideIndex < Slides.Count
-            ? Slides[LiveSlideIndex].Label
+        var live = LiveSlideIndex >= 0 && LiveSlideIndex < Slides.Count
+            ? Slides[LiveSlideIndex]
             : null;
+
+        // Which part of a split verse was live, to land on the same one.
+        var part = live?.Verses is { } before
+            ? live.Index - FindVerseSlide(before.Chapter, before.FirstVerse)
+            : 0;
 
         rebuild();
 
-        if (liveLabel is not null)
+        if (live is null)
+            return;
+
+        // A verse is found by its number, not its label: after a theme change
+        // it may take more or fewer slides, and its label changes with it.
+        int index;
+        if (live.Verses is { } verses)
         {
-            var index = Slides.ToList().FindIndex(s => s.Label == liveLabel);
-            if (index >= 0)
-                GoLiveSlide(index);
+            index = FindVerseSlide(verses.Chapter, verses.FirstVerse);
+            if (index >= 0 && part > 0 && index + part < Slides.Count
+                && Slides[index + part].Verses?.FirstVerse == verses.FirstVerse)
+                index += part;
         }
+        else
+        {
+            index = Slides.ToList().FindIndex(s => s.Label == live.Label);
+        }
+
+        if (index >= 0)
+            GoLiveSlide(index);
     }
 
     // ── Pestañas de biblioteca ───────────────────────────────────
@@ -2837,7 +2856,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
             if (reference.VerseStart is int verse)
             {
-                var index = Slides.ToList().FindIndex(s => s.Label == $"{reference.Chapter}:{verse}");
+                var index = FindVerseSlide(reference.Chapter, verse);
                 SetPreviewIndex(index);
                 if (index >= 0)
                     BibleStatusText = $"Versículo {verse} seleccionado — Enter lo proyecta.";
@@ -2974,32 +2993,47 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 jumpToEnd: true));
         }
 
-        foreach (var v in verses)
+        var bookName = verses[0].BookName;
+        foreach (var group in VerseGrouping.Group(verses, secondaryTexts))
         {
-            var mainText = theme.ShowVerseNumbers ? $"{v.Verse}  {v.Text}" : v.Text;
+            var mainText = theme.ShowVerseNumbers ? $"{group.Numbers}  {group.Text}" : group.Text;
+            var verseReference = $"{bookName} {group.Chapter}:{group.Numbers}";
 
-            string? secondaryText = null;
-            secondaryTexts?.TryGetValue((v.Chapter, v.Verse), out secondaryText);
-
+            // Two versions: label each text inline with its abbreviation (like
+            // BibleShow) and drop the version(s) from the reference.
+            Func<string, string> label = text => text;
+            Func<string, string> secondaryLabel = text => text;
             string caption;
             if (secondary is not null)
             {
-                // Two versions: label each text inline with its abbreviation
-                // (like BibleShow) and drop the version(s) from the reference.
-                mainText = $"[{primary.Abbreviation}] {mainText}";
-                if (secondaryText is not null)
-                    secondaryText = $"[{secondary.Abbreviation}] {secondaryText}";
-                caption = v.Reference;
+                label = text => $"[{primary.Abbreviation}] {text}";
+                secondaryLabel = text => $"[{secondary.Abbreviation}] {text}";
+                caption = verseReference;
             }
             else
             {
-                caption = theme.ShowVersionName ? $"{v.Reference} · {primary.Abbreviation}" : v.Reference;
+                caption = theme.ShowVersionName ? $"{verseReference} · {primary.Abbreviation}" : verseReference;
             }
 
-            Slides.Add(new SlideItemViewModel(
-                Slides.Count,
-                $"{v.Chapter}:{v.Verse}",
-                new SlideContent(mainText, caption, secondaryText, theme)));
+            // A verse too long to read in one slide goes over several,
+            // rather than shrinking past the theme's minimum.
+            var parts = Controls.SlideTextFit.SplitToFit(
+                new SlideContent(mainText, caption, group.SecondaryText, theme), label, secondaryLabel);
+
+            for (var part = 0; part < parts.Count; part++)
+            {
+                var slideLabel = $"{group.Chapter}:{group.Numbers}";
+                if (parts.Count > 1)
+                    slideLabel += $" ({part + 1}/{parts.Count})";
+
+                Slides.Add(new SlideItemViewModel(
+                    Slides.Count,
+                    slideLabel,
+                    new SlideContent(parts[part].Main, caption, parts[part].Secondary, theme))
+                {
+                    Verses = group,
+                });
+            }
         }
 
         // Closing card: jump to the next chapter (crossing into the next
@@ -3132,7 +3166,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         var reference = BibleReferenceParser.TryParse(BibleQuery ?? string.Empty);
         if (reference?.VerseStart is int verse)
         {
-            var index = Slides.ToList().FindIndex(s => s.Label == $"{reference.Chapter}:{verse}");
+            var index = FindVerseSlide(reference.Chapter, verse);
             if (index >= 0)
             {
                 GoLiveSlide(index);
@@ -3158,7 +3192,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             return;
 
         LoadBiblePassage(new BibleReference(result.BookNumber, result.Chapter, null, null));
-        var index = Slides.ToList().FindIndex(s => s.Label == $"{result.Chapter}:{result.Verse}");
+        var index = FindVerseSlide(result.Chapter, result.Verse);
         if (index >= 0)
             GoLiveSlide(index);
     }
@@ -3415,8 +3449,19 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (verse is not int number)
             return null;
 
-        var index = Slides.ToList().FindIndex(s => s.Label == $"{chapter}:{number}");
+        var index = FindVerseSlide(chapter, number, lastPart: direction < 0);
         return index >= 0 ? index : null;
+    }
+
+    /// <summary>
+    /// The slide showing a verse of the loaded chapter, or -1. A verse can
+    /// share its slide with others (a paragraph of the TLA) or be split over
+    /// several: then it is the first part, or the last one going backward.
+    /// </summary>
+    private int FindVerseSlide(int chapter, int verse, bool lastPart = false)
+    {
+        var matches = Slides.Where(s => s.Verses is { } v && v.Chapter == chapter && v.Contains(verse));
+        return (lastPart ? matches.LastOrDefault() : matches.FirstOrDefault())?.Index ?? -1;
     }
 
     private void GoLiveSlide(int index)
