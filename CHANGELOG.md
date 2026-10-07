@@ -9,6 +9,11 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Pestaña Música** (abajo a la derecha, junto a Texto rápido, Aviso al pie,
+  Resaltar y Notas): botones ⏮ ⏯ ⏭ y de volumen que manejan el Spotify
+  instalado en la computadora, o el reproductor que esté abierto, con las
+  teclas multimedia de Windows. No lleva ningún reproductor adentro.
+
 - **Modo PC de bajo rendimiento** (Ver → Modo PC de bajo rendimiento, con
   tilde): para computadoras viejas o notebooks sin placa de video. Las
   transiciones cortan en la salida, el panel LIVE muestra la imagen fija del

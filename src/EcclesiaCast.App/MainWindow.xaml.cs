@@ -6,6 +6,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using EcclesiaCast.App.Controls;
+using EcclesiaCast.App.Services;
 using EcclesiaCast.App.ViewModels;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Presentation;
@@ -151,6 +152,15 @@ public partial class MainWindow : Window
         });
 
         menu.IsOpen = true;
+    }
+
+    // ── Música ───────────────────────────────────────────────────
+
+    /// <summary>Sends the media key named in the button's Tag, as the keyboard would.</summary>
+    private void MusicKey_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { Tag: string name } && Enum.TryParse<MediaKey>(name, out var key))
+            MediaKeys.Send(key);
     }
 
     // ── Soltar archivos en la barra de medios ────────────────────

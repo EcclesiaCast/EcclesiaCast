@@ -348,6 +348,17 @@ querés dejarlo prendido desde el principio. Con el modo prendido:
 Lo que ve la congregación **no cambia**: la letra conserva su sombra y su
 contorno, y el video se proyecta igual.
 
+## 14. Música
+
+En la columna derecha, abajo, la pestaña **Música** tiene los botones **⏮ ⏯ ⏭**
+y de volumen. No trae un reproductor ni un navegador adentro: manda las
+**teclas multimedia de Windows**, así que maneja el **Spotify instalado en la
+computadora** (o el reproductor que esté abierto). Ojo con el volumen: es el
+de toda la computadora, el mismo que sale por el proyector.
+
+La cuenta común de Spotify es para uso personal: pasar música en una reunión
+pública queda por cuenta de la iglesia.
+
 ## Dónde quedan tus datos
 
 Todo (canciones, Biblias, temas, medios y playlists) vive en un solo archivo:
