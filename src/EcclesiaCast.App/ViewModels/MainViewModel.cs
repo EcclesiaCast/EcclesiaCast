@@ -1083,6 +1083,14 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _allMedia.Clear();
         _allMedia.AddRange(_media.GetAll());
 
+        // An item with no tab name belongs to no tab and would never be shown
+        // anywhere: send it to the first one.
+        foreach (var orphan in _allMedia.Where(m => string.IsNullOrWhiteSpace(m.Category)))
+        {
+            orphan.Category = "Fondos";
+            _media.Update(orphan);
+        }
+
         var keepTab = SelectedMediaTab;
         MediaTabs.Clear();
         foreach (var tab in _allMedia.Select(m => m.Category)
@@ -1281,17 +1289,24 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
     private async Task RefreshVideoThumbnailsAsync()
     {
+        // Videos need the VLC engine to get a poster; images and document
+        // pages do not, so a missing engine must not stop their posters.
         var engine = App.VideoEngine;
-        if (engine is null)
-            return;
 
         var rebuildAll = _settings.Get(VideoThumbnailsRebuiltKey) is null;
 
+        // Images are included: their poster is a PNG kept apart from the
+        // picture, and when that file disappears the card in the media bar
+        // stays blank after every restart (it was only ever rebuilt for
+        // videos).
         var pending = _media.GetAll()
-            .Where(m => m.Type == MediaType.Video && !string.IsNullOrWhiteSpace(m.Path))
-            .Where(m => rebuildAll
-                        || string.IsNullOrWhiteSpace(m.ThumbnailPath)
-                        || !File.Exists(m.ThumbnailPath))
+            .Where(m => m.Type switch
+            {
+                MediaType.Video => engine is not null && !string.IsNullOrWhiteSpace(m.Path)
+                                   && (rebuildAll || PosterPolicy.NeedsPoster(m, File.Exists)),
+                MediaType.Image => PosterPolicy.NeedsPoster(m, File.Exists),
+                _ => false,
+            })
             .ToList();
 
         if (pending.Count > 0)
@@ -1301,7 +1316,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 var count = 0;
                 foreach (var item in pending)
                 {
-                    if (rebuildAll)
+                    if (rebuildAll && item.Type == MediaType.Video)
                         MediaThumbnails.Delete(item.ThumbnailPath);
 
                     var thumbnail = MediaThumbnails.Create(item.Path, item.Type, engine);
@@ -1319,7 +1334,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 LoadMedia();
         }
 
-        _settings.Set(VideoThumbnailsRebuiltKey, "1");
+        // Only once the video engine could do the job; otherwise the next
+        // run still has to rebuild the old generic icons.
+        if (engine is not null)
+            _settings.Set(VideoThumbnailsRebuiltKey, "1");
 
         // Sweep posters left behind by earlier rebuilds.
         var current = _media.GetAll().Select(m => m.ThumbnailPath).ToList();

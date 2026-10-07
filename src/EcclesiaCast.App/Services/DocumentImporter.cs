@@ -21,9 +21,7 @@ public sealed record DocumentPages(IReadOnlyList<string> Pages, string? Error);
 public static class DocumentImporter
 {
     /// <summary>Where the rendered pages live, beside the rest of the church's data.</summary>
-    private static string Root => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "EcclesiaCast", "documents");
+    private static string Root => Path.Combine(App.DataDir, "documents");
 
     public static bool IsDocument(string path) =>
         Path.GetExtension(path).ToLowerInvariant() is ".pdf" or ".pptx" or ".ppt";

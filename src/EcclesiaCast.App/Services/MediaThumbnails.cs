@@ -16,9 +16,7 @@ public static class MediaThumbnails
     public const int Width = 320;
     public const int Height = 180;
 
-    public static string Directory => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "EcclesiaCast", "thumbnails");
+    public static string Directory => Path.Combine(App.DataDir, "thumbnails");
 
     /// <summary>
     /// Returns the thumbnail path for a media file: the shell's own image when
@@ -79,6 +77,13 @@ public static class MediaThumbnails
             {
                 if (inUse.Contains(file))
                     continue;
+
+                // A poster is written to disk a moment before its item is saved
+                // to the library; sweeping in between would delete the poster
+                // of an image that is just being imported.
+                if (DateTime.UtcNow - File.GetLastWriteTimeUtc(file) < TimeSpan.FromMinutes(2))
+                    continue;
+
                 try { File.Delete(file); }
                 catch (IOException) { /* still open in the UI; next run gets it */ }
             }

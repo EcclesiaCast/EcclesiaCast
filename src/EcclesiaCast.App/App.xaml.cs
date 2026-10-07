@@ -35,11 +35,7 @@ public partial class App : Application
 
         // ECCLESIACAST_DATA_DIR points a test build at a copy of a library,
         // so it can run next to the real one without touching it.
-        var appDataDir = Environment.GetEnvironmentVariable("ECCLESIACAST_DATA_DIR") is { Length: > 0 } dataDir
-            ? dataDir
-            : Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "EcclesiaCast");
+        var appDataDir = DataDir;
 
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
@@ -163,4 +159,17 @@ public partial class App : Application
 
     /// <summary>Convenience for windows/services that optionally use video.</summary>
     public static LibVLC? VideoEngine { get; internal set; }
+
+    /// <summary>
+    /// Where the library, thumbnails and imported pages live. A test build
+    /// pointed at a copy (ECCLESIACAST_DATA_DIR) must keep <i>all</i> of it
+    /// there: the thumbnail sweep deletes every PNG its library does not
+    /// reference, so one that looked in the real folder would empty it.
+    /// </summary>
+    public static string DataDir { get; } =
+        Environment.GetEnvironmentVariable("ECCLESIACAST_DATA_DIR") is { Length: > 0 } dataDir
+            ? dataDir
+            : Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "EcclesiaCast");
 }

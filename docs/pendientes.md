@@ -33,8 +33,6 @@ los pedidos nuevos:
 
 **Medios**
 
-- [ ] **Anuncios: no aparece la vista previa de las imágenes** después de
-      cerrar y abrir el programa. Es un bug.
 - [ ] Sacar el botón **«sin fondo»**.
 - [ ] **Arrastrar y soltar** archivos.
 - [ ] **Pestañas apiladas a la izquierda**, como lista, en vez de arriba del

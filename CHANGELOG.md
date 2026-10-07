@@ -132,6 +132,14 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Corregido
 
+- **Las vistas previas de las imágenes volvían en blanco al reabrir el
+  programa** (se notaba en Anuncios). La miniatura es un archivo aparte de
+  la imagen; si ese archivo desaparecía, la biblioteca seguía apuntando a él
+  y sólo se rehacía en los videos. Ahora al abrir se vuelven a hacer las de
+  las imágenes que la necesiten, y la limpieza de miniaturas ya no borra las
+  que se están creando en ese momento. Además, un medio sin pestaña (no se
+  veía en ninguna) pasa a Fondos, y una copia de prueba del programa ya no
+  toca las miniaturas de la biblioteca real.
 - **Los saltos de línea ya no cortan la búsqueda en las letras**: «las cadenas
   de la muerte» encuentra *Hay Libertad* aunque la letra tenga un salto entre
   «cadenas» y «de». Los espacios de más y los saltos cuentan como uno solo,
