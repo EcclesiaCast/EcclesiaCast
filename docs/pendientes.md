@@ -30,13 +30,6 @@ los pedidos nuevos:
 - [ ] **Acerca de: una forma de colaborar** (todavía no hay a dónde mandar a
       la gente; se agrega cuando esté decidido).
 
-**Instalador**
-
-- [ ] **Preguntar si se quiere la configuración para PC de bajo
-      rendimiento.** Hoy no existe ese modo como tal: primero hay que
-      definir qué cambia (por ejemplo copias livianas de todos los videos,
-      el LIVE sin video en movimiento, sin sombras ni desenfoques).
-
 **Para evaluar**
 
 - [ ] **Spotify en las pestañas de abajo** (junto a texto rápido, aviso,

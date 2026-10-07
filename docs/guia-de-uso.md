@@ -193,7 +193,9 @@ En el panel **PLAYLIST**:
 ## 7. Buscar en todo de una vez
 
 Botón **🔍** de la barra de arriba, o **Ctrl+K**. Una sola caja que busca a la
-vez en las **canciones**, en la **Biblia** que tengas activa y en los **medios**.
+vez en las **canciones**, en **todas las Biblias** que tengas instaladas (cada versículo
+dice de qué versión es, y se abre en esa) y en los **medios**. Una frase
+escrita de corrido se encuentra aunque en la letra esté partida en dos renglones.
 Las flechas **↑↓** recorren los resultados sin sacar el cursor de la caja, y
 **Enter** carga el que elijas: la canción queda lista para proyectar, el
 versículo se carga en la pestaña Biblia y el medio se aplica de fondo.
@@ -330,6 +332,21 @@ Botón **💾** en la barra de arriba:
   `ecclesiacast.db.before-restore`, por si te arrepentís.
 
 > Restaurar **reemplaza todo** lo que tengas ahora, no lo mezcla.
+
+## 13. PC de bajo rendimiento
+
+Para computadoras viejas o notebooks sin placa de video. Se prende en
+**Ver → Modo PC de bajo rendimiento** (con tilde), y el instalador pregunta si
+querés dejarlo prendido desde el principio. Con el modo prendido:
+
+- las **transiciones cortan** en la pantalla, sin animación;
+- el panel **LIVE** muestra la imagen fija del video en vez del video en
+  movimiento;
+- las **vistas previas** del operador se dibujan sin sombra ni contorno en la
+  letra.
+
+Lo que ve la congregación **no cambia**: la letra conserva su sombra y su
+contorno, y el video se proyecta igual.
 
 ## Dónde quedan tus datos
 

@@ -22,7 +22,47 @@ public partial class OutputWindow : Window
         DataContextChanged += OnDataContextChanged;
         YouTube.Ended += (_, _) => VideoEnded?.Invoke(this, EventArgs.Empty);
         Video.Ended += (_, _) => VideoEnded?.Invoke(this, EventArgs.Empty);
-        Video.PreviewFrameChanged += (_, frame) => VideoFrameChanged?.Invoke(this, frame);
+
+        // The operator's LIVE panel gets a small copy of the video frames,
+        // which costs a shrink and a bitmap write on every one of them. With
+        // «bajo rendimiento» nobody listens, so none of that work is done
+        // (the video's producer only prepares the copy while someone is listening).
+        Loaded += (_, _) =>
+        {
+            PerformanceMode.Changed += OnPerformanceChanged;
+            ApplyPerformance();
+        };
+        Closed += (_, _) => PerformanceMode.Changed -= OnPerformanceChanged;
+    }
+
+    private bool _forwardingFrames;
+
+    private void OnPreviewFrame(object? sender, System.Windows.Media.ImageSource? frame) =>
+        VideoFrameChanged?.Invoke(this, frame);
+
+    private void OnPerformanceChanged(object? sender, EventArgs e) => ApplyPerformance();
+
+    /// <summary>
+    /// Low-performance mode: transitions cut instead of animating on the
+    /// projector, and the video stops being copied for the operator's panel.
+    /// </summary>
+    private void ApplyPerformance()
+    {
+        var low = PerformanceMode.IsLow;
+        Projected.AnimateTransitions = !low;
+
+        if (low && _forwardingFrames)
+        {
+            Video.PreviewFrameChanged -= OnPreviewFrame;
+            _forwardingFrames = false;
+            VideoFrameChanged?.Invoke(this, null);
+        }
+        else if (!low && !_forwardingFrames)
+        {
+            Video.PreviewFrameChanged += OnPreviewFrame;
+            _forwardingFrames = true;
+            Video.ResetPreview();
+        }
     }
 
     /// <summary>Raised when the projected video finishes and shouldn't loop.</summary>

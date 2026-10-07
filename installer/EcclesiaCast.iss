@@ -1,4 +1,4 @@
-; Instalador de EcclesiaCast (Inno Setup 6)
+﻿; Instalador de EcclesiaCast (Inno Setup 6)
 ; Se compila con:  iscc installer\EcclesiaCast.iss
 ; Espera la publicación self-contained en:  publish\
 
@@ -40,9 +40,22 @@ spanish.InstallingWebView2=Instalando el runtime de WebView2...
 english.InstallingWebView2=Installing the WebView2 runtime...
 spanish.WebView2DownloadFailed=No se pudo descargar el runtime de WebView2:%n%n%1%n%nLa instalación va a continuar, pero la proyección de YouTube y de páginas web no va a funcionar hasta que lo instales desde:%nhttps://developer.microsoft.com/microsoft-edge/webview2/
 english.WebView2DownloadFailed=The WebView2 runtime could not be downloaded:%n%n%1%n%nSetup will continue, but YouTube and web projection will not work until you install it from:%nhttps://developer.microsoft.com/microsoft-edge/webview2/
+spanish.PerformanceGroup=Rendimiento:
+english.PerformanceGroup=Performance:
+spanish.LowPerformanceTask=Configurar para una PC de bajo rendimiento (recomendado en computadoras viejas o notebooks sin placa de video)
+english.LowPerformanceTask=Set up for a low-performance PC (recommended for old computers or laptops without a graphics card)
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+; Sin tildar por defecto: sólo las computadoras viejas lo necesitan. Si se tilda,
+; el programa arranca con el «Modo PC de bajo rendimiento» prendido (ver [Registry]).
+Name: "lowperformance"; Description: "{cm:LowPerformanceTask}"; GroupDescription: "{cm:PerformanceGroup}"; Flags: unchecked
+
+[Registry]
+; La respuesta del instalador. El programa la lee al arrancar y, si todavía no hay
+; un ajuste guardado, la copia a sus ajustes (HKCU, así no hace falta ser administrador).
+Root: HKCU; Subkey: "SoftwareEcclesiaCast"; ValueType: dword; ValueName: "LowPerformance"; ValueData: 1; Tasks: lowperformance; Flags: uninsdeletevalue
+Root: HKCU; Subkey: "SoftwareEcclesiaCast"; Flags: uninsdeletekeyifempty
 
 [Files]
 ; Todo el resultado de `dotnet publish` (incluye .NET y las librerías de VLC)

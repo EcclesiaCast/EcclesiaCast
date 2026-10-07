@@ -347,6 +347,18 @@ public partial class VlcVideoSurface : UserControl
         }
     }
 
+    /// <summary>
+    /// Makes the next preview frame announce a fresh picture. Needed after the
+    /// preview was switched off and on again: the existing bitmap is only
+    /// handed out when it is created, so whoever started listening late would
+    /// otherwise never receive it.
+    /// </summary>
+    public void ResetPreview()
+    {
+        lock (_sync)
+            _previewBitmap = null;
+    }
+
     private void ClearSurface() =>
         Dispatcher.BeginInvoke(() =>
         {

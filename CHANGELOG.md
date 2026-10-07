@@ -9,6 +9,15 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Modo PC de bajo rendimiento** (Ver → Modo PC de bajo rendimiento, con
+  tilde): para computadoras viejas o notebooks sin placa de video. Las
+  transiciones cortan en la salida, el panel LIVE muestra la imagen fija del
+  video en vez del video en movimiento y las vistas previas del operador se
+  dibujan sin sombra ni contorno. Lo que ve la congregación conserva su
+  diseño. El instalador ahora tiene una casilla, sin tildar, «Configurar para
+  una PC de bajo rendimiento»; si se tilda, el programa arranca con el modo
+  prendido (mientras todavía no hayas elegido nada en el menú).
+
 - **Editor de escenario y varios escenarios**: la pantalla de los músicos ya
   no es fija. En el editor (▾ junto al botón Escenario, o Proyección →
   Editar los escenarios…) ubicás y agrandás recuadros sobre la pantalla y a

@@ -134,6 +134,26 @@ public partial class SlideView : UserControl
         set => SetValue(IsLiveOutputProperty, value);
     }
 
+    private bool _lowDetail;
+
+    /// <summary>
+    /// Draws the text without its shadow and outline. Both are blur effects
+    /// the graphics card has to redo for every preview; on a computer without
+    /// one that is what makes the operator's panels slow. The projector never
+    /// sets this, so the congregation still sees the full design.
+    /// </summary>
+    public bool LowDetail
+    {
+        get => _lowDetail;
+        set
+        {
+            if (_lowDetail == value)
+                return;
+            _lowDetail = value;
+            Refresh();
+        }
+    }
+
     /// <summary>Re-reads the slide's theme and re-renders. Call after editing themes.</summary>
     public void Refresh() => OnSlideChanged();
 
@@ -344,7 +364,7 @@ public partial class SlideView : UserControl
     private DropShadowEffect? BuildShadow()
     {
         var opacity = Math.Clamp(EffectiveShadowOpacity, 0, 1);
-        if (!EffectiveShadow || opacity <= 0)
+        if (LowDetail || !EffectiveShadow || opacity <= 0)
             return null;
 
         return new DropShadowEffect
@@ -364,7 +384,7 @@ public partial class SlideView : UserControl
     private DropShadowEffect? BuildOutline()
     {
         var width = Math.Clamp(EffectiveOutlineWidth, 0, 40);
-        if (width <= 0)
+        if (LowDetail || width <= 0)
             return null;
 
         return new DropShadowEffect

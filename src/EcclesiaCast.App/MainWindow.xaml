@@ -87,6 +87,10 @@
                 <MenuItem x:Name="PlaylistCollapsedItem" Header="Achicar la playlist"
                           IsCheckable="True" Click="PlaylistCollapsedItem_Click"/>
                 <Separator/>
+                <MenuItem Header="Modo PC de bajo rendimiento" IsCheckable="True"
+                          IsChecked="{Binding IsLowPerformance, Mode=TwoWay}"
+                          ToolTip="Para computadoras viejas o sin placa de video: las transiciones cortan, el panel LIVE muestra la imagen fija del video y las vistas previas se dibujan sin sombra ni contorno. Lo que ve la congregación conserva su diseño."/>
+                <Separator/>
                 <MenuItem Header="Volver al diseño original" Click="ResetLayout_Click"/>
             </MenuItem>
 

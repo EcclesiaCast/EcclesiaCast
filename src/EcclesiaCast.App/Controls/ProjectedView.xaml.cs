@@ -59,6 +59,7 @@ public partial class ProjectedView : UserControl
                 var view = (ProjectedView)d;
                 view.SlideView.IsLiveOutput = (bool)e.NewValue;
                 view.OnBackgroundChanged();
+                view.ApplyPerformance();
             }));
 
     /// <summary>The logo shown in the Logo state.</summary>
@@ -82,6 +83,27 @@ public partial class ProjectedView : UserControl
         // recomputed whenever this control changes size — the same design
         // shows in a small preview box and on the projector.
         SizeChanged += (_, _) => ApplyFraming();
+
+        // «Modo PC de bajo rendimiento»: listened to only while on screen.
+        Loaded += (_, _) =>
+        {
+            PerformanceMode.Changed += OnPerformanceChanged;
+            ApplyPerformance();
+        };
+        Unloaded += (_, _) => PerformanceMode.Changed -= OnPerformanceChanged;
+    }
+
+    private void OnPerformanceChanged(object? sender, EventArgs e) => ApplyPerformance();
+
+    /// <summary>
+    /// In the operator's panels the low-performance mode drops the text's
+    /// shadow and outline and shows a video's poster instead of its moving
+    /// picture. The output window keeps both: that is what the congregation sees.
+    /// </summary>
+    private void ApplyPerformance()
+    {
+        SlideRenderer.LowDetail = PerformanceMode.IsLow && !IsLiveOutput;
+        ApplyLiveVideo();
     }
 
     /// <summary>The underlying slide renderer, so callers can reach its members.</summary>
@@ -255,7 +277,9 @@ public partial class ProjectedView : UserControl
         // Only a video background has frames to show. Anything else (an
         // image, say the offering slide) must never sit under a leftover
         // frame of the video that played before it.
-        var frame = IsLiveOutput || BackgroundMedia?.Type != MediaType.Video ? null : LiveVideoFrame;
+        var frame = IsLiveOutput || PerformanceMode.IsLow || BackgroundMedia?.Type != MediaType.Video
+            ? null
+            : LiveVideoFrame;
         LiveVideo.Source = frame;
         LiveVideo.Visibility = frame is null ? Visibility.Collapsed : Visibility.Visible;
 
