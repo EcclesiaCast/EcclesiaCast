@@ -54,8 +54,8 @@ Name: "lowperformance"; Description: "{cm:LowPerformanceTask}"; GroupDescription
 [Registry]
 ; La respuesta del instalador. El programa la lee al arrancar y, si todavía no hay
 ; un ajuste guardado, la copia a sus ajustes (HKCU, así no hace falta ser administrador).
-Root: HKCU; Subkey: "SoftwareEcclesiaCast"; ValueType: dword; ValueName: "LowPerformance"; ValueData: 1; Tasks: lowperformance; Flags: uninsdeletevalue
-Root: HKCU; Subkey: "SoftwareEcclesiaCast"; Flags: uninsdeletekeyifempty
+Root: HKCU; Subkey: "Software\EcclesiaCast"; ValueType: dword; ValueName: "LowPerformance"; ValueData: 1; Tasks: lowperformance; Flags: uninsdeletevalue
+Root: HKCU; Subkey: "Software\EcclesiaCast"; Flags: uninsdeletekeyifempty
 
 [Files]
 ; Todo el resultado de `dotnet publish` (incluye .NET y las librerías de VLC)
