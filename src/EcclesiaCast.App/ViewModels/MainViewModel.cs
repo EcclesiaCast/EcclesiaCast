@@ -1507,7 +1507,11 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
             case SearchHitKind.Verse:
                 IsBibleTabActive = true;
-                BibleQuery = hit.Title;
+                // The verse opens in the version it was found in, not in
+                // whichever one happened to be selected.
+                if (BibleVersionOptions.FirstOrDefault(o => o.Info.Id == hit.Id) is { } found)
+                    SelectSoloVersion(found);
+                BibleQuery = hit.Reference ?? hit.Title;
                 StatusText = $"{hit.Title} cargado.";
                 break;
 
@@ -1519,7 +1523,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     }
 
     /// <summary>
-    /// Looks through songs, the active Bible version and the media library at
+    /// Looks through songs, every Bible version and the media library at
     /// once. Capped per kind so one enormous group cannot bury the others.
     /// </summary>
     private IReadOnlyList<SearchHit> SearchEverywhere(string query)
@@ -1533,13 +1537,18 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 string.IsNullOrWhiteSpace(song.Artist) ? "Canción" : song.Artist));
         }
 
-        if (SelectedBibleVersionOption?.Info.Id is { } versionId)
+        // Every installed version is searched, and each result says which one
+        // it came from: the same phrase reads differently in each translation.
+        // The cap is per version so one of them cannot bury the others.
+        var perVersion = Math.Clamp(24 / Math.Max(1, BibleVersionOptions.Count), 4, 12);
+        foreach (var option in BibleVersionOptions)
         {
-            foreach (var verse in _bibles.SearchText(versionId, query, 12))
+            foreach (var verse in _bibles.SearchText(option.Info.Id, query, perVersion))
             {
                 hits.Add(new SearchHit(
-                    SearchHitKind.Verse, versionId, "†", verse.Reference, Shorten(verse.Text),
-                    verse.BookNumber, verse.Chapter, verse.Verse));
+                    SearchHitKind.Verse, option.Info.Id, "†",
+                    $"{verse.Reference} · {option.Info.Abbreviation}", Shorten(verse.Text),
+                    verse.BookNumber, verse.Chapter, verse.Verse, verse.Reference));
             }
         }
 

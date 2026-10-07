@@ -10,7 +10,8 @@ public enum SearchHitKind
 
 /// <summary>
 /// One line of the unified search. <see cref="Id"/> is the song, media or
-/// Bible version the operator picked; verses carry the place to go to.
+/// Bible version the operator picked; verses carry the place to go to and the
+/// bare reference (the title also names the version they came from).
 /// </summary>
 public sealed record SearchHit(
     SearchHitKind Kind,
@@ -20,7 +21,8 @@ public sealed record SearchHit(
     string Detail,
     int BookNumber = 0,
     int Chapter = 0,
-    int Verse = 0);
+    int Verse = 0,
+    string? Reference = null);
 
 /// <summary>The one box that searches songs, verses and media together.</summary>
 public interface IGlobalSearchDialog

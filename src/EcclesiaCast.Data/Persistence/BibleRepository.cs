@@ -1,5 +1,6 @@
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Bible;
+using EcclesiaCast.Core.Search;
 using Microsoft.EntityFrameworkCore;
 
 namespace EcclesiaCast.Data.Persistence;
@@ -135,10 +136,16 @@ public sealed class BibleRepository(string dbPath) : IBibleRepository
     public IReadOnlyList<BibleVerseResult> SearchText(int versionId, string query, int limit = 60)
     {
         using var db = new AppDbContext(dbPath);
-        var pattern = $"%{query.Trim()}%";
+        if (TextMatching.ContainsPattern(query) is not { } pattern)
+            return [];
 
+        // Some files keep the line breaks of the printed page; flatten them
+        // the way the query was flattened so a phrase still matches across them.
         return db.BibleVerses.AsNoTracking()
-            .Where(v => v.Book.VersionId == versionId && EF.Functions.Like(v.Text, pattern))
+            .Where(v => v.Book.VersionId == versionId && EF.Functions.Like(
+                v.Text.Replace("\r", " ").Replace("\n", " ").Replace("\t", " ")
+                    .Replace("  ", " ").Replace("  ", " ").Replace("  ", " "),
+                pattern))
             .OrderBy(v => v.Book.Number).ThenBy(v => v.Chapter).ThenBy(v => v.Verse)
             .Take(limit)
             .Select(v => new BibleVerseResult(v.Book.Number, v.Book.Name, v.Chapter, v.Verse, v.Text))

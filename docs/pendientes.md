@@ -25,14 +25,6 @@ La beta.5 se probó el 6/10/2026: lo que anda bien quedó así (Biblia, achicar
 paneles, menú, buscar canciones en internet). Lo que salió de esa prueba y
 los pedidos nuevos:
 
-**Buscador (Ctrl+K)**
-
-- [ ] **Decir de qué versión es cada resultado** de la Biblia (buscar en
-      todas está bien). Prueba: «echa sobre» → Salmo 55:22.
-- [ ] **Que los saltos de línea no corten la búsqueda** en las letras.
-      Prueba: «las cadenas de la muerte» tiene que encontrar *Hay Libertad*
-      (IBI), que tiene un salto entre «cadenas» y «de la muerte».
-
 **Canciones**
 
 - [ ] **Un solo «+»** que ofrezca: crear desde cero, buscar en internet,

@@ -1,4 +1,5 @@
 using EcclesiaCast.Core.Abstractions;
+using EcclesiaCast.Core.Search;
 using EcclesiaCast.Core.Songs;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,13 +12,18 @@ public sealed class SongRepository(string dbPath) : ISongRepository
         using var db = new AppDbContext(dbPath);
         IQueryable<Song> songs = db.Songs.Include(s => s.Sections).AsNoTracking();
 
-        if (!string.IsNullOrWhiteSpace(query))
+        if (TextMatching.ContainsPattern(query) is { } pattern)
         {
-            var pattern = $"%{query.Trim()}%";
+            // Lyrics keep their line breaks, so the stored text is flattened
+            // the same way the query was: one space per run of whitespace.
+            // Three passes of "  " -> " " flatten up to eight spaces in a row.
             songs = songs.Where(s =>
                 EF.Functions.Like(s.Title, pattern)
                 || EF.Functions.Like(s.Artist, pattern)
-                || s.Sections.Any(x => EF.Functions.Like(x.Text, pattern)));
+                || s.Sections.Any(x => EF.Functions.Like(
+                    x.Text.Replace("\r", " ").Replace("\n", " ").Replace("\t", " ")
+                        .Replace("  ", " ").Replace("  ", " ").Replace("  ", " "),
+                    pattern)));
         }
 
         var result = songs.OrderBy(s => s.Title).ToList();

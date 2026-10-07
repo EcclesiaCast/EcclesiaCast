@@ -89,6 +89,10 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Cambiado
 
+- **Ctrl+K busca en todas las Biblias instaladas** y cada versículo dice de qué
+  versión es («Salmos 55:22 · RVR1960»). Al elegirlo se abre en esa versión,
+  no en la que estaba elegida. Cada versión aporta como mucho unos pocos
+  resultados, para que una no tape a las demás.
 - **F1 es Black y F2 es Clear** (antes al revés), y los botones de arriba
   quedaron en ese orden.
 - El panel **LIVE va arriba** y el PREVIEW debajo: lo que está en pantalla es
@@ -128,6 +132,12 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Corregido
 
+- **Los saltos de línea ya no cortan la búsqueda en las letras**: «las cadenas
+  de la muerte» encuentra *Hay Libertad* aunque la letra tenga un salto entre
+  «cadenas» y «de». Los espacios de más y los saltos cuentan como uno solo,
+  tanto en lo que se escribe como en lo guardado, y también vale para el
+  texto de la Biblia. Sirve en Ctrl+K y en el buscador de la lista de
+  canciones.
 - **El resaltado quedaba puesto** al pasar a otra diapositiva o versículo,
   marcando la misma palabra en el texto nuevo. Ahora cada diapositiva
   arranca sin resaltar.
