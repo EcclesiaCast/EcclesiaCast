@@ -59,8 +59,8 @@ los pedidos nuevos:
 
 **Ventana**
 
-- [ ] **Sacar guardar y cronómetro de la barra de arriba**: quedan en los
-      menús (el cronómetro pasa al escenario). Era lo que faltaba decidir.
+- [ ] **Sacar el ⏱ (cuenta regresiva) y el 💾 (copia de seguridad) de la
+      barra de arriba**: ya están en los menús. Era lo que faltaba decidir.
 - [ ] **Ayuda → Acerca de**: «Desarrollado por Alexis Pérez, Montevideo,
       Uruguay», una frase sobre bendecir a otros y un versículo (propuesto
       Mateo 10:8, «de gracia recibisteis, dad de gracia»). Más adelante, una
