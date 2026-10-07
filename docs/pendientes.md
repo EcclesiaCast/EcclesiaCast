@@ -44,6 +44,11 @@ sombra) y la pestaña Música (se ve bien). Falta:
 - [ ] **Los botones de Música** con Spotify abierto.
 - [ ] **El instalador**: que la casilla de bajo rendimiento deje el modo
       prendido en el primer arranque.
+- [ ] **Resaltar arrastrando en el LIVE** con el mouse de verdad (la
+      selección azul se comprobó dibujándola, pero el arrastre no se pudo
+      simular; el clic en una palabra sí anda).
+- [ ] **Descargar un video de YouTube** con el programa abierto (el arreglo
+      del error «Could not copy Chrome cookie database»).
 
 Descartado: importar las Biblias de BibleShow. Sus archivos `.bib` son bases
 de Access protegidas con usuario y contraseña, y NTV, NVI y PDT son textos con
