@@ -162,6 +162,29 @@ public class PresentationServiceTests
     }
 
     [Fact]
+    public void Going_to_another_slide_drops_the_highlight()
+    {
+        _service.GoLive(new SlideContent("Por gracia sois salvos"));
+        _service.SetHighlight("gracia");
+
+        _service.GoLive(new SlideContent("por medio de la fe"));
+
+        Assert.Null(_service.HighlightTerm);
+    }
+
+    [Fact]
+    public void Sending_the_same_slide_again_keeps_the_highlight()
+    {
+        var slide = new SlideContent("Por gracia sois salvos");
+        _service.GoLive(slide);
+        _service.SetHighlight("gracia");
+
+        _service.GoLive(slide with { });
+
+        Assert.Equal("gracia", _service.HighlightTerm);
+    }
+
+    [Fact]
     public void GoLive_while_black_returns_to_content()
     {
         _service.GoLive(new SlideContent("Uno"));

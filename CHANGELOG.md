@@ -9,6 +9,21 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Las transiciones también sacan el texto**: la letra que se va sale con
+  el mismo movimiento con que entra la nueva (se funde, se va por la
+  izquierda, sube o se achica), también al hacer Clear o poner el logo.
+  En Temas, al elegir la transición o su duración, la vista previa muestra
+  un ejemplo de ida y vuelta, y hay un botón «▶ Ver ejemplo».
+
+- **Resaltar desde el LIVE como en un cuadro de texto**: mientras arrastrás
+  sobre la letra, las palabras se marcan en azul sólo en el LIVE; al soltar
+  se resaltan en la pantalla.
+
+- **Reordenar diapositivas se ve**: la tarjeta que llevás sigue al mouse, la
+  original queda desvanecida y una barra marca el hueco entre las dos donde
+  va a caer. Se pone ahí, sin cambiar de lugar con otra. Cerca del borde de
+  arriba o de abajo la grilla se desplaza sola.
+
 - **Nombre arriba de las diapositivas**: el panel central dice qué tiene
   cargado («Mi Gozo — Barak», «Juan 8 · RVR1960») y marca «EN VIVO» cuando
   es lo que está en pantalla. Si en pantalla hay otra cosa (estás mirando lo
@@ -113,6 +128,9 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Corregido
 
+- **El resaltado quedaba puesto** al pasar a otra diapositiva o versículo,
+  marcando la misma palabra en el texto nuevo. Ahora cada diapositiva
+  arranca sin resaltar.
 - **El doble clic en la playlist no proyectaba**: la fila se quedaba con el
   clic antes de que la lista lo viera. Ahora lo atiende la fila misma, y lo
   mismo en la lista de canciones y en los resultados de búsqueda de la

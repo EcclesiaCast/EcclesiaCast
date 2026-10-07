@@ -1,9 +1,11 @@
 using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using EcclesiaCast.App.Controls;
 using EcclesiaCast.App.ViewModels;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Presentation;
@@ -477,6 +479,16 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
+    /// While the button is down the swept words show as selected on the Live
+    /// preview only, like in a text box; the screen waits for the release.
+    /// </summary>
+    private void LiveView_PreviewMouseMove(object sender, MouseEventArgs e)
+    {
+        if (_liveHighlightStart is Point start && e.LeftButton == MouseButtonState.Pressed)
+            LiveView.SlideView.ShowSelection(start, e.GetPosition(LiveView.SlideView));
+    }
+
+    /// <summary>
     /// Pointing at the words on the Live preview highlights them on the
     /// screen: a click takes the word, a drag the phrase. Pointing at what is
     /// already highlighted takes the highlight off again.
@@ -484,6 +496,7 @@ public partial class MainWindow : Window
     private void LiveView_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         LiveView.ReleaseMouseCapture();
+        LiveView.SlideView.ClearSelection();
         if (_liveHighlightStart is not Point start || DataContext is not MainViewModel vm)
             return;
         _liveHighlightStart = null;
@@ -502,6 +515,7 @@ public partial class MainWindow : Window
 
     private Point? _slideDragStart;
     private SlideItemViewModel? _slideDragItem;
+    private SlideDragAdorner? _slideDragAdorner;
 
     private void SlideCard_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
@@ -513,12 +527,15 @@ public partial class MainWindow : Window
     /// A press that travels a few pixels becomes a drag. Until then it is an
     /// ordinary click, which projects the slide on release; once the drag
     /// takes the mouse, the button never sees its release and doesn't fire.
+    /// While it lasts, a copy of the card follows the mouse and the card
+    /// itself fades in its place.
     /// </summary>
     private void SlideCard_PreviewMouseMove(object sender, MouseEventArgs e)
     {
         if (e.LeftButton != MouseButtonState.Pressed
             || _slideDragStart is not Point start
             || _slideDragItem is not { } item
+            || sender is not FrameworkElement card
             || DataContext is not MainViewModel vm
             || !vm.CanMoveSlide(item))
             return;
@@ -529,54 +546,90 @@ public partial class MainWindow : Window
             return;
 
         _slideDragStart = null;
-        DragDrop.DoDragDrop((DependencyObject)sender, new DataObject(typeof(SlideItemViewModel), item), DragDropEffects.Move);
-        _slideDragItem = null;
+        var layer = AdornerLayer.GetAdornerLayer(SlidesScroll);
+        _slideDragAdorner = new SlideDragAdorner(SlidesScroll, card, (Brush)FindResource("AccentBrush"));
+        layer?.Add(_slideDragAdorner);
+        card.Opacity = 0.35;
+
+        try
+        {
+            DragDrop.DoDragDrop(card, new DataObject(typeof(SlideItemViewModel), item), DragDropEffects.Move);
+        }
+        finally
+        {
+            card.Opacity = 1;
+            layer?.Remove(_slideDragAdorner);
+            _slideDragAdorner = null;
+            _slideDragItem = null;
+        }
     }
 
     private static SlideItemViewModel? DraggedSlide(DragEventArgs e) =>
         e.Data.GetData(typeof(SlideItemViewModel)) as SlideItemViewModel;
 
-    private void SlideCard_DragEnter(object sender, DragEventArgs e) => MarkDropTarget(sender, e, true);
-
-    private void SlideCard_DragOver(object sender, DragEventArgs e)
+    private void SlidesScroll_DragOver(object sender, DragEventArgs e)
     {
-        var target = (sender as FrameworkElement)?.DataContext as SlideItemViewModel;
-        var dragged = DraggedSlide(e);
-        e.Effects = dragged is not null && target is not null && !ReferenceEquals(dragged, target)
-            && DataContext is MainViewModel vm && vm.CanMoveSlide(target)
-            ? DragDropEffects.Move
-            : DragDropEffects.None;
         e.Handled = true;
-    }
-
-    private void SlideCard_DragLeave(object sender, DragEventArgs e) => MarkDropTarget(sender, e, false);
-
-    private void SlideCard_Drop(object sender, DragEventArgs e)
-    {
-        MarkDropTarget(sender, e, false);
-        if (DataContext is MainViewModel vm
-            && DraggedSlide(e) is { } dragged
-            && (sender as FrameworkElement)?.DataContext is SlideItemViewModel target)
-            vm.MoveSlide(dragged, target);
-        e.Handled = true;
-    }
-
-    /// <summary>Outlines the card the dragged slide would land on.</summary>
-    private void MarkDropTarget(object sender, DragEventArgs e, bool on)
-    {
-        if (sender is not Button button || button.Template.FindName("card", button) is not Border card)
+        if (DraggedSlide(e) is null || DataContext is not MainViewModel)
+        {
+            e.Effects = DragDropEffects.None;
             return;
+        }
 
-        if (on && DraggedSlide(e) is { } dragged && !ReferenceEquals(dragged, button.DataContext))
+        e.Effects = DragDropEffects.Move;
+        var pointer = e.GetPosition(SlidesScroll);
+        _slideDragAdorner?.Update(pointer, SlideDropGap(e)?.Bar);
+
+        // Near the top or bottom edge the grid scrolls, so a slide can be
+        // carried to a place that is not in sight.
+        const double edge = 36;
+        if (pointer.Y < edge)
+            SlidesScroll.ScrollToVerticalOffset(SlidesScroll.VerticalOffset - 12);
+        else if (pointer.Y > SlidesScroll.ActualHeight - edge)
+            SlidesScroll.ScrollToVerticalOffset(SlidesScroll.VerticalOffset + 12);
+    }
+
+    private void SlidesScroll_DragLeave(object sender, DragEventArgs e) =>
+        _slideDragAdorner?.Update(null, null);
+
+    private void SlidesScroll_Drop(object sender, DragEventArgs e)
+    {
+        e.Handled = true;
+        _slideDragAdorner?.Update(null, null);
+        if (DataContext is MainViewModel vm && DraggedSlide(e) is { } dragged && SlideDropGap(e) is { } gap)
+            vm.MoveSlideTo(dragged, gap.Index);
+    }
+
+    /// <summary>
+    /// The gap a dragged card would fall into: before the card under the
+    /// pointer when it is on that card's left half, after it on the right
+    /// half, after the last card on empty space. Also where to draw the bar
+    /// that marks it, in the grid's scroll viewer coordinates.
+    /// </summary>
+    private (int Index, Rect Bar)? SlideDropGap(DragEventArgs e)
+    {
+        var count = SlideGrid.Items.Count;
+        if (count == 0)
+            return null;
+
+        var index = count - 1;
+        var after = true;
+        if (e.OriginalSource is DependencyObject source
+            && ItemsControl.ContainerFromElement(SlideGrid, source) is FrameworkElement hovered)
         {
-            card.BorderBrush = (Brush)FindResource("AccentBrush");
-            card.BorderThickness = new Thickness(4, 1, 1, 1);
+            index = SlideGrid.ItemContainerGenerator.IndexFromContainer(hovered);
+            after = e.GetPosition(hovered).X > hovered.ActualWidth / 2;
         }
-        else
-        {
-            card.ClearValue(Border.BorderBrushProperty);
-            card.ClearValue(Border.BorderThicknessProperty);
-        }
+
+        if (SlideGrid.ItemContainerGenerator.ContainerFromIndex(index) is not FrameworkElement container)
+            return null;
+
+        // The cards carry a 6 px margin, so the edge of the container is the
+        // middle of the gap between two cards.
+        var topLeft = container.TranslatePoint(new Point(0, 0), SlidesScroll);
+        var x = after ? topLeft.X + container.ActualWidth : topLeft.X;
+        var bar = new Rect(x - 2, topLeft.Y + 8, 4, Math.Max(0, container.ActualHeight - 16));
+        return (after ? index + 1 : index, bar);
     }
 
     // The card's own menu is about songs: a verse gets its own, and the

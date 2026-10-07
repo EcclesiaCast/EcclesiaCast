@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
@@ -28,7 +29,7 @@ public partial class SlideView : UserControl
 
     public static readonly DependencyProperty StateProperty =
         DependencyProperty.Register(nameof(State), typeof(OutputState), typeof(SlideView),
-            new PropertyMetadata(OutputState.Content, (d, _) => ((SlideView)d).OnStateChanged()));
+            new PropertyMetadata(OutputState.Content, (d, e) => ((SlideView)d).OnStateChanged((OutputState)e.OldValue)));
 
     public static readonly DependencyProperty AnimateTransitionsProperty =
         DependencyProperty.Register(nameof(AnimateTransitions), typeof(bool), typeof(SlideView),
@@ -72,6 +73,11 @@ public partial class SlideView : UserControl
 
     private static readonly Brush HighlightBrush = new SolidColorBrush(Color.FromRgb(0xE8, 0xC3, 0x4A));
 
+    /// <summary>The blue of a text selection, for the words being dragged over on the Live preview.</summary>
+    private static readonly Brush SelectionBrush = new SolidColorBrush(Color.FromArgb(0xB0, 0x2F, 0x63, 0xC9));
+
+    private (int Start, int End)? _selection;
+
     private const double CanvasWidth = SlideTextFit.CanvasWidth;
     private const double CanvasHeight = SlideTextFit.CanvasHeight;
     private const double SecondarySpacing = SlideTextFit.SecondarySpacing;
@@ -82,7 +88,7 @@ public partial class SlideView : UserControl
     public SlideView()
     {
         InitializeComponent();
-        OnStateChanged();
+        OnStateChanged(State);
     }
 
     public SlideContent? Slide
@@ -242,12 +248,22 @@ public partial class SlideView : UserControl
 
     private void OnSlideChanged()
     {
+        _selection = null;
+
+        // The words on screen leave the way the new ones arrive; a copy of
+        // them is taken before the new slide overwrites the text.
+        var leaving = AnimateTransitions && State == OutputState.Content ? CopyOfText() : null;
+
         ApplyTheme();
         RenderText();
         RenderExtraBoxes();
 
         if (AnimateTransitions && State == OutputState.Content)
+        {
             TransitionIn(TextLayer);
+            if (leaving is not null)
+                TransitionOut(leaving);
+        }
     }
 
     // ── Tema ─────────────────────────────────────────────────────
@@ -478,9 +494,54 @@ public partial class SlideView : UserControl
     /// </summary>
     public string? PhraseBetween(Point from, Point to)
     {
-        var text = string.Concat(MainText.Inlines.OfType<Run>().Select(r => r.Text));
+        if (SpanBetween(from, to) is not var (start, end))
+            return null;
+
+        var phrase = MainTextShown[start..end].Trim();
+        return phrase.Length == 0 || !phrase.Any(char.IsLetterOrDigit) ? null : phrase;
+    }
+
+    /// <summary>
+    /// Paints the words between two points as selected, the way a text box
+    /// shows a selection while the mouse drags. Only this view shows it: the
+    /// Live preview uses it so the operator sees what will be highlighted
+    /// before letting go, and the screen only changes on release.
+    /// </summary>
+    public void ShowSelection(Point from, Point to)
+    {
+        var span = SpanBetween(from, to);
+        if (span == _selection)
+            return;
+
+        _selection = span;
+        RenderWithHighlight(MainText, Transform(Slide?.MainText));
+    }
+
+    public void ClearSelection()
+    {
+        if (_selection is null)
+            return;
+
+        _selection = null;
+        RenderWithHighlight(MainText, Transform(Slide?.MainText));
+    }
+
+    /// <summary>The main text as it is on screen right now (casing applied).</summary>
+    private string MainTextShown => string.Concat(MainText.Inlines.OfType<Run>().Select(r => r.Text));
+
+    /// <summary>
+    /// Where in the main text the words between two points start and end,
+    /// widened to whole words. Null when neither point is on the text.
+    /// </summary>
+    private (int Start, int End)? SpanBetween(Point from, Point to)
+    {
+        var text = MainTextShown;
         if (text.Length == 0)
             return null;
+
+        // Painting a selection rebuilds the text, and finding the letter
+        // under the mouse refuses to work until it has been laid out again.
+        MainText.UpdateLayout();
 
         var a = OffsetAt(from);
         var b = OffsetAt(to);
@@ -501,8 +562,7 @@ public partial class SlideView : UserControl
         while (end < text.Length && IsWordChar(text[end]))
             end++;
 
-        var phrase = text[start..end].Trim();
-        return phrase.Length == 0 || !phrase.Any(char.IsLetterOrDigit) ? null : phrase;
+        return start < end ? (start, end) : null;
 
         static bool IsWordChar(char c) => char.IsLetterOrDigit(c) || c is '\'' or '’' or '-';
     }
@@ -534,6 +594,18 @@ public partial class SlideView : UserControl
         target.Inlines.Clear();
         if (string.IsNullOrEmpty(text))
             return;
+
+        // A selection being dragged on the Live preview wins over the
+        // highlight: it shows exactly the words under the mouse.
+        if (ReferenceEquals(target, MainText) && _selection is var (from, to) && to <= text.Length)
+        {
+            if (from > 0)
+                target.Inlines.Add(new Run(text[..from]));
+            target.Inlines.Add(new Run(text[from..to]) { Background = SelectionBrush });
+            if (to < text.Length)
+                target.Inlines.Add(new Run(text[to..]));
+            return;
+        }
 
         var term = Highlight;
         if (string.IsNullOrWhiteSpace(term))
@@ -660,8 +732,16 @@ public partial class SlideView : UserControl
 
     // ── Estados ──────────────────────────────────────────────────
 
-    private void OnStateChanged()
+    private void OnStateChanged(OutputState previous)
     {
+        // Clearing the words (or covering them with the logo) takes them off
+        // the way they would leave for the next slide. Black has its own fade.
+        var leaving = AnimateTransitions
+            && previous == OutputState.Content
+            && State is OutputState.Clear or OutputState.Logo
+                ? CopyOfText()
+                : null;
+
         var contentVisible = State == OutputState.Content ? Visibility.Visible : Visibility.Hidden;
         TextLayer.Visibility = contentVisible;
         CaptionLayer.Visibility = contentVisible;
@@ -674,6 +754,8 @@ public partial class SlideView : UserControl
                 new DoubleAnimation(blackTarget, TimeSpan.FromMilliseconds(250)));
             if (State == OutputState.Content)
                 TransitionIn(TextLayer);
+            if (leaving is not null)
+                TransitionOut(leaving);
         }
         else
         {
@@ -818,5 +900,85 @@ public partial class SlideView : UserControl
                 break;
             }
         }
+    }
+
+    /// <summary>
+    /// A still copy of the words on screen, to take them off with the same
+    /// movement the next ones arrive with. Null when there is nothing to see
+    /// leave, or when the theme cuts.
+    /// </summary>
+    private FrameworkElement? CopyOfText()
+    {
+        if (TextLayer.Visibility != Visibility.Visible
+            || MainText.Inlines.Count == 0
+            || EffectiveTransition == SlideTransition.None
+            || EffectiveTransitionMs <= 0)
+            return null;
+
+        try
+        {
+            var copy = (FrameworkElement)XamlReader.Parse(XamlWriter.Save(TextLayer));
+            copy.IsHitTestVisible = false;
+
+            // Caught halfway through its own entrance, it leaves from there.
+            copy.Opacity = TextLayer.Opacity;
+            copy.RenderTransform = System.Windows.Media.Transform.Identity;
+            return copy;
+        }
+        catch (Exception)
+        {
+            // Without the copy the old words simply vanish, as they used to.
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Takes the copy of the old words off the screen: it fades and moves the
+    /// opposite way to the arrival (out to the left, up, or shrinking a
+    /// little), then goes away.
+    /// </summary>
+    private void TransitionOut(FrameworkElement copy)
+    {
+        var duration = TimeSpan.FromMilliseconds(EffectiveTransitionMs);
+        var ease = new QuadraticEase { EasingMode = EasingMode.EaseIn };
+
+        RootCanvas.Children.Insert(RootCanvas.Children.IndexOf(TextLayer) + 1, copy);
+
+        var fade = new DoubleAnimation(copy.Opacity, 0, duration) { EasingFunction = ease };
+        fade.Completed += (_, _) => RootCanvas.Children.Remove(copy);
+
+        copy.RenderTransformOrigin = new Point(0.5, 0.5);
+        switch (EffectiveTransition)
+        {
+            case SlideTransition.SlideLeft:
+            {
+                var move = new TranslateTransform();
+                copy.RenderTransform = move;
+                move.BeginAnimation(TranslateTransform.XProperty,
+                    new DoubleAnimation(0, -CanvasWidth * 0.06, duration) { EasingFunction = ease });
+                break;
+            }
+
+            case SlideTransition.SlideUp:
+            {
+                var move = new TranslateTransform();
+                copy.RenderTransform = move;
+                move.BeginAnimation(TranslateTransform.YProperty,
+                    new DoubleAnimation(0, -CanvasHeight * 0.06, duration) { EasingFunction = ease });
+                break;
+            }
+
+            case SlideTransition.Zoom:
+            {
+                var scale = new ScaleTransform(1, 1);
+                copy.RenderTransform = scale;
+                var shrink = new DoubleAnimation(1, 0.94, duration) { EasingFunction = ease };
+                scale.BeginAnimation(ScaleTransform.ScaleXProperty, shrink);
+                scale.BeginAnimation(ScaleTransform.ScaleYProperty, shrink);
+                break;
+            }
+        }
+
+        copy.BeginAnimation(OpacityProperty, fade);
     }
 }

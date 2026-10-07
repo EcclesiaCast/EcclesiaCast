@@ -113,7 +113,7 @@
                     Height="280" Margin="0,0,0,10">
                 <Viewbox Stretch="Uniform" Margin="6">
                     <Grid Width="960" Height="540" ClipToBounds="True" Background="{StaticResource CheckerBrush}">
-                        <controls:SlideView Slide="{Binding PreviewSlide}"/>
+                        <controls:SlideView Slide="{Binding PreviewSlide}" AnimateTransitions="{Binding AnimatePreview}"/>
                         <Canvas x:Name="Overlay" Background="Transparent">
                             <Border x:Name="BoxBorder"
                                     BorderBrush="{StaticResource AccentBrush}" BorderThickness="1.5"
@@ -204,13 +204,13 @@
                             <ComboBoxItem Content="todas minúsculas"/>
                         </ComboBox>
 
-                        <TextBlock Text="Cómo entra la diapositiva" Style="{StaticResource FieldLabel}"/>
+                        <TextBlock Text="Cómo entra y sale la diapositiva" Style="{StaticResource FieldLabel}"/>
                         <ComboBox SelectedIndex="{Binding TransitionIndex}" FontSize="12"
                                   ToolTip="Cada tema tiene la suya: las canciones pueden fundir y la Biblia cortar">
                             <ComboBoxItem Content="Sin transición (corte)"/>
                             <ComboBoxItem Content="Fundido"/>
-                            <ComboBoxItem Content="Entra desde la derecha"/>
-                            <ComboBoxItem Content="Sube desde abajo"/>
+                            <ComboBoxItem Content="De costado (entra por la derecha, sale por la izquierda)"/>
+                            <ComboBoxItem Content="Hacia arriba (entra por abajo, sale por arriba)"/>
                             <ComboBoxItem Content="Se acomoda (zoom)"/>
                         </ComboBox>
                         <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
@@ -221,6 +221,10 @@
                                                    ToolTip="En milisegundos. 280 es el fundido de siempre; más de 500 se siente lento"/>
                             <TextBlock Text="ms" FontSize="11" VerticalAlignment="Center" Margin="6,0,0,0"
                                        Foreground="{StaticResource MutedBrush}"/>
+                            <Button Content="▶ Ver ejemplo" FontSize="11" Padding="8,3" Margin="12,0,0,0"
+                                    Style="{StaticResource DarkButton}"
+                                    Command="{Binding PlayTransitionSampleCommand}"
+                                    ToolTip="Muestra en la vista previa cómo entra y sale la letra"/>
                         </StackPanel>
 
                         <TextBlock Text="Sombra" Style="{StaticResource FieldLabel}"/>

@@ -12,6 +12,11 @@ public sealed class PresentationService : IPresentationService
 
     public void GoLive(SlideContent slide)
     {
+        // A highlight belongs to the words it was put on: the next slide
+        // starts clean. Sending the same slide again (a theme change) keeps it.
+        if (!Equals(slide, CurrentSlide))
+            HighlightTerm = null;
+
         CurrentSlide = slide;
         State = OutputState.Content;
         OnChanged();

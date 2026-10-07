@@ -2624,17 +2624,25 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     /// the one it was dropped on, and the song keeps the new order. Only song
     /// slides move — a chapter's verses have an order of their own.
     /// </summary>
-    public void MoveSlide(SlideItemViewModel dragged, SlideItemViewModel target)
+    /// <summary>
+    /// Puts a dragged slide in the gap before the slide at <paramref name="gap"/>
+    /// (0 = first, the number of slides = after the last), the way a word is
+    /// dropped between two others: nothing else trades places.
+    /// </summary>
+    public void MoveSlideTo(SlideItemViewModel dragged, int gap)
     {
         var from = SectionOf(dragged);
-        var to = SectionOf(target);
-        if (from is null || to is null || SelectedSong is null || from.Id == to.Id)
+        if (from is null || SelectedSong is null)
             return;
 
         var sections = SelectedSong.Sections;
         var fromIndex = sections.FindIndex(s => s.Id == from.Id);
-        var toIndex = sections.FindIndex(s => s.Id == to.Id);
-        if (fromIndex < 0 || toIndex < 0)
+        if (fromIndex < 0)
+            return;
+
+        // Taking it out shifts every gap after it one place to the left.
+        var toIndex = Math.Clamp(gap > fromIndex ? gap - 1 : gap, 0, sections.Count - 1);
+        if (toIndex == fromIndex)
             return;
 
         sections.RemoveAt(fromIndex);
@@ -3393,6 +3401,17 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     [RelayCommand]
     private void ClearHighlight() => HighlightText = string.Empty;
 
+    /// <summary>
+    /// A new slide on screen drops the highlight (the presentation does it),
+    /// so the box in the Resaltar tab empties too instead of showing a word
+    /// that is no longer marked anywhere.
+    /// </summary>
+    private void SyncHighlightBox()
+    {
+        if (_presentation.HighlightTerm is null && HighlightText.Length > 0)
+            HighlightText = string.Empty;
+    }
+
     [RelayCommand]
     private void ProjectBibleResult(BibleVerseResult? result)
     {
@@ -3738,6 +3757,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         }
 
         _presentation.GoLive(item.Slide);
+        SyncHighlightBox();
         LiveTitle = GridTitle;
         _projection.EnsureVisible(SelectedDisplay.Info);
         _settings.Set(OutputDisplayKey, SelectedDisplay.Info.DeviceName);
@@ -3788,6 +3808,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             return;
 
         _presentation.GoLive(new SlideContent(QuickText.Trim(), Theme: DefaultSongTheme));
+        SyncHighlightBox();
         _projection.EnsureVisible(SelectedDisplay.Info);
         _settings.Set(OutputDisplayKey, SelectedDisplay.Info.DeviceName);
         IsProjecting = true;

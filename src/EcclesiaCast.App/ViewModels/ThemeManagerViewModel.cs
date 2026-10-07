@@ -28,6 +28,53 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     [ObservableProperty]
     private SlideContent? _previewSlide;
 
+    /// <summary>
+    /// True only while the preview plays the transition example. The rest
+    /// of the time it changes without movement, or every tweak of a colour
+    /// or a size would make the preview slide around.
+    /// </summary>
+    [ObservableProperty]
+    private bool _animatePreview;
+
+    /// <summary>Which sample the preview shows: the first text, or the one that follows it.</summary>
+    private bool _showingNextSample;
+
+    /// <summary>Bumped on each example, so an older one stops when a newer one starts.</summary>
+    private int _sampleRun;
+
+    partial void OnTransitionIndexChanged(int value) => PlayTransitionSampleCommand.Execute(null);
+
+    partial void OnTransitionMsChanged(double value) => PlayTransitionSampleCommand.Execute(null);
+
+    /// <summary>
+    /// Shows the chosen transition on the preview: the next text comes in and
+    /// the first one goes out, then back again, so both directions are seen.
+    /// </summary>
+    [RelayCommand(AllowConcurrentExecutions = true)]
+    private async Task PlayTransitionSample()
+    {
+        if (_loading)
+            return;
+
+        var run = ++_sampleRun;
+        var pause = TimeSpan.FromMilliseconds(Math.Clamp(TransitionMs, 0, 1500) + 900);
+
+        AnimatePreview = true;
+        _showingNextSample = true;
+        UpdatePreview();
+
+        await Task.Delay(pause);
+        if (run != _sampleRun)
+            return;
+
+        _showingNextSample = false;
+        UpdatePreview();
+
+        await Task.Delay(pause);
+        if (run == _sampleRun)
+            AnimatePreview = false;
+    }
+
     [ObservableProperty]
     private string _defaultsText = string.Empty;
 
@@ -100,7 +147,9 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         // Cualquier cambio de campo refresca la vista previa en vivo.
         if (!_loading
             && e.PropertyName is not (nameof(PreviewSlide) or nameof(SelectedTheme) or nameof(DefaultsText)
-                or nameof(IsBibleKind) or nameof(StatusText)))
+                or nameof(IsBibleKind) or nameof(StatusText) or nameof(AnimatePreview)
+                // The transition plays its own example (PlayTransitionSample).
+                or nameof(TransitionIndex) or nameof(TransitionMs)))
             UpdatePreview();
 
         if (e.PropertyName == nameof(KindIndex))
@@ -223,16 +272,24 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         var theme = BuildTheme(0);
         var isBible = theme.Kind == ThemeKind.Bible;
 
-        var text = isBible
-            ? "Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito"
-            : "Grande es tu fidelidad\noh Dios mi Padre";
+        // The transition example swaps to a second text and back, so there is
+        // something to watch come in and go out.
+        var text = (isBible, _showingNextSample) switch
+        {
+            (true, false) => "Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito",
+            (true, true) => "para que todo aquel que en él cree, no se pierda, mas tenga vida eterna",
+            (false, false) => "Grande es tu fidelidad\noh Dios mi Padre",
+            (false, true) => "Tu amor me sostiene\ncada día de mi vida",
+        };
         if (isBible && theme.ShowVerseNumbers)
             text = "16 " + text;
 
         // For Bible themes, show a second-version sample so its style is visible;
         // with two versions each text carries its abbreviation inline.
         var secondary = isBible
-            ? "For God so loved the world, that he gave his only Son"
+            ? _showingNextSample
+                ? "that whoever believes in him should not perish but have eternal life"
+                : "For God so loved the world, that he gave his only Son"
             : null;
 
         string caption;

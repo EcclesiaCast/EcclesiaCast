@@ -62,7 +62,7 @@ public interface IPresentationService
     /// <summary>Chooses which logo the Logo state shows.</summary>
     void SetActiveLogo(Logos.Logo? logo);
 
-    /// <summary>Puts a slide live and switches the output to content.</summary>
+    /// <summary>Puts a slide live and switches the output to content; a different slide drops the highlight.</summary>
     void GoLive(SlideContent slide);
 
     /// <summary>Toggles between background-only and the current content.</summary>

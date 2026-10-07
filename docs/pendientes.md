@@ -25,16 +25,6 @@ La beta.5 se probó el 6/10/2026: lo que anda bien quedó así (Biblia, achicar
 paneles, menú, buscar canciones en internet). Lo que salió de esa prueba y
 los pedidos nuevos:
 
-**Diapositivas**
-
-- [ ] **El resaltado se borra** al pasar a otra diapositiva o versículo.
-- [ ] **Resaltar desde el LIVE como en un cuadro de texto**: se ve la
-      selección mientras arrastrás y recién al soltar sale en pantalla.
-- [ ] **Reordenar arrastrando más visual**: que se vea la diapositiva que
-      llevás y una marca entre las dos donde va a caer (no un intercambio).
-- [ ] **Transiciones**: al elegir cómo entra, mostrar un ejemplo; y que
-      salga de la misma forma que entra.
-
 **Buscador (Ctrl+K)**
 
 - [ ] **Decir de qué versión es cada resultado** de la Biblia (buscar en

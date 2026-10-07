@@ -928,7 +928,9 @@
                                     </Style>
                                 </TextBlock.Style>
                             </TextBlock>
-                            <ScrollViewer x:Name="SlidesScroll" VerticalScrollBarVisibility="Auto" Padding="6">
+                            <ScrollViewer x:Name="SlidesScroll" VerticalScrollBarVisibility="Auto" Padding="6" Background="Transparent"
+                                          AllowDrop="True" DragOver="SlidesScroll_DragOver"
+                                          DragLeave="SlidesScroll_DragLeave" Drop="SlidesScroll_Drop">
                                 <ItemsControl x:Name="SlideGrid" ItemsSource="{Binding Slides}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -942,13 +944,8 @@
                                                     Cursor="Hand"
                                                     Tag="{Binding DataContext, ElementName=SlideGrid}"
                                                     ContextMenuOpening="SlideCard_ContextMenuOpening"
-                                                    AllowDrop="True"
                                                     PreviewMouseLeftButtonDown="SlideCard_PreviewMouseLeftButtonDown"
                                                     PreviewMouseMove="SlideCard_PreviewMouseMove"
-                                                    DragEnter="SlideCard_DragEnter"
-                                                    DragOver="SlideCard_DragOver"
-                                                    DragLeave="SlideCard_DragLeave"
-                                                    Drop="SlideCard_Drop"
                                                     AutomationProperties.Name="{Binding Label}"
                                                     AutomationProperties.HelpText="{Binding PreviewText}"
                                                     ToolTip="Clic: proyectar · Arrastrar: cambiarla de lugar · Clic derecho: más opciones">
@@ -1130,6 +1127,7 @@
                                                     Cursor="IBeam"
                                                     PreviewMouseLeftButtonDown="LiveView_PreviewMouseLeftButtonDown"
                                                     PreviewMouseLeftButtonUp="LiveView_PreviewMouseLeftButtonUp"
+                                                    PreviewMouseMove="LiveView_PreviewMouseMove"
                                                     ToolTip="Clic en una palabra: se resalta en la pantalla · Arrastrá sobre varias: se resalta la frase · Clic otra vez: se quita"
                                                     State="{Binding Projection.State}"
                                                     Overlay="{Binding Projection.Overlay}"
