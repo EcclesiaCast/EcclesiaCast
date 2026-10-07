@@ -50,13 +50,25 @@ public sealed class BibleRepository(string dbPath) : IBibleRepository
         return new BibleVersionInfo(version.Id, version.Name, version.Abbreviation, version.Language, parsed.VerseCount);
     }
 
-    public void RenameVersion(int versionId, string newName)
+    public void UpdateVersion(int versionId, string name, string abbreviation)
     {
         using var db = new AppDbContext(dbPath);
         var version = db.BibleVersions.Find(versionId);
         if (version is null)
             return;
-        version.Name = newName;
+
+        if (version.Abbreviation != abbreviation)
+        {
+            var oldSuffix = $"({version.Abbreviation})";
+            foreach (var item in db.PlaylistItems.Where(i => i.BibleVersionId == versionId))
+            {
+                if (item.Caption.EndsWith(oldSuffix, StringComparison.Ordinal))
+                    item.Caption = item.Caption[..^oldSuffix.Length] + $"({abbreviation})";
+            }
+        }
+
+        version.Name = name;
+        version.Abbreviation = abbreviation;
         db.SaveChanges();
     }
 

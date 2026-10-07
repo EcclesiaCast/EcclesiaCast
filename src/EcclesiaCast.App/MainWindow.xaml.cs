@@ -421,11 +421,52 @@ public partial class MainWindow : Window
         }
     }
 
-    // Bible slides have no per-slide actions, so suppress their context menu.
+    // The card's own menu is about songs: a verse gets its own, and the
+    // chapter jump cards none.
     private void SlideCard_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
-        if (sender is FrameworkElement { DataContext: SlideItemViewModel { SectionId: 0 } })
+        if (sender is not FrameworkElement { DataContext: SlideItemViewModel slide } card)
+            return;
+
+        if (slide.Verses is not null)
+        {
             e.Handled = true;
+            if (DataContext is MainViewModel vm)
+                ShowVerseMenu(vm, card, slide);
+            return;
+        }
+
+        if (slide.SectionId == 0)
+            e.Handled = true;
+    }
+
+    /// <summary>
+    /// Right click on a verse: add it to the playlist, or add everything from
+    /// the verse on screen (or marked as next) up to this one («Juan 8:5-10»).
+    /// </summary>
+    private static void ShowVerseMenu(MainViewModel vm, FrameworkElement card, SlideItemViewModel slide)
+    {
+        var verses = slide.Verses!;
+        var menu = new ContextMenu { PlacementTarget = card };
+
+        menu.Items.Add(new MenuItem
+        {
+            Header = $"Agregar {verses.Chapter}:{verses.Numbers} a la playlist",
+            Command = vm.AddVerseSlideToPlaylistCommand,
+            CommandParameter = slide,
+        });
+
+        if (vm.RangeFromLive(slide) is var (first, last))
+        {
+            menu.Items.Add(new MenuItem
+            {
+                Header = $"Agregar {verses.Chapter}:{first}-{last} a la playlist",
+                Command = vm.AddRangeToSlideToPlaylistCommand,
+                CommandParameter = slide,
+            });
+        }
+
+        menu.IsOpen = true;
     }
 
     private void ScrollSlideIntoView(int index)

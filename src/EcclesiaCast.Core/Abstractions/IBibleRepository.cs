@@ -15,7 +15,11 @@ public interface IBibleRepository
 
     BibleVersionInfo Import(string name, string abbreviation, string language, ParsedBible parsed);
 
-    void RenameVersion(int versionId, string newName);
+    /// <summary>
+    /// Changes a version's name and abbreviation. Playlist passages carry the
+    /// abbreviation in their caption («Juan 3:16 (RVR1960)»), so they follow.
+    /// </summary>
+    void UpdateVersion(int versionId, string name, string abbreviation);
 
     void DeleteVersion(int versionId);
 

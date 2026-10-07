@@ -11,8 +11,9 @@ namespace EcclesiaCast.Core.Bible;
 public static partial class BibleReferenceParser
 {
     // The verse may follow the chapter after ":" or ".", or just a space
-    // ("juan 3 16"), which is the fastest to type without looking.
-    [GeneratedRegex(@"^\s*(?<book>.+?)\s+(?<chapter>\d{1,3})(?:(?:\s*[:.]\s*|\s+)(?<vstart>\d{1,3})(?:\s*-\s*(?<vend>\d{1,3}))?)?\s*$")]
+    // ("juan 3 16"), which is the fastest to type without looking. A range
+    // can also be said the way it is read aloud: "juan 8 del 5 al 10".
+    [GeneratedRegex(@"^\s*(?<book>.+?)\s+(?<chapter>\d{1,3})(?:(?:\s*[:.]\s*|\s+(?:del?\s+)?)(?<vstart>\d{1,3})(?:(?:\s*[-–]\s*|\s+al?\s+)(?<vend>\d{1,3}))?)?\s*$", RegexOptions.IgnoreCase)]
     private static partial Regex Pattern();
 
     public static BibleReference? TryParse(string? input)

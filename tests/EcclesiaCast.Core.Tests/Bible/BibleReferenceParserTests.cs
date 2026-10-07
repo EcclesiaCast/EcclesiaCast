@@ -117,6 +117,22 @@ public class BibleReferenceParserTests
         Assert.Equal(3, reference.VerseEnd);
     }
 
+
+    [Theory]
+    [InlineData("juan 8 del 5 al 10")]
+    [InlineData("Juan 8 de 5 a 10")]
+    [InlineData("juan 8:5 al 10")]
+    [InlineData("juan 8:5–10")]
+    public void A_range_read_aloud_parses(string input)
+    {
+        var reference = BibleReferenceParser.TryParse(input);
+
+        Assert.NotNull(reference);
+        Assert.Equal(43, reference!.BookNumber);
+        Assert.Equal(8, reference.Chapter);
+        Assert.Equal(5, reference.VerseStart);
+        Assert.Equal(10, reference.VerseEnd);
+    }
     [Theory]
     [InlineData("")]
     [InlineData("   ")]

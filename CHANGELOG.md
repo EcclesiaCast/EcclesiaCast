@@ -9,6 +9,16 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Pasajes en la playlist**: el botón «➕ Playlist» de la Biblia agrega un
+  tramo escrito en el buscador («juan 8 5-10», o como se lee: «juan 8 del 5
+  al 10»); si no hay tramo escrito, el versículo que está en pantalla; si no,
+  el capítulo. Con clic derecho sobre un versículo se agrega ese, o todo lo
+  que va desde el que está en pantalla hasta él.
+
+- **Editar el nombre y la abreviatura de una Biblia** (✏️ en Versiones). La
+  abreviatura nueva sale en la referencia y en los pasajes que ya estaban en
+  las playlists.
+
 - **Copias livianas de los videos pesados**: los videos 4K o de 60 cuadros
   por segundo (importados, descargados de YouTube o de logo) tienen solos una
   copia en 1080p a 30 cuadros, en H.264, guardada en

@@ -25,12 +25,6 @@ La beta.5 se probó el 6/10/2026: lo que anda bien quedó así (Biblia, achicar
 paneles, menú, buscar canciones en internet). Lo que salió de esa prueba y
 los pedidos nuevos:
 
-**Biblia**
-
-- [ ] **Editar el nombre y la abreviatura** de cada Biblia.
-- [ ] **Pasajes en la playlist**: un versículo o un tramo (por ejemplo Juan
-      8:5-10). Hoy no queda claro cómo se agrega.
-
 **Playlist**
 
 - [ ] **Clic = vista previa en el centro, doble clic = proyectar**, para

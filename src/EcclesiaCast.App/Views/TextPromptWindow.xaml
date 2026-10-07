@@ -10,6 +10,8 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <TextBlock x:Name="MessageText"
@@ -22,9 +24,22 @@
                  BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
                  Padding="8,6" FontSize="14"/>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+        <!-- Segundo campo, sólo cuando se piden dos valores -->
+        <TextBlock Grid.Row="2" x:Name="SecondMessageText"
+                   FontSize="13" Foreground="{StaticResource MutedBrush}"
+                   TextWrapping="Wrap" Margin="0,14,0,8"
+                   Visibility="Collapsed"/>
+
+        <TextBox Grid.Row="3"
+                 x:Name="SecondValueBox"
+                 Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                 BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
+                 Padding="8,6" FontSize="14"
+                 Visibility="Collapsed"/>
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
             <Button Content="Cancelar" Style="{StaticResource DarkButton}" IsCancel="True" Padding="18,9"/>
-            <Button Content="Aceptar" Style="{StaticResource AccentButton}"
+            <Button Content="Aceptar" Style="{StaticResource AccentButton}" IsDefault="True"
                     Click="Accept_Click" Padding="18,9" Margin="10,0,0,0"/>
         </StackPanel>
     </Grid>

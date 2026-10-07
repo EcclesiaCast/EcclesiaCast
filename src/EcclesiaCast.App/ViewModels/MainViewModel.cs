@@ -510,26 +510,101 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         StatusText = $"\"{song.Title}\" agregada a la playlist.";
     }
 
+    /// <summary>
+    /// The ➕ of the Bible panel. What it adds, in order: a range typed in
+    /// the search box («juan 8 5-10»), else the verse on screen (or marked
+    /// as next), else a single verse typed, else the whole chapter.
+    /// </summary>
     [RelayCommand]
     private void AddCurrentPassageToPlaylist()
     {
-        if (_currentPassage is null || PrimaryVersion is null || !EnsurePlaylist())
+        var typed = BibleReferenceParser.TryParse(BibleQuery);
+        if (typed is { VerseStart: int start, VerseEnd: int end } && end > start)
         {
-            if (_currentPassage is null)
-                StatusText = "Cargá un pasaje primero (libro y capítulo, o una referencia).";
+            AddPassageToPlaylist(typed);
             return;
         }
 
-        var reference = _currentPassage;
+        if (_currentPassage is null)
+        {
+            if (typed is not null)
+                AddPassageToPlaylist(typed);
+            else
+                StatusText = "Abrí un capítulo o escribí una referencia (juan 8 5-10) primero.";
+            return;
+        }
+
+        var shown = BibleSlideAt(LiveSlideIndex) ?? BibleSlideAt(PreviewSlideIndex);
+        if (shown is not null)
+            AddPassageToPlaylist(new BibleReference(_currentPassage.BookNumber, shown.Chapter, shown.FirstVerse, shown.LastVerse));
+        else if (typed?.VerseStart is not null)
+            AddPassageToPlaylist(typed);
+        else
+            AddPassageToPlaylist(_currentPassage with { VerseStart = null, VerseEnd = null });
+    }
+
+    /// <summary>Right click on a verse card: just that verse.</summary>
+    [RelayCommand]
+    private void AddVerseSlideToPlaylist(SlideItemViewModel? slide)
+    {
+        if (slide?.Verses is { } verses && _currentPassage is not null)
+            AddPassageToPlaylist(new BibleReference(_currentPassage.BookNumber, verses.Chapter, verses.FirstVerse, verses.LastVerse));
+    }
+
+    /// <summary>Right click on a verse card: from the verse on screen (or marked) to this one.</summary>
+    [RelayCommand]
+    private void AddRangeToSlideToPlaylist(SlideItemViewModel? slide)
+    {
+        if (_currentPassage is not null && RangeFromLive(slide) is var (first, last))
+            AddPassageToPlaylist(new BibleReference(_currentPassage.BookNumber, slide!.Verses!.Chapter, first, last));
+    }
+
+    /// <summary>
+    /// The verses between the one on screen and <paramref name="slide"/>, in
+    /// either direction; null when there is no verse on screen in this
+    /// chapter or it is this same one. Feeds the "from there to here" item.
+    /// </summary>
+    public (int First, int Last)? RangeFromLive(SlideItemViewModel? slide)
+    {
+        var live = BibleSlideAt(LiveSlideIndex) ?? BibleSlideAt(PreviewSlideIndex);
+        if (slide?.Verses is not { } here || live is null || live.Chapter != here.Chapter
+            || live.FirstVerse == here.FirstVerse)
+            return null;
+
+        return (Math.Min(live.FirstVerse, here.FirstVerse), Math.Max(live.LastVerse, here.LastVerse));
+    }
+
+    /// <summary>The verses behind the card at an index, if it is a Bible card.</summary>
+    private VerseGroup? BibleSlideAt(int index) =>
+        index >= 0 && index < Slides.Count ? Slides[index].Verses : null;
+
+    /// <summary>A passage's name as the playlist shows it: «Juan 8:5-10 (RVR1960)».</summary>
+    private string PassageCaption(BibleReference reference)
+    {
         var bookName = BibleBookCatalog.FindByNumber(reference.BookNumber)?.Name ?? $"Libro {reference.BookNumber}";
         var verses = reference.VerseStart is int vs
             ? reference.VerseEnd is int ve && ve != vs ? $":{vs}-{ve}" : $":{vs}"
             : string.Empty;
+        var version = PrimaryVersion is { } primary ? $" ({primary.Abbreviation})" : string.Empty;
+        return $"{bookName} {reference.Chapter}{verses}{version}";
+    }
 
+    private void AddPassageToPlaylist(BibleReference reference)
+    {
+        if (PrimaryVersion is null || !EnsurePlaylist())
+            return;
+
+        if (_bibles.GetPassage(PrimaryVersion.Id, reference).Count == 0)
+        {
+            StatusText = $"{PassageCaption(reference)} no existe en esta versión.";
+            return;
+        }
+
+        var caption = PassageCaption(reference);
         PlaylistItems.Add(new PlaylistItem
         {
             Type = PlaylistItemType.BiblePassage,
-            Caption = $"{bookName} {reference.Chapter}{verses} ({PrimaryVersion.Abbreviation})",
+            Caption = caption,
             BibleVersionId = PrimaryVersion.Id,
             BookNumber = reference.BookNumber,
             Chapter = reference.Chapter,
@@ -537,7 +612,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             VerseEnd = reference.VerseEnd,
         });
         SavePlaylist();
-        StatusText = "Pasaje agregado a la playlist.";
+        StatusText = $"«{caption}» agregado a la playlist.";
     }
 
     [RelayCommand]
@@ -2211,7 +2286,14 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             ? live.Index - FindVerseSlide(before.Chapter, before.FirstVerse)
             : 0;
 
+        // The verse marked as next stays marked too, instead of falling back
+        // to the chapter's first one.
+        var previewed = BibleSlideAt(PreviewSlideIndex);
+
         rebuild();
+
+        if (previewed is not null && FindVerseSlide(previewed.Chapter, previewed.FirstVerse) is var marked and >= 0)
+            SetPreviewIndex(marked);
 
         if (live is null)
             return;
@@ -3303,13 +3385,31 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (target is null)
             return;
 
-        var newName = _textPrompt.Ask("Renombrar versión", "Nuevo nombre:", target.Name);
-        if (string.IsNullOrWhiteSpace(newName))
+        var answer = _textPrompt.AskTwo(
+            "Editar versión",
+            "Nombre:", target.Name,
+            "Abreviatura (la que sale en la referencia, por ejemplo RVR1960):", target.Abbreviation);
+        if (answer is not var (name, abbreviation))
             return;
 
-        _bibles.RenameVersion(target.Id, newName.Trim());
+        name = string.IsNullOrWhiteSpace(name) ? target.Name : name;
+        abbreviation = string.IsNullOrWhiteSpace(abbreviation) ? target.Abbreviation : abbreviation;
+        if (name == target.Name && abbreviation == target.Abbreviation)
+            return;
+
+        _bibles.UpdateVersion(target.Id, name, abbreviation);
         LoadBibleVersions();
-        BibleStatusText = "Versión renombrada.";
+
+        // The playlist captions carry the abbreviation, and the slides on the
+        // grid show it in their reference: both are read again.
+        if (abbreviation != target.Abbreviation)
+        {
+            LoadPlaylists(null);
+            if (_currentPassage is not null)
+                RebuildSlidesPreservingLive(() => LoadBiblePassage(_currentPassage));
+        }
+
+        BibleStatusText = "Versión actualizada.";
     }
 
     [RelayCommand]

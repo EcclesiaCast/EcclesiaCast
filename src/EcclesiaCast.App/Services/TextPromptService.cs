@@ -12,4 +12,15 @@ public sealed class TextPromptService : ITextPrompt
         };
         return window.ShowDialog() == true ? window.Value : null;
     }
+
+    public (string First, string Second)? AskTwo(
+        string title, string firstLabel, string firstValue, string secondLabel, string secondValue)
+    {
+        var window = new TextPromptWindow(title, firstLabel, firstValue)
+        {
+            Owner = System.Windows.Application.Current.MainWindow,
+        };
+        window.AddSecondField(secondLabel, secondValue);
+        return window.ShowDialog() == true ? (window.Value, window.SecondValue) : null;
+    }
 }
