@@ -388,14 +388,14 @@
                                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                                          ToolTip="Buscar por título, artista o letra"/>
                                 <ListBox x:Name="SongsList" ItemsSource="{Binding Songs}"
+                                         PreviewMouseLeftButtonDown="SongsList_PreviewMouseLeftButtonDown"
+                                         PreviewMouseMove="SongsList_PreviewMouseMove"
                                          SelectedItem="{Binding SelectedSong}"
                                          Background="Transparent"
                                          BorderThickness="0"
                                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                         ToolTip="Doble clic proyecta · clic derecho: más opciones">
+                                         ToolTip="Doble clic proyecta · arrastrala a la playlist · clic derecho: más opciones">
                                     <ListBox.InputBindings>
-                                        <MouseBinding MouseAction="LeftDoubleClick"
-                                                      Command="{Binding ProjectFirstSlideCommand}"/>
                                         <KeyBinding Key="Enter"
                                                     Command="{Binding ProjectFirstSlideCommand}"/>
                                     </ListBox.InputBindings>
@@ -676,6 +676,7 @@
 
                                     <!-- Resultados de búsqueda por texto -->
                                     <ListBox x:Name="BibleResultsList"
+                                         PreviewMouseLeftButtonDown="BibleResultsList_PreviewMouseLeftButtonDown"
                                          ItemsSource="{Binding BibleSearchResults}"
                                          Visibility="{Binding ShowBibleResults, Converter={StaticResource BoolToVis}}"
                                          Background="Transparent"
@@ -683,9 +684,6 @@
                                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                          ToolTip="Doble clic proyecta el versículo y carga el capítulo">
                                     <ListBox.InputBindings>
-                                        <MouseBinding MouseAction="LeftDoubleClick"
-                                                      Command="{Binding ProjectBibleResultCommand}"
-                                                      CommandParameter="{Binding SelectedItem, ElementName=BibleResultsList}"/>
                                         <KeyBinding Key="Enter"
                                                     Command="{Binding ProjectBibleResultCommand}"
                                                     CommandParameter="{Binding SelectedItem, ElementName=BibleResultsList}"/>
@@ -775,8 +773,9 @@
                                   SelectedItem="{Binding SelectedPlaylist}"
                                   DisplayMemberPath="Name" FontSize="12"
                                   ToolTip="Orden de la reunión: elegí la playlist que vas a usar hoy"/>
-                        <Grid x:Name="PlaylistBody">
-                            <TextBlock Text="Agregá canciones (clic derecho), pasajes (botón ▶➕ en Biblia)&#10;y medios (clic derecho) · doble clic proyecta.">
+                        <Grid x:Name="PlaylistBody" AllowDrop="True" Background="Transparent"
+                              DragOver="PlaylistBody_DragOver" DragLeave="PlaylistBody_DragLeave" Drop="PlaylistBody_Drop">
+                            <TextBlock Text="Arrastrá canciones acá (o clic derecho), pasajes con «➕ Playlist»&#10;en Biblia y medios con clic derecho · doble clic proyecta.">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock" BasedOn="{StaticResource PlaceholderText}">
                                         <Setter Property="FontSize" Value="10"/>
@@ -794,11 +793,9 @@
                                      SelectedItem="{Binding SelectedPlaylistItem}"
                                      Background="Transparent" BorderThickness="0"
                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                     ToolTip="Clic: cargar sin proyectar · doble clic: proyectar">
+                                     PreviewKeyDown="PlaylistList_PreviewKeyDown"
+                                     ToolTip="Clic: ver sin proyectar · doble clic: proyectar · Supr: quitar">
                                 <ListBox.InputBindings>
-                                    <MouseBinding MouseAction="LeftDoubleClick"
-                                                  Command="{Binding ProjectPlaylistItemCommand}"
-                                                  CommandParameter="{Binding SelectedItem, ElementName=PlaylistList}"/>
                                     <KeyBinding Key="Enter"
                                                 Command="{Binding ProjectPlaylistItemCommand}"
                                                 CommandParameter="{Binding SelectedItem, ElementName=PlaylistList}"/>
@@ -863,6 +860,11 @@
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
+                            <!-- Dónde cae la canción que se está arrastrando -->
+                            <Rectangle x:Name="PlaylistDropLine" Height="3" RadiusX="1.5" RadiusY="1.5"
+                                       VerticalAlignment="Top" Margin="10,0,10,0"
+                                       Fill="{StaticResource AccentBrush}" IsHitTestVisible="False"
+                                       Visibility="Collapsed"/>
                         </Grid>
                     </DockPanel>
                 </Border>
@@ -881,10 +883,33 @@
             <Border x:Name="SlidesPanel" Grid.Column="2" Style="{StaticResource Panel}">
                 <Grid>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0"
+                    <!-- Qué hay en la grilla y, si es otra cosa, qué está en pantalla -->
+                    <DockPanel Grid.Row="0" Margin="12,8,12,8" LastChildFill="False"
+                               Visibility="{Binding HasGridTitle, Converter={StaticResource BoolToVis}}">
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center"
+                                    Visibility="{Binding ShowOtherLive, Converter={StaticResource BoolToVis}}"
+                                    ToolTip="Lo que se está viendo en la pantalla ahora">
+                            <Ellipse Width="8" Height="8" Fill="{StaticResource LiveBrush}" Margin="0,0,6,0"
+                                     VerticalAlignment="Center"/>
+                            <TextBlock Text="En vivo: " FontSize="12" Foreground="{StaticResource MutedBrush}"/>
+                            <TextBlock Text="{Binding LiveTitle}" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="White" MaxWidth="320" TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+                        <TextBlock DockPanel.Dock="Left" Text="{Binding GridTitle}"
+                                   FontSize="15" FontWeight="SemiBold" Foreground="White"
+                                   TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                        <Border DockPanel.Dock="Left" Margin="10,0,0,0" Padding="6,1" CornerRadius="3"
+                                Background="{StaticResource LiveBrush}" VerticalAlignment="Center"
+                                Visibility="{Binding ShowGridLiveBadge, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="EN VIVO" FontSize="10" FontWeight="SemiBold" Foreground="White"/>
+                        </Border>
+                    </DockPanel>
+
+                    <Border Grid.Row="1"
                             BorderBrush="{StaticResource LineBrush}"
                             BorderThickness="0,1,0,0">
                         <Grid>
@@ -895,6 +920,9 @@
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding HasSlides}" Value="False">
                                                 <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding HasPreviewMedia}" Value="True">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -995,6 +1023,32 @@
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                             </ScrollViewer>
+
+                            <!-- Un medio de la playlist abierto con un clic: se ve acá y
+                                 recién el doble clic (o el botón) lo pone en pantalla -->
+                            <Grid Margin="24,16" Visibility="{Binding HasPreviewMedia, Converter={StaticResource BoolToVis}}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Border CornerRadius="6" Background="#10141E" ClipToBounds="True"
+                                        BorderBrush="{StaticResource LineBrush}" BorderThickness="1">
+                                    <Grid>
+                                        <Image Source="{Binding PreviewMediaImage}" Stretch="Uniform"
+                                               Visibility="{Binding HasPreviewMediaImage, Converter={StaticResource BoolToVis}}"/>
+                                        <TextBlock Text="🎞" FontSize="64" Foreground="{StaticResource MutedBrush}"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                   Visibility="{Binding HasPreviewMediaImage, Converter={StaticResource InverseBoolToVis}}"/>
+                                    </Grid>
+                                </Border>
+                                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,14,0,0">
+                                    <TextBlock Text="Doble clic en la playlist o este botón lo pone en pantalla."
+                                               FontSize="12" Foreground="{StaticResource MutedBrush}"
+                                               VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                    <Button Content="▶  Proyectar" Style="{StaticResource AccentButton}" Padding="16,7"
+                                            Command="{Binding ProjectPreviewMediaCommand}"/>
+                                </StackPanel>
+                            </Grid>
                         </Grid>
                     </Border>
                 </Grid>

@@ -9,6 +9,21 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Nombre arriba de las diapositivas**: el panel central dice qué tiene
+  cargado («Mi Gozo — Barak», «Juan 8 · RVR1960») y marca «EN VIVO» cuando
+  es lo que está en pantalla. Si en pantalla hay otra cosa (estás mirando lo
+  que viene), a la derecha dice «En vivo: …».
+
+- **Los medios de la playlist se ven antes de proyectarlos**: un clic los
+  muestra grandes en el centro, y el doble clic (o el botón «Proyectar») los
+  pone en pantalla. Con las flechas se siguen proyectando solos, como antes.
+
+- **Arrastrar canciones a la playlist**, desde la lista de canciones, al
+  lugar exacto: una línea marca dónde va a caer.
+
+- **Suprimir quita de la playlist** el ítem elegido, y se puede apretar
+  varias veces seguidas.
+
 - **Pasajes en la playlist**: el botón «➕ Playlist» de la Biblia agrega un
   tramo escrito en el buscador («juan 8 5-10», o como se lee: «juan 8 del 5
   al 10»); si no hay tramo escrito, el versículo que está en pantalla; si no,
@@ -98,6 +113,12 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Corregido
 
+- **El doble clic en la playlist no proyectaba**: la fila se quedaba con el
+  clic antes de que la lista lo viera. Ahora lo atiende la fila misma, y lo
+  mismo en la lista de canciones y en los resultados de búsqueda de la
+  Biblia, que estaban armados igual.
+- Abrir un capítulo entero desde la playlist podía proyectar, con doble
+  clic, un versículo que había quedado marcado de lo anterior.
 - **Un versículo solo quedaba corrido hacia arriba**: el lugar de la segunda
   versión se reservaba igual aunque no hubiera segunda versión, y en uno
   largo eso sacaba la última línea del recuadro.

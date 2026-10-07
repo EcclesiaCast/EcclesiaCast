@@ -100,6 +100,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         "Creá una canción con ➕, o escribí un texto rápido y presioná Ctrl+Enter.";
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowGridLiveBadge), nameof(ShowOtherLive))]
     private bool _isProjecting;
 
     [ObservableProperty]
@@ -142,6 +143,54 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
     [ObservableProperty]
     private bool _hasSlides;
+
+    /// <summary>
+    /// What the slide grid holds: «Hay libertad — IBI», «Juan 8 · RVR1960»,
+    /// or the name of a media waiting to be projected. Shown above the grid.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsGridLive), nameof(HasGridTitle), nameof(ShowGridLiveBadge), nameof(ShowOtherLive))]
+    private string? _gridTitle;
+
+    /// <summary>The name of what was last put on screen, by the same naming.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsGridLive), nameof(ShowGridLiveBadge), nameof(ShowOtherLive))]
+    private string? _liveTitle;
+
+    /// <summary>True when the grid shows the very thing that is on screen.</summary>
+    public bool IsGridLive => LiveTitle is not null && LiveTitle == GridTitle;
+
+    public bool HasGridTitle => !string.IsNullOrEmpty(GridTitle);
+
+    /// <summary>The «EN VIVO» mark next to the grid's title.</summary>
+    public bool ShowGridLiveBadge => IsProjecting && IsGridLive;
+
+    /// <summary>
+    /// «En vivo: …» on the right of the header, when the screen shows
+    /// something other than the grid (the operator is looking ahead).
+    /// </summary>
+    public bool ShowOtherLive => IsProjecting && LiveTitle is not null && !IsGridLive;
+
+    /// <summary>
+    /// A media item of the playlist opened with one click: the centre shows
+    /// it, and only the double click (or the button) puts it on screen.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasPreviewMedia), nameof(PreviewMediaImage), nameof(HasPreviewMediaImage))]
+    private MediaItem? _previewMedia;
+
+    public bool HasPreviewMedia => PreviewMedia is not null;
+
+    public bool HasPreviewMediaImage => PreviewMediaImage is not null;
+
+    /// <summary>The picture for <see cref="PreviewMedia"/>: its poster, or the image itself.</summary>
+    public string? PreviewMediaImage => PreviewMedia switch
+    {
+        null => null,
+        { ThumbnailPath: { Length: > 0 } poster } when File.Exists(poster) => poster,
+        { Type: MediaType.Image } image when File.Exists(image.Path) => image.Path,
+        _ => null,
+    };
 
     [ObservableProperty]
     private bool _isBibleTabActive;
@@ -496,11 +545,19 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     }
 
     [RelayCommand]
-    private void AddSongToPlaylist(Song? song)
+    private void AddSongToPlaylist(Song? song) => InsertSongInPlaylist(song, PlaylistItems.Count);
+
+    /// <summary>A song dragged from the list lands where it was dropped.</summary>
+    public void InsertSongInPlaylist(Song? song, int index)
     {
         if (song is null || !EnsurePlaylist())
             return;
-        PlaylistItems.Add(new PlaylistItem
+
+        index = Math.Clamp(index, 0, PlaylistItems.Count);
+        if (index <= _currentPlaylistIndex)
+            _currentPlaylistIndex++;
+
+        PlaylistItems.Insert(index, new PlaylistItem
         {
             Type = PlaylistItemType.Song,
             Caption = string.IsNullOrWhiteSpace(song.Artist) ? song.Title : $"{song.Title} — {song.Artist}",
@@ -636,8 +693,18 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         // Nothing to remove from a list that works itself out.
         if (item is null || IsSmartPlaylist)
             return;
+
+        // The arrows walk the playlist from the item in use: removing one
+        // above it shifts it up, and removing that very one leaves none.
+        var index = PlaylistItems.IndexOf(item);
+        if (index >= 0 && index < _currentPlaylistIndex)
+            _currentPlaylistIndex--;
+        else if (index == _currentPlaylistIndex)
+            _currentPlaylistIndex = -1;
+
         PlaylistItems.Remove(item);
         SavePlaylist();
+        StatusText = $"«{item.Caption}» quitado de la playlist.";
     }
 
     [RelayCommand]
@@ -665,9 +732,19 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         SavePlaylist();
     }
 
-    /// <summary>Loads the item into the operator (no projection).</summary>
+    /// <summary>
+    /// One click: loads the item into the operator without projecting it. A
+    /// media item is only shown in the centre, since applying it would put it
+    /// on the screen.
+    /// </summary>
     [RelayCommand]
-    private void OpenPlaylistItem(PlaylistItem? item)
+    private void OpenPlaylistItem(PlaylistItem? item) => LoadPlaylistItem(item, projectMedia: false);
+
+    /// <summary>
+    /// Loads a playlist item. <paramref name="projectMedia"/> says whether a
+    /// media item goes on screen (double click, arrows) or just to the centre.
+    /// </summary>
+    private void LoadPlaylistItem(PlaylistItem? item, bool projectMedia)
     {
         if (item is null)
             return;
@@ -675,7 +752,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _openingPlaylistItem = true;
         try
         {
-            OpenPlaylistItemCore(item);
+            OpenPlaylistItemCore(item, projectMedia);
         }
         finally
         {
@@ -686,7 +763,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         SelectedPlaylistItem = item;
     }
 
-    private void OpenPlaylistItemCore(PlaylistItem item)
+    private void OpenPlaylistItemCore(PlaylistItem item, bool projectMedia)
     {
         switch (item.Type)
         {
@@ -741,9 +818,49 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                     StatusText = $"El medio \"{item.Caption}\" ya no está en la biblioteca.";
                     return;
                 }
-                ApplyBackground(media);
+
+                if (projectMedia)
+                    ProjectMedia(media);
+                else
+                    ShowMediaInCentre(media);
                 break;
         }
+    }
+
+    /// <summary>
+    /// Puts a media of the playlist in the centre, the way a song shows its
+    /// slides: the operator sees what comes before it is on the screen.
+    /// </summary>
+    private void ShowMediaInCentre(MediaItem media)
+    {
+        // Leaving the song selected would make clicking it again do nothing,
+        // since the grid only rebuilds when the selection changes.
+        SelectedSong = null;
+        Slides.Clear();
+        LiveSlideIndex = -1;
+        PreviewSlideIndex = -1;
+        _currentPassage = null;
+        PreviewSlide = null;
+
+        PreviewMedia = media;
+        GridTitle = media.Name;
+        StatusText = $"«{media.Name}» listo: doble clic en la playlist (o el botón Proyectar) lo pone en pantalla.";
+    }
+
+    /// <summary>Puts a media on screen and names it above the grid when it takes the whole screen.</summary>
+    private void ProjectMedia(MediaItem media)
+    {
+        ApplyBackground(media);
+        if (media.Behavior == MediaBehavior.Foreground)
+            LiveTitle = media.Name;
+    }
+
+    /// <summary>The «Proyectar» button under a media shown in the centre.</summary>
+    [RelayCommand]
+    private void ProjectPreviewMedia()
+    {
+        if (PreviewMedia is { } media)
+            ProjectMedia(media);
     }
 
     /// <summary>Double-click: load the item AND put it live.</summary>
@@ -753,7 +870,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (item is null)
             return;
 
-        OpenPlaylistItem(item);
+        LoadPlaylistItem(item, projectMedia: true);
 
         if (item.Type is PlaylistItemType.Song or PlaylistItemType.BiblePassage)
         {
@@ -2346,6 +2463,8 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         LiveSlideIndex = -1;
         PreviewSlideIndex = -1;
         _currentPassage = null;
+        PreviewMedia = null;
+        GridTitle = null;
         if (!_openingPlaylistItem)
             _currentPlaylistIndex = -1;
 
@@ -2356,6 +2475,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         var caption = string.IsNullOrWhiteSpace(SelectedSong.Artist)
             ? SelectedSong.Title
             : $"{SelectedSong.Title} — {SelectedSong.Artist}";
+        GridTitle = caption;
 
         foreach (var section in SelectedSong.Sections)
         {
@@ -3053,6 +3173,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _currentPassage = reference;
         Slides.Clear();
         LiveSlideIndex = -1;
+        PreviewSlideIndex = -1;
 
         // Loading a passage by hand steps out of the service order, the same
         // way choosing a song does. Otherwise the end of the playlist's verse
@@ -3076,6 +3197,11 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         }
 
         var bookName = verses[0].BookName;
+        PreviewMedia = null;
+        GridTitle = secondary is null
+            ? $"{bookName} {reference.Chapter} · {primary.Abbreviation}"
+            : $"{bookName} {reference.Chapter} · {primary.Abbreviation} + {secondary.Abbreviation}";
+
         foreach (var group in VerseGrouping.Group(verses, secondaryTexts))
         {
             var mainText = theme.ShowVerseNumbers ? $"{group.Numbers}  {group.Text}" : group.Text;
@@ -3512,7 +3638,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             return false;
 
         var item = PlaylistItems[target];
-        OpenPlaylistItem(item);
+        LoadPlaylistItem(item, projectMedia: true);
 
         // A media item projects itself when opened (ApplyBackground); putting a
         // slide live on top of it would paint the previous item's text over it.
@@ -3612,6 +3738,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         }
 
         _presentation.GoLive(item.Slide);
+        LiveTitle = GridTitle;
         _projection.EnsureVisible(SelectedDisplay.Info);
         _settings.Set(OutputDisplayKey, SelectedDisplay.Info.DeviceName);
         IsProjecting = true;
@@ -3671,6 +3798,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         // Quick text stands alone: nothing follows it on the stage display.
         Projection.SlideLabel = "Texto rápido";
+        LiveTitle = "Texto rápido";
         Projection.NextSlide = null;
 
         StatusText = "Texto rápido en vivo. F1 Black · F2 Clear · F3 Logo · Esc apaga la salida.";

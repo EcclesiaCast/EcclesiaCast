@@ -25,15 +25,6 @@ La beta.5 se probó el 6/10/2026: lo que anda bien quedó así (Biblia, achicar
 paneles, menú, buscar canciones en internet). Lo que salió de esa prueba y
 los pedidos nuevos:
 
-**Playlist**
-
-- [ ] **Clic = vista previa en el centro, doble clic = proyectar**, para
-      todo lo que haya en la playlist. Hoy el doble clic sólo anda con
-      canciones (con un medio no hace nada útil).
-- [ ] **Nombre de lo que está en vivo** arriba del recuadro central.
-- [ ] **Suprimir** borra el ítem de la playlist.
-- [ ] **Arrastrar canciones** de la lista a la playlist.
-
 **Diapositivas**
 
 - [ ] **El resaltado se borra** al pasar a otra diapositiva o versículo.

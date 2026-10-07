@@ -7,6 +7,7 @@ using System.Windows.Threading;
 using EcclesiaCast.App.ViewModels;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Presentation;
+using EcclesiaCast.Core.Songs;
 
 namespace EcclesiaCast.App;
 
@@ -282,19 +283,176 @@ public partial class MainWindow : Window
 
     /// <summary>
     /// One click on a playlist item loads it without projecting it, so the
-    /// operator can look ahead; the double click that projects it arrives as
-    /// a second press and is left to the list's own binding. A media item is
-    /// only selected: loading it would already put it on the screen.
+    /// operator can look ahead (a media item is only shown in the centre);
+    /// the second press of a double click projects it. Both are taken here,
+    /// before the row handles the press: left to a binding on the list, the
+    /// double click never arrived, because the row marks the press as handled.
     /// </summary>
     private void PlaylistItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.ClickCount != 1
-            || DataContext is not MainViewModel vm
-            || sender is not FrameworkElement { DataContext: Core.Playlists.PlaylistItem item }
-            || item.Type == Core.Playlists.PlaylistItemType.Media)
+        if (DataContext is not MainViewModel vm
+            || sender is not FrameworkElement { DataContext: Core.Playlists.PlaylistItem item })
             return;
 
-        vm.OpenPlaylistItemCommand.Execute(item);
+        if (e.ClickCount == 1)
+        {
+            vm.OpenPlaylistItemCommand.Execute(item);
+        }
+        else if (e.ClickCount == 2)
+        {
+            vm.ProjectPlaylistItemCommand.Execute(item);
+            e.Handled = true;
+        }
+    }
+
+    /// <summary>Double click on a found verse projects it (see the playlist for why it is taken here).</summary>
+    private void BibleResultsList_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ClickCount != 2
+            || DataContext is not MainViewModel vm
+            || e.OriginalSource is not DependencyObject source
+            || ItemsControl.ContainerFromElement(BibleResultsList, source) is not ListBoxItem { DataContext: BibleVerseResult result })
+            return;
+
+        vm.ProjectBibleResultCommand.Execute(result);
+        e.Handled = true;
+    }
+
+    // ── Arrastrar canciones a la playlist ────────────────────────
+
+    private Point? _songDragStart;
+    private Song? _songDragItem;
+
+    private void SongsList_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        _songDragItem = e.OriginalSource is DependencyObject source
+            && ItemsControl.ContainerFromElement(SongsList, source) is ListBoxItem row
+                ? row.DataContext as Song
+                : null;
+        _songDragStart = _songDragItem is null ? null : e.GetPosition(this);
+
+        // The double click is taken here for the same reason as in the
+        // playlist: the row handles the press before a binding on the list
+        // gets to see it.
+        if (e.ClickCount == 2 && _songDragItem is not null && DataContext is MainViewModel vm)
+        {
+            _songDragStart = null;
+            vm.ProjectFirstSlideCommand.Execute(null);
+            e.Handled = true;
+        }
+    }
+
+    /// <summary>
+    /// A press that travels a few pixels becomes a drag, so a plain click
+    /// still selects the song and a double click still projects it.
+    /// </summary>
+    private void SongsList_PreviewMouseMove(object sender, MouseEventArgs e)
+    {
+        if (e.LeftButton != MouseButtonState.Pressed
+            || _songDragStart is not Point start
+            || _songDragItem is not { } song)
+            return;
+
+        var moved = e.GetPosition(this) - start;
+        if (Math.Abs(moved.X) < SystemParameters.MinimumHorizontalDragDistance * 2
+            && Math.Abs(moved.Y) < SystemParameters.MinimumVerticalDragDistance * 2)
+            return;
+
+        _songDragStart = null;
+        DragDrop.DoDragDrop(SongsList, new DataObject(typeof(Song), song), DragDropEffects.Copy);
+        _songDragItem = null;
+        PlaylistDropLine.Visibility = Visibility.Collapsed;
+    }
+
+    private void PlaylistBody_DragOver(object sender, DragEventArgs e)
+    {
+        e.Handled = true;
+        if (!e.Data.GetDataPresent(typeof(Song)))
+        {
+            e.Effects = DragDropEffects.None;
+            return;
+        }
+
+        e.Effects = DragDropEffects.Copy;
+        var (_, lineY) = PlaylistDropPoint(e);
+        PlaylistDropLine.Margin = new Thickness(10, Math.Max(0, lineY - 1.5), 10, 0);
+        PlaylistDropLine.Visibility = Visibility.Visible;
+    }
+
+    private void PlaylistBody_DragLeave(object sender, DragEventArgs e)
+    {
+        // Leaving for a child (a row) also raises DragLeave: only hide the
+        // line when the pointer really left the playlist.
+        var position = e.GetPosition(PlaylistBody);
+        if (position.X < 0 || position.Y < 0
+            || position.X > PlaylistBody.ActualWidth || position.Y > PlaylistBody.ActualHeight)
+            PlaylistDropLine.Visibility = Visibility.Collapsed;
+    }
+
+    private void PlaylistBody_Drop(object sender, DragEventArgs e)
+    {
+        PlaylistDropLine.Visibility = Visibility.Collapsed;
+        e.Handled = true;
+        if (DataContext is not MainViewModel vm || e.Data.GetData(typeof(Song)) is not Song song)
+            return;
+
+        var (index, _) = PlaylistDropPoint(e);
+        vm.InsertSongInPlaylist(song, index);
+    }
+
+    /// <summary>
+    /// Where a drop lands: before the row whose upper half is under the
+    /// pointer, or after the last one. Returns that position in the list and
+    /// the height (within the playlist) where the line marking it goes.
+    /// </summary>
+    private (int Index, double LineY) PlaylistDropPoint(DragEventArgs e)
+    {
+        var pointer = e.GetPosition(PlaylistBody).Y;
+        var count = PlaylistList.Items.Count;
+        var lineY = 0d;
+
+        for (var i = 0; i < count; i++)
+        {
+            if (PlaylistList.ItemContainerGenerator.ContainerFromIndex(i) is not ListBoxItem row
+                || !row.IsVisible)
+                continue;
+
+            var top = row.TranslatePoint(new Point(0, 0), PlaylistBody).Y;
+            if (pointer < top + row.ActualHeight / 2)
+                return (i, top);
+            lineY = top + row.ActualHeight;
+        }
+
+        return (count, lineY);
+    }
+
+    /// <summary>
+    /// Supr takes the selected item off the playlist and selects the one that
+    /// took its place, so a few presses clear several in a row.
+    /// </summary>
+    private void PlaylistList_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Delete
+            || DataContext is not MainViewModel vm
+            || PlaylistList.SelectedItem is not Core.Playlists.PlaylistItem item)
+            return;
+
+        var index = PlaylistList.SelectedIndex;
+        vm.RemovePlaylistItemCommand.Execute(item);
+        e.Handled = true;
+
+        if (PlaylistList.Items.Count == 0)
+            return;
+
+        PlaylistList.SelectedIndex = Math.Min(index, PlaylistList.Items.Count - 1);
+
+        // Saving rebuilds the list, so the keyboard focus has to be put back
+        // on the new row once it exists.
+        Dispatcher.InvokeAsync(() =>
+        {
+            if (PlaylistList.ItemContainerGenerator.ContainerFromIndex(PlaylistList.SelectedIndex) is ListBoxItem row)
+                row.Focus();
+        }, DispatcherPriority.Background);
     }
 
     /// <summary>
