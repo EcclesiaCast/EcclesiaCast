@@ -15,22 +15,25 @@ La pantalla elegida se recuerda para la próxima vez.
 
 En la pestaña **Canciones**:
 
-- **➕** crea una canción. Pegá la letra: **cada párrafo** (bloque separado por
+- **➕** es el único botón para agregar canciones y ofrece cuatro caminos:
+  **Crear desde cero**, **Buscar en internet…**, **Traer de ProPresenter…** e
+  **Importar archivo (.txt, .pro)…**. Crear desde cero abre una canción en
+  blanco: pegá la letra, y **cada párrafo** (bloque separado por
   una línea en blanco) es una diapositiva. Opcionalmente, una línea `[Coro]` o
   `[Verso 1]` no se proyecta, solo le pone nombre a los párrafos que siguen.
-- **🅿** trae **todas** las canciones de ProPresenter de una vez: busca sola
+- **➕ → Traer de ProPresenter…** trae **todas** las canciones de ProPresenter de una vez: busca sola
   dónde está instalado (también en la carpeta de OneDrive), te muestra sus
   bibliotecas con cuántas canciones tiene cada una y las importa. Las que ya
   estén en la biblioteca se saltean. Si tus canciones están en otro lado (un
   disco externo, una copia de otra máquina), usá **Elegir carpeta…**.
-- **📥 → Buscar en internet…** (también en **Archivo**) trae una canción
+- **➕ → Buscar en internet…** (también en **Archivo**) trae una canción
   nueva sin copiar y pegar: escribí el **nombre**, el **artista** o **una frase
   de la letra** y apretá Enter. Busca en musica.com y, si no está ahí, en
   lrclib.net. Al elegir un resultado ves la letra ya separada en diapositivas
   (con [Coro], [Verso 1]… cuando la página los marca); corregila ahí mismo si
   hace falta y apretá **Importar a la biblioteca**. Podés importar varias sin
   cerrar la ventana. Necesita internet, claro.
-- **📥** también importa archivos sueltos `.txt` o `.pro`.
+- **➕ → Importar archivo…** trae archivos sueltos `.txt` o `.pro`.
 - El buscador filtra por título, artista o texto de la letra.
 
 Al escribir la letra, las palabras dudosas se **subrayan en rojo**. El clic

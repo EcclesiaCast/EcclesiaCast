@@ -25,12 +25,6 @@ La beta.5 se probó el 6/10/2026: lo que anda bien quedó así (Biblia, achicar
 paneles, menú, buscar canciones en internet). Lo que salió de esa prueba y
 los pedidos nuevos:
 
-**Canciones**
-
-- [ ] **Un solo «+»** que ofrezca: crear desde cero, buscar en internet,
-      traer de ProPresenter o importar archivo (fusiona los dos primeros
-      botones).
-
 **Medios**
 
 - [ ] Sacar el botón **«sin fondo»**.

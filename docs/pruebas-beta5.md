@@ -137,7 +137,7 @@ punto al probarlo; si algo falla, anotá abajo qué hiciste y qué pasó.
 
 ## Buscar canciones en internet
 
-- [ ] **📥 → Buscar en internet…** abre la ventana (también desde Archivo).
+- [ ] **➕ → Buscar en internet…** abre la ventana (también desde Archivo).
 - [ ] Buscá por **nombre**: «renuevame». Aparecen resultados de musica.com
       enseguida; al elegir uno se ve la letra separada en diapositivas.
 - [ ] Buscá por **artista**: «marcos witt».

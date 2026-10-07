@@ -89,6 +89,9 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Cambiado
 
+- **Un solo ➕ para agregar canciones**: al tocarlo ofrece Crear desde cero,
+  Buscar en internet…, Traer de ProPresenter… e Importar archivo (.txt,
+  .pro)…. Desaparece el botón 📥 ▾ que estaba al lado.
 - **Menos botones arriba**: el ⏱ (cuenta regresiva) y el 💾 (copia de
   seguridad) salieron de la barra, porque ya estaban en los menús. En
   Proyección → Cuenta regresiva… el ítem lleva una tilde y dice «en marcha»

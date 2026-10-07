@@ -154,11 +154,12 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Ways to bring songs in, behind one button. Importing happens once when a
-    /// church moves in and then hardly ever, so it doesn't deserve permanent
-    /// buttons in a panel used every Sunday.
+    /// Every way of getting a song into the library behind the one ➕: writing
+    /// it, finding it online, bringing a whole ProPresenter library or loose
+    /// files. They used to be two buttons, and the operator had to guess which
+    /// of them held the one they wanted.
     /// </summary>
-    private void ImportMenu_Click(object sender, RoutedEventArgs e)
+    private void AddSongMenu_Click(object sender, RoutedEventArgs e)
     {
         if (DataContext is not MainViewModel vm || sender is not FrameworkElement anchor)
             return;
@@ -171,6 +172,13 @@ public partial class MainWindow : Window
 
         menu.Items.Add(new MenuItem
         {
+            Header = "Crear desde cero",
+            Command = vm.NewSongCommand,
+            ToolTip = "Una canción nueva en blanco, para escribir la letra",
+        });
+        menu.Items.Add(new Separator());
+        menu.Items.Add(new MenuItem
+        {
             Header = "Buscar en internet…",
             Command = vm.SearchSongsOnlineCommand,
             ToolTip = "Por nombre, artista o una frase de la letra, en musica.com y lrclib.net",
@@ -178,13 +186,13 @@ public partial class MainWindow : Window
         menu.Items.Add(new Separator());
         menu.Items.Add(new MenuItem
         {
-            Header = "Traer todo de ProPresenter…",
+            Header = "Traer de ProPresenter…",
             Command = vm.ImportFromProPresenterCommand,
             ToolTip = "Busca solo dónde está instalado ProPresenter y trae sus bibliotecas enteras",
         });
         menu.Items.Add(new MenuItem
         {
-            Header = "Importar archivos (.txt, .pro)…",
+            Header = "Importar archivo (.txt, .pro)…",
             Command = vm.ImportSongsCommand,
             ToolTip = "Elegir archivos sueltos de texto o de ProPresenter",
         });
