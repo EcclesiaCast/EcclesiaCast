@@ -147,8 +147,12 @@ public sealed class BibleRepository(string dbPath) : IBibleRepository
                     .Replace("  ", " ").Replace("  ", " ").Replace("  ", " "),
                 pattern))
             .OrderBy(v => v.Book.Number).ThenBy(v => v.Chapter).ThenBy(v => v.Verse)
-            .Take(limit)
             .Select(v => new BibleVerseResult(v.Book.Number, v.Book.Name, v.Chapter, v.Verse, v.Text))
+            .AsEnumerable()
+            // LIKE also matches inside a word («echa» in «derecha»); the rows
+            // are read one by one until enough start at a word.
+            .Where(v => TextMatching.StartsAtWord(v.Text, query))
+            .Take(limit)
             .ToList();
     }
 }

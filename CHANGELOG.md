@@ -141,7 +141,9 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 - **Ctrl+K busca en todas las Biblias instaladas** y cada versículo dice de qué
   versión es («Salmos 55:22 · RVR1960»). Al elegirlo se abre en esa versión,
   no en la que estaba elegida. Cada versión aporta como mucho unos pocos
-  resultados, para que una no tape a las demás.
+  resultados, para que una no tape a las demás. En la Biblia la frase tiene
+  que empezar al principio de una palabra: «echa sobre» ya no se llena de
+  «derecha sobre» antes de llegar a «Echa sobre Jehová tu carga».
 - **F1 es Black y F2 es Clear** (antes al revés), y los botones de arriba
   quedaron en ese orden.
 - El panel **LIVE va arriba** y el PREVIEW debajo: lo que está en pantalla es

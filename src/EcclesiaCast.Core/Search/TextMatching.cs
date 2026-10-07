@@ -25,6 +25,31 @@ public static partial class TextMatching
         return collapsed.Length == 0 ? null : $"%{collapsed}%";
     }
 
+    /// <summary>
+    /// True when the phrase appears in the text starting at the beginning of
+    /// a word. A LIKE match also takes it from inside a word, so «echa sobre»
+    /// finds every «derecha sobre» of the Bible before the «Echa sobre Jehová
+    /// tu carga» the operator meant. The end is left open, so a phrase still
+    /// matches while its last word is being typed.
+    /// </summary>
+    public static bool StartsAtWord(string? text, string? query)
+    {
+        var haystack = CollapseWhitespace(text);
+        var needle = CollapseWhitespace(query);
+        if (needle.Length == 0)
+            return false;
+
+        for (var at = haystack.IndexOf(needle, StringComparison.CurrentCultureIgnoreCase);
+             at >= 0;
+             at = haystack.IndexOf(needle, at + 1, StringComparison.CurrentCultureIgnoreCase))
+        {
+            if (at == 0 || !char.IsLetterOrDigit(haystack[at - 1]))
+                return true;
+        }
+
+        return false;
+    }
+
     [GeneratedRegex(@"\s+")]
     private static partial Regex WhitespaceRun();
 }

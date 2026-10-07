@@ -35,4 +35,20 @@ public class TextMatchingTests
         Assert.Null(TextMatching.ContainsPattern("  "));
         Assert.Null(TextMatching.ContainsPattern(null));
     }
+
+    [Theory]
+    [InlineData("Echa sobre Jehová tu carga, y él te sustentará")]
+    [InlineData("y le dijo: echa sobre mí")]
+    [InlineData("«Echa\nsobre Jehová tu carga»")]
+    [InlineData("Echa sobr")]
+    public void A_phrase_that_starts_a_word_matches(string text) =>
+        Assert.True(TextMatching.StartsAtWord(text, "echa sobr"));
+
+    [Fact]
+    public void A_phrase_inside_another_word_does_not_match() =>
+        Assert.False(TextMatching.StartsAtWord("y puso su mano derecha sobre la cabeza", "echa sobre"));
+
+    [Fact]
+    public void A_later_match_at_a_word_still_counts() =>
+        Assert.True(TextMatching.StartsAtWord("su derecha sobre él; echa sobre Jehová", "echa sobre"));
 }

@@ -73,9 +73,41 @@
                     <Button Content="🗑" Style="{StaticResource DarkButton}" FontSize="12" Padding="9,4" Margin="4,0,0,0"
                             Click="DeleteBox_Click" ToolTip="Quitar el recuadro elegido (Suprimir)"/>
                 </StackPanel>
-                <ListBox x:Name="BoxList" Background="Transparent" BorderThickness="0" DisplayMemberPath="Text"
+                <!-- Mismo estilo que la lista de temas: sin él, WPF pinta los
+                     nombres en negro y sobre este fondo no se leen -->
+                <ListBox x:Name="BoxList" Background="Transparent" BorderThickness="0"
                          SelectionChanged="BoxList_Changed"
-                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="8,5"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="bd" Background="Transparent" CornerRadius="4"
+                                                Margin="0,1" Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="bd" Property="Background" Value="#20242F"/>
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="bd" Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Text}" FontSize="12" Foreground="White"
+                                       TextTrimming="CharacterEllipsis"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </DockPanel>
         </Border>
 

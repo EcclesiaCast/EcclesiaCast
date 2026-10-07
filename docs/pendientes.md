@@ -30,27 +30,20 @@ los pedidos nuevos:
 - [ ] **Acerca de: una forma de colaborar** (todavía no hay a dónde mandar a
       la gente; se agrega cuando esté decidido).
 
-**Para probar con el programa abierto** (lo que se hizo sin abrirlo: sólo
-se compiló, se corrieron las pruebas automáticas y se dibujaron las pantallas
-a imágenes)
+**Para probar con el programa abierto**
 
-- [ ] Ctrl+K: «echa sobre» trae Salmos 55:22 con su versión, y al elegirlo se
-      abre en esa versión. «las cadenas de la muerte» encuentra *Hay Libertad*.
-- [ ] Anuncios: agregar una imagen, cerrar y abrir el programa; la miniatura
-      tiene que seguir ahí.
-- [ ] Barra de medios: las pestañas apiladas se eligen con un clic, el ＋ crea
-      una, y arrastrar archivos desde el Explorador los agrega (con borde de
-      color mientras se arrastra, y aviso si se suelta algo que no sirve).
-- [ ] ➕ de canciones: sus cuatro caminos abren lo que dicen.
-- [ ] Ayuda → Acerca de: se ve bien y el enlace de GitHub abre el navegador.
-- [ ] Escenario: el editor mueve y agranda recuadros con el mouse, las flechas
-      y los números; guardar y cambiar de escenario desde el ▾ con la pantalla
-      prendida; los tres de fábrica se ven bien en la pantalla real;
-      «Mi escenario» conserva lo que había antes.
-- [ ] Modo PC de bajo rendimiento: Ver → tilde; el LIVE muestra el póster del
-      video; las transiciones cortan en la salida. Y en el instalador: la
-      casilla (compilar con ISCC) deja el modo prendido en el primer arranque.
-- [ ] Pestaña Música: ⏮ ⏯ ⏭ y volumen mueven el Spotify abierto.
+Se probó el 7/10/2026 con una copia de la biblioteca real: Ctrl+K («echa
+sobre» → Salmos 55:22 · RVR1960, que se abre en esa versión; «las cadenas de
+la muerte» → *Hay libertad*), las miniaturas de Anuncios (se rehicieron
+solas), el ➕ de canciones, Acerca de, el editor de escenario (mover y
+agrandar con el mouse), los cuatro escenarios en el monitor y su cambio con
+la pantalla prendida, el modo bajo rendimiento (el LIVE queda quieto y sin
+sombra) y la pestaña Música (se ve bien). Falta:
+
+- [ ] **Arrastrar archivos** desde el Explorador a la barra de medios.
+- [ ] **Los botones de Música** con Spotify abierto.
+- [ ] **El instalador**: que la casilla de bajo rendimiento deje el modo
+      prendido en el primer arranque.
 
 Descartado: importar las Biblias de BibleShow. Sus archivos `.bib` son bases
 de Access protegidas con usuario y contraseña, y NTV, NVI y PDT son textos con
