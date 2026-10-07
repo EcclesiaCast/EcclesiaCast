@@ -99,6 +99,7 @@
                 <MenuItem Header="Sin fondo" InputGestureText="F4" Command="{Binding ClearBackgroundCommand}"/>
                 <Separator/>
                 <MenuItem Header="Pantalla de escenario" Command="{Binding ToggleStageCommand}"/>
+                <MenuItem Header="Editar los escenarios…" Command="{Binding EditStageCommand}"/>
                 <MenuItem Header="Poner el cronómetro del escenario en cero" Command="{Binding ResetStageTimerCommand}"/>
                 <!-- Antes era un botón que se pintaba mientras la cuenta corre:
                      ahora el ítem lo dice con una tilde. -->
@@ -205,7 +206,7 @@
                     <!-- Escenario: la pantalla que miran los músicos -->
                     <Button Content="🎭 Escenario" Margin="14,0,0,0"
                             Command="{Binding ToggleStageCommand}"
-                            ToolTip="Prende la pantalla para los músicos: la letra que está en vivo, la que sigue, la hora y el cronómetro">
+                            ToolTip="Prende la pantalla de escenario para los músicos y quien predica, con el escenario elegido en el ▾">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
                                 <Style.Triggers>
@@ -221,7 +222,7 @@
                             Style="{StaticResource DarkButton}"
                             AutomationProperties.Name="Ajustes del escenario"
                             Click="StageOptions_Click"
-                            ToolTip="En qué pantalla va el escenario y qué muestra"/>
+                            ToolTip="Cambiar de escenario (cantantes, predicador…), editarlos y elegir en qué pantalla va"/>
 
                     <!-- Celular: control remoto por la red de la iglesia -->
                     <Button Content="📱" Padding="9,7" Margin="8,0,0,0"
@@ -1076,7 +1077,7 @@
                                          Visibility="{Binding PreviewShowsStage, Converter={StaticResource BoolToVis}}">
                                     <controls:StageView Width="1920" Height="1080"
                                                         DataContext="{Binding Projection}"
-                                                        Options="{Binding DataContext.StageOptionsForPreview, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                                        Layout="{Binding DataContext.ActiveStageLayout, RelativeSource={RelativeSource AncestorType=Window}}"/>
                                 </Viewbox>
                             </Grid>
                         </Border>

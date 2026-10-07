@@ -241,7 +241,7 @@ public partial class MainWindow : Window
         menu.IsOpen = true;
     }
 
-    /// <summary>Screen picker and switches for the stage display, under its ▾ button.</summary>
+    /// <summary>Stage layouts, their editor and the screen picker, under the ▾ of the stage button.</summary>
     private void StageOptions_Click(object sender, RoutedEventArgs e)
     {
         if (DataContext is not MainViewModel vm || sender is not FrameworkElement anchor)
@@ -253,6 +253,23 @@ public partial class MainWindow : Window
             Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom,
         };
 
+        // Quick switch between the saved arrangements; the one in use is ticked.
+        menu.Items.Add(new MenuItem { Header = "Escenario", IsEnabled = false });
+        foreach (var layout in vm.StageLayouts)
+        {
+            var item = new MenuItem
+            {
+                Header = layout.Name,
+                IsCheckable = true,
+                IsChecked = ReferenceEquals(layout, vm.ActiveStageLayout),
+            };
+            item.Click += (_, _) => vm.SelectStageLayoutCommand.Execute(layout);
+            menu.Items.Add(item);
+        }
+
+        menu.Items.Add(new MenuItem { Header = "✏️  Editar los escenarios…", Command = vm.EditStageCommand });
+
+        menu.Items.Add(new Separator());
         menu.Items.Add(new MenuItem { Header = "Pantalla del escenario", IsEnabled = false });
         foreach (var display in vm.StageDisplays)
         {
@@ -267,25 +284,6 @@ public partial class MainWindow : Window
         }
 
         menu.Items.Add(new Separator());
-        menu.Items.Add(Toggle("Mostrar la hora", vm.StageShowClock, v => vm.StageShowClock = v));
-        menu.Items.Add(Toggle("Mostrar el cronómetro", vm.StageShowTimer, v => vm.StageShowTimer = v));
-        menu.Items.Add(Toggle("Mostrar la diapositiva siguiente", vm.StageShowNext, v => vm.StageShowNext = v));
-        menu.Items.Add(Toggle("Mostrar las notas", vm.StageShowNotes, v => vm.StageShowNotes = v));
-
-        menu.Items.Add(new Separator());
-        foreach (var size in new[] { 72d, 96d, 120d, 150d })
-        {
-            var item = new MenuItem
-            {
-                Header = $"Letra {size:0}",
-                IsCheckable = true,
-                IsChecked = Math.Abs(vm.StageTextScale - size) < 1,
-            };
-            item.Click += (_, _) => vm.StageTextScale = size;
-            menu.Items.Add(item);
-        }
-
-        menu.Items.Add(new Separator());
         menu.Items.Add(new MenuItem
         {
             Header = "⟲  Poner el cronómetro en cero",
@@ -293,14 +291,6 @@ public partial class MainWindow : Window
         });
 
         menu.IsOpen = true;
-        return;
-
-        static MenuItem Toggle(string header, bool isChecked, Action<bool> set)
-        {
-            var item = new MenuItem { Header = header, IsCheckable = true, IsChecked = isChecked };
-            item.Click += (s, _) => set(((MenuItem)s).IsChecked);
-            return item;
-        }
     }
 
     /// <summary>

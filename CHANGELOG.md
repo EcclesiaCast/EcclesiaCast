@@ -9,6 +9,20 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Editor de escenario y varios escenarios**: la pantalla de los músicos ya
+  no es fija. En el editor (▾ junto al botón Escenario, o Proyección →
+  Editar los escenarios…) ubicás y agrandás recuadros sobre la pantalla y a
+  cada uno le decís qué muestra: letra en vivo, próxima diapositiva, hora,
+  cronómetro, temporizador (lo que falta de la cuenta regresiva), notas para
+  el predicador, nombre de lo que está en vivo, texto fijo, aviso al pie o
+  «igual a la pantalla principal»; cada recuadro con su tamaño de letra,
+  color y alineación. Se guardan varios con nombre y se cambia entre ellos
+  desde el ▾, también con la pantalla prendida. Vienen tres armados:
+  **Cantantes**, **Predicador** e **Igual a la pantalla principal**. Lo que
+  tenías configurado antes (hora, cronómetro, siguiente, notas, tamaño de
+  letra) pasa solo a un escenario llamado «Mi escenario». El PREVIEW
+  «Escenario» muestra el que está elegido.
+
 - **Arrastrar y soltar archivos en la barra de medios**: soltá desde el
   Explorador imágenes, videos, PDF o PowerPoint y se agregan a la pestaña
   elegida, igual que con «Agregar». Mientras arrastrás, la barra se marca con

@@ -1,6 +1,7 @@
 using EcclesiaCast.App.ViewModels;
 using EcclesiaCast.App.Views;
 using EcclesiaCast.Core.Displays;
+using EcclesiaCast.Core.Stage;
 
 namespace EcclesiaCast.App.Services;
 
@@ -12,7 +13,7 @@ public sealed class StageWindowService(ProjectionViewModel projectionViewModel) 
 
     public event EventHandler? VisibilityChanged;
 
-    public void ShowOn(DisplayInfo display, StageOptions options)
+    public void ShowOn(DisplayInfo display, StageLayout layout)
     {
         if (_window is null || !_window.IsLoaded)
         {
@@ -28,13 +29,13 @@ public sealed class StageWindowService(ProjectionViewModel projectionViewModel) 
             _window.CloseRequested += (_, _) => Hide();
         }
 
-        _window.ApplyOptions(options);
+        _window.ApplyLayout(layout);
         _window.ShowOn(display);
     }
 
     public void Hide() => _window?.Hide();
 
-    public void ApplyOptions(StageOptions options) => _window?.ApplyOptions(options);
+    public void ApplyLayout(StageLayout layout) => _window?.ApplyLayout(layout);
 
     public void ResetTimer() => projectionViewModel.StageTimerStart = DateTime.Now;
 }

@@ -14,6 +14,7 @@ using EcclesiaCast.Core.Media;
 using EcclesiaCast.Core.Playlists;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Core.Songs;
+using EcclesiaCast.Core.Stage;
 using EcclesiaCast.Core.Themes;
 using EcclesiaCast.Data.Persistence;
 using Serilog;
@@ -259,6 +260,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         IProPresenterImportDialog proPresenterImport,
         IWebSongSearchDialog webSongSearch,
         IStageWindowService stage,
+        IStageDesigner stageDesigner,
         IBackupDialog backup,
         ICountdownDialog countdownDialog,
         ISmartPlaylistDialog smartPlaylistDialog,
@@ -287,6 +289,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _proPresenterImport = proPresenterImport;
         _webSongSearch = webSongSearch;
         _stage = stage;
+        _stageDesigner = stageDesigner;
         _backup = backup;
         _countdownDialog = countdownDialog;
         _smartPlaylistDialog = smartPlaylistDialog;
@@ -298,7 +301,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _projection.VisibilityChanged += (_, _) => IsProjecting = _projection.IsOutputVisible;
         _projection.VideoEnded += (_, _) => OnProjectedVideoEnded();
         _stage.VisibilityChanged += (_, _) => IsStageVisible = _stage.IsVisible;
-        _stageOptions = StageOptions.Load(settings);
+        LoadStageLayouts();
         Slides.CollectionChanged += (_, _) => HasSlides = Slides.Count > 0;
         UpdateStateFlags();
         RefreshDisplays();
@@ -2230,50 +2233,61 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     [ObservableProperty]
     private bool _isStageVisible;
 
-    private StageOptions _stageOptions = new();
+    private readonly IStageDesigner _stageDesigner;
 
-    public bool StageShowClock
-    {
-        get => _stageOptions.ShowClock;
-        set => SetStageOption(o => o.ShowClock = value);
-    }
+    private List<StageLayout> _stageLayouts = [];
 
-    public bool StageShowTimer
-    {
-        get => _stageOptions.ShowTimer;
-        set => SetStageOption(o => o.ShowTimer = value);
-    }
-
-    public bool StageShowNext
-    {
-        get => _stageOptions.ShowNext;
-        set => SetStageOption(o => o.ShowNext = value);
-    }
-
-    public bool StageShowNotes
-    {
-        get => _stageOptions.ShowNotes;
-        set => SetStageOption(o => o.ShowNotes = value);
-    }
-
-    public double StageTextScale
-    {
-        get => _stageOptions.TextScale;
-        set => SetStageOption(o => o.TextScale = Math.Clamp(value, 20, 400));
-    }
+    /// <summary>The saved arrangements of the stage screen, in the order they are offered.</summary>
+    public IReadOnlyList<StageLayout> StageLayouts => _stageLayouts;
 
     /// <summary>
-    /// The stage options for the copy of the stage in the preview panel. A
-    /// fresh object each time, so the view notices the change.
+    /// The arrangement the stage screen (and its copy in the preview) is
+    /// showing. The view redraws when this changes, so edits always replace
+    /// the object instead of changing it in place.
     /// </summary>
-    public StageOptions StageOptionsForPreview => new()
+    [ObservableProperty]
+    private StageLayout _activeStageLayout = new();
+
+    private void LoadStageLayouts()
     {
-        ShowClock = _stageOptions.ShowClock,
-        ShowTimer = _stageOptions.ShowTimer,
-        ShowNext = _stageOptions.ShowNext,
-        ShowNotes = _stageOptions.ShowNotes,
-        TextScale = _stageOptions.TextScale,
-    };
+        var state = StageLayoutStore.Load(_settings);
+        _stageLayouts = [.. state.Layouts];
+        ActiveStageLayout = state.Active;
+        OnPropertyChanged(nameof(StageLayouts));
+    }
+
+    /// <summary>Quick switch from the ▾ next to the stage button: takes effect on the open screen at once.</summary>
+    [RelayCommand]
+    private void SelectStageLayout(StageLayout? layout)
+    {
+        if (layout is null || ReferenceEquals(layout, ActiveStageLayout))
+            return;
+
+        ActiveStageLayout = layout;
+        StageLayoutStore.Save(_settings, _stageLayouts, layout.Name);
+        _stage.ApplyLayout(layout);
+        StatusText = $"Escenario: {layout.Name}.";
+    }
+
+    /// <summary>Opens the editor; what it returns replaces the saved arrangements.</summary>
+    [RelayCommand]
+    private void EditStage()
+    {
+        var result = _stageDesigner.Edit(_stageLayouts, ActiveStageLayout.Name);
+        if (result is null)
+            return;
+
+        _stageLayouts = [.. result.Layouts];
+        StageLayoutStore.Save(_settings, _stageLayouts, result.ActiveName);
+        OnPropertyChanged(nameof(StageLayouts));
+
+        // A new object even when nothing about the active one changed: the
+        // views compare by reference and must redraw after an edit.
+        ActiveStageLayout = result.Active.Clone();
+        _stageLayouts[_stageLayouts.FindIndex(l => l.Name == result.Active.Name)] = ActiveStageLayout;
+        _stage.ApplyLayout(ActiveStageLayout);
+        StatusText = "Escenarios guardados.";
+    }
 
     private const string PreviewShowsStageKey = "layout.preview.stage";
 
@@ -2286,19 +2300,6 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
     partial void OnPreviewShowsStageChanged(bool value) =>
         _settings.Set(PreviewShowsStageKey, value ? "1" : "0");
-
-    private void SetStageOption(Action<StageOptions> change)
-    {
-        change(_stageOptions);
-        _stageOptions.Save(_settings);
-        _stage.ApplyOptions(_stageOptions);
-        OnPropertyChanged(nameof(StageOptionsForPreview));
-        OnPropertyChanged(nameof(StageShowClock));
-        OnPropertyChanged(nameof(StageShowTimer));
-        OnPropertyChanged(nameof(StageShowNext));
-        OnPropertyChanged(nameof(StageShowNotes));
-        OnPropertyChanged(nameof(StageTextScale));
-    }
 
     /// <summary>
     /// Turns the stage display on or off. It must not land on the same screen
@@ -2345,7 +2346,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 return;
         }
 
-        _stage.ShowOn(SelectedStageDisplay.Info, _stageOptions);
+        _stage.ShowOn(SelectedStageDisplay.Info, ActiveStageLayout);
         _settings.Set(StageDisplayKey, SelectedStageDisplay.Info.DeviceName);
         StatusText = $"Escenario en {SelectedStageDisplay.Label}.";
     }

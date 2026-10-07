@@ -242,9 +242,29 @@ la columna derecha y tocás *Mostrar*. Se ven sólo acá — el guion de quien
 predica, «cantamos el coro dos veces» — y nunca llegan a la congregación. Si
 son muchas, se achican para entrar enteras.
 
-La flecha **▾** de al lado elige en qué pantalla va, qué se muestra (hora,
-cronómetro, siguiente), el tamaño de la letra y **⟲ pone el cronómetro en
-cero**. No te deja elegir la misma pantalla que la salida.
+### Varios escenarios y el editor
+
+Lo de arriba es lo que muestra el escenario **Cantantes**. Vienen tres armados,
+y podés hacer los que quieras:
+
+- **Cantantes**: la letra en vivo grande y la que sigue.
+- **Predicador**: la hora, el cronómetro, la cuenta regresiva y las notas.
+- **Igual a la pantalla principal**: un solo recuadro con lo mismo que se
+  proyecta, con su fondo.
+
+La flecha **▾** de al lado del botón elige el escenario (se cambia al instante,
+también con la pantalla prendida), abre el **editor**, elige en qué pantalla
+va y **⟲ pone el cronómetro en cero**. No te deja elegir la misma pantalla que
+la salida. El editor también está en **Proyección → Editar los escenarios…**.
+
+En el editor, cada **recuadro** se mueve arrastrándolo y se agranda con las
+manijas de los bordes; en el panel de la derecha elegís **qué muestra** (letra
+en vivo, próxima diapositiva, hora, cronómetro, temporizador, notas, nombre de
+lo que está en vivo, texto fijo, aviso al pie o igual a la pantalla principal),
+el tamaño de letra, el color y la alineación. Con **＋** hacés un escenario
+nuevo, con ⧉ lo duplicás y con **Usar este escenario** elegís cuál se ve. Lo
+que tenías configurado antes (hora, cronómetro, siguiente, notas) quedó
+guardado como un escenario llamado **Mi escenario**.
 
 ## 10. Controlar desde el celular
 

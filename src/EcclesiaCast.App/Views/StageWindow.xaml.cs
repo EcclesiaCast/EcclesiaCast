@@ -4,6 +4,7 @@ using System.Windows.Interop;
 using System.Windows.Media.Animation;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Displays;
+using EcclesiaCast.Core.Stage;
 
 namespace EcclesiaCast.App.Views;
 
@@ -21,8 +22,8 @@ public partial class StageWindow : Window
         InitializeComponent();
     }
 
-    /// <summary>Which parts are shown; the operator picks them in Ajustes.</summary>
-    public void ApplyOptions(StageOptions options) => View.Options = options;
+    /// <summary>Which arrangement is drawn; the operator picks it under ▾ Escenario.</summary>
+    public void ApplyLayout(StageLayout layout) => View.Layout = layout;
 
     /// <summary>Raised when the operator double-clicks the stage screen to close it.</summary>
     public event EventHandler? CloseRequested;

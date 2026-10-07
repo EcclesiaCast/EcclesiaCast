@@ -1,4 +1,5 @@
 using EcclesiaCast.Core.Displays;
+using EcclesiaCast.Core.Stage;
 
 namespace EcclesiaCast.App.Services;
 
@@ -10,12 +11,12 @@ public interface IStageWindowService
     /// <summary>Raised when the stage window is shown or hidden.</summary>
     event EventHandler? VisibilityChanged;
 
-    void ShowOn(DisplayInfo display, StageOptions options);
+    void ShowOn(DisplayInfo display, StageLayout layout);
 
     void Hide();
 
-    /// <summary>Applies changed options to the open window.</summary>
-    void ApplyOptions(StageOptions options);
+    /// <summary>Draws another layout on the open window.</summary>
+    void ApplyLayout(StageLayout layout);
 
     /// <summary>Restarts the "how long the service has been running" timer.</summary>
     void ResetTimer();

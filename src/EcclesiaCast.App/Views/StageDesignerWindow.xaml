@@ -1,0 +1,192 @@
+<Window x:Class="EcclesiaCast.App.Views.StageDesignerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:EcclesiaCast.App.Controls"
+        Title="Editor del escenario"
+        Width="1400" Height="820"
+        MinWidth="1180" MinHeight="680"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BgBrush}"
+        FontFamily="Segoe UI">
+    <Window.Resources>
+        <Style TargetType="TextBlock" x:Key="FieldLabel">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="Margin" Value="0,12,0,3"/>
+        </Style>
+        <Style TargetType="CheckBox">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Margin" Value="0,10,0,0"/>
+        </Style>
+        <Style TargetType="TextBox" x:Key="Field">
+            <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
+            <Setter Property="CaretBrush" Value="White"/>
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="12">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="270"/>
+            <ColumnDefinition Width="12"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="12"/>
+            <ColumnDefinition Width="300"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ── Escenarios y recuadros ── -->
+        <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource Panel}">
+            <DockPanel Margin="10">
+                <TextBlock DockPanel.Dock="Top" Text="ESCENARIOS" Style="{StaticResource PanelTitle}" Margin="2,0,0,6"/>
+                <ComboBox DockPanel.Dock="Top" x:Name="LayoutPicker" FontSize="12" DisplayMemberPath="Text"
+                          SelectionChanged="LayoutPicker_Changed"
+                          ToolTip="Cada escenario es una pantalla armada: elegí cuál editar"/>
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,6,0,0">
+                    <Button Content="＋" Style="{StaticResource DarkButton}" FontSize="12" Padding="9,4"
+                            Click="NewLayout_Click" ToolTip="Un escenario nuevo, en blanco"/>
+                    <Button Content="⧉" Style="{StaticResource DarkButton}" FontSize="12" Padding="9,4" Margin="4,0,0,0"
+                            Click="DuplicateLayout_Click" ToolTip="Duplicar este escenario para armar uno parecido"/>
+                    <Button Content="✏️" Style="{StaticResource DarkButton}" FontSize="12" Padding="9,4" Margin="4,0,0,0"
+                            Click="RenameLayout_Click" ToolTip="Cambiarle el nombre"/>
+                    <Button Content="🗑" Style="{StaticResource DarkButton}" FontSize="12" Padding="9,4" Margin="4,0,0,0"
+                            Click="DeleteLayout_Click" ToolTip="Eliminar este escenario"/>
+                </StackPanel>
+                <Button DockPanel.Dock="Top" x:Name="UseButton" Content="Usar este escenario" Style="{StaticResource DarkButton}"
+                        FontSize="11" Padding="10,5" Margin="0,6,0,0" HorizontalAlignment="Left"
+                        Click="UseLayout_Click"
+                        ToolTip="Es el que se muestra en la pantalla de escenario. Se cambia también desde el ▾ junto al botón Escenario."/>
+
+                <TextBlock DockPanel.Dock="Top" Text="RECUADROS" Style="{StaticResource PanelTitle}" Margin="2,18,0,6"/>
+                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,8,0,0">
+                    <Button Content="➕ Recuadro ▾" Style="{StaticResource DarkButton}" FontSize="11" Padding="10,5"
+                            Click="AddBox_Click" ToolTip="Agregar un recuadro: elegís qué muestra"/>
+                    <Button Content="⧉" Style="{StaticResource DarkButton}" FontSize="12" Padding="9,4" Margin="4,0,0,0"
+                            Click="DuplicateBox_Click" ToolTip="Duplicar el recuadro elegido"/>
+                    <Button Content="🗑" Style="{StaticResource DarkButton}" FontSize="12" Padding="9,4" Margin="4,0,0,0"
+                            Click="DeleteBox_Click" ToolTip="Quitar el recuadro elegido (Suprimir)"/>
+                </StackPanel>
+                <ListBox x:Name="BoxList" Background="Transparent" BorderThickness="0" DisplayMemberPath="Text"
+                         SelectionChanged="BoxList_Changed"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+            </DockPanel>
+        </Border>
+
+        <!-- ── Lienzo ── -->
+        <Border Grid.Row="0" Grid.Column="2" Style="{StaticResource Panel}" Padding="10">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Bottom" FontSize="11" Foreground="{StaticResource FaintBrush}" Margin="0,8,0,0" TextWrapping="Wrap"
+                           Text="Arrastrá un recuadro para moverlo y sus manijas para agrandarlo. Flechas: mover de a 1 (con Mayús, de a 10). Suprimir lo quita. El tamaño de letra se achica solo si el texto no entra."/>
+                <Viewbox Stretch="Uniform">
+                    <Grid Width="1920" Height="1080" Background="Black" ClipToBounds="True">
+                        <Canvas x:Name="Surface" Width="1920" Height="1080"/>
+                        <!-- Cuadrícula de ayuda: tercios de la pantalla -->
+                        <Canvas IsHitTestVisible="False" Opacity="0.35">
+                            <Line X1="640" Y1="0" X2="640" Y2="1080" Stroke="#2A3142" StrokeThickness="2" StrokeDashArray="6 6"/>
+                            <Line X1="1280" Y1="0" X2="1280" Y2="1080" Stroke="#2A3142" StrokeThickness="2" StrokeDashArray="6 6"/>
+                            <Line X1="0" Y1="360" X2="1920" Y2="360" Stroke="#2A3142" StrokeThickness="2" StrokeDashArray="6 6"/>
+                            <Line X1="0" Y1="720" X2="1920" Y2="720" Stroke="#2A3142" StrokeThickness="2" StrokeDashArray="6 6"/>
+                        </Canvas>
+                        <Canvas x:Name="Overlay" Width="1920" Height="1080" Background="Transparent" Focusable="True"
+                                Cursor="Arrow"
+                                MouseLeftButtonDown="Overlay_MouseDown"
+                                MouseMove="Overlay_MouseMove"
+                                MouseLeftButtonUp="Overlay_MouseUp"
+                                PreviewKeyDown="Overlay_KeyDown">
+                            <!-- Marco del recuadro elegido; sin fondo, así los clics
+                                 pasan al lienzo y sólo las manijas lo atajan -->
+                            <Grid x:Name="Selection" Visibility="Collapsed">
+                                <Border BorderBrush="{StaticResource AccentBrush}" BorderThickness="3" IsHitTestVisible="False"/>
+                            </Grid>
+                        </Canvas>
+                    </Grid>
+                </Viewbox>
+            </DockPanel>
+        </Border>
+
+        <!-- ── Qué muestra y cómo se ve ── -->
+        <Border Grid.Row="0" Grid.Column="4" Style="{StaticResource Panel}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="12,10,12,12" x:Name="Props" IsEnabled="False">
+                    <TextBlock Text="RECUADRO" Style="{StaticResource PanelTitle}" Margin="0,0,0,2"/>
+
+                    <TextBlock Text="Qué muestra" Style="{StaticResource FieldLabel}"/>
+                    <ComboBox x:Name="KindBox" FontSize="12" DisplayMemberPath="Text" SelectionChanged="Kind_Changed"/>
+
+                    <TextBlock x:Name="TextLabel" Text="Texto" Style="{StaticResource FieldLabel}"/>
+                    <TextBox x:Name="FixedTextBox" Style="{StaticResource Field}" AcceptsReturn="True" TextWrapping="Wrap"
+                             MinHeight="54" MaxHeight="120" VerticalScrollBarVisibility="Auto" TextChanged="FixedText_Changed"/>
+
+                    <TextBlock Text="Tamaño de letra" Style="{StaticResource FieldLabel}"/>
+                    <controls:NumericField x:Name="FontSizeField" Minimum="8" Maximum="600" Step="4" Decimals="0"
+                                           HorizontalAlignment="Left" ValueChanged="FontSize_Changed"/>
+
+                    <TextBlock Text="Color de la letra" Style="{StaticResource FieldLabel}"/>
+                    <Button x:Name="ColorButton" Style="{StaticResource DarkButton}" Padding="12,6" HorizontalAlignment="Left"
+                            Click="Color_Click" ToolTip="Elegir el color">
+                        <StackPanel Orientation="Horizontal">
+                            <Border x:Name="ColorSwatch" Width="18" Height="18" CornerRadius="3" BorderBrush="White" BorderThickness="1"/>
+                            <TextBlock x:Name="ColorText" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <TextBlock Text="Alineación" Style="{StaticResource FieldLabel}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton x:Name="AlignLeft" Content="Izquierda" GroupName="StageAlign" Style="{StaticResource TabButton}"
+                                     Click="Align_Click" Tag="Left"/>
+                        <RadioButton x:Name="AlignCenter" Content="Centro" GroupName="StageAlign" Style="{StaticResource TabButton}"
+                                     Margin="4,0,0,0" Click="Align_Click" Tag="Center"/>
+                        <RadioButton x:Name="AlignRight" Content="Derecha" GroupName="StageAlign" Style="{StaticResource TabButton}"
+                                     Margin="4,0,0,0" Click="Align_Click" Tag="Right"/>
+                    </StackPanel>
+                    <CheckBox x:Name="BoldBox" Content="Negrita" Click="Bold_Click"/>
+
+                    <TextBlock Text="Lugar y tamaño del recuadro" Style="{StaticResource FieldLabel}" Margin="0,18,0,3"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Izquierda" Foreground="{StaticResource MutedBrush}" FontSize="11" VerticalAlignment="Center" Margin="0,0,10,4"/>
+                        <controls:NumericField Grid.Row="0" Grid.Column="1" x:Name="XField" Minimum="0" Maximum="1920" Step="10" Decimals="0"
+                                               HorizontalAlignment="Left" Margin="0,0,0,4" ValueChanged="Geometry_Changed"/>
+                        <TextBlock Grid.Row="1" Text="Arriba" Foreground="{StaticResource MutedBrush}" FontSize="11" VerticalAlignment="Center" Margin="0,0,10,4"/>
+                        <controls:NumericField Grid.Row="1" Grid.Column="1" x:Name="YField" Minimum="0" Maximum="1080" Step="10" Decimals="0"
+                                               HorizontalAlignment="Left" Margin="0,0,0,4" ValueChanged="Geometry_Changed"/>
+                        <TextBlock Grid.Row="2" Text="Ancho" Foreground="{StaticResource MutedBrush}" FontSize="11" VerticalAlignment="Center" Margin="0,0,10,4"/>
+                        <controls:NumericField Grid.Row="2" Grid.Column="1" x:Name="WField" Minimum="60" Maximum="1920" Step="10" Decimals="0"
+                                               HorizontalAlignment="Left" Margin="0,0,0,4" ValueChanged="Geometry_Changed"/>
+                        <TextBlock Grid.Row="3" Text="Alto" Foreground="{StaticResource MutedBrush}" FontSize="11" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <controls:NumericField Grid.Row="3" Grid.Column="1" x:Name="HField" Minimum="40" Maximum="1080" Step="10" Decimals="0"
+                                               HorizontalAlignment="Left" ValueChanged="Geometry_Changed"/>
+                    </Grid>
+
+                    <TextBlock x:Name="KindHint" Foreground="{StaticResource FaintBrush}" FontSize="11" TextWrapping="Wrap" Margin="0,18,0,0"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- ── Guardar ── -->
+        <DockPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5" Margin="0,12,0,0">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button Content="Cancelar" Style="{StaticResource DarkButton}" Padding="20,8" IsCancel="True"/>
+                <Button Content="Guardar" Style="{StaticResource AccentButton}" Padding="24,8" Margin="8,0,0,0"
+                        IsDefault="True" Click="Save_Click"/>
+            </StackPanel>
+            <TextBlock x:Name="InUseText" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource MutedBrush}"/>
+        </DockPanel>
+    </Grid>
+</Window>

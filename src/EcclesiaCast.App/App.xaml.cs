@@ -129,6 +129,7 @@ public partial class App : Application
         services.AddSingleton<IProPresenterImportDialog, ProPresenterImportDialogService>();
         services.AddSingleton<IWebSongSearchDialog, WebSongSearchDialogService>();
         services.AddSingleton<IStageWindowService, StageWindowService>();
+        services.AddSingleton<IStageDesigner, StageDesignerService>();
         services.AddSingleton<IBackupDialog>(_ => new BackupDialogService(dbPath));
         services.AddSingleton<ICountdownDialog, CountdownDialogService>();
         services.AddSingleton<ISmartPlaylistDialog, SmartPlaylistDialogService>();

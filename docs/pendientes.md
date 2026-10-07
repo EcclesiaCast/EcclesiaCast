@@ -25,15 +25,6 @@ La beta.5 se probó el 6/10/2026: lo que anda bien quedó así (Biblia, achicar
 paneles, menú, buscar canciones en internet). Lo que salió de esa prueba y
 los pedidos nuevos:
 
-**Pantalla de escenario**
-
-- [ ] **Editor de escenario** como el de Biblia y canciones: recuadros que
-      uno ubica donde quiere, cada uno con lo que muestra (cronómetro,
-      temporizador, hora, letra en vivo, próxima diapositiva, etc.).
-- [ ] **Varias configuraciones** guardadas y cambio rápido entre ellas (por
-      ejemplo cantantes, predicador y una igual a la pantalla principal).
-      Reemplaza al cronómetro de la barra.
-
 **Ventana**
 
 - [ ] **Acerca de: una forma de colaborar** (todavía no hay a dónde mandar a
