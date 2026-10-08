@@ -9,6 +9,17 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **La miniatura muestra cómo se va a ver en pantalla.** En **Propiedades del
+  medio**, arriba a la derecha, hay un cuadro 16:9 que dibuja la imagen (o el
+  póster del video) igual que la salida: con su escala, zoom, corrimiento,
+  tamaño fijo, color de relleno, brillo, tinte y desenfoque. Se actualiza **en
+  vivo** al cambiar cualquier campo, antes de guardar. Se puede **arrastrar** el
+  cuadro para correr la imagen y usar la **ruedita** para el zoom; los números
+  de «Zoom» y «Correr» se mueven juntos. Las tarjetas de la barra de medios
+  usan el mismo dibujo (sin desenfoque), así que después de guardar se ve el
+  encuadre: por ejemplo, una página de PDF con «Ajustar» aparece con sus
+  barras.
+
 - **«Selah» y los títulos de los Salmos, a elección.** En el editor de temas,
   en un tema de Biblia, hay una casilla nueva: **Mostrar «Selah» y los títulos
   de los Salmos**. Viene **destildada**: «Selah» no se proyecta y tampoco el

@@ -1,7 +1,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media.Imaging;
+using System.Windows.Input;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Media;
 
@@ -10,6 +10,9 @@ namespace EcclesiaCast.App.Views;
 public partial class MediaInspectorWindow : Window
 {
     private readonly MediaItem _item;
+
+    /// <summary>False while the form is being filled in: the fields must not redraw the preview half-loaded.</summary>
+    private bool _ready;
 
     private string _fillColor = "#000000";
     private string _tint = "#2F63C9";
@@ -90,24 +93,9 @@ public partial class MediaInspectorWindow : Window
         VolSlider.Value = item.Volume;
         BlurField.SetSilently(item.Blur);
 
-        var poster = item.ThumbnailPath ?? (item.Type == MediaType.Image ? item.Path : null);
-        if (!string.IsNullOrWhiteSpace(poster) && File.Exists(poster))
-        {
-            try
-            {
-                var bmp = new BitmapImage();
-                bmp.BeginInit();
-                bmp.UriSource = new Uri(poster);
-                bmp.CacheOption = BitmapCacheOption.OnLoad;
-                bmp.DecodePixelWidth = 240;
-                bmp.EndInit();
-                // Remote posters (YouTube) are still downloading and can't be frozen.
-                if (bmp.CanFreeze)
-                    bmp.Freeze();
-                Poster.Source = bmp;
-            }
-            catch { /* ignore */ }
-        }
+        // From here on the fields drive the preview.
+        _ready = true;
+        RefreshPreview();
     }
 
     public bool Saved { get; private set; }
@@ -153,6 +141,82 @@ public partial class MediaInspectorWindow : Window
         OffsetXField.SetSilently(0);
         OffsetYField.SetSilently(0);
         FixedSizeCheck.IsChecked = false;
+        RefreshPreview();
+    }
+
+    // ── Vista previa en vivo ─────────────────────────────────────
+
+    private void Field_Changed(object sender, RoutedEventArgs e) => RefreshPreview();
+
+    private void Field_SelectionChanged(object sender, SelectionChangedEventArgs e) => RefreshPreview();
+
+    /// <summary>
+    /// Redraws the preview from what the fields say right now — before
+    /// saving — by handing it a copy of the item with those values on it.
+    /// The real item is only touched by «Guardar».
+    /// </summary>
+    private void RefreshPreview()
+    {
+        if (!_ready)
+            return;
+
+        var shown = _item.Clone();
+        shown.Scaling = (MediaScaling)Math.Max(0, ScalingBox.SelectedIndex);
+        shown.Zoom = Math.Clamp(ZoomField.Value / 100, 0.1, 4);
+        shown.OffsetX = Math.Clamp(OffsetXField.Value / 100, -1, 1);
+        shown.OffsetY = Math.Clamp(OffsetYField.Value / 100, -1, 1);
+        shown.FrameWidth = FixedSizeCheck.IsChecked == true ? (int)Math.Clamp(FrameWidthField.Value, 16, 1920) : null;
+        shown.FrameHeight = FixedSizeCheck.IsChecked == true ? (int)Math.Clamp(FrameHeightField.Value, 16, 1080) : null;
+        shown.Brightness = Math.Clamp(BrightnessField.Value, -100, 100);
+        shown.TintStrength = Math.Clamp(TintField.Value, 0, 100);
+        shown.Tint = TintField.Value > 0 ? _tint : null;
+        shown.FillColor = _fillColor;
+
+        Preview.FillMedia = FillMediaBox.SelectedItem is MediaItem { Id: > 0 } fill ? fill : null;
+        Preview.Blur = BlurField.Value;
+        Preview.Media = shown;
+    }
+
+    private Point? _dragFrom;
+    private double _dragStartX;
+    private double _dragStartY;
+
+    private void PreviewFrame_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        _dragFrom = e.GetPosition(PreviewFrame);
+        _dragStartX = OffsetXField.Value;
+        _dragStartY = OffsetYField.Value;
+        PreviewFrame.CaptureMouse();
+        e.Handled = true;
+    }
+
+    /// <summary>
+    /// Dragging moves the picture by the same amount the pointer moved: the
+    /// shift is a fraction of the screen, so a fraction of this frame is the
+    /// same distance. It writes the «Correr» fields, which redraw the preview.
+    /// </summary>
+    private void PreviewFrame_MouseMove(object sender, MouseEventArgs e)
+    {
+        if (_dragFrom is not Point from || !PreviewFrame.IsMouseCaptured
+            || PreviewFrame.ActualWidth <= 0 || PreviewFrame.ActualHeight <= 0)
+            return;
+
+        var now = e.GetPosition(PreviewFrame);
+        OffsetXField.Value = _dragStartX + (now.X - from.X) / PreviewFrame.ActualWidth * 100;
+        OffsetYField.Value = _dragStartY + (now.Y - from.Y) / PreviewFrame.ActualHeight * 100;
+    }
+
+    private void PreviewFrame_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        _dragFrom = null;
+        PreviewFrame.ReleaseMouseCapture();
+    }
+
+    /// <summary>The wheel moves the «Zoom» field by its own step (5 points a notch).</summary>
+    private void PreviewFrame_MouseWheel(object sender, MouseWheelEventArgs e)
+    {
+        ZoomField.Value += e.Delta > 0 ? 5 : -5;
+        e.Handled = true;
     }
 
     private void FixedSize_Changed(object sender, RoutedEventArgs e)
@@ -160,6 +224,7 @@ public partial class MediaInspectorWindow : Window
         var fixedSize = FixedSizeCheck.IsChecked == true;
         SizeRow.IsEnabled = fixedSize;
         PresetBox.IsEnabled = fixedSize;
+        RefreshPreview();
     }
 
     private void Preset_Changed(object sender, SelectionChangedEventArgs e)
@@ -180,6 +245,7 @@ public partial class MediaInspectorWindow : Window
         FrameWidthField.SetSilently(chosen.w);
         FrameHeightField.SetSilently(chosen.h);
         FixedSizeCheck.IsChecked = true;
+        RefreshPreview();
     }
 
     private void PickFillColor_Click(object sender, RoutedEventArgs e)
@@ -188,6 +254,7 @@ public partial class MediaInspectorWindow : Window
         {
             _fillColor = picked;
             UpdateFillSwatch();
+            RefreshPreview();
         }
     }
 
@@ -197,6 +264,7 @@ public partial class MediaInspectorWindow : Window
         {
             _tint = picked;
             UpdateTintSwatch();
+            RefreshPreview();
         }
     }
 

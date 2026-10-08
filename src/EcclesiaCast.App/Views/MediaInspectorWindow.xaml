@@ -39,18 +39,10 @@
             </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Column="0">
-            <DockPanel>
-                <Border DockPanel.Dock="Left" Width="120" Height="68" CornerRadius="4"
-                        BorderBrush="{StaticResource LineBrush}" BorderThickness="1" ClipToBounds="True">
-                    <Image x:Name="Poster" Stretch="UniformToFill"/>
-                </Border>
-                <StackPanel VerticalAlignment="Center" Margin="12,0,0,0">
-                    <TextBlock Text="Nombre" Style="{StaticResource L}" Margin="0,0,0,3"/>
-                    <TextBox x:Name="NameBox" Background="{StaticResource SurfaceAltBrush}" Foreground="White"
-                             BorderBrush="{StaticResource LineBrush}" CaretBrush="White" Padding="6,4" FontSize="13"/>
-                    <TextBlock x:Name="TypeText" FontSize="11" Foreground="{StaticResource FaintBrush}" Margin="0,6,0,0"/>
-                </StackPanel>
-            </DockPanel>
+            <TextBlock Text="Nombre" Style="{StaticResource L}" Margin="0,0,0,3"/>
+            <TextBox x:Name="NameBox" Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                     BorderBrush="{StaticResource LineBrush}" CaretBrush="White" Padding="6,4" FontSize="13"/>
+            <TextBlock x:Name="TypeText" FontSize="11" Foreground="{StaticResource FaintBrush}" Margin="0,6,0,0"/>
 
             <TextBlock Text="Pestaña" Style="{StaticResource L}"/>
             <ComboBox x:Name="CategoryBox" IsEditable="True"/>
@@ -62,7 +54,7 @@
             </ComboBox>
 
             <TextBlock Text="Escala (si no es 16:9)" Style="{StaticResource L}"/>
-            <ComboBox x:Name="ScalingBox">
+            <ComboBox x:Name="ScalingBox" SelectionChanged="Field_SelectionChanged">
                 <ComboBoxItem Content="Rellenar (recorta lo que sobra)"/>
                 <ComboBoxItem Content="Ajustar (todo, con barras)"/>
                 <ComboBoxItem Content="Estirar (deforma)"/>
@@ -77,7 +69,7 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="Zoom" FontSize="11" Width="64" VerticalAlignment="Center"
                                    Foreground="{StaticResource MutedBrush}"/>
-                        <controls:NumericField x:Name="ZoomField" Minimum="10" Maximum="400" Step="5" Decimals="0"
+                        <controls:NumericField x:Name="ZoomField" ValueChanged="Field_Changed" Minimum="10" Maximum="400" Step="5" Decimals="0"
                                                ToolTip="100 % es como está. Más acerca y recorta; menos aleja y deja ver el relleno."/>
                         <TextBlock Text="%" FontSize="11" VerticalAlignment="Center" Margin="6,0,0,0"
                                    Foreground="{StaticResource MutedBrush}"/>
@@ -89,11 +81,11 @@
                     <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
                         <TextBlock Text="Correr" FontSize="11" Width="64" VerticalAlignment="Center"
                                    Foreground="{StaticResource MutedBrush}"/>
-                        <controls:NumericField x:Name="OffsetXField" Minimum="-100" Maximum="100" Step="2" Decimals="0"
+                        <controls:NumericField x:Name="OffsetXField" ValueChanged="Field_Changed" Minimum="-100" Maximum="100" Step="2" Decimals="1"
                                                ToolTip="Hacia los lados, en % de la pantalla"/>
                         <TextBlock Text="↔" FontSize="12" VerticalAlignment="Center" Margin="6,0,10,0"
                                    Foreground="{StaticResource MutedBrush}"/>
-                        <controls:NumericField x:Name="OffsetYField" Minimum="-100" Maximum="100" Step="2" Decimals="0"
+                        <controls:NumericField x:Name="OffsetYField" ValueChanged="Field_Changed" Minimum="-100" Maximum="100" Step="2" Decimals="1"
                                                ToolTip="Hacia arriba y abajo, en % de la pantalla"/>
                         <TextBlock Text="↕" FontSize="12" VerticalAlignment="Center" Margin="6,0,0,0"
                                    Foreground="{StaticResource MutedBrush}"/>
@@ -105,10 +97,10 @@
                     <StackPanel x:Name="SizeRow" Orientation="Horizontal" Margin="0,6,0,0" IsEnabled="False">
                         <TextBlock Text="Medida" FontSize="11" Width="64" VerticalAlignment="Center"
                                    Foreground="{StaticResource MutedBrush}"/>
-                        <controls:NumericField x:Name="FrameWidthField" Minimum="16" Maximum="1920" Step="16" Decimals="0"/>
+                        <controls:NumericField x:Name="FrameWidthField" ValueChanged="Field_Changed" Minimum="16" Maximum="1920" Step="16" Decimals="0"/>
                         <TextBlock Text="×" FontSize="12" VerticalAlignment="Center" Margin="6,0,6,0"
                                    Foreground="{StaticResource MutedBrush}"/>
-                        <controls:NumericField x:Name="FrameHeightField" Minimum="16" Maximum="1080" Step="16" Decimals="0"/>
+                        <controls:NumericField x:Name="FrameHeightField" ValueChanged="Field_Changed" Minimum="16" Maximum="1080" Step="16" Decimals="0"/>
                         <TextBlock Text="px" FontSize="11" VerticalAlignment="Center" Margin="6,0,0,0"
                                    Foreground="{StaticResource MutedBrush}"/>
                     </StackPanel>
@@ -129,7 +121,7 @@
                                 BorderBrush="{StaticResource LineBrush}" BorderThickness="1"/>
                         <Button Content="Color…" Style="{StaticResource DarkButton}" FontSize="11"
                                 Padding="10,3" Margin="8,0,0,0" Click="PickFillColor_Click"/>
-                        <ComboBox x:Name="FillMediaBox" Width="180" Margin="8,0,0,0" FontSize="11"
+                        <ComboBox x:Name="FillMediaBox" SelectionChanged="Field_SelectionChanged" Width="180" Margin="8,0,0,0" FontSize="11"
                                   DisplayMemberPath="Name"
                                   ToolTip="O una imagen o video de la biblioteca detrás: el truco de siempre es una copia desenfocada del mismo video"/>
                     </StackPanel>
@@ -139,15 +131,33 @@
         </StackPanel>
 
         <StackPanel Grid.Column="2">
+            <!-- ── Cómo se va a ver en pantalla ──
+                 El mismo dibujo que hace la salida, y se mueve con el mouse:
+                 arrastrar corre la imagen, la ruedita hace zoom. Los números
+                 de al lado cambian juntos. -->
+            <controls:AspectFitBox AspectRatio="1.7778" MaxBoxHeight="230">
+            <Border x:Name="PreviewFrame" CornerRadius="4" Background="#10141E" Cursor="SizeAll"
+                    BorderBrush="{StaticResource LineBrush}" BorderThickness="1" ClipToBounds="True"
+                    MouseLeftButtonDown="PreviewFrame_MouseLeftButtonDown"
+                    MouseMove="PreviewFrame_MouseMove"
+                    MouseLeftButtonUp="PreviewFrame_MouseLeftButtonUp"
+                    MouseWheel="PreviewFrame_MouseWheel"
+                    ToolTip="Así se va a ver en pantalla. Arrastrá para correr la imagen; la ruedita hace zoom.">
+                <controls:FramedMediaPreview x:Name="Preview" UseOriginal="True" DecodeWidth="960"/>
+            </Border>
+            </controls:AspectFitBox>
+            <TextBlock Text="Arrastrá para correr · ruedita para el zoom" FontSize="10"
+                       Foreground="{StaticResource FaintBrush}" Margin="0,4,0,0"/>
+
             <!-- ── Color: oscurecer, aclarar, teñir ── -->
             <Border Background="{StaticResource SurfaceAltBrush}" CornerRadius="4"
-                    Padding="12,4,12,12" Margin="0">
+                    Padding="12,4,12,12" Margin="0,6,0,0">
                 <StackPanel>
                     <TextBlock Text="Color" Style="{StaticResource L}"/>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="Brillo" FontSize="11" Width="64" VerticalAlignment="Center"
                                    Foreground="{StaticResource MutedBrush}"/>
-                        <controls:NumericField x:Name="BrightnessField" Minimum="-100" Maximum="100" Step="5" Decimals="0"
+                        <controls:NumericField x:Name="BrightnessField" ValueChanged="Field_Changed" Minimum="-100" Maximum="100" Step="5" Decimals="0"
                                                ToolTip="Negativo oscurece (ayuda a leer la letra encima), positivo aclara"/>
                         <TextBlock Text="%" FontSize="11" VerticalAlignment="Center" Margin="6,0,0,0"
                                    Foreground="{StaticResource MutedBrush}"/>
@@ -159,7 +169,7 @@
                                 BorderBrush="{StaticResource LineBrush}" BorderThickness="1"/>
                         <Button Content="Color…" Style="{StaticResource DarkButton}" FontSize="11"
                                 Padding="10,3" Margin="8,0,0,0" Click="PickTintColor_Click"/>
-                        <controls:NumericField x:Name="TintField" Minimum="0" Maximum="100" Step="5" Decimals="0"
+                        <controls:NumericField x:Name="TintField" ValueChanged="Field_Changed" Minimum="0" Maximum="100" Step="5" Decimals="0"
                                                Margin="8,0,0,0"
                                                ToolTip="Cuánto pesa el tinte. 0 = sin tinte."/>
                         <TextBlock Text="%" FontSize="11" VerticalAlignment="Center" Margin="6,0,0,0"
@@ -185,7 +195,7 @@
             <TextBlock Text="Desenfoque del fondo" Style="{StaticResource L}"/>
             <!-- DockPanel y no StackPanel: así el texto de al lado puede bajar de renglón -->
             <DockPanel LastChildFill="True">
-                <controls:NumericField x:Name="BlurField" DockPanel.Dock="Left" Minimum="0" Maximum="100" Step="5" Decimals="0"
+                <controls:NumericField x:Name="BlurField" ValueChanged="Field_Changed" DockPanel.Dock="Left" Minimum="0" Maximum="100" Step="5" Decimals="0"
                                        ToolTip="Difumina este fondo para que la letra encima se lea. 0 = nítido."/>
                 <TextBlock Text="%  · también se puede cambiar en vivo desde la barra de medios"
                            FontSize="11" VerticalAlignment="Center" TextWrapping="Wrap"

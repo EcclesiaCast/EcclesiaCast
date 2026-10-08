@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using EcclesiaCast.Core.Media;
 
 namespace EcclesiaCast.App.Services;
@@ -102,6 +103,52 @@ public static class MediaFraming
             return Brushes.Black;
         }
     }
+
+    /// <summary>
+    /// Darkening and tinting: two flat layers laid over the picture. The
+    /// projector's view and the small previews of the media bar share this, so
+    /// a tinted background looks the same wherever it is drawn.
+    /// </summary>
+    public static void ApplyColour(Rectangle brightnessLayer, Rectangle tintLayer, MediaItem? media)
+    {
+        var brightness = Math.Clamp(media?.Brightness ?? 0, -100, 100);
+        if (brightness == 0)
+        {
+            brightnessLayer.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            // Black to darken, white to lighten. Capped short of full cover:
+            // the point is to adjust the picture, not to replace it.
+            brightnessLayer.Fill = brightness < 0 ? Brushes.Black : Brushes.White;
+            brightnessLayer.Opacity = Math.Abs(brightness) / 100 * 0.85;
+            brightnessLayer.Visibility = Visibility.Visible;
+        }
+
+        var strength = Math.Clamp(media?.TintStrength ?? 0, 0, 100);
+        if (strength <= 0 || string.IsNullOrWhiteSpace(media?.Tint))
+        {
+            tintLayer.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        try
+        {
+            tintLayer.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(media.Tint));
+            tintLayer.Opacity = strength / 100 * 0.85;
+            tintLayer.Visibility = Visibility.Visible;
+        }
+        catch (FormatException)
+        {
+            tintLayer.Visibility = Visibility.Collapsed;
+        }
+    }
+
+    /// <summary>True when darkening or tinting would show anything at all.</summary>
+    public static bool HasColour(MediaItem? media) =>
+        media is not null
+        && (media.Brightness != 0
+            || (media.TintStrength > 0 && !string.IsNullOrWhiteSpace(media.Tint)));
 
     private static void Clear(Image picture)
     {
