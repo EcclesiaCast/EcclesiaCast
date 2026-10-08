@@ -388,6 +388,19 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Corregido
 
+- **Las páginas de PDF y PowerPoint se ven nítidas con zoom.** Se dibujaban a
+  1920 píxeles, justo el tamaño de la pantalla, y al hacer zoom en el Encuadre
+  se agrandaba esa copia y se pixelaba. Ahora las páginas nuevas se dibujan al
+  **doble** (4K: 3840 píxeles del lado largo, sea la página vertical o
+  apaisada), y al proyectar una imagen con zoom se lee al tamaño que de verdad
+  hace falta (el ancho de la pantalla por el zoom, sin pasar del tamaño del
+  archivo ni de 4096). Sin zoom todo se lee igual que antes. Las páginas que ya
+  estaban importadas siguen como estaban: clic derecho sobre una página →
+  **Volver a importar en alta calidad…** dibuja de nuevo todo ese documento
+  (usa el PDF que el programa guarda desde ahora; para páginas viejas pide
+  elegir el original una vez). Cada documento guarda ahora una copia de su PDF
+  junto a sus páginas, y se borra con la última página.
+
 - **Cambiar la escala o el encuadre de un medio que está en pantalla no
   llegaba a la pantalla principal**: el LIVE lo mostraba, pero la salida
   seguía igual hasta volver a elegirlo. Ahora se ve en el momento, y un video

@@ -2574,6 +2574,63 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         }
     }
 
+    /// <summary>
+    /// Right click on a page of a PDF or a deck → «Volver a importar en alta
+    /// calidad»: draws every page of that document again at 4K over the same
+    /// files. Pages imported before the document was kept ask for the original
+    /// once. Nothing is re-imported on its own.
+    /// </summary>
+    [RelayCommand]
+    private async Task ReimportDocumentPage(MediaItem? item)
+    {
+        if (item is null || !DocumentImporter.IsRenderedPage(item.Path))
+            return;
+
+        string? original = null;
+        if (!DocumentImporter.HasSource(item.Path))
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = $"Elegí el documento original de «{item.Name}»",
+                Filter = "PDF y PowerPoint|*.pdf;*.pptx;*.ppt",
+            };
+            if (dialog.ShowDialog() != true)
+                return;
+            original = dialog.FileName;
+        }
+
+        NoteAction($"Volver a importar en alta calidad «{item.Name}»");
+        StatusText = "Dibujando de nuevo las páginas del documento… puede tardar un rato.";
+        var result = await DocumentImporter.ReimportAsync(item.Path, original);
+        if (result.Error is not null)
+        {
+            StatusText = result.Error;
+            return;
+        }
+
+        // The pictures changed under the same names; their small posters are
+        // made again from the sharper pages.
+        var folder = Path.GetDirectoryName(item.Path);
+        var pages = _media.GetAll()
+            .Where(m => m.Type == MediaType.Image
+                        && string.Equals(Path.GetDirectoryName(m.Path), folder, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+        foreach (var page in pages)
+        {
+            MediaThumbnails.Delete(page.ThumbnailPath);
+            page.ThumbnailPath = MediaThumbnails.Create(page.Path, MediaType.Image, videoEngine: null);
+            _media.Update(page);
+        }
+
+        LoadMedia();
+
+        // A page on screen is shown again from the new file.
+        if (pages.FirstOrDefault(p => p.Id == _presentation.Background?.Id) is { } onScreen)
+            _presentation.RefreshBackground(Playable(onScreen).Clone(), ResolveFill(onScreen));
+
+        StatusText = $"{pages.Count} página(s) dibujadas de nuevo en alta calidad.";
+    }
+
     [RelayCommand]
     private void OpenMediaLocation(MediaItem? item)
     {

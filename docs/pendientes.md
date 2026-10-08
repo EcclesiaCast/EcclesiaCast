@@ -13,8 +13,44 @@ Hay cuatro tipos de cosas, cada una en su sección:
 
 ## 1. Para probar (lo prueba Alexis)
 
-Nada pendiente. La beta.7 se probó entera el 8/10/2026 y quedó **dada por
-buena**: se usa el domingo 11/10 en la reunión.
+La beta.7 se probó entera el 8/10/2026 y quedó **dada por buena**: se usa el
+domingo 11/10 en la reunión. Lo que sigue se programó después y no se pudo
+abrir desde acá (la PC estaba en uso); se probó con compilación, pruebas y
+dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
+
+- [ ] **Miniatura fiel en Propiedades.** Clic derecho sobre un medio →
+      Propiedades. Arriba a la derecha hay un cuadro 16:9. Cambiá zoom,
+      «Correr», escala, tamaño fijo, color de relleno, brillo, tinte y
+      desenfoque: el cuadro tiene que cambiar al instante (sin guardar).
+      **Arrastrá** sobre el cuadro: la imagen se corre y los números de
+      «Correr» se mueven. **Ruedita** sobre el cuadro: cambia el «Zoom» de a 5.
+      Probalo con una imagen, con un video y con uno de YouTube. Mirá que la
+      ventana entre entera en la pantalla de la notebook.
+- [ ] **Tarjetas con el encuadre.** Después de guardar, la tarjeta de la barra
+      de medios muestra el encuadre (por ejemplo una página de PDF con
+      «Ajustar», con sus barras negras; una imagen con zoom, acercada).
+      Abrí una pestaña con muchos medios y fijate que no tarde más que antes.
+- [ ] **Selección múltiple.** Ctrl+clic suma o saca; Mayús+clic elige el
+      tramo; Ctrl+A elige todos los de la pestaña; arrastrar un rectángulo en
+      el espacio vacío elige los que toca (con Ctrl suma a los ya elegidos);
+      clic en un espacio vacío limpia; Esc limpia cuando hay varios. Los
+      elegidos se ven con borde y fondo azul. Con varios elegidos: Supr (o
+      clic derecho → Quitar de la biblioteca) pregunta **una sola vez** y dice
+      cuántos; arrastrar uno a otra pestaña mueve todos; arrastrarlos a la
+      playlist los agrega todos, en orden; clic derecho → «Mover a la
+      pestaña…» muestra la lista. Un clic común sigue proyectando. Mirá que el
+      Esc siga apagando la pantalla después de proyectar un medio con un clic.
+- [ ] **Páginas de PDF nítidas.** Importá un PDF o una presentación de
+      PowerPoint (las páginas nuevas se dibujan al doble, 4K), ponele zoom
+      160 % en Propiedades y compará con el navegador: no tiene que
+      pixelarse. Una imagen común sin zoom tiene que proyectarse igual que
+      siempre, sin demora nueva.
+- [ ] **Volver a importar en alta calidad.** Clic derecho sobre una página de
+      un documento **ya importado antes** → «Volver a importar en alta
+      calidad…»: pide elegir el PDF o la presentación original y dibuja de
+      nuevo todas las páginas de ese documento. En un documento importado con
+      esta versión no pide nada. Si hay una página en pantalla, tiene que
+      cambiar sola a la versión nítida.
 
 ## 2. Para la v1.0.0
 

@@ -74,6 +74,8 @@ public partial class ProjectedView : UserControl
             new PropertyMetadata(0d, (d, e) => ((ProjectedView)d).ApplyBlur((double)e.NewValue)));
 
     private string? _lastImagePath;
+    private int _lastDecodeWidth = ImageDecodeSize.Baseline;
+    private long _lastImageStamp;
 
     /// <summary>
     /// The background is a heavy video (4K, 50+ frames): in the operator's
@@ -207,9 +209,26 @@ public partial class ProjectedView : UserControl
 
         ApplyFraming();
 
-        if (path == _lastImagePath)
+        // Zoomed in, a picture has to be read wider than the screen or it goes
+        // soft. Without zoom this stays the 1920 it always was, and the file is
+        // not even opened to find out.
+        var decodeWidth = media?.Type == MediaType.Image ? DecodeWidthFor(media, path) : ImageDecodeSize.Baseline;
+
+        // A page drawn again keeps its file name but not its contents.
+        var stamp = path is not null && !path.StartsWith("http", StringComparison.OrdinalIgnoreCase) && File.Exists(path)
+            ? File.GetLastWriteTimeUtc(path).Ticks
+            : 0;
+
+        if (path == _lastImagePath && decodeWidth == _lastDecodeWidth && stamp == _lastImageStamp)
             return;
+
+        // The fade is for a new picture; a re-read of the same one (the zoom
+        // was edited while it is on screen) must not blink.
+        var newPicture = path != _lastImagePath;
+        var changedOnDisk = !newPicture && stamp != _lastImageStamp;
         _lastImagePath = path;
+        _lastDecodeWidth = decodeWidth;
+        _lastImageStamp = stamp;
 
         // YouTube posters are remote URLs; local media are files on disk.
         var isRemote = path?.StartsWith("http", StringComparison.OrdinalIgnoreCase) == true;
@@ -222,7 +241,11 @@ public partial class ProjectedView : UserControl
                 bitmap.BeginInit();
                 bitmap.UriSource = new Uri(path);
                 bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.DecodePixelWidth = 1920;
+                bitmap.DecodePixelWidth = decodeWidth;
+                // WPF remembers pictures by file name: a file rewritten under
+                // the same name would come back as the old one.
+                if (changedOnDisk)
+                    bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
                 bitmap.EndInit();
                 // A remote poster (YouTube) is still downloading here, and
                 // freezing it would throw and drop us into the black fallback.
@@ -231,7 +254,7 @@ public partial class ProjectedView : UserControl
                     bitmap.Freeze();
                 BackgroundImage.Source = bitmap;
                 BackgroundImage.Visibility = Visibility.Visible;
-                if (AnimateTransitions)
+                if (AnimateTransitions && newPicture)
                     BackgroundImage.BeginAnimation(OpacityProperty,
                         new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(320)) { EasingFunction = new QuadraticEase() });
                 return;
@@ -244,6 +267,29 @@ public partial class ProjectedView : UserControl
 
         BackgroundImage.Source = null;
         BackgroundImage.Visibility = Visibility.Collapsed;
+    }
+
+    /// <summary>
+    /// The width to read this image at: the screen's, unless the media is
+    /// zoomed in, in which case it also depends on the file's own size.
+    /// </summary>
+    private static int DecodeWidthFor(MediaItem media, string? path)
+    {
+        if (!ImageDecodeSize.NeedsFileSize(media.Zoom) || string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+            return ImageDecodeSize.Baseline;
+
+        try
+        {
+            // Only the header is read: no pixels are decoded to learn the size.
+            var frame = BitmapDecoder.Create(new Uri(path), BitmapCreateOptions.DelayCreation, BitmapCacheOption.None)
+                .Frames[0];
+            return ImageDecodeSize.For(
+                media.Scaling, media.Zoom, media.FrameWidth, media.FrameHeight, frame.PixelWidth, frame.PixelHeight);
+        }
+        catch
+        {
+            return ImageDecodeSize.Baseline;
+        }
     }
 
     // ── Encuadre y relleno ───────────────────────────────────────
