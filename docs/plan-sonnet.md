@@ -78,7 +78,9 @@ hacerlos, dónde está cada cosa en el código y cómo probarlos.
     desarrollo tapa todo. `Esc` la apaga. Para leer la ventana del operador
     con la salida prendida, usá UI Automation desde PowerShell.
   - Para leer la base sin abrir la app: `node` (v24) trae `node:sqlite`.
-    No hay Python instalado.
+    **No ejecutes `python`, `python3` ni `py`:** no está instalado y en
+    Windows ese comando abre la Microsoft Store en la pantalla del usuario.
+    Para scripts, node, PowerShell o un programita en C#.
 
 **Trampas que ya encontramos (no las repitas)**
 - En los `ListBox`, un `MouseBinding` de doble clic **nunca se dispara**: la
