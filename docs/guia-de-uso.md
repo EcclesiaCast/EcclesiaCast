@@ -200,8 +200,10 @@ falta el componente WebView2 de Microsoft (el mismo de YouTube).
   clic** la pone en vivo. Su menú de clic derecho tiene sólo lo que sirve:
   cambiar nombre, mover de pestaña, agregar a la playlist y quitar.
 - **El teclado.** Mientras escribís en la página o en la caja de dirección, los
-  atajos del programa (F1 a F4, Esc, las flechas que cambian de diapositiva,
-  Ctrl+K) no se disparan. Vuelven cuando hacés clic afuera de la página.
+  atajos del programa (Esc, las flechas que cambian de diapositiva, Ctrl+K)
+  no se disparan; vuelven cuando hacés clic afuera de la página. **F1 a F4
+  siguen andando siempre**, para poner la pantalla en negro o limpiarla en un
+  apuro.
 - La página con **protección de copia** (Netflix, Spotify) se ve negra en la
   pantalla; no es un problema del programa.
 

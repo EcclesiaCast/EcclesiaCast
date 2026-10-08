@@ -90,9 +90,10 @@ public partial class MainWindow : Window
 
     /// <summary>
     /// While the keyboard is typing into the web page (or its address box) the
-    /// window's shortcuts are taken away: F1–F4, Esc and Ctrl+K are keys of the
-    /// page, and an arrow or the space bar must not move the slides behind it.
-    /// They come back when the focus leaves.
+    /// window's shortcuts are taken away: Esc and Ctrl+K/F are keys of the
+    /// page, and an arrow must not move the slides behind it. F1–F4 stay:
+    /// they are the emergency keys (black, clear, logo) and pages hardly use
+    /// them. The rest come back when the focus leaves.
     /// </summary>
     private void SyncShortcutsWithWebFocus()
     {
@@ -105,12 +106,15 @@ public partial class MainWindow : Window
         _shortcuts ??= InputBindings.Cast<InputBinding>().ToList();
         _shortcutsOff = typing;
         InputBindings.Clear();
-        if (!typing)
+        foreach (var binding in _shortcuts)
         {
-            foreach (var binding in _shortcuts)
+            if (!typing || IsEmergencyKey(binding))
                 InputBindings.Add(binding);
         }
     }
+
+    private static bool IsEmergencyKey(InputBinding binding) =>
+        binding is KeyBinding { Modifiers: ModifierKeys.None, Key: Key.F1 or Key.F2 or Key.F3 or Key.F4 };
 
     /// <summary>True while the keyboard belongs to the web page: nothing of this window reacts to it.</summary>
     private bool WebHasKeyboard =>

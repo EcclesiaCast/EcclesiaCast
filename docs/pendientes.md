@@ -94,8 +94,9 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
       en una ventana de prueba fuera de la pantalla, y la pantalla de salida,
       el mouse y el teclado reales quedan para vos.
       1. «🌐 Web» → escribí `google.com` y buscá algo. Probá escribir en el
-         buscador de la página: las flechas, la barra espaciadora, F1 a F4 y
-         Esc **no** tienen que mover las diapositivas ni apagar la pantalla.
+         buscador de la página: las flechas, la barra espaciadora y Esc **no**
+         tienen que mover las diapositivas ni apagar la pantalla. F1 (negro)
+         sí tiene que andar aunque estés escribiendo en la página.
          Mirá que el **mouse** apunte bien (clics, ruedita, seleccionar texto)
          aunque el panel sea más chico que 1920×1080: la página se achica con
          un Viewbox.
