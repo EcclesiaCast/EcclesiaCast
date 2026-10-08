@@ -36,16 +36,28 @@ public sealed class SlideDragAdorner : Adorner
         _ghostSize = new Size(width, height);
     }
 
-    /// <summary>Moves the copy to the pointer and the bar to the gap (none outside the grid).</summary>
+    /// <summary>The visible area of the adorned panel: nothing is drawn outside it.</summary>
+    private Rect Visible => new(AdornedElement.RenderSize);
+
+    /// <summary>
+    /// Moves the copy to the pointer and the bar to the gap. The bar is dropped
+    /// when the pointer is outside the panel: a fast drag can leave the last
+    /// position behind, and the gap it marks is no longer the target.
+    /// </summary>
     public void Update(Point? pointer, Rect? bar)
     {
         _pointer = pointer;
-        _bar = bar;
+        _bar = pointer is { } at && Visible.Contains(at) ? bar : null;
         InvalidateVisual();
     }
 
     protected override void OnRender(DrawingContext drawing)
     {
+        // The adorner layer belongs to the whole window, so without this the bar
+        // of a card scrolled half out of view (or the copy under a pointer that
+        // left) was painted over the media bar below the grid.
+        drawing.PushClip(new RectangleGeometry(Visible));
+
         if (_bar is { } bar)
             drawing.DrawRoundedRectangle(_barBrush, null, bar, 2, 2);
 
@@ -59,5 +71,7 @@ public sealed class SlideDragAdorner : Adorner
             drawing.DrawImage(_ghost, area);
             drawing.Pop();
         }
+
+        drawing.Pop();
     }
 }
