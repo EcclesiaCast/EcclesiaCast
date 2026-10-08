@@ -60,6 +60,11 @@ rendimiento y cómo se ve la pestaña Música.
       verdad no). Clic derecho → Exportar a un archivo, y traerlo de vuelta
       con 📥 (el round trip está probado con pruebas, no con el diálogo de
       guardar).
+- [ ] **La cajita del ➕ Playlist de la Biblia**: tiene que abrirse con el
+      campo ya completado y seleccionado (para escribir encima), mostrar el
+      texto y agregar con Enter o con el botón. Dibujada y probada por
+      dentro; el foco del teclado al abrirse y el Esc no se pudieron ver
+      sin abrir la ventana.
 - [ ] **Preguntas al agregar un video de YouTube** (🔗 o ▶ YouTube): elegir
       «Reproducir por internet» o «Descargar», y ver la marca 🌐 internet en
       las tarjetas de YouTube. La descarga nueva depende de internet y del

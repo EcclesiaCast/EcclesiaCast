@@ -86,11 +86,14 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 - **Suprimir quita de la playlist** el ítem elegido, y se puede apretar
   varias veces seguidas.
 
-- **Pasajes en la playlist**: el botón «➕ Playlist» de la Biblia agrega un
-  tramo escrito en el buscador («juan 8 5-10», o como se lee: «juan 8 del 5
-  al 10»); si no hay tramo escrito, el versículo que está en pantalla; si no,
-  el capítulo. Con clic derecho sobre un versículo se agrega ese, o todo lo
-  que va desde el que está en pantalla hasta él.
+- **Pasajes en la playlist**: el botón «➕ Playlist» de la Biblia abre una
+  cajita con una cita ya escrita: el tramo del buscador («juan 8 5-10»), si
+  no el versículo que está en pantalla, si no el capítulo. Ahí se puede
+  escribir otra («juan 8 del 5 al 10»), ver el texto del pasaje con la
+  versión, y tocar «Agregar» (o Enter; Esc cierra). Si la cita no existe en
+  esa versión, la cajita lo dice y no deja agregar. Con clic derecho sobre un
+  versículo se agrega ese, o todo lo que va desde el que está en pantalla
+  hasta él, como antes.
 
 - **Editar el nombre y la abreviatura de una Biblia** (clic derecho sobre la
   versión). La abreviatura nueva sale en la referencia y en los pasajes que

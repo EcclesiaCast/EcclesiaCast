@@ -475,13 +475,13 @@
                                 <!-- Versiones: una fila de botones con la abreviatura. Clic = usar sólo
                                      esa; Ctrl+clic = sumar o sacar la segunda. El botón ▾ abre la lista
                                      con los nombres completos. -->
-                                <DockPanel DockPanel.Dock="Top" Margin="12,0,12,4">
+                                <DockPanel x:Name="VersionsHeader" DockPanel.Dock="Top" Margin="12,0,12,4">
                                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Button Content="➕ Playlist" FontSize="11" Padding="7,4" Margin="0,0,4,0"
+                                        <Button x:Name="AddPassageButton" Content="➕ Playlist" FontSize="11" Padding="7,4" Margin="0,0,4,0"
                                                 Style="{StaticResource DarkButton}"
-                                                Command="{Binding AddCurrentPassageToPlaylistCommand}"
+                                                Command="{Binding OpenAddPassageCommand}"
                                                 AutomationProperties.Name="Agregar a la playlist"
-                                                ToolTip="Agrega a la playlist un tramo escrito en el buscador (juan 8 5-10, o juan 8 del 5 al 10); si no, el versículo que está en pantalla; si no, el capítulo entero. También: clic derecho sobre un versículo."/>
+                                                ToolTip="Abre una cajita para agregar un pasaje a la playlist: ya trae el tramo escrito en el buscador, o el versículo que está en pantalla, o el capítulo; se puede escribir otro («juan 8 del 5 al 10»). También: clic derecho sobre un versículo."/>
                                         <Button Content="📥" FontSize="11" Padding="7,4"
                                                 Style="{StaticResource DarkButton}"
                                                 Command="{Binding ImportBibleCommand}"
@@ -498,6 +498,60 @@
                                                FontSize="10" Foreground="{StaticResource FaintBrush}"
                                                Margin="4,0,0,0" VerticalAlignment="Center"/>
                                 </DockPanel>
+
+                                <!-- La cajita del ➕ Playlist: una cita, el texto del pasaje y Agregar -->
+                                <Popup x:Name="AddPassagePopup"
+                                       IsOpen="{Binding IsAddPassageOpen, Mode=TwoWay}"
+                                       PlacementTarget="{Binding ElementName=VersionsHeader}"
+                                       Placement="Bottom" VerticalOffset="2"
+                                       StaysOpen="False" AllowsTransparency="True"
+                                       PopupAnimation="Fade"
+                                       Opened="AddPassagePopup_Opened">
+                                    <Border Width="300" Padding="12" Margin="0,0,8,8"
+                                            Background="{StaticResource SurfaceBrush}"
+                                            BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
+                                            CornerRadius="6"
+                                            KeyDown="AddPassagePopup_KeyDown">
+                                        <Border.Effect>
+                                            <DropShadowEffect BlurRadius="12" ShadowDepth="2" Opacity="0.5"/>
+                                        </Border.Effect>
+                                        <StackPanel>
+                                            <TextBlock Text="Agregar a la playlist" FontSize="12"
+                                                       FontWeight="SemiBold" Foreground="White"/>
+                                            <TextBox x:Name="AddPassageBox" Margin="0,8,0,0" Padding="8,6"
+                                                     Background="{StaticResource SurfaceAltBrush}"
+                                                     Foreground="White" CaretBrush="White"
+                                                     BorderBrush="{StaticResource LineBrush}"
+                                                     FontSize="13"
+                                                     Text="{Binding AddPassageText, UpdateSourceTrigger=PropertyChanged}"
+                                                     AutomationProperties.Name="Cita a agregar"
+                                                     ToolTip="Por ejemplo: juan 8 del 5 al 10, sal 23, 1 co 13">
+                                                <TextBox.InputBindings>
+                                                    <KeyBinding Key="Enter" Command="{Binding ConfirmAddPassageCommand}"/>
+                                                </TextBox.InputBindings>
+                                            </TextBox>
+                                            <TextBlock Text="{Binding AddPassageHeading}" Margin="0,8,0,0"
+                                                       FontSize="11" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource MutedBrush}"
+                                                       TextWrapping="Wrap"/>
+                                            <ScrollViewer MaxHeight="150" Margin="0,4,0,0"
+                                                          VerticalScrollBarVisibility="Auto">
+                                                <TextBlock Text="{Binding AddPassagePreview}" FontSize="12"
+                                                           Foreground="White" TextWrapping="Wrap"/>
+                                            </ScrollViewer>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                                                        Margin="0,10,0,0">
+                                                <Button Content="Cancelar" Margin="0,0,6,0" Padding="10,5" FontSize="12"
+                                                        Style="{StaticResource DarkButton}"
+                                                        Click="AddPassageCancel_Click"/>
+                                                <Button Content="Agregar" Padding="12,5" FontSize="12"
+                                                        Style="{StaticResource AccentButton}"
+                                                        IsEnabled="{Binding CanAddPassage}"
+                                                        Command="{Binding ConfirmAddPassageCommand}"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+                                </Popup>
 
                                 <!-- Cerrada: sólo las abreviaturas -->
                                 <ItemsControl x:Name="VersionsRow" DockPanel.Dock="Top"

@@ -597,37 +597,118 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         StatusText = $"\"{song.Title}\" agregada a la playlist.";
     }
 
+    // ── The ➕ Playlist box of the Bible panel ──
+
+    /// <summary>The little box that asks which passage goes to the playlist.</summary>
+    [ObservableProperty]
+    private bool _isAddPassageOpen;
+
+    /// <summary>The reference in the box; starts with what the ➕ would have added.</summary>
+    [ObservableProperty]
+    private string _addPassageText = string.Empty;
+
+    /// <summary>«Juan 8:5-10 · RVR1960», or what is wrong with the text.</summary>
+    [ObservableProperty]
+    private string _addPassageHeading = string.Empty;
+
+    /// <summary>The words of the passage, so it can be checked before it is added.</summary>
+    [ObservableProperty]
+    private string _addPassagePreview = string.Empty;
+
+    [ObservableProperty]
+    private bool _canAddPassage;
+
+    partial void OnAddPassageTextChanged(string value) => UpdateAddPassagePreview();
+
     /// <summary>
-    /// The ➕ of the Bible panel. What it adds, in order: a range typed in
-    /// the search box («juan 8 5-10»), else the verse on screen (or marked
-    /// as next), else a single verse typed, else the whole chapter.
+    /// What the ➕ proposes, in order: a range typed in the search box
+    /// («juan 8 5-10»), else the verse on screen (or marked as next), else a
+    /// single verse typed, else the whole chapter. Null when there is nothing
+    /// to propose.
     /// </summary>
-    [RelayCommand]
-    private void AddCurrentPassageToPlaylist()
+    private BibleReference? DefaultPassageToAdd()
     {
         var typed = BibleReferenceParser.TryParse(BibleQuery);
         if (typed is { VerseStart: int start, VerseEnd: int end } && end > start)
-        {
-            AddPassageToPlaylist(typed);
-            return;
-        }
+            return typed;
 
         if (_currentPassage is null)
-        {
-            if (typed is not null)
-                AddPassageToPlaylist(typed);
-            else
-                StatusText = "Abrí un capítulo o escribí una referencia (juan 8 5-10) primero.";
-            return;
-        }
+            return typed;
 
         var shown = BibleSlideAt(LiveSlideIndex) ?? BibleSlideAt(PreviewSlideIndex);
         if (shown is not null)
-            AddPassageToPlaylist(new BibleReference(_currentPassage.BookNumber, shown.Chapter, shown.FirstVerse, shown.LastVerse));
-        else if (typed?.VerseStart is not null)
-            AddPassageToPlaylist(typed);
-        else
-            AddPassageToPlaylist(_currentPassage with { VerseStart = null, VerseEnd = null });
+            return new BibleReference(_currentPassage.BookNumber, shown.Chapter, shown.FirstVerse, shown.LastVerse);
+        if (typed?.VerseStart is not null)
+            return typed;
+        return _currentPassage with { VerseStart = null, VerseEnd = null };
+    }
+
+    [RelayCommand]
+    private void OpenAddPassage()
+    {
+        if (PrimaryVersion is null)
+        {
+            StatusText = "Primero elegí una versión de la Biblia.";
+            return;
+        }
+
+        var proposal = DefaultPassageToAdd();
+        // Setting the same text again would not refresh the preview (the
+        // version may have changed since the box was last open).
+        AddPassageText = proposal is null ? string.Empty : BibleReferenceFormatter.Format(proposal);
+        UpdateAddPassagePreview();
+        IsAddPassageOpen = true;
+    }
+
+    private void UpdateAddPassagePreview()
+    {
+        CanAddPassage = false;
+        AddPassagePreview = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(AddPassageText))
+        {
+            AddPassageHeading = "Escribí una cita, por ejemplo «juan 8 del 5 al 10».";
+            return;
+        }
+
+        var reference = BibleReferenceParser.TryParse(AddPassageText);
+        if (reference is null)
+        {
+            AddPassageHeading = "No se entiende la cita. Probá con «juan 8 del 5 al 10» o «sal 23».";
+            return;
+        }
+
+        var version = PrimaryVersion;
+        if (version is null)
+            return;
+
+        var heading = $"{BibleReferenceFormatter.Format(reference)} · {version.Abbreviation}";
+        var verses = _bibles.GetPassage(version.Id, reference);
+        if (verses.Count == 0)
+        {
+            AddPassageHeading = $"{heading} — no existe en esta versión.";
+            return;
+        }
+
+        var text = string.Join("  ", verses.Select(v => $"{v.Verse} {v.Text.Trim()}"));
+        const int limit = 900;
+        if (text.Length > limit)
+            text = text[..limit].TrimEnd() + "…";
+
+        AddPassageHeading = heading;
+        AddPassagePreview = text;
+        CanAddPassage = true;
+    }
+
+    [RelayCommand]
+    private void ConfirmAddPassage()
+    {
+        var reference = BibleReferenceParser.TryParse(AddPassageText);
+        if (reference is null || !CanAddPassage)
+            return;
+
+        if (AddPassageToPlaylist(reference))
+            IsAddPassageOpen = false;
     }
 
     /// <summary>Right click on a verse card: just that verse.</summary>
@@ -676,15 +757,15 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         return $"{bookName} {reference.Chapter}{verses}{version}";
     }
 
-    private void AddPassageToPlaylist(BibleReference reference)
+    private bool AddPassageToPlaylist(BibleReference reference)
     {
         if (PrimaryVersion is null || !EnsurePlaylist())
-            return;
+            return false;
 
         if (_bibles.GetPassage(PrimaryVersion.Id, reference).Count == 0)
         {
             StatusText = $"{PassageCaption(reference)} no existe en esta versión.";
-            return;
+            return false;
         }
 
         var caption = PassageCaption(reference);
@@ -700,6 +781,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         });
         SavePlaylist();
         StatusText = $"«{caption}» agregado a la playlist.";
+        return true;
     }
 
     [RelayCommand]

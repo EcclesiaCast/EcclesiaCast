@@ -579,6 +579,27 @@ public partial class MainWindow : Window
             BibleQueryBox.CaretIndex = BibleQueryBox.Text.Length;
     }
 
+    // ── La cajita del ➕ Playlist de la Biblia ───────────────────
+
+    /// <summary>The box opens ready to type: the proposal is selected, so typing replaces it.</summary>
+    private void AddPassagePopup_Opened(object? sender, EventArgs e) =>
+        Dispatcher.BeginInvoke(() =>
+        {
+            Keyboard.Focus(AddPassageBox);
+            AddPassageBox.SelectAll();
+        }, DispatcherPriority.Input);
+
+    private void AddPassagePopup_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Escape)
+            return;
+
+        AddPassagePopup.IsOpen = false;
+        e.Handled = true;
+    }
+
+    private void AddPassageCancel_Click(object sender, RoutedEventArgs e) => AddPassagePopup.IsOpen = false;
+
     // ── Resaltar señalando el Live ───────────────────────────────
 
     private Point? _liveHighlightStart;
