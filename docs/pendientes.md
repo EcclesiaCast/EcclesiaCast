@@ -55,6 +55,11 @@ rendimiento y cómo se ve la pestaña Música.
       segundos, mirar el último archivo de la carpeta `logs` (línea «Ventana
       congelada») para ver qué estaba haciendo. Probado bloqueando a propósito
       un programa de prueba 3,5 segundos; no con un cuelgue real.
+- [ ] **Versiones de la Biblia en una fila**: clic = sólo esa, Ctrl+clic =
+      suma o saca la segunda (probado sólo por dentro: el Ctrl con teclado de
+      verdad no). Clic derecho → Exportar a un archivo, y traerlo de vuelta
+      con 📥 (el round trip está probado con pruebas, no con el diálogo de
+      guardar).
 - [ ] **Preguntas al agregar un video de YouTube** (🔗 o ▶ YouTube): elegir
       «Reproducir por internet» o «Descargar», y ver la marca 🌐 internet en
       las tarjetas de YouTube. La descarga nueva depende de internet y del

@@ -92,9 +92,9 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   el capítulo. Con clic derecho sobre un versículo se agrega ese, o todo lo
   que va desde el que está en pantalla hasta él.
 
-- **Editar el nombre y la abreviatura de una Biblia** (✏️ en Versiones). La
-  abreviatura nueva sale en la referencia y en los pasajes que ya estaban en
-  las playlists.
+- **Editar el nombre y la abreviatura de una Biblia** (clic derecho sobre la
+  versión). La abreviatura nueva sale en la referencia y en los pasajes que
+  ya estaban en las playlists.
 
 - **Copias livianas de los videos pesados**: los videos 4K o de 60 cuadros
   por segundo (importados, descargados de YouTube o de logo) tienen solos una
@@ -135,6 +135,16 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   diseño original» deshace todo.
 
 ### Cambiado
+
+- **Las versiones de la Biblia, en una fila.** Cada versión es un botón con su
+  abreviatura (RVR1960, NVI, NTV, TLA): un clic usa sólo esa; Ctrl+clic suma
+  o saca una segunda, que se proyecta debajo de la primera. Las activas se ven
+  encendidas, la primera llena y la segunda con borde. El botón ▸ abre la
+  lista con los nombres completos y el programa se acuerda si la dejaste
+  abierta. Con clic derecho sobre una versión: editar nombre y abreviatura,
+  eliminar y **exportar a un archivo** que el mismo programa vuelve a importar
+  (📥), para llevarla a otra computadora. Los botones ✏️ y 🗑 sobraron y se
+  fueron.
 
 - **Videos de YouTube más claros en la barra de medios.** Al agregar uno (por
   el navegador o pegando el link) el programa pregunta si se reproduce por

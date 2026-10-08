@@ -58,6 +58,99 @@
             <Setter Property="BorderThickness" Value="0"/>
         </Style>
 
+        <!-- Bible version button: the abbreviation. Lit when the version is
+             active; the first one solid, the second one outlined, so the
+             order they are projected in can be told apart at a glance. -->
+        <Style x:Key="VersionChip" TargetType="Button" BasedOn="{StaticResource DarkButton}">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Padding" Value="9,4"/>
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Opacity" Value="0.85"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Opacity" Value="0.7"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsSecondary}" Value="True">
+                    <Setter Property="Background" Value="#243558"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsPrimary}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- The same, as a full-width row of the opened list -->
+        <Style x:Key="VersionRow" TargetType="Button" BasedOn="{StaticResource VersionChip}">
+            <Setter Property="Margin" Value="0,0,0,2"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Padding" Value="9,5"/>
+        </Style>
+
+        <!-- ▸ / ▾ that opens the versions list -->
+        <Style x:Key="VersionsExpanderStyle" TargetType="ToggleButton">
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="Width" Value="22"/>
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="bd" CornerRadius="4" Background="Transparent">
+                            <TextBlock x:Name="arrow" Text="▸" FontSize="12"
+                                       Foreground="{TemplateBinding Foreground}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="arrow" Property="Text" Value="▾"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Right click on a Bible version (the button carries the view model in Tag) -->
+        <ContextMenu x:Key="VersionMenu" x:Shared="False">
+            <MenuItem Header="Editar nombre y abreviatura…"
+                      Command="{Binding PlacementTarget.Tag.RenameBibleVersionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+            <MenuItem Header="Exportar a un archivo…"
+                      Command="{Binding PlacementTarget.Tag.ExportBibleVersionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+            <Separator/>
+            <MenuItem Header="Eliminar versión…"
+                      Command="{Binding PlacementTarget.Tag.DeleteBibleVersionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+        </ContextMenu>
+
         <!-- Tab toggle at the top of the library panel (Canciones / Biblia) -->
         <Style x:Key="TabButton" TargetType="RadioButton">
             <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>

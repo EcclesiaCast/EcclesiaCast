@@ -23,6 +23,12 @@ public interface IBibleRepository
 
     void DeleteVersion(int versionId);
 
+    /// <summary>
+    /// Every book and verse of a version as it would be parsed from a file —
+    /// what Export writes, and what importing the file again gives back.
+    /// </summary>
+    ParsedBible ReadVersion(int versionId);
+
     /// <summary>Canonical book numbers (1–66) present in this version, in Bible order.</summary>
     IReadOnlyList<int> GetAvailableBookNumbers(int versionId);
 

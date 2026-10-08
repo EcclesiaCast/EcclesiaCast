@@ -89,6 +89,15 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
     private bool _suppressVersionEvents;
 
+    private const string BibleVersionsExpandedKey = "bible.versions.expanded";
+
+    /// <summary>The versions row is open into a list with the full names.</summary>
+    [ObservableProperty]
+    private bool _isBibleVersionsExpanded;
+
+    partial void OnIsBibleVersionsExpandedChanged(bool value) =>
+        _settings.Set(BibleVersionsExpandedKey, value ? "1" : "0");
+
     /// <summary>The passage currently shown in the grid, to re-render when versions change.</summary>
     private BibleReference? _currentPassage;
 
@@ -315,6 +324,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         UpdateStateFlags();
         RefreshDisplays();
         LoadSongs();
+        IsBibleVersionsExpanded = _settings.Get(BibleVersionsExpandedKey) == "1";
         LoadBibleVersions();
         LoadMedia();
         LoadLogos(null);
@@ -3076,8 +3086,42 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         RefreshAfterVersionChange();
     }
 
-    /// <summary>Clicking a version's name makes it the only active one.</summary>
+    /// <summary>
+    /// A click on a version uses only that one; Ctrl+click adds it as the
+    /// second version, or takes it out if it was already active.
+    /// </summary>
     [RelayCommand]
+    private void ChooseVersion(BibleVersionOption? option)
+    {
+        if (option is null)
+            return;
+
+        if ((System.Windows.Input.Keyboard.Modifiers & System.Windows.Input.ModifierKeys.Control) == 0)
+        {
+            SelectSoloVersion(option);
+            return;
+        }
+
+        SelectedBibleVersionOption = option;
+        // The last active version cannot be taken out: something must project.
+        if (option.IsSelected && _checkedVersionIds.Count <= 1)
+            return;
+
+        // The change handler keeps the list of active ids, the badges and the grid.
+        option.IsSelected = !option.IsSelected;
+    }
+
+    /// <summary>Marks which active version is the first and which the second.</summary>
+    private void UpdateVersionBadges()
+    {
+        foreach (var option in BibleVersionOptions)
+        {
+            var position = _checkedVersionIds.IndexOf(option.Info.Id);
+            option.IsPrimary = position == 0;
+            option.IsSecondary = position == 1;
+        }
+    }
+
     private void SelectSoloVersion(BibleVersionOption? option)
     {
         if (option is null)
@@ -3102,6 +3146,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     /// </summary>
     private void RefreshAfterVersionChange()
     {
+        UpdateVersionBadges();
         RebuildSlidesPreservingLive(() =>
         {
             LoadBibleBooksAvailable();
@@ -3620,6 +3665,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             ?? BibleVersionOptions.FirstOrDefault();
 
         _suppressVersionEvents = false;
+        UpdateVersionBadges();
         LoadBibleBooksAvailable();
     }
 
@@ -3686,9 +3732,9 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     }
 
     [RelayCommand]
-    private void RenameBibleVersion()
+    private void RenameBibleVersion(BibleVersionOption? option)
     {
-        var target = SelectedBibleVersionOption?.Info;
+        var target = (option ?? SelectedBibleVersionOption)?.Info;
         if (target is null)
             return;
 
@@ -3720,9 +3766,9 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     }
 
     [RelayCommand]
-    private void DeleteBibleVersion()
+    private void DeleteBibleVersion(BibleVersionOption? option)
     {
-        var target = SelectedBibleVersionOption?.Info;
+        var target = (option ?? SelectedBibleVersionOption)?.Info;
         if (target is null)
             return;
 
@@ -3732,10 +3778,56 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (confirm != MessageBoxResult.Yes)
             return;
 
+        var wasActive = _checkedVersionIds.Contains(target.Id);
         _bibles.DeleteVersion(target.Id);
         SelectedBibleVersionOption = null;
         LoadBibleVersions();
+        // The text on the grid came from the version that is gone.
+        if (wasActive)
+            RefreshAfterVersionChange();
         BibleStatusText = "Versión eliminada.";
+    }
+
+    /// <summary>
+    /// Saves a version to a file this same program can import again (the JSON
+    /// of <see cref="JsonBibleImporter"/>), to move it to another computer.
+    /// </summary>
+    [RelayCommand]
+    private void ExportBibleVersion(BibleVersionOption? option)
+    {
+        var target = (option ?? SelectedBibleVersionOption)?.Info;
+        if (target is null)
+            return;
+
+        var invalid = Path.GetInvalidFileNameChars();
+        var fileName = new string(target.Name.Select(c => invalid.Contains(c) ? '_' : c).ToArray());
+        var dialog = new Microsoft.Win32.SaveFileDialog
+        {
+            Title = "Exportar Biblia",
+            Filter = "Biblia (*.json)|*.json",
+            FileName = fileName + ".json",
+            AddExtension = true,
+            DefaultExt = ".json",
+        };
+        if (dialog.ShowDialog() != true)
+            return;
+
+        try
+        {
+            var json = JsonBibleExporter.ToJson(_bibles.ReadVersion(target.Id));
+            File.WriteAllText(dialog.FileName, json, new UTF8Encoding(false));
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Falló la exportación de la Biblia {Name}", target.Name);
+            MessageBox.Show(
+                $"No se pudo guardar el archivo:\n\n{ex.Message}",
+                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+
+        BibleStatusText = $"«{target.Name}» exportada. Se vuelve a traer con el botón 📥.";
+        Log.Information("Biblia exportada: {Name} a {Path}", target.Name, dialog.FileName);
     }
 
     // ── Proyección de slides ─────────────────────────────────────

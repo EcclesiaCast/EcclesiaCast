@@ -83,6 +83,30 @@ public sealed class BibleRepository(string dbPath) : IBibleRepository
         db.SaveChanges();
     }
 
+    public ParsedBible ReadVersion(int versionId)
+    {
+        using var db = new AppDbContext(dbPath);
+
+        var books = db.BibleBooks.AsNoTracking()
+            .Where(b => b.VersionId == versionId)
+            .OrderBy(b => b.Number)
+            .Select(b => new { b.Id, b.Number, b.Name })
+            .ToList();
+        var verses = db.BibleVerses.AsNoTracking()
+            .Where(v => v.Book.VersionId == versionId)
+            .OrderBy(v => v.Chapter).ThenBy(v => v.Verse)
+            .Select(v => new { v.BookId, v.Chapter, v.Verse, v.Text })
+            .ToList()
+            .ToLookup(v => v.BookId);
+
+        return new ParsedBible(books
+            .Select(b => new ParsedBook(
+                b.Number,
+                b.Name,
+                verses[b.Id].Select(v => new ParsedVerse(v.Chapter, v.Verse, v.Text)).ToList()))
+            .ToList());
+    }
+
     public IReadOnlyList<int> GetAvailableBookNumbers(int versionId)
     {
         using var db = new AppDbContext(dbPath);
