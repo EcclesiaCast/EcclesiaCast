@@ -55,4 +55,17 @@ public class PosterPolicyTests
 
         Assert.False(PosterPolicy.NeedsPoster(item, Exists));
     }
+
+    [Fact]
+    public void A_saved_web_page_is_never_asked_a_poster_from_its_address()
+    {
+        var item = new MediaItem
+        {
+            Type = MediaType.Web,
+            Path = "https://www.canva.com/design/abc",
+            ThumbnailPath = @"C:\poster\borrado.png",
+        };
+
+        Assert.False(PosterPolicy.NeedsPoster(item, Exists));
+    }
 }

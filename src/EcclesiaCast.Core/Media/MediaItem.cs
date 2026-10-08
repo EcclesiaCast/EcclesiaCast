@@ -7,6 +7,13 @@ public enum MediaType
 
     /// <summary>A YouTube video, played in the embedded browser with the operator's own session.</summary>
     YouTube,
+
+    /// <summary>
+    /// A web page. In the library it is a saved page (a card that opens it in
+    /// the web panel); as the background it is the page shown live, drawn from
+    /// the panel's own browser. Stored as the number 3: no migration needed.
+    /// </summary>
+    Web,
 }
 
 /// <summary>How a non-16:9 asset is fitted to the 16:9 output.</summary>
@@ -59,7 +66,7 @@ public sealed class MediaItem
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
 
-    /// <summary>Absolute path to the source file, or the watch URL for YouTube.</summary>
+    /// <summary>Absolute path to the source file, or the watch URL for YouTube, or the address of a web page.</summary>
     public string Path { get; set; } = string.Empty;
 
     /// <summary>YouTube video id when <see cref="Type"/> is YouTube.</summary>
@@ -69,6 +76,9 @@ public sealed class MediaItem
 
     /// <summary>True for a video played over the internet (no file on this computer).</summary>
     public bool IsYouTube => Type == MediaType.YouTube;
+
+    /// <summary>True for a web page: <see cref="Path"/> is its address.</summary>
+    public bool IsWeb => Type == MediaType.Web;
 
     /// <summary>Absolute path to a generated thumbnail (may be null for images, which self-thumbnail).</summary>
     public string? ThumbnailPath { get; set; }
