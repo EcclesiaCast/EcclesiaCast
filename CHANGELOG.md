@@ -22,7 +22,9 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   sigue proyectándose. **Guardar en medios** guarda la foto o, sin foto, la
   página como tarjeta 🌐 (un clic la abre; se puede agregar a la playlist, y el
   doble clic la pone en vivo). Mientras escribís en la página, los atajos del
-  programa no se disparan, salvo F1 a F4 (negro, limpiar, logo, quitar fondo). Las fotos de más de 7 días se borran solas.
+  programa no se disparan, salvo F1 a F4 (negro, limpiar, logo, quitar fondo).
+  La página sigue viéndose en la pantalla aunque otro programa tape la ventana
+  del operador o la minimices. Las fotos de más de 7 días se borran solas.
 
 - **En Propiedades, el cuadro de vista previa muestra también lo que queda
   afuera de la pantalla.** Se ve la imagen entera, con la parte de afuera

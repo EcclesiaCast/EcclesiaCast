@@ -39,7 +39,13 @@ public static class WebViewProfile
                 // Without this the browser's autoplay policy refuses to start a
                 // video that has sound until someone clicks the page, so a video
                 // projected with audio would just sit on its first frame.
-                AdditionalBrowserArguments = "--autoplay-policy=no-user-gesture-required",
+                // The browser also stops painting when it thinks its window is
+                // covered (another program over the operator's window, or a
+                // Windows panel on top): a web page projected live would go
+                // black on the screen, so that saving is turned off.
+                AdditionalBrowserArguments = "--autoplay-policy=no-user-gesture-required"
+                    + " --disable-features=CalculateNativeWinOcclusion"
+                    + " --disable-backgrounding-occluded-windows",
             });
     }
 

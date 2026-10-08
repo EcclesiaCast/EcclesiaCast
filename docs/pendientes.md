@@ -89,10 +89,15 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
       esta versión no pide nada. Si hay una página en pantalla, tiene que
       cambiar sola a la versión nítida.
 
-- [ ] **Proyectar una página web** (pedido de Alexis, 8/10/2026). Nada de esto
-      se pudo probar con la app abierta: el control del navegador sólo se probó
-      en una ventana de prueba fuera de la pantalla, y la pantalla de salida,
-      el mouse y el teclado reales quedan para vos.
+- [ ] **Proyectar una página web** (pedido de Alexis, 8/10/2026). Claude lo
+      probó con la app abierta el 8/10 a la noche, sin mouse ni teclado (los
+      botones por automatización): la página en el monitor grande, el en vivo
+      (A+ se ve al instante), la foto que queda quieta, el panel cerrado en
+      vivo, otro fondo que lo apaga, «Guardar en medios» con una foto, y la app
+      minimizada un minuto sin que la pantalla se apague. Ahí apareció un
+      error que quedó arreglado: con otra ventana encima, la página se ponía
+      **negra** en la pantalla. Quedan para vos el mouse, el teclado y el
+      puntero.
       1. «🌐 Web» → escribí `google.com` y buscá algo. Probá escribir en el
          buscador de la página: las flechas, la barra espaciadora y Esc **no**
          tienen que mover las diapositivas ni apagar la pantalla. F1 (negro)
@@ -106,7 +111,9 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
          la página) y muestra el puntero (probá con la casilla destildada).
          Volvé a las diapositivas con «✕ Cerrar»: tiene que seguir en vivo.
          Proyectá otro fondo, o una diapositiva: el en vivo se apaga y el
-         botón se despinta. Probá F1, F2, F3 con una página en vivo.
+         botón se despinta. Probá F1, F2, F3 con una página en vivo. Abrí
+         otro programa a pantalla completa encima de EcclesiaCast: la página
+         tiene que seguir viéndose en la pantalla grande.
          Con el modo de PC de bajo rendimiento, LIVE y PREVIEW muestran una
          foto que se renueva cada 2 segundos.
       4. A− / A+ agrandan la letra de la página en la pantalla.
