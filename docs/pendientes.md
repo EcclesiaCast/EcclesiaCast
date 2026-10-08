@@ -162,6 +162,13 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
       agregarlos. Mejora posible: pegar el enlace de una presentación pública
       de Google Slides y que el programa la baje como PDF sola (Canva pide
       iniciar sesión, así que ahí sigue siendo descargar el PDF).
+- [ ] **Proyectar una página web** (pedido de Alexis, 8/10/2026). Abrir una
+      web en el cuadro central (donde están las diapositivas), usarla ahí
+      con el mouse y que se vea en la pantalla, de dos formas: **en vivo**
+      (la pantalla copia lo que pasa, con los movimientos) o **foto** (usás la
+      página y con un botón mandás lo que se ve en ese momento). Serviría
+      también para Canva y Google Slides con sesión iniciada. Hay que sumarlo
+      a la [política de privacidad](privacidad.md). Falta decidir cuándo.
 
 ## 4. Para versiones futuras
 
