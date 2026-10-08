@@ -92,6 +92,56 @@
                         ToolTip="Arrastrá para moverte dentro del video"/>
             </StackPanel>
         </DataTemplate>
+        <!-- Menú de clic derecho de las tarjetas de la barra de medios. Es uno solo,
+             compartido: se arma al abrirse (MediaMenu_Opened) según qué tarjeta lo
+             abrió y cuántas hay elegidas. -->
+        <ContextMenu x:Key="MediaCardMenu" Opened="MediaMenu_Opened">
+            <MenuItem Header="Agregar a la playlist"
+                      Command="{Binding PlacementTarget.Tag.AddMediaToPlaylistCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+            <!-- Sus pestañas se llenan al abrirse -->
+            <MenuItem x:Name="MoveToTabItem" Header="Mover a la pestaña…" SubmenuOpened="MoveToTab_SubmenuOpened">
+                <MenuItem Header="(cargando)" IsEnabled="False"/>
+            </MenuItem>
+            <Separator Visibility="{Binding PlacementTarget.DataContext.IsYouTube, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVis}}"/>
+            <MenuItem Header="Descargar para uso local"
+                      Visibility="{Binding PlacementTarget.DataContext.IsYouTube, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVis}}"
+                      Command="{Binding PlacementTarget.Tag.DownloadYouTubeCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      ToolTip="Guarda el video en la computadora para no depender de internet durante la reunión"/>
+            <Separator/>
+            <MenuItem Header="Propiedades (Inspector)…"
+                      Command="{Binding PlacementTarget.Tag.InspectMediaCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+            <!-- Sólo en los videos de archivo (los de YouTube no tienen qué aliviar) -->
+            <MenuItem Header="Hacer una copia liviana…"
+                      Command="{Binding PlacementTarget.Tag.MakeLightCopyOfCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      ToolTip="Para un video de 4K o de 50 cuadros o más que anda a los saltos: se hace una copia más liviana para proyectar. El original queda donde está y la biblioteca guarda los dos.">
+                <MenuItem.Style>
+                    <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding PlacementTarget.DataContext.Type, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Value="Video">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </MenuItem.Style>
+            </MenuItem>
+            <!-- Sólo en las páginas que el programa dibujó de un PDF o una presentación -->
+            <MenuItem x:Name="ReimportItem" Header="Volver a importar en alta calidad…" Visibility="Collapsed"
+                      Command="{Binding PlacementTarget.Tag.ReimportDocumentPageCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      ToolTip="Dibuja de nuevo todas las páginas de este documento al doble de tamaño, para que no se pixelen con zoom."/>
+            <MenuItem Header="Abrir ubicación del archivo"
+                      Command="{Binding PlacementTarget.Tag.OpenMediaLocationCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+            <Separator/>
+            <MenuItem x:Name="RemoveMediaItem" Header="Quitar de la biblioteca"
+                      Command="{Binding PlacementTarget.Tag.DeleteMediaCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+        </ContextMenu>
     </Window.Resources>
 
     <Grid>
@@ -1783,6 +1833,7 @@
             <!-- ══ Barra de medios ══ -->
             <Border x:Name="MediaPanel" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
                     Style="{StaticResource Panel}"
+                    PreviewKeyDown="MediaPanel_PreviewKeyDown"
                     AllowDrop="True" DragEnter="MediaPanel_DragOver" DragOver="MediaPanel_DragOver"
                     DragLeave="MediaPanel_DragLeave" Drop="MediaPanel_Drop">
             <DockPanel>
@@ -1913,61 +1964,34 @@
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
-                    <ScrollViewer x:Name="MediaScroll" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                        <ItemsControl ItemsSource="{Binding MediaItems}" Margin="0,0,0,6">
+                    <!-- Fondo transparente: así el espacio vacío recibe el clic y se puede
+                         arrastrar un rectángulo para elegir varias tarjetas -->
+                    <ScrollViewer x:Name="MediaScroll" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
+                                  Background="Transparent" Focusable="True" FocusVisualStyle="{x:Null}"
+                                  PreviewMouseLeftButtonDown="MediaScroll_PreviewMouseLeftButtonDown"
+                                  PreviewMouseMove="MediaScroll_PreviewMouseMove"
+                                  PreviewMouseLeftButtonUp="MediaScroll_PreviewMouseLeftButtonUp"
+                                  LostMouseCapture="MediaScroll_LostMouseCapture">
+                        <ItemsControl x:Name="MediaCards" ItemsSource="{Binding MediaItems}" Margin="0,0,0,6">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate><WrapPanel Orientation="Horizontal"/></ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Button Command="{Binding DataContext.ApplyBackgroundCommand, ElementName=MediaScroll}"
-                                            CommandParameter="{Binding}"
+                                    <!-- Un clic proyecta y deja elegida sólo esta tarjeta; con Ctrl o Mayús
+                                         el clic suma a la selección y no proyecta (MediaCard_Click).
+                                         Un solo menú compartido por todas: uno por tarjeta eran
+                                         cientos de objetos en una pestaña grande. -->
+                                    <Button Click="MediaCard_Click"
                                             Cursor="Hand" Margin="6,2"
                                             Tag="{Binding DataContext, ElementName=MediaScroll}"
                                             AutomationProperties.Name="{Binding Name}"
+                                            ContextMenu="{StaticResource MediaCardMenu}"
+                                            Loaded="MediaCard_Loaded"
                                             PreviewMouseLeftButtonDown="MediaCard_PreviewMouseLeftButtonDown"
+                                            PreviewMouseRightButtonDown="MediaCard_PreviewMouseRightButtonDown"
                                             PreviewMouseMove="MediaCard_PreviewMouseMove"
                                             ToolTip="{Binding Name}">
-                                        <Button.ContextMenu>
-                                            <ContextMenu>
-                                                <MenuItem Header="Agregar a la playlist"
-                                                          Command="{Binding PlacementTarget.Tag.AddMediaToPlaylistCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
-                                                <Separator Visibility="{Binding PlacementTarget.DataContext.IsYouTube, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVis}}"/>
-                                                <MenuItem Header="Descargar para uso local"
-                                                          Visibility="{Binding PlacementTarget.DataContext.IsYouTube, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVis}}"
-                                                          Command="{Binding PlacementTarget.Tag.DownloadYouTubeCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                                                          ToolTip="Guarda el video en la computadora para no depender de internet durante la reunión"/>
-                                                <Separator/>
-                                                <MenuItem Header="Propiedades (Inspector)…"
-                                                          Command="{Binding PlacementTarget.Tag.InspectMediaCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
-                                                <!-- Sólo en los videos de archivo (los de YouTube no tienen qué aliviar) -->
-                                                <MenuItem Header="Hacer una copia liviana…"
-                                                          Command="{Binding PlacementTarget.Tag.MakeLightCopyOfCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                                                          ToolTip="Para un video de 4K o de 50 cuadros o más que anda a los saltos: se hace una copia más liviana para proyectar. El original queda donde está y la biblioteca guarda los dos.">
-                                                    <MenuItem.Style>
-                                                        <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
-                                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding PlacementTarget.DataContext.Type, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Value="Video">
-                                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </MenuItem.Style>
-                                                </MenuItem>
-                                                <MenuItem Header="Abrir ubicación del archivo"
-                                                          Command="{Binding PlacementTarget.Tag.OpenMediaLocationCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
-                                                <Separator/>
-                                                <MenuItem Header="Quitar de la biblioteca"
-                                                          Command="{Binding PlacementTarget.Tag.DeleteMediaCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
-                                            </ContextMenu>
-                                        </Button.ContextMenu>
                                         <Button.Template>
                                             <ControlTemplate TargetType="Button">
                                                 <Border x:Name="card" Width="98" Height="56" CornerRadius="4"
@@ -1976,13 +2000,19 @@
                                                         Tag="{Binding DataContext, ElementName=MediaScroll}"
                                                         ClipToBounds="True">
                                                     <Grid>
-                                                        <Image Source="{Binding ThumbnailPath}" Stretch="UniformToFill"/>
+                                                        <!-- Con el encuadre real: escala, zoom, corrimiento, tamaño fijo, relleno,
+                                                             brillo y tinte, igual que en la pantalla (sin desenfoque: no se nota acá) -->
+                                                        <controls:FramedMediaPreview x:Name="preview" Media="{Binding}" DecodeWidth="240"/>
                                                         <Border Background="#66000000" VerticalAlignment="Bottom" Padding="4,1">
                                                             <TextBlock Text="{Binding Name}" FontSize="9" Foreground="White"
                                                                        TextTrimming="CharacterEllipsis"/>
                                                         </Border>
                                                         <TextBlock Text="🎞" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"
                                                                    Visibility="Collapsed" x:Name="videoIcon"/>
+                                                        <!-- Elegida: borde y fondo de acento (distinto del borde fino del mouse encima) -->
+                                                        <Border x:Name="selected" Visibility="Collapsed" IsHitTestVisible="False"
+                                                                CornerRadius="3" Background="#552F63C9"
+                                                                BorderBrush="{StaticResource AccentBrush}" BorderThickness="2"/>
                                                         <!-- Se reproduce por internet: sin conexión no anda -->
                                                         <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="3"
                                                                 Padding="4,1" CornerRadius="3" Background="#B3000000"
@@ -1999,6 +2029,10 @@
                                                     <DataTrigger Binding="{Binding Type}" Value="Video">
                                                         <Setter TargetName="videoIcon" Property="Visibility" Value="Visible"/>
                                                     </DataTrigger>
+                                                    <Trigger Property="controls:MediaCardState.IsSelected" Value="True">
+                                                        <Setter TargetName="selected" Property="Visibility" Value="Visible"/>
+                                                        <Setter TargetName="card" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                                    </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>
                                         </Button.Template>
@@ -2007,6 +2041,10 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </ScrollViewer>
+                    <!-- El rectángulo de selección al arrastrar en el espacio vacío -->
+                    <Border x:Name="MediaBand" Visibility="Collapsed" IsHitTestVisible="False"
+                            HorizontalAlignment="Left" VerticalAlignment="Top"
+                            Background="#332F63C9" BorderBrush="{StaticResource AccentBrush}" BorderThickness="1"/>
                 </Grid>
             </DockPanel>
             </Border>

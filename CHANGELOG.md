@@ -9,6 +9,18 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Selección múltiple en la barra de medios, como en el Explorador.**
+  **Ctrl+clic** suma o saca una tarjeta, **Mayús+clic** elige el tramo desde la
+  última, **Ctrl+A** elige todas las de la pestaña, **Esc** limpia la selección
+  (cuando hay varias) y arrastrar un **rectángulo** en el espacio vacío elige
+  las que toca. Con varias elegidas: **Supr** (o clic derecho → **Quitar de la
+  biblioteca**) las quita todas con **una sola** pregunta que dice cuántas;
+  **arrastrar** una de ellas a otra pestaña las mueve a todas; arrastrarlas a
+  la playlist las agrega todas, en su orden; y clic derecho → **Mover a la
+  pestaña…** deja elegir la pestaña de una lista. Un clic común sigue
+  proyectando y deja elegida sólo esa tarjeta. Las elegidas se ven con borde y
+  fondo azul.
+
 - **La miniatura muestra cómo se va a ver en pantalla.** En **Propiedades del
   medio**, arriba a la derecha, hay un cuadro 16:9 que dibuja la imagen (o el
   póster del video) igual que la salida: con su escala, zoom, corrimiento,

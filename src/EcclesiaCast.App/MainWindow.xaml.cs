@@ -36,6 +36,7 @@ public partial class MainWindow : Window
                 return;
 
             vm.IsOutputMerged = !_outputSplit;
+            vm.MediaSelectionChanged += (_, _) => RefreshMediaSelectionVisuals();
 
             // Keep the relevant slide card visible: the live one while
             // navigating with the arrows, the previewed one after a search.
@@ -445,28 +446,88 @@ public partial class MainWindow : Window
         PlaylistDropLine.Visibility = Visibility.Collapsed;
     }
 
-    // ── Arrastrar medios dentro del programa ─────────────────────
+    // ── Selección y arrastre de medios ───────────────────────────
 
     private Point? _mediaDragStart;
     private MediaItem? _mediaDragItem;
 
+    private static MediaItem? CardMedia(object sender) => (sender as FrameworkElement)?.DataContext as MediaItem;
+
+    /// <summary>
+    /// A card that appears (the bar is rebuilt after almost every change)
+    /// takes its picked frame from the selection, and the fill picture of the
+    /// few media that have one.
+    /// </summary>
+    private void MediaCard_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button card || card.DataContext is not MediaItem media || DataContext is not MainViewModel vm)
+            return;
+
+        MediaCardState.SetIsSelected(card, vm.MediaSelection.Contains(media.Id));
+        if (media.FillMediaId is int fillId
+            && card.Template.FindName("preview", card) is FramedMediaPreview preview)
+            preview.FillMedia = vm.FindMedia(fillId);
+    }
+
+    /// <summary>
+    /// A plain click projects, as always, and leaves only this card picked.
+    /// With Ctrl or Shift it only picks (adds or takes out; the stretch from
+    /// the last one), the way the Explorer does.
+    /// </summary>
+    private void MediaCard_Click(object sender, RoutedEventArgs e)
+    {
+        if (CardMedia(sender) is not { } media || DataContext is not MainViewModel vm)
+            return;
+
+        var modifiers = Keyboard.Modifiers;
+        if (vm.ClickMedia(media,
+                ctrl: modifiers.HasFlag(ModifierKeys.Control),
+                shift: modifiers.HasFlag(ModifierKeys.Shift)))
+            vm.ApplyBackgroundCommand.Execute(media);
+    }
+
+    /// <summary>Right click on a card that is not picked picks only it, so the menu acts on what was clicked.</summary>
+    private void MediaCard_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (CardMedia(sender) is { } media && DataContext is MainViewModel vm)
+            vm.SelectMediaForMenu(media);
+    }
+
+    /// <summary>Paints the picked frame on the cards that exist right now.</summary>
+    private void RefreshMediaSelectionVisuals()
+    {
+        if (DataContext is not MainViewModel vm)
+            return;
+
+        for (var i = 0; i < MediaCards.Items.Count; i++)
+        {
+            if (MediaCards.ItemContainerGenerator.ContainerFromIndex(i) is ContentPresenter holder
+                && VisualTreeHelper.GetChildrenCount(holder) > 0
+                && VisualTreeHelper.GetChild(holder, 0) is Button card
+                && card.DataContext is MediaItem media)
+                MediaCardState.SetIsSelected(card, vm.MediaSelection.Contains(media.Id));
+        }
+    }
+
     private void MediaCard_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        _mediaDragItem = (sender as FrameworkElement)?.DataContext as MediaItem;
+        _mediaDragItem = CardMedia(sender);
         _mediaDragStart = e.GetPosition(this);
     }
 
     /// <summary>
     /// A press that travels a few pixels becomes a drag, like the song list's:
-    /// a plain click still applies the media. It can be dropped on the
-    /// playlist (into the exact place) or on another tab of the bar.
+    /// a plain click still applies the media. Dragging one of the picked cards
+    /// takes all the picked ones; any other takes just itself. It can be
+    /// dropped on the playlist (into the exact place) or on another tab.
     /// </summary>
     private void MediaCard_PreviewMouseMove(object sender, MouseEventArgs e)
     {
         if (e.LeftButton != MouseButtonState.Pressed
             || _mediaDragStart is not Point start
             || _mediaDragItem is not { } media
-            || sender is not FrameworkElement card)
+            || sender is not FrameworkElement card
+            || DataContext is not MainViewModel vm)
             return;
 
         var moved = e.GetPosition(this) - start;
@@ -475,10 +536,11 @@ public partial class MainWindow : Window
             return;
 
         _mediaDragStart = null;
+        var data = new DataObject(typeof(MediaItem), media);
+        data.SetData(typeof(MediaItem[]), vm.MediaTargets(media).ToArray());
         try
         {
-            DragDrop.DoDragDrop(card, new DataObject(typeof(MediaItem), media),
-                DragDropEffects.Copy | DragDropEffects.Move);
+            DragDrop.DoDragDrop(card, data, DragDropEffects.Copy | DragDropEffects.Move);
         }
         finally
         {
@@ -488,16 +550,226 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>Ctrl+A, Supr and Esc on the bar, once the focus is on one of its cards (or its empty space).</summary>
+    private void MediaPanel_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm || e.OriginalSource is TextBox)
+            return;
+
+        if (e.Key == Key.A && Keyboard.Modifiers == ModifierKeys.Control)
+        {
+            vm.SelectAllMedia();
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Delete && vm.MediaSelection.Count > 0)
+        {
+            vm.DeleteSelectedMedia();
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Escape && vm.MediaSelection.Count > 1)
+        {
+            // Only with several picked: a lone card stays picked after a click
+            // that projected it, and Esc there must still switch the output off.
+            vm.ClearMediaSelection();
+            e.Handled = true;
+        }
+    }
+
+    // ── El menú de clic derecho de las tarjetas ──────────────────
+
+    /// <summary>
+    /// Fits the one shared menu to the card that opened it: the words say how
+    /// many it acts on, and «Volver a importar» only shows on a page the
+    /// program drew itself.
+    /// </summary>
+    private void MediaMenu_Opened(object sender, RoutedEventArgs e)
+    {
+        if (sender is not ContextMenu menu
+            || (menu.PlacementTarget as FrameworkElement)?.DataContext is not MediaItem media
+            || DataContext is not MainViewModel vm)
+            return;
+
+        var count = vm.MediaTargets(media).Count;
+        var suffix = count > 1 ? $" ({count})" : string.Empty;
+
+        foreach (var item in menu.Items.OfType<MenuItem>())
+        {
+            switch (item.Name)
+            {
+                case "ReimportItem":
+                    item.Visibility = DocumentImporter.IsRenderedPage(media.Path) ? Visibility.Visible : Visibility.Collapsed;
+                    break;
+                case "RemoveMediaItem":
+                    item.Header = "Quitar de la biblioteca" + suffix;
+                    break;
+                case "MoveToTabItem":
+                    item.Header = "Mover a la pestaña…" + suffix;
+                    break;
+            }
+        }
+
+        if (menu.Items.OfType<MenuItem>().FirstOrDefault(i => i.Command == vm.AddMediaToPlaylistCommand) is { } add)
+            add.Header = "Agregar a la playlist" + suffix;
+    }
+
+    /// <summary>The tabs to move to, without the one the media is already in.</summary>
+    private void MoveToTab_SubmenuOpened(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuItem submenu
+            || submenu.Parent is not ContextMenu { PlacementTarget: FrameworkElement { DataContext: MediaItem media } }
+            || DataContext is not MainViewModel vm)
+            return;
+
+        submenu.Items.Clear();
+        foreach (var tab in vm.MediaTabs.Where(t => !string.Equals(t, media.Category, StringComparison.OrdinalIgnoreCase)))
+        {
+            var target = tab;
+            var entry = new MenuItem { Header = tab.Replace("_", "__") };
+            entry.Click += (_, _) => vm.MoveMediaToTab(vm.MediaTargets(media), target);
+            submenu.Items.Add(entry);
+        }
+
+        if (submenu.Items.Count == 0)
+            submenu.Items.Add(new MenuItem { Header = "(no hay otras pestañas)", IsEnabled = false });
+    }
+
+    // ── Rectángulo de selección en el espacio vacío ──────────────
+
+    private Point? _bandStart;
+    private bool _bandActive;
+    private bool _bandAdditive;
+    private List<MediaItem> _bandBase = [];
+    private List<(MediaItem Item, Rect Bounds)> _bandCards = [];
+    private HashSet<int> _bandLastHits = [];
+
+    private bool IsInsideCardOrScrollBar(DependencyObject? source)
+    {
+        while (source is not null && !ReferenceEquals(source, MediaScroll))
+        {
+            if (source is System.Windows.Controls.Primitives.ButtonBase or System.Windows.Controls.Primitives.ScrollBar)
+                return true;
+            source = source is Visual or System.Windows.Media.Media3D.Visual3D
+                ? VisualTreeHelper.GetParent(source)
+                : LogicalTreeHelper.GetParent(source);
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// A press on the empty space starts a rectangle. Released without moving
+    /// it clears the selection, like clicking the blank part of an Explorer
+    /// window; Ctrl keeps what was picked and adds to it.
+    /// </summary>
+    private void MediaScroll_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.OriginalSource is not DependencyObject source || IsInsideCardOrScrollBar(source)
+            || DataContext is not MainViewModel vm)
+            return;
+
+        MediaScroll.Focus();
+        _bandStart = e.GetPosition(MediaCards);
+        _bandActive = false;
+        _bandAdditive = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
+        _bandBase = _bandAdditive ? vm.SelectedMedia.ToList() : [];
+        MediaScroll.CaptureMouse();
+        e.Handled = true;
+    }
+
+    private void MediaScroll_PreviewMouseMove(object sender, MouseEventArgs e)
+    {
+        if (_bandStart is not Point start || !MediaScroll.IsMouseCaptured || DataContext is not MainViewModel vm)
+            return;
+
+        var now = e.GetPosition(MediaCards);
+        if (!_bandActive)
+        {
+            if (Math.Abs(now.X - start.X) < SystemParameters.MinimumHorizontalDragDistance
+                && Math.Abs(now.Y - start.Y) < SystemParameters.MinimumVerticalDragDistance)
+                return;
+
+            // Where every card is, taken once: the rectangle is compared with
+            // these on each move instead of asking the layout again.
+            _bandActive = true;
+            _bandCards = [];
+            for (var i = 0; i < MediaCards.Items.Count; i++)
+            {
+                if (MediaCards.Items[i] is MediaItem item
+                    && MediaCards.ItemContainerGenerator.ContainerFromIndex(i) is FrameworkElement holder)
+                {
+                    var origin = holder.TranslatePoint(new Point(0, 0), MediaCards);
+                    _bandCards.Add((item, new Rect(origin, holder.RenderSize)));
+                }
+            }
+
+            _bandLastHits = [];
+        }
+
+        var rect = new Rect(start, now);
+        var hits = _bandCards.Where(c => c.Bounds.IntersectsWith(rect)).Select(c => c.Item).ToList();
+        var ids = hits.Select(m => m.Id).ToHashSet();
+        if (!ids.SetEquals(_bandLastHits))
+        {
+            _bandLastHits = ids;
+            vm.SelectMediaIn(hits.Concat(_bandBase), additive: false);
+        }
+
+        // Drawn in the scroll's own coordinates, so it follows the content
+        // when the bar is scrolled and is cut at the edges of what is visible.
+        var topLeft = MediaCards.TranslatePoint(rect.TopLeft, MediaScroll);
+        var bottomRight = MediaCards.TranslatePoint(rect.BottomRight, MediaScroll);
+        var left = Math.Max(0, topLeft.X);
+        var top = Math.Max(0, topLeft.Y);
+        var right = Math.Min(MediaScroll.ActualWidth, bottomRight.X);
+        var bottom = Math.Min(MediaScroll.ActualHeight, bottomRight.Y);
+        if (right > left && bottom > top)
+        {
+            MediaBand.Margin = new Thickness(left, top, 0, 0);
+            MediaBand.Width = right - left;
+            MediaBand.Height = bottom - top;
+            MediaBand.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            MediaBand.Visibility = Visibility.Collapsed;
+        }
+    }
+
+    private void MediaScroll_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        if (_bandStart is null)
+            return;
+
+        var wasClick = !_bandActive;
+        _bandStart = null;
+        MediaScroll.ReleaseMouseCapture();
+
+        if (wasClick && !_bandAdditive && DataContext is MainViewModel vm)
+            vm.ClearMediaSelection();
+    }
+
+    private void MediaScroll_LostMouseCapture(object sender, MouseEventArgs e)
+    {
+        _bandStart = null;
+        _bandActive = false;
+        MediaBand.Visibility = Visibility.Collapsed;
+    }
+
     private static MediaItem? DraggedMedia(DragEventArgs e) =>
         e.Data.GetDataPresent(typeof(MediaItem)) ? e.Data.GetData(typeof(MediaItem)) as MediaItem : null;
+
+    /// <summary>Everything the drag carries: the picked ones when several were dragged, in the bar's order.</summary>
+    private static IReadOnlyList<MediaItem> DraggedMediaList(DragEventArgs e) =>
+        e.Data.GetDataPresent(typeof(MediaItem[])) && e.Data.GetData(typeof(MediaItem[])) is MediaItem[] { Length: > 0 } many
+            ? many
+            : DraggedMedia(e) is { } one ? [one] : [];
 
     /// <summary>The tab a dragged media is over is lit up; the one it came from can't take it.</summary>
     private void MediaTab_DragOver(object sender, DragEventArgs e)
     {
         e.Handled = true;
         if (sender is not ListBoxItem { DataContext: string tab } row
-            || DraggedMedia(e) is not { } media
-            || string.Equals(media.Category, tab, StringComparison.OrdinalIgnoreCase))
+            || DraggedMediaList(e).All(m => string.Equals(m.Category, tab, StringComparison.OrdinalIgnoreCase)))
         {
             e.Effects = DragDropEffects.None;
             if (sender is ListBoxItem other)
@@ -522,7 +794,7 @@ public partial class MainWindow : Window
             return;
 
         row.ClearValue(TagProperty);
-        if (DataContext is MainViewModel vm && DraggedMedia(e) is { } media)
+        if (DataContext is MainViewModel vm && DraggedMediaList(e) is { Count: > 0 } media)
             vm.MoveMediaToTab(media, tab);
     }
 
@@ -603,7 +875,7 @@ public partial class MainWindow : Window
         var (index, _) = PlaylistDropPoint(e);
         if (e.Data.GetData(typeof(Song)) is Song song)
             vm.InsertSongInPlaylist(song, index);
-        else if (DraggedMedia(e) is { } media)
+        else if (DraggedMediaList(e) is { Count: > 0 } media)
             vm.InsertMediaInPlaylist(media, index);
     }
 

@@ -735,44 +735,76 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         return true;
     }
 
+    /// <summary>Right click → «Agregar a la playlist»: the whole selection when the card belongs to it.</summary>
     [RelayCommand]
-    private void AddMediaToPlaylist(MediaItem? item) => InsertMediaInPlaylist(item, PlaylistItems.Count);
+    private void AddMediaToPlaylist(MediaItem? item) =>
+        InsertMediaInPlaylist(MediaTargets(item), PlaylistItems.Count);
 
     /// <summary>A media dragged from the bar lands where it was dropped.</summary>
-    public void InsertMediaInPlaylist(MediaItem? item, int index)
+    public void InsertMediaInPlaylist(MediaItem? item, int index) =>
+        InsertMediaInPlaylist(item is null ? [] : [item], index);
+
+    /// <summary>
+    /// Several media dropped together keep the order the bar shows them in and
+    /// go in with a single save: the playlist is rebuilt on every save, and a
+    /// tab of announcements is a dozen pages.
+    /// </summary>
+    public void InsertMediaInPlaylist(IReadOnlyList<MediaItem> items, int index)
     {
-        if (item is null || !EnsurePlaylist())
+        if (items.Count == 0 || !EnsurePlaylist())
             return;
 
         index = Math.Clamp(index, 0, PlaylistItems.Count);
         if (index <= _currentPlaylistIndex)
-            _currentPlaylistIndex++;
+            _currentPlaylistIndex += items.Count;
 
-        PlaylistItems.Insert(index, new PlaylistItem
+        for (var i = 0; i < items.Count; i++)
         {
-            Type = PlaylistItemType.Media,
-            Caption = item.Name,
-            MediaId = item.Id,
-        });
+            PlaylistItems.Insert(index + i, new PlaylistItem
+            {
+                Type = PlaylistItemType.Media,
+                Caption = items[i].Name,
+                MediaId = items[i].Id,
+            });
+        }
+
         SavePlaylist();
-        StatusText = $"\"{item.Name}\" agregado a la playlist.";
+        StatusText = items.Count == 1
+            ? $"\"{items[0].Name}\" agregado a la playlist."
+            : $"{items.Count} medios agregados a la playlist.";
     }
 
     /// <summary>
-    /// A media dragged onto another tab of the bar moves there: the tab is just
-    /// the media's category. The file itself stays where it is.
+    /// Media dragged onto another tab of the bar move there: the tab is just
+    /// the media's category. The files themselves stay where they are.
     /// </summary>
-    public void MoveMediaToTab(MediaItem? item, string tab)
+    public void MoveMediaToTab(MediaItem? item, string tab) =>
+        MoveMediaToTab(item is null ? [] : [item], tab);
+
+    public void MoveMediaToTab(IReadOnlyList<MediaItem> items, string tab)
     {
-        if (item is null || string.IsNullOrWhiteSpace(tab)
-            || string.Equals(item.Category, tab, StringComparison.OrdinalIgnoreCase))
+        if (string.IsNullOrWhiteSpace(tab))
             return;
 
-        NoteAction($"Mover el medio «{item.Name}» a la pestaña «{tab}»");
-        item.Category = tab;
-        _media.Update(item);
+        var moving = items
+            .Where(m => !string.Equals(m.Category, tab, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+        if (moving.Count == 0)
+            return;
+
+        NoteAction(moving.Count == 1
+            ? $"Mover el medio «{moving[0].Name}» a la pestaña «{tab}»"
+            : $"Mover {moving.Count} medios a la pestaña «{tab}»");
+        foreach (var item in moving)
+        {
+            item.Category = tab;
+            _media.Update(item);
+        }
+
         LoadMedia();
-        StatusText = $"«{item.Name}» pasó a la pestaña «{tab}».";
+        StatusText = moving.Count == 1
+            ? $"«{moving[0].Name}» pasó a la pestaña «{tab}»."
+            : $"{moving.Count} medios pasaron a la pestaña «{tab}».";
     }
 
     [RelayCommand]
@@ -1234,6 +1266,102 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         foreach (var item in _allMedia.Where(m =>
                      string.Equals(m.Category, SelectedMediaTab, StringComparison.OrdinalIgnoreCase)))
             MediaItems.Add(item);
+
+        // The bar is rebuilt after almost every change: what was picked stays
+        // picked as long as it is still in this tab.
+        MediaSelection.Retain(MediaItems.Select(m => m.Id));
+        MediaSelectionChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    // ── Selección de medios, como en el Explorador ───────────────
+
+    /// <summary>The cards picked in the bar. Keyed by id: the items are rebuilt on every reload.</summary>
+    public MediaSelection MediaSelection { get; } = new();
+
+    /// <summary>Raised when the picked cards change, so the bar can redraw their frames.</summary>
+    public event EventHandler? MediaSelectionChanged;
+
+    private void NotifyMediaSelection() => MediaSelectionChanged?.Invoke(this, EventArgs.Empty);
+
+    /// <summary>A library item by id, for the cards whose fill is another media.</summary>
+    public MediaItem? FindMedia(int id) => _allMedia.FirstOrDefault(m => m.Id == id);
+
+    private List<int> MediaOrder() => MediaItems.Select(m => m.Id).ToList();
+
+    /// <summary>The picked media, in the order the bar shows them.</summary>
+    public IReadOnlyList<MediaItem> SelectedMedia =>
+        MediaItems.Where(m => MediaSelection.Contains(m.Id)).ToList();
+
+    /// <summary>
+    /// What a command started from one card acts on: the whole selection when
+    /// that card is part of it, otherwise just the card. Same as right-clicking
+    /// a file in the Explorer.
+    /// </summary>
+    public IReadOnlyList<MediaItem> MediaTargets(MediaItem? item)
+    {
+        if (item is null)
+            return [];
+
+        return MediaSelection.Count > 1 && MediaSelection.Contains(item.Id)
+            ? SelectedMedia
+            : [item];
+    }
+
+    /// <summary>
+    /// A click on a card. Returns true when it should also project it — only a
+    /// plain click does; Ctrl and Shift just pick.
+    /// </summary>
+    public bool ClickMedia(MediaItem item, bool ctrl, bool shift)
+    {
+        if (shift)
+            MediaSelection.Range(MediaOrder(), item.Id, additive: ctrl);
+        else if (ctrl)
+            MediaSelection.Toggle(item.Id);
+        else
+            MediaSelection.Only(item.Id);
+
+        NotifyMediaSelection();
+        return !ctrl && !shift;
+    }
+
+    /// <summary>Right click on a card that is not picked: it becomes the only one, as in the Explorer.</summary>
+    public void SelectMediaForMenu(MediaItem item)
+    {
+        if (MediaSelection.Contains(item.Id))
+            return;
+
+        MediaSelection.Only(item.Id);
+        NotifyMediaSelection();
+    }
+
+    public void SelectAllMedia()
+    {
+        MediaSelection.Set(MediaItems.Select(m => m.Id), additive: false);
+        NotifyMediaSelection();
+    }
+
+    public void ClearMediaSelection()
+    {
+        if (MediaSelection.Count == 0)
+            return;
+
+        MediaSelection.Clear();
+        NotifyMediaSelection();
+    }
+
+    /// <summary>The rectangle dragged over the empty space of the bar.</summary>
+    public void SelectMediaIn(IEnumerable<MediaItem> items, bool additive)
+    {
+        MediaSelection.Set(items.Select(m => m.Id), additive);
+        NotifyMediaSelection();
+    }
+
+    /// <summary>Supr on the bar: removes what is picked, after asking once.</summary>
+    public void DeleteSelectedMedia()
+    {
+        var picked = SelectedMedia;
+        if (picked.Count > 0)
+            RemoveMedia(picked, alwaysAsk: true);
     }
 
     [RelayCommand]
@@ -2463,14 +2591,45 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         });
     }
 
+    /// <summary>Right click → «Quitar de la biblioteca»: the whole selection when the card belongs to it.</summary>
     [RelayCommand]
     private void DeleteMedia(MediaItem? item)
     {
-        if (item is null)
+        if (item is not null)
+            RemoveMedia(MediaTargets(item), alwaysAsk: false);
+    }
+
+    /// <summary>
+    /// Takes media out of the library. One alone goes without asking, as it
+    /// always did (the menu is a deliberate click); several — or Supr, which
+    /// is easy to hit by accident — ask once, saying how many.
+    /// </summary>
+    private void RemoveMedia(IReadOnlyList<MediaItem> items, bool alwaysAsk)
+    {
+        if (items.Count == 0)
             return;
 
-        RemoveMediaCore(item);
+        if (alwaysAsk || items.Count > 1)
+        {
+            var what = items.Count == 1 ? $"«{items[0].Name}»" : $"{items.Count} medios";
+            var answer = _textPrompt.Choose(
+                "Quitar de la biblioteca",
+                $"Se va a quitar {what} de la biblioteca. Los archivos de tu computadora no se borran "
+                + "(sólo las páginas de un PDF o una presentación que el programa dibujó).",
+                ["Quitar"]);
+            if (answer != 0)
+                return;
+        }
+
+        NoteAction(items.Count == 1 ? $"Quitar el medio «{items[0].Name}»" : $"Quitar {items.Count} medios");
+        foreach (var item in items)
+            RemoveMediaCore(item);
+
+        MediaSelection.Clear();
         LoadMedia();
+        StatusText = items.Count == 1
+            ? $"«{items[0].Name}» quitado de la biblioteca."
+            : $"{items.Count} medios quitados de la biblioteca.";
     }
 
     private void RemoveMediaCore(MediaItem item)
