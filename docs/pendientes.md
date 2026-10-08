@@ -120,6 +120,29 @@ por dentro, con pruebas automáticas y dibujando las pantallas.
       Libre); una carpeta privada `biblias` junto al instalador para las PCs
       de la iglesia; y pedirle permiso por la RVR1960 a la Sociedad Bíblica
       del Uruguay o a la American Bible Society.
+- [ ] **Salidas separadas para OBS (NDI), pedido del 8/10/2026.** Mandar al
+      OBS, por separado, la Biblia, las canciones y los anuncios (imágenes y
+      videos), para que cada uno tenga su propia escena o capa. Dos caminos:
+      - **Páginas web separadas** (lo más simple): hoy ya existe la página
+        `/salida` del control remoto, que el OBS toma como «fuente de
+        navegador». Sumar `/salida/biblia`, `/salida/canciones` y
+        `/salida/anuncios`, cada una con fondo transparente y mostrando sólo
+        lo suyo. No necesita nada nuevo instalado.
+      - **NDI de verdad**: cada salida aparece en el OBS como una fuente de
+        video NDI, también desde otra PC de la red. Necesita el kit de NDI
+        (gratis, pero con sus condiciones de licencia y de uso de la marca,
+        a revisar) y que el OBS tenga el complemento de NDI.
+
+      La idea es empezar por las páginas separadas y, si hace falta, sumar
+      NDI después.
+- [ ] **Actualizaciones automáticas, pedido del 8/10/2026.** Al abrir, el
+      programa se fija si hay una versión nueva (en las versiones publicadas
+      de GitHub) y, si la hay, avisa con la lista de lo nuevo y lo corregido
+      en castellano. Botones «Actualizar ahora», «Más tarde» y «Saltar esta
+      versión». Si acepta, baja el instalador, lo ejecuta y vuelve a abrir el
+      programa. Nunca avisa mientras se está proyectando. Va de la mano con
+      la **firma digital del instalador** (sección 3): sin firma, Windows
+      muestra un aviso de «editor desconocido» en cada actualización.
 
 ## 3. Para llegar a la v1.0.0
 
@@ -152,7 +175,7 @@ vMix, buscador único y soporte de PDF y PowerPoint.
 Fuera de alcance a propósito (es otro producto: iglesias grandes con equipo
 técnico): edge blending y warp entre proyectores, display slices para paneles
 LED, sincronización de varias máquinas en red, automatización OSC/MIDI,
-timeline y VFX, NDI, macOS.
+timeline y VFX, macOS. (NDI estaba acá; desde el 8/10/2026 está pedido: ver sección 2.)
 
 ## 6. Conocidos y aceptados
 
