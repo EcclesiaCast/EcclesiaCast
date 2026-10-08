@@ -1,0 +1,98 @@
+<UserControl x:Class="EcclesiaCast.App.Controls.WebPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Una página web en el lugar de la grilla de diapositivas. Lo que se ve
+         acá es lo que se proyecta: la página se dibuja siempre a 1920×1080 y
+         un Viewbox la achica para que entre. -->
+    <Grid Background="{StaticResource SurfaceBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border x:Name="Toolbar" Grid.Row="0" Padding="10,8"
+                BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1">
+            <StackPanel>
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Content="✕ Cerrar" FontSize="12" Padding="10,5" Margin="8,0,0,0"
+                            Style="{StaticResource DarkButton}"
+                            Command="{Binding CloseWebCommand}"
+                            ToolTip="Volver a las diapositivas. Si la página está en vivo, sigue proyectándose."/>
+                    <Button x:Name="BackButton" DockPanel.Dock="Left" Content="◀" FontSize="12" Padding="9,5"
+                            Style="{StaticResource DarkButton}" Click="Back_Click"
+                            AutomationProperties.Name="Atrás" ToolTip="Página anterior"/>
+                    <Button x:Name="ForwardButton" DockPanel.Dock="Left" Content="▶" FontSize="12" Padding="9,5" Margin="4,0,0,0"
+                            Style="{StaticResource DarkButton}" Click="Forward_Click"
+                            AutomationProperties.Name="Adelante" ToolTip="Página siguiente"/>
+                    <Button DockPanel.Dock="Left" Content="⟳" FontSize="13" Padding="9,4" Margin="4,0,8,0"
+                            Style="{StaticResource DarkButton}" Click="Reload_Click"
+                            AutomationProperties.Name="Recargar" ToolTip="Volver a cargar la página"/>
+                    <TextBox x:Name="AddressBox" FontSize="13" Padding="8,5" VerticalContentAlignment="Center"
+                             Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                             BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
+                             GotKeyboardFocus="AddressBox_GotKeyboardFocus"
+                             PreviewMouseLeftButtonDown="AddressBox_PreviewMouseLeftButtonDown"
+                             KeyDown="AddressBox_KeyDown"
+                             AutomationProperties.Name="Dirección"
+                             ToolTip="Escribí una dirección (google.com) o lo que quieras buscar en Google, y apretá Enter"/>
+                </DockPanel>
+
+                <WrapPanel Margin="0,8,0,0">
+                    <Button Content="A−" FontSize="12" FontWeight="SemiBold" Padding="9,4" Margin="0,0,0,4"
+                            Style="{StaticResource DarkButton}" Click="ZoomOut_Click"
+                            AutomationProperties.Name="Achicar la letra"
+                            ToolTip="Achicar la página"/>
+                    <TextBlock x:Name="ZoomText" Text="100 %" FontSize="11" MinWidth="42" TextAlignment="Center"
+                               Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="0,0,0,4"/>
+                    <Button Content="A+" FontSize="12" FontWeight="SemiBold" Padding="9,4" Margin="0,0,0,4"
+                            Style="{StaticResource DarkButton}" Click="ZoomIn_Click"
+                            AutomationProperties.Name="Agrandar la letra"
+                            ToolTip="Agrandar la página, para que el texto se lea en la pantalla grande"/>
+
+                    <Button Content="📷 Proyectar foto" FontSize="12" Padding="10,4" Margin="14,0,0,4"
+                            Style="{StaticResource AccentButton}"
+                            Command="{Binding ProjectWebPhotoCommand}"
+                            ToolTip="Toma una foto de la página tal como está y la proyecta. Si seguís navegando, la pantalla no cambia hasta la próxima foto."/>
+
+                    <Button Margin="6,0,0,4" Padding="10,4" FontSize="12"
+                            Command="{Binding ToggleWebLiveCommand}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                <Setter Property="Content" Value="🔴 En vivo"/>
+                                <Setter Property="ToolTip" Value="Proyecta la página en movimiento: lo que hacés acá (desplazarte, un video, una animación) se ve en la pantalla."/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsWebLive}" Value="True">
+                                        <Setter Property="Content" Value="⏹ Dejar de proyectar en vivo"/>
+                                        <Setter Property="Background" Value="{StaticResource LiveBrush}"/>
+                                        <Setter Property="ToolTip" Value="La página se está proyectando en vivo. Tocá para sacarla de la pantalla."/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <CheckBox Content="Mostrar el puntero" FontSize="11" Foreground="{StaticResource MutedBrush}"
+                              VerticalAlignment="Center" Margin="12,0,0,4"
+                              IsChecked="{Binding ShowWebPointer}"
+                              ToolTip="En vivo, dibuja una flecha en la pantalla donde tenés el mouse sobre la página, para que la congregación vea qué señalás."/>
+
+                    <Button Content="Guardar en medios" FontSize="12" Padding="10,4" Margin="12,0,0,4"
+                            Style="{StaticResource DarkButton}"
+                            Command="{Binding SaveWebToMediaCommand}"
+                            ToolTip="Con una foto tomada de esta página, la guarda como imagen. Sin foto, guarda la página (con su miniatura) para abrirla de nuevo con un clic."/>
+                </WrapPanel>
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="1" Background="#0B0D12">
+            <Viewbox x:Name="PageBox" Stretch="Uniform"
+                     MouseMove="PageBox_MouseMove" MouseLeave="PageBox_MouseLeave"/>
+            <!-- Encima del navegador (que ya existe, con la página en blanco)
+                 hasta que se pide la primera página -->
+            <Border x:Name="PlaceholderCover" Background="#0B0D12">
+                <TextBlock x:Name="Placeholder" Style="{StaticResource PlaceholderText}"
+                           Text="Escribí una dirección (google.com) o lo que quieras buscar,&#10;y apretá Enter.&#10;&#10;Lo que se ve acá es lo que se proyecta."/>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

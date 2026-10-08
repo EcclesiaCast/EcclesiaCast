@@ -342,6 +342,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         LoadLogos(null);
         LoadPlaylists(null);
         InitializeAudio();
+        InitializeWeb();
         StageNotesText = _settings.Get(StageNotesKey) ?? string.Empty;
         _previewShowsStage = _settings.Get(PreviewShowsStageKey) == "1";
         RestoreRemote();
@@ -944,7 +945,15 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                     return;
                 }
 
-                if (projectMedia)
+                // A saved page opens in the web panel; the double click (or the
+                // arrows) also put it live. Nothing else of it goes to the centre.
+                if (media.Type == MediaType.Web)
+                {
+                    OpenWebPage(media.Path, media.Name);
+                    if (projectMedia)
+                        StartWebLive(media.Path, media.Name);
+                }
+                else if (projectMedia)
                     ProjectMedia(media);
                 else
                     ShowMediaInCentre(media);
@@ -967,6 +976,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _currentPassage = null;
         PreviewSlide = null;
 
+        IsWebPanelOpen = false;
         PreviewMedia = media;
         GridTitle = media.Name;
         StatusText = $"«{media.Name}» listo: doble clic en la playlist (o el botón Proyectar) lo pone en pantalla.";
@@ -1858,13 +1868,29 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         await Task.Run(() => MediaThumbnails.DeleteOrphans(current));
     }
 
-    /// <summary>Click a media: background layers behind the text, foreground takes the screen.</summary>
+    /// <summary>
+    /// Click a media: background layers behind the text, foreground takes the
+    /// screen. A saved web page is the exception: it opens in the web panel and
+    /// is projected from its buttons, not by the click.
+    /// </summary>
     [RelayCommand]
     private void ApplyBackground(MediaItem? item)
     {
         if (item is null)
             return;
 
+        if (item.Type == MediaType.Web)
+        {
+            OpenWebPage(item.Path, item.Name);
+            return;
+        }
+
+        ApplyBackgroundCore(item);
+    }
+
+    /// <summary>Puts a media on the output, whatever it is (also what the web panel projects).</summary>
+    private void ApplyBackgroundCore(MediaItem item)
+    {
         // What its tab decides (everything a foreground, say) comes before
         // what the media says; the copy leaves the library untouched.
         item = Playable(item);
@@ -2161,7 +2187,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         {
             hits.Add(new SearchHit(
                 SearchHitKind.Media, media.Id,
-                media.Type == MediaType.Image ? "▣" : "▶", media.Name, media.Category));
+                media.Type switch { MediaType.Image => "▣", MediaType.Web => "🌐", _ => "▶" }, media.Name, media.Category));
         }
 
         return hits;
@@ -3543,6 +3569,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         LiveSlideIndex = -1;
         PreviewSlideIndex = -1;
         _currentPassage = null;
+        IsWebPanelOpen = false;
         PreviewMedia = null;
         GridTitle = null;
         if (!_openingPlaylistItem)
@@ -4345,6 +4372,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         }
 
         var bookName = verses[0].BookName;
+        IsWebPanelOpen = false;
         PreviewMedia = null;
         GridTitle = secondary is null
             ? $"{bookName} {reference.Chapter} · {primary.Abbreviation}"
@@ -5194,6 +5222,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         IsCountdownRunning = _presentation.Countdown is not null;
         IsStageNotesActive = _presentation.StageNotes is not null;
         HasBackground = _presentation.Background is not null;
+
+        // The live page switches itself off the moment anything else takes the
+        // background (or it is cleared): the button must follow.
+        IsWebLive = _presentation.Background is { Type: MediaType.Web };
 
         // Show the blur the current background carries, without saving it back.
         var blur = _presentation.Background?.Blur ?? 0;

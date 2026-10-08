@@ -24,6 +24,13 @@
         <Rectangle x:Name="BrightnessLayer" Visibility="Collapsed" IsHitTestVisible="False"/>
         <Rectangle x:Name="TintLayer" Visibility="Collapsed" IsHitTestVisible="False"/>
 
+        <!-- Una página web proyectada: la flecha del mouse del operador sobre
+             ella. Va sobre la imagen y bajo el texto. -->
+        <Canvas x:Name="WebPointerLayer" Visibility="Collapsed" IsHitTestVisible="False" ClipToBounds="True">
+            <Polygon x:Name="WebPointer" Fill="White" Stroke="Black" StrokeThickness="1.4"
+                     StrokeLineJoin="Round" Points="0,0 0,17 4.2,13.2 7,19.5 9.6,18.4 6.9,12.3 12.5,12.3"/>
+        </Canvas>
+
         <!-- Texto, estados (Clear/Black/Logo), aviso al pie y resaltado -->
         <controls:SlideView x:Name="SlideRenderer"/>
     </Grid>

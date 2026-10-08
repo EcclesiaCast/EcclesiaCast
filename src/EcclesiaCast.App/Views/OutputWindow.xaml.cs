@@ -179,7 +179,8 @@ public partial class OutputWindow : Window
         var background = vm?.Background;
         // Images are drawn by the layer above, which paints its own fill
         // right behind them; here we cover what the video surface leaves.
-        var needsFill = background?.Type != MediaType.Image && MediaFraming.NeedsFill(background);
+        // A web page is drawn by that layer too, from the web panel's browser.
+        var needsFill = background?.Type is not (MediaType.Image or MediaType.Web) && MediaFraming.NeedsFill(background);
         var fill = needsFill ? vm?.BackgroundFill : null;
 
         FillColorLayer.Fill = MediaFraming.FillBrush(background);

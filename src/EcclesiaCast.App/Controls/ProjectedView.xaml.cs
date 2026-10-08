@@ -99,7 +99,11 @@ public partial class ProjectedView : UserControl
             PerformanceMode.Changed += OnPerformanceChanged;
             ApplyPerformance();
         };
-        Unloaded += (_, _) => PerformanceMode.Changed -= OnPerformanceChanged;
+        Unloaded += (_, _) =>
+        {
+            PerformanceMode.Changed -= OnPerformanceChanged;
+            HookWebFeed(false);
+        };
     }
 
     private void OnPerformanceChanged(object? sender, EventArgs e) => ApplyPerformance();
@@ -178,11 +182,127 @@ public partial class ProjectedView : UserControl
         set => SetValue(LogoProperty, value);
     }
 
+    private double _blurRadius;
+
     private void ApplyBlur(double amount)
     {
         var radius = Math.Clamp(amount, 0, 100) * 0.6;
+        _blurRadius = radius;
         // Through the framing, which knows how much it scales the picture.
         MediaFraming.SetBlur(BackgroundImage, radius);
+        if (BackgroundMedia?.Type == MediaType.Web)
+            MediaFraming.SetBlur(LiveVideo, radius);
+    }
+
+    // ── Una página web de fondo ──────────────────────────────────
+
+    private bool _webHooked;
+    private System.Windows.Threading.DispatcherTimer? _webSnapshotTimer;
+    private ImageSource? _webSnapshot;
+
+    /// <summary>
+    /// The page of the web panel as a picture. The output window always gets it
+    /// moving. The operator's panels in «bajo rendimiento» get a still copy
+    /// that is renewed every two seconds: three views redrawing a whole page on
+    /// every frame is what a slow computer cannot afford.
+    /// </summary>
+    private ImageSource? WebFrame()
+    {
+        if (IsLiveOutput || !PerformanceMode.IsLow)
+            return WebLiveFeed.Source;
+
+        _webSnapshot ??= WebLiveFeed.Snapshot();
+        return _webSnapshot;
+    }
+
+    /// <summary>
+    /// Listens to the feed only while a web page is the background of a view
+    /// that is on screen: the feed's events are static, and a view that is gone
+    /// must not stay hooked to them.
+    /// </summary>
+    private void HookWebFeed(bool wanted)
+    {
+        wanted &= IsLoaded;
+        if (wanted == _webHooked)
+        {
+            UpdateSnapshotTimer(wanted);
+            return;
+        }
+
+        _webHooked = wanted;
+        if (wanted)
+        {
+            WebLiveFeed.SourceChanged += OnWebFeedChanged;
+            WebLiveFeed.PointerChanged += OnWebPointerChanged;
+        }
+        else
+        {
+            WebLiveFeed.SourceChanged -= OnWebFeedChanged;
+            WebLiveFeed.PointerChanged -= OnWebPointerChanged;
+            _webSnapshot = null;
+        }
+
+        UpdateSnapshotTimer(wanted);
+    }
+
+    private void UpdateSnapshotTimer(bool wanted)
+    {
+        var needed = wanted && !IsLiveOutput && PerformanceMode.IsLow;
+        if (needed && _webSnapshotTimer is null)
+        {
+            _webSnapshotTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+            _webSnapshotTimer.Tick += (_, _) =>
+            {
+                _webSnapshot = WebLiveFeed.Snapshot();
+                LiveVideo.Source = _webSnapshot;
+                LiveVideo.Visibility = _webSnapshot is null ? Visibility.Collapsed : Visibility.Visible;
+            };
+            _webSnapshotTimer.Start();
+        }
+        else if (!needed && _webSnapshotTimer is not null)
+        {
+            _webSnapshotTimer.Stop();
+            _webSnapshotTimer = null;
+            _webSnapshot = null;
+        }
+    }
+
+    private void OnWebFeedChanged(object? sender, EventArgs e)
+    {
+        _webSnapshot = null;
+        ApplyLiveVideo();
+    }
+
+    private void OnWebPointerChanged(object? sender, EventArgs e) => ApplyPointer();
+
+    /// <summary>
+    /// Draws the operator's mouse arrow on the page, where it is pointing: the
+    /// page is fitted whole in this view, so the fraction of the page the feed
+    /// reports maps straight onto the rectangle it takes here.
+    /// </summary>
+    private void ApplyPointer()
+    {
+        if (BackgroundMedia?.Type != MediaType.Web
+            || WebLiveFeed.Pointer is not { } at
+            || LiveVideo.Source is not { Width: > 0, Height: > 0 } picture
+            || ActualWidth <= 0 || ActualHeight <= 0)
+        {
+            WebPointerLayer.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        var scale = Math.Min(ActualWidth / picture.Width, ActualHeight / picture.Height);
+        var width = picture.Width * scale;
+        var height = picture.Height * scale;
+        var left = (ActualWidth - width) / 2;
+        var top = (ActualHeight - height) / 2;
+
+        // The arrow is 19.5 units tall; on the output it is about 4.5 % of the screen's height.
+        var size = Math.Max(0.7, ActualHeight * 0.045 / 19.5);
+        WebPointer.RenderTransform = new ScaleTransform(size, size);
+        Canvas.SetLeft(WebPointer, left + at.X * width);
+        Canvas.SetTop(WebPointer, top + at.Y * height);
+        WebPointerLayer.Visibility = Visibility.Visible;
     }
 
     private void OnBackgroundChanged()
@@ -325,18 +445,26 @@ public partial class ProjectedView : UserControl
 
     private void ApplyLiveVideo()
     {
+        var isWeb = BackgroundMedia?.Type == MediaType.Web;
+        HookWebFeed(isWeb);
+
         // Only a video background has frames to show. Anything else (an
         // image, say the offering slide) must never sit under a leftover
-        // frame of the video that played before it.
-        var frame = IsLiveOutput || PerformanceMode.IsLow || _backgroundIsHeavy || BackgroundMedia?.Type != MediaType.Video
-            ? null
-            : LiveVideoFrame;
+        // frame of the video that played before it. A web page is the other
+        // case: its frames come from the web panel's browser, in every view.
+        var frame = isWeb
+            ? WebFrame()
+            : IsLiveOutput || PerformanceMode.IsLow || _backgroundIsHeavy || BackgroundMedia?.Type != MediaType.Video
+                ? null
+                : LiveVideoFrame;
         LiveVideo.Source = frame;
         LiveVideo.Visibility = frame is null ? Visibility.Collapsed : Visibility.Visible;
 
         // The framing (zoom, size, shift) applies to the preview exactly as it
         // does on the projector, so what the operator sees is what goes out.
         MediaFraming.Apply(LiveVideo, frame is null ? null : BackgroundMedia, ActualWidth, ActualHeight);
+        MediaFraming.SetBlur(LiveVideo, isWeb ? _blurRadius : 0);
+        ApplyPointer();
 
         // A poster underneath a live frame is just an older copy of it; once
         // the frames stop (output closed, video gone) the poster comes back.
@@ -358,7 +486,7 @@ public partial class ProjectedView : UserControl
         // This layer sits ON TOP of the output window's video surface, so it
         // may only paint the fill when it is the one drawing the picture —
         // otherwise the fill covers the very video it is meant to sit behind.
-        var drawsMedia = media is not null && (media.Type == MediaType.Image || !IsLiveOutput);
+        var drawsMedia = media is not null && (media.Type is MediaType.Image or MediaType.Web || !IsLiveOutput);
         var needsFill = drawsMedia && MediaFraming.NeedsFill(media);
         var fill = needsFill ? FillMedia : null;
 

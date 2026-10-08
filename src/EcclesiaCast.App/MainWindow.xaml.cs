@@ -38,6 +38,16 @@ public partial class MainWindow : Window
             vm.IsOutputMerged = !_outputSplit;
             vm.MediaSelectionChanged += (_, _) => RefreshMediaSelectionVisuals();
 
+            // The web panel: the view model decides when it is open or live;
+            // this window shows or hides it and keeps the keyboard honest.
+            vm.WebHost = WebPanelView;
+            WebPanelView.KeyboardFocusChanged += (_, _) => SyncShortcutsWithWebFocus();
+            vm.PropertyChanged += (_, args) =>
+            {
+                if (args.PropertyName is nameof(MainViewModel.IsWebPanelOpen) or nameof(MainViewModel.IsWebLive))
+                    SyncWebPanel(vm);
+            };
+
             // Keep the relevant slide card visible: the live one while
             // navigating with the arrows, the previewed one after a search.
             vm.PropertyChanged += (_, args) =>
@@ -61,6 +71,50 @@ public partial class MainWindow : Window
             };
         };
     }
+
+    // ── Panel web ────────────────────────────────────────────────
+
+    /// <summary>
+    /// Open: shown. Closed but projected live: still there, invisible, so the
+    /// page goes on moving on the screen. Closed and not live: gone, so a
+    /// browser nobody sees does not keep drawing.
+    /// </summary>
+    private void SyncWebPanel(MainViewModel vm)
+    {
+        WebPanelView.SetState(vm.IsWebPanelOpen, keepAlive: vm.IsWebLive);
+        SyncShortcutsWithWebFocus();
+    }
+
+    private List<InputBinding>? _shortcuts;
+    private bool _shortcutsOff;
+
+    /// <summary>
+    /// While the keyboard is typing into the web page (or its address box) the
+    /// window's shortcuts are taken away: F1–F4, Esc and Ctrl+K are keys of the
+    /// page, and an arrow or the space bar must not move the slides behind it.
+    /// They come back when the focus leaves.
+    /// </summary>
+    private void SyncShortcutsWithWebFocus()
+    {
+        var typing = WebPanelView.Visibility == Visibility.Visible
+                     && WebPanelView.IsHitTestVisible
+                     && WebPanelView.HasKeyboardInside;
+        if (typing == _shortcutsOff)
+            return;
+
+        _shortcuts ??= InputBindings.Cast<InputBinding>().ToList();
+        _shortcutsOff = typing;
+        InputBindings.Clear();
+        if (!typing)
+        {
+            foreach (var binding in _shortcuts)
+                InputBindings.Add(binding);
+        }
+    }
+
+    /// <summary>True while the keyboard belongs to the web page: nothing of this window reacts to it.</summary>
+    private bool WebHasKeyboard =>
+        WebPanelView.Visibility == Visibility.Visible && WebPanelView.IsHitTestVisible && WebPanelView.HasKeyboardInside;
 
     /// <summary>Restores the panel sizes saved from the last session.</summary>
     public void AttachLayoutPersistence(ISettingsStore settings)
@@ -592,12 +646,25 @@ public partial class MainWindow : Window
         var count = vm.MediaTargets(media).Count;
         var suffix = count > 1 ? $" ({count})" : string.Empty;
 
+        // A saved web page has no file and no framing: only what makes sense
+        // for it stays (rename, move, playlist, remove).
+        var isWeb = media.IsWeb;
+        foreach (var separator in menu.Items.OfType<Separator>().Where(s => s.Name == "InspectSeparator"))
+            separator.Visibility = isWeb ? Visibility.Collapsed : Visibility.Visible;
+
         foreach (var item in menu.Items.OfType<MenuItem>())
         {
             switch (item.Name)
             {
                 case "ReimportItem":
-                    item.Visibility = DocumentImporter.IsRenderedPage(media.Path) ? Visibility.Visible : Visibility.Collapsed;
+                    item.Visibility = !isWeb && DocumentImporter.IsRenderedPage(media.Path) ? Visibility.Visible : Visibility.Collapsed;
+                    break;
+                case "RenameMediaItem":
+                    item.Visibility = isWeb && count == 1 ? Visibility.Visible : Visibility.Collapsed;
+                    break;
+                case "InspectItem":
+                case "OpenLocationItem":
+                    item.Visibility = isWeb ? Visibility.Collapsed : Visibility.Visible;
                     break;
                 case "RemoveMediaItem":
                     item.Header = "Quitar de la biblioteca" + suffix;
@@ -1208,8 +1275,9 @@ public partial class MainWindow : Window
         if (e.Handled || (e.Key != Key.Left && e.Key != Key.Right))
             return;
 
-        // Leave the arrows alone while the operator is typing.
-        if (e.OriginalSource is TextBox)
+        // Leave the arrows alone while the operator is typing — in a box, or in
+        // the web page, whose arrows scroll it and move its cursor.
+        if (e.OriginalSource is TextBox || WebHasKeyboard)
             return;
 
         if (DataContext is not MainViewModel vm)

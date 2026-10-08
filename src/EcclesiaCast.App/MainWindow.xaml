@@ -103,14 +103,19 @@
             <MenuItem x:Name="MoveToTabItem" Header="Mover a la pestaña…" SubmenuOpened="MoveToTab_SubmenuOpened">
                 <MenuItem Header="(cargando)" IsEnabled="False"/>
             </MenuItem>
+            <!-- Sólo en las páginas web guardadas: no tienen Propiedades de encuadre,
+                 así que el nombre se cambia desde acá -->
+            <MenuItem x:Name="RenameMediaItem" Header="Cambiar nombre…" Visibility="Collapsed"
+                      Command="{Binding PlacementTarget.Tag.RenameMediaCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
             <Separator Visibility="{Binding PlacementTarget.DataContext.IsYouTube, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVis}}"/>
             <MenuItem Header="Descargar para uso local"
                       Visibility="{Binding PlacementTarget.DataContext.IsYouTube, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVis}}"
                       Command="{Binding PlacementTarget.Tag.DownloadYouTubeCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                       CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                       ToolTip="Guarda el video en la computadora para no depender de internet durante la reunión"/>
-            <Separator/>
-            <MenuItem Header="Propiedades (Inspector)…"
+            <Separator x:Name="InspectSeparator"/>
+            <MenuItem x:Name="InspectItem" Header="Propiedades (Inspector)…"
                       Command="{Binding PlacementTarget.Tag.InspectMediaCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                       CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
             <!-- Sólo en los videos de archivo (los de YouTube no tienen qué aliviar) -->
@@ -134,7 +139,7 @@
                       Command="{Binding PlacementTarget.Tag.ReimportDocumentPageCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                       CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                       ToolTip="Dibuja de nuevo todas las páginas de este documento al doble de tamaño, para que no se pixelen con zoom."/>
-            <MenuItem Header="Abrir ubicación del archivo"
+            <MenuItem x:Name="OpenLocationItem" Header="Abrir ubicación del archivo"
                       Command="{Binding PlacementTarget.Tag.OpenMediaLocationCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                       CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
             <Separator/>
@@ -1224,6 +1229,11 @@
                             </Grid>
                         </Grid>
                     </Border>
+
+                    <!-- Una página web en lugar de la grilla («🌐 Web» en la barra de
+                         medios). Se crea al abrirla por primera vez; mientras está en
+                         vivo y cerrada sigue ahí, invisible: ver SyncWebPanel. -->
+                    <controls:WebPanel x:Name="WebPanelView" Grid.RowSpan="2" Visibility="Collapsed"/>
                 </Grid>
             </Border>
 
@@ -1847,6 +1857,10 @@
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding OpenYouTubeCommand}"
                                 ToolTip="Buscar en YouTube e iniciar sesión con tu cuenta (Premium: sin anuncios)"/>
+                        <Button Content="🌐 Web" FontSize="11" Padding="8,4" Margin="6,0,0,0"
+                                Style="{StaticResource DarkButton}"
+                                Command="{Binding OpenWebCommand}"
+                                ToolTip="Abrir una página web en el cuadro central y proyectarla: como foto o en vivo"/>
                         <Button Content="🔗" FontSize="11" Padding="8,4" Margin="4,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding AddYouTubeLinkCommand}"
@@ -2019,6 +2033,13 @@
                                                                 Visibility="{Binding IsYouTube, Converter={StaticResource BoolToVis}}"
                                                                 ToolTip="Se reproduce por internet. Clic derecho → Descargar para uso local, para no depender de la conexión.">
                                                             <TextBlock Text="🌐 internet" FontSize="8" FontWeight="SemiBold" Foreground="White"/>
+                                                        </Border>
+                                                        <!-- Una página web guardada: un clic la abre en el panel web -->
+                                                        <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="3"
+                                                                Padding="4,1" CornerRadius="3" Background="#B3000000"
+                                                                Visibility="{Binding IsWeb, Converter={StaticResource BoolToVis}}"
+                                                                ToolTip="Una página web. Un clic la abre en el panel web; se proyecta con sus botones.">
+                                                            <TextBlock Text="🌐 página" FontSize="8" FontWeight="SemiBold" Foreground="White"/>
                                                         </Border>
                                                     </Grid>
                                                 </Border>
