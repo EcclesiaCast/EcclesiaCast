@@ -38,8 +38,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [CustomMessages]
 spanish.InstallingWebView2=Instalando el runtime de WebView2...
 english.InstallingWebView2=Installing the WebView2 runtime...
-spanish.WebView2DownloadFailed=No se pudo descargar el runtime de WebView2:%n%n%1%n%nLa instalación va a continuar, pero la proyección de YouTube y de páginas web no va a funcionar hasta que lo instales desde:%nhttps://developer.microsoft.com/microsoft-edge/webview2/
-english.WebView2DownloadFailed=The WebView2 runtime could not be downloaded:%n%n%1%n%nSetup will continue, but YouTube and web projection will not work until you install it from:%nhttps://developer.microsoft.com/microsoft-edge/webview2/
+spanish.WebView2DownloadFailed=No se pudo descargar el runtime de WebView2:%n%n%1%n%nLa instalación va a continuar, pero YouTube y la búsqueda completa de canciones en internet no van a funcionar hasta que lo instales desde:%nhttps://developer.microsoft.com/microsoft-edge/webview2/
+english.WebView2DownloadFailed=The WebView2 runtime could not be downloaded:%n%n%1%n%nSetup will continue, but YouTube and the full online song search will not work until you install it from:%nhttps://developer.microsoft.com/microsoft-edge/webview2/
 spanish.PerformanceGroup=Rendimiento:
 english.PerformanceGroup=Performance:
 spanish.LowPerformanceTask=Configurar para una PC de bajo rendimiento (recomendado en computadoras viejas o notebooks sin placa de video)
@@ -66,7 +66,7 @@ Name: "{group}\{#AppName}"; Filename: "{app}\EcclesiaCast.App.exe"
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\EcclesiaCast.App.exe"; Tasks: desktopicon
 
 [Run]
-; WebView2 runtime (needed for the YouTube / web projection features). The
+; WebView2 runtime (needed for YouTube and the full online song search). The
 ; bootstrapper is downloaded from Microsoft during setup and only when missing,
 ; so the installer itself stays small and always pulls the current version.
 Filename: "{tmp}\MicrosoftEdgeWebview2Setup.exe"; Parameters: "/silent /install"; \
@@ -115,7 +115,7 @@ begin
       @OnDownloadProgress);
     WebView2Downloaded := True;
   except
-    { A missing WebView2 only disables YouTube/web projection, so a failed
+    { A missing WebView2 only disables YouTube and the song search, so a failed
       download must not abort the whole installation: report and carry on. }
     SuppressibleMsgBox(FmtMessage(CustomMessage('WebView2DownloadFailed'), [GetExceptionMessage]),
       mbInformation, MB_OK, IDOK);
