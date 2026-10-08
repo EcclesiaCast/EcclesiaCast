@@ -125,6 +125,7 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     [ObservableProperty] private string _captionColor = "#B9C6DE";
     [ObservableProperty] private bool _showVersionName = true;
     [ObservableProperty] private bool _showVerseNumbers;
+    [ObservableProperty] private bool _showSelahAndTitles;
 
     // Segunda versión bíblica
     [ObservableProperty] private bool _secondaryMatchesPrimary;
@@ -214,6 +215,7 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         CaptionColor = theme.CaptionColor;
         ShowVersionName = theme.ShowVersionName;
         ShowVerseNumbers = theme.ShowVerseNumbers;
+        ShowSelahAndTitles = theme.ShowSelahAndTitles;
         SecondaryMatchesPrimary = theme.SecondaryMatchesPrimary;
         SecondaryScalePercent = theme.SecondaryScale * 100;
         SecondaryColor = theme.SecondaryColor;
@@ -261,6 +263,7 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         CaptionColor = CaptionColor,
         ShowVersionName = ShowVersionName,
         ShowVerseNumbers = ShowVerseNumbers,
+        ShowSelahAndTitles = ShowSelahAndTitles,
         SecondaryMatchesPrimary = SecondaryMatchesPrimary,
         SecondaryScale = Math.Clamp(SecondaryScalePercent / 100, 0.2, 1.5),
         SecondaryColor = SecondaryColor,

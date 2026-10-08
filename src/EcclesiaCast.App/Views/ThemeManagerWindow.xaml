@@ -354,6 +354,8 @@
                             <WrapPanel>
                                 <CheckBox Content="Mostrar versión en la referencia" IsChecked="{Binding ShowVersionName}"/>
                                 <CheckBox Content="Número de versículo en el texto" IsChecked="{Binding ShowVerseNumbers}"/>
+                                <CheckBox Content="Mostrar «Selah» y los títulos de los Salmos" IsChecked="{Binding ShowSelahAndTitles}"
+                                          ToolTip="Destildada (lo normal), «Selah» y los títulos de los Salmos que traen algunas Biblias no se proyectan."/>
                             </WrapPanel>
 
                             <TextBlock Text="Segunda versión (proyección de dos versiones)" Style="{StaticResource FieldLabel}"/>

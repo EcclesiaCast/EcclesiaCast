@@ -9,6 +9,16 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **«Selah» y los títulos de los Salmos, a elección.** En el editor de temas,
+  en un tema de Biblia, hay una casilla nueva: **Mostrar «Selah» y los títulos
+  de los Salmos**. Viene **destildada**: «Selah» no se proyecta y tampoco el
+  título que algunos archivos traen como versículo 0 de cada Salmo («Al músico
+  principal…»). Tildándola vuelven. Vale en las diapositivas y en los
+  resultados de búsqueda. Si un archivo trae el título pegado al principio del
+  versículo 1 no hay forma segura de separarlo: se corrige a mano con
+  «Corregir el texto…». Ninguna de las Biblias instaladas hoy trae «Selah» ni
+  títulos, así que por ahora no se nota; está para las que se agreguen.
+
 - **Corregir el texto de un versículo.** Clic derecho sobre un versículo de la
   grilla → **Corregir el texto…**. Se abre una ventanita con el texto tal como
   está guardado en la Biblia (de la versión principal; con dos versiones, la

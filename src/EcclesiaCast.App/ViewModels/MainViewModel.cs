@@ -3205,7 +3205,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     /// says. Every place that shows a verse's text asks, so the search results
     /// read like the slides do.
     /// </summary>
-    private bool ShowSelahAndTitles => true;
+    private bool ShowSelahAndTitles => DefaultBibleTheme.ShowSelahAndTitles;
 
     private SlideTheme Resolve(int? themeId) =>
         (themeId is int id ? _themes.Get(id) : null) ?? SlideTheme.Fallback;

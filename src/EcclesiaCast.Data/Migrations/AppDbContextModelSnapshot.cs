@@ -499,6 +499,9 @@ namespace EcclesiaCast.Data.Migrations
                     b.Property<bool>("ShowCaption")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("ShowSelahAndTitles")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("ShowVerseNumbers")
                         .HasColumnType("INTEGER");
 

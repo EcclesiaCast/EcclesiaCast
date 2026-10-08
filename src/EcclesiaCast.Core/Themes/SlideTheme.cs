@@ -160,6 +160,12 @@ public sealed class SlideTheme
     /// <summary>Prefix each verse's text with its number.</summary>
     public bool ShowVerseNumbers { get; set; }
 
+    /// <summary>
+    /// Keep «Selah» and the headings some files put before a Psalm. Off by
+    /// default: most churches read the verses and skip both.
+    /// </summary>
+    public bool ShowSelahAndTitles { get; set; }
+
     // ── Transición entre diapositivas ────────────────────────────
     /// <summary>How the text arrives when the slide changes.</summary>
     public SlideTransition Transition { get; set; } = SlideTransition.Fade;

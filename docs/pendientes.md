@@ -42,6 +42,27 @@ por dentro, con pruebas automáticas y dibujando las pantallas.
 - [ ] Versiones en una fila: clic = sólo esa; Ctrl+clic = suma la segunda;
       ▸ despliega los nombres; clic derecho → Editar, Exportar, Eliminar.
 - [ ] «➕ Playlist»: escribir «juan 8 del 5 al 10», ver el texto, Agregar.
+- [ ] **Notas de la edición impresa**: con la NTV, abrir Juan 8 y ver que el
+      versículo 11 termina en «…no peques más.» sin la raya; Juan 7:52 sin la
+      nota; Marcos 16:8 sin la nota ni los títulos «[Final breve de Marcos]» y
+      «[Final largo de Marcos]» (el texto de los finales sí se queda). Y que
+      1 Samuel 10:27 siga con su párrafo entre corchetes completo. Con la TLA,
+      1 Samuel 20:42 sin el «1 (21.1)». Lo mismo en Ctrl+K y en la búsqueda
+      con `?`.
+- [ ] **Corregir el texto**: clic derecho sobre un versículo → «Corregir el
+      texto…»; cambiar una palabra, Guardar, y ver el cambio en la grilla y
+      en el LIVE (si estaba en pantalla). Probar también en la TLA, en un
+      versículo que forma parte de un grupo (por ejemplo Génesis 32:3-4), y
+      con dos versiones elegidas: la ventanita tiene que decir que corrige la
+      principal. Después, cerrar y abrir el programa: la corrección sigue.
+      (Hacelo sobre una copia de la biblioteca o con un versículo que no
+      importe: la corrección queda guardada de verdad.)
+- [ ] **Selah y títulos de los Salmos**: en Temas, el tema de Biblia tiene la
+      casilla «Mostrar «Selah» y los títulos de los Salmos», destildada. Con
+      las Biblias de hoy no se nota nada (ninguna los trae). Para probarlo de
+      verdad hay que importar una Biblia que los tenga, o corregir un
+      versículo para que diga «Selah» y ver que no se proyecta, y que con la
+      casilla tildada sí.
 
 **Diapositivas y resaltado**
 - [ ] Resaltar en el LIVE: arrastrando se marca en azul y al soltar sale en
