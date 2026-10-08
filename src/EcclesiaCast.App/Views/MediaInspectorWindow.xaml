@@ -135,18 +135,20 @@
                  El mismo dibujo que hace la salida, y se mueve con el mouse:
                  arrastrar corre la imagen, la ruedita hace zoom. Los números
                  de al lado cambian juntos. -->
-            <controls:AspectFitBox AspectRatio="1.7778" MaxBoxHeight="230">
+            <!-- El cuadro es un poco más alto que 16:9: alrededor del rectángulo de
+                 la pantalla se ve el resto de la imagen, oscurecido. -->
+            <controls:AspectFitBox AspectRatio="1.66" MaxBoxHeight="232">
             <Border x:Name="PreviewFrame" CornerRadius="4" Background="#10141E" Cursor="SizeAll"
                     BorderBrush="{StaticResource LineBrush}" BorderThickness="1" ClipToBounds="True"
                     MouseLeftButtonDown="PreviewFrame_MouseLeftButtonDown"
                     MouseMove="PreviewFrame_MouseMove"
                     MouseLeftButtonUp="PreviewFrame_MouseLeftButtonUp"
                     MouseWheel="PreviewFrame_MouseWheel"
-                    ToolTip="Así se va a ver en pantalla. Arrastrá para correr la imagen; la ruedita hace zoom.">
-                <controls:FramedMediaPreview x:Name="Preview" UseOriginal="True" DecodeWidth="960"/>
+                    ToolTip="El rectángulo con borde blanco es la pantalla; lo oscurecido queda afuera. Arrastrá para correr la imagen; la ruedita hace zoom.">
+                <controls:FramedMediaPreview x:Name="Preview" UseOriginal="True" ShowOutside="True" DecodeWidth="960"/>
             </Border>
             </controls:AspectFitBox>
-            <TextBlock Text="Arrastrá para correr · ruedita para el zoom" FontSize="10"
+            <TextBlock Text="Blanco = la pantalla · arrastrá para correr · ruedita = zoom" FontSize="10"
                        Foreground="{StaticResource FaintBrush}" Margin="0,4,0,0"/>
 
             <!-- ── Color: oscurecer, aclarar, teñir ── -->

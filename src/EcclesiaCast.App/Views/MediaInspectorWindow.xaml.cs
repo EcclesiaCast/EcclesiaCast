@@ -197,13 +197,15 @@ public partial class MediaInspectorWindow : Window
     /// </summary>
     private void PreviewFrame_MouseMove(object sender, MouseEventArgs e)
     {
+        // The screen is a rectangle inside the frame, so its size, not the
+        // frame's, is what a shift is a fraction of.
         if (_dragFrom is not Point from || !PreviewFrame.IsMouseCaptured
-            || PreviewFrame.ActualWidth <= 0 || PreviewFrame.ActualHeight <= 0)
+            || Preview.ScreenWidth <= 0 || Preview.ScreenHeight <= 0)
             return;
 
         var now = e.GetPosition(PreviewFrame);
-        OffsetXField.Value = _dragStartX + (now.X - from.X) / PreviewFrame.ActualWidth * 100;
-        OffsetYField.Value = _dragStartY + (now.Y - from.Y) / PreviewFrame.ActualHeight * 100;
+        OffsetXField.Value = _dragStartX + (now.X - from.X) / Preview.ScreenWidth * 100;
+        OffsetYField.Value = _dragStartY + (now.Y - from.Y) / Preview.ScreenHeight * 100;
     }
 
     private void PreviewFrame_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)

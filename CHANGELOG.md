@@ -9,6 +9,16 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **En Propiedades, el cuadro de vista previa muestra también lo que queda
+  afuera de la pantalla.** Se ve la imagen entera, con la parte de afuera
+  **oscurecida** y la pantalla marcada con un **rectángulo blanco**, como en un
+  recortador de fotos: así se ve qué parte de una página se va a proyectar y
+  hacia dónde correrla. Arrastrar y la ruedita funcionan igual (el movimiento
+  del mouse ahora se mide contra el rectángulo de la pantalla). El cuadro es un
+  poco más alto para tener lugar alrededor, y la ventana crece unos 15 píxeles.
+  En las tarjetas de la barra de medios sigue viéndose sólo lo que sale en
+  pantalla.
+
 - **Selección múltiple en la barra de medios, como en el Explorador.**
   **Ctrl+clic** suma o saca una tarjeta, **Mayús+clic** elige el tramo desde la
   última, **Ctrl+A** elige todas las de la pestaña, **Esc** limpia la selección
