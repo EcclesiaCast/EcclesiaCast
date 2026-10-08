@@ -1068,8 +1068,10 @@
                             </StackPanel>
                             <TextBlock Text="PREVIEW" Style="{StaticResource PanelTitle}"/>
                         </DockPanel>
-                        <Border Height="165" Margin="12,0,12,12"
-                                Background="#0B0D12" CornerRadius="4" ClipToBounds="True">
+                        <!-- Los dos cuadros (este y el LIVE) llevan siempre la proporción de la
+                             pantalla de salida: no se estiran con el panel -->
+                        <controls:AspectFitBox Margin="12,0,12,12" AspectRatio="{Binding OutputAspectRatio}">
+                        <Border Background="#0B0D12" CornerRadius="4" ClipToBounds="True">
                             <Grid>
                                 <!-- El próximo texto va sobre el fondo que va a quedar: un
                                      anuncio en primer plano sale al proyectar la diapositiva -->
@@ -1087,6 +1089,7 @@
                                 </Viewbox>
                             </Grid>
                         </Border>
+                        </controls:AspectFitBox>
                     </StackPanel>
                 </Border>
 
@@ -1099,8 +1102,8 @@
                                      Margin="12,1,0,0"/>
                             <TextBlock Text="LIVE · PROYECTADO" Style="{StaticResource PanelTitle}" Margin="7,10,12,8"/>
                         </StackPanel>
-                        <Border Height="165" Margin="12,0,12,12"
-                                Background="#0B0D12" CornerRadius="4">
+                        <controls:AspectFitBox Margin="12,0,12,12" AspectRatio="{Binding OutputAspectRatio}">
+                        <Border Background="#0B0D12" CornerRadius="4">
                             <Border.Style>
                                 <Style TargetType="Border">
                                     <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
@@ -1130,6 +1133,7 @@
                                                     LiveVideoFrame="{Binding Projection.LiveFrame}"
                                                     Logo="{Binding Projection.ActiveLogo}"/>
                         </Border>
+                        </controls:AspectFitBox>
 
                         <!-- Transporte del video que está en pantalla, pegado a
                              lo que muestra: sólo con video (archivo o YouTube) -->

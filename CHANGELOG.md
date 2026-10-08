@@ -199,6 +199,12 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Corregido
 
+- **LIVE y PREVIEW ya no se deforman al cambiar el ancho del panel
+  derecho.** Los dos cuadros mantienen siempre la proporción de la pantalla
+  elegida en «Salida» (por ejemplo 16:9). Si el panel se ensancha, el cuadro
+  no crece hacia abajo: queda del alto que tenía, centrado, con espacio a los
+  costados; si se angosta, se achica entero.
+
 - **El PREVIEW ya no muestra la letra encima del anuncio.** Con un medio en
   primer plano en pantalla, el cuadro «Siguiente» dibujaba la próxima
   diapositiva sobre la imagen del anuncio, pero al proyectarla el anuncio

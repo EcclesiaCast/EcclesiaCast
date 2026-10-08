@@ -96,7 +96,13 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     public ObservableCollection<SlideItemViewModel> Slides { get; } = [];
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(OutputAspectRatio))]
     private DisplayOption? _selectedDisplay;
+
+    /// <summary>Width over height of the output screen: LIVE and PREVIEW are drawn at this proportion.</summary>
+    public double OutputAspectRatio => SelectedDisplay is { Info: var info }
+        ? AspectFit.RatioOf(info.Width, info.Height)
+        : AspectFit.DefaultRatio;
 
     [ObservableProperty]
     private string _statusText =
