@@ -205,6 +205,11 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Corregido
 
+- **La barra azul al reordenar diapositivas ya no se escapa.** Si se movía el
+  mouse rápido, la barra (y la copia de la tarjeta) aparecían encima de la
+  barra de medios. Ahora se dibujan sólo dentro del panel de diapositivas, y
+  la barra se esconde si el mouse está afuera.
+
 - **LIVE y PREVIEW ya no se deforman al cambiar el ancho del panel
   derecho.** Los dos cuadros mantienen siempre la proporción de la pantalla
   elegida en «Salida» (por ejemplo 16:9). Si el panel se ensancha, el cuadro

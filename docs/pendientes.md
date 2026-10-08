@@ -33,6 +33,32 @@ rendimiento y cómo se ve la pestaña Música.
       YouTube (unos 60 MB, con barra); después tiene que bajar el video sin
       errores de cookies ni 403. No se pudo probar desde acá (no se bajó nada
       de internet).
+- [ ] **Flechas con la tecla apretada**: en una
+      playlist con un pasaje, un medio y otro pasaje, mantené apretado → en
+      el final del pasaje: tiene que frenarse y decir «Fin del pasaje: → otra
+      vez pasa a…». Soltá y apretá de nuevo: pasa al siguiente. Probado sólo
+      con el programa por dentro, no con un teclado de verdad.
+- [ ] **Arrastrar un medio de la barra** a la playlist (línea azul en el
+      lugar exacto) y a otra pestaña de la izquierda (se resalta y el medio
+      se muda). Los arrastres con el mouse no se pudieron probar desde acá;
+      se probaron por dentro la mudanza de pestaña, el resaltado y el lugar
+      en la playlist, no el gesto en sí.
+- [ ] **LIVE y PREVIEW al ensanchar el panel derecho**: los cuadros no se
+      deforman, quedan centrados con el mismo alto y se achican si se angosta.
+      Visto sólo en imágenes dibujadas a distintos anchos.
+- [ ] **PREVIEW con un anuncio en primer plano** en pantalla: el cuadro
+      «Siguiente» muestra la letra sobre el fondo que va a quedar, no sobre el
+      anuncio.
+- [ ] **Barra azul al reordenar diapositivas** moviendo el mouse rápido: no
+      tiene que aparecer sobre la barra de medios.
+- [ ] **Vigía de cuelgues**: si el programa se vuelve a congelar unos
+      segundos, mirar el último archivo de la carpeta `logs` (línea «Ventana
+      congelada») para ver qué estaba haciendo. Probado bloqueando a propósito
+      un programa de prueba 3,5 segundos; no con un cuelgue real.
+- [ ] **Preguntas al agregar un video de YouTube** (🔗 o ▶ YouTube): elegir
+      «Reproducir por internet» o «Descargar», y ver la marca 🌐 internet en
+      las tarjetas de YouTube. La descarga nueva depende de internet y del
+      sitio de yt-dlp: no se bajó nada desde acá.
 
 ## 2. Para hacer
 
