@@ -18,6 +18,39 @@ domingo 11/10 en la reunión. Lo que sigue se programó después y no se pudo
 abrir desde acá (la PC estaba en uso); se probó con compilación, pruebas y
 dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
 
+- [ ] **Zoom y corrimiento sobre la imagen entera («Rellenar»).** Es lo más
+      importante de esta tanda. Poné una **página vertical** (la tapa de un
+      manual) en «Rellenar» y abrí Propiedades:
+      1. Sin tocar nada, tiene que verse **igual que antes** (se ve la parte de
+         arriba de la página). Probá también «Ajustar» y «Estirar»: iguales.
+      2. **Alejá el zoom** (ruedita sobre el cuadro, o el número): se tiene que
+         ver **más de la página**, achicándose, con el color de relleno donde no
+         llega. Antes se achicaba el recorte con negro alrededor.
+      3. **Corré hacia arriba** (arrastrando, o «Correr» ↕ con un número
+         negativo, por ejemplo -150): tiene que llegar hasta **el final de la
+         página**. «Correr» ahora admite hasta ±1000 %.
+      4. Acercá el zoom (por ejemplo 200 %) y corré: se mueve sobre la página
+         entera. El zoom gira alrededor del centro de la pantalla.
+      5. Proyectala de verdad (clic en la tarjeta) y mirá que la pantalla, el
+         LIVE y el PREVIEW se vean igual que el cuadro de Propiedades. Probá con
+         un **video** en «Rellenar» con zoom y corrimiento (no se pudo probar
+         con la app abierta: el video sólo se verificó leyendo el código), con
+         **desenfoque**, y con «Tamaño fijo en pantalla» (el cuadro queda
+         quieto y la imagen se mueve y se agranda detrás).
+- [ ] **Lo que queda afuera, en Propiedades.** El cuadro de arriba a la derecha
+      muestra la imagen entera con lo de afuera **oscurecido** y la pantalla
+      marcada con un **rectángulo blanco**. Arrastrar y la ruedita tienen que
+      seguir andando (la imagen se mueve lo mismo que el mouse). Mirá que la
+      ventana siga entrando en la pantalla de la notebook: ahora es unos 15
+      píxeles más alta. Las tarjetas de la barra de medios no muestran lo de
+      afuera, sólo lo que sale en pantalla.
+- [ ] **Miniaturas con su forma.** Al abrir el programa por primera vez con esta
+      versión, las miniaturas de imágenes y de páginas se rehacen solas, en
+      segundo plano (puede verse un instante de cambio). Una página vertical
+      tiene que verse en su tarjeta como en la pantalla. Las de video no
+      cambian. Las miniaturas que ya existían ya eran de la forma de la imagen
+      (se comprobó mirando la carpeta, sin tocarla); el cambio las deja de un
+      tamaño parejo y sin depender de Windows.
 - [ ] **Miniatura fiel en Propiedades.** Clic derecho sobre un medio →
       Propiedades. Arriba a la derecha hay un cuadro 16:9. Cambiá zoom,
       «Correr», escala, tamaño fijo, color de relleno, brillo, tinte y
@@ -132,6 +165,14 @@ decodifica HEVC por hardware, y el AV1 de YouTube lo resuelve el procesador
 con muy poco esfuerzo. Sólo serviría en una PC sin decodificación por
 hardware: ahí el HEVC cuesta 40 % menos en H.264 (medido el 4/10/2026). Si
 algún día hace falta, es sumar una condición a `LightCopyPolicy`.
+
+Decidido al arreglar el encuadre (8/10/2026): hasta hoy «Rellenar» deja la
+imagen **pegada arriba a la izquierda** (así lo hace WPF), no centrada: una
+foto 4:3 muestra su parte de arriba y una imagen muy ancha, su parte
+izquierda. Como «Rellenar» sin zoom ni corrimiento no podía cambiar, se dejó
+igual. Si Alexis prefiere que quede centrada, es cambiar una cuenta en
+`FillFraming.Place` (el centro de la imagen que cubre) y sus pruebas; cambiaría
+cómo se ven todas las imágenes que no son 16:9.
 
 ## 6. Ideas tomadas de Spresenter (10/9/2026)
 
