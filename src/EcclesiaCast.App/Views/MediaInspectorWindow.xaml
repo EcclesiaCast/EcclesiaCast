@@ -81,11 +81,11 @@
                     <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
                         <TextBlock Text="Correr" FontSize="11" Width="64" VerticalAlignment="Center"
                                    Foreground="{StaticResource MutedBrush}"/>
-                        <controls:NumericField x:Name="OffsetXField" ValueChanged="Field_Changed" Minimum="-100" Maximum="100" Step="2" Decimals="1"
+                        <controls:NumericField x:Name="OffsetXField" ValueChanged="Field_Changed" Minimum="-1000" Maximum="1000" Step="2" Decimals="1"
                                                ToolTip="Hacia los lados, en % de la pantalla"/>
                         <TextBlock Text="↔" FontSize="12" VerticalAlignment="Center" Margin="6,0,10,0"
                                    Foreground="{StaticResource MutedBrush}"/>
-                        <controls:NumericField x:Name="OffsetYField" ValueChanged="Field_Changed" Minimum="-100" Maximum="100" Step="2" Decimals="1"
+                        <controls:NumericField x:Name="OffsetYField" ValueChanged="Field_Changed" Minimum="-1000" Maximum="1000" Step="2" Decimals="1"
                                                ToolTip="Hacia arriba y abajo, en % de la pantalla"/>
                         <TextBlock Text="↕" FontSize="12" VerticalAlignment="Center" Margin="6,0,0,0"
                                    Foreground="{StaticResource MutedBrush}"/>

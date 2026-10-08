@@ -280,14 +280,8 @@ public partial class VlcVideoSurface : UserControl
     public void SetBlur(double amount)
     {
         var radius = Math.Clamp(amount, 0, 100) * 0.6;
-        Surface.Effect = radius <= 0
-            ? null
-            : new System.Windows.Media.Effects.BlurEffect
-            {
-                Radius = radius,
-                KernelType = System.Windows.Media.Effects.KernelType.Gaussian,
-                RenderingBias = System.Windows.Media.Effects.RenderingBias.Performance,
-            };
+        // Through the framing, which knows how much it scales the picture.
+        MediaFraming.SetBlur(Surface, radius);
     }
 
     private MediaPlayer? EnsurePlayer(LibVLC engine)
@@ -490,6 +484,10 @@ public partial class VlcVideoSurface : UserControl
                         _bitmapWidth = _width;
                         _bitmapHeight = _height;
                         Surface.Source = _bitmap;
+
+                        // «Rellenar» depends on the shape of the picture, which
+                        // is only known now (or has just changed).
+                        MediaFraming.Apply(Surface, _framing, ActualWidth, ActualHeight);
                     }
 
                     _bitmap.WritePixels(

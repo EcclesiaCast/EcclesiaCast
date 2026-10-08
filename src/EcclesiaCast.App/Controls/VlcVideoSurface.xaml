@@ -1,8 +1,11 @@
 <UserControl x:Class="EcclesiaCast.App.Controls.VlcVideoSurface"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             ClipToBounds="True">
     <!-- The decoded video frames are written into a WriteableBitmap, so the
          text (a normal WPF layer above) composites cleanly on top — no
-         native/WPF airspace problem. -->
+         native/WPF airspace problem. ClipToBounds: «Rellenar» dibuja la
+         imagen entera y deja que lo que no entra sobresalga; el borde de la
+         pantalla es el único recorte. -->
     <Image x:Name="Surface" Stretch="UniformToFill"/>
 </UserControl>

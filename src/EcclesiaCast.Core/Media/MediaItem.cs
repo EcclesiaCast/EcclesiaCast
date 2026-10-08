@@ -114,10 +114,10 @@ public sealed class MediaItem
     /// </summary>
     public double Zoom { get; set; } = 1;
 
-    /// <summary>Horizontal shift of the framing, as a fraction of the width (-1 to 1).</summary>
+    /// <summary>Horizontal shift of the framing, as a fraction of the width (-10 to 10: a zoomed-in tall page needs several screens).</summary>
     public double OffsetX { get; set; }
 
-    /// <summary>Vertical shift of the framing, as a fraction of the height (-1 to 1).</summary>
+    /// <summary>Vertical shift of the framing, as a fraction of the height (-10 to 10).</summary>
     public double OffsetY { get; set; }
 
     /// <summary>

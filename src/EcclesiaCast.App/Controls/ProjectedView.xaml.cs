@@ -181,14 +181,8 @@ public partial class ProjectedView : UserControl
     private void ApplyBlur(double amount)
     {
         var radius = Math.Clamp(amount, 0, 100) * 0.6;
-        BackgroundImage.Effect = radius <= 0
-            ? null
-            : new System.Windows.Media.Effects.BlurEffect
-            {
-                Radius = radius,
-                KernelType = System.Windows.Media.Effects.KernelType.Gaussian,
-                RenderingBias = System.Windows.Media.Effects.RenderingBias.Performance,
-            };
+        // Through the framing, which knows how much it scales the picture.
+        MediaFraming.SetBlur(BackgroundImage, radius);
     }
 
     private void OnBackgroundChanged()
@@ -254,6 +248,8 @@ public partial class ProjectedView : UserControl
                     bitmap.Freeze();
                 BackgroundImage.Source = bitmap;
                 BackgroundImage.Visibility = Visibility.Visible;
+                // «Rellenar» depends on the shape of the picture just loaded.
+                MediaFraming.Apply(BackgroundImage, BackgroundMedia, ActualWidth, ActualHeight);
                 if (AnimateTransitions && newPicture)
                     BackgroundImage.BeginAnimation(OpacityProperty,
                         new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(320)) { EasingFunction = new QuadraticEase() });
@@ -267,6 +263,7 @@ public partial class ProjectedView : UserControl
 
         BackgroundImage.Source = null;
         BackgroundImage.Visibility = Visibility.Collapsed;
+        MediaFraming.Apply(BackgroundImage, BackgroundMedia, ActualWidth, ActualHeight);
     }
 
     /// <summary>

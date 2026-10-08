@@ -181,21 +181,9 @@ public sealed class FramedMediaPreview : Grid
         // The output's radius is in pixels of a 1920-wide screen; the same
         // proportion is kept at whatever size this preview has.
         var radius = Math.Clamp(Blur, 0, 100) * 0.6 * (ActualWidth / 1920);
-        if (radius < 0.3)
-        {
-            _picture.Effect = null;
-            return;
-        }
 
-        if (_picture.Effect is BlurEffect existing && existing.Radius == radius)
-            return;
-
-        _picture.Effect = new BlurEffect
-        {
-            Radius = radius,
-            KernelType = KernelType.Gaussian,
-            RenderingBias = RenderingBias.Performance,
-        };
+        // Through the framing, which knows how much it scales the picture.
+        MediaFraming.SetBlur(_picture, radius < 0.3 ? 0 : radius);
     }
 
     /// <summary>

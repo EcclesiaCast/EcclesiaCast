@@ -163,8 +163,8 @@ public partial class MediaInspectorWindow : Window
         var shown = _item.Clone();
         shown.Scaling = (MediaScaling)Math.Max(0, ScalingBox.SelectedIndex);
         shown.Zoom = Math.Clamp(ZoomField.Value / 100, 0.1, 4);
-        shown.OffsetX = Math.Clamp(OffsetXField.Value / 100, -1, 1);
-        shown.OffsetY = Math.Clamp(OffsetYField.Value / 100, -1, 1);
+        shown.OffsetX = Math.Clamp(OffsetXField.Value / 100, -MediaFraming.MaxOffset, MediaFraming.MaxOffset);
+        shown.OffsetY = Math.Clamp(OffsetYField.Value / 100, -MediaFraming.MaxOffset, MediaFraming.MaxOffset);
         shown.FrameWidth = FixedSizeCheck.IsChecked == true ? (int)Math.Clamp(FrameWidthField.Value, 16, 1920) : null;
         shown.FrameHeight = FixedSizeCheck.IsChecked == true ? (int)Math.Clamp(FrameHeightField.Value, 16, 1080) : null;
         shown.Brightness = Math.Clamp(BrightnessField.Value, -100, 100);
@@ -323,8 +323,8 @@ public partial class MediaInspectorWindow : Window
         _item.Blur = BlurField.Value;
 
         _item.Zoom = Math.Clamp(ZoomField.Value / 100, 0.1, 4);
-        _item.OffsetX = Math.Clamp(OffsetXField.Value / 100, -1, 1);
-        _item.OffsetY = Math.Clamp(OffsetYField.Value / 100, -1, 1);
+        _item.OffsetX = Math.Clamp(OffsetXField.Value / 100, -MediaFraming.MaxOffset, MediaFraming.MaxOffset);
+        _item.OffsetY = Math.Clamp(OffsetYField.Value / 100, -MediaFraming.MaxOffset, MediaFraming.MaxOffset);
 
         if (FixedSizeCheck.IsChecked == true)
         {
