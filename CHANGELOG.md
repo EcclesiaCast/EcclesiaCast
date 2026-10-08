@@ -139,6 +139,23 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Cambiado
 
+- **Pestañas de medios: nombre, regla y borrado.** Con clic derecho sobre una
+  pestaña: **Cambiar nombre** (se pueden usar emojis; sus medios y sus
+  opciones la acompañan), **Configurar…** y **Eliminar** (avisa que los medios
+  ya no se van a ver en el programa y que los archivos no se borran). En
+  Configurar se elige que todo lo de la pestaña vaya como **fondo**, como
+  **primer plano** o **como diga cada medio**; para primer plano hay una
+  casilla «Al terminar, mostrar el logo». El programa ahora se acuerda de las
+  pestañas por sí mismo: una pestaña vacía, o en otro orden, sigue ahí al
+  volver a abrirlo.
+
+- **Qué sigue después de un medio**, en Propiedades. Un video puede repetirse,
+  quedar quieto, mostrar el logo o **seguir con otro medio de la biblioteca**.
+  Una imagen en primer plano puede tener **segundos**: pasados, sale de la
+  pantalla, muestra el logo o sigue con otro medio (por ejemplo, un aviso que
+  se ve 10 segundos y deja paso al siguiente). Con 0 segundos se queda hasta
+  que cambies.
+
 - **Se sacó la lista inteligente** (botón ✨, ventana y menú). Casi nadie la
   usaba y complicaba la playlist. Las listas inteligentes que hubiera se borran
   solas al abrir esta versión (no guardaban canciones, sólo la regla); las

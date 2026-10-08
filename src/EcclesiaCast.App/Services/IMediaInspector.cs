@@ -11,4 +11,10 @@ public interface IMediaInspector
     /// this one.
     /// </summary>
     bool Edit(MediaItem item, IReadOnlyList<string> categories, IReadOnlyList<MediaItem> library);
+
+    /// <summary>
+    /// Asks what the tab decides for all its media (right click on a tab →
+    /// Configurar). Null when the operator cancelled.
+    /// </summary>
+    MediaTabRule? EditTabRule(string tab, MediaTabRule current);
 }

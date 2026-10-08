@@ -46,7 +46,7 @@
             <ComboBox x:Name="CategoryBox" IsEditable="True"/>
 
             <TextBlock Text="Comportamiento" Style="{StaticResource L}"/>
-            <ComboBox x:Name="BehaviorBox">
+            <ComboBox x:Name="BehaviorBox" SelectionChanged="After_Changed">
                 <ComboBoxItem Content="Fondo (detrás del texto, en bucle)"/>
                 <ComboBoxItem Content="Primer plano (pantalla completa, tapa el texto)"/>
             </ComboBox>
@@ -178,13 +178,50 @@
                            Foreground="{StaticResource FaintBrush}" Margin="8,0,0,0"/>
             </StackPanel>
 
+            <!-- ── Qué sigue después ── -->
             <StackPanel x:Name="VideoOptions">
-                <TextBlock Text="Al terminar el video" Style="{StaticResource L}"/>
-                <ComboBox x:Name="EndBox">
+                <TextBlock Text="Qué sigue cuando termina el video" Style="{StaticResource L}"/>
+                <ComboBox x:Name="EndBox" SelectionChanged="After_Changed">
                     <ComboBoxItem Content="Repetir en bucle"/>
-                    <ComboBoxItem Content="Detener al final"/>
-                    <ComboBoxItem Content="Al terminar, mostrar el logo"/>
+                    <ComboBoxItem Content="Nada: queda en el último cuadro"/>
+                    <ComboBoxItem Content="Mostrar el logo"/>
+                    <ComboBoxItem Content="Seguir con otro medio de la biblioteca"/>
                 </ComboBox>
+            </StackPanel>
+
+            <StackPanel x:Name="ImageOptions">
+                <TextBlock Text="Cuánto se ve en primer plano" Style="{StaticResource L}"/>
+                <StackPanel Orientation="Horizontal">
+                    <controls:NumericField x:Name="ShowSecondsField" Minimum="0" Maximum="3600" Step="1" Decimals="0"
+                                           ToolTip="0 = se queda hasta que cambies. Sólo cuenta cuando la imagen va en primer plano."/>
+                    <TextBlock Text="segundos (0 = hasta que cambies)" FontSize="11" VerticalAlignment="Center"
+                               TextWrapping="Wrap" Foreground="{StaticResource FaintBrush}" Margin="8,0,0,0"/>
+                </StackPanel>
+                <TextBlock Text="Qué sigue pasados esos segundos" Style="{StaticResource L}"/>
+                <ComboBox x:Name="ImageEndBox" SelectionChanged="After_Changed">
+                    <ComboBoxItem Content="Nada: sale de la pantalla"/>
+                    <ComboBoxItem Content="Mostrar el logo"/>
+                    <ComboBoxItem Content="Seguir con otro medio de la biblioteca"/>
+                </ComboBox>
+            </StackPanel>
+
+            <StackPanel x:Name="NextPanel" Visibility="Collapsed">
+                <TextBlock Text="Medio que sigue" Style="{StaticResource L}"/>
+                <ComboBox x:Name="NextMediaBox"
+                          ToolTip="Se elige de la biblioteca; arranca solo cuando termina éste">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Name}"/>
+                                <TextBlock Text="{Binding Category, StringFormat='  · {0}'}"
+                                           Foreground="{StaticResource FaintBrush}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+
+            <StackPanel x:Name="AudioOptions">
 
                 <CheckBox x:Name="MuteCheck" Content="Silenciar audio" Margin="0,14,0,0"/>
                 <TextBlock Style="{StaticResource L}">

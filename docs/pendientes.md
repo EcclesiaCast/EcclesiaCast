@@ -77,6 +77,16 @@ rendimiento y cómo se ve la pestaña Música.
       la casilla «Hacer lo mismo con las demás» tiene que responder sola las
       siguientes. Las reglas y el guardado se probaron por dentro; la
       ventana, dibujada, no con el mouse.
+- [ ] **Pestañas de medios**: clic derecho sobre una pestaña (Cambiar nombre
+      con un emoji, Configurar…, Eliminar…). Probado por dentro con una copia
+      de la biblioteca (renombrar, regla, borrar, y que al reabrir se
+      recuerden); el menú de clic derecho con el mouse no se pudo ver sin
+      abrir la ventana.
+- [ ] **Qué sigue después de un medio**: en Propiedades de una imagen en
+      primer plano ponerle 5 segundos y «Seguir con otro medio»; proyectarla
+      y mirar que pase sola. Con un video, «Seguir con otro medio» al
+      terminar. Probado por dentro con tiempos reales de 1 segundo; los
+      videos de verdad (que terminen en VLC) no.
 - [ ] **Preguntas al agregar un video de YouTube** (🔗 o ▶ YouTube): elegir
       «Reproducir por internet» o «Descargar», y ver la marca 🌐 internet en
       las tarjetas de YouTube. La descarga nueva depende de internet y del

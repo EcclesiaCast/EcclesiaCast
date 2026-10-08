@@ -32,16 +32,25 @@ public enum MediaBehavior
     Foreground,
 }
 
-/// <summary>What a video does when it reaches the end.</summary>
+/// <summary>
+/// What comes after a media: when a video reaches the end, or when an image
+/// has been shown for its seconds.
+/// </summary>
 public enum VideoEndBehavior
 {
     Loop,
 
-    /// <summary>Play once and stop (last frame / black).</summary>
+    /// <summary>
+    /// Nothing more: a video stops on its last frame; an image that has run
+    /// out its seconds comes off the screen.
+    /// </summary>
     Stop,
 
-    /// <summary>Play once and switch the output to the church logo.</summary>
+    /// <summary>Switch the output to the church logo.</summary>
     Logo,
+
+    /// <summary>Go on with another media of the library, <see cref="MediaItem.NextMediaId"/>.</summary>
+    NextMedia,
 }
 
 /// <summary>A background asset in the media library (an image or a video).</summary>
@@ -72,6 +81,16 @@ public sealed class MediaItem
     public MediaBehavior Behavior { get; set; } = MediaBehavior.Background;
 
     public VideoEndBehavior EndBehavior { get; set; } = VideoEndBehavior.Loop;
+
+    /// <summary>The media that follows when <see cref="EndBehavior"/> is NextMedia; null when none is chosen.</summary>
+    public int? NextMediaId { get; set; }
+
+    /// <summary>
+    /// For an image on the whole screen: how many seconds it stays before what
+    /// <see cref="EndBehavior"/> says happens. 0 keeps it until the operator
+    /// changes it.
+    /// </summary>
+    public int ShowSeconds { get; set; }
 
     /// <summary>Mute the video's audio (backgrounds are muted by default).</summary>
     public bool Muted { get; set; } = true;

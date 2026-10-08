@@ -468,6 +468,41 @@ public partial class MainWindow : Window
             vm.MoveMediaToTab(media, tab);
     }
 
+    // ── Clic derecho sobre una pestaña de medios ─────────────────
+
+    /// <summary>
+    /// Builds the menu of a tab when its row appears. It is made
+    /// here and not in the XAML because a Click inside a style setter breaks
+    /// the loading of the window.
+    /// </summary>
+    private void MediaTab_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (sender is not ListBoxItem tabItem || tabItem.ContextMenu is not null)
+            return;
+
+        MenuItem Entry(string header, Action<MainViewModel, string> run)
+        {
+            var entry = new MenuItem { Header = header };
+            entry.Click += (_, _) =>
+            {
+                if (DataContext is MainViewModel vm && tabItem.DataContext is string tab)
+                    run(vm, tab);
+            };
+            return entry;
+        }
+
+        tabItem.ContextMenu = new ContextMenu
+        {
+            Items =
+            {
+                Entry("Cambiar nombre…", (vm, tab) => vm.RenameMediaTabCommand.Execute(tab)),
+                Entry("Configurar…", (vm, tab) => vm.ConfigureMediaTabCommand.Execute(tab)),
+                new Separator(),
+                Entry("Eliminar…", (vm, tab) => vm.DeleteMediaTabCommand.Execute(tab)),
+            },
+        };
+    }
+
     private void ClearTabDropHighlights()
     {
         for (var i = 0; i < MediaTabsList.Items.Count; i++)

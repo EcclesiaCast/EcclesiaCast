@@ -10,6 +10,38 @@ namespace EcclesiaCast.Core.Tests.Persistence;
 public class RemoveSmartPlaylistsMigrationTests
 {
     [Fact]
+    public void Media_saved_before_the_after_media_columns_keep_working_with_the_new_ones_empty()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"ecclesiacast-test-{Guid.NewGuid():N}.db");
+        try
+        {
+            using (var old = new AppDbContext(path))
+            {
+                old.GetService<IMigrator>().Migrate("20261008065208_RemoveSmartPlaylists");
+                old.Database.ExecuteSqlRaw(
+                    "INSERT INTO MediaItems (Name, Path, Type, Category) VALUES ('Ofrendas', 'C:\\a.png', 0, 'Anuncios')");
+            }
+
+            using (var upgraded = new AppDbContext(path))
+                upgraded.Database.Migrate();
+
+            var item = Assert.Single(new MediaRepository(path).GetAll());
+            Assert.Equal("Ofrendas", item.Name);
+            Assert.Equal("Anuncios", item.Category);
+            Assert.Equal(0, item.ShowSeconds);
+            Assert.Null(item.NextMediaId);
+        }
+        finally
+        {
+            SqliteConnection.ClearAllPools();
+            foreach (var file in new[] { path, path + "-wal", path + "-shm" })
+            {
+                try { File.Delete(file); } catch (IOException) { }
+            }
+        }
+    }
+
+    [Fact]
     public void An_old_database_loses_its_smart_lists_and_keeps_the_hand_made_ones()
     {
         var path = Path.Combine(Path.GetTempPath(), $"ecclesiacast-test-{Guid.NewGuid():N}.db");

@@ -1518,6 +1518,9 @@
                                 <EventSetter Event="DragOver" Handler="MediaTab_DragOver"/>
                                 <EventSetter Event="DragLeave" Handler="MediaTab_DragLeave"/>
                                 <EventSetter Event="Drop" Handler="MediaTab_Drop"/>
+                                <!-- El menú de clic derecho se arma en el código: los Click
+                                     dentro de un estilo rompen la carga de la ventana. -->
+                                <EventSetter Event="Loaded" Handler="MediaTab_Loaded"/>
                                 <Setter Property="Template">
                                     <Setter.Value>
                                         <ControlTemplate TargetType="ListBoxItem">

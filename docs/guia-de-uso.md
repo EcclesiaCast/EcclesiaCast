@@ -65,7 +65,11 @@ En la pestaña **Biblia**:
 En la barra **MEDIOS**, abajo:
 
 - Las **pestañas** (Fondos, Anuncios, y las que agregues con **＋**) van en
-  una lista a la izquierda y organizan los medios.
+  una lista a la izquierda y organizan los medios. Con **clic derecho** sobre
+  una: **Cambiar nombre…** (sirven los emojis), **Configurar…** (todo lo de la
+  pestaña va como *fondo*, como *primer plano* o *como diga cada medio*; para
+  primer plano, «Al terminar, mostrar el logo») y **Eliminar…** (los medios
+  dejan de verse en el programa; los archivos no se borran).
 - **📥 Agregar** importa imágenes y videos a la pestaña activa, y también
   **PDF** y **presentaciones de PowerPoint**: cada página entra como un medio
   de pantalla completa, numerado y en orden. El PDF lo dibuja Windows sin
@@ -79,7 +83,10 @@ En la barra **MEDIOS**, abajo:
   - **Comportamiento**: *Fondo* (detrás del texto) o *Primer plano* (pantalla
     completa, tapa el texto — para anuncios o videos institucionales).
   - **Escala**: *Rellenar* (recorta), *Ajustar* (con barras) o *Estirar*.
-  - **Al terminar el video**: repetir en bucle o detenerse.
+  - **Qué sigue después**: en un video, repetir en bucle, nada, el logo u
+    **otro medio de la biblioteca**. En una imagen en primer plano, cuántos
+    segundos se ve y qué pasa pasados esos segundos (nada: sale de la
+    pantalla; el logo; u otro medio).
   - **Audio**: silenciar o volumen.
   - **Desenfoque**: difumina el fondo para que la letra se lea encima.
   - **Encuadre**: **zoom** para acercar o alejar (100 % es como está), y

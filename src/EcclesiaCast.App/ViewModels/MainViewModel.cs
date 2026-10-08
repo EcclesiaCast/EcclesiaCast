@@ -937,6 +937,20 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
     private static string ContinuousKey(string tab) => $"media.tab.{tab.ToLowerInvariant()}.continuous";
 
+    private const string MediaTabsKey = "media.tabs";
+
+    private static string RuleKey(string tab) => $"media.tab.{tab.ToLowerInvariant()}.rule";
+
+    /// <summary>What the tab decides for its media (everything a foreground, say); each media's own setting when it decides nothing.</summary>
+    private MediaTabRule TabRule(string? tab) =>
+        string.IsNullOrWhiteSpace(tab) ? MediaTabRule.Default : MediaTabRule.Parse(_settings.Get(RuleKey(tab)));
+
+    /// <summary>The media as it is to play: with the rule of its tab applied.</summary>
+    private MediaItem Playable(MediaItem item) => TabRule(item.Category).Resolve(item);
+
+    private void SaveMediaTabs(IEnumerable<string> tabs) =>
+        _settings.Set(MediaTabsKey, MediaTabNames.Serialize(tabs));
+
     private bool IsContinuousTab(string? tab) =>
         !string.IsNullOrWhiteSpace(tab) && _settings.Get(ContinuousKey(tab)) == "1";
 
@@ -1007,7 +1021,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private List<MediaItem> BackgroundPool(string tab) =>
         _allMedia
             .Where(m => string.Equals(m.Category, tab, StringComparison.OrdinalIgnoreCase))
-            .Where(m => m.Behavior == MediaBehavior.Background)
+            .Where(m => Playable(m).Behavior == MediaBehavior.Background)
             .ToList();
 
     /// <summary>Applies a background drawn at random from the tab on screen.</summary>
@@ -1105,7 +1119,8 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         return index < 0 ? siblings[0] : siblings[(index + 1) % siblings.Count];
     }
 
-    private void LoadMedia()
+    /// <param name="selectTab">The tab to leave open; the one that was open when null.</param>
+    private void LoadMedia(string? selectTab = null)
     {
         _allMedia.Clear();
         _allMedia.AddRange(_media.GetAll());
@@ -1118,13 +1133,17 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             _media.Update(orphan);
         }
 
-        var keepTab = SelectedMediaTab;
+        // The tabs are the saved list (so an empty or reordered one is kept,
+        // and a deleted one stays deleted) plus any category in use that the
+        // list does not have yet.
+        var keepTab = selectTab ?? SelectedMediaTab;
+        var saved = MediaTabNames.Deserialize(_settings.Get(MediaTabsKey));
+        var tabs = MediaTabNames.Merge(saved, _allMedia.Select(m => m.Category));
         MediaTabs.Clear();
-        foreach (var tab in _allMedia.Select(m => m.Category)
-                     .Prepend("YouTube").Prepend("Anuncios").Prepend("Fondos")
-                     .Distinct(StringComparer.OrdinalIgnoreCase)
-                     .OrderBy(t => t == "Fondos" ? 0 : t == "Anuncios" ? 1 : t == "YouTube" ? 2 : 3))
+        foreach (var tab in tabs)
             MediaTabs.Add(tab);
+        if (saved is null || !saved.SequenceEqual(tabs))
+            SaveMediaTabs(tabs);
 
         SelectedMediaTab = MediaTabs.Contains(keepTab) ? keepTab : MediaTabs.FirstOrDefault() ?? "Fondos";
         FilterMediaByTab();
@@ -1170,8 +1189,115 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             return;
         name = name.Trim();
         if (!MediaTabs.Contains(name, StringComparer.OrdinalIgnoreCase))
+        {
             MediaTabs.Add(name);
-        SelectedMediaTab = name;
+            SaveMediaTabs(MediaTabs);
+        }
+        SelectedMediaTab = MediaTabs.FirstOrDefault(t => string.Equals(t, name, StringComparison.OrdinalIgnoreCase)) ?? name;
+    }
+
+    /// <summary>
+    /// Right click on a tab → «Cambiar nombre». A tab is only the category
+    /// written on its media, so renaming it rewrites that on each one, and its
+    /// own switches (continuous play, rule) move to the new name.
+    /// </summary>
+    [RelayCommand]
+    private void RenameMediaTab(string? tab)
+    {
+        if (string.IsNullOrWhiteSpace(tab))
+            return;
+
+        var typed = _textPrompt.Ask("Cambiar nombre de la pestaña", "Nombre nuevo (se pueden usar emojis):", tab);
+        if (typed is null || typed.Trim() == tab)
+            return;
+
+        var name = typed.Trim();
+        if (MediaTabNames.WhyNotRename(MediaTabs, tab, name) is { } why)
+        {
+            StatusText = why;
+            return;
+        }
+
+        NoteAction($"Cambiar el nombre de la pestaña «{tab}» a «{name}»");
+        foreach (var item in _allMedia.Where(m => string.Equals(m.Category, tab, StringComparison.OrdinalIgnoreCase)).ToList())
+        {
+            item.Category = name;
+            _media.Update(item);
+        }
+
+        // Its switches follow it; the old name is left switched off.
+        if (_settings.Get(ContinuousKey(tab)) is { } continuous)
+        {
+            _settings.Set(ContinuousKey(name), continuous);
+            _settings.Set(ContinuousKey(tab), "0");
+        }
+        if (_settings.Get(RuleKey(tab)) is { } rule)
+        {
+            _settings.Set(RuleKey(name), rule);
+            _settings.Set(RuleKey(tab), MediaTabRule.Default.ToSetting());
+        }
+        if (string.Equals(_settings.Get(RandomTabKey), tab, StringComparison.OrdinalIgnoreCase))
+            _settings.Set(RandomTabKey, name);
+
+        SaveMediaTabs(MediaTabs.Select(t => string.Equals(t, tab, StringComparison.OrdinalIgnoreCase) ? name : t));
+        LoadMedia(string.Equals(SelectedMediaTab, tab, StringComparison.OrdinalIgnoreCase) ? name : null);
+        StatusText = $"La pestaña «{tab}» ahora se llama «{name}».";
+    }
+
+    /// <summary>
+    /// Right click on a tab → «Eliminar». The media leave the library; their
+    /// files stay where they are.
+    /// </summary>
+    [RelayCommand]
+    private void DeleteMediaTab(string? tab)
+    {
+        if (string.IsNullOrWhiteSpace(tab))
+            return;
+
+        var items = _allMedia
+            .Where(m => string.Equals(m.Category, tab, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        var answer = _textPrompt.Choose(
+            $"Eliminar la pestaña «{tab}»",
+            "Los medios de esta pestaña ya no se van a ver en el programa (los archivos no se borran)."
+            + (items.Count > 0 ? $"\n\nSon {items.Count} medio(s)." : string.Empty),
+            ["Eliminar la pestaña"]);
+        if (answer != 0)
+            return;
+
+        NoteAction($"Eliminar la pestaña «{tab}»");
+        foreach (var item in items)
+            RemoveMediaCore(item);
+
+        _settings.Set(ContinuousKey(tab), "0");
+        _settings.Set(RuleKey(tab), MediaTabRule.Default.ToSetting());
+        SaveMediaTabs(MediaTabs.Where(t => !string.Equals(t, tab, StringComparison.OrdinalIgnoreCase)));
+        LoadMedia(string.Equals(SelectedMediaTab, tab, StringComparison.OrdinalIgnoreCase)
+            ? MediaTabs.FirstOrDefault(t => !string.Equals(t, tab, StringComparison.OrdinalIgnoreCase))
+            : null);
+        StatusText = $"Pestaña «{tab}» eliminada.";
+    }
+
+    /// <summary>Right click on a tab → «Configurar…»: where everything in it goes, and what follows.</summary>
+    [RelayCommand]
+    private void ConfigureMediaTab(string? tab)
+    {
+        if (string.IsNullOrWhiteSpace(tab))
+            return;
+
+        if (_mediaInspector.EditTabRule(tab, TabRule(tab)) is not { } rule)
+            return;
+
+        _settings.Set(RuleKey(tab), rule.ToSetting());
+        StatusText = rule.Mode switch
+        {
+            MediaTabMode.Background => $"«{tab}»: todo va como fondo.",
+            MediaTabMode.Foreground => rule.LogoAtEnd
+                ? $"«{tab}»: todo va en primer plano y al terminar se muestra el logo."
+                : $"«{tab}»: todo va en primer plano.",
+            _ => $"«{tab}»: cada medio dice cómo va.",
+        };
     }
 
     [RelayCommand]
@@ -1400,6 +1526,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (item is null)
             return;
 
+        // What its tab decides (everything a foreground, say) comes before
+        // what the media says; the copy leaves the library untouched.
+        item = Playable(item);
+
         // A tab set to play through can't have its videos looping, or they
         // would never reach the end that triggers the next one. The change is
         // made on a copy so the item's own setting stays as the operator left it.
@@ -1430,6 +1560,68 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         StatusText = item.Behavior == MediaBehavior.Foreground
             ? $"Primer plano: {item.Name} (a pantalla completa)."
             : $"Fondo: {item.Name}.";
+
+        StartAfterImageTimer(item);
+    }
+
+    // ── Qué sigue después de un medio ────────────────────────────
+
+    private System.Windows.Threading.DispatcherTimer? _afterImageTimer;
+
+    private void StopAfterImageTimer()
+    {
+        _afterImageTimer?.Stop();
+        _afterImageTimer = null;
+    }
+
+    /// <summary>
+    /// An image on the whole screen with seconds set goes on to what follows
+    /// it once they are up, as a video does when it ends. Anything else that
+    /// takes the screen in the meantime cancels it.
+    /// </summary>
+    private void StartAfterImageTimer(MediaItem item)
+    {
+        StopAfterImageTimer();
+        if (item.Type != MediaType.Image || item.Behavior != MediaBehavior.Foreground || item.ShowSeconds <= 0)
+            return;
+
+        var timer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(item.ShowSeconds) };
+        timer.Tick += (_, _) =>
+        {
+            StopAfterImageTimer();
+            if (_presentation.Background?.Id != item.Id)
+                return;
+
+            NoteAction($"Pasar de la imagen «{item.Name}» a lo que sigue");
+            if (item.EndBehavior == VideoEndBehavior.NextMedia && GoToNextMedia(item))
+                return;
+
+            if (item.EndBehavior == VideoEndBehavior.Logo)
+            {
+                _presentation.SetBackground(null);
+                if (!IsLogoActive)
+                    _presentation.ToggleLogo();
+                StatusText = $"\"{item.Name}\" terminó → logo.";
+            }
+            else
+            {
+                ClearBackground();
+            }
+        };
+        _afterImageTimer = timer;
+        timer.Start();
+    }
+
+    /// <summary>Puts on the media that follows <paramref name="media"/>; false when none is chosen or it is gone.</summary>
+    private bool GoToNextMedia(MediaItem media)
+    {
+        if (media.NextMediaId is not int id || id == media.Id
+            || _allMedia.FirstOrDefault(m => m.Id == id) is not { } next)
+            return false;
+
+        ApplyBackground(next);
+        StatusText = $"\"{media.Name}\" terminó → {next.Name}.";
+        return true;
     }
 
     /// <summary>
@@ -1441,6 +1633,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private void ClearBackground()
     {
         NoteAction("Sacar el fondo");
+        StopAfterImageTimer();
         _presentation.SetBackground(null);
 
         if (_presentation.State == OutputState.Clear && _presentation.CurrentSlide is not null)
@@ -1454,6 +1647,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     {
         var background = _presentation.Background;
         if (background is null || background.EndBehavior == VideoEndBehavior.Loop)
+            return;
+
+        // A media that names what follows it goes there before anything else.
+        if (background.EndBehavior == VideoEndBehavior.NextMedia && GoToNextMedia(background))
             return;
 
         // The tab plays through: hand over to the next item in it.
@@ -2045,7 +2242,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             _media.Update(item);
             LoadMedia();
             if (_presentation.Background?.Id == item.Id)
-                _presentation.SetBackground(item, ResolveFill(item)); // re-aplica con las nuevas opciones
+                _presentation.SetBackground(Playable(item), ResolveFill(item)); // re-aplica con las nuevas opciones
             StatusText = $"«{item.Name}» actualizado.";
         }
     }
@@ -2073,6 +2270,12 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (item is null)
             return;
 
+        RemoveMediaCore(item);
+        LoadMedia();
+    }
+
+    private void RemoveMediaCore(MediaItem item)
+    {
         if (_presentation.Background?.Id == item.Id)
             _presentation.SetBackground(null);
         _media.Delete(item.Id);
@@ -2081,8 +2284,6 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         // item out of the library has to take the image with it.
         if (DocumentImporter.IsRenderedPage(item.Path))
             DocumentImporter.Forget(item.Path);
-
-        LoadMedia();
     }
 
     // ── Control desde el celular ─────────────────────────────────

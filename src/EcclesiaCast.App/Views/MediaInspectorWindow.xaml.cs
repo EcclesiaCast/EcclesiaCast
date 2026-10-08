@@ -58,9 +58,15 @@ public partial class MediaInspectorWindow : Window
             MediaType.YouTube => $"YouTube · {item.YouTubeId}",
             _ => "Imagen",
         };
-        VideoOptions.Visibility = item.Type is MediaType.Video or MediaType.YouTube
-            ? Visibility.Visible
-            : Visibility.Collapsed;
+        var isVideo = item.Type is MediaType.Video or MediaType.YouTube;
+        VideoOptions.Visibility = isVideo ? Visibility.Visible : Visibility.Collapsed;
+        AudioOptions.Visibility = isVideo ? Visibility.Visible : Visibility.Collapsed;
+        ImageOptions.Visibility = isVideo ? Visibility.Collapsed : Visibility.Visible;
+
+        // What can follow: any other media of the library.
+        var followers = library.Where(m => m.Id != item.Id).OrderBy(m => m.Name).ToList();
+        NextMediaBox.ItemsSource = followers;
+        NextMediaBox.SelectedItem = followers.FirstOrDefault(m => m.Id == item.NextMediaId);
 
         // YouTube always fills the screen with its own player.
         ScalingBox.IsEnabled = item.Type != MediaType.YouTube;
@@ -71,6 +77,15 @@ public partial class MediaInspectorWindow : Window
         BehaviorBox.SelectedIndex = (int)item.Behavior;
         ScalingBox.SelectedIndex = (int)item.Scaling;
         EndBox.SelectedIndex = (int)item.EndBehavior;
+        ShowSecondsField.SetSilently(item.ShowSeconds);
+        // An image has no loop: the default of a new one (Loop) means "nothing".
+        ImageEndBox.SelectedIndex = item.EndBehavior switch
+        {
+            VideoEndBehavior.Logo => 1,
+            VideoEndBehavior.NextMedia => 2,
+            _ => 0,
+        };
+        UpdateAfterOptions();
         MuteCheck.IsChecked = item.Muted;
         VolSlider.Value = item.Volume;
         BlurField.SetSilently(item.Blur);
@@ -96,6 +111,24 @@ public partial class MediaInspectorWindow : Window
     }
 
     public bool Saved { get; private set; }
+
+    private void After_Changed(object sender, SelectionChangedEventArgs e) => UpdateAfterOptions();
+
+    /// <summary>
+    /// Shows the box that picks the next media only when «seguir con otro
+    /// medio» is chosen, and lets an image's seconds be set only when it goes
+    /// on the whole screen: a background image never ends.
+    /// </summary>
+    private void UpdateAfterOptions()
+    {
+        if (NextPanel is null || ImageEndBox is null || EndBox is null || BehaviorBox is null)
+            return;
+
+        var isVideo = _item.Type is MediaType.Video or MediaType.YouTube;
+        var follows = isVideo ? EndBox.SelectedIndex == 3 : ImageEndBox.SelectedIndex == 2;
+        NextPanel.Visibility = follows ? Visibility.Visible : Visibility.Collapsed;
+        ImageOptions.IsEnabled = BehaviorBox.SelectedIndex == 1;
+    }
 
     private void Vol_Changed(object sender, RoutedPropertyChangedEventArgs<double> e) =>
         VolValue.Text = $"{VolSlider.Value:0}";
@@ -201,7 +234,22 @@ public partial class MediaInspectorWindow : Window
         _item.Category = string.IsNullOrWhiteSpace(CategoryBox.Text) ? "Fondos" : CategoryBox.Text.Trim();
         _item.Behavior = (MediaBehavior)Math.Max(0, BehaviorBox.SelectedIndex);
         _item.Scaling = (MediaScaling)Math.Max(0, ScalingBox.SelectedIndex);
-        _item.EndBehavior = (VideoEndBehavior)Math.Max(0, EndBox.SelectedIndex);
+        var isVideo = _item.Type is MediaType.Video or MediaType.YouTube;
+        _item.EndBehavior = isVideo
+            ? (VideoEndBehavior)Math.Max(0, EndBox.SelectedIndex)
+            : ImageEndBox.SelectedIndex switch
+            {
+                1 => VideoEndBehavior.Logo,
+                2 => VideoEndBehavior.NextMedia,
+                _ => VideoEndBehavior.Stop,
+            };
+
+        // Seconds and a following media only mean something with the choice that uses them.
+        _item.ShowSeconds = isVideo ? 0 : (int)Math.Clamp(ShowSecondsField.Value, 0, 3600);
+        var next = (NextMediaBox.SelectedItem as MediaItem)?.Id;
+        if (_item.EndBehavior == VideoEndBehavior.NextMedia && next is null)
+            _item.EndBehavior = VideoEndBehavior.Stop; // none chosen: nothing follows
+        _item.NextMediaId = _item.EndBehavior == VideoEndBehavior.NextMedia ? next : null;
         _item.Muted = MuteCheck.IsChecked == true;
         _item.Volume = (int)VolSlider.Value;
         _item.Blur = BlurField.Value;

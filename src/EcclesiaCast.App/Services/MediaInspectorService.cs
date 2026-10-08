@@ -13,4 +13,13 @@ public sealed class MediaInspectorService : IMediaInspector
         };
         return window.ShowDialog() == true && window.Saved;
     }
+
+    public MediaTabRule? EditTabRule(string tab, MediaTabRule current)
+    {
+        var window = new MediaTabRuleWindow(tab, current)
+        {
+            Owner = System.Windows.Application.Current.MainWindow,
+        };
+        return window.ShowDialog() == true ? window.Rule : null;
+    }
 }

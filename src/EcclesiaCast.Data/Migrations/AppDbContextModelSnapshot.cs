@@ -190,6 +190,9 @@ namespace EcclesiaCast.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("NextMediaId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<double>("OffsetX")
                         .HasColumnType("REAL");
 
@@ -201,6 +204,9 @@ namespace EcclesiaCast.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Scaling")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ShowSeconds")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("ThumbnailPath")
