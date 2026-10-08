@@ -35,6 +35,18 @@ rendimiento y cómo se ve la pestaña Música.
 
 - [ ] **Acerca de: una forma de colaborar.** Todavía no hay a dónde mandar a
       la gente; se agrega cuando esté decidido.
+- [ ] **Biblias (para decidir más adelante, por las licencias).** Lo
+      averiguado el 7/10/2026: las versiones con derechos (RVR1960, NVI, NTV,
+      TLA) no se pueden repartir con el programa ni desde un repositorio,
+      aunque se avise; OpenLP y CrossWire no lo hacen por eso. Opciones:
+      un botón «Agregar Biblias» con un catálogo de Biblias libres de varios
+      idiomas (https://github.com/seven1m/open-bibles: en castellano RV1909,
+      Biblia en Español Sencillo, Palabra de Dios para ti, Versión Biblia
+      Libre); una carpeta privada `biblias` junto al instalador para las PCs
+      de la iglesia; y pedirle permiso por la RVR1960 a la Sociedad Bíblica
+      del Uruguay o a la American Bible Society.
+- [ ] **Lo pedido al probar la beta.6** (7/10/2026): está todo en
+      [plan-sonnet-2.md](plan-sonnet-2.md), en tres tandas.
 
 ## 3. Para llegar a la v1.0.0
 
