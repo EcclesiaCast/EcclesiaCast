@@ -6,6 +6,7 @@ using System.Windows.Media;
 using EcclesiaCast.App.ViewModels;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Core.Stage;
+using EcclesiaCast.Core.Timing;
 using EcclesiaCast.Core.Themes;
 
 namespace EcclesiaCast.App.Controls;
@@ -55,7 +56,7 @@ public sealed class StageBoxView : Border
         }
 
         var single = Box.Kind is StageBoxKind.Clock or StageBoxKind.Timer or StageBoxKind.Countdown
-            or StageBoxKind.LiveName or StageBoxKind.Overlay;
+            or StageBoxKind.SectionTimer or StageBoxKind.LiveName or StageBoxKind.Overlay;
 
         _text = new TextBlock
         {
@@ -104,6 +105,13 @@ public sealed class StageBoxView : Border
         var text = Projection is { } vm ? LiveContent(vm) : SampleContent();
         _text.Text = text;
 
+        // The section timer turns red once its time is over.
+        if (Box.Kind == StageBoxKind.SectionTimer)
+        {
+            var late = Projection?.Clocks is { HasSection: true } clocks && clocks.Section.IsOvertime(DateTimeOffset.Now);
+            _text.Foreground = late ? new SolidColorBrush(Color.FromRgb(0xFF, 0x5A, 0x5A)) : ParseBrush(Box.Color);
+        }
+
         // The footer notice only has its band while there is something in it.
         if (Box.Kind == StageBoxKind.Overlay)
         {
@@ -120,7 +128,7 @@ public sealed class StageBoxView : Border
     /// </summary>
     public void Tick()
     {
-        if (Box.Kind is StageBoxKind.Clock or StageBoxKind.Timer or StageBoxKind.Countdown
+        if (Box.Kind is StageBoxKind.Clock or StageBoxKind.Timer or StageBoxKind.Countdown or StageBoxKind.SectionTimer
             || Projection?.Countdown is not null)
             Refresh();
     }
@@ -163,7 +171,8 @@ public sealed class StageBoxView : Border
                 _ => vm.SlideLabel ?? string.Empty,
             },
             StageBoxKind.Clock => DateTime.Now.ToString("HH:mm", CultureInfo.CurrentCulture),
-            StageBoxKind.Timer => FormatElapsed(DateTime.Now - vm.StageTimerStart),
+            StageBoxKind.Timer => TimeText.Elapsed(vm.Clocks.Stopwatch.Elapsed(now)),
+            StageBoxKind.SectionTimer => vm.Clocks.HasSection ? TimeText.Clock(vm.Clocks.Section.Remaining(now)) : "—",
             StageBoxKind.Countdown => vm.Countdown?.Format(now) ?? string.Empty,
             StageBoxKind.Notes => vm.StageNotes ?? string.Empty,
             StageBoxKind.Overlay => vm.Overlay ?? string.Empty,
@@ -180,6 +189,7 @@ public sealed class StageBoxView : Border
         StageBoxKind.Clock => "10:30",
         StageBoxKind.Timer => "12:45",
         StageBoxKind.Countdown => "5:00",
+        StageBoxKind.SectionTimer => "25:00",
         StageBoxKind.Notes => "Los puntos del mensaje:\n1. La gracia\n2. La fe\n3. La respuesta",
         StageBoxKind.Overlay => "Aviso al pie",
         StageBoxKind.FixedText => string.IsNullOrEmpty(Box.Text) ? "Texto fijo" : Box.Text,
@@ -250,9 +260,6 @@ public sealed class StageBoxView : Border
 
         return Brushes.White;
     }
-
-    private static string FormatElapsed(TimeSpan elapsed) =>
-        elapsed.TotalHours >= 1 ? elapsed.ToString(@"h\:mm\:ss") : elapsed.ToString(@"m\:ss");
 
     /// <summary>
     /// Matches the projector's casing so the singers read what the

@@ -109,6 +109,7 @@ public partial class App : Application
         var services = new ServiceCollection();
         services.AddSingleton<IDisplayProvider, ScreenDisplayProvider>();
         services.AddSingleton<IPresentationService, PresentationService>();
+        services.AddSingleton<EcclesiaCast.Core.Timing.MeetingClocks>();
         services.AddSingleton<ProjectionViewModel>();
         services.AddSingleton<IProjectionWindowService, ProjectionWindowService>();
         services.AddSingleton<ISettingsStore>(_ => new SqliteSettingsStore(dbPath));

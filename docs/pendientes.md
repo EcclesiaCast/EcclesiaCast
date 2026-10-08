@@ -87,6 +87,18 @@ rendimiento y cómo se ve la pestaña Música.
       y mirar que pase sola. Con un video, «Seguir con otro medio» al
       terminar. Probado por dentro con tiempos reales de 1 segundo; los
       videos de verdad (que terminen en VLC) no.
+- [ ] **Pestaña Tiempos**: elegir una sección, iniciar, mirar que cuente, pasarse
+      del tiempo (tiene que quedar en rojo y en negativo, también en el
+      recuadro «Temporizador» del escenario, que hay que agregar desde el
+      editor de escenarios), +1/−1 minuto, Siguiente y el cronómetro. Probado
+      por dentro con tiempos reales y con el recuadro dibujado; no en la
+      pantalla de escenario de verdad, ni escribiendo en las casillas.
+- [ ] **Abrir la versión nueva con la biblioteca real** (conviene guardar antes
+      una copia: Archivo → Guardar una copia de la biblioteca): arranca sola
+      con dos migraciones (sacar la lista inteligente y lo que sigue a un
+      medio). Se probó con copias de la biblioteca y con bases de pruebas
+      viejas; las listas inteligentes que hubiera se borran, las demás
+      playlists no se tocan.
 - [ ] **Preguntas al agregar un video de YouTube** (🔗 o ▶ YouTube): elegir
       «Reproducir por internet» o «Descargar», y ver la marca 🌐 internet en
       las tarjetas de YouTube. La descarga nueva depende de internet y del
@@ -107,7 +119,10 @@ rendimiento y cómo se ve la pestaña Música.
       de la iglesia; y pedirle permiso por la RVR1960 a la Sociedad Bíblica
       del Uruguay o a la American Bible Society.
 - [ ] **Lo pedido al probar la beta.6** (7/10/2026): está todo en
-      [plan-sonnet-2.md](plan-sonnet-2.md), en tres tandas.
+      [plan-sonnet-2.md](plan-sonnet-2.md), en tres tandas. Las tandas 1 y 2
+      están programadas (falta probarlas, sección 1); queda la **tanda 3**:
+      menús oscuros, pantalla de carga y «Acerca de» la primera vez, LIVE +
+      PREVIEW + Escenario en un solo recuadro, videos pesados y audios.
 
 ## 3. Para llegar a la v1.0.0
 

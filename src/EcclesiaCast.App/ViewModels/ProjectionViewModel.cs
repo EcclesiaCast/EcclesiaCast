@@ -80,14 +80,15 @@ public sealed partial class ProjectionViewModel : ObservableObject
     private string? _slideLabel;
 
     /// <summary>
-    /// When the stage's service timer was last reset. Kept here so the stage
-    /// screen and its copy in the operator's preview count the same time.
+    /// The service stopwatch and the timer of the section that is running.
+    /// Kept here so the stage screen and its copy in the operator's preview
+    /// read the same time as the Tiempos tab that sets them.
     /// </summary>
-    [ObservableProperty]
-    private DateTime _stageTimerStart = DateTime.Now;
+    public EcclesiaCast.Core.Timing.MeetingClocks Clocks { get; }
 
-    public ProjectionViewModel(IPresentationService presentation)
+    public ProjectionViewModel(IPresentationService presentation, EcclesiaCast.Core.Timing.MeetingClocks clocks)
     {
+        Clocks = clocks;
         presentation.Changed += (_, _) => Sync(presentation);
         Sync(presentation);
     }

@@ -49,10 +49,17 @@ desde la primera. Las flechas **←→** navegan en vivo.
 En la pestaña **Biblia**:
 
 - **📥** importa una Biblia en **JSON** o **Zefania XML**.
-- Marcá la casilla de una versión para activarla. **Podés marcar dos**: la
-  segunda se proyecta debajo de la primera, y cada texto lleva su abreviatura
-  entre corchetes (`[RVR]`, `[NTV]`). Un **clic en el nombre** cambia a esa
-  versión sola.
+- Las versiones van en una fila de botones con su abreviatura. Un **clic**
+  usa sólo esa versión; **Ctrl+clic suma o saca una segunda**, que se proyecta
+  debajo de la primera (cada texto lleva su abreviatura entre corchetes,
+  `[RVR]`, `[NTV]`). Las activas se ven encendidas: la primera llena, la
+  segunda con borde. El botón **▸** abre la lista con los nombres completos.
+  Con **clic derecho** sobre una versión: **editar** su nombre y abreviatura,
+  **exportar** a un archivo que el programa vuelve a importar (con 📥), o
+  **eliminar**.
+- **➕ Playlist** abre una cajita con la cita que agregaría (la del buscador, el
+  versículo en pantalla o el capítulo). Ahí podés escribir otra
+  (`juan 8 del 5 al 10`), leer el pasaje y tocar **Agregar**.
 - Elegí **libro → capítulo**, o escribí una referencia: `Juan 3:16`,
   `jn 3:16-18`, `sal 23`, `1 co 13`. Con una referencia, **Enter** proyecta el
   versículo indicado.
@@ -220,8 +227,21 @@ versículo se carga en la pestaña Biblia y el medio se aplica de fondo.
 - **Texto rápido**: escribí un anuncio y proyectalo al momento.
 - **Aviso al pie**: un mensaje que aparece sobre todo lo demás (ideal para
   "el auto ABC 123 está mal estacionado"). Se quita con **Quitar**.
-- **Resaltar en vivo**: escribí una palabra y se pinta como con marcador sobre
-  el texto proyectado.
+- **Resaltar en vivo**: escribí una o varias palabras o frases separadas por
+  **;** (`gracia; fe`) y se pintan como con marcador, en todas las veces que
+  aparecen. También podés marcar con el mouse sobre el panel LIVE: un clic en
+  una palabra o un arrastre sobre una frase la resalta **sólo esa vez**;
+  con **Shift** se suma otra marca sin perder las anteriores, y marcar de
+  nuevo algo resaltado lo saca. Al cambiar de diapositiva se borra todo.
+- **Tiempos**: las **secciones de la reunión** con su duración (por ejemplo
+  Alabanza 25 minutos, Anuncios 5, Prédica 35), que cambiás escribiendo. Elegís
+  una con el círculo y la manejás con **▶ Iniciar / ⏸ Pausar**, **⟲** (vuelve
+  al tiempo completo), **−1 min**, **+1 min** y **Siguiente ⏭**. Si se pasa del
+  tiempo sigue contando en negativo y el número se pone **rojo**. Abajo está el
+  **cronómetro** del servicio: iniciar, pausar y poner en cero. En la pantalla
+  de escenario, el recuadro **Temporizador** muestra lo que le queda a la
+  sección en marcha; la **cuenta regresiva** que se proyecta antes de empezar
+  es otra cosa, con su propio recuadro.
 
 ## 9. Pantalla de escenario
 
@@ -259,8 +279,8 @@ la salida. El editor también está en **Proyección → Editar los escenarios�
 
 En el editor, cada **recuadro** se mueve arrastrándolo y se agranda con las
 manijas de los bordes; en el panel de la derecha elegís **qué muestra** (letra
-en vivo, próxima diapositiva, hora, cronómetro, temporizador, notas, nombre de
-lo que está en vivo, texto fijo, aviso al pie o igual a la pantalla principal),
+en vivo, próxima diapositiva, hora, cronómetro, temporizador de la sección,
+cuenta regresiva, notas, nombre de lo que está en vivo, texto fijo, aviso al pie o igual a la pantalla principal),
 el tamaño de letra, el color y la alineación. Con **＋** hacés un escenario
 nuevo, con ⧉ lo duplicás y con **Usar este escenario** elegís cuál se ve. Lo
 que tenías configurado antes (hora, cronómetro, siguiente, notas) quedó

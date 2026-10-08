@@ -12,7 +12,7 @@ public enum StageBoxKind
     /// <summary>Time of day.</summary>
     Clock,
 
-    /// <summary>How long the service has been running.</summary>
+    /// <summary>The service stopwatch: how long the service has been running.</summary>
     Timer,
 
     /// <summary>What is left of the countdown before the service (empty when none runs).</summary>
@@ -32,6 +32,9 @@ public enum StageBoxKind
 
     /// <summary>Exactly what the projector shows: the live slide with its background.</summary>
     Mirror,
+
+    /// <summary>What is left of the section that is running (Alabanza, Prédica…), red once it is over.</summary>
+    SectionTimer,
 }
 
 public enum StageAlign
@@ -79,7 +82,8 @@ public sealed class StageBox
         StageBoxKind.NextSlide => "Próxima diapositiva",
         StageBoxKind.Clock => "Hora",
         StageBoxKind.Timer => "Cronómetro",
-        StageBoxKind.Countdown => "Temporizador (cuenta regresiva)",
+        StageBoxKind.Countdown => "Cuenta regresiva (antes de empezar)",
+        StageBoxKind.SectionTimer => "Temporizador (lo que queda de la sección)",
         StageBoxKind.Notes => "Notas para el predicador",
         StageBoxKind.LiveName => "Nombre de lo que está en vivo",
         StageBoxKind.FixedText => "Texto fijo",

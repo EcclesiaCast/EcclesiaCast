@@ -9,6 +9,20 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Pestaña Tiempos** (abajo a la derecha, junto a Música): las **secciones
+  de la reunión** con su tiempo (viene con Alabanza 25 minutos, Anuncios 5 y
+  Prédica 35; se cambian, se agregan, se quitan y se ordenan, y quedan
+  guardadas). Se elige una y se maneja con Iniciar, Pausar, volver a cero,
+  +1 y −1 minuto y Siguiente sección (si estaba corriendo, la que sigue
+  arranca sola). Si se pasa del tiempo sigue contando en negativo y se pone
+  en rojo. Abajo, el **cronómetro** del servicio con Iniciar, Pausar y Cero;
+  es el mismo que muestra el recuadro «Cronómetro» del escenario (que sigue
+  arrancando solo al abrir el programa). En el escenario hay un recuadro nuevo,
+  **Temporizador**, que muestra lo que le queda a la sección en marcha, en
+  rojo al pasarse; se agrega desde el editor de escenarios. El recuadro que
+  antes se llamaba «Temporizador (cuenta regresiva)» pasó a llamarse **Cuenta
+  regresiva (antes de empezar)** y sigue mostrando la cuenta que se proyecta.
+
 - **Arrastrar medios dentro del programa.** Un medio de la barra se puede
   soltar en la playlist, en el lugar exacto y con la misma línea azul que las
   canciones, o en otra pestaña de la lista de la izquierda, a la que se muda

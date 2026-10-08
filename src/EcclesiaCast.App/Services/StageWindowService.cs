@@ -37,5 +37,10 @@ public sealed class StageWindowService(ProjectionViewModel projectionViewModel) 
 
     public void ApplyLayout(StageLayout layout) => _window?.ApplyLayout(layout);
 
-    public void ResetTimer() => projectionViewModel.StageTimerStart = DateTime.Now;
+    public void ResetTimer()
+    {
+        // Zero, and counting: the stopwatch of the service restarts from here.
+        projectionViewModel.Clocks.Stopwatch.Reset();
+        projectionViewModel.Clocks.Stopwatch.Start(DateTimeOffset.Now);
+    }
 }

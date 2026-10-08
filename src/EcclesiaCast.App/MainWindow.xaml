@@ -1269,6 +1269,9 @@
                             <RadioButton x:Name="TabMusic" Content="Música"
                                          Style="{StaticResource TabButton}" GroupName="WriteTab" Margin="4,0,0,0"
                                          ToolTip="Pasar, pausar y bajar o subir la música del Spotify (o el reproductor) que esté abierto en esta computadora"/>
+                            <RadioButton x:Name="TabTimes" Content="Tiempos"
+                                         Style="{StaticResource TabButton}" GroupName="WriteTab" Margin="4,0,0,0"
+                                         ToolTip="Cuánto dura cada parte de la reunión (alabanza, anuncios, prédica) y un cronómetro; el escenario muestra lo que queda"/>
                         </WrapPanel>
 
                         <Grid>
@@ -1388,6 +1391,138 @@
                                            FontSize="10.5" Foreground="{StaticResource FaintBrush}"
                                            TextWrapping="Wrap" Margin="12,8,12,0"/>
                             </StackPanel>
+
+                            <!-- ── Tiempos: secciones de la reunión y cronómetro ── -->
+                            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                          Visibility="{Binding IsChecked, ElementName=TabTimes, Converter={StaticResource BoolToVis}}">
+                                <StackPanel Margin="12,0,12,10">
+                                    <!-- La sección en marcha -->
+                                    <TextBlock Text="{Binding CurrentSectionName}" FontSize="12" FontWeight="SemiBold"
+                                               Foreground="{StaticResource MutedBrush}" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding SectionClockText}" FontSize="40" FontWeight="SemiBold"
+                                               AutomationProperties.Name="Tiempo que queda de la sección">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="White"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSectionOvertime}" Value="True">
+                                                        <Setter Property="Foreground" Value="#FF5A5A"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <WrapPanel Margin="0,4,0,0">
+                                        <Button Padding="12,6" Margin="0,0,4,4" MinWidth="86"
+                                                Command="{Binding ToggleSectionTimerCommand}">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource AccentButton}">
+                                                    <Setter Property="Content" Value="▶ Iniciar"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsSectionRunning}" Value="True">
+                                                            <Setter Property="Content" Value="⏸ Pausar"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <Button Content="⟲" Padding="10,6" Margin="0,0,4,4"
+                                                Style="{StaticResource DarkButton}"
+                                                Command="{Binding ResetSectionTimerCommand}"
+                                                AutomationProperties.Name="Volver a cero"
+                                                ToolTip="Volver al tiempo completo de la sección, detenido"/>
+                                        <Button Content="−1 min" Padding="9,6" Margin="0,0,4,4"
+                                                Style="{StaticResource DarkButton}"
+                                                Command="{Binding TakeMinuteFromSectionCommand}"
+                                                ToolTip="Quitar un minuto a lo que queda"/>
+                                        <Button Content="+1 min" Padding="9,6" Margin="0,0,4,4"
+                                                Style="{StaticResource DarkButton}"
+                                                Command="{Binding AddMinuteToSectionCommand}"
+                                                ToolTip="Darle un minuto más"/>
+                                        <Button Content="Siguiente ⏭" Padding="9,6" Margin="0,0,0,4"
+                                                Style="{StaticResource DarkButton}"
+                                                Command="{Binding NextSectionTimerCommand}"
+                                                ToolTip="Pasar a la sección que sigue (si estaba corriendo, sigue corriendo)"/>
+                                    </WrapPanel>
+
+                                    <!-- La lista de secciones, editable -->
+                                    <TextBlock Text="SECCIONES DE LA REUNIÓN" FontSize="10" FontWeight="SemiBold"
+                                               Foreground="{StaticResource FaintBrush}" Margin="0,12,0,4"
+                                               ToolTip="Tocá el círculo para elegir con cuál se trabaja. Cambiá el nombre o los minutos escribiendo."/>
+                                    <ItemsControl x:Name="SectionsList" ItemsSource="{Binding MeetingSections}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <DockPanel Margin="0,0,0,4" LastChildFill="True">
+                                                    <RadioButton DockPanel.Dock="Left" GroupName="CurrentSection"
+                                                                 IsChecked="{Binding IsCurrent, Mode=TwoWay}"
+                                                                 VerticalAlignment="Center" Margin="0,0,8,0"
+                                                                 AutomationProperties.Name="Usar esta sección"
+                                                                 ToolTip="Trabajar con esta sección"/>
+                                                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="4,0,0,0">
+                                                        <Button Content="▲" FontSize="9" Padding="5,3" Style="{StaticResource DarkButton}"
+                                                                Command="{Binding DataContext.MoveSectionUpCommand, ElementName=SectionsList}"
+                                                                CommandParameter="{Binding}" ToolTip="Subir"/>
+                                                        <Button Content="▼" FontSize="9" Padding="5,3" Margin="2,0,0,0" Style="{StaticResource DarkButton}"
+                                                                Command="{Binding DataContext.MoveSectionDownCommand, ElementName=SectionsList}"
+                                                                CommandParameter="{Binding}" ToolTip="Bajar"/>
+                                                        <Button Content="✕" FontSize="10" Padding="6,3" Margin="2,0,0,0" Style="{StaticResource DarkButton}"
+                                                                Command="{Binding DataContext.RemoveSectionCommand, ElementName=SectionsList}"
+                                                                CommandParameter="{Binding}"
+                                                                AutomationProperties.Name="Quitar la sección" ToolTip="Quitar la sección"/>
+                                                    </StackPanel>
+                                                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="4,0,0,0">
+                                                        <TextBox Text="{Binding Minutes, UpdateSourceTrigger=LostFocus, StringFormat='0'}"
+                                                                 Width="40" HorizontalContentAlignment="Center"
+                                                                 Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                                                                 BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
+                                                                 Padding="2,4" FontSize="12" VerticalContentAlignment="Center"
+                                                                 AutomationProperties.Name="Minutos de la sección"
+                                                                 ToolTip="Minutos de esta sección"/>
+                                                        <TextBlock Text="min" FontSize="10" VerticalAlignment="Center" Margin="4,0,0,0"
+                                                                   Foreground="{StaticResource MutedBrush}"/>
+                                                    </StackPanel>
+                                                    <TextBox Text="{Binding Name, UpdateSourceTrigger=LostFocus}"
+                                                             Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                                                             BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
+                                                             Padding="6,4" FontSize="12" VerticalContentAlignment="Center"
+                                                             AutomationProperties.Name="Nombre de la sección"/>
+                                                </DockPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <Button Content="＋ Sección" Style="{StaticResource DarkButton}"
+                                            HorizontalAlignment="Left" FontSize="11" Padding="10,4" Margin="0,2,0,0"
+                                            Command="{Binding AddSectionCommand}"/>
+
+                                    <!-- El cronómetro del servicio -->
+                                    <TextBlock Text="CRONÓMETRO" FontSize="10" FontWeight="SemiBold"
+                                               Foreground="{StaticResource FaintBrush}" Margin="0,14,0,2"
+                                               ToolTip="Cuánto lleva el servicio. Es el mismo que muestra el recuadro «Cronómetro» del escenario."/>
+                                    <DockPanel>
+                                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Button Padding="10,5" MinWidth="82" Margin="0,0,4,0"
+                                                    Command="{Binding ToggleStopwatchCommand}">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                                        <Setter Property="Content" Value="▶ Iniciar"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsStopwatchRunning}" Value="True">
+                                                                <Setter Property="Content" Value="⏸ Pausar"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                            <Button Content="⟲" Padding="10,5" Style="{StaticResource DarkButton}"
+                                                    Command="{Binding ResetStopwatchCommand}"
+                                                    AutomationProperties.Name="Poner el cronómetro en cero"
+                                                    ToolTip="Poner el cronómetro en cero (queda detenido)"/>
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding StopwatchText}" FontSize="26" FontWeight="SemiBold"
+                                                   Foreground="White" VerticalAlignment="Center"/>
+                                    </DockPanel>
+                                </StackPanel>
+                            </ScrollViewer>
 
                             <!-- ── Notas para la plataforma ── -->
                             <DockPanel Visibility="{Binding IsChecked, ElementName=TabNotes, Converter={StaticResource BoolToVis}}">
