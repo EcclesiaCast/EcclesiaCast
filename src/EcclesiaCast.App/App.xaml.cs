@@ -17,6 +17,7 @@ namespace EcclesiaCast.App;
 public partial class App : Application
 {
     private ServiceProvider? _services;
+    private UiWatchdog? _watchdog;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -144,11 +145,16 @@ public partial class App : Application
         mainWindow.AttachLayoutPersistence(_services.GetRequiredService<ISettingsStore>());
         MainWindow = mainWindow;
         mainWindow.Show();
+
+        // Last, so the slow start-up is not mistaken for a freeze.
+        _watchdog = new UiWatchdog(Dispatcher);
+        _watchdog.Start();
     }
 
     protected override void OnExit(ExitEventArgs e)
     {
         Log.Information("EcclesiaCast exiting");
+        _watchdog?.Stop();
         LightVideoCache.Shutdown();
 
         // Stop listening on the network before the process goes away.

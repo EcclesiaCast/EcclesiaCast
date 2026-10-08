@@ -9,6 +9,14 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Un vigía anota los cuelgues en el registro.** Si la ventana del operador
+  se queda sin responder más de 2 segundos, el registro (carpeta «logs»)
+  deja una línea «Ventana congelada» con las últimas cosas que hizo el
+  programa (proyectar una diapositiva, poner un fondo, abrir un capítulo,
+  guardar una canción o la playlist…, cada una con su nombre), y otra
+  «Ventana descongelada» con cuánto duró. No cuesta nada mientras todo anda
+  bien.
+
 - **Pestaña Música** (abajo a la derecha, junto a Texto rápido, Aviso al pie,
   Resaltar y Notas): botones ⏮ ⏯ ⏭ y de volumen que manejan el Spotify
   instalado en la computadora, o el reproductor que esté abierto, con las

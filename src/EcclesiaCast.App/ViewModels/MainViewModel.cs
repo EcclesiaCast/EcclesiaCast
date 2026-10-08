@@ -8,6 +8,7 @@ using EcclesiaCast.App.Remote;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Bible;
+using EcclesiaCast.Core.Diagnostics;
 using EcclesiaCast.Core.Displays;
 using EcclesiaCast.Core.Logos;
 using EcclesiaCast.Core.Media;
@@ -399,10 +400,18 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             : $"«{playlist.Name}»: {chosen.Count} {described}.";
     }
 
+    /// <summary>
+    /// Writes what the program is about to do on the trail the watchdog reads,
+    /// so a freeze in the log says what it was busy with.
+    /// </summary>
+    private static void NoteAction(string what) => ActionTrail.Shared.Note(what);
+
     private void SavePlaylist()
     {
         if (SelectedPlaylist is null)
             return;
+
+        NoteAction($"Guardar la playlist «{SelectedPlaylist.Name}»");
 
         // A smart list's items are worked out, not kept. Writing them down
         // would freeze today's answer into the library and quietly turn the
@@ -1384,6 +1393,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             item.EndBehavior = VideoEndBehavior.Stop;
         }
 
+        NoteAction($"Poner el fondo «{item.Name}»");
         _presentation.SetBackground(item, ResolveFill(item));
 
         // Foreground = the media alone (no text). Background with no live slide
@@ -1412,6 +1422,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     [RelayCommand]
     private void ClearBackground()
     {
+        NoteAction("Sacar el fondo");
         _presentation.SetBackground(null);
 
         if (_presentation.State == OutputState.Clear && _presentation.CurrentSlide is not null)
@@ -2571,6 +2582,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
     private void BuildSongSlides()
     {
+        NoteAction($"Abrir la canción «{SelectedSong?.Title}»");
         Slides.Clear();
         LiveSlideIndex = -1;
         PreviewSlideIndex = -1;
@@ -2626,6 +2638,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (!_songDesigner.Edit(SelectedSong, theme, index))
             return;
 
+        NoteAction($"Guardar la canción «{SelectedSong.Title}»");
         var saved = _songs.Save(SelectedSong);
         RebuildSlidesPreservingLive(() =>
         {
@@ -2662,6 +2675,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         }
 
         section.Text = edited;
+        NoteAction($"Guardar la canción «{SelectedSong!.Title}»");
         var saved = _songs.Save(SelectedSong!);
         RebuildSlidesPreservingLive(() =>
         {
@@ -2773,6 +2787,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         for (var i = 0; i < SelectedSong.Sections.Count; i++)
             SelectedSong.Sections[i].Order = i;
 
+        NoteAction($"Guardar la canción «{SelectedSong.Title}»");
         var saved = _songs.Save(SelectedSong);
         LoadSongs();
         SelectedSong = Songs.FirstOrDefault(s => s.Id == saved.Id);
@@ -2817,6 +2832,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 .ToList(),
         };
 
+        NoteAction($"Guardar la canción «{copy.Title}»");
         var saved = _songs.Save(copy);
         LoadSongs();
         SelectedSong = Songs.FirstOrDefault(s => s.Id == saved.Id);
@@ -2839,6 +2855,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (created is null)
             return;
 
+        NoteAction($"Guardar la canción «{created.Title}»");
         var saved = _songs.Save(created);
         LoadSongs();
         SelectedSong = Songs.FirstOrDefault(s => s.Id == saved.Id);
@@ -2855,6 +2872,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (edited is null)
             return;
 
+        NoteAction($"Guardar la canción «{edited.Title}»");
         var saved = _songs.Save(edited);
         LoadSongs();
         SelectedSong = Songs.FirstOrDefault(s => s.Id == saved.Id);
@@ -3269,6 +3287,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (primary is null)
             return;
 
+        NoteAction($"Abrir el capítulo {BibleBookCatalog.FindByNumber(reference.BookNumber)?.Name} {reference.Chapter} ({primary.Abbreviation})");
         var verses = _bibles.GetPassage(primary.Id, reference);
         if (verses.Count == 0)
         {
@@ -3864,6 +3883,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         }
 
         var item = Slides[index];
+        NoteAction($"Proyectar la diapositiva {index + 1} de {Slides.Count}: {item.Label}");
 
         // A foreground media takes the whole screen and hides the text: it is
         // an announcement, not a background. Projecting lyrics on top of one
@@ -4054,6 +4074,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     [RelayCommand]
     private void ToggleBlack()
     {
+        NoteAction("Pantalla negra (Black)");
         _presentation.ToggleBlack();
         EnsureOutputOn();
     }
