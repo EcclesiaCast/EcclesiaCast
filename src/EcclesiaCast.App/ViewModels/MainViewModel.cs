@@ -39,6 +39,12 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     /// <summary>Marks that video posters were rebuilt with the VLC fallback (see RefreshVideoThumbnailsAsync).</summary>
     private const string VideoThumbnailsRebuiltKey = "media.video-thumbnails.rebuilt";
 
+    /// <summary>
+    /// Marks that the posters of images and document pages were redrawn in
+    /// their own shape (they used to be whatever the Windows shell gave).
+    /// </summary>
+    private const string ImageThumbnailsShapedKey = "media.image-thumbnails.shaped";
+
     private readonly IDisplayProvider _displayProvider;
     private readonly IProjectionWindowService _projection;
     private readonly ISettingsStore _settings;
@@ -1792,6 +1798,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         var engine = App.VideoEngine;
 
         var rebuildAll = _settings.Get(VideoThumbnailsRebuiltKey) is null;
+        var reshapeImages = _settings.Get(ImageThumbnailsShapedKey) is null;
 
         // Images are included: their poster is a PNG kept apart from the
         // picture, and when that file disappears the card in the media bar
@@ -1802,7 +1809,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             {
                 MediaType.Video => engine is not null && !string.IsNullOrWhiteSpace(m.Path)
                                    && (rebuildAll || PosterPolicy.NeedsPoster(m, File.Exists)),
-                MediaType.Image => PosterPolicy.NeedsPoster(m, File.Exists),
+                MediaType.Image => (reshapeImages && File.Exists(m.Path)) || PosterPolicy.NeedsPoster(m, File.Exists),
                 _ => false,
             })
             .ToList();
@@ -1817,6 +1824,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                     if (rebuildAll && item.Type == MediaType.Video)
                         MediaThumbnails.Delete(item.ThumbnailPath);
 
+                    var replaced = item.ThumbnailPath;
                     var thumbnail = MediaThumbnails.Create(item.Path, item.Type, engine);
                     if (thumbnail is null)
                         continue;
@@ -1824,6 +1832,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                     item.ThumbnailPath = thumbnail;
                     _media.Update(item);
                     count++;
+
+                    // The old poster goes only once the new one is in place.
+                    if (item.Type == MediaType.Image && reshapeImages && replaced != thumbnail)
+                        MediaThumbnails.Delete(replaced);
                 }
                 return count;
             });
@@ -1831,6 +1843,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             if (rebuilt > 0)
                 LoadMedia();
         }
+
+        // Images and pages do not need the engine: once is enough.
+        if (reshapeImages)
+            _settings.Set(ImageThumbnailsShapedKey, "1");
 
         // Only once the video engine could do the job; otherwise the next
         // run still has to rebuild the old generic icons.

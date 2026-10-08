@@ -238,6 +238,14 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Cambiado
 
+- **Las miniaturas de las imágenes y de las páginas de un documento se dibujan
+  con la forma de la imagen**, con 320 píxeles del lado largo (una página
+  vertical queda vertical; una imagen 16:9, 320×180 como siempre). Antes las
+  armaba Windows con el tamaño que le salía, y a veces no coincidía con lo que
+  se proyecta. Así la tarjeta puede encuadrar la imagen igual que la pantalla.
+  Las miniaturas que ya existían se rehacen **solas, una sola vez**, en
+  segundo plano, al abrir el programa. Las de video no cambian.
+
 - **Las páginas de un PDF o un PowerPoint entran con «Ajustar»**: se ven
   enteras, con barras a los costados si hace falta. Antes llenaban la
   pantalla y una página vertical quedaba recortada a una franja.

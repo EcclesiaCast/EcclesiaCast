@@ -19,16 +19,24 @@ public static class MediaThumbnails
     public static string Directory => Path.Combine(App.DataDir, "thumbnails");
 
     /// <summary>
-    /// Returns the thumbnail path for a media file: the shell's own image when
-    /// it has one, otherwise a frame decoded with VLC. Images fall back to the
-    /// file itself. Returns null when nothing could be produced.
+    /// Returns the thumbnail path for a media file. An image gets a poster of
+    /// its own shape (see <see cref="PosterSize"/>); a video gets the shell's
+    /// image when it has one, otherwise a frame decoded with VLC. Images fall
+    /// back to the file itself. Returns null when nothing could be produced.
     /// </summary>
     public static string? Create(string sourcePath, MediaType type, LibVLC? videoEngine)
     {
         if (string.IsNullOrWhiteSpace(sourcePath) || !File.Exists(sourcePath))
             return null;
 
-        var source = ShellThumbnail.TryGet(sourcePath, Width, Height);
+        // The shell fits whatever it likes into a box and its answer varies
+        // with the format, so an image is drawn here, at a size that follows
+        // its shape. What the card shows is then the same picture the screen
+        // gets (the shell would also apply a photo's rotation, which the
+        // screen does not).
+        var source = type == MediaType.Image ? ImagePoster(sourcePath) : null;
+
+        source ??= ShellThumbnail.TryGet(sourcePath, Width, Height);
 
         if (source is null && type == MediaType.Video && videoEngine is not null)
             source = VideoThumbnail.TryGet(videoEngine, sourcePath, Width, Height);
@@ -91,6 +99,38 @@ public static class MediaThumbnails
         catch (Exception ex)
         {
             Log.Debug(ex, "No se pudieron limpiar las miniaturas huérfanas");
+        }
+    }
+
+    /// <summary>
+    /// The image shrunk to <see cref="PosterSize.LongSide"/> on its long side,
+    /// keeping its shape; null when WPF cannot read the file.
+    /// </summary>
+    private static BitmapSource? ImagePoster(string path)
+    {
+        try
+        {
+            var uri = new Uri(path);
+
+            // Only the header: no pixels are decoded to learn the size.
+            var frame = BitmapDecoder.Create(uri, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None).Frames[0];
+            var (width, height) = PosterSize.For(frame.PixelWidth, frame.PixelHeight);
+
+            var bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.UriSource = uri;
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+            bitmap.DecodePixelWidth = width;
+            bitmap.DecodePixelHeight = height;
+            bitmap.EndInit();
+            bitmap.Freeze();
+            return bitmap;
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "No se pudo dibujar la miniatura de {Path}", path);
+            return null;
         }
     }
 
