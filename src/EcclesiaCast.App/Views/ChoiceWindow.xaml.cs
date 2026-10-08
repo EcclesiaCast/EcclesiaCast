@@ -10,11 +10,17 @@ namespace EcclesiaCast.App.Views;
 /// </summary>
 public partial class ChoiceWindow : Window
 {
-    public ChoiceWindow(string title, string message, IReadOnlyList<string> options)
+    public ChoiceWindow(string title, string message, IReadOnlyList<string> options, string? rememberLabel = null)
     {
         InitializeComponent();
         Title = title;
         MessageText.Text = message;
+
+        if (!string.IsNullOrEmpty(rememberLabel))
+        {
+            RememberBox.Content = rememberLabel;
+            RememberBox.Visibility = Visibility.Visible;
+        }
 
         for (var i = 0; i < options.Count; i++)
         {
@@ -32,6 +38,7 @@ public partial class ChoiceWindow : Window
             button.Click += (_, _) =>
             {
                 Chosen = index;
+                Remember = RememberBox.IsChecked == true;
                 DialogResult = true;
             };
             OptionsPanel.Children.Add(button);
@@ -40,4 +47,7 @@ public partial class ChoiceWindow : Window
 
     /// <summary>Index of the chosen option, or -1 when the window was closed.</summary>
     public int Chosen { get; private set; } = -1;
+
+    /// <summary>The "do the same with the rest" box was ticked when the option was picked.</summary>
+    public bool Remember { get; private set; }
 }

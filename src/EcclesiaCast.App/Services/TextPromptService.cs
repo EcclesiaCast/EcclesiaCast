@@ -13,13 +13,19 @@ public sealed class TextPromptService : ITextPrompt
         return window.ShowDialog() == true ? window.Value : null;
     }
 
-    public int Choose(string title, string message, IReadOnlyList<string> options)
+    public int Choose(string title, string message, IReadOnlyList<string> options) =>
+        ChooseAndRemember(title, message, options, rememberLabel: null).Index;
+
+    public (int Index, bool Repeat) ChooseAndRemember(
+        string title, string message, IReadOnlyList<string> options, string? rememberLabel)
     {
-        var window = new ChoiceWindow(title, message, options)
-        {
-            Owner = System.Windows.Application.Current.MainWindow,
-        };
-        return window.ShowDialog() == true ? window.Chosen : -1;
+        // Over whichever window the operator is looking at: a question asked
+        // from inside an import window must not hide behind the main one.
+        var app = System.Windows.Application.Current;
+        var owner = app.Windows.OfType<System.Windows.Window>().FirstOrDefault(w => w.IsActive)
+                    ?? app.MainWindow;
+        var window = new ChoiceWindow(title, message, options, rememberLabel) { Owner = owner };
+        return window.ShowDialog() == true ? (window.Chosen, window.Remember) : (-1, false);
     }
 
     public (string First, string Second)? AskTwo(

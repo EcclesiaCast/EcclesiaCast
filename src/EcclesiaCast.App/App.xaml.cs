@@ -117,6 +117,7 @@ public partial class App : Application
         services.AddSingleton<IBibleRepository>(_ => new BibleRepository(dbPath));
         services.AddSingleton<IBibleImportDialog, BibleImportDialogService>();
         services.AddSingleton<ITextPrompt, TextPromptService>();
+        services.AddSingleton<SongSaver>();
         services.AddSingleton<IThemeRepository>(_ => new ThemeRepository(dbPath));
         services.AddSingleton<IThemeManagerDialog, ThemeManagerDialogService>();
         services.AddSingleton<ISongDesigner, SongDesignerService>();

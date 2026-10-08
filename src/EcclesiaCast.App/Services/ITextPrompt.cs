@@ -13,6 +13,14 @@ public interface ITextPrompt
     int Choose(string title, string message, IReadOnlyList<string> options);
 
     /// <summary>
+    /// The same, with a box under the buttons that the operator can tick to
+    /// say "do this for the rest too" (the next ones of a batch). Index -1
+    /// when cancelled.
+    /// </summary>
+    (int Index, bool Repeat) ChooseAndRemember(
+        string title, string message, IReadOnlyList<string> options, string? rememberLabel);
+
+    /// <summary>
     /// Asks for two values in the same window (a name and its abbreviation,
     /// say). Null if the operator cancelled.
     /// </summary>

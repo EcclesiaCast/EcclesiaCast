@@ -43,11 +43,11 @@ public partial class WebSongSearchWindow : Window
     private const int FullRank = 1;
     private const int FallbackRank = 2;
 
-    private readonly ISongRepository _songs;
+    private readonly SongSaver _songSaver;
     private readonly WebSongClient _client = new();
     private readonly ObservableCollection<Row> _results = [];
     private readonly Dictionary<string, WebSong> _fetched = [];
-    private readonly HashSet<string> _libraryTitles;
+    private readonly List<string> _libraryTitles;
     private readonly List<Song> _imported = [];
     private readonly HashSet<string> _importedUrls = [];
 
@@ -56,15 +56,13 @@ public partial class WebSongSearchWindow : Window
     private CancellationTokenSource? _previewCancel;
     private Row? _previewRow;
 
-    public WebSongSearchWindow(ISongRepository songs)
+    public WebSongSearchWindow(SongSaver songSaver, ISongRepository songs)
     {
         InitializeComponent();
-        _songs = songs;
+        _songSaver = songSaver;
         ResultsList.ItemsSource = _results;
 
-        _libraryTitles = new HashSet<string>(
-            _songs.Search(string.Empty).Select(s => s.Title),
-            StringComparer.OrdinalIgnoreCase);
+        _libraryTitles = songs.GetTitles().Select(s => s.Title).ToList();
 
         Loaded += (_, _) =>
         {
@@ -257,8 +255,8 @@ public partial class WebSongSearchWindow : Window
         var title = TitleBox.Text.Trim();
 
         var info = slides == 1 ? "1 diapositiva." : $"{slides} diapositivas.";
-        if (title.Length > 0 && _libraryTitles.Contains(title))
-            info += $"  Ojo: ya tenés una canción llamada «{title}» en la biblioteca.";
+        if (title.Length > 0 && _libraryTitles.Any(t => SongTitles.Same(t, title)))
+            info += $"  Ojo: ya tenés una canción llamada «{title}» en la biblioteca; al importar te pregunto qué hacer.";
 
         PreviewInfoText.Text = info;
         ImportButton.IsEnabled = slides > 0 && title.Length > 0;
@@ -302,24 +300,24 @@ public partial class WebSongSearchWindow : Window
         if (title.Length == 0 || sections.Count == 0)
             return;
 
-        if (_libraryTitles.Contains(title))
-        {
-            var answer = MessageBox.Show(
-                $"Ya tenés una canción llamada «{title}» en la biblioteca.\n\n¿La importo igual, como otra canción aparte?",
-                "EcclesiaCast", MessageBoxButton.YesNo, MessageBoxImage.Question);
-            if (answer != MessageBoxResult.Yes)
-                return;
-        }
-
         try
         {
-            var song = _songs.Save(new Song
+            // A repeated title is asked about: replace, keep both or drop it.
+            var outcome = _songSaver.Begin().Save(new Song
             {
                 Title = title,
                 Artist = ArtistBox.Text.Trim(),
                 Sections = sections,
             });
 
+            if (outcome.Song is not { } song)
+            {
+                StatusText.Text = $"«{title}» no se importó: ya estaba en tu biblioteca.";
+                return;
+            }
+
+            title = song.Title;
+            _imported.RemoveAll(s => s.Id == song.Id);
             _imported.Add(song);
             _libraryTitles.Add(title);
             if (_previewRow is not null)

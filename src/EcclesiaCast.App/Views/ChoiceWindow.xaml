@@ -15,6 +15,10 @@
         <!-- Una opción por botón, llenados desde el código -->
         <StackPanel x:Name="OptionsPanel"/>
 
+        <!-- Sólo cuando la pregunta se repite en una tanda -->
+        <CheckBox x:Name="RememberBox" Visibility="Collapsed" Margin="0,14,0,0"
+                  Foreground="{StaticResource MutedBrush}"/>
+
         <Button Content="Cancelar" Style="{StaticResource DarkButton}" IsCancel="True"
                 Padding="18,9" Margin="0,14,0,0" HorizontalAlignment="Right"/>
     </StackPanel>

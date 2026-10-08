@@ -71,6 +71,12 @@ rendimiento y cómo se ve la pestaña Música.
       con mouse y Shift no. En la pestaña Resaltar, `gracia; fe` marca las dos
       cosas en todas sus apariciones. La página para OBS/vMix también tiene
       que mostrar el amarillo.
+- [ ] **Canción repetida**: guardar una canción nueva con un título que ya
+      existe (probalo con «mi gozó» en minúsculas y con otra cosa) tiene que
+      mostrar las tres opciones. Con una tanda de archivos o de ProPresenter,
+      la casilla «Hacer lo mismo con las demás» tiene que responder sola las
+      siguientes. Las reglas y el guardado se probaron por dentro; la
+      ventana, dibujada, no con el mouse.
 - [ ] **Preguntas al agregar un video de YouTube** (🔗 o ▶ YouTube): elegir
       «Reproducir por internet» o «Descargar», y ver la marca 🌐 internet en
       las tarjetas de YouTube. La descarga nueva depende de internet y del

@@ -1,6 +1,7 @@
 using System.IO;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
+using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Songs;
 using Serilog;
@@ -29,13 +30,13 @@ public partial class ProPresenterImportWindow : Window
         private bool _selected = library.SongCount > 0;
     }
 
-    private readonly ISongRepository _songs;
+    private readonly SongSaver _songSaver;
     private readonly List<Row> _rows = [];
 
-    public ProPresenterImportWindow(ISongRepository songs)
+    public ProPresenterImportWindow(SongSaver songSaver)
     {
         InitializeComponent();
-        _songs = songs;
+        _songSaver = songSaver;
         LibrariesList.ItemsSource = _rows;
 
         Loaded += (_, _) => Discover();
@@ -219,15 +220,12 @@ public partial class ProPresenterImportWindow : Window
         ProgressText.Visibility = Visibility.Visible;
         Progress.Maximum = files.Count;
 
-        var skipExisting = SkipExistingCheck.IsChecked == true;
+        // Titles are matched in memory by the saver: asking the database once
+        // per song turns a 300-song import into 300 round trips. A repeated
+        // title is asked about, with a box to answer the same for the rest.
+        var session = _songSaver.Begin(several: true);
 
-        // Titles are matched in memory: asking the database once per song
-        // turns a 300-song import into 300 round trips.
-        var existing = new HashSet<string>(
-            _songs.Search(string.Empty).Select(s => s.Title),
-            StringComparer.OrdinalIgnoreCase);
-
-        int imported = 0, skipped = 0, failed = 0, cloudOnly = 0;
+        int imported = 0, replaced = 0, skipped = 0, discarded = 0, failed = 0, cloudOnly = 0;
 
         for (var i = 0; i < files.Count; i++)
         {
@@ -251,14 +249,12 @@ public partial class ProPresenterImportWindow : Window
                     continue;
                 }
 
-                if (skipExisting && !existing.Add(song.Title))
+                switch (session.Save(song).Result)
                 {
-                    skipped++;
-                    continue;
+                    case SongSaveResult.Replaced: replaced++; break;
+                    case SongSaveResult.Discarded: discarded++; break;
+                    default: imported++; break;
                 }
-
-                _songs.Save(song);
-                imported++;
             }
             catch (IOException ex) when (ProPresenterLocator.IsCloudOnly(path))
             {
@@ -274,29 +270,33 @@ public partial class ProPresenterImportWindow : Window
             }
         }
 
-        Imported = imported;
+        Imported = imported + replaced;
 
         var parts = new List<string> { $"{imported} canciones importadas de ProPresenter" };
+        if (replaced > 0)
+            parts.Add($"{replaced} reemplazadas");
+        if (discarded > 0)
+            parts.Add($"{discarded} descartadas por repetidas");
         if (skipped > 0)
-            parts.Add($"{skipped} omitidas (vacías o repetidas)");
+            parts.Add($"{skipped} omitidas (vacías)");
         if (failed > 0)
             parts.Add($"{failed} con error (ver el log)");
         Summary = string.Join(" · ", parts) + ".";
 
         Log.Information(
-            "Importación de ProPresenter: {Imported} importadas, {Skipped} omitidas, {Failed} con error ({Cloud} sólo en la nube)",
-            imported, skipped, failed, cloudOnly);
+            "Importación de ProPresenter: {Imported} importadas, {Replaced} reemplazadas, {Discarded} descartadas, {Skipped} omitidas, {Failed} con error ({Cloud} sólo en la nube)",
+            imported, replaced, discarded, skipped, failed, cloudOnly);
 
         // Nothing came through: say so out loud instead of leaving a line in
         // the status bar that is easy to miss and looks like success.
-        if (imported == 0)
+        if (imported + replaced == 0)
         {
             var reason = cloudOnly > 0
                 ? $"Las {cloudOnly} canciones están en OneDrive y todavía no bajaron a esta computadora.\n\n"
                   + "Abrí la carpeta en el Explorador, clic derecho sobre ella → «Conservar siempre en "
                   + "este dispositivo», esperá a que termine de bajar y volvé a intentar."
-                : skipped == files.Count
-                    ? "Todas ya estaban en tu biblioteca."
+                : discarded > 0 && discarded + skipped == files.Count
+                    ? "Todas ya estaban en tu biblioteca y las descartaste."
                     : "No se pudo leer ninguna. El detalle está en el registro de la aplicación.";
 
             MessageBox.Show(

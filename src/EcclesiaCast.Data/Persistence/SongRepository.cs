@@ -32,6 +32,14 @@ public sealed class SongRepository(string dbPath) : ISongRepository
         return result;
     }
 
+    public IReadOnlyList<SongTitle> GetTitles()
+    {
+        using var db = new AppDbContext(dbPath);
+        return db.Songs.AsNoTracking()
+            .Select(s => new SongTitle(s.Id, s.Title))
+            .ToList();
+    }
+
     public Song? Get(int id)
     {
         using var db = new AppDbContext(dbPath);

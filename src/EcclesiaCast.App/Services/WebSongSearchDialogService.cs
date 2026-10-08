@@ -5,11 +5,11 @@ using EcclesiaCast.Core.Songs;
 
 namespace EcclesiaCast.App.Services;
 
-public sealed class WebSongSearchDialogService(ISongRepository songs) : IWebSongSearchDialog
+public sealed class WebSongSearchDialogService(SongSaver songSaver, ISongRepository songs) : IWebSongSearchDialog
 {
     public IReadOnlyList<Song> Show()
     {
-        var window = new WebSongSearchWindow(songs)
+        var window = new WebSongSearchWindow(songSaver, songs)
         {
             Owner = Application.Current.MainWindow,
         };

@@ -139,6 +139,17 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Cambiado
 
+- **Canción repetida: el programa pregunta.** Al guardar una canción nueva o
+  traerla (escrita desde cero, de un archivo, de ProPresenter o de internet)
+  con un título que ya existe (sin distinguir mayúsculas ni acentos), una
+  ventanita ofrece **Guardar como «Título (1)»** (con el primer número libre;
+  las dos quedan), **Reemplazar** la que ya estaba (conserva su tema) o
+  **Descartar** la nueva. Si se traen varias juntas, una casilla «Hacer lo
+  mismo con las demás» evita responder una por una. Antes los archivos y
+  ProPresenter salteaban en silencio las repetidas, y desde cero se guardaba
+  una segunda igual. En la ventana de ProPresenter ya no está la casilla
+  «Omitir las que ya están»: la pregunta la reemplaza.
+
 - **Resaltar: varias cosas, y sólo la que elegís.** Al marcar en el LIVE
   (clic o arrastre) se resalta sólo esa vez en el texto, no todas las veces que
   aparece la palabra. Con **Shift** se suma otra marca sin perder las

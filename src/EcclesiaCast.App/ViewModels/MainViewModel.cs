@@ -47,6 +47,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private readonly IBibleRepository _bibles;
     private readonly IBibleImportDialog _bibleImportDialog;
     private readonly ITextPrompt _textPrompt;
+    private readonly SongSaver _songSaver;
     private readonly IThemeRepository _themes;
     private readonly IThemeManagerDialog _themeManager;
     private readonly ISongDesigner _songDesigner;
@@ -264,6 +265,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         IBibleRepository bibles,
         IBibleImportDialog bibleImportDialog,
         ITextPrompt textPrompt,
+        SongSaver songSaver,
         IThemeRepository themes,
         IThemeManagerDialog themeManager,
         ISongDesigner songDesigner,
@@ -293,6 +295,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _bibles = bibles;
         _bibleImportDialog = bibleImportDialog;
         _textPrompt = textPrompt;
+        _songSaver = songSaver;
         _themes = themes;
         _themeManager = themeManager;
         _songDesigner = songDesigner;
@@ -2984,10 +2987,21 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             return;
 
         NoteAction($"Guardar la canción «{created.Title}»");
-        var saved = _songs.Save(created);
+        var outcome = _songSaver.Begin().Save(created);
+        if (outcome.Song is not { } saved)
+        {
+            StatusText = $"No se guardó «{created.Title}»: ya había una canción con ese título.";
+            return;
+        }
+
         LoadSongs();
         SelectedSong = Songs.FirstOrDefault(s => s.Id == saved.Id);
-        StatusText = $"Canción \"{saved.Title}\" guardada.";
+        StatusText = outcome.Result switch
+        {
+            SongSaveResult.Replaced => $"Canción \"{saved.Title}\" reemplazada.",
+            SongSaveResult.SavedAsCopy => $"Canción guardada como \"{saved.Title}\".",
+            _ => $"Canción \"{saved.Title}\" guardada.",
+        };
     }
 
     [RelayCommand]
@@ -3067,7 +3081,11 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (dialog.ShowDialog() != true)
             return;
 
-        int imported = 0, skipped = 0, failed = 0;
+        int imported = 0, replaced = 0, skipped = 0, discarded = 0, failed = 0;
+
+        // One question about a repeated title is asked once per song, unless
+        // the operator ticks "the same for the rest".
+        var session = _songSaver.Begin(several: dialog.FileNames.Length > 1);
 
         foreach (var path in dialog.FileNames)
         {
@@ -3084,16 +3102,12 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                     continue;
                 }
 
-                var duplicate = _songs.Search(song.Title).Any(s =>
-                    string.Equals(s.Title, song.Title, StringComparison.OrdinalIgnoreCase));
-                if (duplicate)
+                switch (session.Save(song).Result)
                 {
-                    skipped++;
-                    continue;
+                    case SongSaveResult.Replaced: replaced++; break;
+                    case SongSaveResult.Discarded: discarded++; break;
+                    default: imported++; break;
                 }
-
-                _songs.Save(song);
-                imported++;
             }
             catch (Exception ex)
             {
@@ -3105,8 +3119,12 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         LoadSongs();
 
         var parts = new List<string> { $"{imported} canciones importadas" };
+        if (replaced > 0)
+            parts.Add($"{replaced} reemplazadas");
+        if (discarded > 0)
+            parts.Add($"{discarded} descartadas por repetidas");
         if (skipped > 0)
-            parts.Add($"{skipped} omitidas (vacías o ya existentes)");
+            parts.Add($"{skipped} omitidas (vacías)");
         if (failed > 0)
             parts.Add($"{failed} con error (ver log)");
         StatusText = string.Join(" · ", parts) + ".";

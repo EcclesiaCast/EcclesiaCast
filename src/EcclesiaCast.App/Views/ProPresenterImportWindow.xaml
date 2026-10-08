@@ -86,8 +86,8 @@
                 </DockPanel>
             </Border>
 
-            <CheckBox x:Name="SkipExistingCheck" IsChecked="True"
-                      Content="Omitir las canciones que ya están en la biblioteca (por título)"/>
+            <TextBlock FontSize="11" Foreground="{StaticResource FaintBrush}" TextWrapping="Wrap"
+                       Text="Si una canción ya está en la biblioteca (mismo título), el programa pregunta qué hacer: reemplazarla, guardar las dos o descartar la nueva."/>
             <TextBlock x:Name="ProgressText" FontSize="11" Foreground="{StaticResource MutedBrush}"
                        Margin="0,10,0,0" Visibility="Collapsed"/>
             <ProgressBar x:Name="Progress" Height="4" Margin="0,6,0,0"

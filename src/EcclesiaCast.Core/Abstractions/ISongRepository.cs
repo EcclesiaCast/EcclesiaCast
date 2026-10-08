@@ -12,6 +12,9 @@ public interface ISongRepository
 
     Song? Get(int id);
 
+    /// <summary>Id and title of every song, without their lyrics: the cheap way to ask whether a title is taken.</summary>
+    IReadOnlyList<SongTitle> GetTitles();
+
     /// <summary>Inserts (Id 0) or updates a song, replacing its sections.</summary>
     Song Save(Song song);
 
