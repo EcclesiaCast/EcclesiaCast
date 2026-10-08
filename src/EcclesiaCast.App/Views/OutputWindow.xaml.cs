@@ -37,6 +37,14 @@ public partial class OutputWindow : Window
 
     private bool _forwardingFrames;
 
+    /// <summary>
+    /// The background is a heavy video (4K, 50+ frames). The operator's LIVE
+    /// panel shows its poster instead of a moving copy: the projector already
+    /// has all it can do with that picture, and shrinking every frame for a
+    /// small panel would take more of the same processor.
+    /// </summary>
+    private bool _backgroundIsHeavy;
+
     private void OnPreviewFrame(object? sender, System.Windows.Media.ImageSource? frame) =>
         VideoFrameChanged?.Invoke(this, frame);
 
@@ -51,13 +59,14 @@ public partial class OutputWindow : Window
         var low = PerformanceMode.IsLow;
         Projected.AnimateTransitions = !low;
 
-        if (low && _forwardingFrames)
+        var forward = !low && !_backgroundIsHeavy;
+        if (!forward && _forwardingFrames)
         {
             Video.PreviewFrameChanged -= OnPreviewFrame;
             _forwardingFrames = false;
             VideoFrameChanged?.Invoke(this, null);
         }
-        else if (!low && !_forwardingFrames)
+        else if (forward && !_forwardingFrames)
         {
             Video.PreviewFrameChanged += OnPreviewFrame;
             _forwardingFrames = true;
@@ -131,6 +140,14 @@ public partial class OutputWindow : Window
     private void UpdateVideo()
     {
         var background = (DataContext as ProjectionViewModel)?.Background;
+
+        var heavy = background is not null && LightVideoCache.IsHeavy(background);
+        if (heavy != _backgroundIsHeavy)
+        {
+            _backgroundIsHeavy = heavy;
+            if (IsLoaded)
+                ApplyPerformance();
+        }
 
         if (background is { Type: MediaType.YouTube })
         {

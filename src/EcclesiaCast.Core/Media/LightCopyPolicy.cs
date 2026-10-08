@@ -58,6 +58,16 @@ public static class LightCopyPolicy
         return shrink || num > 0 ? new LightCopyPlan(shrink, num, den) : null;
     }
 
+    /// <summary>Whether a video is heavy enough for a light copy to be offered.</summary>
+    public static bool IsHeavy(VideoStreamInfo video) => Plan(video) is not null;
+
+    /// <summary>
+    /// The video in words for the question that offers a copy: "3840×2160, 60
+    /// cuadros por segundo". Both numbers are given, whichever one made it heavy.
+    /// </summary>
+    public static string Describe(VideoStreamInfo video) =>
+        $"{video.Width}×{video.Height}, {Math.Round(video.FrameRate):0} cuadros por segundo";
+
     /// <summary>
     /// How much the picture can shrink and still cover the whole screen —
     /// the larger of the two ratios, so neither side ends up softer than the

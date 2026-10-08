@@ -77,4 +77,24 @@ public class LightCopyPolicyTests
     {
         Assert.Null(LightCopyPolicy.Plan(new VideoStreamInfo(0, 0, 30, 1)));
     }
+
+    [Theory]
+    [InlineData(3840, 2160, 30, 1, true)]
+    [InlineData(1920, 1080, 60, 1, true)]
+    [InlineData(1920, 1080, 50, 1, true)]
+    [InlineData(1920, 1080, 30000, 1001, false)]
+    [InlineData(1280, 720, 30, 1, false)]
+    public void A_video_is_heavy_when_it_is_4K_or_runs_at_50_frames_or_more(
+        int width, int height, int rateNumerator, int rateDenominator, bool heavy)
+    {
+        Assert.Equal(heavy, LightCopyPolicy.IsHeavy(new VideoStreamInfo(width, height, rateNumerator, rateDenominator)));
+    }
+
+    [Fact]
+    public void The_question_describes_the_video_in_words()
+    {
+        var text = LightCopyPolicy.Describe(new VideoStreamInfo(3840, 2160, 60000, 1001));
+
+        Assert.Equal("3840×2160, 60 cuadros por segundo", text);
+    }
 }

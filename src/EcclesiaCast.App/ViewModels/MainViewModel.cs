@@ -1332,6 +1332,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         var added = 0;
         var skipped = 0;
         var documents = new List<string>();
+        var newVideos = new List<(string Path, string Name)>();
 
         foreach (var path in paths)
         {
@@ -1371,6 +1372,8 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 Behavior = MediaBehavior.Background,
             });
             added++;
+            if (type == MediaType.Video)
+                newVideos.Add((path, Path.GetFileNameWithoutExtension(path)));
         }
 
         LoadMedia();
@@ -1383,10 +1386,143 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 ? $"No se agregó nada: sólo entran imágenes, videos, PDF y PowerPoint."
                 : $"{added} medio(s) agregado(s) a «{SelectedMediaTab}».{ignored}";
         _ = RefreshVideoThumbnailsAsync();
+
+        // The new videos wait for their answer before the background work may
+        // make (or skip) a copy of them.
+        LightVideoCache.Hold(newVideos.Select(v => v.Path));
         RefreshLightCopies();
+        if (newVideos.Count > 0)
+            _ = OfferLightCopiesAsync(newVideos);
 
         if (documents.Count > 0)
             _ = ImportDocumentsAsync(documents);
+    }
+
+    /// <summary>
+    /// A 4K video, or one of 50 frames or more, costs the projection computer
+    /// several times what a 1080p one does and looks the same on the projector.
+    /// For each such video just brought in, asks whether to make a lighter
+    /// copy; yes makes it now, with a bar. The original stays where it is and
+    /// stays in the library: the copy is only the file played in its place.
+    /// </summary>
+    private async Task OfferLightCopiesAsync(IReadOnlyList<(string Path, string Name)> videos)
+    {
+        try
+        {
+            if (!LightVideoCache.IsAvailable)
+                return;
+
+            var heavy = new List<(string Path, string Name, VideoStreamInfo Info)>();
+            foreach (var (path, name) in videos)
+            {
+                var info = await LightVideoCache.ProbeAsync(path);
+                if (info is not null && LightCopyPolicy.IsHeavy(info))
+                    heavy.Add((path, name, info));
+            }
+
+            int? sameForAll = null;
+            for (var i = 0; i < heavy.Count; i++)
+            {
+                var (path, name, info) = heavy[i];
+
+                int choice;
+                if (sameForAll is { } remembered)
+                {
+                    choice = remembered;
+                }
+                else
+                {
+                    var more = i < heavy.Count - 1;
+                    var (index, repeat) = _textPrompt.ChooseAndRemember(
+                        "Video muy pesado",
+                        "Este video es muy pesado para proyectar. ¿Hago una copia más liviana?\n\n"
+                        + $"«{name}» ({LightCopyPolicy.Describe(info)})\n\n"
+                        + "La copia se parece al original y es la que se proyecta; tu archivo queda como está "
+                        + "y la biblioteca guarda los dos. Sin copia, en una computadora lenta el video puede andar a los saltos.",
+                        [
+                            "Sí, hacer la copia ahora (tarda unos minutos)",
+                            "No, proyectar el original",
+                        ],
+                        more ? "Hacer lo mismo con los demás videos pesados" : null);
+                    choice = index;
+                    if (repeat)
+                        sameForAll = index;
+                }
+
+                if (choice == 0)
+                    MakeLightCopy(path, name);
+                else
+                    LightVideoCache.Decline(path);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "No se pudo ofrecer la copia liviana de los videos nuevos");
+        }
+        finally
+        {
+            LightVideoCache.Release(videos.Select(v => v.Path));
+            RefreshLightCopies();
+        }
+    }
+
+    /// <summary>Runs the window that makes the copy; a cancelled copy is remembered as "no".</summary>
+    private void MakeLightCopy(string path, string name)
+    {
+        var window = new Views.LightCopyWindow(path, name) { Owner = Application.Current.MainWindow };
+        var done = window.ShowDialog() == true;
+
+        if (done)
+        {
+            StatusText = $"Copia liviana lista: «{name}». La biblioteca guarda el original y la copia.";
+            return;
+        }
+
+        if (window.Cancelled)
+            LightVideoCache.Decline(path);
+
+        StatusText = window.Cancelled
+            ? $"Sin copia liviana de «{name}»: se proyecta el original. Clic derecho sobre el video → Hacer una copia liviana, si querés hacerla después."
+            : $"No se pudo hacer la copia liviana de «{name}»: se proyecta el original.";
+    }
+
+    /// <summary>
+    /// The way back for a video that was left without its copy: right click →
+    /// «Hacer una copia liviana». Tells the operator when it is not needed.
+    /// </summary>
+    [RelayCommand]
+    private async Task MakeLightCopyOf(MediaItem? item)
+    {
+        if (item is not { Type: MediaType.Video } || !File.Exists(item.Path))
+            return;
+
+        if (!LightVideoCache.IsAvailable)
+        {
+            StatusText = "Para hacer copias livianas hace falta ffmpeg, y no se encontró en esta computadora.";
+            return;
+        }
+
+        var info = await LightVideoCache.ProbeAsync(item.Path);
+        if (info is null)
+        {
+            StatusText = $"No se pudo leer «{item.Name}».";
+            return;
+        }
+
+        if (!LightCopyPolicy.IsHeavy(info))
+        {
+            StatusText = $"«{item.Name}» ({LightCopyPolicy.Describe(info)}) ya es liviano: no hace falta una copia.";
+            return;
+        }
+
+        if (LightVideoCache.HasCopy(item.Path))
+        {
+            StatusText = $"«{item.Name}» ya tiene su copia liviana.";
+            return;
+        }
+
+        MakeLightCopy(item.Path, item.Name);
+        RefreshLightCopies();
     }
 
     /// <summary>

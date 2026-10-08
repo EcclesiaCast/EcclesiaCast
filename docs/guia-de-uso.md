@@ -151,6 +151,13 @@ En la barra **MEDIOS**, abajo:
 > **nunca empiezan con la salida prendida**; la barra de abajo avisa cuando
 > una está lista. Los videos que ya son livianos (como los loops de 1080p a
 > 30) se reproducen directo del original.
+>
+> **Al agregar un video pesado** (4K, o de 50 cuadros o más), el programa
+> pregunta «¿Hago una copia más liviana?». Con **Sí** la copia se hace en ese
+> momento, con una barra de avance (y **Cancelar** si no querés esperar); con
+> **No** se proyecta el original y no se vuelve a preguntar. Para hacerla más
+> tarde: clic derecho sobre el video → **Hacer una copia liviana…**. En el panel
+> LIVE, estos videos se muestran con su imagen quieta en vez de moverse.
 
 > Para que el texto se vea *sobre* el fondo, el tema tiene que tener el fondo
 > transparente (los temas nuevos ya vienen así).

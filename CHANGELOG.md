@@ -9,6 +9,19 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Videos pesados: el programa pregunta y se hace la copia al momento.** Al
+  agregar un video de 4K o de 50 cuadros por segundo o más (con el botón
+  Agregar o arrastrándolo), aparece «Este video es muy pesado para proyectar.
+  ¿Hago una copia más liviana?». Con **Sí** se hace en el momento, con una
+  barra que avanza y un botón Cancelar; con **No** el video se proyecta
+  tal cual y el programa se acuerda, así que no hace la copia a escondidas.
+  Si agregás varios, una casilla permite contestar lo mismo para todos. La
+  biblioteca guarda los dos: el original, que no se toca, y la copia liviana,
+  que es la que se proyecta. Para hacerla después, clic derecho sobre el
+  video → **Hacer una copia liviana…**. Además, en el panel LIVE los videos
+  pesados se ven con su imagen quieta (como los de YouTube), porque dibujar
+  ahí un segundo video en movimiento le quitaba trabajo al proyector.
+
 - **Pantalla de carga y «Acerca de» la primera vez.** Al abrir el programa
   aparece una pantalla con el logo, el nombre y la versión mientras carga, y se
   va sola cuando se ve la ventana principal. La **primera vez** que se abre, se

@@ -75,6 +75,13 @@ public partial class ProjectedView : UserControl
 
     private string? _lastImagePath;
 
+    /// <summary>
+    /// The background is a heavy video (4K, 50+ frames): in the operator's
+    /// panels it stays a still poster, like a YouTube video, instead of a
+    /// moving copy of a picture the projector already finds hard to draw.
+    /// </summary>
+    private bool _backgroundIsHeavy;
+
     public ProjectedView()
     {
         InitializeComponent();
@@ -185,6 +192,7 @@ public partial class ProjectedView : UserControl
     private void OnBackgroundChanged()
     {
         var media = BackgroundMedia;
+        _backgroundIsHeavy = !IsLiveOutput && media is not null && LightVideoCache.IsHeavy(media);
 
         // Let the slide layer know it is sitting on top of media, so the
         // theme's background colour doesn't paint over it.
@@ -277,7 +285,7 @@ public partial class ProjectedView : UserControl
         // Only a video background has frames to show. Anything else (an
         // image, say the offering slide) must never sit under a leftover
         // frame of the video that played before it.
-        var frame = IsLiveOutput || PerformanceMode.IsLow || BackgroundMedia?.Type != MediaType.Video
+        var frame = IsLiveOutput || PerformanceMode.IsLow || _backgroundIsHeavy || BackgroundMedia?.Type != MediaType.Video
             ? null
             : LiveVideoFrame;
         LiveVideo.Source = frame;

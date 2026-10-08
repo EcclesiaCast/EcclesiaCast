@@ -1768,6 +1768,22 @@
                                                 <MenuItem Header="Propiedades (Inspector)…"
                                                           Command="{Binding PlacementTarget.Tag.InspectMediaCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                           CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                <!-- Sólo en los videos de archivo (los de YouTube no tienen qué aliviar) -->
+                                                <MenuItem Header="Hacer una copia liviana…"
+                                                          Command="{Binding PlacementTarget.Tag.MakeLightCopyOfCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                          ToolTip="Para un video de 4K o de 50 cuadros o más que anda a los saltos: se hace una copia más liviana para proyectar. El original queda donde está y la biblioteca guarda los dos.">
+                                                    <MenuItem.Style>
+                                                        <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding PlacementTarget.DataContext.Type, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Value="Video">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </MenuItem.Style>
+                                                </MenuItem>
                                                 <MenuItem Header="Abrir ubicación del archivo"
                                                           Command="{Binding PlacementTarget.Tag.OpenMediaLocationCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                           CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>

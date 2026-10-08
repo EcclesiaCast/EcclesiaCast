@@ -125,6 +125,14 @@ rendimiento y cómo se ve la pestaña Música.
       al cerrar y abrir el programa se acuerda de cuál dejaste. Se vio
       dibujado en las tres pestañas y separado, y se probó por dentro que la
       elección se guarda; falta con el mouse y con un video de verdad.
+- [ ] **Videos pesados**: agregar un video de 4K o de 50-60 cuadros (por el
+      botón Agregar y arrastrándolo): tiene que preguntar «¿Hago una copia más
+      liviana?». Con Sí, mirar la barra y que el video proyecte la copia; con
+      No, que se proyecte el original; y clic derecho → Hacer una copia
+      liviana… como camino de vuelta. En el LIVE tiene que verse la imagen quieta
+      del video pesado. Probado por dentro con videos de prueba (4K a 60,
+      1080p a 60, 1080p a 30): preguntas, copia con avance, cancelar sin dejar
+      restos y el póster en el LIVE; las ventanas, dibujadas, no abiertas.
 
 ## 2. Para hacer
 
