@@ -18,9 +18,9 @@ public readonly record struct FramedRect(double X, double Y, double Width, doubl
 /// picture is drawn as «Ajustar» would (everything inside the box, centred)
 /// and the rest is a scale and a shift of that whole picture.
 ///
-/// The picture is anchored at the top-left corner of its box, where
-/// UniformToFill has always put it: «Rellenar» without zoom or shift looks
-/// exactly as it always did.
+/// The covering picture is centred on its box, so what is cut is cut evenly
+/// from both sides (WPF's UniformToFill anchored it at the top-left corner,
+/// showing the top of a tall photo and the left of a wide one).
 /// </summary>
 public static class FillFraming
 {
@@ -68,18 +68,11 @@ public static class FillFraming
         var cover = Math.Max(boxWidth / sourceWidth, boxHeight / sourceHeight);
         var coverScale = cover / fit;
 
-        var centreX = containerWidth / 2;
-        var centreY = containerHeight / 2;
-
-        // Where the middle of the covering picture sits (its corner is the
-        // box's corner), against the middle of the container, which is where
-        // the drawn picture's own middle is.
-        var coverCentreX = centreX - boxWidth / 2 + sourceWidth * cover / 2;
-        var coverCentreY = centreY - boxHeight / 2 + sourceHeight * cover / 2;
-
+        // The drawn picture's middle is the container's middle, and so is the
+        // covering picture's: only the shift moves it.
         var scale = coverScale * zoom;
-        var moveX = (coverCentreX - centreX) * zoom + shiftX;
-        var moveY = (coverCentreY - centreY) * zoom + shiftY;
+        var moveX = shiftX;
+        var moveY = shiftY;
 
         FramedRect? window = null;
         if (hasFrame)
@@ -108,8 +101,8 @@ public static class FillFraming
     {
         var cover = Math.Max(boxWidth / sourceWidth, boxHeight / sourceHeight);
         return new FramedRect(
-            (containerWidth - boxWidth) / 2,
-            (containerHeight - boxHeight) / 2,
+            (containerWidth - sourceWidth * cover) / 2,
+            (containerHeight - sourceHeight * cover) / 2,
             sourceWidth * cover,
             sourceHeight * cover);
     }

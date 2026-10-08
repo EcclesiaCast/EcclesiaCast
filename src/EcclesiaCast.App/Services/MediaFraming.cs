@@ -123,10 +123,9 @@ public static class MediaFraming
     }
 
     /// <summary>
-    /// «Rellenar»: the picture covers the box, anchored at the box's top-left
-    /// corner — where WPF's own UniformToFill has always put it (it does not
-    /// centre the overflow), so nothing that is on screen today moves — and
-    /// zooming works from the middle of the screen. With a fixed size the box
+    /// «Rellenar»: the picture covers the box, centred on it (WPF's own
+    /// UniformToFill anchors it at the top-left corner instead), and zooming
+    /// works from the middle of the screen. With a fixed size the box
     /// stays where it is: it is a window onto the picture, which moves and
     /// zooms behind it.
     /// </summary>

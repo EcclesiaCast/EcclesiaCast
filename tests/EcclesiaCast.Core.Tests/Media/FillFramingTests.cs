@@ -42,40 +42,40 @@ public class FillFramingTests
     }
 
     [Fact]
-    public void A_tall_page_covers_the_screen_from_its_top_left_corner()
+    public void A_tall_page_covers_the_screen_from_its_middle()
     {
         // 600×850 covers 1920 wide, so it is 2720 high; the part shown is the
-        // top, as UniformToFill has always shown it.
+        // middle, with 820 cut above and 820 below.
         var final = Final(600, 850, Place(600, 850));
 
         Assert.Equal(0, final.X, 6);
-        Assert.Equal(0, final.Y, 6);
+        Assert.Equal(-820, final.Y, 6);
         Assert.Equal(1920, final.Width, 6);
         Assert.Equal(2720, final.Height, 6);
     }
 
     [Fact]
-    public void A_wide_picture_also_starts_at_the_top_left()
+    public void A_wide_picture_is_cut_evenly_on_both_sides()
     {
-        // 2:1 covers 1080 high, so it is 2160 wide and its right end is cut.
+        // 2:1 covers 1080 high, so it is 2160 wide: 120 cut on each side.
         var final = Final(1200, 600, Place(1200, 600));
 
-        Assert.Equal(0, final.X, 6);
+        Assert.Equal(-120, final.X, 6);
         Assert.Equal(0, final.Y, 6);
         Assert.Equal(2160, final.Width, 6);
         Assert.Equal(1080, final.Height, 6);
     }
 
     [Fact]
-    public void Shifting_a_tall_page_up_brings_its_bottom_to_the_bottom_of_the_screen()
+    public void Shifting_a_tall_page_reaches_both_its_top_and_its_bottom()
     {
-        // The crop used to be fixed: the page could never be moved down to
-        // its end. 2720 − 1080 = 1640 pixels is 1.52 screens: more than the
-        // old limit of one.
-        var final = Final(600, 850, Place(600, 850, shiftY: -1640));
+        // The crop used to be fixed: the page could never be moved to its
+        // end. Now the whole of it is there to move through.
+        var top = Final(600, 850, Place(600, 850, shiftY: 820));
+        var bottom = Final(600, 850, Place(600, 850, shiftY: -820));
 
-        Assert.Equal(H, final.Bottom, 6);
-        Assert.InRange(1640 / H, 1.01, 10);
+        Assert.Equal(0, top.Y, 6);
+        Assert.Equal(H, bottom.Bottom, 6);
     }
 
     [Fact]
@@ -147,22 +147,31 @@ public class FillFramingTests
     }
 
     [Fact]
-    public void The_natural_bounds_of_a_tall_page_hang_below_the_screen()
+    public void The_natural_bounds_of_a_tall_page_hang_above_and_below_the_screen()
     {
         var bounds = FillFraming.NaturalBounds(600, 850, W, H, W, H);
 
-        Assert.Equal(new FramedRect(0, 0, 1920, 2720), bounds, new RectComparer());
+        Assert.Equal(new FramedRect(0, -820, 1920, 2720), bounds, new RectComparer());
     }
 
     [Fact]
-    public void The_natural_bounds_with_a_fixed_size_start_at_the_box()
+    public void The_natural_bounds_with_a_fixed_size_are_centred_on_the_box()
     {
         var bounds = FillFraming.NaturalBounds(600, 850, W, H, 1080, 1080);
 
         Assert.Equal((W - 1080) / 2, bounds.X, 6);
-        Assert.Equal(0, bounds.Y, 6);
+        Assert.Equal((H - 1530) / 2, bounds.Y, 6);
         Assert.Equal(1080, bounds.Width, 6);
-        Assert.Equal(1080 * 850 / 600.0, bounds.Height, 6);
+        Assert.Equal(1530, bounds.Height, 6);
+    }
+
+    [Fact]
+    public void The_natural_bounds_match_the_placement()
+    {
+        var bounds = FillFraming.NaturalBounds(1200, 600, W, H, W, H);
+        var final = Final(1200, 600, Place(1200, 600));
+
+        Assert.Equal(final, bounds, new RectComparer());
     }
 
     private sealed class RectComparer : IEqualityComparer<FramedRect>

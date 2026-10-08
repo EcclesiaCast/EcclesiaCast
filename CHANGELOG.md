@@ -414,12 +414,17 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   Ahora la imagen se dibuja entera y lo único que recorta es el borde de la
   pantalla: alejando el zoom se ve más de la imagen (con el color de relleno
   donde no llega), y corriéndola se llega de arriba a abajo. El zoom ahora gira
-  alrededor del **centro de la pantalla**. Sin zoom ni corrimiento, «Rellenar»
-  se ve **exactamente igual que antes**, y «Ajustar» y «Estirar» no cambiaron.
+  alrededor del **centro de la pantalla**. «Ajustar» y «Estirar» no cambiaron.
   Vale para la salida, el LIVE y el PREVIEW, los videos y las miniaturas. Para
   poder llegar al final de una página alta, **«Correr» ahora admite hasta
   ±1000 %** de la pantalla (antes ±100 %). Con un tamaño fijo, el cuadro se
   queda quieto y la imagen se mueve y se agranda detrás.
+
+- **«Rellenar» deja la imagen centrada.** Antes quedaba pegada arriba a la
+  izquierda: una foto vertical mostraba sólo su parte de arriba y una muy
+  ancha, sólo su parte izquierda. Ahora lo que sobra se recorta parejo de los
+  dos lados, como en los demás programas. Las imágenes 16:9 se ven igual; si
+  alguna otra ya tenía un corrimiento puesto, puede que haya que acomodarla.
 
 - **Las páginas de PDF y PowerPoint se ven nítidas con zoom.** Se dibujaban a
   1920 píxeles, justo el tamaño de la pantalla, y al hacer zoom en el Encuadre
