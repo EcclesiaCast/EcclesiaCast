@@ -252,6 +252,10 @@ public partial class MainWindow : Window
         menu.IsOpen = true;
     }
 
+    /// <summary>A dimmed, bold row that names the group of entries under it.</summary>
+    private static MenuItem SectionTitle(string text) =>
+        new() { Header = text, IsEnabled = false, FontWeight = FontWeights.SemiBold, FontSize = 11 };
+
     /// <summary>Stage layouts, their editor and the screen picker, under the ▾ of the stage button.</summary>
     private void StageOptions_Click(object sender, RoutedEventArgs e)
     {
@@ -265,7 +269,7 @@ public partial class MainWindow : Window
         };
 
         // Quick switch between the saved arrangements; the one in use is ticked.
-        menu.Items.Add(new MenuItem { Header = "Escenario", IsEnabled = false });
+        menu.Items.Add(SectionTitle("Escenario"));
         foreach (var layout in vm.StageLayouts)
         {
             var item = new MenuItem
@@ -281,7 +285,7 @@ public partial class MainWindow : Window
         menu.Items.Add(new MenuItem { Header = "✏️  Editar los escenarios…", Command = vm.EditStageCommand });
 
         menu.Items.Add(new Separator());
-        menu.Items.Add(new MenuItem { Header = "Pantalla del escenario", IsEnabled = false });
+        menu.Items.Add(SectionTitle("Pantalla del escenario"));
         foreach (var display in vm.StageDisplays)
         {
             var item = new MenuItem

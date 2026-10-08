@@ -286,5 +286,356 @@
             <Setter Property="Margin" Value="16"/>
         </Style>
 
+
+        <!-- ══ Dark menus, drop-down lists and tooltips ══
+             Windows draws these with its own white theme, which clashes with
+             everything else. They are styled once, here, so every window
+             (and every menu built in code) picks them up without asking.
+             A window that declares its own style for one of these types has
+             to base it on this one (BasedOn), or it loses all of it. -->
+        <SolidColorBrush x:Key="PopupBorderBrush" Color="#3A3F4C"/>
+        <SolidColorBrush x:Key="PopupHoverBrush" Color="#2F63C9"/>
+        <SolidColorBrush x:Key="PopupSelectedBrush" Color="#243558"/>
+        <SolidColorBrush x:Key="DisabledTextBrush" Color="#7C8396"/>
+        <SolidColorBrush x:Key="AccentSoftBrush" Color="#7AA2F7"/>
+        <SolidColorBrush x:Key="TipBrush" Color="#2C3140"/>
+        <SolidColorBrush x:Key="TipBorderBrush" Color="#454B5E"/>
+
+        <!-- The box that holds the rows of a menu, wherever it opens from -->
+        <Style x:Key="MenuPopupBorder" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource PopupBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="0,4"/>
+            <Setter Property="MinWidth" Value="170"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+        </Style>
+
+        <!-- A right click menu -->
+        <Style TargetType="ContextMenu">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="HasDropShadow" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContextMenu">
+                        <Border Style="{StaticResource MenuPopupBorder}">
+                            <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto">
+                                <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle"
+                                                Grid.IsSharedSizeScope="True"/>
+                            </ScrollViewer>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- The bar at the top of the window -->
+        <Style TargetType="Menu">
+            <Setter Property="Background" Value="{StaticResource BgBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+        </Style>
+
+        <Style x:Key="{x:Static MenuItem.SeparatorStyleKey}" TargetType="Separator">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Separator">
+                        <Border Height="1" Margin="10,4" Background="{StaticResource PopupBorderBrush}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Row of a menu: tick, text, shortcut, arrow. The columns are shared
+             across the rows of one menu so the shortcuts line up. -->
+        <ControlTemplate x:Key="MenuSubItemTemplate" TargetType="MenuItem">
+            <Border x:Name="Bd" Margin="4,1" Padding="6,0" MinHeight="26" CornerRadius="4"
+                    Background="Transparent" SnapsToDevicePixels="True">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="MenuTick"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="MenuShortcut"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="MenuArrow"/>
+                    </Grid.ColumnDefinitions>
+                    <Path x:Name="Tick" Data="M0,5 L3.5,8.5 L10,1" Stroke="{StaticResource AccentSoftBrush}"
+                          StrokeThickness="1.8" Width="11" Height="9" Stretch="Fill" Margin="4,0,2,0"
+                          VerticalAlignment="Center" Visibility="Collapsed"/>
+                    <ContentPresenter Grid.Column="1" ContentSource="Header" RecognizesAccessKey="True"
+                                      Margin="8,0,12,0" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="Shortcut" Grid.Column="2" Text="{TemplateBinding InputGestureText}"
+                               Foreground="{StaticResource MutedBrush}" Margin="18,0,4,0"
+                               VerticalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <Trigger Property="Text" Value="">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <Path x:Name="Arrow" Grid.Column="3" Data="M0,0 L4,4 L0,8" Stroke="{StaticResource MutedBrush}"
+                          StrokeThickness="1.4" Width="5" Height="8" Stretch="Fill" Margin="8,0,2,0"
+                          VerticalAlignment="Center" Visibility="Collapsed"/>
+                    <Popup x:Name="PART_Popup" Placement="Right" HorizontalOffset="2" VerticalOffset="-5"
+                           IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                           AllowsTransparency="True" Focusable="False">
+                        <Border Style="{StaticResource MenuPopupBorder}">
+                            <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto">
+                                <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle"
+                                                Grid.IsSharedSizeScope="True"/>
+                            </ScrollViewer>
+                        </Border>
+                    </Popup>
+                </Grid>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="Role" Value="SubmenuHeader">
+                    <Setter TargetName="Arrow" Property="Visibility" Value="Visible"/>
+                </Trigger>
+                <Trigger Property="IsCheckable" Value="True">
+                    <Setter TargetName="Tick" Property="Visibility" Value="Hidden"/>
+                </Trigger>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter TargetName="Tick" Property="Visibility" Value="Visible"/>
+                </Trigger>
+                <Trigger Property="IsHighlighted" Value="True">
+                    <Setter TargetName="Bd" Property="Background" Value="{StaticResource PopupHoverBrush}"/>
+                    <Setter TargetName="Tick" Property="Stroke" Value="White"/>
+                    <Setter TargetName="Shortcut" Property="Foreground" Value="#D6E2FA"/>
+                    <Setter TargetName="Arrow" Property="Stroke" Value="White"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="{StaticResource DisabledTextBrush}"/>
+                    <Setter TargetName="Shortcut" Property="Foreground" Value="{StaticResource DisabledTextBrush}"/>
+                    <Setter TargetName="Arrow" Property="Stroke" Value="{StaticResource DisabledTextBrush}"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <!-- A name on the bar (Archivo, Edición…) -->
+        <ControlTemplate x:Key="MenuTopTemplate" TargetType="MenuItem">
+            <Grid SnapsToDevicePixels="True">
+                <Border x:Name="Bd" CornerRadius="4" Padding="{TemplateBinding Padding}" Background="Transparent">
+                    <ContentPresenter ContentSource="Header" RecognizesAccessKey="True" VerticalAlignment="Center"/>
+                </Border>
+                <Popup x:Name="PART_Popup" Placement="Bottom" VerticalOffset="2"
+                       IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                       AllowsTransparency="True" Focusable="False">
+                    <Border Style="{StaticResource MenuPopupBorder}">
+                        <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto">
+                            <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle"
+                                            Grid.IsSharedSizeScope="True"/>
+                        </ScrollViewer>
+                    </Border>
+                </Popup>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsHighlighted" Value="True">
+                    <Setter TargetName="Bd" Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+                <Trigger Property="IsSubmenuOpen" Value="True">
+                    <Setter TargetName="Bd" Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="{StaticResource DisabledTextBrush}"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <Style TargetType="MenuItem">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="9,3"/>
+            <Setter Property="Template" Value="{StaticResource MenuSubItemTemplate}"/>
+            <Style.Triggers>
+                <Trigger Property="Role" Value="TopLevelHeader">
+                    <Setter Property="Template" Value="{StaticResource MenuTopTemplate}"/>
+                    <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+                </Trigger>
+                <Trigger Property="Role" Value="TopLevelItem">
+                    <Setter Property="Template" Value="{StaticResource MenuTopTemplate}"/>
+                    <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Drop-down list (ComboBox). The arrow is the only thing the button
+             inside draws; the frame belongs to the box, so hover, focus and
+             "open" all light the same border. -->
+        <Style x:Key="ComboArrowToggle" TargetType="ToggleButton">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="ClickMode" Value="Press"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border Background="Transparent">
+                            <Path x:Name="Chevron" Data="M0,0 L4.5,4.5 L9,0" Stroke="{StaticResource MutedBrush}"
+                                  StrokeThickness="1.5" Width="9" Height="5" Stretch="Fill"
+                                  HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Chevron" Property="Stroke" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- The text part of an editable list (fonts, tab names) -->
+        <Style x:Key="ComboEditText" TargetType="TextBox">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CaretBrush" Value="White"/>
+            <Setter Property="SelectionBrush" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <ScrollViewer x:Name="PART_ContentHost" Focusable="False"
+                                      HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,5,28,5"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="MinHeight" Value="28"/>
+            <Setter Property="MaxDropDownHeight" Value="320"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid x:Name="Root" SnapsToDevicePixels="True">
+                            <Border x:Name="Bd" CornerRadius="4"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"/>
+                            <ToggleButton Style="{StaticResource ComboArrowToggle}"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
+                            <ContentPresenter x:Name="ContentSite" IsHitTestVisible="False"
+                                              Content="{TemplateBinding SelectionBoxItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                              ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                              Margin="{TemplateBinding Padding}"
+                                              HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <TextBox x:Name="PART_EditableTextBox" Style="{StaticResource ComboEditText}"
+                                     Foreground="{TemplateBinding Foreground}"
+                                     IsReadOnly="{TemplateBinding IsReadOnly}"
+                                     Margin="{TemplateBinding Padding}" Visibility="Hidden"
+                                     VerticalAlignment="Center"/>
+                            <Popup x:Name="PART_Popup" Placement="Bottom" Focusable="False" AllowsTransparency="True"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}">
+                                <Border Style="{StaticResource MenuPopupBorder}" Margin="0,3,0,0" Padding="4"
+                                        MinWidth="{Binding ActualWidth, ElementName=Root}"
+                                        MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <ScrollViewer SnapsToDevicePixels="True" CanContentScroll="True">
+                                        <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEditable" Value="True">
+                                <Setter Property="IsTabStop" Value="False"/>
+                                <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="ContentSite" Property="Visibility" Value="Hidden"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#4A5063"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsDropDownOpen" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.45"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Row of a drop-down list: tinted when it is the current value,
+             solid accent under the pointer or the arrow keys -->
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="9,5"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="Bd" Margin="0,1" CornerRadius="3" Background="Transparent"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource PopupSelectedBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource PopupHoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="{StaticResource DisabledTextBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- The note that says what a button does. The long ones wrap
+             instead of running off the screen. -->
+        <Style TargetType="ToolTip">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="HasDropShadow" Value="False"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="MaxWidth" Value="400"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToolTip">
+                        <Border Background="{StaticResource TipBrush}" BorderBrush="{StaticResource TipBorderBrush}"
+                                BorderThickness="1" CornerRadius="4" Padding="10,6" SnapsToDevicePixels="True">
+                            <ContentPresenter TextElement.Foreground="{TemplateBinding Foreground}">
+                                <ContentPresenter.Resources>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextWrapping" Value="Wrap"/>
+                                    </Style>
+                                </ContentPresenter.Resources>
+                            </ContentPresenter>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
     </Application.Resources>
 </Application>

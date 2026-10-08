@@ -153,6 +153,14 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Cambiado
 
+- **Menús, listas desplegables y globitos oscuros.** Los menús de arriba, los de
+  clic derecho, las listas desplegables (la pantalla de salida, la playlist, los
+  tipos de letra…) y los globitos que explican cada botón salían con el blanco
+  de Windows, que desentonaba con todo lo demás. Ahora son oscuros, con la
+  misma paleta del programa: lo que está bajo el mouse se marca en azul, lo
+  tildado lleva una tilde clara y el valor actual de una lista se ve
+  resaltado. Los globitos largos ya no se cortan: bajan de renglón.
+
 - **Pestañas de medios: nombre, regla y borrado.** Con clic derecho sobre una
   pestaña: **Cambiar nombre** (se pueden usar emojis; sus medios y sus
   opciones la acompañan), **Configurar…** y **Eliminar** (avisa que los medios

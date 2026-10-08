@@ -32,19 +32,7 @@
              Todo lo que se hace de vez en cuando (importar, copias de
              seguridad, el diseño de la ventana) vive acá; los botones quedan
              para lo que se usa en medio del servicio. -->
-        <Menu Grid.Row="0" Background="{StaticResource BgBrush}" Padding="6,2"
-              FontSize="12">
-            <Menu.ItemContainerStyle>
-                <Style TargetType="MenuItem">
-                    <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
-                    <Setter Property="Padding" Value="8,3"/>
-                    <Style.Triggers>
-                        <Trigger Property="IsHighlighted" Value="True">
-                            <Setter Property="Foreground" Value="Black"/>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </Menu.ItemContainerStyle>
+        <Menu Grid.Row="0" Padding="6,2" FontSize="12">
 
             <MenuItem Header="_Archivo">
                 <MenuItem Header="Buscar canciones en internet…" Command="{Binding SearchSongsOnlineCommand}"/>
@@ -108,7 +96,7 @@
                      ahora el ítem lo dice con una tilde. -->
                 <MenuItem Command="{Binding OpenCountdownCommand}">
                     <MenuItem.Style>
-                        <Style TargetType="MenuItem">
+                        <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
                             <Setter Property="Header" Value="Cuenta regresiva…"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsCountdownRunning}" Value="True">

@@ -29,7 +29,7 @@
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="Margin" Value="0,6,14,0"/>
         </Style>
-        <Style TargetType="ComboBox">
+        <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
             <Setter Property="FontSize" Value="12"/>
         </Style>
     </Window.Resources>

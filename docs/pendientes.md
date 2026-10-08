@@ -103,6 +103,14 @@ rendimiento y cómo se ve la pestaña Música.
       «Reproducir por internet» o «Descargar», y ver la marca 🌐 internet en
       las tarjetas de YouTube. La descarga nueva depende de internet y del
       sitio de yt-dlp: no se bajó nada desde acá.
+- [ ] **Menús y listas oscuros**: abrí los menús de arriba, hacé clic derecho
+      (una diapositiva, una pestaña de medios, una versión de la Biblia, un
+      cuadro de texto: el Cortar/Copiar/Pegar también tiene que salir oscuro),
+      abrí la lista «Salida» y las de Temas y Propiedades del medio, y dejá el
+      mouse quieto sobre un botón para ver el globito. Se miraron dibujados
+      por dentro; un menú abierto es una ventana aparte y no se abrió ninguna.
+      Ojo con las listas donde se escribe (tipografía, pestaña): tienen que
+      dejar escribir y seguir mostrando el texto en blanco.
 
 ## 2. Para hacer
 
