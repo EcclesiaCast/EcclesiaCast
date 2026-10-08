@@ -185,6 +185,20 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Cambiado
 
+- **Las notas de la edición impresa ya no se proyectan.** Algunos archivos de
+  Biblias traen pegadas al texto cosas del libro de papel. Ahora se sacan al
+  mostrar: las **rayas** (`----------`) y la nota entre corchetes que viene
+  después (por ejemplo, la de Juan 7:52 y la de Marcos 16:8 en la NTV), los
+  **títulos cortos entre corchetes** como «[Final largo de Marcos]» y los
+  **números de versículo que la TLA deja en el medio** («43b (44) Sin
+  embargo…»). Un párrafo entre corchetes que es texto de la Biblia, como el de
+  1 Samuel 10:27 en la NTV, se queda. Vale en las diapositivas, en los
+  resultados de búsqueda (Ctrl+K y el `?`) y en la cajita de «➕ Playlist», y
+  por lo tanto también en el escenario, el control remoto y la salida web. Lo
+  guardado no cambia, así que la búsqueda y la exportación siguen igual. En
+  la biblioteca de prueba cambia 3 versículos de la NTV y 3 de la TLA; la
+  RVR1960 y la NVI quedan como estaban.
+
 - **LIVE, PREVIEW y ESCENARIO en un solo recuadro.** Arriba a la derecha, en
   vez de dos recuadros uno abajo del otro, ahora hay uno solo con tres
   pestañas: **LIVE** (lo que se proyecta), **PREVIEW** (la diapositiva que

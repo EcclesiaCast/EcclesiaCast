@@ -586,7 +586,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             return;
 
         var heading = $"{BibleReferenceFormatter.Format(reference)} · {version.Abbreviation}";
-        var verses = _bibles.GetPassage(version.Id, reference);
+        var verses = BibleTextCleaner.ForList(_bibles.GetPassage(version.Id, reference), ShowSelahAndTitles);
         if (verses.Count == 0)
         {
             AddPassageHeading = $"{heading} — no existe en esta versión.";
@@ -1952,7 +1952,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         var perVersion = Math.Clamp(24 / Math.Max(1, BibleVersionOptions.Count), 4, 12);
         foreach (var option in BibleVersionOptions)
         {
-            foreach (var verse in _bibles.SearchText(option.Info.Id, query, perVersion))
+            foreach (var verse in BibleTextCleaner.ForList(_bibles.SearchText(option.Info.Id, query, perVersion), ShowSelahAndTitles))
             {
                 hits.Add(new SearchHit(
                     SearchHitKind.Verse, option.Info.Id, "†",
@@ -3152,6 +3152,13 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private SlideTheme DefaultBibleTheme =>
         Resolve(ThemeSeeder.GetDefaultId(_settings, ThemeSeeder.DefaultBibleThemeKey));
 
+    /// <summary>
+    /// Whether «Selah» and the Psalm headings are shown, as the Bible theme
+    /// says. Every place that shows a verse's text asks, so the search results
+    /// read like the slides do.
+    /// </summary>
+    private bool ShowSelahAndTitles => true;
+
     private SlideTheme Resolve(int? themeId) =>
         (themeId is int id ? _themes.Get(id) : null) ?? SlideTheme.Fallback;
 
@@ -3969,7 +3976,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             return;
         }
 
-        foreach (var result in _bibles.SearchText(PrimaryVersion.Id, words))
+        foreach (var result in BibleTextCleaner.ForList(_bibles.SearchText(PrimaryVersion.Id, words), ShowSelahAndTitles))
             BibleSearchResults.Add(result);
 
         BibleStatusText = BibleSearchResults.Count == 0
@@ -4002,7 +4009,8 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             return;
 
         NoteAction($"Abrir el capítulo {BibleBookCatalog.FindByNumber(reference.BookNumber)?.Name} {reference.Chapter} ({primary.Abbreviation})");
-        var verses = _bibles.GetPassage(primary.Id, reference);
+        var showSelah = ShowSelahAndTitles;
+        var verses = BibleTextCleaner.WithoutHiddenTitles(_bibles.GetPassage(primary.Id, reference), showSelah);
         if (verses.Count == 0)
         {
             BibleStatusText = "No se encontraron versículos para esa referencia.";
@@ -4013,7 +4021,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         Dictionary<(int Chapter, int Verse), string>? secondaryTexts = null;
         if (secondary is not null)
         {
-            secondaryTexts = _bibles.GetPassage(secondary.Id, reference)
+            secondaryTexts = BibleTextCleaner.WithoutHiddenTitles(_bibles.GetPassage(secondary.Id, reference), showSelah)
                 .ToDictionary(v => (v.Chapter, v.Verse), v => v.Text);
         }
 
@@ -4055,8 +4063,15 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             ? $"{bookName} {reference.Chapter} · {primary.Abbreviation}"
             : $"{bookName} {reference.Chapter} · {primary.Abbreviation} + {secondary.Abbreviation}";
 
-        foreach (var group in VerseGrouping.Group(verses, secondaryTexts))
+        foreach (var stored in VerseGrouping.Group(verses, secondaryTexts))
         {
+            // Grouping compares the stored texts; only what reaches the
+            // screen is cleaned, so the database and the search stay as they were.
+            var group = stored with
+            {
+                Text = BibleTextCleaner.Clean(stored.Text, showSelah),
+                SecondaryText = stored.SecondaryText is null ? null : BibleTextCleaner.Clean(stored.SecondaryText, showSelah),
+            };
             var mainText = theme.ShowVerseNumbers ? $"{group.Numbers}  {group.Text}" : group.Text;
             var verseReference = $"{bookName} {group.Chapter}:{group.Numbers}";
 
