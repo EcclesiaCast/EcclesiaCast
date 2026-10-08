@@ -241,15 +241,8 @@ public partial class MainWindow
         }
     }
 
-    private void About_Click(object sender, RoutedEventArgs e)
-    {
-        var version = typeof(MainWindow).Assembly
-            .GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
-            .OfType<System.Reflection.AssemblyInformationalVersionAttribute>()
-            .FirstOrDefault()?.InformationalVersion.Split('+')[0] ?? "?";
-
-        new Views.AboutWindow(version) { Owner = this }.ShowDialog();
-    }
+    private void About_Click(object sender, RoutedEventArgs e) =>
+        new Views.AboutWindow(Services.AppInfo.Version) { Owner = this }.ShowDialog();
 
     /// <summary>Everything back where it comes out of the box.</summary>
     private void ResetLayout_Click(object sender, RoutedEventArgs e)

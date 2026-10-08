@@ -111,6 +111,14 @@ rendimiento y cómo se ve la pestaña Música.
       por dentro; un menú abierto es una ventana aparte y no se abrió ninguna.
       Ojo con las listas donde se escribe (tipografía, pestaña): tienen que
       dejar escribir y seguir mostrando el texto en blanco.
+- [ ] **Pantalla de carga y «Acerca de» la primera vez**: abrí el programa y
+      mirá que la pantalla de carga se vea y se vaya sola. Para ver el «Acerca
+      de» de la primera vez, abrí la versión de prueba con una biblioteca copia
+      (ECCLESIACAST_DATA_DIR) que nunca haya abierto la versión nueva: tiene que
+      salir con el botón «Aceptar» y no volver a salir. Se dibujaron las dos
+      ventanas y se probó la regla de «una sola vez»; el arranque de verdad no
+      se vio (hubiera abierto ventanas). En una PC lenta, fijate que no se quede
+      congelada la pantalla de carga más de la cuenta.
 
 ## 2. Para hacer
 

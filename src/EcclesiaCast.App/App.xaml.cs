@@ -19,6 +19,9 @@ public partial class App : Application
     private ServiceProvider? _services;
     private UiWatchdog? _watchdog;
 
+    /// <summary>Set once the "Acerca de" of the very first start has been shown.</summary>
+    private const string AboutSeenKey = "app.about.seen";
+
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
@@ -45,6 +48,11 @@ public partial class App : Application
                 rollingInterval: RollingInterval.Day,
                 retainedFileCountLimit: 14)
             .CreateLogger();
+
+        // The loading screen goes up first, before the slow parts (database,
+        // video engine), and comes down when the main window has been drawn.
+        var splash = new Views.SplashWindow();
+        splash.ShowNow();
 
         Log.Information("EcclesiaCast starting");
 
@@ -143,8 +151,20 @@ public partial class App : Application
         {
             DataContext = _services.GetRequiredService<MainViewModel>()
         };
-        mainWindow.AttachLayoutPersistence(_services.GetRequiredService<ISettingsStore>());
+        var settings = _services.GetRequiredService<ISettingsStore>();
+        mainWindow.AttachLayoutPersistence(settings);
+
+        // The splash was the first window opened, so WPF took it for the main
+        // one: hand the title over before closing it, or the program would exit.
         MainWindow = mainWindow;
+        mainWindow.ContentRendered += (_, _) =>
+        {
+            splash.Close();
+
+            // Once, the first time the program ever opens.
+            if (OneTimeNotice.ShouldShow(settings, AboutSeenKey))
+                new Views.AboutWindow(Services.AppInfo.Version, firstRun: true) { Owner = mainWindow }.ShowDialog();
+        };
         mainWindow.Show();
 
         // Last, so the slow start-up is not mistaken for a freeze.

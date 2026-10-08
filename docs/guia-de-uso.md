@@ -11,6 +11,12 @@ y apaga la proyección; **Esc** también la apaga.
 
 La pantalla elegida se recuerda para la próxima vez.
 
+Al abrir el programa aparece una pantalla de carga con el logo y la versión,
+que se va sola cuando carga la ventana principal. La **primera vez** que se
+abre, además, se muestra **Acerca de EcclesiaCast**: tocá **Aceptar** y sigue.
+No vuelve a aparecer, pero lo podés abrir cuando quieras en **Ayuda → Acerca de
+EcclesiaCast**.
+
 ## 2. Cargar canciones
 
 En la pestaña **Canciones**:

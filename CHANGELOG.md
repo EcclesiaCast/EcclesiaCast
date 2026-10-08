@@ -9,6 +9,13 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Pantalla de carga y «Acerca de» la primera vez.** Al abrir el programa
+  aparece una pantalla con el logo, el nombre y la versión mientras carga, y se
+  va sola cuando se ve la ventana principal. La **primera vez** que se abre, se
+  muestra además «Acerca de EcclesiaCast», con el botón **Aceptar** en vez de
+  Cerrar; no vuelve a salir (se sigue abriendo cuando quieras desde Ayuda).
+  «Acerca de» ahora lleva el logo.
+
 - **Pestaña Tiempos** (abajo a la derecha, junto a Música): las **secciones
   de la reunión** con su tiempo (viene con Alabanza 25 minutos, Anuncios 5 y
   Prédica 35; se cambian, se agregan, se quitan y se ordenan, y quedan
