@@ -119,6 +119,12 @@ rendimiento y cómo se ve la pestaña Música.
       ventanas y se probó la regla de «una sola vez»; el arranque de verdad no
       se vio (hubiera abierto ventanas). En una PC lenta, fijate que no se quede
       congelada la pantalla de carga más de la cuenta.
+- [ ] **LIVE, PREVIEW y ESCENARIO en un solo recuadro**: tocá las tres
+      pestañas; el video en pantalla tiene que mostrar sus botones también en
+      PREVIEW; Ver → Separar el PREVIEW del LIVE vuelve a los dos recuadros, y
+      al cerrar y abrir el programa se acuerda de cuál dejaste. Se vio
+      dibujado en las tres pestañas y separado, y se probó por dentro que la
+      elección se guarda; falta con el mouse y con un video de verdad.
 
 ## 2. Para hacer
 

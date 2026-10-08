@@ -160,6 +160,15 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Cambiado
 
+- **LIVE, PREVIEW y ESCENARIO en un solo recuadro.** Arriba a la derecha, en
+  vez de dos recuadros uno abajo del otro, ahora hay uno solo con tres
+  pestañas: **LIVE** (lo que se proyecta), **PREVIEW** (la diapositiva que
+  sigue) y **ESCENARIO** (lo que ven los músicos). Así queda más lugar para
+  Texto rápido, Tiempos y las demás pestañas de abajo. Si hay un video en
+  pantalla, sus botones (pausa, adelantar, la barra) se ven también en la
+  pestaña PREVIEW. Para volver a los dos recuadros: **Ver → Separar el PREVIEW
+  del LIVE**; el programa se acuerda de lo que elijas.
+
 - **Menús, listas desplegables y globitos oscuros.** Los menús de arriba, los de
   clic derecho, las listas desplegables (la pantalla de salida, la playlist, los
   tipos de letra…) y los globitos que explican cada botón salían con el blanco

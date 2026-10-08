@@ -213,6 +213,14 @@ versículo se carga en la pestaña Biblia y el medio se aplica de fondo.
 
 ## 8. Durante el servicio
 
+**LIVE, PREVIEW y ESCENARIO** son las tres pestañas del recuadro de arriba a la
+derecha: *LIVE* es lo que se está proyectando, *PREVIEW* la diapositiva que
+sigue y *ESCENARIO* lo que ven los músicos, esté prendida o no esa pantalla.
+Con un video en pantalla, sus botones se ven tanto en LIVE como en PREVIEW. Si
+preferís dos recuadros, uno arriba del otro, tildá **Ver → Separar el PREVIEW
+del LIVE** (ahí, PREVIEW sigue teniendo su **Siguiente / Escenario**); el
+programa recuerda lo que elijas.
+
 | Atajo | Qué hace |
 |---|---|
 | **←→** | Diapositiva anterior / siguiente (y salta al ítem contiguo de la playlist) |

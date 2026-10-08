@@ -19,6 +19,7 @@ public partial class MainWindow
     private const string PlaylistTopKey = "layout.playlist.top";
     private const string MediaTopKey = "layout.media.top";
     private const string LiveBottomKey = "layout.live.bottom";
+    private const string OutputSplitKey = "layout.output.split";
     private const string LibraryCollapsedKey = "layout.library.collapsed";
     private const string PlaylistCollapsedKey = "layout.playlist.collapsed";
 
@@ -39,6 +40,13 @@ public partial class MainWindow
     /// <summary>Preview above Live instead of below it.</summary>
     private bool _liveAtBottom;
 
+    /// <summary>
+    /// LIVE and PREVIEW as two boxes. Off (the default) they, and the stage
+    /// view, are the tabs of a single box: the right column is narrow, and one
+    /// box leaves the rest of it to the text panels under it.
+    /// </summary>
+    private bool _outputSplit;
+
     private bool _libraryCollapsed;
     private bool _playlistCollapsed;
 
@@ -54,6 +62,7 @@ public partial class MainWindow
         _playlistOnTop = _settings?.Get(PlaylistTopKey) == "1";
         _mediaOnTop = _settings?.Get(MediaTopKey) == "1";
         _liveAtBottom = _settings?.Get(LiveBottomKey) == "1";
+        _outputSplit = _settings?.Get(OutputSplitKey) == "1";
         _libraryCollapsed = _settings?.Get(LibraryCollapsedKey) == "1";
         _playlistCollapsed = _settings?.Get(PlaylistCollapsedKey) == "1";
         ApplyLayout();
@@ -68,6 +77,7 @@ public partial class MainWindow
         _settings.Set(PlaylistTopKey, _playlistOnTop ? "1" : "0");
         _settings.Set(MediaTopKey, _mediaOnTop ? "1" : "0");
         _settings.Set(LiveBottomKey, _liveAtBottom ? "1" : "0");
+        _settings.Set(OutputSplitKey, _outputSplit ? "1" : "0");
         _settings.Set(LibraryCollapsedKey, _libraryCollapsed ? "1" : "0");
         _settings.Set(PlaylistCollapsedKey, _playlistCollapsed ? "1" : "0");
     }
@@ -168,8 +178,14 @@ public partial class MainWindow
             : Visibility.Visible;
 
         // ── Live and preview ──
-        Grid.SetRow(LivePanel, _liveAtBottom ? 2 : 0);
-        Grid.SetRow(PreviewPanel, _liveAtBottom ? 0 : 2);
+        // Merged, both sit in the first row (only one is visible at a time, the
+        // view model decides which) and the gap that would separate them goes.
+        var rightRows = RightPanel.RowDefinitions;
+        rightRows[3].Height = new GridLength(_outputSplit ? 10 : 0);
+        Grid.SetRow(LivePanel, _outputSplit && _liveAtBottom ? 2 : 0);
+        Grid.SetRow(PreviewPanel, !_outputSplit ? 0 : _liveAtBottom ? 0 : 2);
+        if (DataContext is ViewModels.MainViewModel vm)
+            vm.IsOutputMerged = !_outputSplit;
     }
 
     private void ChangeLayout(Action change)
@@ -199,7 +215,11 @@ public partial class MainWindow
         LibraryRightItem.IsChecked = _mirrored;
         PlaylistTopItem.IsChecked = _playlistOnTop;
         MediaTopItem.IsChecked = _mediaOnTop;
+        SplitOutputItem.IsChecked = _outputSplit;
         LiveBottomItem.IsChecked = _liveAtBottom;
+
+        // Which of the two goes on top only means something with two boxes.
+        LiveBottomItem.IsEnabled = _outputSplit;
         LibraryCollapsedItem.IsChecked = _libraryCollapsed;
         PlaylistCollapsedItem.IsChecked = _playlistCollapsed;
     }
@@ -212,6 +232,9 @@ public partial class MainWindow
 
     private void MediaTop_Click(object sender, RoutedEventArgs e) =>
         ChangeLayout(() => _mediaOnTop = !_mediaOnTop);
+
+    private void SplitOutput_Click(object sender, RoutedEventArgs e) =>
+        ChangeLayout(() => _outputSplit = !_outputSplit);
 
     private void LiveBottom_Click(object sender, RoutedEventArgs e) =>
         ChangeLayout(() => _liveAtBottom = !_liveAtBottom);
@@ -247,7 +270,7 @@ public partial class MainWindow
     /// <summary>Everything back where it comes out of the box.</summary>
     private void ResetLayout_Click(object sender, RoutedEventArgs e)
     {
-        _mirrored = _playlistOnTop = _mediaOnTop = _liveAtBottom = false;
+        _mirrored = _playlistOnTop = _mediaOnTop = _liveAtBottom = _outputSplit = false;
         _libraryCollapsed = _playlistCollapsed = false;
         _libraryWidth = 270;
         _rightWidth = 320;

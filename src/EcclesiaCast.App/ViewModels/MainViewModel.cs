@@ -1947,6 +1947,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private bool _updatingPlayback;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowTransportInPreview))]
     private bool _hasVideoPlayback;
 
     [ObservableProperty]
@@ -2600,10 +2601,47 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     /// screen as the band sees it (true). Remembered between services.
     /// </summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PreviewIsStage))]
     private bool _previewShowsStage;
 
     partial void OnPreviewShowsStageChanged(bool value) =>
         _settings.Set(PreviewShowsStageKey, value ? "1" : "0");
+
+    // ── LIVE, PREVIEW and stage in one box ──
+    // The operator window can show the three as tabs of a single box (the
+    // default) or as two boxes. Whether it is merged is a layout choice that
+    // MainWindow keeps and remembers; it hands it over here so the XAML can
+    // bind to what each box has to show.
+
+    /// <summary>LIVE, PREVIEW and the stage view are tabs of one box.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsOutputSplit), nameof(ShowLivePanel), nameof(ShowPreviewPanel),
+        nameof(PreviewIsStage), nameof(ShowTransportInPreview))]
+    private bool _isOutputMerged = true;
+
+    /// <summary>The tab on show while merged: 0 = LIVE, 1 = PREVIEW, 2 = ESCENARIO.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowLivePanel), nameof(ShowPreviewPanel), nameof(PreviewIsStage))]
+    private int _mergedTab;
+
+    public bool IsOutputSplit => !IsOutputMerged;
+
+    /// <summary>The LIVE box is on show: always when split, only on its own tab when merged.</summary>
+    public bool ShowLivePanel => !IsOutputMerged || MergedTab == 0;
+
+    public bool ShowPreviewPanel => !IsOutputMerged || MergedTab != 0;
+
+    /// <summary>
+    /// The PREVIEW box shows the stage screen instead of the next slide: the
+    /// ESCENARIO tab when merged, the Siguiente / Escenario toggle when split.
+    /// </summary>
+    public bool PreviewIsStage => IsOutputMerged ? MergedTab == 2 : PreviewShowsStage;
+
+    /// <summary>
+    /// The video controls follow the video, not the LIVE tab: with the box
+    /// merged, someone looking at PREVIEW still needs to pause what is playing.
+    /// </summary>
+    public bool ShowTransportInPreview => IsOutputMerged && HasVideoPlayback;
 
     /// <summary>
     /// Turns the stage display on or off. It must not land on the same screen

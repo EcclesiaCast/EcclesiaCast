@@ -34,6 +34,8 @@ public partial class MainWindow : Window
             if (DataContext is not MainViewModel vm)
                 return;
 
+            vm.IsOutputMerged = !_outputSplit;
+
             // Keep the relevant slide card visible: the live one while
             // navigating with the arrows, the previewed one after a search.
             vm.PropertyChanged += (_, args) =>

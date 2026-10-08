@@ -20,6 +20,80 @@
         <KeyBinding Key="F" Modifiers="Control" Command="{Binding SearchEverythingCommand}"/>
     </Window.InputBindings>
 
+    <Window.Resources>
+        <!-- LIVE · PREVIEW · ESCENARIO as the tabs of one box. Both boxes carry
+             this strip, so whichever one is on show has it in the same place.
+             The radio buttons need no group name: each strip is its own group. -->
+        <DataTemplate x:Key="OutputTabsTemplate">
+            <StackPanel Orientation="Horizontal" Margin="8,6,10,4">
+                <RadioButton Style="{StaticResource TabButton}" Padding="9,4" FontSize="11"
+                             IsChecked="{Binding MergedTab, Converter={StaticResource IndexIs}, ConverterParameter=0}"
+                             ToolTip="Lo que se está proyectando ahora">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Width="7" Height="7" Fill="{StaticResource LiveBrush}" Margin="0,0,6,0"
+                                 VerticalAlignment="Center"/>
+                        <TextBlock Text="LIVE"/>
+                    </StackPanel>
+                </RadioButton>
+                <RadioButton Content="PREVIEW" Style="{StaticResource TabButton}" Padding="9,4" FontSize="11"
+                             Margin="2,0,0,0"
+                             IsChecked="{Binding MergedTab, Converter={StaticResource IndexIs}, ConverterParameter=1}"
+                             ToolTip="La diapositiva que va a salir después"/>
+                <RadioButton Content="ESCENARIO" Style="{StaticResource TabButton}" Padding="9,4" FontSize="11"
+                             Margin="2,0,0,0"
+                             IsChecked="{Binding MergedTab, Converter={StaticResource IndexIs}, ConverterParameter=2}"
+                             ToolTip="Lo que ven los músicos y quien predica en la pantalla de escenario, aunque no esté prendida"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <!-- Controls of the video on screen. Used under LIVE and, while the
+             boxes are merged, under PREVIEW too. -->
+        <DataTemplate x:Key="VideoTransportTemplate">
+            <StackPanel>
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Right" Text="{Binding PlaybackTimeText}" FontSize="11"
+                               VerticalAlignment="Center" TextAlignment="Right"
+                               Foreground="{StaticResource MutedBrush}" Margin="8,0,0,0"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="⏮" FontSize="12" Padding="8,3"
+                                Style="{StaticResource DarkButton}"
+                                AutomationProperties.Name="Volver al principio"
+                                Command="{Binding RestartVideoCommand}"
+                                ToolTip="Volver al principio del video"/>
+                        <Button Content="⏪ 10s" FontSize="11" Padding="7,3" Margin="4,0,0,0"
+                                Style="{StaticResource DarkButton}"
+                                Command="{Binding SkipBackwardCommand}"
+                                ToolTip="Retroceder 10 segundos"/>
+                        <Button FontSize="12" Padding="10,3" Margin="4,0,0,0"
+                                AutomationProperties.Name="Reproducir o pausar"
+                                Command="{Binding TogglePlayPauseCommand}"
+                                ToolTip="Reproducir o pausar el video que está en pantalla">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                    <Setter Property="Content" Value="▶"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsVideoPlaying}" Value="True">
+                                            <Setter Property="Content" Value="⏸"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <Button Content="10s ⏩" FontSize="11" Padding="7,3" Margin="4,0,0,0"
+                                Style="{StaticResource DarkButton}"
+                                Command="{Binding SkipForwardCommand}"
+                                ToolTip="Adelantar 10 segundos"/>
+                    </StackPanel>
+                </DockPanel>
+                <!-- Barra de progreso, arrastrable -->
+                <Slider Minimum="0" Maximum="{Binding PlaybackDurationSeconds}"
+                        Value="{Binding PlaybackPositionSeconds}"
+                        IsMoveToPointEnabled="True" Margin="0,6,0,0"
+                        ToolTip="Arrastrá para moverte dentro del video"/>
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -66,6 +140,9 @@
                           IsCheckable="True" Click="PlaylistTop_Click"/>
                 <MenuItem x:Name="MediaTopItem" Header="Medios arriba de las diapositivas"
                           IsCheckable="True" Click="MediaTop_Click"/>
+                <MenuItem x:Name="SplitOutputItem" Header="Separar el PREVIEW del LIVE"
+                          IsCheckable="True" Click="SplitOutput_Click"
+                          ToolTip="Por defecto, LIVE, PREVIEW y ESCENARIO son pestañas de un solo recuadro. Tildado, vuelven a ser dos recuadros, uno arriba del otro."/>
                 <MenuItem x:Name="LiveBottomItem" Header="Preview arriba del Live"
                           IsCheckable="True" Click="LiveBottom_Click"/>
                 <Separator/>
@@ -1105,11 +1182,14 @@
                     <RowDefinition Height="*" MinHeight="130"/>
                 </Grid.RowDefinitions>
 
-                <Border x:Name="PreviewPanel" Grid.Row="2" Style="{StaticResource Panel}">
+                <Border x:Name="PreviewPanel" Grid.Row="2" Style="{StaticResource Panel}"
+                        Visibility="{Binding ShowPreviewPanel, Converter={StaticResource BoolToVis}}">
                     <StackPanel>
+                        <ContentControl Content="{Binding}" ContentTemplate="{StaticResource OutputTabsTemplate}"
+                                        Visibility="{Binding IsOutputMerged, Converter={StaticResource BoolToVis}}"/>
                         <!-- Qué muestra: la diapositiva que sigue, o la pantalla
                              de escenario tal como la ven los músicos -->
-                        <DockPanel>
+                        <DockPanel Visibility="{Binding IsOutputSplit, Converter={StaticResource BoolToVis}}">
                             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="0,6,10,4">
                                 <RadioButton Content="Siguiente" Style="{StaticResource TabButton}"
                                              GroupName="PreviewMode" Padding="8,3" FontSize="11"
@@ -1134,9 +1214,9 @@
                                                         FillMedia="{Binding Projection.PreviewBackgroundFill}"
                                                         BackgroundBlur="{Binding Projection.BackgroundBlur}"
                                                         Logo="{Binding Projection.ActiveLogo}"
-                                                        Visibility="{Binding PreviewShowsStage, Converter={StaticResource InverseBoolToVis}}"/>
+                                                        Visibility="{Binding PreviewIsStage, Converter={StaticResource InverseBoolToVis}}"/>
                                 <Viewbox Stretch="Uniform"
-                                         Visibility="{Binding PreviewShowsStage, Converter={StaticResource BoolToVis}}">
+                                         Visibility="{Binding PreviewIsStage, Converter={StaticResource BoolToVis}}">
                                     <controls:StageView Width="1920" Height="1080"
                                                         DataContext="{Binding Projection}"
                                                         Layout="{Binding DataContext.ActiveStageLayout, RelativeSource={RelativeSource AncestorType=Window}}"/>
@@ -1144,18 +1224,26 @@
                             </Grid>
                         </Border>
                         </controls:AspectFitBox>
+                        <ContentControl Content="{Binding}" ContentTemplate="{StaticResource VideoTransportTemplate}"
+                                        Margin="12,-4,12,12"
+                                        Visibility="{Binding ShowTransportInPreview, Converter={StaticResource BoolToVis}}"/>
                     </StackPanel>
                 </Border>
 
-                <Border x:Name="LivePanel" Grid.Row="0" Style="{StaticResource Panel}">
+                <Border x:Name="LivePanel" Grid.Row="0" Style="{StaticResource Panel}"
+                        Visibility="{Binding ShowLivePanel, Converter={StaticResource BoolToVis}}">
                     <StackPanel>
-                        <StackPanel Orientation="Horizontal">
+                        <!-- Con los recuadros separados, el título; fusionados, las pestañas -->
+                        <StackPanel Orientation="Horizontal"
+                                    Visibility="{Binding IsOutputSplit, Converter={StaticResource BoolToVis}}">
                             <Ellipse Width="9" Height="9"
                                      Fill="{StaticResource LiveBrush}"
                                      VerticalAlignment="Center"
                                      Margin="12,1,0,0"/>
                             <TextBlock Text="LIVE · PROYECTADO" Style="{StaticResource PanelTitle}" Margin="7,10,12,8"/>
                         </StackPanel>
+                        <ContentControl Content="{Binding}" ContentTemplate="{StaticResource OutputTabsTemplate}"
+                                        Visibility="{Binding IsOutputMerged, Converter={StaticResource BoolToVis}}"/>
                         <controls:AspectFitBox Margin="12,0,12,12" AspectRatio="{Binding OutputAspectRatio}">
                         <Border Background="#0B0D12" CornerRadius="4">
                             <Border.Style>
@@ -1191,49 +1279,9 @@
 
                         <!-- Transporte del video que está en pantalla, pegado a
                              lo que muestra: sólo con video (archivo o YouTube) -->
-                        <StackPanel Margin="12,-4,12,12"
-                                    Visibility="{Binding HasVideoPlayback, Converter={StaticResource BoolToVis}}">
-                            <DockPanel>
-                                <TextBlock DockPanel.Dock="Right" Text="{Binding PlaybackTimeText}" FontSize="11"
-                                           VerticalAlignment="Center" TextAlignment="Right"
-                                           Foreground="{StaticResource MutedBrush}" Margin="8,0,0,0"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <Button Content="⏮" FontSize="12" Padding="8,3"
-                                            Style="{StaticResource DarkButton}"
-                                            AutomationProperties.Name="Volver al principio"
-                                            Command="{Binding RestartVideoCommand}"
-                                            ToolTip="Volver al principio del video"/>
-                                    <Button Content="⏪ 10s" FontSize="11" Padding="7,3" Margin="4,0,0,0"
-                                            Style="{StaticResource DarkButton}"
-                                            Command="{Binding SkipBackwardCommand}"
-                                            ToolTip="Retroceder 10 segundos"/>
-                                    <Button FontSize="12" Padding="10,3" Margin="4,0,0,0"
-                                            AutomationProperties.Name="Reproducir o pausar"
-                                            Command="{Binding TogglePlayPauseCommand}"
-                                            ToolTip="Reproducir o pausar el video que está en pantalla">
-                                        <Button.Style>
-                                            <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
-                                                <Setter Property="Content" Value="▶"/>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsVideoPlaying}" Value="True">
-                                                        <Setter Property="Content" Value="⏸"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Button.Style>
-                                    </Button>
-                                    <Button Content="10s ⏩" FontSize="11" Padding="7,3" Margin="4,0,0,0"
-                                            Style="{StaticResource DarkButton}"
-                                            Command="{Binding SkipForwardCommand}"
-                                            ToolTip="Adelantar 10 segundos"/>
-                                </StackPanel>
-                            </DockPanel>
-                            <!-- Barra de progreso, arrastrable -->
-                            <Slider Minimum="0" Maximum="{Binding PlaybackDurationSeconds}"
-                                    Value="{Binding PlaybackPositionSeconds}"
-                                    IsMoveToPointEnabled="True" Margin="0,6,0,0"
-                                    ToolTip="Arrastrá para moverte dentro del video"/>
-                        </StackPanel>
+                        <ContentControl Content="{Binding}" ContentTemplate="{StaticResource VideoTransportTemplate}"
+                                        Margin="12,-4,12,12"
+                                        Visibility="{Binding HasVideoPlayback, Converter={StaticResource BoolToVis}}"/>
                     </StackPanel>
                 </Border>
 
