@@ -122,6 +122,14 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Cambiado
 
+- **Videos de YouTube más claros en la barra de medios.** Al agregar uno (por
+  el navegador o pegando el link) el programa pregunta si se reproduce por
+  internet o si se descarga para usarlo sin conexión. Los que se reproducen por
+  internet llevan una marca «🌐 internet» en la tarjeta, y los descargados no.
+  La descarga queda en la pestaña de medios que estaba elegida (ya no en
+  «Descargados»), y «Descargar para uso local» aparece sólo en el menú de los
+  videos de YouTube.
+
 - **Las pestañas de medios van apiladas a la izquierda**, una debajo de la
   otra y con la elegida resaltada, en vez de en fila arriba. El ＋ para
   agregar una pestaña quedó junto al título MEDIOS. La barra de medios

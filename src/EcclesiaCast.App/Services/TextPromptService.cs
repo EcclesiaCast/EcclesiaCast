@@ -13,6 +13,15 @@ public sealed class TextPromptService : ITextPrompt
         return window.ShowDialog() == true ? window.Value : null;
     }
 
+    public int Choose(string title, string message, IReadOnlyList<string> options)
+    {
+        var window = new ChoiceWindow(title, message, options)
+        {
+            Owner = System.Windows.Application.Current.MainWindow,
+        };
+        return window.ShowDialog() == true ? window.Chosen : -1;
+    }
+
     public (string First, string Second)? AskTwo(
         string title, string firstLabel, string firstValue, string secondLabel, string secondValue)
     {

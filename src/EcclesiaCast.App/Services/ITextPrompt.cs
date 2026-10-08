@@ -7,6 +7,12 @@ public interface ITextPrompt
     string? Ask(string title, string message, string initialValue = "");
 
     /// <summary>
+    /// Offers a few named options as buttons. Returns the index of the one
+    /// picked, or -1 if the operator cancelled. The first is the suggested one.
+    /// </summary>
+    int Choose(string title, string message, IReadOnlyList<string> options);
+
+    /// <summary>
     /// Asks for two values in the same window (a name and its abbreviation,
     /// say). Null if the operator cancelled.
     /// </summary>

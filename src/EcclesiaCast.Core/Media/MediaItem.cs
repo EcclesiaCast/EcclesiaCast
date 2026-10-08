@@ -58,6 +58,9 @@ public sealed class MediaItem
 
     public MediaType Type { get; set; }
 
+    /// <summary>True for a video played over the internet (no file on this computer).</summary>
+    public bool IsYouTube => Type == MediaType.YouTube;
+
     /// <summary>Absolute path to a generated thumbnail (may be null for images, which self-thumbnail).</summary>
     public string? ThumbnailPath { get; set; }
 

@@ -1865,17 +1865,38 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
     private void AddYouTubeVideos(IReadOnlyList<string> videoIds, string source)
     {
-        if (videoIds.Count == 0)
+        var fresh = videoIds
+            .Distinct()
+            .Where(id => !_allMedia.Any(m => m.Type == MediaType.YouTube && m.YouTubeId == id))
+            .ToList();
+        if (fresh.Count == 0)
+        {
+            if (videoIds.Count > 0)
+                StatusText = "Ese video ya estaba en la biblioteca.";
+            return;
+        }
+
+        // Played over the internet the video is always YouTube's to serve (and
+        // its ads, if the account has no Premium); a copy on this computer
+        // depends on nothing. The operator picks, once for the whole batch.
+        var choice = _textPrompt.Choose(
+            "Agregar de YouTube",
+            fresh.Count == 1
+                ? "¿Cómo querés usar este video?"
+                : $"¿Cómo querés usar estos {fresh.Count} videos?",
+            [
+                "🌐  Reproducir por internet",
+                "💾  Descargar para usar sin internet",
+            ]);
+        if (choice < 0)
             return;
 
-        var tab = MediaTabs.Contains("YouTube", StringComparer.OrdinalIgnoreCase) ? "YouTube" : "YouTube";
-        var added = 0;
+        // A download lands in the tab that was open, not in the YouTube one.
+        var openTab = SelectedMediaTab;
+        const string tab = "YouTube";
 
-        foreach (var id in videoIds)
+        foreach (var id in fresh)
         {
-            if (_allMedia.Any(m => m.Type == MediaType.YouTube && m.YouTubeId == id))
-                continue;
-
             _media.Add(new MediaItem
             {
                 Name = $"YouTube {id}",
@@ -1889,23 +1910,36 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 EndBehavior = VideoEndBehavior.Logo,
                 Muted = false,
             });
-            added++;
         }
 
         LoadMedia();
         SelectedMediaTab = tab;
-        StatusText = added > 0
-            ? $"{added} video(s) de YouTube agregado(s) {source}. Renombralos en Propiedades."
-            : "Ese video ya estaba en la biblioteca.";
-    }
 
-    /// <summary>Tab the locally downloaded copies land in.</summary>
-    private const string DownloadedTab = "Descargados";
+        if (choice == 0)
+        {
+            StatusText = $"{fresh.Count} video(s) de YouTube agregado(s) {source}, para reproducir por internet. "
+                       + "Renombralos en Propiedades.";
+            return;
+        }
+
+        var downloaded = 0;
+        foreach (var id in fresh)
+        {
+            if (_allMedia.FirstOrDefault(m => m.Type == MediaType.YouTube && m.YouTubeId == id) is not { } online)
+                continue;
+            if (DownloadYouTubeCore(online, openTab, removeOnlineEntry: true))
+                downloaded++;
+        }
+
+        StatusText = downloaded == fresh.Count
+            ? StatusText
+            : $"Se bajaron {downloaded} de {fresh.Count}. Los que no, quedaron en «{tab}» para reproducir por internet.";
+    }
 
     /// <summary>
     /// Saves a YouTube video as a local file, so the service doesn't depend on
     /// the connection holding up (and the quality stops being YouTube's call).
-    /// The copy is added to its own tab and the original entry is kept.
+    /// The copy goes into the tab that is open; the YouTube entry is kept.
     /// </summary>
     [RelayCommand]
     private void DownloadYouTube(MediaItem? item)
@@ -1916,6 +1950,18 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             return;
         }
 
+        DownloadYouTubeCore(item, SelectedMediaTab, removeOnlineEntry: false);
+    }
+
+    /// <summary>
+    /// Runs the download window for <paramref name="item"/> and, when it works,
+    /// adds the file to <paramref name="targetTab"/>. With
+    /// <paramref name="removeOnlineEntry"/> the YouTube entry is dropped once the
+    /// copy exists (it was only added as a stand-in); if the download fails it
+    /// stays, so the video is never lost.
+    /// </summary>
+    private bool DownloadYouTubeCore(MediaItem item, string targetTab, bool removeOnlineEntry)
+    {
         var window = new Views.YouTubeDownloadWindow(item.YouTubeId!, item.Name)
         {
             Owner = Application.Current.MainWindow,
@@ -1924,7 +1970,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (window.ShowDialog() != true || window.DownloadedPath is not { } path)
         {
             StatusText = "La descarga no se completó.";
-            return;
+            return false;
         }
 
         var name = Path.GetFileNameWithoutExtension(path);
@@ -1934,7 +1980,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             Path = path,
             Type = MediaType.Video,
             ThumbnailPath = MediaThumbnails.Create(path, MediaType.Video, App.VideoEngine),
-            Category = DownloadedTab,
+            Category = targetTab,
             // A downloaded announcement behaves like the YouTube one did.
             Behavior = item.Behavior,
             EndBehavior = item.EndBehavior,
@@ -1942,10 +1988,14 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             Volume = item.Volume,
         });
 
+        if (removeOnlineEntry)
+            _media.Delete(item.Id);
+
         LoadMedia();
-        SelectedMediaTab = DownloadedTab;
+        SelectedMediaTab = targetTab;
         RefreshLightCopies();
-        StatusText = $"«{name}» descargado y agregado a «{DownloadedTab}».";
+        StatusText = $"«{name}» descargado y agregado a «{targetTab}».";
+        return true;
     }
 
     /// <summary>

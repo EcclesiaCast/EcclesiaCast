@@ -1498,8 +1498,9 @@
                                                 <MenuItem Header="Agregar a la playlist"
                                                           Command="{Binding PlacementTarget.Tag.AddMediaToPlaylistCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                           CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
-                                                <Separator/>
-                                                <MenuItem Header="Descargar para uso local (YouTube)"
+                                                <Separator Visibility="{Binding PlacementTarget.DataContext.IsYouTube, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVis}}"/>
+                                                <MenuItem Header="Descargar para uso local"
+                                                          Visibility="{Binding PlacementTarget.DataContext.IsYouTube, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVis}}"
                                                           Command="{Binding PlacementTarget.Tag.DownloadYouTubeCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                           CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                           ToolTip="Guarda el video en la computadora para no depender de internet durante la reunión"/>
@@ -1531,6 +1532,13 @@
                                                         </Border>
                                                         <TextBlock Text="🎞" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"
                                                                    Visibility="Collapsed" x:Name="videoIcon"/>
+                                                        <!-- Se reproduce por internet: sin conexión no anda -->
+                                                        <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="3"
+                                                                Padding="4,1" CornerRadius="3" Background="#B3000000"
+                                                                Visibility="{Binding IsYouTube, Converter={StaticResource BoolToVis}}"
+                                                                ToolTip="Se reproduce por internet. Clic derecho → Descargar para uso local, para no depender de la conexión.">
+                                                            <TextBlock Text="🌐 internet" FontSize="8" FontWeight="SemiBold" Foreground="White"/>
+                                                        </Border>
                                                     </Grid>
                                                 </Border>
                                                 <ControlTemplate.Triggers>
