@@ -3,52 +3,49 @@
 Lista única de lo que falta. Si algo no está acá, no está anotado en ningún
 lado. Al cerrar un punto, borralo y anotalo en el [CHANGELOG](../CHANGELOG.md).
 
-## 1. Para llegar a la v1.0.0
+Hay tres tipos de cosas, cada una en su sección:
 
-- [ ] **Correr la [guía de pruebas](pruebas-beta.md) en la PC del proyector.**
-      Es el bloqueante real: nada de la beta.4 se probó con proyector de
-      verdad. El instalador ya está armado en
-      `dist\EcclesiaCast-1.0.0-beta.4-setup.exe` (rearmado el 11/9/2026, con
-      la revisión de código de las nueve funciones nuevas ya adentro).
-      También está publicado como
-      [pre-release en GitHub](https://github.com/EcclesiaCast/EcclesiaCast/releases/tag/v1.0.0-beta.4),
-      armado por el workflow en una máquina limpia: si la prueba destapa algo,
-      se arregla y sale una beta.5.
+1. **Para probar**: ya está programado; falta que Alexis lo pruebe con el
+   mouse, con Spotify o instalándolo, porque desde acá no se pudo.
+2. **Para hacer**: cambios que todavía hay que programar.
+3. **Para llegar a la v1.0.0**: lo que falta para dejar de ser beta.
+
+## 1. Para probar (lo prueba Alexis)
+
+Todo esto ya está en el instalador `dist\EcclesiaCast-1.0.0-beta.6-setup.exe`
+(armado el 7/10/2026). El resto de la beta.6 ya se probó con una copia de la
+biblioteca real: Ctrl+K, las miniaturas de Anuncios, el ➕ de canciones,
+Acerca de, el editor y los escenarios en el monitor, el modo bajo
+rendimiento y cómo se ve la pestaña Música.
+
+- [ ] **Arrastrar un archivo** desde el Explorador a la barra de medios: se
+      agrega a la pestaña elegida.
+- [ ] **Los botones de Música** con Spotify abierto: anterior, pausa,
+      siguiente y volumen.
+- [ ] **Instalar la beta.6** tildando la casilla de bajo rendimiento: el
+      programa tiene que arrancar con Ver → Modo PC de bajo rendimiento
+      tildado.
+- [ ] **Resaltar arrastrando en el LIVE**: mientras arrastrás, las palabras
+      se marcan en azul sólo en el LIVE, y al soltar se resaltan en la
+      pantalla. (El clic en una palabra ya se probó y anda.)
+- [ ] **Descargar un video de YouTube**: que no vuelva el error «Could not
+      copy Chrome cookie database».
+
+## 2. Para hacer
+
+- [ ] **Acerca de: una forma de colaborar.** Todavía no hay a dónde mandar a
+      la gente; se agrega cuando esté decidido.
+
+## 3. Para llegar a la v1.0.0
+
+- [ ] **Usar la beta.6 en un servicio de verdad**, en la PC del proyector, y
+      anotar lo que falle o no guste (como se hizo con la beta.5).
 - [ ] Actualizar README y CHANGELOG (hoy dicen "Beta") y taguear `v1.0.0`.
 - [ ] **Firma digital del instalador.** Hoy Windows muestra "Editor
       desconocido" y hay que darle a "Más información → Ejecutar de todas
       formas". Espanta a cualquier iglesia que lo baje sin conocernos.
 
-## 2. Funciones que faltan
-
-La beta.5 se probó el 6/10/2026: lo que anda bien quedó así (Biblia, achicar
-paneles, menú, buscar canciones en internet). Lo que salió de esa prueba y
-los pedidos nuevos:
-
-**Ventana**
-
-- [ ] **Acerca de: una forma de colaborar** (todavía no hay a dónde mandar a
-      la gente; se agrega cuando esté decidido).
-
-**Para probar con el programa abierto**
-
-Se probó el 7/10/2026 con una copia de la biblioteca real: Ctrl+K («echa
-sobre» → Salmos 55:22 · RVR1960, que se abre en esa versión; «las cadenas de
-la muerte» → *Hay libertad*), las miniaturas de Anuncios (se rehicieron
-solas), el ➕ de canciones, Acerca de, el editor de escenario (mover y
-agrandar con el mouse), los cuatro escenarios en el monitor y su cambio con
-la pantalla prendida, el modo bajo rendimiento (el LIVE queda quieto y sin
-sombra) y la pestaña Música (se ve bien). Falta:
-
-- [ ] **Arrastrar archivos** desde el Explorador a la barra de medios.
-- [ ] **Los botones de Música** con Spotify abierto.
-- [ ] **El instalador**: que la casilla de bajo rendimiento deje el modo
-      prendido en el primer arranque.
-- [ ] **Resaltar arrastrando en el LIVE** con el mouse de verdad (la
-      selección azul se comprobó dibujándola, pero el arrastre no se pudo
-      simular; el clic en una palabra sí anda).
-- [ ] **Descargar un video de YouTube** con el programa abierto (el arreglo
-      del error «Could not copy Chrome cookie database»).
+## 4. Decisiones tomadas
 
 Descartado: importar las Biblias de BibleShow. Sus archivos `.bib` son bases
 de Access protegidas con usuario y contraseña, y NTV, NVI y PDT son textos con
@@ -61,7 +58,7 @@ con muy poco esfuerzo. Sólo serviría en una PC sin decodificación por
 hardware: ahí el HEVC cuesta 40 % menos en H.264 (medido el 4/10/2026). Si
 algún día hace falta, es sumar una condición a `LightCopyPolicy`.
 
-## 3. Ideas tomadas de Spresenter (10/9/2026)
+## 5. Ideas tomadas de Spresenter (10/9/2026)
 
 Comparación completa contra [spresenter.com](https://spresenter.com) hecha el
 10/9/2026. Las tres que valían la pena están hechas: salida web para OBS y
@@ -72,7 +69,7 @@ técnico): edge blending y warp entre proyectores, display slices para paneles
 LED, sincronización de varias máquinas en red, automatización OSC/MIDI,
 timeline y VFX, NDI, macOS.
 
-## 4. Conocidos y aceptados
+## 6. Conocidos y aceptados
 
 Cosas que ya sabemos y decidimos bancar por ahora. No son bugs nuevos.
 
