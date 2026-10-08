@@ -64,7 +64,6 @@
                 <MenuItem Header="Editar la canción elegida" Command="{Binding EditSongCommand}"/>
                 <Separator/>
                 <MenuItem Header="Nueva playlist" Command="{Binding NewPlaylistCommand}"/>
-                <MenuItem Header="Nueva lista inteligente…" Command="{Binding EditSmartPlaylistCommand}"/>
                 <Separator/>
                 <MenuItem Header="Temas…" Command="{Binding OpenThemesCommand}"/>
                 <MenuItem Header="Logos…" Command="{Binding OpenLogosCommand}"/>
@@ -804,11 +803,6 @@
                                         Style="{StaticResource DarkButton}"
                                         Command="{Binding NewPlaylistCommand}"
                                         AutomationProperties.Name="Nueva playlist" ToolTip="Nueva playlist"/>
-                                <Button Content="✨" FontSize="11" Padding="6,3" Margin="4,0,0,0"
-                                        Style="{StaticResource DarkButton}"
-                                        Command="{Binding EditSmartPlaylistCommand}"
-                                        AutomationProperties.Name="Lista inteligente"
-                                        ToolTip="Lista inteligente: se arma sola (lo que agregaste hace poco, lo que hace rato no cantás, un artista, una palabra)"/>
                                 <Button Content="✏️" FontSize="11" Padding="6,3" Margin="4,0,0,0"
                                         Style="{StaticResource DarkButton}"
                                         Command="{Binding RenamePlaylistCommand}"

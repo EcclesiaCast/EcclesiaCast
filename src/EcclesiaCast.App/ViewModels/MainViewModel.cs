@@ -63,7 +63,6 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private readonly IStageWindowService _stage;
     private readonly IBackupDialog _backup;
     private readonly ICountdownDialog _countdownDialog;
-    private readonly ISmartPlaylistDialog _smartPlaylistDialog;
     private readonly IGlobalSearchDialog _globalSearch;
 
     /// <summary>Copied slide (label + text + style) for paste/duplicate.</summary>
@@ -282,7 +281,6 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         IStageDesigner stageDesigner,
         IBackupDialog backup,
         ICountdownDialog countdownDialog,
-        ISmartPlaylistDialog smartPlaylistDialog,
         IGlobalSearchDialog globalSearch,
         ProjectionViewModel projectionViewModel)
     {
@@ -312,7 +310,6 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _stageDesigner = stageDesigner;
         _backup = backup;
         _countdownDialog = countdownDialog;
-        _smartPlaylistDialog = smartPlaylistDialog;
         _globalSearch = globalSearch;
         Projection = projectionViewModel;
 
@@ -355,10 +352,6 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     [ObservableProperty]
     private PlaylistItem? _selectedPlaylistItem;
 
-    /// <summary>True while the chosen list is one that fills itself.</summary>
-    [ObservableProperty]
-    private bool _isSmartPlaylist;
-
     /// <summary>Index in <see cref="PlaylistItems"/> of the item currently driving the grid; -1 if none.</summary>
     private int _currentPlaylistIndex = -1;
 
@@ -377,46 +370,12 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     partial void OnSelectedPlaylistChanged(Playlist? value)
     {
         PlaylistItems.Clear();
-        IsSmartPlaylist = value?.IsSmart == true;
 
         if (value is null)
             return;
 
-        if (value.IsSmart)
-        {
-            FillSmartPlaylist(value);
-            return;
-        }
-
         foreach (var item in value.Items.OrderBy(i => i.Order))
             PlaylistItems.Add(item);
-    }
-
-    /// <summary>
-    /// Works out what belongs in a smart list, right now. Nothing is stored:
-    /// the answer changes with the library, which is the point of it.
-    /// </summary>
-    private void FillSmartPlaylist(Playlist playlist)
-    {
-        var chosen = Core.Playlists.SmartPlaylist.Select(
-            _songs.Search(), playlist.Rule, playlist.RuleValue, DateTime.Now);
-
-        var order = 0;
-        foreach (var song in chosen)
-        {
-            PlaylistItems.Add(new PlaylistItem
-            {
-                Order = order++,
-                Type = PlaylistItemType.Song,
-                SongId = song.Id,
-                Caption = string.IsNullOrWhiteSpace(song.Artist) ? song.Title : $"{song.Title} · {song.Artist}",
-            });
-        }
-
-        var described = Core.Playlists.SmartPlaylist.Describe(playlist.Rule, playlist.RuleValue);
-        StatusText = chosen.Count == 0
-            ? $"«{playlist.Name}»: ninguna canción cumple ahora ({described})."
-            : $"«{playlist.Name}»: {chosen.Count} {described}.";
     }
 
     /// <summary>
@@ -431,16 +390,6 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             return;
 
         NoteAction($"Guardar la playlist «{SelectedPlaylist.Name}»");
-
-        // A smart list's items are worked out, not kept. Writing them down
-        // would freeze today's answer into the library and quietly turn the
-        // list into a hand-made one.
-        if (SelectedPlaylist.IsSmart)
-        {
-            _playlists.Save(SelectedPlaylist);
-            StatusText = "Esta lista se arma sola: no se le agregan ni quitan cosas a mano.";
-            return;
-        }
 
         for (var i = 0; i < PlaylistItems.Count; i++)
             PlaylistItems[i].Order = i;
@@ -460,53 +409,11 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         StatusText = $"Playlist \"{saved.Name}\" creada.";
     }
 
-    /// <summary>
-    /// Creates a list that fills itself, or edits the rule of the one chosen.
-    /// Churches accumulate songs faster than anyone remembers them; this is
-    /// how the ones nobody has sung in months come back up.
-    /// </summary>
-    [RelayCommand]
-    private void EditSmartPlaylist()
-    {
-        var editing = SelectedPlaylist is { IsSmart: true } ? SelectedPlaylist : null;
-
-        var choice = _smartPlaylistDialog.Show(
-            editing?.Name ?? "Hace rato que no cantamos",
-            editing?.Rule ?? PlaylistRule.NotSungLately,
-            editing?.RuleValue);
-
-        if (choice is null)
-            return;
-
-        var playlist = editing ?? new Playlist();
-        playlist.Name = choice.Name;
-        playlist.Rule = choice.Rule;
-        playlist.RuleValue = choice.Value;
-
-        var saved = _playlists.Save(playlist);
-        LoadPlaylists(saved.Id);
-
-        // Re-reading it from the library is what fills it in.
-        if (SelectedPlaylist?.Id == saved.Id)
-            OnSelectedPlaylistChanged(SelectedPlaylist);
-
-        var described = Core.Playlists.SmartPlaylist.Describe(saved.Rule, saved.RuleValue);
-        StatusText = $"Lista inteligente «{saved.Name}»: {described}.";
-    }
-
     [RelayCommand]
     private void RenamePlaylist()
     {
         if (SelectedPlaylist is null)
             return;
-
-        // A smart list is renamed where its rule lives, so both are edited in
-        // the same place instead of two different ones.
-        if (SelectedPlaylist.IsSmart)
-        {
-            EditSmartPlaylist();
-            return;
-        }
 
         var name = _textPrompt.Ask("Renombrar playlist", "Nuevo nombre:", SelectedPlaylist.Name);
         if (string.IsNullOrWhiteSpace(name))
@@ -521,16 +428,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (SelectedPlaylist is null)
             return;
 
-        // A smart list keeps no items of its own, so copying its rule would
-        // hand back an empty list. Duplicating one freezes what it is showing
-        // right now into an ordinary list — which is the point: the list
-        // suggests the forgotten songs, and Sunday is built from some of them.
-        var source = SelectedPlaylist.IsSmart ? PlaylistItems.ToList() : SelectedPlaylist.Items;
-
         var copy = new Playlist
         {
             Name = $"{SelectedPlaylist.Name} (copia)",
-            Items = source
+            Items = SelectedPlaylist.Items
                 .Select(i => new PlaylistItem
                 {
                     Order = i.Order, Type = i.Type, Caption = i.Caption,
@@ -563,14 +464,6 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
     private bool EnsurePlaylist()
     {
-        // Adding to a list that fills itself would be lost the moment it is
-        // worked out again, so say so instead of pretending it worked.
-        if (SelectedPlaylist is { IsSmart: true } smart)
-        {
-            StatusText = $"«{smart.Name}» se arma sola: elegí otra lista para agregar cosas a mano.";
-            return false;
-        }
-
         if (SelectedPlaylist is not null)
             return true;
         NewPlaylist();
@@ -830,8 +723,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     [RelayCommand]
     private void RemovePlaylistItem(PlaylistItem? item)
     {
-        // Nothing to remove from a list that works itself out.
-        if (item is null || IsSmartPlaylist)
+        if (item is null)
             return;
 
         // The arrows walk the playlist from the item in use: removing one
@@ -850,7 +742,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     [RelayCommand]
     private void MovePlaylistItemUp(PlaylistItem? item)
     {
-        if (item is null || IsSmartPlaylist)
+        if (item is null)
             return;
         var index = PlaylistItems.IndexOf(item);
         if (index <= 0)
@@ -863,7 +755,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     [RelayCommand]
     private void MovePlaylistItemDown(PlaylistItem? item)
     {
-        if (item is null || IsSmartPlaylist)
+        if (item is null)
             return;
         var index = PlaylistItems.IndexOf(item);
         if (index < 0 || index >= PlaylistItems.Count - 1)

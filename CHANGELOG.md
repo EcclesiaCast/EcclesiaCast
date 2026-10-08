@@ -139,6 +139,11 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Cambiado
 
+- **Se sacó la lista inteligente** (botón ✨, ventana y menú). Casi nadie la
+  usaba y complicaba la playlist. Las listas inteligentes que hubiera se borran
+  solas al abrir esta versión (no guardaban canciones, sólo la regla); las
+  playlists armadas a mano no se tocan.
+
 - **Canción repetida: el programa pregunta.** Al guardar una canción nueva o
   traerla (escrita desde cero, de un archivo, de ProPresenter o de internet)
   con un título que ya existe (sin distinguir mayúsculas ni acentos), una

@@ -15,7 +15,7 @@ namespace EcclesiaCast.Data.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.30");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.31");
 
             modelBuilder.Entity("EcclesiaCast.Core.Bible.BibleBook", b =>
                 {
@@ -243,12 +243,6 @@ namespace EcclesiaCast.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Rule")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("RuleValue")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
