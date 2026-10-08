@@ -132,6 +132,8 @@ public partial class App : Application
         services.AddSingleton<ISongDesigner, SongDesignerService>();
         services.AddSingleton<IQuickTextEditor, QuickTextEditorService>();
         services.AddSingleton<IMediaRepository>(_ => new MediaRepository(dbPath));
+        services.AddSingleton<IAudioRepository>(_ => new AudioRepository(dbPath));
+        services.AddSingleton<IAudioPlayer>(_ => new VlcAudioPlayer(() => VideoEngine));
         services.AddSingleton<IMediaInspector, MediaInspectorService>();
         services.AddSingleton<IPlaylistRepository>(_ => new PlaylistRepository(dbPath));
         services.AddSingleton<IYouTubeBrowser, YouTubeBrowserService>();
@@ -180,6 +182,7 @@ public partial class App : Application
 
         // Stop listening on the network before the process goes away.
         _services?.GetService<MainViewModel>()?.StopRemote();
+        _services?.GetService<MainViewModel>()?.StopAudio();
         Log.CloseAndFlush();
         _services?.Dispose();
         base.OnExit(e);

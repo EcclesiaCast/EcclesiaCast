@@ -9,6 +9,18 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Lista de audios en la pestaña Música.** Además de los botones para
+  Spotify, la pestaña tiene ahora una **lista de audios propia**: se agregan
+  archivos mp3, wav, m4a, ogg o flac (con ➕ o arrastrándolos desde el
+  Explorador), se **ordenan** (↑ ↓, o A–Z por nombre) y se reproducen con su
+  propia barra: reproducir y pausa, anterior y siguiente, adelantar y atrasar
+  10 segundos, una barra para moverse dentro del audio y un **volumen propio**
+  que no toca el del video ni el de Windows. Doble clic (o Enter) reproduce el
+  audio elegido; al terminar, sigue solo con el que viene después, y en el
+  último se detiene. La lista queda guardada: sólo se anota dónde está cada
+  archivo, que no se mueve ni se copia. Va con su propio reproductor, aparte
+  del que pasa los videos de fondo.
+
 - **Videos pesados: el programa pregunta y se hace la copia al momento.** Al
   agregar un video de 4K o de 50 cuadros por segundo o más (con el botón
   Agregar o arrastrándolo), aparece «Este video es muy pesado para proyectar.

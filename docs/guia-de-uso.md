@@ -389,10 +389,29 @@ contorno, y el video se proyecta igual.
 
 ## 14. Música
 
-En la columna derecha, abajo, la pestaña **Música** tiene los botones **⏮ ⏯ ⏭**
-y de volumen. No trae un reproductor ni un navegador adentro: manda las
-**teclas multimedia de Windows**, así que maneja el **Spotify instalado en la
-computadora** (o el reproductor que esté abierto). Ojo con el volumen: es el
+En la columna derecha, abajo, la pestaña **Música** tiene dos partes.
+
+**Audios.** Una lista propia de archivos de sonido (mp3, wav, m4a, ogg y flac)
+para la música de antes de la reunión, la ofrenda o lo que haga falta.
+
+- **➕** agrega audios (o arrastralos desde el Explorador a la lista). El archivo
+  se queda donde está: la lista sólo se acuerda de dónde.
+- **↑ ↓** suben o bajan el audio elegido; **A–Z** ordena toda la lista por
+  nombre. **🗑** lo saca de la lista (el archivo no se borra; también con *Supr*).
+- **Doble clic** (o *Enter*) reproduce el audio. Abajo está la barra: **⏮ ⏪ ▶/⏸ ⏩ ⏭**
+  (anterior, 10 segundos atrás, reproducir o pausar, 10 segundos adelante,
+  siguiente), la barra para moverte dentro del audio y el **volumen de los
+  audios**, que es sólo de ellos: no cambia el del video ni el de Windows.
+- Al terminar un audio sigue solo con el de abajo; al terminar el último, se
+  detiene. **⏮** vuelve al principio del audio si ya pasaron unos segundos, y
+  recién ahí pasa al anterior.
+- Los audios suenan por la salida de sonido de la computadora, igual que el
+  video. Para que no se pisen con otra cosa, bajales el volumen o pausalos
+  antes de proyectar un video con sonido.
+
+**Spotify u otro reproductor.** Los botones **⏮ ⏯ ⏭** y de volumen mandan las
+**teclas multimedia de Windows**, así que manejan el **Spotify instalado en la
+computadora** (o el reproductor que esté abierto). Ojo con el volumen: ése es el
 de toda la computadora, el mismo que sale por el proyector.
 
 La cuenta común de Spotify es para uso personal: pasar música en una reunión

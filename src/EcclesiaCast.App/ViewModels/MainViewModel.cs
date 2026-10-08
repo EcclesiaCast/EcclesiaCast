@@ -283,6 +283,8 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         IBackupDialog backup,
         ICountdownDialog countdownDialog,
         IGlobalSearchDialog globalSearch,
+        IAudioRepository audios,
+        IAudioPlayer audioPlayer,
         ProjectionViewModel projectionViewModel)
     {
         _displayProvider = displayProvider;
@@ -312,6 +314,8 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _backup = backup;
         _countdownDialog = countdownDialog;
         _globalSearch = globalSearch;
+        _audios = audios;
+        _audioPlayer = audioPlayer;
         Projection = projectionViewModel;
 
         _presentation.Changed += (_, _) => UpdateStateFlags();
@@ -331,6 +335,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         LoadMedia();
         LoadLogos(null);
         LoadPlaylists(null);
+        InitializeAudio();
         StageNotesText = _settings.Get(StageNotesKey) ?? string.Empty;
         _previewShowsStage = _settings.Get(PreviewShowsStageKey) == "1";
         RestoreRemote();

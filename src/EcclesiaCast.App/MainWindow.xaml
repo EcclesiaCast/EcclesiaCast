@@ -1401,32 +1401,201 @@
                                 <Grid/>
                             </DockPanel>
 
-                            <!-- ── Música: las teclas multimedia de Windows ── -->
-                            <StackPanel Visibility="{Binding IsChecked, ElementName=TabMusic, Converter={StaticResource BoolToVis}}">
-                                <UniformGrid Columns="6" Margin="10,2,10,0">
-                                    <Button Content="⏮" FontSize="16" Padding="0,7" Margin="2,0" Style="{StaticResource DarkButton}"
-                                            Tag="PreviousTrack" Click="MusicKey_Click"
-                                            AutomationProperties.Name="Canción anterior" ToolTip="Canción anterior"/>
-                                    <Button Content="⏯" FontSize="16" Padding="0,7" Margin="2,0" Style="{StaticResource DarkButton}"
-                                            Tag="PlayPause" Click="MusicKey_Click"
-                                            AutomationProperties.Name="Reproducir o pausar" ToolTip="Reproducir o pausar"/>
-                                    <Button Content="⏭" FontSize="16" Padding="0,7" Margin="2,0" Style="{StaticResource DarkButton}"
-                                            Tag="NextTrack" Click="MusicKey_Click"
-                                            AutomationProperties.Name="Canción siguiente" ToolTip="Canción siguiente"/>
-                                    <Button Content="🔉" FontSize="14" Padding="0,7" Margin="2,0" Style="{StaticResource DarkButton}"
-                                            Tag="VolumeDown" Click="MusicKey_Click"
-                                            AutomationProperties.Name="Bajar el volumen" ToolTip="Bajar el volumen"/>
-                                    <Button Content="🔊" FontSize="14" Padding="0,7" Margin="2,0" Style="{StaticResource DarkButton}"
-                                            Tag="VolumeUp" Click="MusicKey_Click"
-                                            AutomationProperties.Name="Subir el volumen" ToolTip="Subir el volumen"/>
-                                    <Button Content="🔇" FontSize="14" Padding="0,7" Margin="2,0" Style="{StaticResource DarkButton}"
-                                            Tag="Mute" Click="MusicKey_Click"
-                                            AutomationProperties.Name="Silenciar" ToolTip="Silenciar o volver a oír"/>
-                                </UniformGrid>
-                                <TextBlock Text="Sirve para el Spotify instalado en esta computadora (o el reproductor que esté abierto). El volumen es el de toda la computadora, el mismo que sale por el proyector."
-                                           FontSize="10.5" Foreground="{StaticResource FaintBrush}"
-                                           TextWrapping="Wrap" Margin="12,8,12,0"/>
-                            </StackPanel>
+                            <!-- ── Música: la lista de audios propia y, abajo, las teclas multimedia de Windows ── -->
+                            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                          Visibility="{Binding IsChecked, ElementName=TabMusic, Converter={StaticResource BoolToVis}}">
+                                <StackPanel Margin="12,0,12,10">
+                                    <!-- Título y botones de la lista -->
+                                    <DockPanel Margin="0,0,0,6">
+                                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                            <Button Content="➕" FontSize="11" Padding="7,3" Style="{StaticResource DarkButton}"
+                                                    Command="{Binding ImportAudioCommand}"
+                                                    AutomationProperties.Name="Agregar audios"
+                                                    ToolTip="Agregar audios (mp3, wav, m4a, ogg o flac). También se pueden arrastrar desde el Explorador."/>
+                                            <Button Content="↑" FontSize="11" Padding="8,3" Margin="4,0,0,0" Style="{StaticResource DarkButton}"
+                                                    Command="{Binding MoveAudioUpCommand}"
+                                                    AutomationProperties.Name="Subir el audio elegido"
+                                                    ToolTip="Subir el audio elegido en la lista"/>
+                                            <Button Content="↓" FontSize="11" Padding="8,3" Margin="4,0,0,0" Style="{StaticResource DarkButton}"
+                                                    Command="{Binding MoveAudioDownCommand}"
+                                                    AutomationProperties.Name="Bajar el audio elegido"
+                                                    ToolTip="Bajar el audio elegido en la lista"/>
+                                            <Button Content="A–Z" FontSize="11" Padding="7,3" Margin="4,0,0,0" Style="{StaticResource DarkButton}"
+                                                    Command="{Binding SortAudioByNameCommand}"
+                                                    ToolTip="Ordenar toda la lista por nombre"/>
+                                            <Button Content="🗑" FontSize="11" Padding="7,3" Margin="4,0,0,0" Style="{StaticResource DarkButton}"
+                                                    Command="{Binding RemoveAudioCommand}"
+                                                    AutomationProperties.Name="Quitar el audio elegido"
+                                                    ToolTip="Quitar el audio elegido de la lista (el archivo no se borra)"/>
+                                        </StackPanel>
+                                        <TextBlock Text="AUDIOS" Style="{StaticResource PanelTitle}" Margin="0" VerticalAlignment="Center"/>
+                                    </DockPanel>
+
+                                    <!-- La lista: doble clic o Enter reproduce, Supr quita -->
+                                    <Border Background="{StaticResource BgBrush}" BorderBrush="{StaticResource LineBrush}"
+                                            BorderThickness="1" CornerRadius="4" MinHeight="110" MaxHeight="210">
+                                        <Grid>
+                                            <ListBox x:Name="AudioList" ItemsSource="{Binding AudioTracks}"
+                                                     SelectedItem="{Binding SelectedAudio}"
+                                                     Background="Transparent" BorderThickness="0" Padding="2"
+                                                     MaxHeight="206"
+                                                     AllowDrop="True"
+                                                     PreviewMouseLeftButtonDown="AudioList_PreviewMouseLeftButtonDown"
+                                                     PreviewKeyDown="AudioList_PreviewKeyDown"
+                                                     DragOver="AudioList_DragOver" Drop="AudioList_Drop"
+                                                     AutomationProperties.Name="Lista de audios"
+                                                     ToolTip="Doble clic o Enter: reproducir · Supr: quitar de la lista">
+                                                <ListBox.ItemContainerStyle>
+                                                    <Style TargetType="ListBoxItem">
+                                                        <Setter Property="Template">
+                                                            <Setter.Value>
+                                                                <ControlTemplate TargetType="ListBoxItem">
+                                                                    <Border x:Name="bd" CornerRadius="3" Padding="6,5" Margin="0,1"
+                                                                            Background="Transparent">
+                                                                        <ContentPresenter/>
+                                                                    </Border>
+                                                                    <ControlTemplate.Triggers>
+                                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                                            <Setter TargetName="bd" Property="Background" Value="{StaticResource SurfaceBrush}"/>
+                                                                        </Trigger>
+                                                                        <Trigger Property="IsSelected" Value="True">
+                                                                            <Setter TargetName="bd" Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+                                                                        </Trigger>
+                                                                    </ControlTemplate.Triggers>
+                                                                </ControlTemplate>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Style>
+                                                </ListBox.ItemContainerStyle>
+                                                <ListBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <DockPanel>
+                                                            <!-- El que está cargado en el reproductor -->
+                                                            <TextBlock DockPanel.Dock="Left" Text="▶" FontSize="10" Width="16"
+                                                                       VerticalAlignment="Center"
+                                                                       Foreground="{StaticResource AccentSoftBrush}">
+                                                                <TextBlock.Style>
+                                                                    <Style TargetType="TextBlock">
+                                                                        <Setter Property="Visibility" Value="Hidden"/>
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+                                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </TextBlock.Style>
+                                                            </TextBlock>
+                                                            <TextBlock Text="{Binding Name}" FontSize="12" TextTrimming="CharacterEllipsis"
+                                                                       VerticalAlignment="Center">
+                                                                <TextBlock.Style>
+                                                                    <Style TargetType="TextBlock">
+                                                                        <Setter Property="Foreground" Value="White"/>
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+                                                                                <Setter Property="Foreground" Value="{StaticResource AccentSoftBrush}"/>
+                                                                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </TextBlock.Style>
+                                                            </TextBlock>
+                                                        </DockPanel>
+                                                    </DataTemplate>
+                                                </ListBox.ItemTemplate>
+                                            </ListBox>
+                                            <!-- Lista vacía: dice qué hacer -->
+                                            <TextBlock Text="Arrastrá acá tus audios (mp3, wav, m4a, ogg, flac) o tocá ➕"
+                                                       IsHitTestVisible="False"
+                                                       Style="{StaticResource PlaceholderText}"
+                                                       Visibility="{Binding HasAudios, Converter={StaticResource InverseBoolToVis}}"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- El reproductor -->
+                                    <TextBlock Text="{Binding AudioNowPlayingText}" FontSize="12" FontWeight="SemiBold"
+                                               Foreground="White" TextTrimming="CharacterEllipsis" Margin="0,10,0,0"/>
+                                    <DockPanel Margin="0,4,0,0">
+                                        <TextBlock DockPanel.Dock="Right" Text="{Binding AudioTimeText}" FontSize="11"
+                                                   Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center"
+                                                   Margin="8,0,0,0"/>
+                                        <Slider Minimum="0" Maximum="{Binding AudioDurationSeconds}"
+                                                Value="{Binding AudioPositionSeconds}"
+                                                IsMoveToPointEnabled="True" VerticalAlignment="Center"
+                                                AutomationProperties.Name="Posición del audio"
+                                                ToolTip="Arrastrá para moverte dentro del audio"/>
+                                    </DockPanel>
+                                    <DockPanel Margin="0,6,0,0">
+                                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center"
+                                                    ToolTip="Volumen de los audios: no cambia el del video ni el de Windows">
+                                            <TextBlock Text="🔈" FontSize="12" Foreground="{StaticResource MutedBrush}"
+                                                       VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                            <Slider Minimum="0" Maximum="100" Width="76" VerticalAlignment="Center"
+                                                    Value="{Binding AudioVolume}" IsMoveToPointEnabled="True"
+                                                    AutomationProperties.Name="Volumen de los audios"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="⏮" FontSize="12" Padding="8,4" Style="{StaticResource DarkButton}"
+                                                    Command="{Binding PreviousAudioCommand}"
+                                                    AutomationProperties.Name="Audio anterior"
+                                                    ToolTip="Audio anterior (si ya pasaron unos segundos, vuelve al principio de éste)"/>
+                                            <Button Content="⏪" FontSize="12" Padding="7,4" Margin="3,0,0,0" Style="{StaticResource DarkButton}"
+                                                    Command="{Binding SkipAudioBackCommand}"
+                                                    AutomationProperties.Name="Atrasar 10 segundos"
+                                                    ToolTip="Atrasar 10 segundos"/>
+                                            <Button FontSize="12" Padding="11,4" Margin="3,0,0,0"
+                                                    Command="{Binding ToggleAudioPlayPauseCommand}"
+                                                    AutomationProperties.Name="Reproducir o pausar el audio"
+                                                    ToolTip="Reproducir o pausar">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource AccentButton}">
+                                                        <Setter Property="Content" Value="▶"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsAudioPlaying}" Value="True">
+                                                                <Setter Property="Content" Value="⏸"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                            <Button Content="⏩" FontSize="12" Padding="7,4" Margin="3,0,0,0" Style="{StaticResource DarkButton}"
+                                                    Command="{Binding SkipAudioForwardCommand}"
+                                                    AutomationProperties.Name="Adelantar 10 segundos"
+                                                    ToolTip="Adelantar 10 segundos"/>
+                                            <Button Content="⏭" FontSize="12" Padding="8,4" Margin="3,0,0,0" Style="{StaticResource DarkButton}"
+                                                    Command="{Binding NextAudioCommand}"
+                                                    AutomationProperties.Name="Audio siguiente"
+                                                    ToolTip="Audio siguiente"/>
+                                        </StackPanel>
+                                    </DockPanel>
+
+                                    <!-- Otro reproductor (Spotify…): las teclas multimedia de Windows -->
+                                    <Rectangle Height="1" Fill="{StaticResource LineBrush}" Margin="0,14,0,0"/>
+                                    <TextBlock Text="SPOTIFY U OTRO REPRODUCTOR" Style="{StaticResource PanelTitle}" Margin="0,10,0,6"/>
+                                    <UniformGrid Columns="6">
+                                        <Button Content="⏮" FontSize="16" Padding="0,7" Margin="0,0,3,0" Style="{StaticResource DarkButton}"
+                                                Tag="PreviousTrack" Click="MusicKey_Click"
+                                                AutomationProperties.Name="Canción anterior" ToolTip="Canción anterior"/>
+                                        <Button Content="⏯" FontSize="16" Padding="0,7" Margin="3,0" Style="{StaticResource DarkButton}"
+                                                Tag="PlayPause" Click="MusicKey_Click"
+                                                AutomationProperties.Name="Reproducir o pausar" ToolTip="Reproducir o pausar"/>
+                                        <Button Content="⏭" FontSize="16" Padding="0,7" Margin="3,0" Style="{StaticResource DarkButton}"
+                                                Tag="NextTrack" Click="MusicKey_Click"
+                                                AutomationProperties.Name="Canción siguiente" ToolTip="Canción siguiente"/>
+                                        <Button Content="🔉" FontSize="14" Padding="0,7" Margin="3,0" Style="{StaticResource DarkButton}"
+                                                Tag="VolumeDown" Click="MusicKey_Click"
+                                                AutomationProperties.Name="Bajar el volumen" ToolTip="Bajar el volumen"/>
+                                        <Button Content="🔊" FontSize="14" Padding="0,7" Margin="3,0" Style="{StaticResource DarkButton}"
+                                                Tag="VolumeUp" Click="MusicKey_Click"
+                                                AutomationProperties.Name="Subir el volumen" ToolTip="Subir el volumen"/>
+                                        <Button Content="🔇" FontSize="14" Padding="0,7" Margin="3,0,0,0" Style="{StaticResource DarkButton}"
+                                                Tag="Mute" Click="MusicKey_Click"
+                                                AutomationProperties.Name="Silenciar" ToolTip="Silenciar o volver a oír"/>
+                                    </UniformGrid>
+                                    <TextBlock Text="Estos botones manejan el Spotify instalado en esta computadora (o el reproductor que esté abierto). El volumen es el de toda la computadora, el mismo que sale por el proyector."
+                                               FontSize="10.5" Foreground="{StaticResource FaintBrush}"
+                                               TextWrapping="Wrap" Margin="0,8,0,0"/>
+                                </StackPanel>
+                            </ScrollViewer>
 
                             <!-- ── Tiempos: secciones de la reunión y cronómetro ── -->
                             <ScrollViewer VerticalScrollBarVisibility="Auto"

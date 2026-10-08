@@ -1,3 +1,4 @@
+using EcclesiaCast.Core.Audio;
 using EcclesiaCast.Core.Bible;
 using EcclesiaCast.Core.Logos;
 using EcclesiaCast.Core.Media;
@@ -23,6 +24,7 @@ public sealed class AppDbContext : DbContext
     public DbSet<SlideTheme> Themes => Set<SlideTheme>();
     public DbSet<MediaItem> MediaItems => Set<MediaItem>();
     public DbSet<Logo> Logos => Set<Logo>();
+    public DbSet<AudioTrack> AudioTracks => Set<AudioTrack>();
     public DbSet<Playlist> Playlists => Set<Playlist>();
     public DbSet<PlaylistItem> PlaylistItems => Set<PlaylistItem>();
 
@@ -87,6 +89,12 @@ public sealed class AppDbContext : DbContext
         {
             media.HasKey(m => m.Id);
             media.Property(m => m.Path).IsRequired();
+        });
+
+        modelBuilder.Entity<AudioTrack>(track =>
+        {
+            track.HasKey(t => t.Id);
+            track.Property(t => t.Path).IsRequired();
         });
 
         modelBuilder.Entity<Logo>(logo =>

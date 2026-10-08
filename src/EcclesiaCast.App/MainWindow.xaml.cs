@@ -9,6 +9,7 @@ using EcclesiaCast.App.Controls;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.App.ViewModels;
 using EcclesiaCast.Core.Abstractions;
+using EcclesiaCast.Core.Audio;
 using EcclesiaCast.Core.Media;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Core.Songs;
@@ -164,6 +165,57 @@ public partial class MainWindow : Window
     {
         if (sender is FrameworkElement { Tag: string name } && Enum.TryParse<MediaKey>(name, out var key))
             MediaKeys.Send(key);
+    }
+
+    // ── Lista de audios de la pestaña Música ─────────────────────
+
+    /// <summary>
+    /// A double click plays the track under the pointer. It is read on the
+    /// press, not with a MouseBinding: a list row keeps the click for itself
+    /// and the binding never fires.
+    /// </summary>
+    private void AudioList_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ClickCount != 2 || DataContext is not MainViewModel vm || e.OriginalSource is not DependencyObject source)
+            return;
+
+        if (ItemsControl.ContainerFromElement(AudioList, source) is ListBoxItem { DataContext: AudioTrackItem track })
+        {
+            vm.PlayAudioCommand.Execute(track);
+            e.Handled = true;
+        }
+    }
+
+    private void AudioList_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm)
+            return;
+
+        if (e.Key == Key.Enter && vm.SelectedAudio is { } track)
+        {
+            vm.PlayAudioCommand.Execute(track);
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Delete)
+        {
+            vm.RemoveAudioCommand.Execute(null);
+            e.Handled = true;
+        }
+    }
+
+    /// <summary>Audio files dragged in from Explorer; anything else is refused with the "no" cursor.</summary>
+    private void AudioList_DragOver(object sender, DragEventArgs e)
+    {
+        e.Effects = DroppedFiles(e)?.Any(AudioFiles.IsAudio) == true ? DragDropEffects.Copy : DragDropEffects.None;
+        e.Handled = true;
+    }
+
+    private void AudioList_Drop(object sender, DragEventArgs e)
+    {
+        if (DroppedFiles(e) is { } files && DataContext is MainViewModel vm)
+            vm.AddAudioFiles(files);
+
+        e.Handled = true;
     }
 
     // ── Soltar archivos en la barra de medios ────────────────────

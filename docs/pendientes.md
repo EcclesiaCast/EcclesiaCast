@@ -133,6 +133,16 @@ rendimiento y cómo se ve la pestaña Música.
       del video pesado. Probado por dentro con videos de prueba (4K a 60,
       1080p a 60, 1080p a 30): preguntas, copia con avance, cancelar sin dejar
       restos y el póster en el LIVE; las ventanas, dibujadas, no abiertas.
+- [ ] **Lista de audios (pestaña Música)**: agregar archivos con ➕ y
+      arrastrándolos, probar mp3, wav, m4a, ogg y flac; doble clic reproduce
+      (y **se tiene que oír**: acá se probó con la salida de sonido apagada, para
+      no molestar); pausa, ⏪ ⏩, la barra, el volumen propio y que al terminar uno
+      siga con el otro. Se probó por dentro con archivos de prueba: orden,
+      guardado, que al terminar siga solo, anterior/siguiente, pausa, la barra y
+      el volumen; la pestaña, dibujada. Falta oírlo de verdad, ver el arrastre con
+      el mouse, y el doble clic y el Enter con el teclado.
+      Al abrir la versión nueva con la biblioteca real hay una migración más
+      (la tabla de audios): se probó con una base vieja y con copias.
 
 ## 2. Para hacer
 
