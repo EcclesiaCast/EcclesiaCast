@@ -693,11 +693,19 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     }
 
     [RelayCommand]
-    private void AddMediaToPlaylist(MediaItem? item)
+    private void AddMediaToPlaylist(MediaItem? item) => InsertMediaInPlaylist(item, PlaylistItems.Count);
+
+    /// <summary>A media dragged from the bar lands where it was dropped.</summary>
+    public void InsertMediaInPlaylist(MediaItem? item, int index)
     {
         if (item is null || !EnsurePlaylist())
             return;
-        PlaylistItems.Add(new PlaylistItem
+
+        index = Math.Clamp(index, 0, PlaylistItems.Count);
+        if (index <= _currentPlaylistIndex)
+            _currentPlaylistIndex++;
+
+        PlaylistItems.Insert(index, new PlaylistItem
         {
             Type = PlaylistItemType.Media,
             Caption = item.Name,
@@ -705,6 +713,23 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         });
         SavePlaylist();
         StatusText = $"\"{item.Name}\" agregado a la playlist.";
+    }
+
+    /// <summary>
+    /// A media dragged onto another tab of the bar moves there: the tab is just
+    /// the media's category. The file itself stays where it is.
+    /// </summary>
+    public void MoveMediaToTab(MediaItem? item, string tab)
+    {
+        if (item is null || string.IsNullOrWhiteSpace(tab)
+            || string.Equals(item.Category, tab, StringComparison.OrdinalIgnoreCase))
+            return;
+
+        NoteAction($"Mover el medio «{item.Name}» a la pestaña «{tab}»");
+        item.Category = tab;
+        _media.Update(item);
+        LoadMedia();
+        StatusText = $"«{item.Name}» pasó a la pestaña «{tab}».";
     }
 
     [RelayCommand]

@@ -1446,10 +1446,17 @@
                              ScrollViewer.VerticalScrollBarVisibility="Auto">
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
+                                <!-- Un medio arrastrado desde la barra se suelta sobre una pestaña
+                                     para mudarlo a ella; Tag = "drop" la resalta mientras pasa -->
+                                <Setter Property="AllowDrop" Value="True"/>
+                                <EventSetter Event="DragOver" Handler="MediaTab_DragOver"/>
+                                <EventSetter Event="DragLeave" Handler="MediaTab_DragLeave"/>
+                                <EventSetter Event="Drop" Handler="MediaTab_Drop"/>
                                 <Setter Property="Template">
                                     <Setter.Value>
                                         <ControlTemplate TargetType="ListBoxItem">
-                                            <Border x:Name="bd" CornerRadius="4" Margin="0,1" Padding="10,5" Background="Transparent">
+                                            <Border x:Name="bd" CornerRadius="4" Margin="0,1" Padding="10,5" Background="Transparent"
+                                                    BorderBrush="Transparent" BorderThickness="1">
                                                 <TextBlock x:Name="label" Text="{Binding}" FontSize="12" FontWeight="SemiBold"
                                                            Foreground="{StaticResource MutedBrush}"
                                                            TextTrimming="CharacterEllipsis"/>
@@ -1460,6 +1467,11 @@
                                                 </Trigger>
                                                 <Trigger Property="IsSelected" Value="True">
                                                     <Setter TargetName="bd" Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+                                                    <Setter TargetName="label" Property="Foreground" Value="White"/>
+                                                </Trigger>
+                                                <Trigger Property="Tag" Value="drop">
+                                                    <Setter TargetName="bd" Property="Background" Value="#442F63C9"/>
+                                                    <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
                                                     <Setter TargetName="label" Property="Foreground" Value="White"/>
                                                 </Trigger>
                                             </ControlTemplate.Triggers>
@@ -1498,6 +1510,8 @@
                                             Cursor="Hand" Margin="6,2"
                                             Tag="{Binding DataContext, ElementName=MediaScroll}"
                                             AutomationProperties.Name="{Binding Name}"
+                                            PreviewMouseLeftButtonDown="MediaCard_PreviewMouseLeftButtonDown"
+                                            PreviewMouseMove="MediaCard_PreviewMouseMove"
                                             ToolTip="{Binding Name}">
                                         <Button.ContextMenu>
                                             <ContextMenu>

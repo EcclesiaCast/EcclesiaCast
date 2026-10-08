@@ -9,6 +9,7 @@ using EcclesiaCast.App.Controls;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.App.ViewModels;
 using EcclesiaCast.Core.Abstractions;
+using EcclesiaCast.Core.Media;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Core.Songs;
 
@@ -386,10 +387,98 @@ public partial class MainWindow : Window
         PlaylistDropLine.Visibility = Visibility.Collapsed;
     }
 
+    // ── Arrastrar medios dentro del programa ─────────────────────
+
+    private Point? _mediaDragStart;
+    private MediaItem? _mediaDragItem;
+
+    private void MediaCard_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        _mediaDragItem = (sender as FrameworkElement)?.DataContext as MediaItem;
+        _mediaDragStart = e.GetPosition(this);
+    }
+
+    /// <summary>
+    /// A press that travels a few pixels becomes a drag, like the song list's:
+    /// a plain click still applies the media. It can be dropped on the
+    /// playlist (into the exact place) or on another tab of the bar.
+    /// </summary>
+    private void MediaCard_PreviewMouseMove(object sender, MouseEventArgs e)
+    {
+        if (e.LeftButton != MouseButtonState.Pressed
+            || _mediaDragStart is not Point start
+            || _mediaDragItem is not { } media
+            || sender is not FrameworkElement card)
+            return;
+
+        var moved = e.GetPosition(this) - start;
+        if (Math.Abs(moved.X) < SystemParameters.MinimumHorizontalDragDistance * 2
+            && Math.Abs(moved.Y) < SystemParameters.MinimumVerticalDragDistance * 2)
+            return;
+
+        _mediaDragStart = null;
+        try
+        {
+            DragDrop.DoDragDrop(card, new DataObject(typeof(MediaItem), media),
+                DragDropEffects.Copy | DragDropEffects.Move);
+        }
+        finally
+        {
+            _mediaDragItem = null;
+            PlaylistDropLine.Visibility = Visibility.Collapsed;
+            ClearTabDropHighlights();
+        }
+    }
+
+    private static MediaItem? DraggedMedia(DragEventArgs e) =>
+        e.Data.GetDataPresent(typeof(MediaItem)) ? e.Data.GetData(typeof(MediaItem)) as MediaItem : null;
+
+    /// <summary>The tab a dragged media is over is lit up; the one it came from can't take it.</summary>
+    private void MediaTab_DragOver(object sender, DragEventArgs e)
+    {
+        e.Handled = true;
+        if (sender is not ListBoxItem { DataContext: string tab } row
+            || DraggedMedia(e) is not { } media
+            || string.Equals(media.Category, tab, StringComparison.OrdinalIgnoreCase))
+        {
+            e.Effects = DragDropEffects.None;
+            if (sender is ListBoxItem other)
+                other.ClearValue(TagProperty);
+            return;
+        }
+
+        e.Effects = DragDropEffects.Move;
+        row.Tag = "drop";
+    }
+
+    private void MediaTab_DragLeave(object sender, DragEventArgs e)
+    {
+        if (sender is ListBoxItem row)
+            row.ClearValue(TagProperty);
+    }
+
+    private void MediaTab_Drop(object sender, DragEventArgs e)
+    {
+        e.Handled = true;
+        if (sender is not ListBoxItem { DataContext: string tab } row)
+            return;
+
+        row.ClearValue(TagProperty);
+        if (DataContext is MainViewModel vm && DraggedMedia(e) is { } media)
+            vm.MoveMediaToTab(media, tab);
+    }
+
+    private void ClearTabDropHighlights()
+    {
+        for (var i = 0; i < MediaTabsList.Items.Count; i++)
+            if (MediaTabsList.ItemContainerGenerator.ContainerFromIndex(i) is ListBoxItem row)
+                row.ClearValue(TagProperty);
+    }
+
     private void PlaylistBody_DragOver(object sender, DragEventArgs e)
     {
         e.Handled = true;
-        if (!e.Data.GetDataPresent(typeof(Song)))
+        if (!e.Data.GetDataPresent(typeof(Song)) && DraggedMedia(e) is null)
         {
             e.Effects = DragDropEffects.None;
             return;
@@ -415,11 +504,14 @@ public partial class MainWindow : Window
     {
         PlaylistDropLine.Visibility = Visibility.Collapsed;
         e.Handled = true;
-        if (DataContext is not MainViewModel vm || e.Data.GetData(typeof(Song)) is not Song song)
+        if (DataContext is not MainViewModel vm)
             return;
 
         var (index, _) = PlaylistDropPoint(e);
-        vm.InsertSongInPlaylist(song, index);
+        if (e.Data.GetData(typeof(Song)) is Song song)
+            vm.InsertSongInPlaylist(song, index);
+        else if (DraggedMedia(e) is { } media)
+            vm.InsertMediaInPlaylist(media, index);
     }
 
     /// <summary>

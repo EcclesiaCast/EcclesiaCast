@@ -9,6 +9,12 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Arrastrar medios dentro del programa.** Un medio de la barra se puede
+  soltar en la playlist, en el lugar exacto y con la misma línea azul que las
+  canciones, o en otra pestaña de la lista de la izquierda, a la que se muda
+  (la pestaña de destino se resalta mientras pasás por encima). El archivo no
+  se mueve de lugar.
+
 - **Un vigía anota los cuelgues en el registro.** Si la ventana del operador
   se queda sin responder más de 2 segundos, el registro (carpeta «logs»)
   deja una línea «Ventana congelada» con las últimas cosas que hizo el
