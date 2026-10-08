@@ -157,6 +157,21 @@ public sealed class BibleRepository(string dbPath) : IBibleRepository
             .ToList();
     }
 
+    public int UpdateVerseText(int versionId, int bookNumber, int chapter, int firstVerse, int lastVerse, string text)
+    {
+        using var db = new AppDbContext(dbPath);
+
+        var verses = db.BibleVerses
+            .Where(v => v.Book.VersionId == versionId && v.Book.Number == bookNumber
+                && v.Chapter == chapter && v.Verse >= firstVerse && v.Verse <= lastVerse)
+            .ToList();
+        foreach (var verse in verses)
+            verse.Text = text;
+
+        db.SaveChanges();
+        return verses.Count;
+    }
+
     public IReadOnlyList<BibleVerseResult> SearchText(int versionId, string query, int limit = 60)
     {
         using var db = new AppDbContext(dbPath);

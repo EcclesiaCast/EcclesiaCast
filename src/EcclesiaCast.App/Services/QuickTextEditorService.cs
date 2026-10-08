@@ -4,9 +4,9 @@ namespace EcclesiaCast.App.Services;
 
 public sealed class QuickTextEditorService : IQuickTextEditor
 {
-    public string? Edit(string text)
+    public string? Edit(string text, string? title = null, string? message = null)
     {
-        var window = new QuickTextWindow(text)
+        var window = new QuickTextWindow(text, title, message)
         {
             Owner = System.Windows.Application.Current.MainWindow,
         };

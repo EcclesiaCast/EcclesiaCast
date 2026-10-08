@@ -39,4 +39,12 @@ public interface IBibleRepository
     IReadOnlyList<BibleVerseResult> GetPassage(int versionId, BibleReference reference);
 
     IReadOnlyList<BibleVerseResult> SearchText(int versionId, string query, int limit = 60);
+
+    /// <summary>
+    /// Replaces the stored text of verses <paramref name="firstVerse"/> to
+    /// <paramref name="lastVerse"/> of a chapter, in one version, with the
+    /// same text (a translation that tells several verses as one paragraph
+    /// repeats it under each). Returns how many verses changed.
+    /// </summary>
+    int UpdateVerseText(int versionId, int bookNumber, int chapter, int firstVerse, int lastVerse, string text);
 }

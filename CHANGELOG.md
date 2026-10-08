@@ -9,6 +9,16 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Corregir el texto de un versículo.** Clic derecho sobre un versículo de la
+  grilla → **Corregir el texto…**. Se abre una ventanita con el texto tal como
+  está guardado en la Biblia (de la versión principal; con dos versiones, la
+  ventanita avisa que se corrige la principal), se arregla y se guarda: queda
+  en la Biblia para siempre, no sólo en esa diapositiva, y si el versículo
+  está en pantalla se actualiza solo. Si la versión cuenta varios versículos
+  como un solo párrafo (la TLA), la corrección va a todos los de la
+  diapositiva. Si dos versículos de la misma diapositiva tienen textos
+  distintos en la versión principal, avisa y pide corregirlos de a uno.
+
 - **Lista de audios en la pestaña Música.** Además de los botones para
   Spotify, la pestaña tiene ahora una **lista de audios propia**: se agregan
   archivos mp3, wav, m4a, ogg o flac (con ➕ o arrastrándolos desde el

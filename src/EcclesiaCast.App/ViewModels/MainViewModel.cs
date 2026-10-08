@@ -622,6 +622,54 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             AddPassageToPlaylist(new BibleReference(_currentPassage.BookNumber, verses.Chapter, verses.FirstVerse, verses.LastVerse));
     }
 
+    /// <summary>
+    /// Right click on a verse card → "Corregir el texto…": a typo in the Bible
+    /// itself. What opens is the stored text of the main version, the one the
+    /// card was made from, and the fix is saved there for good. A translation
+    /// that tells several verses as one paragraph keeps that paragraph under
+    /// each of them, so the same fix goes to all of the card's verses.
+    /// </summary>
+    [RelayCommand]
+    private void CorrectVerseText(SlideItemViewModel? slide)
+    {
+        if (slide?.Verses is not { } group || _currentPassage is null || PrimaryVersion is not { } version)
+            return;
+
+        var stored = _bibles.GetPassage(
+            version.Id, new BibleReference(_currentPassage.BookNumber, group.Chapter, group.FirstVerse, group.LastVerse));
+        var texts = stored.Select(v => v.Text.Trim()).Distinct().ToList();
+        if (texts.Count == 0)
+            return;
+
+        // The card can bring together verses that only the second version
+        // repeats; saving one text over all of them would flatten the main one.
+        if (texts.Count > 1)
+        {
+            StatusText = $"En {version.Abbreviation} estos versículos se guardan con textos distintos: corregí de a uno.";
+            return;
+        }
+
+        var reference = $"{stored[0].BookName} {group.Chapter}:{group.Numbers}";
+        var message = SecondaryVersion is null
+            ? $"Texto guardado de {reference} en {version.Abbreviation}. Lo que cambies queda en la Biblia, no sólo en esta diapositiva."
+            : $"Se corrige la versión principal ({version.Abbreviation}), no la segunda. Texto guardado de {reference}; lo que cambies queda en la Biblia, no sólo en esta diapositiva.";
+        var edited = _quickTextEditor.Edit(texts[0], "Corregir el texto", message);
+        if (edited is null || edited == texts[0])
+            return;
+
+        if (edited.Length == 0)
+        {
+            StatusText = "El texto no puede quedar vacío.";
+            return;
+        }
+
+        NoteAction($"Corregir el texto de {reference} ({version.Abbreviation})");
+        _bibles.UpdateVerseText(version.Id, _currentPassage.BookNumber, group.Chapter, group.FirstVerse, group.LastVerse, edited);
+        var passage = _currentPassage;
+        RebuildSlidesPreservingLive(() => LoadBiblePassage(passage));
+        StatusText = $"Texto de {reference} corregido en {version.Abbreviation}.";
+    }
+
     /// <summary>Right click on a verse card: from the verse on screen (or marked) to this one.</summary>
     [RelayCommand]
     private void AddRangeToSlideToPlaylist(SlideItemViewModel? slide)

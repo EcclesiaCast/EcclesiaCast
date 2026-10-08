@@ -15,7 +15,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="Corregí el texto de esta diapositiva (solo el texto — el formato no cambia)."
+        <TextBlock Grid.Row="0" x:Name="MessageText" Text="Corregí el texto de esta diapositiva (solo el texto — el formato no cambia)."
                    FontSize="12" Foreground="{StaticResource MutedBrush}"
                    TextWrapping="Wrap" Margin="0,0,0,8"/>
 
