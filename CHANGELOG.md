@@ -191,6 +191,14 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Corregido
 
+- **Las flechas ya no se pasan solas al ítem siguiente de la playlist.** Con
+  la tecla apretada, las flechas llegaban al final del pasaje, ponían de fondo
+  el video que seguía en la playlist y saltaban al ítem de después, todo en
+  menos de un segundo. Ahora se frenan en el final (o el principio) de cada
+  ítem y la barra de estado avisa «Fin del pasaje: → otra vez pasa a «…»».
+  Sólo una pulsación nueva (no la repetición de la tecla apretada) pasa al
+  siguiente ítem, y la repetición de esa misma pulsación se ignora.
+
 - **Las vistas previas de las imágenes volvían en blanco al reabrir el
   programa** (se notaba en Anuncios). La miniatura es un archivo aparte de
   la imagen; si ese archivo desaparecía, la biblioteca seguía apuntando a él

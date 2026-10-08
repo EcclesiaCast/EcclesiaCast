@@ -3697,44 +3697,71 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private void ProjectFirstSlide() => GoLiveSlide(0);
 
     [RelayCommand]
-    private void NextSlide()
-    {
-        // A media item has no slides of its own: the arrows move between
-        // playlist items (the slide grid still shows the previous item).
-        if (CurrentPlaylistItemIsMedia)
-        {
-            TryAdvancePlaylist(+1);
-            return;
-        }
+    private void NextSlide() => Navigate(+1, isRepeat: false);
 
-        var next = LiveSlideIndex < 0 ? 0 : LiveSlideIndex + 1;
+    [RelayCommand]
+    private void PreviousSlide() => Navigate(-1, isRepeat: false);
+
+    private readonly ArrowStepGate _arrowGate = new();
+
+    /// <summary>
+    /// One arrow press. A press that comes from a key held down (the keyboard's
+    /// own repetition) never leaves the playlist item: it stops at the edge and
+    /// says what another press does, so a held key can't run through the whole
+    /// service, putting backgrounds on as it goes.
+    /// </summary>
+    public void Navigate(int direction, bool isRepeat)
+    {
+        var neighbour = _currentPlaylistIndex + direction;
+        var hasNeighbour = _currentPlaylistIndex >= 0 && neighbour >= 0 && neighbour < PlaylistItems.Count;
+
+        // A media item has no slides of its own: the arrows move between
+        // playlist items (the slide grid still shows the previous item), so
+        // every press is at the edge.
+        var target = LiveSlideIndex < 0 && direction > 0 ? 0 : LiveSlideIndex + direction;
+        var atEdge = CurrentPlaylistItemIsMedia
+            || target < 0 || target >= Slides.Count || LeavesPassage(direction);
 
         // At the end of the item, the arrow continues to the next playlist
         // item. For a Bible passage the item ends at its last planned verse,
         // not at the chapter's end (the whole chapter is loaded around it).
-        // When there is no next item, fall through: the operator can keep
-        // reading past the passage.
-        if ((next >= Slides.Count || LeavesPassage(+1)) && TryAdvancePlaylist(+1))
-            return;
+        // When there is no next item, the operator can keep reading past the
+        // passage.
+        switch (_arrowGate.Decide(atEdge, hasNeighbour, isRepeat))
+        {
+            case ArrowAction.Ignore:
+                return;
 
-        GoLiveSlide(next);
+            case ArrowAction.Hold:
+                StatusText = EdgeMessage(direction, PlaylistItems[neighbour]);
+                return;
+
+            case ArrowAction.Cross:
+                TryAdvancePlaylist(direction);
+                return;
+
+            default:
+                if (!CurrentPlaylistItemIsMedia)
+                    GoLiveSlide(target);
+                return;
+        }
     }
 
-    [RelayCommand]
-    private void PreviousSlide()
+    /// <summary>What the status bar says when an arrow stops at the edge of an item.</summary>
+    private string EdgeMessage(int direction, PlaylistItem neighbour)
     {
-        if (CurrentPlaylistItemIsMedia)
+        var current = _currentPlaylistIndex >= 0 && _currentPlaylistIndex < PlaylistItems.Count
+            ? PlaylistItems[_currentPlaylistIndex].Type
+            : PlaylistItemType.Media;
+        var edge = (direction > 0 ? "Fin" : "Principio") + current switch
         {
-            TryAdvancePlaylist(-1);
-            return;
-        }
-
-        var previous = LiveSlideIndex - 1;
-
-        if ((previous < 0 || LeavesPassage(-1)) && TryAdvancePlaylist(-1))
-            return;
-
-        GoLiveSlide(previous);
+            PlaylistItemType.Song => " de la canción",
+            PlaylistItemType.BiblePassage => " del pasaje",
+            _ => " del elemento",
+        };
+        var arrow = direction > 0 ? "→" : "←";
+        var verb = direction > 0 ? "pasa a" : "vuelve a";
+        return $"{edge}: {arrow} otra vez {verb} «{neighbour.Caption}».";
     }
 
     private bool CurrentPlaylistItemIsMedia =>

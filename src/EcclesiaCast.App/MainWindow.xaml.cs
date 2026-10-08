@@ -730,10 +730,9 @@ public partial class MainWindow : Window
         if (DataContext is not MainViewModel vm)
             return;
 
-        if (e.Key == Key.Right)
-            vm.NextSlideCommand.Execute(null);
-        else
-            vm.PreviousSlideCommand.Execute(null);
+        // IsRepeat tells a held key from a new press: the view model stops the
+        // held one at the edge of a playlist item.
+        vm.Navigate(e.Key == Key.Right ? +1 : -1, e.IsRepeat);
 
         e.Handled = true;
     }
