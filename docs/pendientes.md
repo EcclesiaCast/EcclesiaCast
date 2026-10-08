@@ -99,14 +99,10 @@ por dentro, con pruebas automáticas y dibujando las pantallas.
       Libre); una carpeta privada `biblias` junto al instalador para las PCs
       de la iglesia; y pedirle permiso por la RVR1960 a la Sociedad Bíblica
       del Uruguay o a la American Bible Society.
-- [ ] **Armar la beta.7.** Las tres tandas de lo pedido al probar la beta.6
-      (7/10/2026, en [plan-sonnet-2.md](plan-sonnet-2.md)) ya están
-      programadas, pero ninguna está en el instalador de la beta.6: falta
-      armar uno nuevo con todo, y probarlo (sección 1).
 
 ## 3. Para llegar a la v1.0.0
 
-- [ ] **Usar la beta.6 en un servicio de verdad**, en la PC del proyector, y
+- [ ] **Usar la beta.7 en un servicio de verdad**, en la PC del proyector, y
       anotar lo que falle o no guste (como se hizo con la beta.5).
 - [ ] Actualizar README y CHANGELOG (hoy dicen "Beta") y taguear `v1.0.0`.
 - [ ] **Firma digital del instalador.** Hoy Windows muestra "Editor
