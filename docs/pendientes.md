@@ -12,140 +12,78 @@ Hay tres tipos de cosas, cada una en su sección:
 
 ## 1. Para probar (lo prueba Alexis)
 
-Lo más viejo de esta lista está en el instalador
-`dist\EcclesiaCast-1.0.0-beta.6-setup.exe` (armado el 7/10/2026); lo de las
-tres tandas de después (menús oscuros, pantalla de carga, recuadro único,
-videos pesados, audios…) está sólo en el código. El resto de la beta.6 ya se probó con una copia de la
-biblioteca real: Ctrl+K, las miniaturas de Anuncios, el ➕ de canciones,
-Acerca de, el editor y los escenarios en el monitor, el modo bajo
-rendimiento y cómo se ve la pestaña Música.
+Todo esto está en el instalador **`dist\EcclesiaCast-1.0.0-beta.7-setup.exe`**
+(armado el 8/10/2026). Nada se pudo probar con el programa abierto: se probó
+por dentro, con pruebas automáticas y dibujando las pantallas.
 
-- [ ] **Arrastrar un archivo** desde el Explorador a la barra de medios: se
-      agrega a la pestaña elegida.
-- [ ] **Los botones de Música** con Spotify abierto: anterior, pausa,
-      siguiente y volumen.
-- [ ] **Instalar la beta.6** tildando la casilla de bajo rendimiento: el
-      programa tiene que arrancar con Ver → Modo PC de bajo rendimiento
-      tildado.
-- [ ] **Resaltar arrastrando en el LIVE**: mientras arrastrás, las palabras
-      se marcan en azul sólo en el LIVE, y al soltar se resaltan en la
-      pantalla. (El clic en una palabra ya se probó y anda.)
-- [ ] **Descargar un video de YouTube** (clic derecho → Descargar para uso
-      local): la primera vez baja solo el descargador y un componente de
-      YouTube (unos 60 MB, con barra); después tiene que bajar el video sin
-      errores de cookies ni 403. No se pudo probar desde acá (no se bajó nada
-      de internet).
-- [ ] **Flechas con la tecla apretada**: en una
-      playlist con un pasaje, un medio y otro pasaje, mantené apretado → en
-      el final del pasaje: tiene que frenarse y decir «Fin del pasaje: → otra
-      vez pasa a…». Soltá y apretá de nuevo: pasa al siguiente. Probado sólo
-      con el programa por dentro, no con un teclado de verdad.
-- [ ] **Arrastrar un medio de la barra** a la playlist (línea azul en el
-      lugar exacto) y a otra pestaña de la izquierda (se resalta y el medio
-      se muda). Los arrastres con el mouse no se pudieron probar desde acá;
-      se probaron por dentro la mudanza de pestaña, el resaltado y el lugar
-      en la playlist, no el gesto en sí.
-- [ ] **LIVE y PREVIEW al ensanchar el panel derecho**: los cuadros no se
-      deforman, quedan centrados con el mismo alto y se achican si se angosta.
-      Visto sólo en imágenes dibujadas a distintos anchos.
-- [ ] **PREVIEW con un anuncio en primer plano** en pantalla: el cuadro
-      «Siguiente» muestra la letra sobre el fondo que va a quedar, no sobre el
+**Antes de instalar**
+- [ ] Guardar una copia de la biblioteca: Archivo → Guardar una copia de la
+      biblioteca. La versión nueva actualiza la base sola (se probó sobre una
+      copia de la tuya y quedó todo igual), pero por las dudas.
+- [ ] Instalar tildando la casilla de **bajo rendimiento** y ver que arranque
+      con Ver → Modo PC de bajo rendimiento tildado (después se puede sacar).
+
+**Al abrir por primera vez**
+- [ ] Sale la **pantalla de carga** con el logo y se va sola.
+- [ ] Sale **«Acerca de»** con el botón «Aceptar», y no vuelve a salir.
+- [ ] Que no se quede trabada: la primera vez rehace las miniaturas que
+      faltan (en tu biblioteca faltan todas).
+
+**Ventana**
+- [ ] Menús de arriba, clic derecho (también en un cuadro de texto), listas
+      desplegables y globitos: todo oscuro y legible.
+- [ ] LIVE, PREVIEW y ESCENARIO en un solo recuadro con tres pestañas; Ver →
+      Separar el PREVIEW del LIVE; al cerrar y abrir se acuerda.
+- [ ] Al ensanchar el panel derecho, LIVE y PREVIEW no se deforman.
+- [ ] Con un anuncio en primer plano, el PREVIEW muestra la letra sin el
       anuncio.
-- [ ] **Barra azul al reordenar diapositivas** moviendo el mouse rápido: no
-      tiene que aparecer sobre la barra de medios.
-- [ ] **Vigía de cuelgues**: si el programa se vuelve a congelar unos
-      segundos, mirar el último archivo de la carpeta `logs` (línea «Ventana
-      congelada») para ver qué estaba haciendo. Probado bloqueando a propósito
-      un programa de prueba 3,5 segundos; no con un cuelgue real.
-- [ ] **Versiones de la Biblia en una fila**: clic = sólo esa, Ctrl+clic =
-      suma o saca la segunda (probado sólo por dentro: el Ctrl con teclado de
-      verdad no). Clic derecho → Exportar a un archivo, y traerlo de vuelta
-      con 📥 (el round trip está probado con pruebas, no con el diálogo de
-      guardar).
-- [ ] **La cajita del ➕ Playlist de la Biblia**: tiene que abrirse con el
-      campo ya completado y seleccionado (para escribir encima), mostrar el
-      texto y agregar con Enter o con el botón. Dibujada y probada por
-      dentro; el foco del teclado al abrirse y el Esc no se pudieron ver
-      sin abrir la ventana.
-- [ ] **Resaltar con el mouse en el LIVE**: un clic marca sólo esa palabra
-      (no todas las iguales), Shift+clic suma otra marca, y otro clic sobre una
-      marcada la saca. Probado por dentro y dibujado a imagen; el gesto real
-      con mouse y Shift no. En la pestaña Resaltar, `gracia; fe` marca las dos
-      cosas en todas sus apariciones. La página para OBS/vMix también tiene
-      que mostrar el amarillo.
-- [ ] **Canción repetida**: guardar una canción nueva con un título que ya
-      existe (probalo con «mi gozó» en minúsculas y con otra cosa) tiene que
-      mostrar las tres opciones. Con una tanda de archivos o de ProPresenter,
-      la casilla «Hacer lo mismo con las demás» tiene que responder sola las
-      siguientes. Las reglas y el guardado se probaron por dentro; la
-      ventana, dibujada, no con el mouse.
-- [ ] **Pestañas de medios**: clic derecho sobre una pestaña (Cambiar nombre
-      con un emoji, Configurar…, Eliminar…). Probado por dentro con una copia
-      de la biblioteca (renombrar, regla, borrar, y que al reabrir se
-      recuerden); el menú de clic derecho con el mouse no se pudo ver sin
-      abrir la ventana.
-- [ ] **Qué sigue después de un medio**: en Propiedades de una imagen en
-      primer plano ponerle 5 segundos y «Seguir con otro medio»; proyectarla
-      y mirar que pase sola. Con un video, «Seguir con otro medio» al
-      terminar. Probado por dentro con tiempos reales de 1 segundo; los
-      videos de verdad (que terminen en VLC) no.
-- [ ] **Pestaña Tiempos**: elegir una sección, iniciar, mirar que cuente, pasarse
-      del tiempo (tiene que quedar en rojo y en negativo, también en el
-      recuadro «Temporizador» del escenario, que hay que agregar desde el
-      editor de escenarios), +1/−1 minuto, Siguiente y el cronómetro. Probado
-      por dentro con tiempos reales y con el recuadro dibujado; no en la
-      pantalla de escenario de verdad, ni escribiendo en las casillas.
-- [ ] **Abrir la versión nueva con la biblioteca real** (conviene guardar antes
-      una copia: Archivo → Guardar una copia de la biblioteca): arranca sola
-      con tres migraciones (sacar la lista inteligente, lo que sigue a un
-      medio y la tabla de audios). Se probó con copias de la biblioteca (una
-      copia de la real, el 8/10/2026: quedaron sus 14 canciones, 31 medios, la
-      playlist y los logos) y con bases de pruebas viejas; las listas
-      inteligentes que hubiera se borran, las demás playlists no se tocan.
-- [ ] **Preguntas al agregar un video de YouTube** (🔗 o ▶ YouTube): elegir
-      «Reproducir por internet» o «Descargar», y ver la marca 🌐 internet en
-      las tarjetas de YouTube. La descarga nueva depende de internet y del
-      sitio de yt-dlp: no se bajó nada desde acá.
-- [ ] **Menús y listas oscuros**: abrí los menús de arriba, hacé clic derecho
-      (una diapositiva, una pestaña de medios, una versión de la Biblia, un
-      cuadro de texto: el Cortar/Copiar/Pegar también tiene que salir oscuro),
-      abrí la lista «Salida» y las de Temas y Propiedades del medio, y dejá el
-      mouse quieto sobre un botón para ver el globito. Se miraron dibujados
-      por dentro; un menú abierto es una ventana aparte y no se abrió ninguna.
-      Ojo con las listas donde se escribe (tipografía, pestaña): tienen que
-      dejar escribir y seguir mostrando el texto en blanco.
-- [ ] **Pantalla de carga y «Acerca de» la primera vez**: abrí el programa y
-      mirá que la pantalla de carga se vea y se vaya sola. Para ver el «Acerca
-      de» de la primera vez, abrí la versión de prueba con una biblioteca copia
-      (ECCLESIACAST_DATA_DIR) que nunca haya abierto la versión nueva: tiene que
-      salir con el botón «Aceptar» y no volver a salir. Se dibujaron las dos
-      ventanas y se probó la regla de «una sola vez»; el arranque de verdad no
-      se vio (hubiera abierto ventanas). En una PC lenta, fijate que no se quede
-      congelada la pantalla de carga más de la cuenta.
-- [ ] **LIVE, PREVIEW y ESCENARIO en un solo recuadro**: tocá las tres
-      pestañas; el video en pantalla tiene que mostrar sus botones también en
-      PREVIEW; Ver → Separar el PREVIEW del LIVE vuelve a los dos recuadros, y
-      al cerrar y abrir el programa se acuerda de cuál dejaste. Se vio
-      dibujado en las tres pestañas y separado, y se probó por dentro que la
-      elección se guarda; falta con el mouse y con un video de verdad.
-- [ ] **Videos pesados**: agregar un video de 4K o de 50-60 cuadros (por el
-      botón Agregar y arrastrándolo): tiene que preguntar «¿Hago una copia más
-      liviana?». Con Sí, mirar la barra y que el video proyecte la copia; con
-      No, que se proyecte el original; y clic derecho → Hacer una copia
-      liviana… como camino de vuelta. En el LIVE tiene que verse la imagen quieta
-      del video pesado. Probado por dentro con videos de prueba (4K a 60,
-      1080p a 60, 1080p a 30): preguntas, copia con avance, cancelar sin dejar
-      restos y el póster en el LIVE; las ventanas, dibujadas, no abiertas.
-- [ ] **Lista de audios (pestaña Música)**: agregar archivos con ➕ y
-      arrastrándolos, probar mp3, wav, m4a, ogg y flac; doble clic reproduce
-      (y **se tiene que oír**: acá se probó con la salida de sonido apagada, para
-      no molestar); pausa, ⏪ ⏩, la barra, el volumen propio y que al terminar uno
-      siga con el otro. Se probó por dentro con archivos de prueba: orden,
-      guardado, que al terminar siga solo, anterior/siguiente, pausa, la barra y
-      el volumen; la pestaña, dibujada. Falta oírlo de verdad, ver el arrastre con
-      el mouse, y el doble clic y el Enter con el teclado.
-      Al abrir la versión nueva con la biblioteca real hay una migración más
-      (la tabla de audios): se probó con una base vieja y con copias.
+
+**Biblia**
+- [ ] Versiones en una fila: clic = sólo esa; Ctrl+clic = suma la segunda;
+      ▸ despliega los nombres; clic derecho → Editar, Exportar, Eliminar.
+- [ ] «➕ Playlist»: escribir «juan 8 del 5 al 10», ver el texto, Agregar.
+
+**Diapositivas y resaltado**
+- [ ] Resaltar en el LIVE: arrastrando se marca en azul y al soltar sale en
+      pantalla; un clic marca sólo esa palabra; Shift+clic suma otra; en la
+      pestaña Resaltar, `gracia; fe` marca todas las apariciones.
+- [ ] Reordenar diapositivas moviendo rápido: la barra azul no se escapa.
+
+**Playlist**
+- [ ] Con la tecla → apretada, se frena al final del pasaje y avisa; soltando
+      y apretando de nuevo pasa al siguiente.
+- [ ] Arrastrar un medio de la barra a la playlist.
+
+**Canciones**
+- [ ] Crear una canción con un título que ya existe (por ejemplo «mi gozo»):
+      pregunta Reemplazar, Guardar como (1) o Descartar.
+
+**Medios**
+- [ ] Arrastrar un archivo desde el Explorador y un medio a otra pestaña.
+- [ ] Clic derecho sobre una pestaña: Cambiar nombre (con emoji),
+      Configurar… (todo fondo o todo primer plano, logo al terminar),
+      Eliminar.
+- [ ] Propiedades de un medio → «Qué sigue después»: que pase solo a otro
+      medio o al logo.
+- [ ] Agregar un video de 4K o 60 cuadros: pregunta si hace una copia
+      liviana; con Sí, ver la barra; en el LIVE se ve la imagen quieta.
+
+**YouTube**
+- [ ] Al agregar un video pregunta «por internet» o «descargar»; los de
+      internet tienen la marca 🌐.
+- [ ] Descargar uno: la primera vez baja sus componentes (unos 60 MB) y
+      después el video, sin errores.
+
+**Tiempos y Música**
+- [ ] Pestaña Tiempos: elegir una sección, iniciar, pasarse del tiempo (rojo,
+      en negativo, también en el recuadro «Temporizador» del escenario, que
+      se agrega desde el editor), ±1 minuto, Siguiente, cronómetro.
+- [ ] Pestaña Música: agregar audios, que se oigan, pausa, barra, volumen, que
+      siga con el próximo. Y los botones de Spotify con Spotify abierto.
+
+**Si se vuelve a congelar**
+- [ ] Mirar el último archivo de la carpeta `logs`: la línea «Ventana
+      congelada» dice qué estaba haciendo. Pasámelo.
 
 ## 2. Para hacer
 
