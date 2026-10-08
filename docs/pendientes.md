@@ -12,8 +12,10 @@ Hay tres tipos de cosas, cada una en su sección:
 
 ## 1. Para probar (lo prueba Alexis)
 
-Todo esto ya está en el instalador `dist\EcclesiaCast-1.0.0-beta.6-setup.exe`
-(armado el 7/10/2026). El resto de la beta.6 ya se probó con una copia de la
+Lo más viejo de esta lista está en el instalador
+`dist\EcclesiaCast-1.0.0-beta.6-setup.exe` (armado el 7/10/2026); lo de las
+tres tandas de después (menús oscuros, pantalla de carga, recuadro único,
+videos pesados, audios…) está sólo en el código. El resto de la beta.6 ya se probó con una copia de la
 biblioteca real: Ctrl+K, las miniaturas de Anuncios, el ➕ de canciones,
 Acerca de, el editor y los escenarios en el monitor, el modo bajo
 rendimiento y cómo se ve la pestaña Música.
@@ -95,10 +97,11 @@ rendimiento y cómo se ve la pestaña Música.
       pantalla de escenario de verdad, ni escribiendo en las casillas.
 - [ ] **Abrir la versión nueva con la biblioteca real** (conviene guardar antes
       una copia: Archivo → Guardar una copia de la biblioteca): arranca sola
-      con dos migraciones (sacar la lista inteligente y lo que sigue a un
-      medio). Se probó con copias de la biblioteca y con bases de pruebas
-      viejas; las listas inteligentes que hubiera se borran, las demás
-      playlists no se tocan.
+      con tres migraciones (sacar la lista inteligente, lo que sigue a un
+      medio y la tabla de audios). Se probó con copias de la biblioteca (una
+      copia de la real, el 8/10/2026: quedaron sus 14 canciones, 31 medios, la
+      playlist y los logos) y con bases de pruebas viejas; las listas
+      inteligentes que hubiera se borran, las demás playlists no se tocan.
 - [ ] **Preguntas al agregar un video de YouTube** (🔗 o ▶ YouTube): elegir
       «Reproducir por internet» o «Descargar», y ver la marca 🌐 internet en
       las tarjetas de YouTube. La descarga nueva depende de internet y del
@@ -158,11 +161,10 @@ rendimiento y cómo se ve la pestaña Música.
       Libre); una carpeta privada `biblias` junto al instalador para las PCs
       de la iglesia; y pedirle permiso por la RVR1960 a la Sociedad Bíblica
       del Uruguay o a la American Bible Society.
-- [ ] **Lo pedido al probar la beta.6** (7/10/2026): está todo en
-      [plan-sonnet-2.md](plan-sonnet-2.md), en tres tandas. Las tandas 1 y 2
-      están programadas (falta probarlas, sección 1); queda la **tanda 3**:
-      menús oscuros, pantalla de carga y «Acerca de» la primera vez, LIVE +
-      PREVIEW + Escenario en un solo recuadro, videos pesados y audios.
+- [ ] **Armar la beta.7.** Las tres tandas de lo pedido al probar la beta.6
+      (7/10/2026, en [plan-sonnet-2.md](plan-sonnet-2.md)) ya están
+      programadas, pero ninguna está en el instalador de la beta.6: falta
+      armar uno nuevo con todo, y probarlo (sección 1).
 
 ## 3. Para llegar a la v1.0.0
 
