@@ -1071,9 +1071,11 @@
                         <Border Height="165" Margin="12,0,12,12"
                                 Background="#0B0D12" CornerRadius="4" ClipToBounds="True">
                             <Grid>
+                                <!-- El próximo texto va sobre el fondo que va a quedar: un
+                                     anuncio en primer plano sale al proyectar la diapositiva -->
                                 <controls:ProjectedView Slide="{Binding PreviewSlide}"
-                                                        BackgroundMedia="{Binding Projection.Background}"
-                                                        FillMedia="{Binding Projection.BackgroundFill}"
+                                                        BackgroundMedia="{Binding Projection.PreviewBackground}"
+                                                        FillMedia="{Binding Projection.PreviewBackgroundFill}"
                                                         BackgroundBlur="{Binding Projection.BackgroundBlur}"
                                                         Logo="{Binding Projection.ActiveLogo}"
                                                         Visibility="{Binding PreviewShowsStage, Converter={StaticResource InverseBoolToVis}}"/>

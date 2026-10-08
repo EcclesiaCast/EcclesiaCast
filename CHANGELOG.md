@@ -199,6 +199,12 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Corregido
 
+- **El PREVIEW ya no muestra la letra encima del anuncio.** Con un medio en
+  primer plano en pantalla, el cuadro «Siguiente» dibujaba la próxima
+  diapositiva sobre la imagen del anuncio, pero al proyectarla el anuncio
+  sale. Ahora el PREVIEW muestra la letra sobre el fondo que va a quedar (el
+  fondo normal, o ninguno).
+
 - **Las flechas ya no se pasan solas al ítem siguiente de la playlist.** Con
   la tecla apretada, las flechas llegaban al final del pasaje, ponían de fondo
   el video que seguía en la playlist y saltaban al ítem de después, todo en

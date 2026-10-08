@@ -41,6 +41,17 @@ public sealed partial class ProjectionViewModel : ObservableObject
     [ObservableProperty]
     private System.Windows.Media.ImageSource? _liveFrame;
 
+    /// <summary>
+    /// The background the PREVIEW draws behind the next slide: the live one,
+    /// unless it is a foreground announcement, which the next slide takes off.
+    /// </summary>
+    [ObservableProperty]
+    private EcclesiaCast.Core.Media.MediaItem? _previewBackground;
+
+    /// <summary>What fills the screen behind <see cref="PreviewBackground"/>.</summary>
+    [ObservableProperty]
+    private EcclesiaCast.Core.Media.MediaItem? _previewBackgroundFill;
+
     /// <summary>What fills the screen behind a framed background.</summary>
     [ObservableProperty]
     private EcclesiaCast.Core.Media.MediaItem? _backgroundFill;
@@ -90,6 +101,8 @@ public sealed partial class ProjectionViewModel : ObservableObject
         Background = presentation.Background;
         BackgroundBlur = presentation.Background?.Blur ?? 0;
         BackgroundFill = presentation.BackgroundFill;
+        PreviewBackground = NextSlideBackground.Resolve(presentation.Background);
+        PreviewBackgroundFill = PreviewBackground is null ? null : presentation.BackgroundFill;
         ActiveLogo = presentation.ActiveLogo;
         Countdown = presentation.Countdown;
         StageNotes = presentation.StageNotes;
