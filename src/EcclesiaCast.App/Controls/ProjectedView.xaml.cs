@@ -40,8 +40,8 @@ public partial class ProjectedView : UserControl
             new PropertyMetadata(null, (d, e) => ((ProjectedView)d).SlideView.Overlay = (string?)e.NewValue));
 
     public static readonly DependencyProperty HighlightProperty =
-        DependencyProperty.Register(nameof(Highlight), typeof(string), typeof(ProjectedView),
-            new PropertyMetadata(null, (d, e) => ((ProjectedView)d).SlideView.Highlight = (string?)e.NewValue));
+        DependencyProperty.Register(nameof(Highlight), typeof(HighlightSet), typeof(ProjectedView),
+            new PropertyMetadata(null, (d, e) => ((ProjectedView)d).SlideView.Highlight = (HighlightSet?)e.NewValue));
 
     public static readonly DependencyProperty AnimateTransitionsProperty =
         DependencyProperty.Register(nameof(AnimateTransitions), typeof(bool), typeof(ProjectedView),
@@ -139,9 +139,9 @@ public partial class ProjectedView : UserControl
         set => SetValue(OverlayProperty, value);
     }
 
-    public string? Highlight
+    public HighlightSet? Highlight
     {
-        get => (string?)GetValue(HighlightProperty);
+        get => (HighlightSet?)GetValue(HighlightProperty);
         set => SetValue(HighlightProperty, value);
     }
 

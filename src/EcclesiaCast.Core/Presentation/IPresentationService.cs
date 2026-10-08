@@ -18,10 +18,12 @@ public interface IPresentationService
     string? OverlayMessage { get; }
 
     /// <summary>
-    /// Word or phrase highlighted inside the projected text (like a marker
-    /// pen over the live verse). Null when nothing is highlighted.
+    /// What is marked inside the projected text (like a marker pen over the
+    /// live verse): terms typed in the Resaltar box, which mark every
+    /// appearance, and single appearances pointed at on the Live panel.
+    /// Empty when nothing is marked.
     /// </summary>
-    string? HighlightTerm { get; }
+    HighlightSet Highlight { get; }
 
     /// <summary>
     /// What shows behind the background where it does not reach — another
@@ -62,7 +64,7 @@ public interface IPresentationService
     /// <summary>Chooses which logo the Logo state shows.</summary>
     void SetActiveLogo(Logos.Logo? logo);
 
-    /// <summary>Puts a slide live and switches the output to content; a different slide drops the highlight.</summary>
+    /// <summary>Puts a slide live and switches the output to content; a different slide drops every mark.</summary>
     void GoLive(SlideContent slide);
 
     /// <summary>Toggles between background-only and the current content.</summary>
@@ -79,8 +81,8 @@ public interface IPresentationService
 
     void HideOverlay();
 
-    /// <summary>Highlights a word or phrase in the projected text; null or blank clears it.</summary>
-    void SetHighlight(string? term);
+    /// <summary>Sets what is marked in the projected text; <see cref="HighlightSet.None"/> clears it.</summary>
+    void SetHighlight(HighlightSet highlight);
 
     /// <summary>
     /// Sets the background layer; null clears it. <paramref name="fill"/> is

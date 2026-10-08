@@ -139,6 +139,15 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Cambiado
 
+- **Resaltar: varias cosas, y sólo la que elegís.** Al marcar en el LIVE
+  (clic o arrastre) se resalta sólo esa vez en el texto, no todas las veces que
+  aparece la palabra. Con **Shift** se suma otra marca sin perder las
+  anteriores, y marcar de nuevo algo resaltado lo saca. En la pestaña Resaltar
+  se pueden escribir varias palabras o frases separadas por **;** («gracia;
+  fe»), y esas sí se pintan en todas las veces que aparecen. Al cambiar de
+  diapositiva se borra todo. El resaltado también sale en la página para OBS y
+  vMix.
+
 - **Las versiones de la Biblia, en una fila.** Cada versión es un botón con su
   abreviatura (RVR1960, NVI, NTV, TLA): un clic usa sólo esa; Ctrl+clic suma
   o saca una segunda, que se proyecta debajo de la primera. Las activas se ven

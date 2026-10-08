@@ -42,7 +42,8 @@ public interface IRemoteHost
 /// styles it, and the announcements that ride over everything.
 ///
 /// It carries style rather than a picture because that is what a stream
-/// wants — clean text over transparency, to sit on top of the camera.
+/// wants — clean text over transparency, to sit on top of the camera. The
+/// marker-pen highlight goes as [start, length] pairs over each text.
 /// </summary>
 public sealed record RemoteOutput(
     bool ShowText,
@@ -60,4 +61,6 @@ public sealed record RemoteOutput(
     string OutlineColor,
     double OutlineWidth,
     string AlignH,
-    string AlignV);
+    string AlignV,
+    IReadOnlyList<int[]> MainMarks,
+    IReadOnlyList<int[]> SecondaryMarks);

@@ -2341,7 +2341,12 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             OutlineColor: over?.OutlineColor ?? theme.OutlineColor,
             OutlineWidth: over?.OutlineWidth ?? theme.OutlineWidth,
             AlignH: (over?.AlignH ?? theme.AlignH).ToString().ToLowerInvariant(),
-            AlignV: (over?.AlignV ?? theme.AlignV).ToString().ToLowerInvariant());
+            AlignV: (over?.AlignV ?? theme.AlignV).ToString().ToLowerInvariant(),
+            MainMarks: Marks(_presentation.Highlight.Resolve(slide?.MainText)),
+            SecondaryMarks: Marks(_presentation.Highlight.Resolve(slide?.SecondaryText, includeSpans: false)));
+
+        static IReadOnlyList<int[]> Marks(IReadOnlyList<TextSpan> spans) =>
+            spans.Select(s => new[] { s.Start, s.Length }).ToList();
     }
 
     void IRemoteHost.Execute(string action, int? index)
@@ -3685,10 +3690,38 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
     // ── Resaltado en vivo ────────────────────────────────────────
 
-    partial void OnHighlightTextChanged(string value) => _presentation.SetHighlight(value);
+    /// <summary>The box holds the terms, split by «;»; the appearances pointed at on the Live panel stay.</summary>
+    partial void OnHighlightTextChanged(string value) =>
+        _presentation.SetHighlight(_presentation.Highlight.WithTerms(HighlightSet.SplitTerms(value)));
+
+    /// <summary>
+    /// The operator pointed at words on the Live panel (positions in the main
+    /// text of the live slide). Only that appearance is marked, not every one
+    /// of the same word; Shift adds it to the earlier marks, and pointing at
+    /// something already marked takes it off.
+    /// </summary>
+    public void MarkOnLive(TextSpan mark, bool addToOthers)
+    {
+        var text = _presentation.CurrentSlide?.MainText;
+        if (string.IsNullOrEmpty(text) || mark.End > text.Length)
+            return;
+
+        var before = _presentation.Highlight;
+        var after = before.Point(mark, text, addToOthers);
+        _presentation.SetHighlight(after);
+
+        // Pointing at a typed word took it off the Resaltar box as well.
+        if (after.Terms.Count != before.Terms.Count)
+            HighlightText = HighlightSet.JoinTerms(after.Terms);
+    }
 
     [RelayCommand]
-    private void ClearHighlight() => HighlightText = string.Empty;
+    private void ClearHighlight()
+    {
+        HighlightText = string.Empty;
+        // The marks pointed at on the Live panel are not in the box.
+        _presentation.SetHighlight(HighlightSet.None);
+    }
 
     /// <summary>
     /// A new slide on screen drops the highlight (the presentation does it),
@@ -3697,7 +3730,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     /// </summary>
     private void SyncHighlightBox()
     {
-        if (_presentation.HighlightTerm is null && HighlightText.Length > 0)
+        if (_presentation.Highlight.Terms.Count == 0 && HighlightText.Length > 0)
             HighlightText = string.Empty;
     }
 

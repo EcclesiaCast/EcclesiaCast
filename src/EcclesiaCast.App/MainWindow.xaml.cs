@@ -623,8 +623,9 @@ public partial class MainWindow : Window
 
     /// <summary>
     /// Pointing at the words on the Live preview highlights them on the
-    /// screen: a click takes the word, a drag the phrase. Pointing at what is
-    /// already highlighted takes the highlight off again.
+    /// screen: a click takes the word, a drag the phrase, and only that
+    /// appearance is marked. With Shift the mark joins the earlier ones;
+    /// pointing at what is already highlighted takes it off again.
     /// </summary>
     private void LiveView_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
@@ -635,12 +636,10 @@ public partial class MainWindow : Window
         _liveHighlightStart = null;
 
         var phrase = LiveView.SlideView.PhraseBetween(start, e.GetPosition(LiveView.SlideView));
-        if (phrase is null)
+        if (phrase is not { } mark)
             return;
 
-        vm.HighlightText = string.Equals(phrase, vm.HighlightText, StringComparison.CurrentCultureIgnoreCase)
-            ? string.Empty
-            : phrase;
+        vm.MarkOnLive(mark, addToOthers: (Keyboard.Modifiers & ModifierKeys.Shift) != 0);
         e.Handled = true;
     }
 

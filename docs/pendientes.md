@@ -65,6 +65,12 @@ rendimiento y cómo se ve la pestaña Música.
       texto y agregar con Enter o con el botón. Dibujada y probada por
       dentro; el foco del teclado al abrirse y el Esc no se pudieron ver
       sin abrir la ventana.
+- [ ] **Resaltar con el mouse en el LIVE**: un clic marca sólo esa palabra
+      (no todas las iguales), Shift+clic suma otra marca, y otro clic sobre una
+      marcada la saca. Probado por dentro y dibujado a imagen; el gesto real
+      con mouse y Shift no. En la pestaña Resaltar, `gracia; fe` marca las dos
+      cosas en todas sus apariciones. La página para OBS/vMix también tiene
+      que mostrar el amarillo.
 - [ ] **Preguntas al agregar un video de YouTube** (🔗 o ▶ YouTube): elegir
       «Reproducir por internet» o «Descargar», y ver la marca 🌐 internet en
       las tarjetas de YouTube. La descarga nueva depende de internet y del

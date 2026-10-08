@@ -12,10 +12,10 @@ public sealed class PresentationService : IPresentationService
 
     public void GoLive(SlideContent slide)
     {
-        // A highlight belongs to the words it was put on: the next slide
-        // starts clean. Sending the same slide again (a theme change) keeps it.
+        // A mark belongs to the words it was put on: the next slide starts
+        // clean. Sending the same slide again (a theme change) keeps them.
         if (!Equals(slide, CurrentSlide))
-            HighlightTerm = null;
+            Highlight = HighlightSet.None;
 
         CurrentSlide = slide;
         State = OutputState.Content;
@@ -46,15 +46,15 @@ public sealed class PresentationService : IPresentationService
         OnChanged();
     }
 
-    public string? HighlightTerm { get; private set; }
+    public HighlightSet Highlight { get; private set; } = HighlightSet.None;
 
-    public void SetHighlight(string? term)
+    public void SetHighlight(HighlightSet highlight)
     {
-        term = string.IsNullOrWhiteSpace(term) ? null : term.Trim();
-        if (term == HighlightTerm)
+        highlight ??= HighlightSet.None;
+        if (highlight.Equals(Highlight))
             return;
 
-        HighlightTerm = term;
+        Highlight = highlight;
         OnChanged();
     }
 

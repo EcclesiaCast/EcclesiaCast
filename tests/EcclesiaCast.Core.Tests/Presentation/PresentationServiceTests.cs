@@ -127,61 +127,64 @@ public class PresentationServiceTests
         Assert.Equal(0, raised);
     }
 
+    private static HighlightSet Terms(params string[] terms) => new(terms, []);
+
     [Fact]
-    public void SetHighlight_trims_and_raises_Changed()
+    public void SetHighlight_keeps_the_terms_trimmed_and_raises_Changed()
     {
         var raised = 0;
         _service.Changed += (_, _) => raised++;
 
-        _service.SetHighlight("  gracia  ");
+        _service.SetHighlight(Terms("  gracia  "));
 
-        Assert.Equal("gracia", _service.HighlightTerm);
+        Assert.Equal(["gracia"], _service.Highlight.Terms);
         Assert.Equal(1, raised);
     }
 
     [Fact]
-    public void SetHighlight_with_blank_clears_the_term()
+    public void SetHighlight_with_blank_terms_clears_it()
     {
-        _service.SetHighlight("gracia");
+        _service.SetHighlight(Terms("gracia"));
 
-        _service.SetHighlight("   ");
+        _service.SetHighlight(Terms("   "));
 
-        Assert.Null(_service.HighlightTerm);
+        Assert.True(_service.Highlight.IsEmpty);
     }
 
     [Fact]
-    public void SetHighlight_with_the_same_value_does_not_raise_Changed()
+    public void SetHighlight_with_the_same_marks_does_not_raise_Changed()
     {
-        _service.SetHighlight("gracia");
+        _service.SetHighlight(new HighlightSet(["gracia"], [new TextSpan(4, 3)]));
         var raised = 0;
         _service.Changed += (_, _) => raised++;
 
-        _service.SetHighlight("gracia");
+        _service.SetHighlight(new HighlightSet(["GRACIA"], [new TextSpan(4, 3)]));
 
         Assert.Equal(0, raised);
     }
 
     [Fact]
-    public void Going_to_another_slide_drops_the_highlight()
+    public void Going_to_another_slide_drops_every_mark()
     {
         _service.GoLive(new SlideContent("Por gracia sois salvos"));
-        _service.SetHighlight("gracia");
+        _service.SetHighlight(new HighlightSet(["gracia"], [new TextSpan(0, 3)]));
 
         _service.GoLive(new SlideContent("por medio de la fe"));
 
-        Assert.Null(_service.HighlightTerm);
+        Assert.True(_service.Highlight.IsEmpty);
     }
 
     [Fact]
-    public void Sending_the_same_slide_again_keeps_the_highlight()
+    public void Sending_the_same_slide_again_keeps_the_marks()
     {
         var slide = new SlideContent("Por gracia sois salvos");
         _service.GoLive(slide);
-        _service.SetHighlight("gracia");
+        _service.SetHighlight(new HighlightSet(["gracia"], [new TextSpan(0, 3)]));
 
         _service.GoLive(slide with { });
 
-        Assert.Equal("gracia", _service.HighlightTerm);
+        Assert.Equal(["gracia"], _service.Highlight.Terms);
+        Assert.Equal([new TextSpan(0, 3)], _service.Highlight.Spans);
     }
 
     [Fact]

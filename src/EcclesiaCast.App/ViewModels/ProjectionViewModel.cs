@@ -20,7 +20,7 @@ public sealed partial class ProjectionViewModel : ObservableObject
     private string? _overlay;
 
     [ObservableProperty]
-    private string? _highlight;
+    private HighlightSet _highlight = HighlightSet.None;
 
     [ObservableProperty]
     private EcclesiaCast.Core.Media.MediaItem? _background;
@@ -97,7 +97,7 @@ public sealed partial class ProjectionViewModel : ObservableObject
         Slide = presentation.CurrentSlide;
         State = presentation.State;
         Overlay = presentation.OverlayMessage;
-        Highlight = presentation.HighlightTerm;
+        Highlight = presentation.Highlight;
         Background = presentation.Background;
         BackgroundBlur = presentation.Background?.Blur ?? 0;
         BackgroundFill = presentation.BackgroundFill;

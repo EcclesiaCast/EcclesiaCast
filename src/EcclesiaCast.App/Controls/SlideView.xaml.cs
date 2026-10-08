@@ -68,7 +68,7 @@ public partial class SlideView : UserControl
     }
 
     public static readonly DependencyProperty HighlightProperty =
-        DependencyProperty.Register(nameof(Highlight), typeof(string), typeof(SlideView),
+        DependencyProperty.Register(nameof(Highlight), typeof(HighlightSet), typeof(SlideView),
             new PropertyMetadata(null, (d, _) => ((SlideView)d).RenderText()));
 
     private static readonly Brush HighlightBrush = new SolidColorBrush(Color.FromRgb(0xE8, 0xC3, 0x4A));
@@ -115,10 +115,10 @@ public partial class SlideView : UserControl
         set => SetValue(OverlayProperty, value);
     }
 
-    /// <summary>Word or phrase to paint over the projected text, marker-pen style.</summary>
-    public string? Highlight
+    /// <summary>What to paint over the projected text, marker-pen style: typed terms and pointed-at appearances.</summary>
+    public HighlightSet? Highlight
     {
-        get => (string?)GetValue(HighlightProperty);
+        get => (HighlightSet?)GetValue(HighlightProperty);
         set => SetValue(HighlightProperty, value);
     }
 
@@ -507,18 +507,26 @@ public partial class SlideView : UserControl
     private string? Transform(string? text) => SlideTextFit.ApplyCase(text, EffectiveCase);
 
     /// <summary>
-    /// The words of the main text between two points (in this control's
-    /// coordinates), widened to whole words: a click gives the word under it,
-    /// a drag the phrase it swept. Null when neither point is on the text.
-    /// Used to highlight by pointing at the Live preview.
+    /// Where in the main text the words between two points (in this control's
+    /// coordinates) are, widened to whole words: a click gives the word under
+    /// it, a drag the phrase it swept. Null when neither point is on the text,
+    /// or what is under them has no letters. Used to highlight by pointing at
+    /// the Live preview: only that appearance is marked, not every one of the
+    /// same word.
     /// </summary>
-    public string? PhraseBetween(Point from, Point to)
+    public TextSpan? PhraseBetween(Point from, Point to)
     {
         if (SpanBetween(from, to) is not var (start, end))
             return null;
 
-        var phrase = MainTextShown[start..end].Trim();
-        return phrase.Length == 0 || !phrase.Any(char.IsLetterOrDigit) ? null : phrase;
+        var phrase = MainTextShown[start..end];
+        if (!phrase.Any(char.IsLetterOrDigit))
+            return null;
+
+        // The edges are trimmed so a drag that took a space marks the words only.
+        var lead = phrase.Length - phrase.TrimStart().Length;
+        var length = phrase.Trim().Length;
+        return new TextSpan(start + lead, length);
     }
 
     /// <summary>
@@ -615,45 +623,53 @@ public partial class SlideView : UserControl
         if (string.IsNullOrEmpty(text))
             return;
 
-        // A selection being dragged on the Live preview wins over the
-        // highlight: it shows exactly the words under the mouse.
-        if (ReferenceEquals(target, MainText) && _selection is var (from, to) && to <= text.Length)
-        {
-            if (from > 0)
-                target.Inlines.Add(new Run(text[..from]));
-            target.Inlines.Add(new Run(text[from..to]) { Background = SelectionBrush });
-            if (to < text.Length)
-                target.Inlines.Add(new Run(text[to..]));
-            return;
-        }
+        // Pointed-at appearances belong to the main text only: their
+        // position means nothing in the second version below it.
+        var isMain = ReferenceEquals(target, MainText);
+        var marked = (Highlight ?? HighlightSet.None).Resolve(text, includeSpans: isMain);
 
-        var term = Highlight;
-        if (string.IsNullOrWhiteSpace(term))
+        // A selection being dragged on the Live preview wins over the marks
+        // under it: it shows exactly the words under the mouse.
+        TextSpan? selection = isMain && _selection is var (from, to) && to <= text.Length
+            ? new TextSpan(from, to - from)
+            : null;
+
+        if (marked.Count == 0 && selection is null)
         {
             target.Inlines.Add(new Run(text));
             return;
         }
 
-        var position = 0;
-        while (position < text.Length)
+        // The text is cut wherever a mark or the selection starts or stops;
+        // each piece is painted by what covers it.
+        var cuts = new SortedSet<int> { 0, text.Length };
+        foreach (var mark in marked)
         {
-            var index = text.IndexOf(term, position, StringComparison.CurrentCultureIgnoreCase);
-            if (index < 0)
+            cuts.Add(mark.Start);
+            cuts.Add(Math.Min(mark.End, text.Length));
+        }
+        if (selection is { } picked)
+        {
+            cuts.Add(picked.Start);
+            cuts.Add(picked.End);
+        }
+
+        var edges = cuts.ToList();
+        for (var i = 0; i + 1 < edges.Count; i++)
+        {
+            var piece = new TextSpan(edges[i], edges[i + 1] - edges[i]);
+            var run = new Run(text.Substring(piece.Start, piece.Length));
+            if (selection is { } chosen && chosen.Contains(piece))
             {
-                target.Inlines.Add(new Run(text[position..]));
-                break;
+                run.Background = SelectionBrush;
+            }
+            else if (marked.Any(m => m.Contains(piece)))
+            {
+                run.Background = HighlightBrush;
+                run.Foreground = Brushes.Black;
             }
 
-            if (index > position)
-                target.Inlines.Add(new Run(text[position..index]));
-
-            target.Inlines.Add(new Run(text.Substring(index, term.Length))
-            {
-                Background = HighlightBrush,
-                Foreground = Brushes.Black,
-            });
-
-            position = index + term.Length;
+            target.Inlines.Add(run);
         }
     }
 

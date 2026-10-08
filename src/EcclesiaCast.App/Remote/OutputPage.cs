@@ -37,6 +37,8 @@ public static class OutputPage
             #canvas.abajo  { justify-content: flex-end; }
 
             #main, #secondary { margin: 0; white-space: pre-wrap; line-height: 1.15; }
+            /* The marker pen, the same yellow as on the projector. */
+            mark { background: #E8C34A; color: #000; text-shadow: none; }
             #secondary { opacity: .92; font-size: .62em; margin-top: .4em; }
             /* Lives outside #canvas, so it gets its own colour: inheriting
                from the body meant black text on a black stream. */
@@ -95,6 +97,21 @@ public static class OutputPage
 
             function show(el, on) { el.classList.toggle('oculto', !on); }
 
+            // Writes the text with the highlighted stretches ([start, length]
+            // pairs, in order) wrapped in <mark>.
+            function setText(el, text, marks) {
+              el.textContent = '';
+              var at = 0;
+              (marks || []).forEach(function (m) {
+                if (m[0] > at) el.appendChild(document.createTextNode(text.substring(at, m[0])));
+                var mark = document.createElement('mark');
+                mark.textContent = text.substring(m[0], m[0] + m[1]);
+                el.appendChild(mark);
+                at = m[0] + m[1];
+              });
+              if (at < text.length) el.appendChild(document.createTextNode(text.substring(at)));
+            }
+
             function paint(s) {
               // Sizes come over as points on the 1080-high canvas the
               // projector renders to, so they are turned into viewport
@@ -117,9 +134,9 @@ public static class OutputPage
                     }).join(',')
                 : '0 0 1.4vh rgba(0,0,0,.85)';
 
-              main.textContent = s.showText ? (s.mainText || '') : '';
+              setText(main, s.showText ? (s.mainText || '') : '', s.showText ? s.mainMarks : []);
               show(secondary, s.showText && !!s.secondaryText);
-              secondary.textContent = s.secondaryText || '';
+              setText(secondary, s.secondaryText || '', s.secondaryMarks);
               show(caption, s.showText && !!s.caption);
               caption.textContent = s.caption || '';
               caption.style.color = s.color || '#FFFFFF';
