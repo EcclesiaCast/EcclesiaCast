@@ -246,7 +246,9 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 - **Las versiones de la Biblia, en una fila.** Cada versión es un botón con su
   abreviatura (RVR1960, NVI, NTV, TLA): un clic usa sólo esa; Ctrl+clic suma
-  o saca una segunda, que se proyecta debajo de la primera. Las activas se ven
+  o saca una segunda, que se proyecta debajo de la primera (si ya había dos,
+  la nueva reemplaza a la segunda y la primera se queda; debajo de la fila lo
+  dice «Ctrl+clic: sumar una segunda versión»). Las activas se ven
   encendidas, la primera llena y la segunda con borde. El botón ▸ abre la
   lista con los nombres completos y el programa se acuerda si la dejaste
   abierta. Con clic derecho sobre una versión: editar nombre y abreviatura,

@@ -645,11 +645,16 @@
                                                     CommandParameter="{Binding}"
                                                     Tag="{Binding Tag, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                     AutomationProperties.Name="{Binding Info.Name}"
-                                                    ToolTip="{Binding Info.Name}"
+                                                    ToolTip="{Binding Info.Name, StringFormat='{}{0}&#10;Clic: usar sólo esta · Ctrl+clic: sumarla como segunda versión'}"
                                                     ContextMenu="{StaticResource VersionMenu}"/>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
+
+                                <!-- Que el Ctrl+clic no quede escondido en el globito -->
+                                <TextBlock DockPanel.Dock="Top" Margin="12,0,12,6"
+                                           Text="Ctrl+clic: sumar una segunda versión"
+                                           FontSize="10" Foreground="{StaticResource FaintBrush}"/>
 
                                 <!-- Abierta: una fila por versión, con el nombre completo -->
                                 <Border DockPanel.Dock="Top" Margin="12,0,12,6"
@@ -673,6 +678,7 @@
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
                                                     <Button Style="{StaticResource VersionRow}"
+                                                            ToolTip="Clic: usar sólo esta · Ctrl+clic: sumarla como segunda versión"
                                                             Command="{Binding Tag.ChooseVersionCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                             CommandParameter="{Binding}"
                                                             Tag="{Binding Tag, RelativeSource={RelativeSource AncestorType=ItemsControl}}"

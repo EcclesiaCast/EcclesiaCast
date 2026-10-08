@@ -3700,16 +3700,17 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         {
             _checkedVersionIds.Add(option.Info.Id);
 
-            // Up to two versions at a time: checking a third releases the oldest.
+            // Up to two versions at a time: a third takes the place of the
+            // second. The first one stays — it is the version being read.
             while (_checkedVersionIds.Count > 2)
             {
-                var oldestId = _checkedVersionIds[0];
-                _checkedVersionIds.RemoveAt(0);
-                var oldest = BibleVersionOptions.FirstOrDefault(o => o.Info.Id == oldestId);
-                if (oldest is not null)
+                var replacedId = _checkedVersionIds[1];
+                _checkedVersionIds.RemoveAt(1);
+                var replaced = BibleVersionOptions.FirstOrDefault(o => o.Info.Id == replacedId);
+                if (replaced is not null)
                 {
                     _suppressVersionEvents = true;
-                    oldest.IsSelected = false;
+                    replaced.IsSelected = false;
                     _suppressVersionEvents = false;
                 }
             }
@@ -3724,7 +3725,8 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
     /// <summary>
     /// A click on a version uses only that one; Ctrl+click adds it as the
-    /// second version, or takes it out if it was already active.
+    /// second version (in place of the second, if there were two already),
+    /// or takes it out if it was already active.
     /// </summary>
     [RelayCommand]
     private void ChooseVersion(BibleVersionOption? option)
