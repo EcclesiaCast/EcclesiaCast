@@ -162,6 +162,49 @@ En la barra **MEDIOS**, abajo:
 > Para que el texto se vea *sobre* el fondo, el tema tiene que tener el fondo
 > transparente (los temas nuevos ya vienen así).
 
+### Proyectar una página web
+
+El botón **🌐 Web** de la barra de medios abre una página web **en el lugar de
+las diapositivas** (el cuadro central). La usás ahí con el mouse y el teclado
+como en cualquier navegador, y la mandás a la pantalla de dos formas. Hace
+falta el componente WebView2 de Microsoft (el mismo de YouTube).
+
+- **La dirección.** Escribí una dirección (`google.com`) y apretá Enter, o
+  escribí lo que quieras buscar (`juan 3 16 comentario`) y lo busca en Google.
+  Con ◀ ▶ ⟳ volvés, avanzás y recargás. Las ventanas nuevas que abre una página
+  se abren en este mismo panel. Si iniciás sesión (Google, Canva), queda
+  guardada y vale también para YouTube.
+- **Lo que ves es lo que se proyecta.** La página se arma siempre como en una
+  pantalla de 1920×1080 y se achica para entrar en el panel (con barras a los
+  costados si sobra lugar). **A−** y **A+** achican y agrandan la letra de la
+  página, para que se lea en la pantalla grande.
+- **📷 Proyectar foto.** Saca una foto de la página tal como está y la
+  proyecta, **en primer plano** (tapa la letra, como un anuncio) y entera. Si
+  seguís navegando, la pantalla **no cambia** hasta la próxima foto. Las fotos
+  se guardan en la carpeta `capturas` y las de más de 7 días se borran solas
+  al abrir el programa, salvo las que guardaste en medios.
+- **🔴 En vivo.** La pantalla muestra la página **en movimiento**: lo que te
+  desplazás, un video o una animación. Con **Mostrar el puntero** (prendido de
+  entrada; se recuerda) se dibuja en la pantalla una flecha donde tenés el
+  mouse sobre la página, para que la congregación vea qué señalás. Se apaga con
+  el mismo botón, o solo cuando proyectás otro fondo o una diapositiva. Si
+  tocás **✕ Cerrar** y volvés a las diapositivas, la página **sigue en vivo**.
+  Con el **modo de PC de bajo rendimiento**, tus paneles LIVE y PREVIEW
+  muestran una foto que se renueva cada 2 segundos (la pantalla siempre va en
+  movimiento).
+- **Guardar en medios.** Si sacaste una foto de la página que tenés abierta, la
+  guarda como imagen en la pestaña elegida. Si no, guarda **la página**: una
+  tarjeta 🌐 con su título y una miniatura. Un **clic** en una tarjeta 🌐 abre
+  la página en el panel, sin proyectarla (se proyecta con los botones). Se
+  puede agregar a la playlist: al elegirla se abre el panel, y el **doble
+  clic** la pone en vivo. Su menú de clic derecho tiene sólo lo que sirve:
+  cambiar nombre, mover de pestaña, agregar a la playlist y quitar.
+- **El teclado.** Mientras escribís en la página o en la caja de dirección, los
+  atajos del programa (F1 a F4, Esc, las flechas que cambian de diapositiva,
+  Ctrl+K) no se disparan. Vuelven cuando hacés clic afuera de la página.
+- La página con **protección de copia** (Netflix, Spotify) se ve negra en la
+  pantalla; no es un problema del programa.
+
 ## 5. Temas: tipografía, colores y márgenes
 
 Botón **🎨 Temas** en la barra superior:

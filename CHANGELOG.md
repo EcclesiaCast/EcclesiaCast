@@ -9,6 +9,21 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Proyectar una página web.** El botón **🌐 Web** de la barra de medios abre
+  una página en el cuadro central, en lugar de las diapositivas: la usás con el
+  mouse y el teclado y la mandás a la pantalla de dos formas. **📷 Proyectar
+  foto** saca una foto de lo que se ve y la proyecta en primer plano (si
+  seguís navegando, la pantalla no cambia hasta la próxima foto); **🔴 En vivo**
+  muestra la página en movimiento (desplazarse, videos, animaciones), con una
+  flecha donde tenés el mouse si dejás tildado **Mostrar el puntero**. La
+  página se arma como en una pantalla de 1920×1080, así que lo que ves es lo
+  que se proyecta; **A−** y **A+** agrandan la letra. Se escribe una dirección
+  o lo que quieras buscar en Google. Al cerrar el panel, una página en vivo
+  sigue proyectándose. **Guardar en medios** guarda la foto o, sin foto, la
+  página como tarjeta 🌐 (un clic la abre; se puede agregar a la playlist, y el
+  doble clic la pone en vivo). Mientras escribís en la página, los atajos del
+  programa no se disparan. Las fotos de más de 7 días se borran solas.
+
 - **En Propiedades, el cuadro de vista previa muestra también lo que queda
   afuera de la pantalla.** Se ve la imagen entera, con la parte de afuera
   **oscurecida** y la pantalla marcada con un **rectángulo blanco**, como en un

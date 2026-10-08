@@ -89,6 +89,37 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
       esta versión no pide nada. Si hay una página en pantalla, tiene que
       cambiar sola a la versión nítida.
 
+- [ ] **Proyectar una página web** (pedido de Alexis, 8/10/2026). Nada de esto
+      se pudo probar con la app abierta: el control del navegador sólo se probó
+      en una ventana de prueba fuera de la pantalla, y la pantalla de salida,
+      el mouse y el teclado reales quedan para vos.
+      1. «🌐 Web» → escribí `google.com` y buscá algo. Probá escribir en el
+         buscador de la página: las flechas, la barra espaciadora, F1 a F4 y
+         Esc **no** tienen que mover las diapositivas ni apagar la pantalla.
+         Mirá que el **mouse** apunte bien (clics, ruedita, seleccionar texto)
+         aunque el panel sea más chico que 1920×1080: la página se achica con
+         un Viewbox.
+      2. «📷 Proyectar foto»: la pantalla muestra esa foto, entera y tapando la
+         letra. Seguí navegando: la pantalla no cambia hasta la próxima foto.
+      3. «🔴 En vivo»: la pantalla sigue lo que hacés (desplazarte, un video de
+         la página) y muestra el puntero (probá con la casilla destildada).
+         Volvé a las diapositivas con «✕ Cerrar»: tiene que seguir en vivo.
+         Proyectá otro fondo, o una diapositiva: el en vivo se apaga y el
+         botón se despinta. Probá F1, F2, F3 con una página en vivo.
+         Con el modo de PC de bajo rendimiento, LIVE y PREVIEW muestran una
+         foto que se renueva cada 2 segundos.
+      4. A− / A+ agrandan la letra de la página en la pantalla.
+      5. «Guardar en medios» → aparece una tarjeta 🌐; un clic la abre; agregala
+         a la playlist: al elegirla se abre el panel y el doble clic la pone en
+         vivo. Con una foto tomada, «Guardar en medios» la guarda como imagen.
+         Clic derecho en la tarjeta 🌐: sólo cambiar nombre, mover de pestaña,
+         playlist y quitar.
+      6. Probalo con **Canva** o **Google Slides** con la sesión iniciada, y con
+         un video de la página en vivo (los videos con protección, como
+         Netflix o Spotify, se ven negros: ya se sabe).
+      7. Cuántos cuadros por segundo da en la PC de la iglesia con el proyector
+         real (en la notebook de prueba dio 55 a 58 con una animación a 60).
+
 ## 2. Para la v1.0.0
 
 - [ ] **Usar la beta.7 en la reunión del domingo** y anotar lo que falle o no
@@ -161,14 +192,9 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
       Para Canva y Google Slides hoy hay que descargarlos como PDF y
       agregarlos. Mejora posible: pegar el enlace de una presentación pública
       de Google Slides y que el programa la baje como PDF sola (Canva pide
-      iniciar sesión, así que ahí sigue siendo descargar el PDF).
-- [ ] **Proyectar una página web** (pedido de Alexis, 8/10/2026). Abrir una
-      web en el cuadro central (donde están las diapositivas), usarla ahí
-      con el mouse y que se vea en la pantalla, de dos formas: **en vivo**
-      (la pantalla copia lo que pasa, con los movimientos) o **foto** (usás la
-      página y con un botón mandás lo que se ve en ese momento). Serviría
-      también para Canva y Google Slides con sesión iniciada. Hay que sumarlo
-      a la [política de privacidad](privacidad.md). Falta decidir cuándo.
+      iniciar sesión, así que ahí sigue siendo descargar el PDF). Mientras
+      tanto, con el panel **🌐 Web** se puede abrir Canva o Google Slides con la
+      sesión iniciada y proyectarlos como foto o en vivo.
 
 ## 4. Para versiones futuras
 
@@ -230,5 +256,5 @@ Cosas que ya sabemos y decidimos bancar por ahora. No son bugs nuevos.
   - Bajar el cache de VLC de 1500 a 500 ms sí bajó de 742 a 649 MB, y es lo
     que está puesto. Si en la PC del proyector el video tironea, subilo.
   - El navegador de YouTube (WebView2, que son cientos de MB) **no se crea**
-    salvo que proyectes un YouTube: verificado, 0 procesos con la salida
+    salvo que proyectes un YouTube (ni el del panel web, hasta que lo abrís): verificado, 0 procesos con la salida
     encendida y un video local corriendo.
