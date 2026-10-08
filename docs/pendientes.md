@@ -116,6 +116,22 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
         «reputación».
       - **Azure Artifact Signing** (Microsoft): no está disponible para
         personas de Uruguay (sólo Estados Unidos y Canadá).
+
+      Se eligió SignPath. Pasos:
+      1. [x] Preparado en el repositorio (8/10/2026): sección «Code signing
+         policy» en el README, [política de privacidad](privacidad.md),
+         firma en `.github/workflows/release.yml` (apagada hasta tener las
+         claves) y `.signpath/artifact-configuration.xml`. **Falta subirlo a
+         GitHub** (push a `main`), porque SignPath lo mira ahí.
+      2. [ ] Alexis: verificación en dos pasos activada en GitHub (la piden
+         para todo el equipo). Llenar el formulario de
+         https://signpath.org/apply.html y esperar la respuesta.
+      3. [ ] Cuando aprueben: en GitHub, *Settings → Secrets and variables →
+         Actions*, el secreto `SIGNPATH_API_TOKEN` y la variable
+         `SIGNPATH_ORGANIZATION_ID`; en SignPath, el proyecto con el nombre
+         `EcclesiaCast`, la política `release-signing` y la configuración
+         del archivo de `.signpath/`. Desde ahí cada versión espera que la
+         apruebes en SignPath (hay una hora de plazo) antes de publicarse.
 - [ ] Actualizar README y CHANGELOG (hoy dicen «Beta») y taguear `v1.0.0`.
 
 ## 3. Para hacer después de la 1.0

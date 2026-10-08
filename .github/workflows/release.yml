@@ -12,6 +12,8 @@ on:
 
 permissions:
   contents: write
+  # SignPath reads this run's details and downloads the unsigned installer.
+  actions: read
 
 jobs:
   build-installer:
@@ -53,6 +55,38 @@ jobs:
           $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
           & $iscc /DAppVersion=${{ steps.version.outputs.version }} installer\EcclesiaCast.iss
 
+      # Signing through SignPath Foundation (see «Code signing policy» in the
+      # README). It stays off until the repository has the SIGNPATH_API_TOKEN
+      # secret and the SIGNPATH_ORGANIZATION_ID variable; until then the
+      # installer is published unsigned, as before.
+      - name: Upload unsigned installer
+        id: unsigned
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: EcclesiaCast-installer-unsigned
+          path: dist/*.exe
+
+      - name: Sign installer (SignPath)
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: EcclesiaCast
+          signing-policy-slug: release-signing
+          github-artifact-id: ${{ steps.unsigned.outputs.artifact-id }}
+          # Every release is approved by hand in SignPath: give it an hour.
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: signed
+
+      - name: Use the signed installer
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        shell: pwsh
+        run: |
+          Copy-Item signed\*.exe dist\ -Force
+          Get-AuthenticodeSignature dist\*.exe | Format-List Path, Status, SignerCertificate
+
       - uses: actions/upload-artifact@v4
         with:
           name: EcclesiaCast-installer
@@ -63,6 +97,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: dist/*.exe
+          body: |
+            [Code signing policy](https://github.com/EcclesiaCast/EcclesiaCast#code-signing-policy) · [Política de privacidad](https://github.com/EcclesiaCast/EcclesiaCast/blob/main/docs/privacidad.md)
           generate_release_notes: true
           # A version with a suffix (v1.0.0-beta.1, -rc.2...) is a pre-release,
           # so it doesn't get announced as the latest stable download.

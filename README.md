@@ -55,6 +55,27 @@ dotnet test
 
 Todo vive en `%APPDATA%\EcclesiaCast\ecclesiacast.db` — copiá ese archivo y tenés el backup completo.
 
+Qué se conecta a internet y cuándo: [política de privacidad](docs/privacidad.md).
+
+## Code signing policy
+
+*Política de firma de código.*
+
+Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/).
+
+*(Firma de código gratuita de SignPath.io, con certificado de SignPath Foundation.)*
+
+- **Autores y revisores** (*committers and reviewers*): los
+  [miembros de la organización EcclesiaCast](https://github.com/orgs/EcclesiaCast/people);
+  hoy, Alexis Pérez ([@alexisperez7](https://github.com/alexisperez7)). Los
+  cambios de cualquier otra persona entran sólo por *pull request*, revisados
+  por un autor.
+- **Aprobadores** (*approvers*): los dueños de la organización; hoy, Alexis
+  Pérez ([@alexisperez7](https://github.com/alexisperez7)).
+- Sólo se firman los instaladores que GitHub Actions compila desde el código de
+  este repositorio, y **cada versión se aprueba a mano** antes de firmarse.
+- **Privacidad:** [política de privacidad](docs/privacidad.md).
+
 ## Contribuir
 
 Se agradecen issues y pull requests: leé [CONTRIBUTING.md](CONTRIBUTING.md).
