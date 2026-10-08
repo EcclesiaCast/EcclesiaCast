@@ -205,6 +205,12 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Cambiado
 
+- **Las páginas de un PDF o un PowerPoint entran con «Ajustar»**: se ven
+  enteras, con barras a los costados si hace falta. Antes llenaban la
+  pantalla y una página vertical quedaba recortada a una franja.
+- **La ventana de Propiedades de un medio es más ancha y más baja**: dos
+  columnas (a la izquierda qué es y cómo se encuadra, a la derecha cómo se
+  ve y qué sigue), en vez de una sola que no entraba en una notebook.
 - **Las notas de la edición impresa ya no se proyectan.** Algunos archivos de
   Biblias traen pegadas al texto cosas del libro de papel. Ahora se sacan al
   mostrar: las **rayas** (`----------`) y la nota entre corchetes que viene
@@ -359,6 +365,10 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Corregido
 
+- **Cambiar la escala o el encuadre de un medio que está en pantalla no
+  llegaba a la pantalla principal**: el LIVE lo mostraba, pero la salida
+  seguía igual hasta volver a elegirlo. Ahora se ve en el momento, y un video
+  no se reinicia por eso.
 - **La barra azul al reordenar diapositivas ya no se escapa.** Si se movía el
   mouse rápido, la barra (y la copia de la tarjeta) aparecían encima de la
   barra de medios. Ahora se dibujan sólo dentro del panel de diapositivas, y

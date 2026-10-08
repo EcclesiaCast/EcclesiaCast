@@ -82,6 +82,20 @@ public sealed class PresentationService : IPresentationService
         OnChanged();
     }
 
+    public void RefreshBackground(Media.MediaItem background, Media.MediaItem? fill = null)
+    {
+        // SetBackground ignores the same item on purpose (changing slides
+        // re-applies it); edited settings are the one case that must get
+        // through, so the screen gets a fresh object with the same id and
+        // each layer redraws it in place.
+        if (Background?.Id != background.Id)
+            return;
+
+        Background = background;
+        BackgroundFill = fill;
+        OnChanged();
+    }
+
     public string? StageNotes { get; private set; }
 
     public void SetStageNotes(string? notes)

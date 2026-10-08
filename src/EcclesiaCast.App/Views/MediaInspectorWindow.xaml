@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:EcclesiaCast.App.Controls"
         Title="Propiedades del medio"
-        Width="420" SizeToContent="Height"
+        Width="820" SizeToContent="Height"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource BgBrush}"
@@ -28,7 +28,17 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0">
+        <!-- Dos columnas: a la izquierda qué es y cómo se encuadra, a la derecha
+             cómo se ve y qué pasa después. Una sola columna quedaba más alta
+             que la pantalla de una notebook. -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0">
             <DockPanel>
                 <Border DockPanel.Dock="Left" Width="120" Height="68" CornerRadius="4"
                         BorderBrush="{StaticResource LineBrush}" BorderThickness="1" ClipToBounds="True">
@@ -126,9 +136,12 @@
                 </StackPanel>
             </Border>
 
+        </StackPanel>
+
+        <StackPanel Grid.Column="2">
             <!-- ── Color: oscurecer, aclarar, teñir ── -->
             <Border Background="{StaticResource SurfaceAltBrush}" CornerRadius="4"
-                    Padding="12,4,12,12" Margin="0,10,0,0">
+                    Padding="12,4,12,12" Margin="0">
                 <StackPanel>
                     <TextBlock Text="Color" Style="{StaticResource L}"/>
                     <StackPanel Orientation="Horizontal">
@@ -170,13 +183,14 @@
             </StackPanel>
 
             <TextBlock Text="Desenfoque del fondo" Style="{StaticResource L}"/>
-            <StackPanel Orientation="Horizontal">
-                <controls:NumericField x:Name="BlurField" Minimum="0" Maximum="100" Step="5" Decimals="0"
+            <!-- DockPanel y no StackPanel: así el texto de al lado puede bajar de renglón -->
+            <DockPanel LastChildFill="True">
+                <controls:NumericField x:Name="BlurField" DockPanel.Dock="Left" Minimum="0" Maximum="100" Step="5" Decimals="0"
                                        ToolTip="Difumina este fondo para que la letra encima se lea. 0 = nítido."/>
                 <TextBlock Text="%  · también se puede cambiar en vivo desde la barra de medios"
                            FontSize="11" VerticalAlignment="Center" TextWrapping="Wrap"
                            Foreground="{StaticResource FaintBrush}" Margin="8,0,0,0"/>
-            </StackPanel>
+            </DockPanel>
 
             <!-- ── Qué sigue después ── -->
             <StackPanel x:Name="VideoOptions">
@@ -234,6 +248,7 @@
                     Click="OpenLocation_Click" Margin="0,16,0,0" HorizontalAlignment="Left" Padding="12,6"/>
         </StackPanel>
 
+        </Grid>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
             <Button Content="Guardar" Style="{StaticResource AccentButton}" Click="Save_Click" Padding="20,8"/>
             <Button Content="Cancelar" Style="{StaticResource DarkButton}" IsCancel="True" Padding="20,8" Margin="8,0,0,0"/>

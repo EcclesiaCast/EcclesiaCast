@@ -198,4 +198,37 @@ public class PresentationServiceTests
         Assert.Equal(OutputState.Content, _service.State);
         Assert.Equal("Dos", _service.CurrentSlide!.MainText);
     }
+
+    [Fact]
+    public void Edited_settings_of_the_background_on_screen_reach_the_screen()
+    {
+        var shown = new EcclesiaCast.Core.Media.MediaItem { Id = 7, Name = "Página 1" };
+        _service.SetBackground(shown);
+        var raised = 0;
+        _service.Changed += (_, _) => raised++;
+
+        // Choosing the same item again is ignored, so a slide change never restarts it…
+        _service.SetBackground(shown);
+        Assert.Equal(0, raised);
+
+        // …but its edited settings must get through.
+        var edited = new EcclesiaCast.Core.Media.MediaItem
+        {
+            Id = 7, Name = "Página 1", Scaling = EcclesiaCast.Core.Media.MediaScaling.Fit,
+        };
+        _service.RefreshBackground(edited);
+
+        Assert.Equal(1, raised);
+        Assert.Same(edited, _service.Background);
+    }
+
+    [Fact]
+    public void Refreshing_a_background_that_is_not_on_screen_changes_nothing()
+    {
+        _service.SetBackground(new EcclesiaCast.Core.Media.MediaItem { Id = 7 });
+
+        _service.RefreshBackground(new EcclesiaCast.Core.Media.MediaItem { Id = 8 });
+
+        Assert.Equal(7, _service.Background!.Id);
+    }
 }

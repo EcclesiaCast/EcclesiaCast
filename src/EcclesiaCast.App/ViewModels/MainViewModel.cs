@@ -1612,6 +1612,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                     ThumbnailPath = MediaThumbnails.Create(result.Pages[page], MediaType.Image, videoEngine: null),
                     Category = tab,
                     Behavior = MediaBehavior.Foreground,
+
+                    // A page is read, not decorated: all of it has to show.
+                    // Filling the screen cropped a portrait page to a strip.
+                    Scaling = MediaScaling.Fit,
                 });
                 pagesAdded++;
             }
@@ -2433,8 +2437,11 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         {
             _media.Update(item);
             LoadMedia();
+            // The edited item goes to the screen as a fresh copy: the one on
+            // screen is this same object, edited in place, so nothing would
+            // notice the change.
             if (_presentation.Background?.Id == item.Id)
-                _presentation.SetBackground(Playable(item), ResolveFill(item)); // re-aplica con las nuevas opciones
+                _presentation.RefreshBackground(Playable(item).Clone(), ResolveFill(item));
             StatusText = $"«{item.Name}» actualizado.";
         }
     }

@@ -115,8 +115,14 @@ public partial class VlcVideoSurface : UserControl
 
         // Re-applying the same background must not restart it — the operator
         // may have paused it on purpose, and changing slides re-applies it.
+        // Its framing may have changed, though (edited in Propiedades while on
+        // screen), and that is redrawn in place.
         if (media.Id == _currentId)
+        {
+            _framing = media;
+            ApplyStretch();
             return;
+        }
 
         _currentId = media.Id;
         _pausedForHiddenOutput = false;

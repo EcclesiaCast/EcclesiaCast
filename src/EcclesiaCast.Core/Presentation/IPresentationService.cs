@@ -90,6 +90,13 @@ public interface IPresentationService
     /// </summary>
     void SetBackground(Media.MediaItem? background, Media.MediaItem? fill = null);
 
+    /// <summary>
+    /// Shows the new settings of the background that is already on screen
+    /// (its scale, framing, colour…) without starting it over. Does nothing
+    /// when <paramref name="background"/> is not the one on screen.
+    /// </summary>
+    void RefreshBackground(Media.MediaItem background, Media.MediaItem? fill = null);
+
     /// <summary>Hides the text so only the background shows (for image/video-only slides).</summary>
     void ShowBackgroundOnly();
 
