@@ -1916,9 +1916,6 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             return;
         }
 
-        if (YtDlp.FindExecutable() is null && !OfferToInstallYtDlp())
-            return;
-
         var window = new Views.YouTubeDownloadWindow(item.YouTubeId!, item.Name)
         {
             Owner = Application.Current.MainWindow,
@@ -1949,37 +1946,6 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         SelectedMediaTab = DownloadedTab;
         RefreshLightCopies();
         StatusText = $"«{name}» descargado y agregado a «{DownloadedTab}».";
-    }
-
-    /// <summary>
-    /// yt-dlp is a separate program and is not bundled. Explain where it goes
-    /// and open the folder, rather than pulling an executable off the internet
-    /// on the operator's behalf.
-    /// </summary>
-    private bool OfferToInstallYtDlp()
-    {
-        var answer = MessageBox.Show(
-            "Para descargar videos, EcclesiaCast usa yt-dlp, un programa aparte y gratuito "
-            + "que no viene incluido.\n\n"
-            + "Instalalo de una de estas dos formas:\n"
-            + "  • En una terminal:  winget install yt-dlp\n"
-            + $"  • O bajá yt-dlp.exe de github.com/yt-dlp/yt-dlp/releases y ponelo en:\n    {YtDlp.ToolsFolder}\n\n"
-            + "Con ffmpeg instalado además (winget install ffmpeg) se baja hasta 1080p.\n\n"
-            + "¿Abro esa carpeta ahora?",
-            "EcclesiaCast", MessageBoxButton.YesNo, MessageBoxImage.Information);
-
-        if (answer == MessageBoxResult.Yes)
-        {
-            Directory.CreateDirectory(YtDlp.ToolsFolder);
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-            {
-                FileName = YtDlp.ToolsFolder,
-                UseShellExecute = true,
-            });
-        }
-
-        StatusText = "Instalá yt-dlp y volvé a intentar la descarga.";
-        return false;
     }
 
     /// <summary>

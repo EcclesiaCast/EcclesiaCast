@@ -1,19 +1,22 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
+using EcclesiaCast.Core.Media;
 using Serilog;
 
 namespace EcclesiaCast.App.Services;
 
 /// <summary>
 /// Downloads a YouTube video to a local file through yt-dlp, so a service
-/// doesn't depend on the church's internet holding up. yt-dlp is not shipped
-/// with EcclesiaCast: it is looked up on the system and, if missing, the
-/// operator is told where to get it.
+/// doesn't depend on the church's internet holding up. EcclesiaCast looks after
+/// yt-dlp by itself: it fetches the official build when it is missing, keeps it
+/// up to date (YouTube changes every few weeks and an old copy gets 403) and
+/// hands it the YouTube session, so the operator never types a command.
 /// </summary>
 public static partial class YtDlp
 {
-    /// <summary>Where a manually installed copy is looked for first.</summary>
+    /// <summary>Where the helper programs live; yt-dlp finds a runtime placed next to it.</summary>
     public static string ToolsFolder => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "EcclesiaCast", "tools");
@@ -22,8 +25,19 @@ public static partial class YtDlp
     public static string DownloadsFolder => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), "EcclesiaCast");
 
-    /// <summary>Full path to yt-dlp, or null when it isn't installed.</summary>
-    public static string? FindExecutable() => Find("yt-dlp.exe");
+    private static readonly ToolInstaller Installer = new(ToolsFolder);
+
+    /// <summary>
+    /// Full path to the yt-dlp EcclesiaCast manages, or null when it isn't there
+    /// yet. A copy found on the PATH is ignored on purpose: a package manager's
+    /// copy can't update itself with <c>-U</c>.
+    /// </summary>
+    public static string? FindExecutable() =>
+        File.Exists(Installer.YtDlpPath) ? Installer.YtDlpPath : null;
+
+    /// <summary>The JavaScript runtime YouTube needs, or null when it isn't around.</summary>
+    private static string? FindRuntime() =>
+        File.Exists(Installer.DenoPath) ? Installer.DenoPath : Find("deno.exe");
 
     /// <summary>
     /// True when ffmpeg is around. Without it yt-dlp can't join the separate
@@ -66,48 +80,162 @@ public static partial class YtDlp
     [GeneratedRegex(@"\[download\]\s+(\d{1,3}(?:[.,]\d+)?)%")]
     private static partial Regex ProgressLine();
 
-    /// <summary>
-    /// The embedded browser's profile, which holds the church's YouTube
-    /// session. Handing its cookies to yt-dlp downloads as the signed-in
-    /// account — the same account whose Premium subscription the player
-    /// already uses — instead of as an anonymous stranger.
-    /// </summary>
-    private static string? CookieProfile()
+    // ── Keeping the tools ready ──────────────────────────────────
+
+    private static string CheckStampPath => Path.Combine(ToolsFolder, "yt-dlp.checked");
+
+    private static DateTimeOffset? _lastUpdateAttempt;
+
+    private static DateTimeOffset? ReadCheckStamp()
     {
-        var profile = Path.Combine(WebViewProfile.UserDataFolder, "EBWebView");
-        return Directory.Exists(Path.Combine(profile, "Default")) ? profile : null;
+        try
+        {
+            return DateTimeOffset.TryParse(File.ReadAllText(CheckStampPath), CultureInfo.InvariantCulture,
+                DateTimeStyles.RoundtripKind, out var stamp) ? stamp : null;
+        }
+        catch (IOException)
+        {
+            return null;
+        }
+    }
+
+    private static void WriteCheckStamp()
+    {
+        try
+        {
+            Directory.CreateDirectory(ToolsFolder);
+            File.WriteAllText(CheckStampPath, DateTimeOffset.UtcNow.ToString("o", CultureInfo.InvariantCulture));
+        }
+        catch (IOException ex)
+        {
+            Log.Warning(ex, "No se pudo anotar la fecha de la última revisión de yt-dlp");
+        }
     }
 
     /// <summary>
-    /// Turns yt-dlp's own words into something an operator can act on. A 403
-    /// almost always means the copy of yt-dlp is older than YouTube's latest
-    /// change, which is frequent and fixed by updating it.
+    /// Makes sure yt-dlp and its JavaScript runtime exist and that yt-dlp is not
+    /// older than three days since its last check. Downloads what is missing,
+    /// reporting progress; an update that can't be done (no internet at that
+    /// moment) is not an error, the download is tried with what there is.
     /// </summary>
-    public static string Explain(string error)
+    public static async Task EnsureToolsAsync(
+        IProgress<(double Percent, string Message)> progress, CancellationToken cancellation)
     {
-        if (IsCookieError(error))
-            return "No pude leer la sesión de YouTube del programa para descargar.\n\n"
-                 + "Cerrá EcclesiaCast, volvé a abrirlo y probá de nuevo. Si sigue pasando, "
-                 + "actualizá yt-dlp con «winget upgrade yt-dlp».";
+        if (FindExecutable() is null)
+        {
+            await Installer.DownloadYtDlpAsync(progress, cancellation);
+            WriteCheckStamp(); // a fresh download is the newest by definition
+        }
 
-        if (error.Contains("403", StringComparison.Ordinal))
-            return "YouTube rechazó la descarga (error 403).\n\n"
-                 + "Casi siempre es que yt-dlp quedó viejo: YouTube cambia seguido y hay que "
-                 + "actualizarlo. Abrí una terminal y ejecutá:\n\n"
-                 + "    winget upgrade yt-dlp\n\n"
-                 + "Después volvé a intentar la descarga.";
+        if (FindRuntime() is null)
+        {
+            try
+            {
+                await Installer.DownloadDenoAsync(progress, cancellation);
+            }
+            catch (ToolDownloadException ex)
+            {
+                // Some videos still work without it; let yt-dlp try.
+                Log.Warning(ex, "No se pudo bajar el componente de YouTube");
+            }
+        }
 
-        if (error.Contains("Sign in", StringComparison.OrdinalIgnoreCase)
-            || error.Contains("age", StringComparison.OrdinalIgnoreCase))
-            return "YouTube pide iniciar sesión para este video.\n\n"
-                 + "Entrá con la cuenta de la iglesia desde el botón «▶ YouTube» y volvé a intentar.";
-
-        if (error.Contains("Private video", StringComparison.OrdinalIgnoreCase)
-            || error.Contains("unavailable", StringComparison.OrdinalIgnoreCase))
-            return "El video es privado o no está disponible para esta cuenta.";
-
-        return error;
+        if (ToolUpdatePolicy.IsDue(ReadCheckStamp(), DateTimeOffset.UtcNow))
+            await UpdateAsync(progress, cancellation);
     }
+
+    /// <summary>Asks yt-dlp to update itself. Returns false when it couldn't (offline, blocked).</summary>
+    private static async Task<bool> UpdateAsync(
+        IProgress<(double Percent, string Message)> progress, CancellationToken cancellation)
+    {
+        var executable = FindExecutable();
+        if (executable is null)
+            return false;
+
+        // One update per minute is plenty: the 403 retry and the three-day check
+        // can land together.
+        if (_lastUpdateAttempt is { } last && DateTimeOffset.UtcNow - last < TimeSpan.FromMinutes(1))
+            return true;
+        _lastUpdateAttempt = DateTimeOffset.UtcNow;
+
+        progress.Report((-1, "Buscando una versión nueva del descargador…"));
+        try
+        {
+            var info = new ProcessStartInfo(executable)
+            {
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            };
+            info.ArgumentList.Add("-U");
+
+            using var process = Process.Start(info)!;
+            var output = process.StandardOutput.ReadToEndAsync(cancellation);
+            var errors = process.StandardError.ReadToEndAsync(cancellation);
+
+            using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellation);
+            timeout.CancelAfter(TimeSpan.FromMinutes(2));
+            try
+            {
+                await process.WaitForExitAsync(timeout.Token);
+            }
+            catch (OperationCanceledException) when (!cancellation.IsCancellationRequested)
+            {
+                try { process.Kill(entireProcessTree: true); } catch { /* ya terminó */ }
+                Log.Warning("yt-dlp -U tardó demasiado y se cortó");
+                return false;
+            }
+
+            Log.Information("yt-dlp -U ({Code}): {Output} {Errors}",
+                process.ExitCode, (await output).Trim(), (await errors).Trim());
+            if (process.ExitCode != 0)
+                return false;
+
+            WriteCheckStamp();
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException
+                                   or System.ComponentModel.Win32Exception)
+        {
+            Log.Warning(ex, "No se pudo actualizar yt-dlp");
+            return false;
+        }
+    }
+
+    // ── Telling the operator what happened ───────────────────────
+
+    /// <summary>
+    /// Turns what went wrong into a sentence for the operator: what happened,
+    /// and that the video can still be projected over the internet. Nothing
+    /// here asks anyone to open a terminal.
+    /// </summary>
+    public static string Explain(Exception exception)
+    {
+        if (exception is ToolDownloadException)
+            return exception.Message + "\n\nMientras tanto, el video se puede proyectar por internet.";
+
+        const string Fallback = "\n\nEl video se puede proyectar por internet igual: "
+            + "queda en la biblioteca y se reproduce con conexión.";
+
+        return DownloadFailure.Classify(exception.Message) switch
+        {
+            DownloadFailureKind.Network =>
+                "No hay conexión a internet, o se cortó en medio de la descarga." + Fallback,
+            DownloadFailureKind.SignInRequired =>
+                "YouTube pide una cuenta para este video. Entrá con la cuenta de la iglesia "
+                + "desde el botón «▶ YouTube» y volvé a intentar." + Fallback,
+            DownloadFailureKind.Unavailable =>
+                "El video es privado o no está disponible para esta cuenta." + Fallback,
+            DownloadFailureKind.Forbidden or DownloadFailureKind.Challenge =>
+                "YouTube no dejó descargar este video, aunque el programa ya buscó una "
+                + "versión nueva del descargador. Suele arreglarse solo en unos días." + Fallback,
+            _ =>
+                "No se pudo descargar el video." + Fallback,
+        };
+    }
+
+    // ── Downloading ──────────────────────────────────────────────
 
     /// <summary>
     /// Downloads one video and returns the file it produced. Reports progress
@@ -119,40 +247,41 @@ public static partial class YtDlp
         IProgress<(double Percent, string Message)> progress,
         CancellationToken cancellation)
     {
-        var profile = CookieProfile();
-        if (profile is null)
-            return await DownloadAsync(videoId, targetFolder, null, progress, cancellation);
+        await EnsureToolsAsync(progress, cancellation);
 
-        // The browser sometimes holds its cookie file busy for a moment, so
-        // reading it fails now and works a second later. Try twice with the
-        // session; most videos don't need it at all, so then go anonymous.
-        for (var attempt = 1; ; attempt++)
+        progress.Report((-1, "Preparando la descarga…"));
+        var cookies = await YouTubeCookies.ExportAsync();
+        try
         {
             try
             {
-                return await DownloadAsync(videoId, targetFolder, profile, progress, cancellation);
+                return await RunAsync(videoId, targetFolder, cookies, progress, cancellation);
             }
-            catch (InvalidOperationException ex) when (IsCookieError(ex.Message))
+            catch (InvalidOperationException ex)
+                when (DownloadFailure.Classify(ex.Message) is DownloadFailureKind.Forbidden
+                                                             or DownloadFailureKind.Challenge)
             {
-                Log.Warning("yt-dlp no pudo leer las cookies (intento {Attempt}): {Error}", attempt, ex.Message);
-                if (attempt == 2)
-                    break;
-                await Task.Delay(TimeSpan.FromSeconds(2), cancellation);
+                // The usual cause is a yt-dlp that is behind YouTube: update it and
+                // try once more before giving up.
+                Log.Warning("YouTube rechazó la descarga; se actualiza yt-dlp y se reintenta: {Error}", ex.Message);
+                await UpdateAsync(progress, cancellation);
+                progress.Report((-1, "Reintentando la descarga…"));
+                return await RunAsync(videoId, targetFolder, cookies, progress, cancellation);
             }
         }
-
-        progress.Report((-1, "Reintentando sin la sesión de YouTube…"));
-        return await DownloadAsync(videoId, targetFolder, null, progress, cancellation);
+        finally
+        {
+            if (cookies is not null)
+            {
+                try { File.Delete(cookies); } catch (IOException) { /* es un temporal */ }
+            }
+        }
     }
 
-    /// <summary>yt-dlp's complaints about reading or decrypting the browser's cookies.</summary>
-    private static bool IsCookieError(string error) =>
-        error.Contains("cookie", StringComparison.OrdinalIgnoreCase);
-
-    private static async Task<string?> DownloadAsync(
+    private static async Task<string?> RunAsync(
         string videoId,
         string targetFolder,
-        string? cookieProfile,
+        string? cookieFile,
         IProgress<(double Percent, string Message)> progress,
         CancellationToken cancellation)
     {
@@ -160,6 +289,7 @@ public static partial class YtDlp
             ?? throw new InvalidOperationException("yt-dlp no está instalado.");
 
         Directory.CreateDirectory(targetFolder);
+        var startedAt = DateTime.Now.AddSeconds(-2);
 
         // Above 720p YouTube serves video and audio apart, and joining them
         // needs ffmpeg; without it, ask for the best single file instead.
@@ -181,12 +311,18 @@ public static partial class YtDlp
             arguments.Add("mp4");
         }
 
-        if (cookieProfile is { } profile)
+        if (FindRuntime() is { } runtime)
         {
-            // WebView2 stores its profile in Chromium's own layout, so yt-dlp
-            // reads it with the chrome backend pointed at that folder.
-            arguments.Add("--cookies-from-browser");
-            arguments.Add($"chrome:{profile}");
+            // YouTube hides its stream addresses behind a small JavaScript puzzle
+            // that yt-dlp solves with this runtime.
+            arguments.Add("--js-runtimes");
+            arguments.Add($"deno:{runtime}");
+        }
+
+        if (cookieFile is not null)
+        {
+            arguments.Add("--cookies");
+            arguments.Add(cookieFile);
         }
 
         arguments.Add($"https://www.youtube.com/watch?v={videoId}");
@@ -195,9 +331,13 @@ public static partial class YtDlp
         {
             RedirectStandardOutput = true,
             RedirectStandardError = true,
+            StandardOutputEncoding = System.Text.Encoding.UTF8,
+            StandardErrorEncoding = System.Text.Encoding.UTF8,
             UseShellExecute = false,
             CreateNoWindow = true,
         };
+        // Python would otherwise print titles in the console's old code page.
+        info.Environment["PYTHONUTF8"] = "1";
         foreach (var argument in arguments)
             info.ArgumentList.Add(argument);
 
@@ -226,8 +366,7 @@ public static partial class YtDlp
             {
                 if (ProgressLine().Match(line) is { Success: true } match
                     && double.TryParse(match.Groups[1].Value.Replace(',', '.'),
-                        System.Globalization.NumberStyles.Float,
-                        System.Globalization.CultureInfo.InvariantCulture, out var percent))
+                        NumberStyles.Float, CultureInfo.InvariantCulture, out var percent))
                 {
                     progress.Report((percent, $"Descargando… {percent:0}%"));
                     continue;
@@ -261,6 +400,18 @@ public static partial class YtDlp
             throw new InvalidOperationException(detail);
         }
 
-        return downloaded;
+        // If the printed path didn't survive the trip (odd characters in a
+        // title), the file is still the newest one in the folder.
+        return downloaded ?? NewestFileSince(targetFolder, startedAt);
     }
+
+    /// <summary>The most recently written finished video in <paramref name="folder"/> since <paramref name="since"/>.</summary>
+    private static string? NewestFileSince(string folder, DateTime since) =>
+        new DirectoryInfo(folder).EnumerateFiles()
+            .Where(f => f.LastWriteTime >= since
+                        && !f.Name.EndsWith(".part", StringComparison.OrdinalIgnoreCase)
+                        && !f.Name.EndsWith(".ytdl", StringComparison.OrdinalIgnoreCase))
+            .OrderByDescending(f => f.LastWriteTime)
+            .Select(f => f.FullName)
+            .FirstOrDefault();
 }

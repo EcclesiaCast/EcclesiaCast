@@ -28,8 +28,11 @@ rendimiento y cómo se ve la pestaña Música.
 - [ ] **Resaltar arrastrando en el LIVE**: mientras arrastrás, las palabras
       se marcan en azul sólo en el LIVE, y al soltar se resaltan en la
       pantalla. (El clic en una palabra ya se probó y anda.)
-- [ ] **Descargar un video de YouTube**: que no vuelva el error «Could not
-      copy Chrome cookie database».
+- [ ] **Descargar un video de YouTube** (clic derecho → Descargar para uso
+      local): la primera vez baja solo el descargador y un componente de
+      YouTube (unos 60 MB, con barra); después tiene que bajar el video sin
+      errores de cookies ni 403. No se pudo probar desde acá (no se bajó nada
+      de internet).
 
 ## 2. Para hacer
 

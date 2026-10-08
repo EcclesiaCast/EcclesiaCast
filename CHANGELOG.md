@@ -209,11 +209,15 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 - **Un versículo solo quedaba corrido hacia arriba**: el lugar de la segunda
   versión se reservaba igual aunque no hubiera segunda versión, y en uno
   largo eso sacaba la última línea del recuadro.
-- **Descargar de YouTube fallaba con «Could not copy Chrome cookie
-  database»**: el navegador del programa a veces tenía ocupado el archivo de
-  la sesión justo cuando yt-dlp lo quería leer. Ahora el navegador no lo
-  bloquea, la descarga reintenta una vez y, si igual no puede, baja el video
-  sin la sesión (la mayoría no la necesita).
+- **Descargar de YouTube ahora anda solo, sin instalar nada.** Fallaba con
+  «Could not copy Chrome cookie database» y con el error 403 porque el
+  programa de descargas (yt-dlp) de la PC era viejo. Ahora EcclesiaCast baja
+  y mantiene su propio yt-dlp y el componente que YouTube exige hoy (unos 60
+  MB, con una barra de progreso la primera vez), lo actualiza cada tres días y, si YouTube lo rechaza, lo actualiza y
+  vuelve a intentar. La sesión de YouTube de la iglesia se la pide al
+  navegador del programa, en lugar de leer el archivo que Windows tiene
+  bloqueado. Si igual falla, el aviso lo explica en castellano y recuerda que
+  el video se puede proyectar por internet.
 - **Playlist que mostraba siempre lo primero**: si en el buscador de
   canciones quedaba algo escrito, las canciones de la playlist que no
   coincidían con esa búsqueda no se podían abrir. Ahora se borra el filtro.

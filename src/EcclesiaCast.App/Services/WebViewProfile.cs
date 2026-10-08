@@ -39,11 +39,7 @@ public static class WebViewProfile
                 // Without this the browser's autoplay policy refuses to start a
                 // video that has sound until someone clicks the page, so a video
                 // projected with audio would just sit on its first frame.
-                // The browser also locks its cookie file while it runs, and then
-                // yt-dlp can't read the YouTube session to download a video
-                // (yt-dlp issue 7271); the second flag drops that lock.
-                AdditionalBrowserArguments = "--autoplay-policy=no-user-gesture-required "
-                    + "--disable-features=LockProfileCookieDatabase",
+                AdditionalBrowserArguments = "--autoplay-policy=no-user-gesture-required",
             });
     }
 
