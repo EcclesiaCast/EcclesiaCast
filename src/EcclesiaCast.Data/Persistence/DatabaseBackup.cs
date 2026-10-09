@@ -50,15 +50,65 @@ public static class DatabaseBackup
         using var source = new SqliteConnection($"Data Source={dbPath};Mode=ReadOnly");
         source.Open();
         using var target = new SqliteConnection($"Data Source={destination}");
-        target.Open();
-        source.BackupDatabase(target);
+        try
+        {
+            target.Open();
+            source.BackupDatabase(target);
 
-        // The copy inherits the live database's write-ahead log, which would
-        // leave a "-wal" and a "-shm" beside it. A backup has to be the single
-        // file the operator drags onto a pendrive, so fold the log back in.
-        using var checkpoint = target.CreateCommand();
-        checkpoint.CommandText = "PRAGMA journal_mode=DELETE";
-        checkpoint.ExecuteNonQuery();
+            // The copy inherits the live database's write-ahead log, which would
+            // leave a "-wal" and a "-shm" beside it. A backup has to be the single
+            // file the operator drags onto a pendrive, so fold the log back in.
+            using var checkpoint = target.CreateCommand();
+            checkpoint.CommandText = "PRAGMA journal_mode=DELETE";
+            checkpoint.ExecuteNonQuery();
+        }
+        finally
+        {
+            // Closed connections go back to a pool that keeps the file open,
+            // and an open file can not be replaced, moved or deleted. Pruning
+            // old copies and making the next one both need it free.
+            target.Close();
+            SqliteConnection.ClearPool(target);
+        }
+    }
+
+    /// <summary>How many copies made before an update are kept; older ones are deleted.</summary>
+    public const int BeforeUpdateCopiesKept = 3;
+
+    /// <summary>
+    /// The copy made right before an update installs <paramref name="version"/>,
+    /// which may migrate the library to a newer shape. Nobody asks for it, so it
+    /// goes into a folder of the program's own, and only the last few are kept.
+    /// Returns where it was written.
+    /// </summary>
+    public static string CreateBeforeUpdate(string dbPath, string folder, string version)
+    {
+        Directory.CreateDirectory(folder);
+
+        var invalid = Path.GetInvalidFileNameChars();
+        var safe = new string(version.Select(c => Array.IndexOf(invalid, c) >= 0 ? '_' : c).ToArray());
+        var destination = Path.GetFullPath(Path.Combine(folder, $"antes-de-{safe}.db"));
+
+        Create(dbPath, destination);
+
+        // The one just written stays whatever the clock says; of the others,
+        // the newest fill the remaining places and the rest go.
+        var old = new DirectoryInfo(folder).GetFiles("antes-de-*.db")
+            .Where(file => !string.Equals(file.FullName, destination, StringComparison.OrdinalIgnoreCase))
+            .OrderByDescending(file => file.LastWriteTimeUtc)
+            .ThenByDescending(file => file.Name, StringComparer.Ordinal)
+            .Skip(BeforeUpdateCopiesKept - 1);
+
+        foreach (var file in old)
+        {
+            try { file.Delete(); }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                // A copy that can not be deleted now will be the next time.
+            }
+        }
+
+        return destination;
     }
 
     /// <summary>
