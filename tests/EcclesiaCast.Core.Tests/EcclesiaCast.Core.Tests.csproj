@@ -21,6 +21,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- A real answer of the GitHub releases API, trimmed, for the update tests. -->
+    <None Update="Updates\releases-sample.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\EcclesiaCast.Core\EcclesiaCast.Core.csproj" />
     <ProjectReference Include="..\..\src\EcclesiaCast.Data\EcclesiaCast.Data.csproj" />
   </ItemGroup>
