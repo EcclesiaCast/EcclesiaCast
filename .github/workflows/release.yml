@@ -92,14 +92,55 @@ jobs:
           name: EcclesiaCast-installer
           path: dist/*.exe
 
+      # The notes of the release are the section of this version in the
+      # CHANGELOG (in Spanish): the program shows them in its update notice, so
+      # they must be readable by the people who run it, not commit titles. The
+      # marker under the signing line tells the program where the notes start.
+      # Order of preference: «## [<version>]», then «## [Sin publicar]», and
+      # only if neither has text, the notes GitHub generates.
+      - name: Release notes from the CHANGELOG
+        id: notes
+        shell: pwsh
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          $signing = '[Code signing policy](https://github.com/EcclesiaCast/EcclesiaCast#code-signing-policy) · [Política de privacidad](https://github.com/EcclesiaCast/EcclesiaCast/blob/main/docs/privacidad.md)'
+          $lines = @(Get-Content -Path CHANGELOG.md -Encoding UTF8)
+
+          function Get-Section([string]$name) {
+            $start = -1
+            for ($i = 0; $i -lt $lines.Count; $i++) {
+              if ($lines[$i] -match ('^##\s*\[' + [regex]::Escape($name) + '\]')) { $start = $i + 1; break }
+            }
+            if ($start -lt 0) { return '' }
+            $end = $lines.Count
+            for ($i = $start; $i -lt $lines.Count; $i++) {
+              if ($lines[$i] -match '^##\s*\[') { $end = $i; break }
+            }
+            if ($end -le $start) { return '' }
+            return (($lines[$start..($end - 1)]) -join "`n").Trim()
+          }
+
+          $section = Get-Section $env:VERSION
+          if (-not $section) { $section = Get-Section 'Sin publicar' }
+
+          if ($section) {
+            $body = $signing + "`n`n<!-- notas -->`n`n" + $section + "`n"
+            $generate = 'false'
+          } else {
+            $body = $signing + "`n"
+            $generate = 'true'
+          }
+          Set-Content -Path release-notes.md -Value $body -Encoding utf8
+          "generate=$generate" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
       - name: Publish GitHub release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
           files: dist/*.exe
-          body: |
-            [Code signing policy](https://github.com/EcclesiaCast/EcclesiaCast#code-signing-policy) · [Política de privacidad](https://github.com/EcclesiaCast/EcclesiaCast/blob/main/docs/privacidad.md)
-          generate_release_notes: true
+          body_path: release-notes.md
+          generate_release_notes: ${{ steps.notes.outputs.generate }}
           # A version with a suffix (v1.0.0-beta.1, -rc.2...) is a pre-release,
           # so it doesn't get announced as the latest stable download.
           prerelease: ${{ contains(github.ref_name, '-') }}
