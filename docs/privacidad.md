@@ -6,7 +6,8 @@ ajustes) queda en tu PC, en `%APPDATA%\EcclesiaCast`, y el registro de errores
 también (`%APPDATA%\EcclesiaCast\logs`).
 
 El programa se conecta a internet **sólo cuando usás una función que lo
-necesita**, y sólo con los sitios de esta lista:
+necesita** (y una vez por día, al abrirlo, para saber si hay una versión
+nueva), y sólo con los sitios de esta lista:
 
 | Cuándo | Con quién | Qué se manda |
 |---|---|---|
@@ -14,6 +15,7 @@ necesita**, y sólo con los sitios de esta lista:
 | Agregás, mirás o descargás un video de YouTube | [YouTube](https://www.youtube.com) | El enlace del video. Si iniciaste sesión en YouTube dentro del programa, se usa esa sesión; sus datos se guardan sólo en tu PC. |
 | Abrís una página web en el programa | La página que abrís (y Google, si escribís algo que no es una dirección) | Lo mismo que si la abrieras en un navegador. Si iniciás sesión en esa página (Google, Canva…), la sesión se guarda sólo en tu PC, la misma que usa YouTube. |
 | Descargás de YouTube por primera vez, y después cada tres días al descargar | [GitHub](https://github.com) | Nada tuyo: baja o actualiza el descargador ([yt-dlp](https://github.com/yt-dlp/yt-dlp) y [deno](https://github.com/denoland/deno)). |
+| Al abrir el programa (una vez por día; se apaga en Ayuda) | [GitHub](https://github.com) | Nada tuyo: pregunta cuál es la última versión. Al actualizar, baja el instalador nuevo. |
 | Hacés clic en un enlace (la guía de uso, informar un error) | El sitio del enlace, en tu navegador | Lo mismo que si lo abrieras a mano. |
 | Instalás el programa y a la PC le falta WebView2 | [Microsoft](https://developer.microsoft.com/microsoft-edge/webview2/) | Nada tuyo: baja el componente de Microsoft que usa el programa para YouTube, para las páginas web y para buscar canciones. |
 
@@ -26,7 +28,3 @@ Cada uno de esos sitios tiene su propia política de privacidad:
 [GitHub](https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement),
 [Microsoft](https://privacy.microsoft.com),
 [musica.com](https://www.musica.com) y [lrclib.net](https://lrclib.net).
-
-Si algún día el programa empieza a conectarse por su cuenta (por ejemplo, para
-avisar que hay una versión nueva), va a figurar en esta lista y se va a poder
-apagar.

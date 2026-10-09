@@ -128,18 +128,45 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
       7. Cuántos cuadros por segundo da en la PC de la iglesia con el proyector
          real (en la notebook de prueba dio 55 a 58 con una animación a 60).
 
+- [ ] **Actualizaciones automáticas** (se programaron sin abrir el programa:
+      sólo hay pruebas y dibujos). Hace falta que esté publicada en GitHub una
+      versión **mayor** que la instalada, con su instalador (la 1.0.0-beta.6 y
+      la beta.7 todavía no están: por ahora lo último publicado es la beta.5).
+      Con la beta.7 instalada:
+      1. Abrí el programa: a los pocos segundos (15) aparece el aviso con lo
+         que trae la versión nueva, en castellano. Si hoy ya buscó, no busca
+         de nuevo: usá Ayuda → «Buscar actualizaciones…».
+      2. «Más tarde» → cierra el aviso y queda el botón **⬆ Versión nueva** en
+         la fila del menú; no vuelve a avisar hasta mañana. «Saltar esta
+         versión» → el botón desaparece y no avisa más por esa.
+      3. Con la salida prendida, no aparece ninguna ventana: aparece «⬆ Versión
+         nueva» arriba a la derecha, y tocándolo se abre el aviso.
+      4. «Actualizar ahora» → baja con la barra de avance (probá «Cancelar»),
+         se cierra, Windows pide permiso, el instalador actualiza y el
+         programa se vuelve a abrir solo. Las canciones y todo lo demás siguen
+         ahí, y hay una copia en `%APPDATA%\EcclesiaCast\respaldos`
+         (`antes-de-<versión>.db`). Con la salida prendida, antes pregunta
+         «Se va a cerrar la proyección para actualizar. ¿Seguimos?».
+         Mirá sobre todo que **el programa se reabra solo** y que lo haga
+         **sin permisos de administrador** (no pudo probarse).
+      5. Ayuda → «Buscar actualizaciones…» sin nada nuevo dice «Tenés la
+         última versión». Sin internet: «No se pudo buscar: revisá la
+         conexión a internet». Destildá «Buscar actualizaciones al abrir» y
+         reabrí: no busca.
+      6. Si decís que no al permiso de administrador de Windows, el aviso
+         tiene que quedarse abierto diciendo que no se instaló nada.
+
 ## 2. Para la v1.0.0
 
 - [ ] **Usar la beta.7 en la reunión del domingo** y anotar lo que falle o no
       guste.
-- [ ] **Actualizaciones automáticas.** Tiene que estar en la 1.0: si no, quien
-      instale la 1.0 nunca se entera de las versiones nuevas y tiene que
-      bajarlas a mano. Al abrir, el programa se fija si hay una versión nueva
-      (en las versiones publicadas de GitHub) y, si la hay, avisa con la
-      lista de lo nuevo y lo corregido, en castellano. Botones «Actualizar
-      ahora», «Más tarde» y «Saltar esta versión». Si acepta, baja el
-      instalador, lo ejecuta y vuelve a abrir el programa. Nunca avisa
-      mientras se está proyectando.
+- [x] **Actualizaciones automáticas.** Hechas (programadas y probadas con
+      pruebas y dibujos; falta probarlas con el programa abierto, ver §1).
+      Para que las notas de cada versión salgan en castellano, al publicar la
+      1.0 hay que **renombrar `[Sin publicar]` a `[1.0.0] - fecha`** en el
+      `CHANGELOG.md` (y dejar arriba un `[Sin publicar]` vacío): el workflow
+      toma de ahí la sección de la versión que se publica, y si no la
+      encuentra usa `[Sin publicar]`.
 - [ ] **Firma digital del instalador.** Hoy Windows muestra «Editor
       desconocido» y hay que darle a «Más información → Ejecutar de todas
       formas». Opciones averiguadas el 8/10/2026:
@@ -171,6 +198,16 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
          `EcclesiaCast`, la política `release-signing` y la configuración
          del archivo de `.signpath/`. Desde ahí cada versión espera que la
          apruebes en SignPath (hay una hora de plazo) antes de publicarse.
+      4. [ ] **Para que las actualizaciones comprueben la firma.** El programa
+         sólo exige que el instalador nuevo tenga el mismo firmante cuando el
+         programa **instalado** está firmado (`EcclesiaCast.App.exe` o
+         `unins000.exe`). La configuración actual de `.signpath/` firma sólo
+         el `setup.exe`, y los archivos que el instalador deja en la
+         carpeta del programa quedan sin firma, así que esa comprobación nunca
+         se activaría. Falta firmar también `EcclesiaCast.App.exe` (en el mismo
+         pedido de SignPath, antes de armar el instalador) o que el instalador
+         firme el desinstalador (`SignedUninstaller`). Mientras tanto, la
+         comprobación que queda es el tamaño y el SHA-256 que publica GitHub.
 - [ ] Actualizar README y CHANGELOG (hoy dicen «Beta») y taguear `v1.0.0`.
 
 ## 3. Para hacer después de la 1.0

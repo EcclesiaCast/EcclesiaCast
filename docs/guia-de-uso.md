@@ -462,6 +462,44 @@ de toda la computadora, el mismo que sale por el proyector.
 La cuenta común de Spotify es para uso personal: pasar música en una reunión
 pública queda por cuenta de la iglesia.
 
+## 15. Actualizaciones
+
+EcclesiaCast se fija solo si hay una versión nueva: **una vez por día**, a los
+pocos segundos de abrirlo, le pregunta a GitHub cuál es la última. No manda
+nada tuyo, y si no hay internet no te avisa de nada.
+
+Si hay una versión nueva, se abre un aviso que dice qué trae, con tres botones:
+
+- **Actualizar ahora** baja el instalador (se ve el avance, y **Cancelar** lo
+  corta), comprueba que el archivo sea el que se publicó, guarda una copia de tu
+  biblioteca y abre el instalador. Windows te pide permiso de administrador:
+  aceptalo. EcclesiaCast se cierra, se actualiza y **se vuelve a abrir solo**,
+  con todas tus canciones y lo demás como estaban. Si algo falla, el aviso dice
+  qué pasó y se puede reintentar; no se instala nada a medias.
+- **Más tarde** cierra el aviso. Vuelve a avisar la próxima vez que se mire (como
+  mucho, mañana).
+- **Saltar esta versión** no avisa más por esa versión. Cuando salga una más
+  nueva, avisa de nuevo.
+
+**Nunca interrumpe mientras proyectás.** Con la salida prendida no se abre
+ninguna ventana: aparece un botón **⬆ Versión nueva** arriba a la derecha, en la
+fila del menú, y al tocarlo se abre el aviso. El botón queda hasta que
+actualices o saltes esa versión. Si actualizás con la salida prendida, antes te
+pregunta, porque la proyección se va a cerrar.
+
+En el menú **Ayuda**:
+
+- **Buscar actualizaciones…** busca en el momento, aunque ya se haya buscado hoy
+  y aunque hayas saltado esa versión. Si no hay nada nuevo, dice «Tenés la última
+  versión».
+- **Buscar actualizaciones al abrir** (con tilde de entrada) apaga la búsqueda
+  automática. Podés seguir buscando a mano.
+
+Antes de cada actualización queda una copia de la biblioteca en
+`%APPDATA%\EcclesiaCast\respaldos` (se guardan las tres últimas), por si la
+versión nueva no te gusta y querés volver: se restaura desde **Archivo →
+Restaurar desde una copia…**.
+
 ## Dónde quedan tus datos
 
 Todo (canciones, Biblias, temas, medios y playlists) vive en un solo archivo:

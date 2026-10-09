@@ -9,6 +9,22 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Actualizaciones automáticas.** Una vez por día, a los pocos segundos de
+  abrir, EcclesiaCast mira en GitHub si hay una versión nueva y, si la hay,
+  abre un aviso con lo que trae, en castellano, y tres botones: **Actualizar
+  ahora**, **Más tarde** y **Saltar esta versión**. Actualizar baja el
+  instalador (con barra de avance y **Cancelar**), comprueba que el archivo sea
+  el publicado (tamaño, SHA-256 y, cuando el programa instalado esté firmado,
+  que lo firme el mismo editor), guarda una copia de la biblioteca en
+  `respaldos` (las tres últimas), instala y vuelve a abrir el programa solo.
+  **Nunca interrumpe mientras se proyecta**: con la salida prendida sólo
+  aparece un botón **⬆ Versión nueva** arriba a la derecha, y si se actualiza
+  con la salida prendida antes pregunta. Si no hay internet, o GitHub no
+  contesta, no avisa de nada. En **Ayuda** están **Buscar actualizaciones…**
+  (busca en el momento) y **Buscar actualizaciones al abrir** (se apaga ahí).
+  Las notas de cada versión publicada pasan a ser esta lista de cambios, en
+  castellano, en lugar de los títulos de los commits.
+
 - **Proyectar una página web.** El botón **🌐 Web** de la barra de medios abre
   una página en el cuadro central, en lugar de las diapositivas: la usás con el
   mouse y el teclado y la mandás a la pantalla de dos formas. **📷 Proyectar
