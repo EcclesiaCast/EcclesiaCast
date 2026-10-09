@@ -146,6 +146,12 @@ public partial class App : Application
         services.AddSingleton<IBackupDialog>(_ => new BackupDialogService(dbPath));
         services.AddSingleton<ICountdownDialog, CountdownDialogService>();
         services.AddSingleton<IGlobalSearchDialog, GlobalSearchDialogService>();
+        services.AddSingleton(sp => new UpdateChecker(
+            sp.GetRequiredService<ISettingsStore>(),
+            sp.GetRequiredService<IProjectionWindowService>(),
+            appDataDir,
+            dbPath));
+        services.AddSingleton<IUpdates>(sp => sp.GetRequiredService<UpdateChecker>());
         services.AddSingleton<MainViewModel>();
         _services = services.BuildServiceProvider();
 
@@ -168,6 +174,9 @@ public partial class App : Application
                 new Views.AboutWindow(Services.AppInfo.Version, firstRun: true) { Owner = mainWindow }.ShowDialog();
         };
         mainWindow.Show();
+
+        // Looks for a new version a few seconds from now, not during start-up.
+        _services.GetRequiredService<UpdateChecker>().StartAutomaticCheck();
 
         // Last, so the slow start-up is not mistaken for a freeze.
         _watchdog = new UiWatchdog(Dispatcher);

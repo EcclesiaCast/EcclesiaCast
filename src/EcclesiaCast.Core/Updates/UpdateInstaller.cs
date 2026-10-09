@@ -76,7 +76,7 @@ public sealed class UpdateInstaller(
         progress?.Report(new UpdateProgress(UpdateStep.BackingUp, -1));
         try
         {
-            backUpLibrary(offer.Version);
+            await Task.Run(() => backUpLibrary(offer.Version), CancellationToken.None);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -114,8 +114,9 @@ public sealed class UpdateInstaller(
         if (problem is not null)
             throw UpdateException.NotValid(problem);
 
-        var installed = installedSignature();
-        var candidate = signatures.Read(path);
+        // Windows takes a moment to check the signature of a file this big,
+        // and the program's window must keep answering meanwhile.
+        var (installed, candidate) = await Task.Run(() => (installedSignature(), signatures.Read(path)), cancellation);
         if (!SignaturePolicy.Accepts(installed, candidate))
         {
             throw UpdateException.NotValid(

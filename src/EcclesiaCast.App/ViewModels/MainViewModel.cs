@@ -291,6 +291,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         IGlobalSearchDialog globalSearch,
         IAudioRepository audios,
         IAudioPlayer audioPlayer,
+        IUpdates updates,
         ProjectionViewModel projectionViewModel)
     {
         _displayProvider = displayProvider;
@@ -322,6 +323,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _globalSearch = globalSearch;
         _audios = audios;
         _audioPlayer = audioPlayer;
+        _updates = updates;
         Projection = projectionViewModel;
 
         _presentation.Changed += (_, _) => UpdateStateFlags();
@@ -343,6 +345,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         LoadPlaylists(null);
         InitializeAudio();
         InitializeWeb();
+        InitializeUpdates();
         StageNotesText = _settings.Get(StageNotesKey) ?? string.Empty;
         _previewShowsStage = _settings.Get(PreviewShowsStageKey) == "1";
         RestoreRemote();

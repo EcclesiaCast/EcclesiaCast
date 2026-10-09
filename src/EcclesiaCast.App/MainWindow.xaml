@@ -245,9 +245,28 @@
 
             <MenuItem Header="A_yuda">
                 <MenuItem Header="Guía de uso (en internet)" Click="Guide_Click"/>
+                <Separator/>
+                <MenuItem Header="Buscar actualizaciones…" Command="{Binding CheckForUpdatesCommand}"/>
+                <MenuItem Header="Buscar actualizaciones al abrir" IsCheckable="True"
+                          IsChecked="{Binding CheckForUpdatesOnStartup, Mode=TwoWay}"
+                          ToolTip="Una vez por día, a los pocos segundos de abrir el programa, mira en GitHub si hay una versión nueva. No manda nada tuyo. Nunca interrumpe mientras se proyecta."/>
+                <Separator/>
                 <MenuItem Header="Acerca de EcclesiaCast" Click="About_Click"/>
             </MenuItem>
         </Menu>
+
+        <!-- Hay una versión nueva. Discreto a propósito: va en la fila del menú,
+             porque la barra de abajo no tiene lugar de sobra, no abre nada solo
+             y queda hasta que se actualice o se salte esa versión. -->
+        <Button x:Name="UpdateAvailableButton" Grid.Row="0" Content="⬆ Versión nueva"
+                HorizontalAlignment="Right" VerticalAlignment="Center"
+                Margin="0,2,12,2" Padding="10,2" FontSize="12"
+                Foreground="{StaticResource AccentSoftBrush}"
+                BorderBrush="{StaticResource AccentBrush}"
+                Style="{StaticResource DarkButton}"
+                Visibility="{Binding HasUpdate, Converter={StaticResource BoolToVis}}"
+                Command="{Binding ShowUpdateCommand}"
+                ToolTip="{Binding UpdateToolTip}"/>
 
         <!-- ══ Barra superior ══ -->
         <Border Grid.Row="1"
