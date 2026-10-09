@@ -30,6 +30,10 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 UninstallDisplayIcon={app}\EcclesiaCast.App.exe
 SetupIconFile=..\src\EcclesiaCast.App\app.ico
+; Si el programa sigue abierto al actualizar, Windows lo cierra antes de copiar los
+; archivos (en silencio no pregunta). Que no lo reabra solo: de eso se ocupa /RELANZAR.
+CloseApplications=yes
+RestartApplications=no
 
 [Languages]
 Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
@@ -71,7 +75,12 @@ Name: "{autodesktop}\{#AppName}"; Filename: "{app}\EcclesiaCast.App.exe"; Tasks:
 ; so the installer itself stays small and always pulls the current version.
 Filename: "{tmp}\MicrosoftEdgeWebview2Setup.exe"; Parameters: "/silent /install"; \
     StatusMsg: "{cm:InstallingWebView2}"; Check: ShouldInstallWebView2; Flags: waituntilterminated
-Filename: "{app}\EcclesiaCast.App.exe"; Description: "{cm:LaunchProgram,{#AppName}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\EcclesiaCast.App.exe"; Description: "{cm:LaunchProgram,{#AppName}}"; Flags: nowait postinstall skipifsilent; Check: not ShouldRelaunch
+; Una actualización desde el propio programa lo instala en silencio con /RELANZAR (ver
+; EcclesiaCast.Core/Updates/UpdateInstaller.cs): el programa se cerró para dejar
+; actualizar sus archivos y acá se vuelve a abrir solo. Sin «skipifsilent»,
+; y como «postinstall» corre con el usuario que lo pidió, no como administrador.
+Filename: "{app}\EcclesiaCast.App.exe"; Description: "{cm:LaunchProgram,{#AppName}}"; Flags: nowait postinstall; Check: ShouldRelaunch
 
 [Code]
 const
@@ -95,6 +104,20 @@ end;
 function ShouldInstallWebView2: Boolean;
 begin
   Result := WebView2Downloaded;
+end;
+
+{ True when the program asked to be opened again once updated (/RELANZAR). }
+function ShouldRelaunch: Boolean;
+var
+  I: Integer;
+begin
+  Result := False;
+  for I := 1 to ParamCount do
+    if CompareText(ParamStr(I), '/RELANZAR') = 0 then
+    begin
+      Result := True;
+      Exit;
+    end;
 end;
 
 function OnDownloadProgress(const Url, FileName: String; const Progress, ProgressMax: Int64): Boolean;
