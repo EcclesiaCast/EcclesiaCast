@@ -78,9 +78,12 @@ Filename: "{tmp}\MicrosoftEdgeWebview2Setup.exe"; Parameters: "/silent /install"
 Filename: "{app}\EcclesiaCast.App.exe"; Description: "{cm:LaunchProgram,{#AppName}}"; Flags: nowait postinstall skipifsilent; Check: not ShouldRelaunch
 ; Una actualización desde el propio programa lo instala en silencio con /RELANZAR (ver
 ; EcclesiaCast.Core/Updates/UpdateInstaller.cs): el programa se cerró para dejar
-; actualizar sus archivos y acá se vuelve a abrir solo. Sin «skipifsilent»,
-; y como «postinstall» corre con el usuario que lo pidió, no como administrador.
-Filename: "{app}\EcclesiaCast.App.exe"; Description: "{cm:LaunchProgram,{#AppName}}"; Flags: nowait postinstall; Check: ShouldRelaunch
+; actualizar sus archivos y acá se vuelve a abrir solo, sin «skipifsilent».
+; El programa lanzó este instalador ya elevado (runas), así que «postinstall» y
+; «runasoriginaluser» lo abrirían como administrador, y un programa elevado no
+; acepta archivos arrastrados desde el Explorador. Lo abre el Explorador, que
+; siempre abre con el usuario común de la sesión.
+Filename: "{win}\explorer.exe"; Parameters: """{app}\EcclesiaCast.App.exe"""; Description: "{cm:LaunchProgram,{#AppName}}"; Flags: nowait postinstall; Check: ShouldRelaunch
 
 [Code]
 const
