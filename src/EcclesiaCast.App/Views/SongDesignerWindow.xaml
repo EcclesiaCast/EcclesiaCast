@@ -174,7 +174,8 @@
                                 <ScaleTransform x:Name="ZoomTransform" ScaleX="1" ScaleY="1"/>
                             </Grid.LayoutTransform>
                             <controls:SlideView x:Name="Preview"/>
-                            <Canvas x:Name="Overlay" Background="Transparent">
+                            <Canvas x:Name="Overlay" Background="Transparent"
+                                    MouseLeftButtonDown="Overlay_MouseDown">
                                 <Border x:Name="BoxBorder"
                                         BorderBrush="{StaticResource AccentBrush}" BorderThickness="1.5"
                                         Background="#11FFFFFF" Cursor="SizeAll"

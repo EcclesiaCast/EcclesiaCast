@@ -588,11 +588,78 @@ public partial class SongDesignerWindow : Window
         return over with { Boxes = boxes };
     }
 
+    /// <summary>
+    /// Which box lies under a point of the canvas: -1 is the song's words, 0
+    /// and up the extra boxes, null is none. The smallest wins, so a small box
+    /// sitting inside the big one of the words can still be reached.
+    /// </summary>
+    private int? BoxAt(Point p)
+    {
+        if (Selected < 0 || _overrides[Selected] is not { } over)
+            return null;
+
+        int? best = null;
+        var bestArea = double.MaxValue;
+
+        void Consider(int index, double x, double y, double w, double h)
+        {
+            var area = w * h;
+            if (p.X >= x * Scale && p.X <= (x + w) * Scale && p.Y >= y * Scale && p.Y <= (y + h) * Scale
+                && area <= bestArea)
+            {
+                best = index;
+                bestArea = area;
+            }
+        }
+
+        if (over.HasBox)
+            Consider(-1, over.BoxX ?? 0, over.BoxY ?? 0, over.BoxWidth ?? 1920, over.BoxHeight ?? 1080);
+
+        // Later boxes are drawn over earlier ones, so on a tie they win.
+        for (var i = 0; i < over.TextBoxes.Count; i++)
+        {
+            var b = over.TextBoxes[i];
+            Consider(i, b.X, b.Y, b.Width, b.Height);
+        }
+
+        return best;
+    }
+
+    /// <summary>Makes the box under the pointer the one being edited; true when it changed.</summary>
+    private bool SelectBoxAt(Point p)
+    {
+        if (BoxAt(p) is not { } index || index == _selectedBox)
+            return false;
+
+        _selectedBox = index;
+        RebuildBoxPicker();
+        LoadControls(_overrides[Selected]!);
+        RefreshSelected();
+        return true;
+    }
+
+    private void Overlay_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        // Only the empty canvas lands here; the selected box handles its own clicks.
+        if (_editing || e.OriginalSource != Overlay)
+            return;
+
+        if (SelectBoxAt(e.GetPosition(Overlay)) && e.ClickCount == 2)
+            EnterEdit();
+
+        e.Handled = true;
+    }
+
     private void Box_MouseDown(object sender, MouseButtonEventArgs e)
     {
         // While editing text, let the inner TextBox handle the mouse.
         if (_editing)
             return;
+
+        // The selected box may be sitting on top of a smaller one (the song's
+        // words cover most of the slide): the clicked box is the one to move.
+        if (e.OriginalSource is not System.Windows.Controls.Primitives.Thumb)
+            SelectBoxAt(e.GetPosition(Overlay));
 
         // Double-click writes directly on the slide.
         if (e.ClickCount == 2)

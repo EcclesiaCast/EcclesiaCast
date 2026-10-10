@@ -439,6 +439,12 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Corregido
 
+- **Varios cuadros de texto en una diapositiva del diseñador.** Con más de un
+  cuadro sólo se podía editar el que elegías en la lista de la derecha, y el
+  marco grande de la letra quedaba encima de los cuadros chicos sin dejar
+  tocarlos. Ahora un clic (o doble clic para escribir) sobre cualquier cuadro
+  lo elige, y si se superponen gana el más chico.
+
 - **El zoom y el corrimiento de «Rellenar» trabajan sobre la imagen entera.**
   Antes, «Rellenar» recortaba lo que sobraba **primero** y el zoom y el
   corrimiento movían ese pedazo ya recortado: con una página vertical (la tapa
