@@ -9,6 +9,17 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Vencimiento de una imagen.** En Propiedades, «Fecha del evento (opcional)»
+  y «se queda N días más» (10 por defecto): cuando llega ese día, la imagen pasa
+  sola a la pestaña **Eventos pasados** (que se crea sola) y el programa lo
+  avisa en la barra de estado. Se revisa al abrir el programa y al cambiar la
+  biblioteca. El archivo no se toca: sólo cambia de pestaña.
+- **Una imagen nueva entra en «Ajustar» y con el relleno de la misma imagen
+  desenfocada.** Vale al agregarla con ➕, arrastrándola o con «Agregar a
+  medios» de Google. Los videos, los PDF y lo que ya estaba no cambian.
+- **«➕ Agregar la abierta» en Google Imágenes.** Un botón en la fila de
+  imágenes del panel web, y el clic derecho sobre la imagen grande (aunque
+  Google la tape con un vínculo), agregan a los medios la imagen original.
 - **Imágenes y GIF de Google.** El botón **🖼 Imágenes** de la barra de medios
   abre Google Imágenes en el panel web (en castellano, con todos sus filtros), y
   el panel tiene una fila para escribir qué buscás, con **🖼 Imágenes**, **🎞 GIF**
@@ -662,6 +673,17 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Corregido
 
+- **El cambio de una imagen a otra ya no se demora.** Se midió: la imagen nueva
+  se leía en el momento del cambio y bloqueaba la ventana (120 ms una portada
+  de 1350 px, 60 ms una página 4K), la agrandaba al leerla aunque fuera más
+  chica que la pantalla, y el relleno desenfocado se dibujaba en vivo (250 ms,
+  y de nuevo en cada paso del fundido). Ahora se lee en segundo plano (la
+  imagen vieja sigue en pantalla hasta que la nueva está lista), se empieza a
+  leer cuando apoyás el mouse sobre la tarjeta, no se agranda de más, y el
+  relleno desenfocado es una imagen chica ya desenfocada (9 ms).
+- **El menú del teclado se ve en los tooltips.** Con el diseño avanzado las
+  teclas F1, F2, F3, F4, Esc y Ctrl+Enter ya no están escritas en los botones;
+  ahora las dice el globito de cada uno.
 - **La flecha pasa al versículo siguiente después de buscar uno.** Escribías
   «juan 3 16», Enter, y al apretar → el cursor se movía dentro de la caja en
   lugar de ir al 17. Ahora, mientras no escribas nada más ni hagas clic en la

@@ -252,45 +252,52 @@ public static class MediaFraming
         };
     }
 
+    private static readonly ConditionalWeakTable<BitmapSource, BitmapSource> BlurredFills = new();
+
     /// <summary>
-    /// Gives the fill picture its look: soft and a little enlarged when the
-    /// bars are painted with a copy of the image itself (the enlargement keeps
-    /// the blur's faded edge off-screen), as it comes otherwise. The radius is
-    /// in pixels of a 1920-wide screen, kept in proportion at any size.
+    /// The picture, already blurred, for the bars of an image that fills them
+    /// with a copy of itself. It is drawn once at 480×270 (a blur hides the
+    /// resolution: it costs 7 ms, where the same blur live at full size costs
+    /// 250 ms every time the picture changes and again at every step of a fade)
+    /// and shown stretched like any other picture.
+    ///
+    /// The copy is drawn 1.4 times bigger than the frame and centered, so the
+    /// faded edge a blur leaves falls outside it. It is made bigger itself and
+    /// not scaled with a render transform: a blur under a scale transform leaves
+    /// a black strip along the bottom edge (measured: 48 rows at 1920×1080).
     /// </summary>
-    public static void SetFillLook(Image fill, MediaItem? media, double screenWidth, double screenHeight)
+    public static BitmapSource? BlurredFill(BitmapSource? source)
     {
-        if (media is null || !media.FillsWithSelf || screenWidth <= 0 || screenHeight <= 0)
-        {
-            fill.Effect = null;
-            fill.ClearValue(FrameworkElement.WidthProperty);
-            fill.ClearValue(FrameworkElement.HeightProperty);
-            fill.RenderTransform = Transform.Identity;
-            return;
-        }
+        if (source is null)
+            return null;
 
-        // The blur fades to transparent at the edge of the picture, so the
-        // picture is made bigger than the screen (and centered) until that
-        // faded edge falls off it. It is made bigger itself, not scaled by a
-        // render transform: a blur under a scale transform leaves a black
-        // strip along the bottom edge (measured: 48 rows at 1920×1080).
+        if (BlurredFills.TryGetValue(source, out var cached))
+            return cached;
+
+        const int Width = 480, Height = 270;
         const double Oversize = 1.4;
-        fill.RenderTransform = Transform.Identity;
-        fill.HorizontalAlignment = HorizontalAlignment.Center;
-        fill.VerticalAlignment = VerticalAlignment.Center;
-        fill.Width = screenWidth * Oversize;
-        fill.Height = screenHeight * Oversize;
 
-        var radius = 40 * (screenWidth / 1920);
-        if (fill.Effect is not BlurEffect existing || Math.Abs(existing.Radius - radius) > 0.01)
+        var frame = new Grid { Width = Width, Height = Height, ClipToBounds = true, Background = Brushes.Black };
+        frame.Children.Add(new Image
         {
-            fill.Effect = new BlurEffect
-            {
-                Radius = radius,
-                KernelType = KernelType.Gaussian,
-                RenderingBias = RenderingBias.Performance,
-            };
-        }
+            Source = source,
+            Stretch = Stretch.UniformToFill,
+            Width = Width * Oversize,
+            Height = Height * Oversize,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            // 10 here is 40 on a 1920-wide screen.
+            Effect = new BlurEffect { Radius = 10, KernelType = KernelType.Gaussian, RenderingBias = RenderingBias.Performance },
+        });
+        frame.Measure(new Size(Width, Height));
+        frame.Arrange(new Rect(0, 0, Width, Height));
+        frame.UpdateLayout();
+
+        var blurred = new RenderTargetBitmap(Width, Height, 96, 96, PixelFormats.Pbgra32);
+        blurred.Render(frame);
+        blurred.Freeze();
+        BlurredFills.Add(source, blurred);
+        return blurred;
     }
 
     /// <summary>True when the picture leaves part of the output uncovered.</summary>

@@ -18,6 +18,43 @@ reproductor de Spotify, «mismo título, distinto artista» y las flechas del
 teclado en Propiedades. Lo que sigue se corrigió o se agregó después de esa
 prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
 
+- [ ] **Teclas en los tooltips (diseño avanzado).** Pasá el mouse por Black,
+      Clear, Logo, Sin fondo, Poner en vivo / Apagar salida y Proyectar ▶: el
+      globito dice la tecla (F1, F2, F3, F4, Esc, Ctrl+Enter) aunque estés en
+      el diseño avanzado, que las esconde de los botones.
+- [ ] **Cambio de una imagen a otra, sin demora.** (Medido el 14/10 con
+      OverFlow y una página 4K: leer la imagen en el momento del cambio
+      bloqueaba la ventana 120 ms y el relleno desenfocado en vivo costaba 250
+      ms.) Ahora la imagen nueva se lee en segundo plano y el cambio sigue
+      mostrando la vieja hasta que la nueva está lista; al apoyar el mouse
+      150 ms sobre una tarjeta la imagen ya se va leyendo, así que el clic la
+      encuentra lista; no se agranda una imagen chica al leerla; y el relleno
+      desenfocado es una imagen chica ya desenfocada (~9 ms). Probalo pasando de
+      «26-10-09 Encuentro» a «OverFlow» y de vuelta, con el mouse sobre la
+      tarjeta un instante y con un clic rápido sin esperar: no tiene que haber
+      un tirón ni quedar la imagen vieja mal encuadrada un instante. Probalo
+      también con el modo de bajo rendimiento y con una imagen que se edita
+      (zoom) mientras está en pantalla.
+- [ ] **Vencimiento de una imagen («Eventos pasados»).** En Propiedades hay
+      «Fecha del evento (opcional)» y «se queda N días más» (10 por defecto).
+      Poné 17/10/2026: la nota de abajo dice «Pasa a «Eventos pasados» el
+      27/10/2026». Cuando llega ese día (al abrir el programa o al cambiar la
+      biblioteca) la imagen pasa sola a la pestaña **Eventos pasados** (se
+      crea sola) y la barra de estado lo avisa. Para probarlo sin esperar: una
+      fecha vieja (por ejemplo 1/1/2026) se mueve al guardar. Una fecha mal
+      escrita no deja guardar. Si la sacás de «Eventos pasados» a mano, no
+      vuelve (la fecha se borra al archivarla). Mirá que la ventana de
+      Propiedades siga entrando en la pantalla de la notebook: ahora es unos
+      70 píxeles más alta.
+- [ ] **Imágenes nuevas: «Ajustar» y relleno desenfocado por defecto.** Agregá
+      una imagen con ➕ o arrastrándola, o con «Agregar a medios» de Google: en
+      Propiedades tiene que venir con Escala «Ajustar» y «Los bordes se rellenan
+      con (la misma imagen, desenfocada)». Los videos, los PDF y las imágenes
+      que ya estaban no cambian.
+- [ ] **«Agregar la abierta» en Google Imágenes.** Con una imagen abierta en
+      grande a la derecha: el botón **➕ Agregar la abierta** de la fila de
+      imágenes, y el clic derecho sobre cualquier parte de la imagen grande (o de
+      lo que la tape), ofrecen «Agregar a medios» y bajan **la imagen original**.
 - [ ] **Achicar la lista de audios.** En la pestaña Música, un clic en el título
       **▾ AUDIOS** esconde la lista, sus botones **y el reproductor de audios**
       (la barra, el tiempo, los botones de anterior y siguiente; queda sólo el

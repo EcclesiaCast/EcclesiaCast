@@ -83,6 +83,16 @@ public partial class ProjectedView : UserControl
             new PropertyMetadata(0d, (d, e) => ((ProjectedView)d).ApplyBlur((double)e.NewValue)));
 
     private string? _lastImagePath;
+
+    /// <summary>Bumped on every change of background: the answer of an older read must be ignored.</summary>
+    private int _loadVersion;
+
+    /// <summary>A new picture is being read on another thread; the layers still show the old one.</summary>
+    private bool _loadPending;
+
+    /// <summary>The last picture that could not be read: it is not waited for again.</summary>
+    private string? _loadFailedPath;
+
     private int _lastDecodeWidth = ImageDecodeSize.Baseline;
     private long _lastImageStamp;
 
@@ -363,17 +373,49 @@ public partial class ProjectedView : UserControl
             ? media.Path
             : IsLiveOutput ? null : media?.ThumbnailPath; // póster de video/YouTube en los previews
 
-        ApplyFraming();
-
         // Zoomed in, a picture has to be read wider than the screen or it goes
         // soft. Without zoom this stays the 1920 it always was, and the file is
         // not even opened to find out.
-        var decodeWidth = media?.Type == MediaType.Image ? DecodeWidthFor(media, path) : ImageDecodeSize.Baseline;
+        var decodeWidth = media?.Type == MediaType.Image ? ImageLoadCache.DecodeWidthFor(media, path) : ImageDecodeSize.Baseline;
 
         // A page drawn again keeps its file name but not its contents.
         var stamp = path is not null && !path.StartsWith("http", StringComparison.OrdinalIgnoreCase) && File.Exists(path)
             ? File.GetLastWriteTimeUtc(path).Ticks
             : 0;
+
+        // A new picture that has not been read yet is read on another thread:
+        // decoding it here froze the window for 60 to 130 ms right at the
+        // change, and the new one came in late. The old one stays on screen
+        // (framing and all) until the new one is ready, then this runs again
+        // and finds it in the cache.
+        var loadVersion = ++_loadVersion;
+        _loadPending = false;
+        if (media?.Type == MediaType.Image && stamp != 0 && path is not null
+            && path != _lastImagePath && path != _loadFailedPath
+            && ImageLoadCache.Get(path, decodeWidth, stamp) is null)
+        {
+            _loadPending = true;
+            var pendingPath = path;
+            var pendingWidth = decodeWidth;
+            var pendingStamp = stamp;
+            _ = Task.Run(() => ImageLoadCache.Prepare(pendingPath, pendingWidth, pendingStamp) is not null)
+                .ContinueWith(done =>
+                {
+                    Dispatcher.BeginInvoke(() =>
+                    {
+                        if (loadVersion != _loadVersion)
+                            return;
+
+                        // Unreadable: carry on, and the old code draws the black fallback.
+                        if (!done.Result)
+                            _loadFailedPath = pendingPath;
+                        OnBackgroundChanged();
+                    });
+                }, TaskScheduler.Default);
+            return;
+        }
+
+        ApplyFraming();
 
         if (path == _lastImagePath && decodeWidth == _lastDecodeWidth && stamp == _lastImageStamp)
             return;
@@ -397,21 +439,34 @@ public partial class ProjectedView : UserControl
                 var previousSource = BackgroundImage.Visibility == Visibility.Visible ? BackgroundImage.Source : null;
                 var previousMedia = _shownMedia;
 
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.UriSource = new Uri(path);
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.DecodePixelWidth = decodeWidth;
-                // WPF remembers pictures by file name: a file rewritten under
-                // the same name would come back as the old one.
-                if (changedOnDisk)
-                    bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
-                bitmap.EndInit();
-                // A remote poster (YouTube) is still downloading here, and
-                // freezing it would throw and drop us into the black fallback.
-                // WPF fills the Image in once the download finishes.
-                if (bitmap.CanFreeze)
-                    bitmap.Freeze();
+                BitmapImage bitmap;
+                if (!isRemote && stamp != 0)
+                {
+                    // Already read (on another thread, or ahead of time) in nearly
+                    // every case; if not, it is read here as it always was.
+                    bitmap = ImageLoadCache.Get(path, decodeWidth, stamp)
+                             ?? ImageLoadCache.Prepare(path, decodeWidth, stamp)
+                             ?? throw new IOException("No se pudo leer la imagen");
+                }
+                else
+                {
+                    bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.UriSource = new Uri(path);
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmap.DecodePixelWidth = decodeWidth;
+                    // WPF remembers pictures by file name: a file rewritten under
+                    // the same name would come back as the old one.
+                    if (changedOnDisk)
+                        bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+                    bitmap.EndInit();
+                    // A remote poster (YouTube) is still downloading here, and
+                    // freezing it would throw and drop us into the black fallback.
+                    // WPF fills the Image in once the download finishes.
+                    if (bitmap.CanFreeze)
+                        bitmap.Freeze();
+                }
+
                 BackgroundImage.Source = bitmap;
                 BackgroundImage.Visibility = Visibility.Visible;
                 // «Rellenar» depends on the shape of the picture just loaded.
@@ -594,29 +649,6 @@ public partial class ProjectedView : UserControl
         _heldImageTimer.Start();
     }
 
-    /// <summary>
-    /// The width to read this image at: the screen's, unless the media is
-    /// zoomed in, in which case it also depends on the file's own size.
-    /// </summary>
-    private static int DecodeWidthFor(MediaItem media, string? path)
-    {
-        if (!ImageDecodeSize.NeedsFileSize(media.Zoom) || string.IsNullOrWhiteSpace(path) || !File.Exists(path))
-            return ImageDecodeSize.Baseline;
-
-        try
-        {
-            // Only the header is read: no pixels are decoded to learn the size.
-            var frame = BitmapDecoder.Create(new Uri(path), BitmapCreateOptions.DelayCreation, BitmapCacheOption.None)
-                .Frames[0];
-            return ImageDecodeSize.For(
-                media.Scaling, media.Zoom, media.FrameWidth, media.FrameHeight, frame.PixelWidth, frame.PixelHeight);
-        }
-        catch
-        {
-            return ImageDecodeSize.Baseline;
-        }
-    }
-
     // ── Encuadre y relleno ───────────────────────────────────────
 
     /// <summary>
@@ -689,6 +721,11 @@ public partial class ProjectedView : UserControl
     /// </summary>
     private void ApplyFraming()
     {
+        // The new picture is still being read: its framing and fill would be
+        // painted on the old one. They are applied when it arrives.
+        if (_loadPending)
+            return;
+
         var media = BackgroundMedia;
         MediaFraming.Apply(BackgroundImage, media, ActualWidth, ActualHeight);
         if (PreviousImage.Visibility == Visibility.Visible)
@@ -706,13 +743,20 @@ public partial class ProjectedView : UserControl
         // background video's poster does in the previews.
         var fillPath = fill?.Type == MediaType.Image ? fill.Path : fill?.ThumbnailPath;
 
-        if (fillPath != _lastFillImagePath)
+        // An image that fills its own bars shows itself, already blurred; any
+        // other fill is the picture as it is.
+        var selfFill = needsFill && media is { FillsWithSelf: true } && fillPath is not null;
+        var fillKey = selfFill ? "blur:" + fillPath : fillPath;
+
+        if (fillKey != _lastFillImagePath)
         {
-            _lastFillImagePath = fillPath;
-            FillImage.Source = LoadBitmap(fillPath);
+            _lastFillImagePath = fillKey;
+            FillImage.Source = selfFill
+                ? MediaFraming.BlurredFill(
+                    ImageLoadCache.GetLatest(fillPath!) ?? ImageLoadCache.Prepare(fillPath!, 480, ImageLoadCache.StampOf(fillPath!)))
+                : LoadBitmap(fillPath);
         }
 
-        MediaFraming.SetFillLook(FillImage, needsFill ? media : null, ActualWidth, ActualHeight);
         var showFillImage = needsFill && FillImage.Source is not null;
         FillImage.Visibility = showFillImage ? Visibility.Visible : Visibility.Collapsed;
 

@@ -99,6 +99,11 @@ public partial class MediaInspectorWindow : Window
         VolSlider.Value = item.Volume;
         BlurField.SetSilently(item.Blur);
 
+        // Vencimiento: the day of the event and how long it stays after it.
+        EventDateBox.Text = item.EventDate is { } eventDate ? MediaExpiry.Format(eventDate) : string.Empty;
+        ArchiveDaysField.SetSilently(item.EventDate is null ? MediaExpiry.DefaultDays : item.ArchiveAfterDays);
+        UpdateEventNote();
+
         // From here on the fields drive the preview.
         _ready = true;
 
@@ -156,6 +161,35 @@ public partial class MediaInspectorWindow : Window
     // ── Vista previa en vivo ─────────────────────────────────────
 
     private void Field_Changed(object sender, RoutedEventArgs e) => RefreshPreview();
+
+    private void EventDateBox_TextChanged(object sender, TextChangedEventArgs e) => UpdateEventNote();
+
+    private void EventDate_Changed(object sender, RoutedEventArgs e) => UpdateEventNote();
+
+    /// <summary>Says, under the date, what it will do: «pasa a Eventos pasados el 27/10/2026», or what is wrong with what was typed.</summary>
+    private void UpdateEventNote()
+    {
+        if (EventDateNote is null)
+            return;
+
+        var text = EventDateBox.Text.Trim();
+        if (text.Length == 0)
+        {
+            EventDateNote.Text = "Sin fecha: no vence. Con la fecha de un evento, pasa sola a «Eventos pasados» unos días después.";
+            return;
+        }
+
+        if (!MediaExpiry.TryParseDate(text, out var date))
+        {
+            EventDateNote.Text = "No entiendo la fecha: escribila así, 17/10/2026.";
+            return;
+        }
+
+        var day = MediaExpiry.MovesOn(date, (int)ArchiveDaysField.Value)!.Value;
+        EventDateNote.Text = day <= DateTime.Today
+            ? $"Esa fecha ya pasó: al guardar se mueve a «{MediaExpiry.ArchiveTab}»."
+            : $"Pasa a «{MediaExpiry.ArchiveTab}» el {MediaExpiry.Format(day)}.";
+    }
 
     private void Field_SelectionChanged(object sender, SelectionChangedEventArgs e) => RefreshPreview();
 
@@ -333,7 +367,25 @@ public partial class MediaInspectorWindow : Window
 
     private void Save_Click(object sender, RoutedEventArgs e)
     {
-        _item.Name = string.IsNullOrWhiteSpace(NameBox.Text) ? _item.Name : NameBox.Text.Trim();
+        // The date is checked first: nothing is saved with one that cannot be read.
+        DateTime? eventDate = null;
+        if (EventDateBox.Text.Trim().Length > 0)
+        {
+            if (!MediaExpiry.TryParseDate(EventDateBox.Text, out var parsed))
+            {
+                MessageBox.Show(this,
+                    "No entiendo la fecha del evento. Escribila así: 17/10/2026 (o dejala vacía para que no venza).",
+                    "Fecha del evento", MessageBoxButton.OK, MessageBoxImage.Information);
+                EventDateBox.Focus();
+                return;
+            }
+
+            eventDate = parsed;
+        }
+
+        _item.EventDate = eventDate;
+        _item.ArchiveAfterDays = (int)Math.Clamp(ArchiveDaysField.Value, 0, 365);
+        _item.Name =string.IsNullOrWhiteSpace(NameBox.Text) ? _item.Name : NameBox.Text.Trim();
         _item.Category = string.IsNullOrWhiteSpace(CategoryBox.Text) ? "Fondos" : CategoryBox.Text.Trim();
         _item.Behavior = (MediaBehavior)Math.Max(0, BehaviorBox.SelectedIndex);
         _item.Scaling = (MediaScaling)Math.Max(0, ScalingBox.SelectedIndex);

@@ -202,8 +202,7 @@ public sealed class FramedMediaPreview : Grid
         if (fillSource is not null)
         {
             var image = EnsureFillImage();
-            image.Source = fillSource;
-            MediaFraming.SetFillLook(image, media, ScreenWidth, ScreenHeight);
+            image.Source = media is { FillsWithSelf: true } ? MediaFraming.BlurredFill(fillSource as BitmapSource) ?? fillSource : fillSource;
             image.Visibility = Visibility.Visible;
         }
         else if (_fillImage is not null)

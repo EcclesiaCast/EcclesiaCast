@@ -94,6 +94,13 @@ public sealed partial class MainViewModel
     /// </summary>
     private async Task AddWebImageAsync(WebImageChosen chosen)
     {
+        if (string.IsNullOrEmpty(chosen.Source))
+        {
+            StatusText = "No encontré una imagen para agregar. Hacé clic en una imagen de Google para abrirla en grande "
+                         + "a la derecha y probá de nuevo (clic derecho sobre ella o «➕ Agregar la abierta»).";
+            return;
+        }
+
         // Only Google's small copy is known: taking it would put a blurry picture
         // in the library. Better to say how to get the real one.
         if (chosen.IsThumbnail)

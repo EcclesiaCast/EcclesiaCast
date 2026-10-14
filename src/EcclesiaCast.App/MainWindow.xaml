@@ -314,7 +314,7 @@
                 <StackPanel DockPanel.Dock="Left" Orientation="Horizontal"
                             VerticalAlignment="Center" Margin="24,0,0,0">
                     <Button Content="Black" controls:ShortcutHint.Text="F1" Command="{Binding ToggleBlackCommand}"
-                            ToolTip="Pantalla en negro: tapa todo (letra y fondo) sin apagar la salida.">
+                            ToolTip="Pantalla en negro (tecla F1): tapa todo (letra y fondo) sin apagar la salida.">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
                                 <Style.Triggers>
@@ -327,7 +327,7 @@
                         </Button.Style>
                     </Button>
                     <Button Content="Clear" controls:ShortcutHint.Text="F2" Command="{Binding ToggleClearCommand}" Margin="6,0,0,0"
-                            ToolTip="Saca la letra de la pantalla y deja el fondo (imagen o video) a la vista. Se vuelve a apretar para traer la letra de nuevo.">
+                            ToolTip="Saca la letra de la pantalla y deja el fondo (imagen o video) a la vista (tecla F2). Se vuelve a apretar para traer la letra de nuevo.">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
                                 <Style.Triggers>
@@ -341,7 +341,7 @@
                     </Button>
                     <!-- Logo: el botón lo prende/apaga, la flecha elige cuál -->
                     <Button Content="Logo" controls:ShortcutHint.Text="F3" Command="{Binding ToggleLogoCommand}" Margin="6,0,0,0"
-                            ToolTip="{Binding ActiveLogoName, StringFormat='Muestra el logo a pantalla completa. Ahora está elegido: {0}'}">
+                            ToolTip="{Binding ActiveLogoName, StringFormat='Muestra el logo a pantalla completa (tecla F3). Ahora está elegido: {0}'}">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
                                 <Style.Triggers>
@@ -370,7 +370,7 @@
                             Style="{StaticResource DarkButton}"
                             Command="{Binding ClearBackgroundCommand}"
                             IsEnabled="{Binding HasBackground}"
-                            ToolTip="Quita la imagen o el video de fondo y deja la letra sola sobre el fondo del tema"/>
+                            ToolTip="Quita la imagen o el video de fondo y deja la letra sola sobre el fondo del tema (tecla F4)"/>
                     <Button Content="🎨 Temas" Margin="14,0,0,0"
                             Style="{StaticResource DarkButton}"
                             Command="{Binding OpenThemesCommand}"
@@ -438,7 +438,7 @@
                             ToolTip="Actualizar pantallas"
                             Padding="9,6" Margin="6,0,14,0"/>
                     <Button Command="{Binding ToggleOutputCommand}"
-                            ToolTip="Prende o apaga la ventana de salida en la pantalla elegida.">
+                            ToolTip="Prende o apaga la ventana de salida en la pantalla elegida. Con la salida prendida, la tecla Esc la apaga.">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
                                 <Setter Property="Content" Value="🔴  Poner en vivo"/>
@@ -1661,7 +1661,7 @@
                                         Style="{StaticResource AccentButton}"
                                         Command="{Binding GoLiveCommand}"
                                         Margin="12,8,12,12" Padding="10,8"
-                                        ToolTip="Manda lo escrito a la pantalla, con el tema de las canciones"/>
+                                        ToolTip="Manda lo escrito a la pantalla, con el tema de las canciones (teclas Ctrl+Enter)"/>
                                 <StackPanel DockPanel.Dock="Top" Margin="12,0,12,10">
                                     <TextBlock Text="Tipografía" Foreground="{StaticResource MutedBrush}"
                                                FontSize="11" Margin="0,0,0,4"/>
@@ -2359,6 +2359,7 @@
                                             AutomationProperties.Name="{Binding Name}"
                                             ContextMenu="{StaticResource MediaCardMenu}"
                                             Loaded="MediaCard_Loaded"
+                                            MouseEnter="MediaCard_MouseEnter"
                                             PreviewMouseLeftButtonDown="MediaCard_PreviewMouseLeftButtonDown"
                                             PreviewMouseRightButtonDown="MediaCard_PreviewMouseRightButtonDown"
                                             PreviewMouseMove="MediaCard_PreviewMouseMove"

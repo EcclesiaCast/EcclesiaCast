@@ -85,6 +85,9 @@
                 <!-- Imágenes y GIF de Google: abre Google Imágenes en este mismo
                      panel; con clic derecho sobre una imagen se agrega a los medios -->
                 <DockPanel Margin="0,2,0,0">
+                    <Button DockPanel.Dock="Right" Content="➕ Agregar la abierta" FontSize="12" Padding="10,4" Margin="6,0,0,0"
+                            Style="{StaticResource AccentButton}" Click="AddOpenImage_Click"
+                            ToolTip="Agrega a los medios la imagen que abriste en grande a la derecha de Google Imágenes (es lo mismo que clic derecho → Agregar a medios)"/>
                     <Button DockPanel.Dock="Right" Content="🎞 GIF" FontSize="12" Padding="10,4" Margin="6,0,0,0"
                             Style="{StaticResource DarkButton}"
                             Command="{Binding SearchWebImagesCommand}" CommandParameter="gifs"

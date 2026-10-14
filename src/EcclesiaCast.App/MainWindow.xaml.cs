@@ -535,6 +535,21 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
+    /// The pointer rests on a card (150 ms: not just passing over): its picture
+    /// is read in the background, so the click that follows finds it ready and
+    /// the change of picture does not wait for the file.
+    /// </summary>
+    private async void MediaCard_MouseEnter(object sender, MouseEventArgs e)
+    {
+        if (sender is not Button { IsMouseOver: true } card || card.DataContext is not MediaItem media)
+            return;
+
+        await Task.Delay(150);
+        if (card.IsMouseOver)
+            await ImageLoadCache.PrefetchAsync(media);
+    }
+
+    /// <summary>
     /// A plain click projects, as always, and leaves only this card picked.
     /// With Ctrl or Shift it only picks (adds or takes out; the stretch from
     /// the last one), the way the Explorer does.

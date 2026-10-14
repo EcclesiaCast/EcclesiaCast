@@ -170,6 +170,17 @@ public sealed class MediaItem
     /// <summary>True when the bars are filled with a blurred copy of this very image.</summary>
     public bool FillsWithSelf => FillMediaId == FillWithSelfId && Type == MediaType.Image;
 
+    // ── Vencimiento ──────────────────────────────────────────────
+
+    /// <summary>
+    /// The day of the event this picture announces, or null for one that does
+    /// not expire. See <see cref="MediaExpiry"/>.
+    /// </summary>
+    public DateTime? EventDate { get; set; }
+
+    /// <summary>Days after <see cref="EventDate"/> that it stays in its tab before going to the tab of past events.</summary>
+    public int ArchiveAfterDays { get; set; } = MediaExpiry.DefaultDays;
+
     // ── Recorte y color ──────────────────────────────────────────
 
     /// <summary>

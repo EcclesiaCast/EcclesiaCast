@@ -47,6 +47,22 @@
             <TextBlock Text="Pestaña" Style="{StaticResource L}"/>
             <ComboBox x:Name="CategoryBox" IsEditable="True"/>
 
+            <TextBlock Text="Fecha del evento (opcional)" Style="{StaticResource L}"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBox x:Name="EventDateBox" Width="104" Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                         BorderBrush="{StaticResource LineBrush}" CaretBrush="White" Padding="6,4" FontSize="13"
+                         TextChanged="EventDateBox_TextChanged"
+                         ToolTip="El día del evento que anuncia (por ejemplo 17/10/2026). Vacío: no vence nunca."/>
+                <TextBlock Text="se queda" FontSize="11" Margin="10,0,6,0" VerticalAlignment="Center"
+                           Foreground="{StaticResource MutedBrush}"/>
+                <controls:NumericField x:Name="ArchiveDaysField" ValueChanged="EventDate_Changed" Minimum="0" Maximum="365" Step="1" Decimals="0"
+                                       ToolTip="Cuántos días después del evento sigue en esta pestaña antes de pasar a «Eventos pasados»"/>
+                <TextBlock Text="días más" FontSize="11" Margin="6,0,0,0" VerticalAlignment="Center"
+                           Foreground="{StaticResource MutedBrush}"/>
+            </StackPanel>
+            <TextBlock x:Name="EventDateNote" FontSize="10.5" Foreground="{StaticResource FaintBrush}"
+                       TextWrapping="Wrap" Margin="0,4,0,0"/>
+
             <TextBlock Text="Comportamiento" Style="{StaticResource L}"/>
             <ComboBox x:Name="BehaviorBox" SelectionChanged="After_Changed">
                 <ComboBoxItem Content="Fondo (detrás del texto, en bucle)"/>

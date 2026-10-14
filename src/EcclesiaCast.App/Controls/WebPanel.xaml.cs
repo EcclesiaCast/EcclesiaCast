@@ -264,8 +264,25 @@ public partial class WebPanel : UserControl, IWebPageHost
         else if (imageSource is not null)
             chosen = new WebImageChosen(imageSource, page, IsThumbnail: WebImages.IsGoogleThumbnail(imageSource));
 
-        if (chosen is not null)
+        if (chosen is { IsThumbnail: false })
+        {
             Add("➕ Agregar a medios", () => ImageChosen?.Invoke(this, chosen));
+        }
+        else if (IsGoogleImages(page))
+        {
+            // Over Google's own overlay (the picture opened beside the results is
+            // often covered by one) the browser reports no picture at all: the
+            // one that is open is looked for in the page instead.
+            Add("➕ Agregar a medios", async () =>
+            {
+                var found = await FindOpenImageAsync();
+                ImageChosen?.Invoke(this, found ?? chosen ?? new WebImageChosen(string.Empty, page));
+            });
+        }
+        else if (chosen is not null)
+        {
+            Add("➕ Agregar a medios", () => ImageChosen?.Invoke(this, chosen));
+        }
 
         if (link is not null && WebImages.FromImgres(link) is null)
         {
@@ -284,6 +301,71 @@ public partial class WebPanel : UserControl, IWebPageHost
         Add("⟳ Recargar", () => _web?.Reload());
 
         menu.IsOpen = true;
+    }
+
+    /// <summary>The page is Google Images (its results, and the picture opened beside them).</summary>
+    private static bool IsGoogleImages(string? address) =>
+        Uri.TryCreate(address, UriKind.Absolute, out var uri)
+        && uri.Host.Contains("google.", StringComparison.OrdinalIgnoreCase)
+        && (uri.Query.Contains("udm=2", StringComparison.Ordinal) || uri.Query.Contains("tbm=isch", StringComparison.Ordinal));
+
+    /// <summary>
+    /// The picture Google Images has opened beside its results: the biggest one
+    /// in view that is not one of Google's own small copies. Its address is the
+    /// original file, and the link around it is the page it came from.
+    /// </summary>
+    private const string OpenImageScript = """
+        (() => {
+          const small = s => !s || /^data:|encrypted-tbn/.test(s);
+          let best = null, area = 0;
+          for (const i of document.images) {
+            const r = i.getBoundingClientRect(), s = i.currentSrc || i.src;
+            if (small(s) || r.width < 200 || r.height < 150) continue;
+            if (r.bottom <= 0 || r.top >= innerHeight || r.right <= 0 || r.left >= innerWidth) continue;
+            if (r.width * r.height > area) { area = r.width * r.height; best = i; }
+          }
+          const link = best && best.closest('a');
+          return JSON.stringify({ src: best ? (best.currentSrc || best.src) : null, page: link ? link.href : null });
+        })()
+        """;
+
+    private async Task<WebImageChosen?> FindOpenImageAsync()
+    {
+        if (_web?.CoreWebView2 is not { } core)
+            return null;
+
+        try
+        {
+            // ExecuteScriptAsync returns the script's JSON-encoded result: a string, so quoted.
+            var raw = await core.ExecuteScriptAsync(OpenImageScript);
+            var json = System.Text.Json.JsonSerializer.Deserialize<string>(raw);
+            if (string.IsNullOrEmpty(json))
+                return null;
+
+            using var doc = System.Text.Json.JsonDocument.Parse(json);
+            var src = doc.RootElement.TryGetProperty("src", out var s) && s.ValueKind == System.Text.Json.JsonValueKind.String
+                ? s.GetString()
+                : null;
+            if (string.IsNullOrEmpty(src))
+                return null;
+
+            var page = doc.RootElement.TryGetProperty("page", out var p) && p.ValueKind == System.Text.Json.JsonValueKind.String
+                ? p.GetString()
+                : core.Source;
+            return new WebImageChosen(src, page);
+        }
+        catch (Exception ex) when (ex is System.Text.Json.JsonException or InvalidOperationException or System.Runtime.InteropServices.COMException)
+        {
+            Log.Debug(ex, "No se pudo buscar la imagen abierta en la página");
+            return null;
+        }
+    }
+
+    /// <summary>«➕ Agregar la abierta»: the picture opened beside Google's results goes to the media bar.</summary>
+    private async void AddOpenImage_Click(object sender, RoutedEventArgs e)
+    {
+        var found = await FindOpenImageAsync();
+        ImageChosen?.Invoke(this, found ?? new WebImageChosen(string.Empty, CurrentAddress));
     }
 
     private static void TryCopy(string text)

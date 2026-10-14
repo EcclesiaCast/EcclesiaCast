@@ -293,6 +293,24 @@ public sealed partial class MainViewModel
         _allMedia.Clear();
         _allMedia.AddRange(_media.GetAll());
 
+        // A poster whose event is over goes to «Eventos pasados» by itself.
+        var overdue = _allMedia.Where(m => MediaExpiry.IsDue(m, DateTime.Today)).ToList();
+        foreach (var old in overdue)
+        {
+            old.Category = MediaExpiry.ArchiveTab;
+            // It has done its job: with the date cleared it will not jump back
+            // if someone moves it out of the archive on purpose.
+            old.EventDate = null;
+            _media.Update(old);
+        }
+
+        if (overdue.Count > 0)
+        {
+            StatusText = overdue.Count == 1
+                ? $"«{overdue[0].Name}» ya pasó (su evento terminó) y se movió a «{MediaExpiry.ArchiveTab}»."
+                : $"{overdue.Count} medios ya pasaron (sus eventos terminaron) y se movieron a «{MediaExpiry.ArchiveTab}».";
+        }
+
         // An item with no tab name belongs to no tab and would never be shown
         // anywhere: send it to the first one.
         foreach (var orphan in _allMedia.Where(m => string.IsNullOrWhiteSpace(m.Category)))
@@ -680,6 +698,12 @@ public sealed partial class MainViewModel
                 // Videos with audio default to a foreground announcement; silent
                 // ones and images to a background — the operator can change it.
                 Behavior = MediaBehavior.Background,
+
+                // A picture goes in whole («Ajustar»), and the bars the screen shape
+                // leaves are filled with a blurred copy of itself, so it looks like
+                // one picture. A video keeps what it always had.
+                Scaling = type == MediaType.Image ? MediaScaling.Fit : default,
+                FillMediaId = type == MediaType.Image ? MediaItem.FillWithSelfId : null,
             });
             added++;
             if (type == MediaType.Video)
@@ -743,6 +767,8 @@ public sealed partial class MainViewModel
                         ThumbnailPath = MediaThumbnails.Create(gif, MediaType.Image, videoEngine: null),
                         Category = tab,
                         Behavior = MediaBehavior.Background,
+                        Scaling = MediaScaling.Fit,
+                        FillMediaId = MediaItem.FillWithSelfId,
                     });
                     kept++;
                     continue;
