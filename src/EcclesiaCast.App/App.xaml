@@ -10,6 +10,7 @@
         <converters:InverseBooleanConverter x:Key="InverseBool"/>
         <converters:NonZeroToBooleanConverter x:Key="NonZeroToBool"/>
         <converters:IndexMatchConverter x:Key="IndexIs"/>
+        <converters:TabMutedToVisibilityConverter x:Key="TabMutedToVis"/>
 
         <!-- Dark theme palette -->
         <SolidColorBrush x:Key="BgBrush" Color="#14161C"/>

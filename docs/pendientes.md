@@ -166,6 +166,14 @@ dibujos a imagen):
       segunda vez con el mismo archivo no lo repite. No aparece en las páginas
       de un PDF ni en un YouTube. Si borrás el medio de la barra, el logo
       sigue andando.
+- [ ] **Silenciar una pestaña.** Poné un video con sonido en una pestaña,
+      proyectalo y, con clic derecho en la pestaña, «🔇 Silenciar la pestaña»:
+      el sonido tiene que cortarse en el momento y el video **no** debe
+      reiniciarse. Al abrir el menú otra vez dice «🔊 Quitar el silencio» y el
+      sonido vuelve. Lo mismo con un video de YouTube sin descargar (no se pudo
+      probar el `mute()` del reproductor). La pestaña muestra el 🔇 mientras
+      está silenciada, y también se tilda en «Configurar…». Cambiá el nombre de
+      la pestaña y cerrá y abrí el programa: sigue silenciada.
 
 ## 2. Para la v1.0.0
 

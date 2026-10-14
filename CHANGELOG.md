@@ -16,6 +16,14 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   muestra. No aparece en las páginas de un PDF o de una presentación, porque se
   borran junto con el medio.
 
+- **Silenciar una pestaña de medios entera.** Con clic derecho en la pestaña,
+  **🔇 Silenciar la pestaña** (y **🔊 Quitar el silencio** para volver): todos los
+  videos de esa pestaña se proyectan sin sonido, incluidos los de YouTube, y
+  la pestaña muestra un 🔇 al lado del nombre. También está como casilla en
+  **Configurar…**. Si lo que suena en pantalla es de esa pestaña, el cambio se
+  escucha en el momento, sin reiniciar el video. Las Propiedades de cada medio
+  no se tocan: al quitar el silencio, cada uno vuelve a sonar como estaba.
+
 - **Tipografía para cada recuadro del escenario.** En el diseñador de
   escenarios, cada recuadro (las notas del predicador, la hora, un texto fijo…)
   puede tener su propia letra: se elige de la lista de las que tiene la

@@ -900,16 +900,29 @@ public partial class MainWindow : Window
             return entry;
         }
 
-        tabItem.ContextMenu = new ContextMenu
+        var muteEntry = Entry("🔇 Silenciar la pestaña", (vm, tab) => vm.ToggleMediaTabMuteCommand.Execute(tab));
+
+        var menu = new ContextMenu
         {
             Items =
             {
                 Entry("Cambiar nombre…", (vm, tab) => vm.RenameMediaTabCommand.Execute(tab)),
                 Entry("Configurar…", (vm, tab) => vm.ConfigureMediaTabCommand.Execute(tab)),
+                muteEntry,
                 new Separator(),
                 Entry("Eliminar…", (vm, tab) => vm.DeleteMediaTabCommand.Execute(tab)),
             },
         };
+
+        // The wording follows the state of the tab at the moment of opening:
+        // it can change from «Configurar…» or from this very entry.
+        menu.Opened += (_, _) =>
+        {
+            muteEntry.Header = DataContext is MainViewModel vm && vm.IsMediaTabMuted(tabItem.DataContext as string)
+                ? "🔊 Quitar el silencio"
+                : "🔇 Silenciar la pestaña";
+        };
+        tabItem.ContextMenu = menu;
     }
 
     private void ClearTabDropHighlights()

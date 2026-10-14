@@ -1064,6 +1064,55 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     /// <summary>The media as it is to play: with the rule of its tab applied.</summary>
     private MediaItem Playable(MediaItem item) => TabRule(item.Category).Resolve(item);
 
+    /// <summary>
+    /// Names of the tabs whose media play without sound. The tab list shows a
+    /// speaker on each; the set is replaced (never edited) so the bindings see
+    /// it change.
+    /// </summary>
+    [ObservableProperty]
+    private HashSet<string> _mutedMediaTabs = new(StringComparer.OrdinalIgnoreCase);
+
+    private void RefreshMutedMediaTabs() =>
+        MutedMediaTabs = new HashSet<string>(
+            MediaTabs.Where(t => TabRule(t).Muted), StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>True when the tab is silenced; the menu of the tab asks it to word its entry.</summary>
+    public bool IsMediaTabMuted(string? tab) =>
+        !string.IsNullOrWhiteSpace(tab) && TabRule(tab).Muted;
+
+    /// <summary>
+    /// Keeps the rule of a tab. When its sound changed and the media on screen
+    /// belongs to it, the screen gets the media again so the change is heard
+    /// now, not at the next click (the video keeps playing: only its mute
+    /// switches).
+    /// </summary>
+    private void SaveMediaTabRule(string tab, MediaTabRule rule)
+    {
+        var soundChanged = TabRule(tab).Muted != rule.Muted;
+        _settings.Set(RuleKey(tab), rule.ToSetting());
+        RefreshMutedMediaTabs();
+
+        if (soundChanged
+            && _presentation.Background is { } onScreen
+            && _allMedia.FirstOrDefault(m => m.Id == onScreen.Id) is { } original
+            && string.Equals(original.Category, tab, StringComparison.OrdinalIgnoreCase))
+            _presentation.RefreshBackground(Playable(original).Clone(), ResolveFill(original));
+    }
+
+    /// <summary>Right click on a tab → «Silenciar la pestaña» / «Quitar el silencio».</summary>
+    [RelayCommand]
+    private void ToggleMediaTabMute(string? tab)
+    {
+        if (string.IsNullOrWhiteSpace(tab))
+            return;
+
+        var rule = TabRule(tab);
+        SaveMediaTabRule(tab, rule with { Muted = !rule.Muted });
+        StatusText = rule.Muted
+            ? $"«{tab}»: ahora suena (cada medio con lo que dice en sus Propiedades)."
+            : $"«{tab}»: silenciada, sus medios se proyectan sin sonido.";
+    }
+
     private void SaveMediaTabs(IEnumerable<string> tabs) =>
         _settings.Set(MediaTabsKey, MediaTabNames.Serialize(tabs));
 
@@ -1264,6 +1313,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         SelectedMediaTab = MediaTabs.Contains(keepTab) ? keepTab : MediaTabs.FirstOrDefault() ?? "Fondos";
         FilterMediaByTab();
         SyncMediaTabOptions();
+        RefreshMutedMediaTabs();
     }
 
     partial void OnSelectedMediaTabChanged(string value)
@@ -1501,7 +1551,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (_mediaInspector.EditTabRule(tab, TabRule(tab)) is not { } rule)
             return;
 
-        _settings.Set(RuleKey(tab), rule.ToSetting());
+        SaveMediaTabRule(tab, rule);
         StatusText = rule.Mode switch
         {
             MediaTabMode.Background => $"«{tab}»: todo va como fondo.",
@@ -1510,6 +1560,8 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 : $"«{tab}»: todo va en primer plano.",
             _ => $"«{tab}»: cada medio dice cómo va.",
         };
+        if (rule.Muted)
+            StatusText += " Sin sonido.";
     }
 
     [RelayCommand]

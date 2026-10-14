@@ -86,10 +86,89 @@ public class MediaTabRuleTests
             new MediaTabRule(MediaTabMode.Background, false),
             new MediaTabRule(MediaTabMode.Foreground, false),
             new MediaTabRule(MediaTabMode.Foreground, true),
+            new MediaTabRule(MediaTabMode.PerItem, false, true),
+            new MediaTabRule(MediaTabMode.Background, false, true),
+            new MediaTabRule(MediaTabMode.Foreground, false, true),
+            new MediaTabRule(MediaTabMode.Foreground, true, true),
         })
         {
             Assert.Equal(rule, MediaTabRule.Parse(rule.ToSetting()));
         }
+    }
+
+    [Theory]
+    [InlineData("item+mute", MediaTabMode.PerItem, false, true)]
+    [InlineData("background+mute", MediaTabMode.Background, false, true)]
+    [InlineData("foreground+logo+mute", MediaTabMode.Foreground, true, true)]
+    [InlineData("foreground+mute+logo", MediaTabMode.Foreground, true, true)]
+    [InlineData(" Foreground + Mute ", MediaTabMode.Foreground, false, true)]
+    [InlineData("foreground+logo", MediaTabMode.Foreground, true, false)]
+    public void The_mute_is_read_from_the_settings_next_to_the_rest(string text, MediaTabMode mode, bool logo, bool muted)
+    {
+        Assert.Equal(new MediaTabRule(mode, logo, muted), MediaTabRule.Parse(text));
+    }
+
+    [Fact]
+    public void A_rule_nobody_can_read_is_not_muted()
+    {
+        Assert.Equal(MediaTabRule.Default, MediaTabRule.Parse("mute"));
+        Assert.Equal(MediaTabRule.Default, MediaTabRule.Parse("algo raro+mute"));
+    }
+
+    [Fact]
+    public void The_text_saved_for_a_muted_tab_ends_in_mute_and_the_old_ones_do_not_change()
+    {
+        Assert.Equal("item+mute", new MediaTabRule(MediaTabMode.PerItem, false, true).ToSetting());
+        Assert.Equal("foreground+logo+mute", new MediaTabRule(MediaTabMode.Foreground, true, true).ToSetting());
+        Assert.Equal("foreground+logo", new MediaTabRule(MediaTabMode.Foreground, true).ToSetting());
+        Assert.Equal("item", MediaTabRule.Default.ToSetting());
+    }
+
+    [Fact]
+    public void A_muted_tab_silences_a_media_that_had_sound_without_touching_the_original()
+    {
+        var item = Video();
+        item.Muted = false;
+
+        var resolved = new MediaTabRule(MediaTabMode.PerItem, false, true).Resolve(item);
+
+        Assert.True(resolved.Muted);
+        Assert.False(item.Muted);
+        Assert.Equal(item.Behavior, resolved.Behavior);
+    }
+
+    [Fact]
+    public void A_muted_tab_changes_nothing_in_a_media_that_was_already_silent()
+    {
+        var item = Video();
+        item.Muted = true;
+
+        Assert.Same(item, new MediaTabRule(MediaTabMode.PerItem, false, true).Resolve(item));
+    }
+
+    [Fact]
+    public void A_tab_that_is_not_muted_never_gives_sound_to_a_silent_media_or_takes_it_from_a_loud_one()
+    {
+        var silent = Video();
+        silent.Muted = true;
+        var loud = Video();
+        loud.Muted = false;
+
+        Assert.Same(silent, MediaTabRule.Default.Resolve(silent));
+        Assert.Same(loud, MediaTabRule.Default.Resolve(loud));
+    }
+
+    [Fact]
+    public void A_muted_foreground_tab_applies_the_mute_together_with_the_rest_of_the_rule()
+    {
+        var item = Video(MediaBehavior.Background);
+        item.Muted = false;
+
+        var resolved = new MediaTabRule(MediaTabMode.Foreground, true, true).Resolve(item);
+
+        Assert.True(resolved.Muted);
+        Assert.Equal(MediaBehavior.Foreground, resolved.Behavior);
+        Assert.Equal(VideoEndBehavior.Logo, resolved.EndBehavior);
     }
 }
 
