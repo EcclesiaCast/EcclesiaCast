@@ -308,6 +308,14 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Cambiado
 
+- **La letra de una canción ya no se dibuja encima de los cuadros de texto
+  extra.** Si una diapositiva tiene un cuadro que ocupa al menos la mitad del
+  ancho de la letra (un título, una traducción a lo ancho), la letra se achica
+  y se acomoda en el espacio que queda, con un respiro de 12 píxeles. Los
+  cuadros angostos de una esquina no le sacan nada. **Esto cambia cómo se ven
+  las canciones que ya tengan un cuadro a lo ancho**: la letra puede quedar
+  algo más chica que antes. Revisalas en el diseñador si alguna no te gusta.
+
 - **Las miniaturas de las imágenes y de las páginas de un documento se dibujan
   con la forma de la imagen**, con 320 píxeles del lado largo (una página
   vertical queda vertical; una imagen 16:9, 320×180 como siempre). Antes las

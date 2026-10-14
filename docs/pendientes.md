@@ -185,6 +185,13 @@ dibujos a imagen):
       tipografía en el cuadro sin apretar Enter y cambiá de cuadro con la lista:
       se tiene que conservar en el primero. Guardá, volvé a entrar y mirá que
       todos se puedan editar.
+- [ ] **La letra no pisa los cuadros extra.** Poné en una canción de letra
+      larga un cuadro a lo ancho abajo (por ejemplo una traducción o una
+      referencia de 1500 px de ancho): al proyectarla, la letra tiene que
+      terminar arriba del cuadro y achicarse si hace falta, en la pantalla, el
+      LIVE y el PREVIEW. Un cuadro chico en una esquina no tiene que cambiar
+      nada. Mirá un par de canciones que ya tengan cuadros extra por si alguna
+      cambió de tamaño de letra.
 
 ## 2. Para la v1.0.0
 
