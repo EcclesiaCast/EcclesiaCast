@@ -388,6 +388,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         RefreshDisplays();
         LoadSongs();
         IsBibleVersionsExpanded = _settings.Get(BibleVersionsExpandedKey) == "1";
+
+        // The Bibles the installer left, before anything reads the library:
+        // the window is not up yet, so there is no one to keep waiting.
+        var bundledNote = ImportBundledBibles();
         LoadBibleVersions();
         LoadBibleHistory();
         LoadMedia();
@@ -410,8 +414,8 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             Application.Current?.Dispatcher.BeginInvoke(() => StatusText = message);
         RefreshLightCopies();
 
-        // The Bibles the installer left, once the window is up.
-        _bundledImport = ImportBundledBiblesAsync();
+        if (bundledNote is not null)
+            StatusText = bundledNote;
     }
 
     // ── Playlist del servicio ────────────────────────────────────

@@ -431,6 +431,13 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Cambiado
 
+- **Las Biblias del instalador se traen antes de abrir la ventana.** La
+  primera vez que abrís el programa después de instalarlo, mientras se ve la
+  pantalla de carga, se copian a tu biblioteca las Biblias que elegiste (unos
+  dos segundos por cada una en una notebook modesta). Antes se copiaban con la
+  ventana ya abierta, y si tocabas algo en esos segundos el programa se
+  quedaba esperando. Las veces siguientes no se nota: no queda nada por traer.
+
 - **La letra de una canción ya no se dibuja encima de los cuadros de texto
   extra.** Si una diapositiva tiene un cuadro que ocupa al menos la mitad del
   ancho de la letra (un título, una traducción a lo ancho), la letra se achica

@@ -15,9 +15,6 @@ public sealed partial class MainViewModel
 {
     private readonly IBiblePackageDialog _biblePackageDialog = new BiblePackageDialogService();
 
-    /// <summary>The start-up import of the installer's Bibles, so the package offer waits for it.</summary>
-    private Task _bundledImport = Task.CompletedTask;
-
     /// <summary>Where the installer copies the Bibles that were ticked.</summary>
     private static string BundledBiblesFolder => Path.Combine(AppContext.BaseDirectory, "bibles");
 
@@ -30,38 +27,39 @@ public sealed partial class MainViewModel
 
     /// <summary>
     /// At start-up, brings into the library the Bibles the installer left that
-    /// it does not have yet. It reads and saves tens of thousands of verses, so
-    /// it runs apart from the window; the status bar says what came in.
+    /// it does not have yet. It saves some 31,000 verses per version in one
+    /// transaction (about a second and a half each on a modest notebook), and
+    /// while that lasts every write the window makes to the library waits for
+    /// it: measured, a settings write stalled for the whole version. So it
+    /// runs here, in the constructor, behind the loading screen and before
+    /// anything reads the Bibles, where nobody can be waiting. Once the
+    /// Bibles are in, finding nothing pending costs a few milliseconds.
     /// </summary>
-    private async Task ImportBundledBiblesAsync()
+    /// <returns>What the status bar should say, or null when nothing came in.</returns>
+    private string? ImportBundledBibles()
     {
         try
         {
             var folder = BundledBiblesFolder;
             if (!Directory.Exists(folder))
-                return;
+                return null;
 
-            var hadVersions = BibleVersionOptions.Count > 0;
-            var result = await Task.Run(() => BundledBibleImporter.Run(folder, _bibles, _settings));
+            var result = BundledBibleImporter.Run(folder, _bibles, _settings);
 
             foreach (var failed in result.Failed)
                 Log.Warning("No se pudo leer la Biblia del instalador: {File}", failed);
             if (result.Imported.Count == 0)
-                return;
+                return null;
 
-            LoadBibleVersions();
-            // A library that had no Bible shows its first one right away.
-            if (!hadVersions)
-                RefreshAfterVersionChange();
-
-            StatusText = result.Imported.Count == 1
+            Log.Information("Biblias del instalador traídas a la biblioteca: {Names}", string.Join(", ", result.Imported));
+            return result.Imported.Count == 1
                 ? $"Se instaló la Biblia «{result.Imported[0]}», que venía con el instalador."
                 : $"Se instalaron {result.Imported.Count} Biblias que venían con el instalador: {string.Join(", ", result.Imported)}.";
-            Log.Information("Biblias del instalador traídas a la biblioteca: {Names}", string.Join(", ", result.Imported));
         }
         catch (Exception ex)
         {
             Log.Warning(ex, "No se pudieron traer las Biblias del instalador");
+            return null;
         }
     }
 
@@ -241,9 +239,8 @@ public sealed partial class MainViewModel
     {
         try
         {
-            // The free Bibles first, so the window marks them as already there.
-            await _bundledImport;
-
+            // The free Bibles are already in (they come in at start-up), so the
+            // window marks them as already there.
             var folder = InstalledPackageFolder;
             if (!Directory.Exists(folder))
                 return;
