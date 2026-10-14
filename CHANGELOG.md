@@ -451,6 +451,14 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Corregido
 
+- **Al elegir otro medio ya no hay un salto a negro.** Pasar de una imagen a
+  otra, de un video a una imagen o de una imagen a un video hacía un
+  parpadeo negro: la imagen vieja desaparecía de golpe y la nueva subía desde
+  la nada. Ahora la anterior se queda en pantalla (la imagen, o el último
+  cuadro del video) y la nueva se funde por encima. Con **bajo rendimiento**
+  se mantiene lo anterior en pantalla pero el cambio es directo, sin fundido.
+  Hacia un video de YouTube todavía hay un instante negro mientras carga.
+
 - **El logo y el negro tapan también a un video de YouTube.** Con un YouTube
   sin descargar en pantalla, F3 (logo) y F1 (negro) no lo tapaban: había que
   cambiar a otro medio para que el logo se viera. Ahora, mientras el logo o el

@@ -84,6 +84,14 @@ public partial class VlcVideoSurface : UserControl
         // The framing is given over a 1920×1080 canvas: a different window
         // size means different numbers.
         SizeChanged += (_, _) => MediaFraming.Apply(Surface, _framing, ActualWidth, ActualHeight);
+
+        // A held picture keeps the framing it was taken with, so it only needs
+        // the new size (it never lives long enough for anything else).
+        SizeChanged += (_, _) =>
+        {
+            if (Hold.Visibility == Visibility.Visible && Hold.Source is not null)
+                MediaFraming.Apply(Hold, _holdFraming, ActualWidth, ActualHeight);
+        };
     }
 
     /// <summary>Raised when a non-looping video reaches its end.</summary>
@@ -123,6 +131,12 @@ public partial class VlcVideoSurface : UserControl
             ApplyStretch();
             return;
         }
+
+        // The last picture of the old video stays on screen, frozen, until the
+        // first one of the new video arrives: the gap in between (the decoder
+        // opening the file) used to show as a flash of black. Taken before the
+        // framing changes, so it keeps the old video's own framing.
+        HoldLastFrame();
 
         _currentId = media.Id;
         _pausedForHiddenOutput = false;
@@ -175,10 +189,19 @@ public partial class VlcVideoSurface : UserControl
         }
     }
 
-    public void Stop()
+    /// <summary>
+    /// Stops the video. With <paramref name="holdLastFrame"/> its last picture
+    /// stays on screen, frozen, until <see cref="ReleaseHold"/> — for when
+    /// something else is about to fade in over it, so the change does not go
+    /// through black.
+    /// </summary>
+    public void Stop(bool holdLastFrame = false)
     {
         _currentId = -1;
         _pausedForHiddenOutput = false;
+
+        if (holdLastFrame)
+            HoldLastFrame();
 
         // A paused video counts too: left open, it kept its decoder and frame
         // buffers alive behind the image that replaced it.
@@ -192,7 +215,140 @@ public partial class VlcVideoSurface : UserControl
         // Frames already queued for the UI thread must not draw over the
         // clear (see _generation).
         Interlocked.Increment(ref _generation);
-        ClearSurface();
+        if (holdLastFrame)
+            Dispatcher.BeginInvoke(() => PreviewFrameChanged?.Invoke(this, null));
+        else
+            ClearSurface();
+    }
+
+    // ── Último cuadro retenido ───────────────────────────────────
+
+    /// <summary>
+    /// How long the held picture takes to fade away when the first frame of the
+    /// next video arrives. Zero cuts (the «bajo rendimiento» mode).
+    /// </summary>
+    public TimeSpan HoldFade { get; set; } = TimeSpan.FromMilliseconds(320);
+
+    /// <summary>Raised on the UI thread when a video draws its first picture.</summary>
+    public event EventHandler? FirstFrame;
+
+    private readonly DispatcherTimer _holdTimer = new() { Interval = TimeSpan.FromSeconds(2) };
+    private bool _holdTimerHooked;
+    private int _holdVersion;
+    private double _blurRadius;
+    private MediaItem? _holdFraming;
+
+    /// <summary>
+    /// Freezes a copy of the picture on screen into <see cref="Hold"/> and
+    /// empties the live surface. UI thread. Does nothing when no picture has
+    /// been drawn yet (then there is nothing to hold, and whatever is already
+    /// held stays).
+    /// </summary>
+    private void HoldLastFrame()
+    {
+        if (!Dispatcher.CheckAccess())
+        {
+            Dispatcher.Invoke(HoldLastFrame);
+            return;
+        }
+
+        WriteableBitmap? bitmap;
+        lock (_sync)
+            bitmap = _bitmap;
+
+        if (bitmap is null)
+            return;
+
+        try
+        {
+            // Only the UI thread writes into the bitmap, and this is the UI
+            // thread: the copy cannot catch it half drawn.
+            var copy = new WriteableBitmap(bitmap);
+            copy.Freeze();
+
+            _holdVersion++;
+            Hold.BeginAnimation(OpacityProperty, null);
+            Hold.Opacity = 1;
+            Hold.Source = copy;
+            _holdFraming = _framing;
+            MediaFraming.Apply(Hold, _holdFraming, ActualWidth, ActualHeight);
+            MediaFraming.SetBlur(Hold, _blurRadius);
+            Hold.Visibility = Visibility.Visible;
+            StartHoldTimer();
+        }
+        catch (Exception ex)
+        {
+            // Without the copy the change simply goes through black, as before.
+            Log.Debug(ex, "No se pudo retener el último cuadro del video");
+        }
+
+        lock (_sync)
+        {
+            Surface.Source = null;
+            _bitmap = null;
+            _bitmapWidth = _bitmapHeight = 0;
+            _previewBitmap = null;
+        }
+    }
+
+    /// <summary>
+    /// Lets go of the held picture, fading it out over <paramref name="fade"/>
+    /// (zero cuts). It is called when whatever replaces it is already on
+    /// screen; if that never happens, two seconds later this lets go anyway.
+    /// </summary>
+    public void ReleaseHold(TimeSpan fade)
+    {
+        if (!Dispatcher.CheckAccess())
+        {
+            Dispatcher.BeginInvoke(() => ReleaseHold(fade));
+            return;
+        }
+
+        _holdTimer.Stop();
+        if (Hold.Visibility != Visibility.Visible)
+            return;
+
+        if (fade <= TimeSpan.Zero)
+        {
+            ClearHold();
+            return;
+        }
+
+        var version = ++_holdVersion;
+        var animation = new System.Windows.Media.Animation.DoubleAnimation(0, fade);
+        animation.Completed += (_, _) =>
+        {
+            if (version == _holdVersion)
+                ClearHold();
+        };
+        Hold.BeginAnimation(OpacityProperty, animation);
+    }
+
+    private void ClearHold()
+    {
+        _holdTimer.Stop();
+        _holdVersion++;
+        Hold.BeginAnimation(OpacityProperty, null);
+        Hold.Opacity = 1;
+        Hold.Visibility = Visibility.Collapsed;
+        Hold.Source = null;
+    }
+
+    private void StartHoldTimer()
+    {
+        if (!_holdTimerHooked)
+        {
+            _holdTimerHooked = true;
+            _holdTimer.Tick += (_, _) =>
+            {
+                // The next picture never came (VLC failed to open it).
+                _holdTimer.Stop();
+                ReleaseHold(HoldFade);
+            };
+        }
+
+        _holdTimer.Stop();
+        _holdTimer.Start();
     }
 
     // ── Transporte (barra de reproducción del operador) ──────────
@@ -280,8 +436,11 @@ public partial class VlcVideoSurface : UserControl
     public void SetBlur(double amount)
     {
         var radius = Math.Clamp(amount, 0, 100) * 0.6;
+        _blurRadius = radius;
         // Through the framing, which knows how much it scales the picture.
         MediaFraming.SetBlur(Surface, radius);
+        if (Hold.Visibility == Visibility.Visible)
+            MediaFraming.SetBlur(Hold, radius);
     }
 
     private MediaPlayer? EnsurePlayer(LibVLC engine)
@@ -326,6 +485,9 @@ public partial class VlcVideoSurface : UserControl
 
     private void Dispose()
     {
+        _holdTimer.Stop();
+        ClearHold();
+
         var player = _player;
         _player = null;
 
@@ -362,6 +524,7 @@ public partial class VlcVideoSurface : UserControl
     private void ClearSurface() =>
         Dispatcher.BeginInvoke(() =>
         {
+            ClearHold();
             Surface.Source = null;
             _bitmap = null;
             _bitmapWidth = _bitmapHeight = 0;
@@ -463,6 +626,7 @@ public partial class VlcVideoSurface : UserControl
 
         Dispatcher.BeginInvoke(DispatcherPriority.Render, () =>
         {
+            var firstFrame = false;
             try
             {
                 lock (_sync)
@@ -484,6 +648,7 @@ public partial class VlcVideoSurface : UserControl
                         _bitmapWidth = _width;
                         _bitmapHeight = _height;
                         Surface.Source = _bitmap;
+                        firstFrame = true;
 
                         // «Rellenar» depends on the shape of the picture, which
                         // is only known now (or has just changed).
@@ -509,6 +674,14 @@ public partial class VlcVideoSurface : UserControl
                             new Int32Rect(0, 0, _previewWidth, _previewHeight),
                             _previewPixels!, _previewWidth * 4, 0);
                     }
+                }
+
+                // The new picture is drawn: the old one held in front of it
+                // can fade away now, and so can whatever else was kept for it.
+                if (firstFrame)
+                {
+                    ReleaseHold(HoldFade);
+                    FirstFrame?.Invoke(this, EventArgs.Empty);
                 }
             }
             catch

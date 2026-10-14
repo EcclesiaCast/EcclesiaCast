@@ -161,6 +161,15 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
          tiene que ver el logo (no el video) y el sonido tiene que callarse.
          F3 de nuevo: el video vuelve y sigue donde estaba. Lo mismo con F1
          (negro). Mirá que la barra de reproducción siga mandando al YouTube.
+      2. **Cambiar de medio sin negro.** Con la salida prendida probá: imagen
+         → imagen (fundido sin oscurecerse), video → imagen, imagen → video,
+         video → video y video → «Sin fondo» (F4). No tiene que haber ningún
+         parpadeo negro. Con **bajo rendimiento** el cambio es directo, pero
+         tampoco tiene que haber negro entre medio. Probalo también con un
+         video pesado (copia liviana) y mirá que el sonido y el video sigan
+         bien después de muchos cambios seguidos (el programa no debe
+         cerrarse). Hacia YouTube sigue habiendo un instante negro: es lo
+         esperado.
 
 ## 2. Para la v1.0.0
 

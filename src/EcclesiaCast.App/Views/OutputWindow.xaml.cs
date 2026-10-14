@@ -23,6 +23,15 @@ public partial class OutputWindow : Window
         YouTube.Ended += (_, _) => VideoEnded?.Invoke(this, EventArgs.Empty);
         Video.Ended += (_, _) => VideoEnded?.Invoke(this, EventArgs.Empty);
 
+        // Changing media never goes through black: whatever was on screen stays
+        // until the new picture is up, then fades away.
+        // • Image to video: the image (kept by the projected view) goes when the
+        //   video draws its first picture.
+        Video.FirstFrame += (_, _) => Projected.ReleaseHeldImage(MediaFade);
+        // • Video to image: the video's last picture (kept by the surface) goes
+        //   when the image has finished fading in over it.
+        Projected.BackgroundImageSettled += (_, _) => Video.ReleaseHold(TimeSpan.Zero);
+
         // The operator's LIVE panel gets a small copy of the video frames,
         // which costs a shrink and a bitmap write on every one of them. With
         // «bajo rendimiento» nobody listens, so none of that work is done
@@ -34,6 +43,10 @@ public partial class OutputWindow : Window
         };
         Closed += (_, _) => PerformanceMode.Changed -= OnPerformanceChanged;
     }
+
+    /// <summary>How long one medium takes to give way to the next; zero in «bajo rendimiento».</summary>
+    private static TimeSpan MediaFade =>
+        PerformanceMode.IsLow ? TimeSpan.Zero : TimeSpan.FromMilliseconds(320);
 
     private bool _forwardingFrames;
 
@@ -58,6 +71,7 @@ public partial class OutputWindow : Window
     {
         var low = PerformanceMode.IsLow;
         Projected.AnimateTransitions = !low;
+        Video.HoldFade = LogoVideo.HoldFade = FillVideo.HoldFade = MediaFade;
 
         var forward = !low && !_backgroundIsHeavy;
         if (!forward && _forwardingFrames)
@@ -188,7 +202,23 @@ public partial class OutputWindow : Window
         {
             YouTube.Clear();
             YouTube.Visibility = Visibility.Collapsed;
-            Video.Show(background);
+
+            if (background is { Type: MediaType.Image })
+            {
+                // The image fades in over the video's last picture; when it is
+                // fully up, BackgroundImageSettled lets that picture go.
+                Video.Stop(holdLastFrame: true);
+            }
+            else if (background is null)
+            {
+                // Nothing replaces it: the last picture fades out instead of cutting.
+                Video.Stop(holdLastFrame: true);
+                Video.ReleaseHold(MediaFade);
+            }
+            else
+            {
+                Video.Show(background);
+            }
         }
 
         UpdateFill();

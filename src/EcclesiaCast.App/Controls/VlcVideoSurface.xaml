@@ -7,5 +7,12 @@
          native/WPF airspace problem. ClipToBounds: «Rellenar» dibuja la
          imagen entera y deja que lo que no entra sobresalga; el borde de la
          pantalla es el único recorte. -->
-    <Image x:Name="Surface" Stretch="UniformToFill"/>
+    <Grid>
+        <Image x:Name="Surface" Stretch="UniformToFill"/>
+
+        <!-- El último cuadro del video anterior, congelado, mientras llega el
+             primero del que sigue (o mientras una imagen se funde encima): así
+             cambiar de medio no pasa por negro. -->
+        <Image x:Name="Hold" Stretch="UniformToFill" Visibility="Collapsed" IsHitTestVisible="False"/>
+    </Grid>
 </UserControl>
