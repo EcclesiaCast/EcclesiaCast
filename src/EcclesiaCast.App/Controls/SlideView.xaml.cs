@@ -40,6 +40,34 @@ public partial class SlideView : UserControl
         DependencyProperty.Register(nameof(Overlay), typeof(string), typeof(SlideView),
             new PropertyMetadata(null, (d, _) => ((SlideView)d).OnOverlayChanged()));
 
+    /// <summary>Typeface of the lower-third announcement; null or empty is Segoe UI.</summary>
+    public static readonly DependencyProperty OverlayFontFamilyProperty =
+        DependencyProperty.Register(nameof(OverlayFontFamily), typeof(string), typeof(SlideView),
+            new PropertyMetadata(null, (d, _) => ((SlideView)d).ApplyOverlayFont()));
+
+    /// <summary>Size of the lower-third announcement, in canvas units; held between 20 and 160.</summary>
+    public static readonly DependencyProperty OverlayFontSizeProperty =
+        DependencyProperty.Register(nameof(OverlayFontSize), typeof(double), typeof(SlideView),
+            new PropertyMetadata(OverlayStyle.DefaultSize, (d, _) => ((SlideView)d).ApplyOverlayFont()));
+
+    public string? OverlayFontFamily
+    {
+        get => (string?)GetValue(OverlayFontFamilyProperty);
+        set => SetValue(OverlayFontFamilyProperty, value);
+    }
+
+    public double OverlayFontSize
+    {
+        get => (double)GetValue(OverlayFontSizeProperty);
+        set => SetValue(OverlayFontSizeProperty, value);
+    }
+
+    private void ApplyOverlayFont()
+    {
+        OverlayText.FontFamily = new FontFamily(OverlayStyle.FontOrDefault(OverlayFontFamily));
+        OverlayText.FontSize = OverlayStyle.ClampSize(OverlayFontSize);
+    }
+
     /// <summary>The logo shown in the Logo state; null uses the built-in wordmark.</summary>
     public static readonly DependencyProperty LogoProperty =
         DependencyProperty.Register(nameof(Logo), typeof(Logo), typeof(SlideView),

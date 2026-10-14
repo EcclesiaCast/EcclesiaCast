@@ -191,6 +191,11 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
          0,25 / 0. En **Temas** mirá que la duración de la transición ahora
          esté en segundos y que un tema viejo (280 ms) diga 0,28. Con el
          modo de bajo rendimiento todo tiene que cortar de golpe.
+      5. **Aviso al pie.** En la pestaña «Aviso al pie» elegí otra
+         tipografía (Georgia, por ejemplo) y otro tamaño, y mostralo: el LIVE
+         y la pantalla tienen que cambiar al instante, también si el aviso ya
+         está puesto. Cerrá y abrí el programa: se tiene que acordar. Vacía la
+         tipografía: vuelve a Segoe UI.
 
 ## 2. Para la v1.0.0
 

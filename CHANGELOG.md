@@ -9,6 +9,12 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Tipografía y tamaño para el aviso al pie.** En la pestaña **Aviso al pie**
+  hay una lista **Tipografía** (se elige de las que tiene la computadora, o se
+  escribe el nombre) y un **Tamaño** de 20 a 160. El LIVE y la pantalla lo
+  muestran al instante, y se recuerda aunque se cierre el programa. Si queda
+  vacía, sigue Segoe UI de tamaño 54, como antes.
+
 - **Transiciones en segundos para el logo, los medios, el negro y el apagado.**
   En **Proyección → Transiciones…** se elige cuántos segundos tarda: el logo en
   aparecer y desaparecer (antes aparecía de golpe), el cambio de una imagen o

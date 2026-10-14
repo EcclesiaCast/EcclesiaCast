@@ -39,6 +39,15 @@ public partial class ProjectedView : UserControl
         DependencyProperty.Register(nameof(Overlay), typeof(string), typeof(ProjectedView),
             new PropertyMetadata(null, (d, e) => ((ProjectedView)d).SlideView.Overlay = (string?)e.NewValue));
 
+    /// <summary>Typeface and size of the lower-third announcement, handed to the slide view.</summary>
+    public static readonly DependencyProperty OverlayFontFamilyProperty =
+        DependencyProperty.Register(nameof(OverlayFontFamily), typeof(string), typeof(ProjectedView),
+            new PropertyMetadata(null, (d, e) => ((ProjectedView)d).SlideView.OverlayFontFamily = (string?)e.NewValue));
+
+    public static readonly DependencyProperty OverlayFontSizeProperty =
+        DependencyProperty.Register(nameof(OverlayFontSize), typeof(double), typeof(ProjectedView),
+            new PropertyMetadata(OverlayStyle.DefaultSize, (d, e) => ((ProjectedView)d).SlideView.OverlayFontSize = (double)e.NewValue));
+
     public static readonly DependencyProperty HighlightProperty =
         DependencyProperty.Register(nameof(Highlight), typeof(HighlightSet), typeof(ProjectedView),
             new PropertyMetadata(null, (d, e) => ((ProjectedView)d).SlideView.Highlight = (HighlightSet?)e.NewValue));
@@ -150,6 +159,18 @@ public partial class ProjectedView : UserControl
     {
         get => (string?)GetValue(OverlayProperty);
         set => SetValue(OverlayProperty, value);
+    }
+
+    public string? OverlayFontFamily
+    {
+        get => (string?)GetValue(OverlayFontFamilyProperty);
+        set => SetValue(OverlayFontFamilyProperty, value);
+    }
+
+    public double OverlayFontSize
+    {
+        get => (double)GetValue(OverlayFontSizeProperty);
+        set => SetValue(OverlayFontSizeProperty, value);
     }
 
     public HighlightSet? Highlight

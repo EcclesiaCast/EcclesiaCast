@@ -60,6 +60,17 @@ public sealed partial class ProjectionViewModel : ObservableObject
     [ObservableProperty]
     private string? _stageNotes;
 
+    /// <summary>
+    /// Typeface and size of the lower-third announcement. They come from the
+    /// operator's choice (the Aviso al pie tab), not from the presentation
+    /// service, so <see cref="Sync"/> leaves them alone.
+    /// </summary>
+    [ObservableProperty]
+    private string _overlayFontFamily = OverlayStyle.DefaultFont;
+
+    [ObservableProperty]
+    private double _overlayFontSize = OverlayStyle.DefaultSize;
+
     /// <summary>The countdown running before the service, if any.</summary>
     [ObservableProperty]
     private Countdown? _countdown;

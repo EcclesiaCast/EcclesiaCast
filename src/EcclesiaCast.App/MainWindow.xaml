@@ -1356,6 +1356,8 @@
                                                     ToolTip="Clic en una palabra: se resalta esa en la pantalla · Arrastrá sobre varias: se resalta la frase · Shift: suma otra marca sin sacar las anteriores · Clic otra vez sobre lo resaltado: se quita"
                                                     State="{Binding Projection.State}"
                                                     Overlay="{Binding Projection.Overlay}"
+                                                    OverlayFontFamily="{Binding Projection.OverlayFontFamily}"
+                                                    OverlayFontSize="{Binding Projection.OverlayFontSize}"
                                                     Countdown="{Binding Projection.Countdown}"
                                                     Highlight="{Binding Projection.Highlight}"
                                                     BackgroundMedia="{Binding Projection.Background}"
@@ -1439,6 +1441,27 @@
                                            Text="Aparece en una franja abajo, por encima de todo — incluso con Black puesto."
                                            FontSize="11" Foreground="{StaticResource FaintBrush}"
                                            TextWrapping="Wrap" Margin="12,0,12,8"/>
+                                <Grid DockPanel.Dock="Top" Margin="12,0,12,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Tipografía" Foreground="{StaticResource MutedBrush}"
+                                                   FontSize="11" Margin="0,0,0,4"/>
+                                        <ComboBox IsEditable="True" FontSize="12"
+                                                  ItemsSource="{Binding SystemFonts}"
+                                                  Text="{Binding OverlayFont, UpdateSourceTrigger=PropertyChanged}"
+                                                  ToolTip="Letra del aviso. Vacía: Segoe UI."/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                        <TextBlock Text="Tamaño" Foreground="{StaticResource MutedBrush}"
+                                                   FontSize="11" Margin="0,0,0,4"/>
+                                        <controls:NumericField Minimum="20" Maximum="160" Step="2"
+                                                               Value="{Binding OverlayFontSize}"
+                                                               ToolTip="Tamaño de la letra del aviso, de 20 a 160. El de siempre es 54."/>
+                                    </StackPanel>
+                                </Grid>
                                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="12,8,12,12">
                                     <Button Content="Mostrar" Command="{Binding ShowOverlayCommand}" Padding="16,8"
                                             ToolTip="Pone la franja en pantalla">
