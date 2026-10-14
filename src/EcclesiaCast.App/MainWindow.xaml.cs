@@ -312,7 +312,9 @@ public partial class MainWindow : Window
         if (DroppedFiles(e) is not { } files || DataContext is not MainViewModel vm)
             return;
 
-        vm.ImportMediaFiles(files);
+        // Out of the drop itself: a PDF opens a dialog right away, and while
+        // the drop has not returned Explorer, the drag source, stays frozen.
+        Dispatcher.BeginInvoke(() => vm.ImportMediaFiles(files));
         e.Handled = true;
     }
 
