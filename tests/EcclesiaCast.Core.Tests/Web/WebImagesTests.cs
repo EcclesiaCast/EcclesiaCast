@@ -92,6 +92,43 @@ public class WebImagesTests
         Assert.Equal(".gif", WebImages.ExtensionFor(bytes));
     }
 
+    [Fact]
+    public void A_google_result_link_gives_the_original_picture_and_its_page()
+    {
+        var link = "https://www.google.com/imgres?q=arca%20de%20noe&imgurl=https%3A%2F%2Fupload.wikimedia.org%2Fa%2FNoah%2527s_Ark.jpg%3Futm_source%3Des"
+                   + "&imgrefurl=https%3A%2F%2Fes.wikipedia.org%2Fwiki%2FArca&docid=x&w=2592&h=1944";
+
+        var found = WebImages.FromImgres(link);
+
+        Assert.NotNull(found);
+        Assert.Equal("https://upload.wikimedia.org/a/Noah%27s_Ark.jpg?utm_source=es", found.Value.Image);
+        Assert.Equal("https://es.wikipedia.org/wiki/Arca", found.Value.Page);
+    }
+
+    [Theory]
+    [InlineData("https://www.google.com/search?q=cruz")]
+    [InlineData("https://example.com/imgres?imgurl=https%3A%2F%2Fa.com%2Fb.jpg")]
+    [InlineData("https://www.google.com/imgres?q=x")]
+    [InlineData("https://www.google.com/imgres?imgurl=javascript%3Aalert(1)")]
+    [InlineData("https://www.google.com/imgres?imgurl=file%3A%2F%2F%2FC%3A%2Fa.jpg")]
+    [InlineData("/imgres?imgurl=https%3A%2F%2Fa.com%2Fb.jpg")]
+    [InlineData(null)]
+    public void Anything_else_is_not_a_result_link(string? link)
+    {
+        Assert.Null(WebImages.FromImgres(link));
+    }
+
+    [Theory]
+    [InlineData("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR&s=10", true)]
+    [InlineData("data:image/jpeg;base64,/9j/4AAQ", true)]
+    [InlineData("https://upload.wikimedia.org/a.jpg", false)]
+    [InlineData("https://www.gstatic.com/images/branding/x.png", false)]
+    [InlineData(null, false)]
+    public void Google_thumbnails_are_told_from_the_originals(string? source, bool expected)
+    {
+        Assert.Equal(expected, WebImages.IsGoogleThumbnail(source));
+    }
+
     [Theory]
     [InlineData("https://example.com/a.jpg")]
     [InlineData("data:text/html;base64,PGI+")]

@@ -221,7 +221,7 @@
                           ToolTip="Texto rápido, aviso al pie, resaltar, notas, música y tiempos quedan como una tira de íconos."/>
                 <MenuItem x:Name="AudioListCollapsedItem" Header="Achicar la lista de audios"
                           IsCheckable="True" Click="AudioListCollapsedItem_Click"
-                          ToolTip="En la pestaña Música, deja sólo el reproductor y esconde la lista de audios."/>
+                          ToolTip="En la pestaña Música, esconde la lista de audios y su reproductor (la música sigue sonando)."/>
                 <MenuItem x:Name="LeftRailItem" Header="Canciones y playlist como íconos"
                           IsCheckable="True" Click="LeftRailItem_Click"
                           ToolTip="Achica canciones, Biblia y playlist a una columna angosta de íconos."/>
@@ -1888,7 +1888,8 @@
                                         </Grid>
                                     </Border>
 
-                                    <!-- El reproductor -->
+                                    <!-- El reproductor: se esconde junto con la lista al achicar AUDIOS -->
+                                    <StackPanel x:Name="AudioPlayerPanel">
                                     <TextBlock Text="{Binding AudioNowPlayingText}" FontSize="12" FontWeight="SemiBold"
                                                Foreground="White" TextTrimming="CharacterEllipsis" Margin="0,10,0,0"/>
                                     <DockPanel Margin="0,4,0,0">
@@ -1944,6 +1945,7 @@
                                                     ToolTip="Audio siguiente"/>
                                         </StackPanel>
                                     </DockPanel>
+                                    </StackPanel>
 
                                     <!-- Otro reproductor (Spotify…): las teclas multimedia de Windows -->
                                     <Rectangle Height="1" Fill="{StaticResource LineBrush}" Margin="0,14,0,0"/>

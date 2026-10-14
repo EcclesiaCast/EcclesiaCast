@@ -94,6 +94,15 @@ public sealed partial class MainViewModel
     /// </summary>
     private async Task AddWebImageAsync(WebImageChosen chosen)
     {
+        // Only Google's small copy is known: taking it would put a blurry picture
+        // in the library. Better to say how to get the real one.
+        if (chosen.IsThumbnail)
+        {
+            StatusText = "Eso es la miniatura de Google y se vería borrosa. Hacé clic en la imagen para verla grande "
+                         + "a la derecha y probá con clic derecho sobre la grande.";
+            return;
+        }
+
         StatusText = "Bajando la imagen…";
         try
         {

@@ -231,6 +231,7 @@ public partial class MainWindow
         // ── Music tab: the list of audios folds to its title ──
         AudioListBox.Visibility = _audioListCollapsed ? Visibility.Collapsed : Visibility.Visible;
         AudioButtons.Visibility = _audioListCollapsed ? Visibility.Collapsed : Visibility.Visible;
+        AudioPlayerPanel.Visibility = _audioListCollapsed ? Visibility.Collapsed : Visibility.Visible;
         AudioTitle.Text = _audioListCollapsed ? "▸  AUDIOS" : "▾  AUDIOS";
 
         // The media bar sits under (or over) the library and the slides.

@@ -13,78 +13,64 @@ Hay cuatro tipos de cosas, cada una en su sección:
 
 ## 1. Para probar (lo prueba Alexis)
 
-Todo lo anterior se probó el 14/10/2026 con la beta.10 y quedó dado por bueno
-(salvo lo que se anotó como falla). Lo que sigue se programó después y no se
-abrió desde acá: sólo hay compilación y pruebas.
+Se probaron el 14/10/2026 con la beta.11 y quedaron **dados por buenos**: el mini
+reproductor de Spotify, «mismo título, distinto artista» y las flechas del
+teclado en Propiedades. Lo que sigue se corrigió o se agregó después de esa
+prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
 
-- [ ] **Mini reproductor en Música.** Con Spotify sonando, en la pestaña Música:
-      1) se ven la carátula, el título y el artista, y la barra avanza cada
-      segundo; 2) el ícono cambia entre ⏸ y ▶ al pausar desde Spotify o desde
-      el botón; 3) anterior, pausa y siguiente andan; 4) al cambiar de canción
-      desde Spotify se actualiza sola; 5) con Spotify cerrado dice «No hay nada
-      sonando» y los botones siguen mandando la tecla multimedia; 6) probalo
-      también con un video de YouTube en el navegador; 7) el volumen de abajo
-      sigue andando. La barra no se puede arrastrar y no hay fila de
-      reproducción (Windows no la da).
-- [ ] **Mismo título, distinto artista.** Guardá «Hay Libertad» con artista IBI
-      y otra con artista Christina Aguilera: quedan las dos, sin pregunta
-      (probá escribiéndola, importando un archivo y desde la búsqueda en
-      internet). Si repetís la misma con el mismo artista, o sin artista,
-      tiene que preguntar y nombrar al artista. En la lista se ve el artista
-      debajo del título.
 - [ ] **Achicar la lista de audios.** En la pestaña Música, un clic en el título
-      **▾ AUDIOS** esconde la lista y sus botones (queda el reproductor); otro
-      clic la devuelve. También está en Ver → «Achicar la lista de audios»
-      (se tilda sola). Cerrá y abrí el programa: queda como lo dejaste, y
-      «Volver al diseño original» la despliega.
-- [ ] **Flechas del teclado en Propiedades.** Clic derecho en una imagen →
-      Propiedades: el cuadro de vista previa arranca elegido. Las flechas
-      corren la imagen de a 0,1 % (con Mayús, de a 1 %) y los números de
-      «Correr» se mueven. Si hacés clic en un campo de texto o en una lista,
-      las flechas vuelven a hacer lo de siempre ahí; un clic o un arrastre
-      sobre el cuadro las devuelve a la imagen.
-- [ ] **Relleno con la misma imagen desenfocada.** En Propiedades de una
-      **imagen**, «Los bordes se rellenan con»: la lista tiene **(la misma
-      imagen, desenfocada)** (en videos y YouTube no aparece). Elegila con una
-      imagen en «Ajustar» (o con un tamaño fijo, o con zoom menor a 100 %): en
-      vez de barras negras, los costados se ven con la misma imagen agrandada y
-      borrosa, como una sola imagen. Mirá la vista previa, la tarjeta de la
-      barra de medios, el LIVE y la pantalla; con un color sólido (la opción de
-      antes) todo sigue igual. Fijate que no quede un borde oscuro en las
-      orillas de la pantalla y que no pese en la PC de la iglesia (en el modo de
-      bajo rendimiento también se ve).
-- [ ] **Imágenes y GIF de Google (lo más incierto: no se pudo probar nada
-      con Google de verdad).**
+      **▾ AUDIOS** esconde la lista, sus botones **y el reproductor de audios**
+      (la barra, el tiempo, los botones de anterior y siguiente; queda sólo el
+      reproductor de Spotify de abajo); otro clic los devuelve. También está en
+      Ver → «Achicar la lista de audios». Con un audio sonando, achicar no lo
+      corta. Cerrá y abrí el programa: queda como lo dejaste, y «Volver al
+      diseño original» la despliega.
+- [ ] **Relleno con la misma imagen desenfocada.** Se arregló el reborde negro de
+      abajo (era un defecto del desenfoque de WPF cuando va con agrandado: se
+      midió 48 filas negras y ahora son 0). Probalo con una imagen en «Ajustar»
+      o con tamaño fijo y «(la misma imagen, desenfocada)»: no tiene que quedar
+      ningún borde negro arriba, abajo ni a los costados, en la vista previa, el
+      LIVE y la pantalla. También el pasaje **de una imagen a otra**: el relleno
+      de la nueva ahora sube con el fundido en vez de aparecer de golpe. Ojo: un
+      fundido entre dos imágenes siempre las mezcla mientras dura; si lo ves
+      demasiado largo, se acorta en **Proyección → Transiciones… → Medios** (en
+      0 corta directo).
+- [ ] **Imágenes y GIF de Google.**
       1. En la barra de medios, **🖼 Imágenes** abre el panel web en Google
-         Imágenes, en castellano. Dentro del panel hay una fila nueva: escribí
-         «cruz» y Enter (o **🖼 Imágenes** / **🎞 GIF**): abre la búsqueda;
-         **🎞 GIF** muestra sólo animados. Con «Sólo licencia libre» tildada
-         se ve el filtro «Derechos de uso» de Google. Escribir en esa caja no
-         tiene que mover diapositivas ni apagar la pantalla (F1 sí anda).
-      2. En Google, clic en una imagen para verla grande y **clic derecho
-         sobre la grande**: el menú tiene arriba **➕ Agregar a medios**. Se baja
-         y entra a la pestaña de medios abierta, con el nombre de lo que
-         buscaste («cruz», «cruz (2)»…). **Lo importante:** mirá que lo que
-         entra sea la imagen grande y no la miniatura; si es chica, el estado
-         lo dice con su tamaño. Si el clic derecho sobre la grande no da
-         «Agregar a medios» (Google a veces tapa la imagen con un enlace),
-         avisame qué pasa y lo cambio.
-      3. Con un GIF animado: tiene que quedar como video en bucle y sin sonido
-         (como un GIF que arrastrás). Probá también con un webp animado: ése
-         queda quieto.
-      4. Clic derecho → «Quitar de la biblioteca» borra el archivo bajado de
-         `%APPDATA%\EcclesiaCast\imagenes-web`. Sin internet: «No se pudo
-         bajar la imagen».
-      5. Cuidado con los derechos: Google muestra imágenes de cualquiera; el
+         Imágenes. La fila nueva del panel busca con Enter, **🖼 Imágenes**,
+         **🎞 GIF** y «Sólo licencia libre». Escribir en esa caja no tiene que
+         mover diapositivas (F1 sí anda).
+      2. **Clic derecho sobre una imagen**, aunque sea una miniatura sin abrir:
+         el menú ahora es del programa y tiene que **abrirse donde hiciste clic**
+         (antes salía lejos). Con «➕ Agregar a medios» baja **la imagen
+         original** (Google pone su dirección en el vínculo de cada resultado:
+         se comprobó en el navegador y las direcciones bajan completas). Mirá que
+         entre grande y no borrosa; el estado dice si es chica.
+      3. Si por algún motivo sólo se conoce la miniatura de Google, no la baja:
+         avisa que hagas clic en la imagen para verla grande y pruebes sobre la
+         grande.
+      4. En una página común, el menú tiene Abrir vínculo, Copiar vínculo,
+         Copiar (con texto elegido), Atrás, Adelante y Recargar.
+      5. GIF animado: queda como video en bucle y sin sonido. Un webp animado
+         queda quieto. Quitar de la biblioteca borra el archivo bajado de
+         `%APPDATA%\EcclesiaCast\imagenes-web`. Sin internet: «No se pudo bajar
+         la imagen».
+      6. Cuidado con los derechos: Google muestra imágenes de cualquiera; el
          filtro de licencia es lo que declara Google, no una garantía.
-- [ ] **Buscar desde el celular.** Con el control desde el celular prendido,
-      arriba de todo hay una caja «Buscar canción o versículo…». Escribí dos
-      letras o más (por ejemplo «gracia» o «juan 3 16»): salen canciones (♪) y
-      versículos (†) de todas las versiones, como en Ctrl+K pero sin medios.
-      Tocar un resultado lo **carga** en la computadora (no lo proyecta) y la
-      página baja a las diapositivas de esa canción o de ese capítulo, para
-      elegir cuál proyectar. Mirá que la búsqueda no trabe la computadora
-      mientras se escribe y que, sin resultados, diga «No encontré nada».
+- [ ] **Buscar desde el celular (y Ctrl+K).** Arriba de todo en la página del
+      celular hay una caja «Buscar canción o versículo…». Mejoró lo que busca:
+      1. **Escribí «juan 3 16»** (o «sal 23», «1 co 13 4-7»): el primer
+         resultado es el versículo o el capítulo (con la versión elegida), y al
+         tocarlo se carga en la computadora para elegir cuál proyectar. Lo
+         mismo en Ctrl+K.
+      2. **Escribí el nombre de una canción** («hay libertad»): sale primera la
+         que se llama así; después las que lo tienen en el nombre, el artista y,
+         al final, las que sólo lo dicen en la letra (marcadas «En la letra»).
+         Antes salían por orden alfabético y la tuya podía quedar afuera.
+      3. Una palabra suelta («gracia») sigue buscando en las letras y en el
+         texto de los versículos, sin necesidad de poner «?».
+      4. Tocar un resultado lo **carga** sin proyectarlo; la página baja a las
+         diapositivas. Sin resultados dice «No encontré nada».
 
 ## 2. Para la v1.0.0
 

@@ -77,11 +77,23 @@ public sealed partial class MainViewModel
     {
         var hits = new List<SearchHit>();
 
-        foreach (var song in _songs.Search(query).Take(12))
+        // «juan 3 16» is a place in the Bible, not words to look for: it comes first.
+        if (ReferenceHit(query) is { } place)
+            hits.Add(place);
+
+        // A song whose NAME is what was typed goes first, then one whose name
+        // starts or contains it, then the artist, and last the ones that only
+        // have it in the lyrics. Alphabetical order alone buried «Hay Libertad»
+        // under every song that says «hay libertad» in its words.
+        foreach (var song in _songs.Search(query)
+                     .OrderBy(s => SongMatchRank(s, query))
+                     .ThenBy(s => s.Title, StringComparer.CurrentCultureIgnoreCase)
+                     .Take(12))
         {
+            var rank = SongMatchRank(song, query);
             hits.Add(new SearchHit(
                 SearchHitKind.Song, song.Id, "♪", song.Title,
-                string.IsNullOrWhiteSpace(song.Artist) ? "Canción" : song.Artist));
+                rank >= 3 ? "En la letra" : string.IsNullOrWhiteSpace(song.Artist) ? "Canción" : song.Artist));
         }
 
         // Every installed version is searched, and each result says which one
@@ -107,6 +119,56 @@ public sealed partial class MainViewModel
         }
 
         return hits;
+    }
+
+    /// <summary>0 = the title is exactly what was typed, 1 = it starts with it, 2 = it has it (or the artist does), 3 = only the lyrics do.</summary>
+    private static int SongMatchRank(Song song, string query)
+    {
+        var wanted = SongTitles.Normalize(query);
+        var title = SongTitles.Normalize(song.Title);
+        if (wanted.Length == 0)
+            return 3;
+
+        if (title == wanted)
+            return 0;
+        if (title.StartsWith(wanted, StringComparison.Ordinal))
+            return 1;
+        return title.Contains(wanted, StringComparison.Ordinal) || SongTitles.Normalize(song.Artist).Contains(wanted, StringComparison.Ordinal)
+            ? 2
+            : 3;
+    }
+
+    /// <summary>
+    /// The search result for what looks like a Bible reference («juan 3 16»,
+    /// «sal 23», «1 co 13 4-7»), in the version that is selected: opening it
+    /// loads the chapter with the verse picked, as typing it in the Bible box
+    /// does. Null when it is not a reference or the version does not have it.
+    /// </summary>
+    private SearchHit? ReferenceHit(string query)
+    {
+        var reference = BibleReferenceParser.TryParse(query);
+        var version = PrimaryVersion ?? BibleVersionOptions.FirstOrDefault()?.Info;
+        if (reference is null || version is null)
+            return null;
+
+        var passage = _bibles.GetPassage(version.Id, reference);
+        if (passage.Count == 0)
+            return null;
+
+        var first = passage[0];
+        var place = reference.VerseStart is null
+            ? $"{first.BookName} {reference.Chapter}"
+            : reference.VerseEnd is { } end && end != reference.VerseStart
+                ? $"{first.BookName} {reference.Chapter}:{reference.VerseStart}-{end}"
+                : $"{first.BookName} {reference.Chapter}:{reference.VerseStart}";
+
+        var detail = reference.VerseStart is null
+            ? $"Capítulo completo · {passage.Count} versículos"
+            : Shorten(string.Join(' ', BibleTextCleaner.ForList(passage, ShowSelahAndTitles).Select(v => v.Text)));
+
+        return new SearchHit(
+            SearchHitKind.Verse, version.Id, "†", $"{place} · {version.Abbreviation}", detail,
+            reference.BookNumber, reference.Chapter, reference.VerseStart ?? 0, place);
     }
 
     /// <summary>

@@ -94,6 +94,53 @@ public static class WebImages
     }
 
     /// <summary>
+    /// Google's result links («…/imgres?imgurl=<i>the original</i>&amp;imgrefurl=<i>its page</i>…»)
+    /// carry the address of the full-size picture. Returns it and the page it
+    /// is on, or null when the link is not one of those.
+    /// </summary>
+    public static (string Image, string? Page)? FromImgres(string? linkUri)
+    {
+        if (!Uri.TryCreate(linkUri, UriKind.Absolute, out var link)
+            || !link.AbsolutePath.EndsWith("/imgres", StringComparison.OrdinalIgnoreCase)
+            || !link.Host.Contains("google.", StringComparison.OrdinalIgnoreCase))
+            return null;
+
+        string? image = null, page = null;
+        foreach (var pair in link.Query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var kv = pair.Split('=', 2);
+            if (kv.Length != 2)
+                continue;
+
+            if (kv[0] == "imgurl")
+                image = Uri.UnescapeDataString(kv[1]);
+            else if (kv[0] == "imgrefurl")
+                page = Uri.UnescapeDataString(kv[1]);
+        }
+
+        return Uri.TryCreate(image, UriKind.Absolute, out var parsed) && parsed.Scheme is "http" or "https"
+            ? (image!, page)
+            : null;
+    }
+
+    /// <summary>
+    /// True for the small copies Google keeps of every result («encrypted-tbn0.gstatic.com»
+    /// or a picture inside the page itself): what its grid shows, not the original.
+    /// </summary>
+    public static bool IsGoogleThumbnail(string? source)
+    {
+        if (string.IsNullOrEmpty(source))
+            return false;
+
+        if (source.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return Uri.TryCreate(source, UriKind.Absolute, out var uri)
+               && uri.Host.EndsWith("gstatic.com", StringComparison.OrdinalIgnoreCase)
+               && uri.Host.StartsWith("encrypted-tbn", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
     /// The bytes of a <c>data:</c> address (Google puts the thumbnails in the
     /// page itself); null when it is not one, or is not base64.
     /// </summary>

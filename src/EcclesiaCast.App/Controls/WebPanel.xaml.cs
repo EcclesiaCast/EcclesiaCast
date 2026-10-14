@@ -226,25 +226,76 @@ public partial class WebPanel : UserControl, IWebPageHost
     }
 
     /// <summary>
-    /// Right click on a picture of a page: the browser's own menu gets one more
-    /// entry on top, «Agregar a medios». What it hands over is the picture's
-    /// address; the view model downloads it and puts it in the library.
+    /// Right click on the page. The browser's own menu opens far from the
+    /// pointer (the page is drawn at 1920×1080 and shrunk by a Viewbox, which
+    /// the browser knows nothing about), so it is replaced by one of ours,
+    /// opened where the mouse is. On a Google Images result it offers
+    /// «Agregar a medios» with the ORIGINAL picture: Google puts the address of
+    /// the full-size file in the link of every result as soon as it is
+    /// right-clicked, so the thumbnail does not have to be opened first.
     /// </summary>
     private void OnContextMenuRequested(object? sender, CoreWebView2ContextMenuRequestedEventArgs e)
     {
         if (_web?.CoreWebView2 is not { } core)
             return;
 
+        // Everything is read now: the arguments are only good inside this call.
         var target = e.ContextMenuTarget;
-        if (target.Kind != CoreWebView2ContextMenuTargetKind.Image || string.IsNullOrEmpty(target.SourceUri))
-            return;
-
-        var source = target.SourceUri;
+        var link = target.HasLinkUri ? target.LinkUri : null;
+        var imageSource = target.Kind == CoreWebView2ContextMenuTargetKind.Image && target.HasSourceUri ? target.SourceUri : null;
+        var selection = target.HasSelection ? target.SelectionText : null;
         var page = core.Source;
-        var entry = core.Environment.CreateContextMenuItem("➕ Agregar a medios", null, CoreWebView2ContextMenuItemKind.Command);
-        entry.CustomItemSelected += (_, _) =>
-            Dispatcher.BeginInvoke(() => ImageChosen?.Invoke(this, new WebImageChosen(source, page)));
-        e.MenuItems.Insert(0, entry);
+        e.Handled = true;
+
+        var menu = new ContextMenu { PlacementTarget = _web, Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint };
+
+        MenuItem Add(string header, Action action, bool enabled = true)
+        {
+            var item = new MenuItem { Header = header, IsEnabled = enabled };
+            item.Click += (_, _) => action();
+            menu.Items.Add(item);
+            return item;
+        }
+
+        // The picture: the original from Google's link, or the picture's own address.
+        WebImageChosen? chosen = null;
+        if (WebImages.FromImgres(link) is { } original)
+            chosen = new WebImageChosen(original.Image, original.Page ?? page);
+        else if (imageSource is not null)
+            chosen = new WebImageChosen(imageSource, page, IsThumbnail: WebImages.IsGoogleThumbnail(imageSource));
+
+        if (chosen is not null)
+            Add("➕ Agregar a medios", () => ImageChosen?.Invoke(this, chosen));
+
+        if (link is not null && WebImages.FromImgres(link) is null)
+        {
+            Add("Abrir vínculo", () => core.Navigate(link));
+            Add("Copiar vínculo", () => TryCopy(link));
+        }
+
+        if (!string.IsNullOrEmpty(selection))
+            Add("Copiar", () => TryCopy(selection));
+
+        if (menu.Items.Count > 0)
+            menu.Items.Add(new Separator());
+
+        Add("◀ Atrás", () => _web?.GoBack(), _web.CanGoBack);
+        Add("▶ Adelante", () => _web?.GoForward(), _web.CanGoForward);
+        Add("⟳ Recargar", () => _web?.Reload());
+
+        menu.IsOpen = true;
+    }
+
+    private static void TryCopy(string text)
+    {
+        try
+        {
+            Clipboard.SetText(text);
+        }
+        catch (System.Runtime.InteropServices.COMException)
+        {
+            // Another program has the clipboard open for a moment: nothing to do.
+        }
     }
 
     /// <summary>

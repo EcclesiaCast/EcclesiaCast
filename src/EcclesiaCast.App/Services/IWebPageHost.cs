@@ -30,4 +30,4 @@ public interface IWebPageHost
 /// A picture the operator picked on a page («Agregar a medios» in the browser's
 /// right-click menu): where the picture is, and the page it was on.
 /// </summary>
-public sealed record WebImageChosen(string Source, string? Page);
+public sealed record WebImageChosen(string Source, string? Page, bool IsThumbnail = false);

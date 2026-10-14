@@ -439,10 +439,17 @@ public partial class ProjectedView : UserControl
                         BackgroundImageSettled?.Invoke(this, EventArgs.Empty);
                     };
                     BackgroundImage.BeginAnimation(OpacityProperty, fade);
+
+                    // What fills the bars of the new picture rises with it, instead of
+                    // popping in under the old one.
+                    FillImage.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, mediaFade));
+                    FillColorLayer.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, mediaFade));
                 }
                 else if (newPicture)
                 {
                     _fadeVersion++;
+                    FillImage.BeginAnimation(OpacityProperty, null);
+                    FillColorLayer.BeginAnimation(OpacityProperty, null);
                     // A fade of zero seconds is a cut: no animation may linger.
                     BackgroundImage.BeginAnimation(OpacityProperty, null);
                     ClearPreviousImage();
@@ -705,7 +712,7 @@ public partial class ProjectedView : UserControl
             FillImage.Source = LoadBitmap(fillPath);
         }
 
-        MediaFraming.SetFillLook(FillImage, needsFill ? media : null, ActualWidth);
+        MediaFraming.SetFillLook(FillImage, needsFill ? media : null, ActualWidth, ActualHeight);
         var showFillImage = needsFill && FillImage.Source is not null;
         FillImage.Visibility = showFillImage ? Visibility.Visible : Visibility.Collapsed;
 

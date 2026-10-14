@@ -203,7 +203,7 @@ public sealed class FramedMediaPreview : Grid
         {
             var image = EnsureFillImage();
             image.Source = fillSource;
-            MediaFraming.SetFillLook(image, media, ScreenWidth);
+            MediaFraming.SetFillLook(image, media, ScreenWidth, ScreenHeight);
             image.Visibility = Visibility.Visible;
         }
         else if (_fillImage is not null)

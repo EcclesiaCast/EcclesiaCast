@@ -258,17 +258,30 @@ public static class MediaFraming
     /// the blur's faded edge off-screen), as it comes otherwise. The radius is
     /// in pixels of a 1920-wide screen, kept in proportion at any size.
     /// </summary>
-    public static void SetFillLook(Image fill, MediaItem? media, double screenWidth)
+    public static void SetFillLook(Image fill, MediaItem? media, double screenWidth, double screenHeight)
     {
-        if (media is null || !media.FillsWithSelf)
+        if (media is null || !media.FillsWithSelf || screenWidth <= 0 || screenHeight <= 0)
         {
             fill.Effect = null;
+            fill.ClearValue(FrameworkElement.WidthProperty);
+            fill.ClearValue(FrameworkElement.HeightProperty);
             fill.RenderTransform = Transform.Identity;
             return;
         }
 
-        var scale = screenWidth > 0 ? screenWidth / 1920 : 1;
-        var radius = 60 * scale;
+        // The blur fades to transparent at the edge of the picture, so the
+        // picture is made bigger than the screen (and centered) until that
+        // faded edge falls off it. It is made bigger itself, not scaled by a
+        // render transform: a blur under a scale transform leaves a black
+        // strip along the bottom edge (measured: 48 rows at 1920×1080).
+        const double Oversize = 1.4;
+        fill.RenderTransform = Transform.Identity;
+        fill.HorizontalAlignment = HorizontalAlignment.Center;
+        fill.VerticalAlignment = VerticalAlignment.Center;
+        fill.Width = screenWidth * Oversize;
+        fill.Height = screenHeight * Oversize;
+
+        var radius = 40 * (screenWidth / 1920);
         if (fill.Effect is not BlurEffect existing || Math.Abs(existing.Radius - radius) > 0.01)
         {
             fill.Effect = new BlurEffect
@@ -278,9 +291,6 @@ public static class MediaFraming
                 RenderingBias = RenderingBias.Performance,
             };
         }
-
-        fill.RenderTransformOrigin = new Point(0.5, 0.5);
-        fill.RenderTransform = new ScaleTransform(1.2, 1.2);
     }
 
     /// <summary>True when the picture leaves part of the output uncovered.</summary>

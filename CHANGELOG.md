@@ -13,14 +13,19 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   abre Google Imágenes en el panel web (en castellano, con todos sus filtros), y
   el panel tiene una fila para escribir qué buscás, con **🖼 Imágenes**, **🎞 GIF**
   (sólo animados) y «Sólo licencia libre» (el filtro «Derechos de uso» de
-  Google). Con clic derecho sobre una imagen aparece **➕ Agregar a medios**: se
-  baja y entra a la pestaña abierta; un GIF animado se convierte en video en
+  Google). Con clic derecho sobre una imagen (aunque sea una miniatura sin abrir)
+  aparece un menú propio, en el lugar del clic, con **➕ Agregar a medios**: baja
+  la imagen **original** (la dirección la da el propio Google) y entra a la
+  pestaña abierta, y si sólo se conoce la miniatura avisa en vez de bajarla
+  borrosa. Un GIF animado se convierte en video en
   bucle como los que arrastrás. Avisa si la imagen es chica para una pantalla
   grande. Quitarla de la biblioteca borra el archivo bajado. No usa API ni
   claves.
 - **Buscar desde el celular.** La página del celular tiene arriba una caja para
   buscar canciones y versículos (todas las versiones de la Biblia), con la
-  misma búsqueda que Ctrl+K de la computadora, sin los medios. Tocar un
+  misma búsqueda que Ctrl+K de la computadora, sin los medios: «juan 3 16» da
+  el versículo, y una canción que se llama como lo escrito sale antes que las
+  que sólo lo dicen en la letra (eso también vale para Ctrl+K). Tocar un
   resultado lo carga en la computadora y la página baja a sus diapositivas
   para elegir cuál proyectar.
 - **Rellenar los bordes con la misma imagen, desenfocada.** En Propiedades de
@@ -28,14 +33,17 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   desenfocada)** además del color sólido: donde la imagen no llega (en
   «Ajustar», con un tamaño fijo o con zoom menor a 100 %) se ve una copia
   agrandada y borrosa de ella misma, para que parezca una sola imagen sin
-  borde negro. Se ve igual en la vista previa, las tarjetas, el LIVE y la
+  borde negro (el desenfoque se dibuja a mano para que no deje un borde negro
+  abajo). Al pasar de una imagen a otra, ese relleno sube con el fundido. Se ve
+  igual en la vista previa, las tarjetas, el LIVE y la
   pantalla.
 - **Ajuste fino con las flechas del teclado en Propiedades.** Con el cuadro de
   vista previa elegido (arranca así), las flechas corren la imagen de a 0,1 %
   de la pantalla, y con Mayús de a 1 %.
 - **Achicar la lista de audios.** En la pestaña Música, un clic en el título
   **AUDIOS** (o Ver → «Achicar la lista de audios») esconde la lista y sus
-  botones y deja sólo el reproductor. Se recuerda al cerrar el programa.
+  botones y el reproductor de audios (la música sigue sonando). Se recuerda al
+  cerrar el programa.
 - **Mini reproductor en la pestaña Música.** Donde estaban los botones de
   «Spotify u otro reproductor» ahora se ve la carátula, el título, el artista,
   de qué programa viene y una barra de avance de lo que suene en la
