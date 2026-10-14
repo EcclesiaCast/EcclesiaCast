@@ -18,6 +18,30 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   clic o Enter lo proyecta. **Borrar historial** la vacía. La lista se
   recuerda aunque se cierre el programa. No se anotan los versículos a los que
   se llega con las flechas ni con clics en las tarjetas.
+- **Usar una imagen o un video de la barra de medios como logo.** Con clic
+  derecho en la tarjeta, **Usar como logo** lo suma a la lista de logos sin
+  pasar por el administrador de logos. Si ese archivo ya era un logo, lo deja
+  elegido en vez de repetirlo. No cambia lo que hay en pantalla: **F3** lo
+  muestra. No aparece en las páginas de un PDF o de una presentación, porque se
+  borran junto con el medio.
+
+- **Silenciar una pestaña de medios entera.** Con clic derecho en la pestaña,
+  **🔇 Silenciar la pestaña** (y **🔊 Quitar el silencio** para volver): todos los
+  videos de esa pestaña se proyectan sin sonido, incluidos los de YouTube, y
+  la pestaña muestra un 🔇 al lado del nombre. También está como casilla en
+  **Configurar…**. Si lo que suena en pantalla es de esa pestaña, el cambio se
+  escucha en el momento, sin reiniciar el video. Las Propiedades de cada medio
+  no se tocan: al quitar el silencio, cada uno vuelve a sonar como estaba.
+
+- **Varios cuadros de texto en el diseñador de diapositivas, sin pisarse.** Antes
+  el segundo cuadro caía justo encima del primero y no se podía elegir ni
+  editar el de abajo. Ahora: cada cuadro nuevo aparece en un lugar libre (abajo
+  al centro, arriba al centro, las esquinas…); los otros cuadros se ven con un
+  contorno punteado y su nombre («Letra», «Cuadro 2»); un clic en cualquiera lo
+  elige, aunque se esté escribiendo en otro; **Tab** pasa al siguiente cuadro; y
+  **▲ Traer adelante** / **▼ Enviar atrás** cambian cuál se dibuja encima. Al
+  cambiar de cuadro con la lista, la tipografía escrita sin confirmar ya no se
+  pierde.
 
 - **Tipografía para cada recuadro del escenario.** En el diseñador de
   escenarios, cada recuadro (las notas del predicador, la hora, un texto fijo…)
@@ -292,6 +316,14 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   diseño original» deshace todo.
 
 ### Cambiado
+
+- **La letra de una canción ya no se dibuja encima de los cuadros de texto
+  extra.** Si una diapositiva tiene un cuadro que ocupa al menos la mitad del
+  ancho de la letra (un título, una traducción a lo ancho), la letra se achica
+  y se acomoda en el espacio que queda, con un respiro de 12 píxeles. Los
+  cuadros angostos de una esquina no le sacan nada. **Esto cambia cómo se ven
+  las canciones que ya tengan un cuadro a lo ancho**: la letra puede quedar
+  algo más chica que antes. Revisalas en el diseñador si alguna no te gusta.
 
 - **Las miniaturas de las imágenes y de las páginas de un documento se dibujan
   con la forma de la imagen**, con 320 píxeles del lado largo (una página

@@ -286,6 +286,7 @@ public static class SlideTextFit
                 }
             }
 
+            (x, y, w, h) = AvoidExtraBoxes(over, x, y, w, h);
             return (new Thickness(x, y, CanvasWidth - x - w, CanvasHeight - y - h), w, h);
         }
 
@@ -302,7 +303,27 @@ public static class SlideTextFit
 
         var width = Math.Max(200, CanvasWidth - 2 * theme.MarginHorizontal);
         var height = Math.Max(150, CanvasHeight - marginTop - marginBottom);
-        return (new Thickness(theme.MarginHorizontal, marginTop, theme.MarginHorizontal, marginBottom), width, height);
+
+        var (ax, ay, aw, ah) = AvoidExtraBoxes(over, theme.MarginHorizontal, marginTop, width, height);
+        return (new Thickness(ax, ay, CanvasWidth - ax - aw, CanvasHeight - ay - ah), aw, ah);
+    }
+
+    /// <summary>
+    /// Takes the area the slide's extra text boxes occupy out of the words'
+    /// area (see <see cref="TextAreaCarver"/>): without it a long verse was
+    /// drawn right over a box sitting under it. The boxes are measured at the
+    /// size <see cref="SlideView"/> draws them.
+    /// </summary>
+    private static (double X, double Y, double W, double H) AvoidExtraBoxes(
+        SlideOverride? over, double x, double y, double w, double h)
+    {
+        if (over is null || over.TextBoxes.Count == 0)
+            return (x, y, w, h);
+
+        var carved = TextAreaCarver.Carve(
+            new BoxRect(x, y, w, h),
+            over.TextBoxes.Select(b => new BoxRect(b.X, b.Y, Math.Max(20, b.Width), Math.Max(20, b.Height))));
+        return (carved.X, carved.Y, carved.W, carved.H);
     }
 
     /// <summary>Where <see cref="SlideView"/> draws the caption, on the 1920×1080 canvas.</summary>

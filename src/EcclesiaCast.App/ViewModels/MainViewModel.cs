@@ -1069,6 +1069,55 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     /// <summary>The media as it is to play: with the rule of its tab applied.</summary>
     private MediaItem Playable(MediaItem item) => TabRule(item.Category).Resolve(item);
 
+    /// <summary>
+    /// Names of the tabs whose media play without sound. The tab list shows a
+    /// speaker on each; the set is replaced (never edited) so the bindings see
+    /// it change.
+    /// </summary>
+    [ObservableProperty]
+    private HashSet<string> _mutedMediaTabs = new(StringComparer.OrdinalIgnoreCase);
+
+    private void RefreshMutedMediaTabs() =>
+        MutedMediaTabs = new HashSet<string>(
+            MediaTabs.Where(t => TabRule(t).Muted), StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>True when the tab is silenced; the menu of the tab asks it to word its entry.</summary>
+    public bool IsMediaTabMuted(string? tab) =>
+        !string.IsNullOrWhiteSpace(tab) && TabRule(tab).Muted;
+
+    /// <summary>
+    /// Keeps the rule of a tab. When its sound changed and the media on screen
+    /// belongs to it, the screen gets the media again so the change is heard
+    /// now, not at the next click (the video keeps playing: only its mute
+    /// switches).
+    /// </summary>
+    private void SaveMediaTabRule(string tab, MediaTabRule rule)
+    {
+        var soundChanged = TabRule(tab).Muted != rule.Muted;
+        _settings.Set(RuleKey(tab), rule.ToSetting());
+        RefreshMutedMediaTabs();
+
+        if (soundChanged
+            && _presentation.Background is { } onScreen
+            && _allMedia.FirstOrDefault(m => m.Id == onScreen.Id) is { } original
+            && string.Equals(original.Category, tab, StringComparison.OrdinalIgnoreCase))
+            _presentation.RefreshBackground(Playable(original).Clone(), ResolveFill(original));
+    }
+
+    /// <summary>Right click on a tab → «Silenciar la pestaña» / «Quitar el silencio».</summary>
+    [RelayCommand]
+    private void ToggleMediaTabMute(string? tab)
+    {
+        if (string.IsNullOrWhiteSpace(tab))
+            return;
+
+        var rule = TabRule(tab);
+        SaveMediaTabRule(tab, rule with { Muted = !rule.Muted });
+        StatusText = rule.Muted
+            ? $"«{tab}»: ahora suena (cada medio con lo que dice en sus Propiedades)."
+            : $"«{tab}»: silenciada, sus medios se proyectan sin sonido.";
+    }
+
     private void SaveMediaTabs(IEnumerable<string> tabs) =>
         _settings.Set(MediaTabsKey, MediaTabNames.Serialize(tabs));
 
@@ -1269,6 +1318,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         SelectedMediaTab = MediaTabs.Contains(keepTab) ? keepTab : MediaTabs.FirstOrDefault() ?? "Fondos";
         FilterMediaByTab();
         SyncMediaTabOptions();
+        RefreshMutedMediaTabs();
     }
 
     partial void OnSelectedMediaTabChanged(string value)
@@ -1506,7 +1556,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (_mediaInspector.EditTabRule(tab, TabRule(tab)) is not { } rule)
             return;
 
-        _settings.Set(RuleKey(tab), rule.ToSetting());
+        SaveMediaTabRule(tab, rule);
         StatusText = rule.Mode switch
         {
             MediaTabMode.Background => $"«{tab}»: todo va como fondo.",
@@ -1515,6 +1565,8 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 : $"«{tab}»: todo va en primer plano.",
             _ => $"«{tab}»: cada medio dice cómo va.",
         };
+        if (rule.Muted)
+            StatusText += " Sin sonido.";
     }
 
     [RelayCommand]
@@ -2130,6 +2182,55 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             ToggleLogo();
         else
             StatusText = $"Logo: {logo.Name}.";
+    }
+
+    /// <summary>
+    /// Right-click on a picture or video → «Usar como logo». It only adds the
+    /// logo to the list: switching the screen to it is F3's job, and doing it
+    /// here would blank the output in the middle of a service.
+    /// </summary>
+    [RelayCommand]
+    private async Task UseMediaAsLogoAsync(MediaItem? item)
+    {
+        // A rendered PDF/PPT page goes away with its media, which would leave
+        // the logo pointing at a missing file.
+        if (item is null
+            || item.Type is not (MediaType.Image or MediaType.Video)
+            || string.IsNullOrWhiteSpace(item.Path)
+            || DocumentImporter.IsRenderedPage(item.Path))
+            return;
+
+        var existing = Logos.FirstOrDefault(l =>
+            l.Kind != LogoKind.Text && string.Equals(l.Path, item.Path, StringComparison.OrdinalIgnoreCase));
+        if (existing is not null)
+        {
+            SelectedLogo = existing;
+            StatusText = $"«{existing.Name}» ya era un logo; quedó elegido (F3 lo muestra).";
+            return;
+        }
+
+        var isVideo = item.Type == MediaType.Video;
+
+        // A brand-new poster, not the card's thumbnail: deleting the logo
+        // deletes its poster, and the card still needs its own.
+        var poster = isVideo
+            ? await Task.Run(() => MediaThumbnails.Create(item.Path, MediaType.Video, App.VideoEngine))
+            : null;
+
+        var created = _logos.Save(new Logo
+        {
+            Name = item.Name,
+            Kind = isVideo ? LogoKind.Video : LogoKind.Image,
+            Path = item.Path,
+            PosterPath = poster,
+            Scaling = item.Scaling,
+            Muted = true,
+            Order = Logos.Count,
+        });
+
+        LoadLogos(created.Id);
+        RefreshLightCopies();
+        StatusText = $"«{created.Name}» agregado como logo (F3 lo muestra).";
     }
 
     // ── Búsqueda global ──────────────────────────────────────────

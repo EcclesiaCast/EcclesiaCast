@@ -24,6 +24,7 @@ public partial class MediaTabRuleWindow : Window
         }
 
         LogoCheck.IsChecked = current.LogoAtEnd;
+        MuteCheck.IsChecked = current.Muted;
         Mode_Changed(this, new RoutedEventArgs());
     }
 
@@ -47,7 +48,10 @@ public partial class MediaTabRuleWindow : Window
             : BackgroundRadio.IsChecked == true ? MediaTabMode.Background
             : MediaTabMode.PerItem;
 
-        Rule = new MediaTabRule(mode, mode == MediaTabMode.Foreground && LogoCheck.IsChecked == true);
+        Rule = new MediaTabRule(
+            mode,
+            mode == MediaTabMode.Foreground && LogoCheck.IsChecked == true,
+            MuteCheck.IsChecked == true);
         DialogResult = true;
     }
 }

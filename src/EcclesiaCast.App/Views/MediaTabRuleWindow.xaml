@@ -45,6 +45,11 @@
         <TextBlock Style="{StaticResource Hint}"
                    Text="Los videos terminan en el logo. Las imágenes, pasados los segundos que tengan puestos en sus Propiedades; si no tienen, se quedan hasta que cambies."/>
 
+        <CheckBox x:Name="MuteCheck" Content="Silenciar todos los medios de esta pestaña" Margin="22,14,0,0"
+                  Foreground="White" FontSize="12"/>
+        <TextBlock Style="{StaticResource Hint}"
+                   Text="Los videos de esta pestaña se proyectan sin sonido, aunque en sus Propiedades lo tengan prendido. Se nota en la pestaña con un 🔇."/>
+
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
             <Button Content="Guardar" Style="{StaticResource AccentButton}" IsDefault="True"
                     Click="Save_Click" Padding="20,8"/>

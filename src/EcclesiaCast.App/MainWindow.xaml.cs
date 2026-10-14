@@ -671,6 +671,14 @@ public partial class MainWindow : Window
                 case "OpenLocationItem":
                     item.Visibility = isWeb ? Visibility.Collapsed : Visibility.Visible;
                     break;
+                case "UseAsLogoItem":
+                    // A page drawn from a PDF or presentation is deleted with
+                    // its media, and the logo would be left pointing at nothing.
+                    item.Visibility = count == 1
+                        && media.Type is MediaType.Image or MediaType.Video
+                        && !DocumentImporter.IsRenderedPage(media.Path)
+                        ? Visibility.Visible : Visibility.Collapsed;
+                    break;
                 case "RemoveMediaItem":
                     item.Header = "Quitar de la biblioteca" + suffix;
                     break;
@@ -893,16 +901,29 @@ public partial class MainWindow : Window
             return entry;
         }
 
-        tabItem.ContextMenu = new ContextMenu
+        var muteEntry = Entry("🔇 Silenciar la pestaña", (vm, tab) => vm.ToggleMediaTabMuteCommand.Execute(tab));
+
+        var menu = new ContextMenu
         {
             Items =
             {
                 Entry("Cambiar nombre…", (vm, tab) => vm.RenameMediaTabCommand.Execute(tab)),
                 Entry("Configurar…", (vm, tab) => vm.ConfigureMediaTabCommand.Execute(tab)),
+                muteEntry,
                 new Separator(),
                 Entry("Eliminar…", (vm, tab) => vm.DeleteMediaTabCommand.Execute(tab)),
             },
         };
+
+        // The wording follows the state of the tab at the moment of opening:
+        // it can change from «Configurar…» or from this very entry.
+        menu.Opened += (_, _) =>
+        {
+            muteEntry.Header = DataContext is MainViewModel vm && vm.IsMediaTabMuted(tabItem.DataContext as string)
+                ? "🔊 Quitar el silencio"
+                : "🔇 Silenciar la pestaña";
+        };
+        tabItem.ContextMenu = menu;
     }
 
     private void ClearTabDropHighlights()

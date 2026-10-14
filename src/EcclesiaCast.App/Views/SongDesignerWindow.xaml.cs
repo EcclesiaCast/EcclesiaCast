@@ -268,6 +268,7 @@ public partial class SongDesignerWindow : Window
         _thumbs[Selected].Slide = BuildSlide(Selected);
         UpdateColorSwatch();
         UpdateBoxInfo();
+        DrawGhosts();
     }
 
     private void UpdateColorSwatch()
@@ -392,7 +393,9 @@ public partial class SongDesignerWindow : Window
 
         var over = _overrides[Selected]!;
         var boxes = over.TextBoxes.ToList();
-        boxes.Add(SlideTextBox.Fresh());
+        // Not on top of the ones already there: two boxes on the same spot
+        // cannot be told apart with the mouse.
+        boxes.Add(SlideTextBox.FreshAvoiding(boxes));
 
         _touched.Add(Selected);
         _overrides[Selected] = over with { Boxes = boxes };
@@ -440,9 +443,17 @@ public partial class SongDesignerWindow : Window
             BoxPicker.Items.Add($"Cuadro {i + 1}");
 
         BoxPicker.SelectedIndex = Math.Clamp(_selectedBox + 1, 0, BoxPicker.Items.Count - 1);
-        RemoveBoxButton.IsEnabled = _selectedBox >= 0;
+        UpdateBoxButtons(count);
 
         _loading = previous;
+    }
+
+    /// <summary>Remove and order buttons only mean something on an extra box, and the order ones need a neighbour.</summary>
+    private void UpdateBoxButtons(int extraCount)
+    {
+        RemoveBoxButton.IsEnabled = _selectedBox >= 0;
+        BringForwardButton.IsEnabled = _selectedBox >= 0 && _selectedBox < extraCount - 1;
+        SendBackButton.IsEnabled = _selectedBox > 0;
     }
 
     private void BoxPicker_Changed(object sender, SelectionChangedEventArgs e)
@@ -453,10 +464,63 @@ public partial class SongDesignerWindow : Window
         if (_editing)
             CommitEdit();
 
+        // A typeface typed but not confirmed yet belongs to the box being left.
+        CommitPendingFont();
+
         _selectedBox = BoxPicker.SelectedIndex - 1;
-        RemoveBoxButton.IsEnabled = _selectedBox >= 0;
+        UpdateBoxButtons(_overrides[Selected]!.TextBoxes.Count);
         LoadControls(_overrides[Selected]!);
+        RefreshSelected();
     }
+
+    /// <summary>
+    /// A typeface written in the box but not confirmed (no Enter, focus still
+    /// in the combo) would be lost, or worse, land on the next box. It is
+    /// applied to the box being left, and only when it really differs so that
+    /// just looking at a slide never marks it as edited.
+    /// </summary>
+    private void CommitPendingFont()
+    {
+        if (_loading || Selected < 0 || string.IsNullOrWhiteSpace(FontCombo.Text))
+            return;
+
+        var over = _overrides[Selected]!;
+        var current = _selectedBox >= 0 && _selectedBox < over.TextBoxes.Count
+            ? over.TextBoxes[_selectedBox].FontFamily ?? _theme.FontFamily
+            : over.FontFamily ?? _theme.FontFamily;
+
+        if (!string.Equals(FontCombo.Text.Trim(), current, StringComparison.OrdinalIgnoreCase))
+            Style_Changed(FontCombo, new RoutedEventArgs());
+    }
+
+    /// <summary>Moves the chosen extra box one place in the drawing order: later boxes are drawn over earlier ones.</summary>
+    private void MoveBoxOrder(int direction)
+    {
+        if (Selected < 0 || _selectedBox < 0)
+            return;
+
+        if (_editing)
+            CommitEdit();
+
+        var over = _overrides[Selected]!;
+        var boxes = over.TextBoxes.ToList();
+        var target = _selectedBox + direction;
+        if (_selectedBox >= boxes.Count || target < 0 || target >= boxes.Count)
+            return;
+
+        (boxes[_selectedBox], boxes[target]) = (boxes[target], boxes[_selectedBox]);
+        _touched.Add(Selected);
+        _overrides[Selected] = over with { Boxes = boxes };
+        _selectedBox = target;
+
+        RebuildBoxPicker();
+        LoadControls(_overrides[Selected]!);
+        RefreshSelected();
+    }
+
+    private void BringForward_Click(object sender, RoutedEventArgs e) => MoveBoxOrder(+1);
+
+    private void SendBack_Click(object sender, RoutedEventArgs e) => MoveBoxOrder(-1);
 
     private void InlineEditor_LostFocus(object sender, RoutedEventArgs e) => CommitEdit();
 
@@ -555,6 +619,61 @@ public partial class SongDesignerWindow : Window
         BoxBorder.Width = w * Scale;
         BoxBorder.Height = h * Scale;
         UpdateBoxInfo();
+        DrawGhosts();
+    }
+
+    /// <summary>
+    /// Dotted outlines and a small name for every box that is not the chosen
+    /// one. With several boxes on a slide the one on top used to hide where the
+    /// others were; the outlines say what can be clicked and what each is called.
+    /// </summary>
+    private void DrawGhosts()
+    {
+        GhostLayer.Children.Clear();
+        if (Selected < 0 || _overrides[Selected] is not { } over)
+            return;
+
+        void Ghost(int index, string label, double x, double y, double w, double h)
+        {
+            if (index == _selectedBox)
+                return;
+
+            var outline = new System.Windows.Shapes.Rectangle
+            {
+                Width = w * Scale,
+                Height = h * Scale,
+                Stroke = new SolidColorBrush(Color.FromArgb(0x66, 0xFF, 0xFF, 0xFF)),
+                StrokeThickness = 1,
+                StrokeDashArray = [4, 3],
+            };
+            Canvas.SetLeft(outline, x * Scale);
+            Canvas.SetTop(outline, y * Scale);
+            GhostLayer.Children.Add(outline);
+
+            var tag = new Border
+            {
+                Background = new SolidColorBrush(Color.FromArgb(0x99, 0x00, 0x00, 0x00)),
+                Padding = new Thickness(3, 0, 3, 0),
+                Child = new TextBlock
+                {
+                    Text = label,
+                    FontSize = 9,
+                    Foreground = new SolidColorBrush(Color.FromArgb(0xCC, 0xFF, 0xFF, 0xFF)),
+                },
+            };
+            Canvas.SetLeft(tag, x * Scale);
+            Canvas.SetTop(tag, y * Scale);
+            GhostLayer.Children.Add(tag);
+        }
+
+        if (over.HasBox)
+            Ghost(-1, "Letra", over.BoxX ?? 0, over.BoxY ?? 0, over.BoxWidth ?? 1920, over.BoxHeight ?? 1080);
+
+        for (var i = 0; i < over.TextBoxes.Count; i++)
+        {
+            var b = over.TextBoxes[i];
+            Ghost(i, $"Cuadro {i + 1}", b.X, b.Y, b.Width, b.Height);
+        }
     }
 
     private void CommitBox()
@@ -631,18 +750,35 @@ public partial class SongDesignerWindow : Window
         if (BoxAt(p) is not { } index || index == _selectedBox)
             return false;
 
+        // Writing on one box and clicking another used to leave the operator
+        // stuck in the first: the click is what ends the edit.
+        if (_editing)
+            CommitEdit();
+        CommitPendingFont();
+
+        SelectBox(index);
+        return true;
+    }
+
+    /// <summary>Makes <paramref name="index"/> (-1 the words, 0 and up the extra boxes) the one being edited.</summary>
+    private void SelectBox(int index)
+    {
         _selectedBox = index;
         RebuildBoxPicker();
         LoadControls(_overrides[Selected]!);
         RefreshSelected();
-        return true;
     }
 
     private void Overlay_MouseDown(object sender, MouseButtonEventArgs e)
     {
         // Only the empty canvas lands here; the selected box handles its own clicks.
-        if (_editing || e.OriginalSource != Overlay)
+        if (e.OriginalSource != Overlay)
             return;
+
+        // The canvas does not take the keyboard focus, so clicking it while
+        // writing would leave the text editor open and the click unanswered.
+        if (_editing)
+            CommitEdit();
 
         if (SelectBoxAt(e.GetPosition(Overlay)) && e.ClickCount == 2)
             EnterEdit();
@@ -720,6 +856,21 @@ public partial class SongDesignerWindow : Window
     {
         if (_editing)
             return;
+
+        // Tab walks through the boxes of the slide (the words first), Shift+Tab backwards.
+        if (e.Key == Key.Tab && Selected >= 0)
+        {
+            var count = (_overrides[Selected]?.TextBoxes.Count ?? 0) + 1;
+            var shift = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
+            var position = _selectedBox + 1;
+            var next = (position + (shift ? count - 1 : 1)) % count - 1;
+
+            CommitPendingFont();
+            SelectBox(next);
+            BoxBorder.Focus();
+            e.Handled = true;
+            return;
+        }
 
         var step = (Keyboard.Modifiers & ModifierKeys.Control) != 0 ? 1 : 4;
         double dx = 0, dy = 0;

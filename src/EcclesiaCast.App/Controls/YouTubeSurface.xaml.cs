@@ -105,7 +105,12 @@ public partial class YouTubeSurface : UserControl
         }
 
         if (media.YouTubeId == _currentId)
+        {
+            // The same video is not restarted, but the sound can change under
+            // it (a tab was muted or un-muted while it plays).
+            Run(media.Muted ? "mute()" : "unmute()");
             return;
+        }
 
         _currentId = media.YouTubeId;
         _blur = media.Blur;
@@ -313,6 +318,8 @@ public partial class YouTubeSurface : UserControl
                 play: function () { try { player.playVideo(); } catch (e) {} },
                 pause: function () { try { player.pauseVideo(); } catch (e) {} },
                 seek: function (seconds) { try { player.seekTo(seconds, true); } catch (e) {} },
+                mute: function () { try { player.mute(); } catch (e) {} },
+                unmute: function () { try { player.unMute(); player.setVolume(volume); } catch (e) {} },
                 // Blurring shrinks the picture at the edges, so scale it up a
                 // little to keep the screen covered.
                 blur: function (px) {

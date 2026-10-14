@@ -188,6 +188,42 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
          entrada guardada con otra versión: tiene que volver a esa versión.
       6. Cerrá y abrí el programa: el historial sigue. «Borrar historial» lo
          vacía y avisa en la barra de estado.
+Tramo B del plan del 13/10 (medios y diseñador; sólo compilación, pruebas y
+dibujos a imagen):
+
+- [ ] **Usar como logo.** Clic derecho en una imagen y en un video de la barra
+      de medios → «Usar como logo». Tiene que aparecer en Logo (la lista del
+      botón) con el nombre del archivo, y **F3** lo muestra. En un video, mirá
+      que el logo tenga su cuadro de muestra en el administrador de logos. Una
+      segunda vez con el mismo archivo no lo repite. No aparece en las páginas
+      de un PDF ni en un YouTube. Si borrás el medio de la barra, el logo
+      sigue andando.
+- [ ] **Silenciar una pestaña.** Poné un video con sonido en una pestaña,
+      proyectalo y, con clic derecho en la pestaña, «🔇 Silenciar la pestaña»:
+      el sonido tiene que cortarse en el momento y el video **no** debe
+      reiniciarse. Al abrir el menú otra vez dice «🔊 Quitar el silencio» y el
+      sonido vuelve. Lo mismo con un video de YouTube sin descargar (no se pudo
+      probar el `mute()` del reproductor). La pestaña muestra el 🔇 mientras
+      está silenciada, y también se tilda en «Configurar…». Cambiá el nombre de
+      la pestaña y cerrá y abrí el programa: sigue silenciada.
+- [ ] **Varios cuadros en el diseñador.** En una canción abrí el diseñador y
+      agregá tres cuadros con «➕ Cuadro de texto»: cada uno tiene que caer en
+      un lugar distinto. Los que no están elegidos se ven con contorno punteado
+      y nombre. Hacé clic sobre uno y después sobre otro (probá también
+      **mientras escribís** en uno con doble clic: el clic afuera tiene que
+      cerrar la edición y elegir el otro). **Tab** y **Shift+Tab** recorren los
+      cuadros con el cuadro elegido enfocado. «▲ Traer adelante» / «▼ Enviar
+      atrás» tienen que cambiar cuál tapa a cuál cuando se pisan. Escribí una
+      tipografía en el cuadro sin apretar Enter y cambiá de cuadro con la lista:
+      se tiene que conservar en el primero. Guardá, volvé a entrar y mirá que
+      todos se puedan editar.
+- [ ] **La letra no pisa los cuadros extra.** Poné en una canción de letra
+      larga un cuadro a lo ancho abajo (por ejemplo una traducción o una
+      referencia de 1500 px de ancho): al proyectarla, la letra tiene que
+      terminar arriba del cuadro y achicarse si hace falta, en la pantalla, el
+      LIVE y el PREVIEW. Un cuadro chico en una esquina no tiene que cambiar
+      nada. Mirá un par de canciones que ya tengan cuadros extra por si alguna
+      cambió de tamaño de letra.
 
 ## 2. Para la v1.0.0
 

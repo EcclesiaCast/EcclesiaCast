@@ -20,9 +20,10 @@ public enum MediaTabMode
 /// announcements, or «everything here is a background», for a tab of loops.
 /// It is worked out when the media goes on screen, so changing the rule never
 /// rewrites the library: take it off and each media goes back to what its own
-/// properties say.
+/// properties say. <paramref name="Muted"/> silences every media of the tab
+/// the same way (the tab is for announcements read by someone, say).
 /// </summary>
-public sealed record MediaTabRule(MediaTabMode Mode, bool LogoAtEnd)
+public sealed record MediaTabRule(MediaTabMode Mode, bool LogoAtEnd, bool Muted = false)
 {
     public static MediaTabRule Default { get; } = new(MediaTabMode.PerItem, false);
 
@@ -42,16 +43,21 @@ public sealed record MediaTabRule(MediaTabMode Mode, bool LogoAtEnd)
         if (Mode == MediaTabMode.Foreground && LogoAtEnd && end != VideoEndBehavior.NextMedia)
             end = VideoEndBehavior.Logo;
 
-        if (behavior == item.Behavior && end == item.EndBehavior)
+        // Only ever silences: a media already muted, or a tab that is not
+        // muted, leaves the item as it is.
+        var muted = item.Muted || Muted;
+
+        if (behavior == item.Behavior && end == item.EndBehavior && muted == item.Muted)
             return item;
 
         var resolved = item.Clone();
         resolved.Behavior = behavior;
         resolved.EndBehavior = end;
+        resolved.Muted = muted;
         return resolved;
     }
 
-    /// <summary>The text kept in the settings: «foreground+logo», «background», «item».</summary>
+    /// <summary>The text kept in the settings: «foreground+logo», «background+mute», «item».</summary>
     public string ToSetting()
     {
         var mode = Mode switch
@@ -60,19 +66,34 @@ public sealed record MediaTabRule(MediaTabMode Mode, bool LogoAtEnd)
             MediaTabMode.Foreground => "foreground",
             _ => "item",
         };
-        return Mode == MediaTabMode.Foreground && LogoAtEnd ? mode + "+logo" : mode;
+        if (Mode == MediaTabMode.Foreground && LogoAtEnd)
+            mode += "+logo";
+        return Muted ? mode + "+mute" : mode;
     }
 
+    /// <summary>
+    /// Reads the text of <see cref="ToSetting"/>: the mode first, then the
+    /// extras after a «+». The texts saved before «mute» existed still read
+    /// the same; anything unreadable is the default rule.
+    /// </summary>
     public static MediaTabRule Parse(string? setting)
     {
-        var text = (setting ?? string.Empty).Trim().ToLowerInvariant();
-        return text switch
+        var parts = (setting ?? string.Empty).Trim().ToLowerInvariant().Split('+');
+        var mode = parts[0].Trim() switch
         {
-            "background" => new MediaTabRule(MediaTabMode.Background, false),
-            "foreground" => new MediaTabRule(MediaTabMode.Foreground, false),
-            "foreground+logo" => new MediaTabRule(MediaTabMode.Foreground, true),
-            _ => Default,
+            "background" => MediaTabMode.Background,
+            "foreground" => MediaTabMode.Foreground,
+            "item" => MediaTabMode.PerItem,
+            _ => (MediaTabMode?)null,
         };
+        if (mode is null)
+            return Default;
+
+        var extras = parts.Skip(1).Select(p => p.Trim()).ToHashSet();
+        return new MediaTabRule(
+            mode.Value,
+            mode == MediaTabMode.Foreground && extras.Contains("logo"),
+            extras.Contains("mute"));
     }
 }
 
