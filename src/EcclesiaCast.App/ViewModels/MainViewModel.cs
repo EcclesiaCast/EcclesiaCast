@@ -3953,12 +3953,17 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         // to the chapter's first one.
         var previewed = BibleSlideAt(PreviewSlideIndex);
 
+        // The slide last projected is only put up again when it really is on
+        // the air: otherwise (cleared, black, a page or another media took the
+        // screen) the rebuild would bring a dismissed slide back by itself.
+        var wasOnAir = IsGridOnAir;
+
         rebuild();
 
         if (previewed is not null && FindVerseSlide(previewed.Chapter, previewed.FirstVerse) is var marked and >= 0)
             SetPreviewIndex(marked);
 
-        if (live is null)
+        if (live is null || !wasOnAir)
             return;
 
         // A verse is found by its number, not its label: after a theme change
