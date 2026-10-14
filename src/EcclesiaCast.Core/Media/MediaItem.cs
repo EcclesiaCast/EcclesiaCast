@@ -14,6 +14,13 @@ public enum MediaType
     /// the panel's own browser. Stored as the number 3: no migration needed.
     /// </summary>
     Web,
+
+    /// <summary>
+    /// Another program's window, projected live (Windows' own window capture).
+    /// <see cref="MediaItem.Path"/> is «proceso.exe|Título», see
+    /// <c>WindowTarget</c>. Stored as the number 4: no migration needed.
+    /// </summary>
+    Window,
 }
 
 /// <summary>How a non-16:9 asset is fitted to the 16:9 output.</summary>
@@ -79,6 +86,9 @@ public sealed class MediaItem
 
     /// <summary>True for a web page: <see cref="Path"/> is its address.</summary>
     public bool IsWeb => Type == MediaType.Web;
+
+    /// <summary>True for another program's window shown live: <see cref="Path"/> says which.</summary>
+    public bool IsWindow => Type == MediaType.Window;
 
     /// <summary>Absolute path to a generated thumbnail (may be null for images, which self-thumbnail).</summary>
     public string? ThumbnailPath { get; set; }

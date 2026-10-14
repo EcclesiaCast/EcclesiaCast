@@ -5254,6 +5254,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         // The live page switches itself off the moment anything else takes the
         // background (or it is cleared): the button must follow.
         IsWebLive = _presentation.Background is { Type: MediaType.Web };
+        IsWindowLive = _presentation.Background is { Type: MediaType.Window };
 
         // Show the blur the current background carries, without saving it back.
         var blur = _presentation.Background?.Blur ?? 0;

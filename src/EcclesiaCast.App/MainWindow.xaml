@@ -1948,6 +1948,10 @@
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding OpenWebCommand}"
                                 ToolTip="Abrir una página web en el cuadro central y proyectarla: como foto o en vivo"/>
+                        <Button Content="🪟 Ventana" FontSize="11" Padding="8,4" Margin="6,0,0,0"
+                                Style="{StaticResource DarkButton}"
+                                Command="{Binding OpenWindowPickerCommand}"
+                                ToolTip="Proyectar otra ventana de esta computadora (un PowerPoint, un reproductor, un navegador) en vivo, tal como se ve"/>
                         <Button Content="🔗" FontSize="11" Padding="8,4" Margin="4,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding AddYouTubeLinkCommand}"

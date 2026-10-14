@@ -57,6 +57,14 @@ public class PosterPolicyTests
     }
 
     [Fact]
+    public void A_window_never_gets_a_poster_even_if_something_answers_to_its_path()
+    {
+        var item = new MediaItem { Type = MediaType.Window, Path = "explorer.exe|Descargas" };
+
+        Assert.False(PosterPolicy.NeedsPoster(item, _ => true));
+    }
+
+    [Fact]
     public void A_saved_web_page_is_never_asked_a_poster_from_its_address()
     {
         var item = new MediaItem

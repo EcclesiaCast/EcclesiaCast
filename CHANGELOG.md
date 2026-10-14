@@ -9,6 +9,16 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Proyectar otra ventana de Windows.** El botón **🪟 Ventana** de la barra de
+  medios abre la lista de ventanas abiertas (con ícono, título y programa);
+  elegís una y se ve en la pantalla **en vivo**, tal como está: un PowerPoint
+  en presentación, un reproductor, una planilla. También se puede usar el
+  selector de Windows (que deja elegir una pantalla entera) y tildar **Mostrar
+  el puntero**. No sale a internet: es la captura de ventanas del propio
+  Windows. Se apaga con F4 o al proyectar otro fondo; si cerrás la ventana se
+  deja de proyectar sola, y si la minimizás queda el último cuadro. En
+  «bajo rendimiento» baja a 12 cuadros por segundo.
+
 - **Secciones que se achican a íconos.** Además de canciones/Biblia y la
   playlist, ahora se pueden achicar la **barra de medios** (queda sólo su
   cabecera, con los botones 📥 ▶ 🌐 🔗 🎲: un clic en «MEDIOS» la achica y la

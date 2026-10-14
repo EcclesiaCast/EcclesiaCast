@@ -15,11 +15,12 @@ public static class PosterPolicy
     /// not a file) and are left alone, and so is an item whose media file is
     /// missing too, because there is nothing to draw it from. A saved web page
     /// is in the same case: its poster was a photo of the page, and a page
-    /// cannot be drawn again without opening it.
+    /// cannot be drawn again without opening it. A window has no poster at all
+    /// (its path names a program, not a file).
     /// </summary>
     public static bool NeedsPoster(MediaItem item, Func<string, bool> fileExists)
     {
-        if (item.Type is MediaType.YouTube or MediaType.Web || string.IsNullOrWhiteSpace(item.Path))
+        if (item.Type is MediaType.YouTube or MediaType.Web or MediaType.Window || string.IsNullOrWhiteSpace(item.Path))
             return false;
 
         if (!fileExists(item.Path))
