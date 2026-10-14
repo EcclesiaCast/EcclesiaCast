@@ -929,15 +929,22 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     /// Loads a playlist item. <paramref name="projectMedia"/> says whether a
     /// media item goes on screen (double click, arrows) or just to the centre.
     /// </summary>
-    private void LoadPlaylistItem(PlaylistItem? item, bool projectMedia)
+    /// <returns>
+    /// False when there was nothing to load (the song, media or presentation
+    /// is gone): the grid still holds the previous item, so the caller must
+    /// not project from it. The entry is still the current one, so the arrows
+    /// go on past it.
+    /// </returns>
+    private bool LoadPlaylistItem(PlaylistItem? item, bool projectMedia)
     {
         if (item is null)
-            return;
+            return false;
 
+        bool loaded;
         _openingPlaylistItem = true;
         try
         {
-            OpenPlaylistItemCore(item, projectMedia);
+            loaded = OpenPlaylistItemCore(item, projectMedia);
         }
         finally
         {
@@ -946,9 +953,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         _currentPlaylistIndex = PlaylistItems.IndexOf(item);
         SelectedPlaylistItem = item;
+        return loaded;
     }
 
-    private void OpenPlaylistItemCore(PlaylistItem item, bool projectMedia)
+    private bool OpenPlaylistItemCore(PlaylistItem item, bool projectMedia)
     {
         switch (item.Type)
         {
@@ -968,7 +976,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 if (song is null)
                 {
                     StatusText = $"La canción \"{item.Caption}\" ya no está en la biblioteca.";
-                    return;
+                    return false;
                 }
 
                 // Choosing the song that is already selected changes nothing,
@@ -1001,7 +1009,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 if (media is null)
                 {
                     StatusText = $"El medio \"{item.Caption}\" ya no está en la biblioteca.";
-                    return;
+                    return false;
                 }
 
                 // A saved page opens in the web panel; the double click (or the
@@ -1026,9 +1034,14 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 if (!IsPresentationTab(tab))
                     SetPresentationTab(tab, true);
                 if (!OpenPresentation(tab, null))
+                {
                     StatusText = $"La presentación \"{item.Caption}\" ya no tiene páginas en la biblioteca.";
+                    return false;
+                }
                 break;
         }
+
+        return true;
     }
 
     /// <summary>
@@ -1080,7 +1093,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (item is null)
             return;
 
-        LoadPlaylistItem(item, projectMedia: true);
+        // The grid still holds the previous item when this one is gone: its
+        // first slide must not go up in its place.
+        if (!LoadPlaylistItem(item, projectMedia: true))
+            return;
 
         if (item.Type is PlaylistItemType.Song or PlaylistItemType.BiblePassage or PlaylistItemType.Presentation)
         {
@@ -5513,7 +5529,11 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             return false;
 
         var item = PlaylistItems[target];
-        LoadPlaylistItem(item, projectMedia: true);
+        // An item that could not be loaded leaves the previous one in the
+        // grid: nothing is projected, and its message stays in the status bar.
+        // It is still the current entry, so the next arrow goes on past it.
+        if (!LoadPlaylistItem(item, projectMedia: true))
+            return true;
 
         // A media item projects itself when opened (ApplyBackground); putting a
         // slide live on top of it would paint the previous item's text over it.
