@@ -48,6 +48,54 @@ spanish.PerformanceGroup=Rendimiento:
 english.PerformanceGroup=Performance:
 spanish.LowPerformanceTask=Configurar para una PC de bajo rendimiento (recomendado en computadoras viejas o notebooks sin placa de video)
 english.LowPerformanceTask=Set up for a low-performance PC (recommended for old computers or laptops without a graphics card)
+spanish.TypeBiblesStandard=Instalación estándar (con la Reina-Valera 1909)
+english.TypeBiblesStandard=Standard installation (with the Reina-Valera 1909)
+spanish.TypeBiblesAll=Con todas las Biblias libres
+english.TypeBiblesAll=With all the free Bibles
+spanish.TypeBiblesNone=Sin ninguna Biblia (se pueden traer después desde el programa)
+english.TypeBiblesNone=With no Bible (they can be added later from the program)
+spanish.TypeBiblesCustom=Elegir una por una
+english.TypeBiblesCustom=Choose one by one
+spanish.BibleRv1909=Reina-Valera 1909 (dominio público)
+english.BibleRv1909=Reina-Valera 1909 (public domain)
+spanish.BibleBlm=Biblia libre para el mundo (dominio público; es un borrador que se sigue revisando)
+english.BibleBlm=Biblia libre para el mundo (public domain; a draft that is still being reviewed)
+spanish.BibleVbl=Versión Biblia Libre (licencia libre CC BY-SA 4.0)
+english.BibleVbl=Versión Biblia Libre (free license CC BY-SA 4.0)
+spanish.PackagePageTitle=Paquete de Biblias propio
+english.PackagePageTitle=Your own Bible package
+spanish.PackagePageSubtitle=¿Tenés un paquete de Biblias (.ecbiblias)?
+english.PackagePageSubtitle=Do you have a Bible package (.ecbiblias)?
+spanish.PackagePageLabel=Es el archivo que se arma con «Exportar paquete de Biblias» en otra computadora tuya, para llevar las Biblias con derechos que ya tenés (RVR1960, NVI...). Si lo elegís, la primera vez que abras el programa se abre la ventana para traerlas. Usalo sólo en tus propias computadoras. Si no tenés uno, dejá el campo vacío y seguí.
+english.PackagePageLabel=This is the file made by «Export Bible package» on another computer of yours, to carry the Bibles with copyright you already have (RVR1960, NIV...). If you choose one, the first time you open the program a window opens to bring them in. Use it only on your own computers. If you have none, leave the field empty and continue.
+spanish.PackageFileCaption=Archivo del paquete (opcional):
+english.PackageFileCaption=Package file (optional):
+spanish.PackageFileFilter=Paquete de Biblias (*.ecbiblias)|*.ecbiblias
+english.PackageFileFilter=Bible package (*.ecbiblias)|*.ecbiblias
+spanish.PackageFileInvalid=El archivo elegido no existe o no es un paquete de Biblias (.ecbiblias). Elegí otro o dejá el campo vacío.
+english.PackageFileInvalid=The chosen file does not exist or is not a Bible package (.ecbiblias). Choose another or leave the field empty.
+
+[Messages]
+; La página de componentes sólo sirve para elegir Biblias, así que habla de eso.
+spanish.WizardSelectComponents=Biblias
+english.WizardSelectComponents=Bibles
+spanish.SelectComponentsDesc=¿Qué Biblias querés tener instaladas?
+english.SelectComponentsDesc=Which Bibles do you want installed?
+spanish.SelectComponentsLabel2=Tildá las Biblias libres que querés. Las que tienen derechos (RVR1960, NVI...) no se pueden repartir con el instalador. Más adelante se pueden traer o borrar desde el programa.
+english.SelectComponentsLabel2=Tick the free Bibles you want. Bibles with copyright (RVR1960, NIV...) cannot be shipped with the installer. You can add or remove more later from the program.
+
+; Sólo Biblias de dominio público o con licencia que permite redistribuir (ver
+; installer\bibles\LICENCIAS.md). Una casilla por versión; la Reina-Valera 1909 viene tildada.
+[Types]
+Name: "estandar"; Description: "{cm:TypeBiblesStandard}"
+Name: "todas"; Description: "{cm:TypeBiblesAll}"
+Name: "ninguna"; Description: "{cm:TypeBiblesNone}"
+Name: "personalizada"; Description: "{cm:TypeBiblesCustom}"; Flags: iscustom
+
+[Components]
+Name: "rv1909"; Description: "{cm:BibleRv1909}"; Types: estandar todas
+Name: "blm"; Description: "{cm:BibleBlm}"; Types: todas
+Name: "vbl"; Description: "{cm:BibleVbl}"; Types: todas
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
@@ -64,6 +112,16 @@ Root: HKCU; Subkey: "Software\EcclesiaCast"; Flags: uninsdeletekeyifempty
 [Files]
 ; Todo el resultado de `dotnet publish` (incluye .NET y las librerías de VLC)
 Source: "..\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; Las Biblias que se eligieron: el programa las trae a su biblioteca al arrancar
+; (las que todavía no tiene) y deja anotado cuáles, para no volver a traer una borrada.
+Source: "bibles\RV1909.ecbiblias"; DestDir: "{app}\bibles"; Flags: ignoreversion; Components: rv1909
+Source: "bibles\BLM.ecbiblias"; DestDir: "{app}\bibles"; Flags: ignoreversion; Components: blm
+Source: "bibles\VBL.ecbiblias"; DestDir: "{app}\bibles"; Flags: ignoreversion; Components: vbl
+; El paquete propio del operador (con las Biblias con derechos que ya tiene) va a una
+; carpeta aparte: las libres se traen solas al arrancar, éste en cambio abre la ventana
+; de importar, una sola vez. Se puede pasar por línea de comandos: /PAQUETE="C:\ruta\x.ecbiblias"
+Source: "{code:PackagePath}"; DestDir: "{app}\bibles\paquete"; DestName: "paquete-de-biblias.ecbiblias"; \
+    Flags: external ignoreversion; Check: HasPackage
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\EcclesiaCast.App.exe"
@@ -93,6 +151,44 @@ const
 
 var
   WebView2Downloaded: Boolean;
+  PackagePage: TInputFileWizardPage;
+
+{ The optional page for the operator's own Bible package, right after the Bibles page. }
+procedure InitializeWizard;
+begin
+  PackagePage := CreateInputFilePage(wpSelectComponents,
+    CustomMessage('PackagePageTitle'), CustomMessage('PackagePageSubtitle'),
+    CustomMessage('PackagePageLabel'));
+  PackagePage.Add(CustomMessage('PackageFileCaption'), CustomMessage('PackageFileFilter'), '.ecbiblias');
+end;
+
+{ The package to copy: the one chosen on the page or, in a silent install, /PAQUETE=. }
+function PackagePath(Param: String): String;
+begin
+  Result := Trim(PackagePage.Values[0]);
+  if Result = '' then
+    Result := Trim(ExpandConstant('{param:PAQUETE|}'));
+end;
+
+function HasPackage: Boolean;
+var
+  Path: String;
+begin
+  Path := PackagePath('');
+  Result := (Path <> '') and FileExists(Path) and
+            (CompareText(ExtractFileExt(Path), '.ecbiblias') = 0);
+end;
+
+{ A file typed by hand that is not there (or is not a package) is told, not ignored. }
+function NextButtonClick(CurPageID: Integer): Boolean;
+begin
+  Result := True;
+  if (CurPageID = PackagePage.ID) and (Trim(PackagePage.Values[0]) <> '') and not HasPackage then
+  begin
+    MsgBox(CustomMessage('PackageFileInvalid'), mbError, MB_OK);
+    Result := False;
+  end;
+end;
 
 function IsWebView2Installed: Boolean;
 var

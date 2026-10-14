@@ -84,4 +84,4 @@ Se agradecen issues y pull requests: leé [CONTRIBUTING.md](CONTRIBUTING.md).
 
 [GPL-3.0](LICENSE) — EcclesiaCast es y será siempre software libre.
 
-> Nota sobre las Biblias: el programa importa el archivo que tengas, pero las traducciones tienen sus propios derechos de autor. El repositorio no distribuye traducciones con copyright.
+> Nota sobre las Biblias: el programa importa el archivo que tengas, pero las traducciones tienen sus propios derechos de autor. El repositorio no distribuye traducciones con copyright: el instalador sólo trae Biblias de dominio público o con licencia libre (origen y licencia de cada una en `installer/bibles/LICENCIAS.md`).

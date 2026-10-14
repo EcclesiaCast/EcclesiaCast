@@ -37,6 +37,33 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
       teclas F1 a F4 y Esc siguen funcionando en los dos diseños. 4) Cerrá y
       abrí el programa: queda el diseño que elegiste. 5) «Volver al diseño
       original» vuelve al de aprendizaje.
+- [ ] **Biblias en el instalador (Tramo G).** Hace falta instalar de verdad (en
+      una PC de prueba o una máquina virtual, no sobre la tuya):
+      1. En el instalador aparece la página **Biblias** con cuatro tipos
+         (estándar, todas, ninguna, elegir una por una). Con «estándar» sólo
+         queda tildada la Reina-Valera 1909.
+      2. Al abrir el programa por primera vez, abajo dice qué Biblias se
+         instalaron, y están en la lista de versiones de la pestaña Biblia
+         (proyectá Juan 3:16 con cada una).
+      3. Borrá una versión, cerrá y abrí el programa: **no** tiene que volver.
+      4. Reinstalá o actualizá (también en silencio, como hace la
+         actualización automática): no tiene que duplicar ninguna ni traer de
+         vuelta la que borraste. Ojo: quien actualiza desde una beta anterior
+         recibe la RV1909 una vez, porque nunca eligió nada.
+- [ ] **Paquetes de Biblias (Tramo G, parte 2).**
+      1. **Archivo → Exportar paquete de Biblias…**: aparece la lista con las
+         versiones instaladas y el aviso amarillo. Marcá dos y guardá. También
+         está en el clic derecho sobre una versión.
+      2. En otra carpeta de datos (o borrando una versión antes), **Archivo →
+         Importar paquete de Biblias…**: la que ya está sale destildada y con
+         «ya está en la biblioteca»; las otras se importan y abajo lo dice.
+      3. En el instalador, la página **Paquete de Biblias propio** (después de
+         la de Biblias): elegí el archivo; al abrir el programa por primera
+         vez tiene que aparecer la ventana de importar, y **no** de nuevo al
+         abrirlo otra vez. Probá también escribir a mano un archivo que no
+         existe: el instalador tiene que avisar y no seguir.
+      4. Instalación en silencio con `/PAQUETE="C:\ruta\Biblias.ecbiblias"`.
+
 - [ ] **Zoom y corrimiento sobre la imagen entera («Rellenar»).** Es lo más
       importante de esta tanda. Poné una **página vertical** (la tapa de un
       manual) en «Rellenar» y abrí Propiedades:
