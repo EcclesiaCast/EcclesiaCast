@@ -215,6 +215,13 @@
                           IsChecked="{Binding IsLowPerformance, Mode=TwoWay}"
                           ToolTip="Para computadoras viejas o sin placa de video: las transiciones cortan, el panel LIVE muestra la imagen fija del video y las vistas previas se dibujan sin sombra ni contorno. Lo que ve la congregación conserva su diseño."/>
                 <Separator/>
+                <!-- Con los atajos a la vista (F1, Esc…) o sin ellos, con menos texto.
+                     Cambia sólo lo que se lee en la ventana: los atajos andan en los dos. -->
+                <MenuItem x:Name="LearningModeItem" Header="Diseño de aprendizaje (con atajos a la vista)"
+                          IsCheckable="True" Click="LearningMode_Click"/>
+                <MenuItem x:Name="AdvancedModeItem" Header="Diseño avanzado (menos texto, sin atajos)"
+                          IsCheckable="True" Click="AdvancedMode_Click"/>
+                <Separator/>
                 <MenuItem Header="Volver al diseño original" Click="ResetLayout_Click"/>
             </MenuItem>
 
@@ -287,7 +294,7 @@
 
                 <StackPanel DockPanel.Dock="Left" Orientation="Horizontal"
                             VerticalAlignment="Center" Margin="24,0,0,0">
-                    <Button Content="Black  (F1)" Command="{Binding ToggleBlackCommand}"
+                    <Button Content="Black" controls:ShortcutHint.Text="F1" Command="{Binding ToggleBlackCommand}"
                             ToolTip="Pantalla en negro: tapa todo (letra y fondo) sin apagar la salida.">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
@@ -300,7 +307,7 @@
                             </Style>
                         </Button.Style>
                     </Button>
-                    <Button Content="Clear  (F2)" Command="{Binding ToggleClearCommand}" Margin="6,0,0,0"
+                    <Button Content="Clear" controls:ShortcutHint.Text="F2" Command="{Binding ToggleClearCommand}" Margin="6,0,0,0"
                             ToolTip="Saca la letra de la pantalla y deja el fondo (imagen o video) a la vista. Se vuelve a apretar para traer la letra de nuevo.">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
@@ -314,7 +321,7 @@
                         </Button.Style>
                     </Button>
                     <!-- Logo: el botón lo prende/apaga, la flecha elige cuál -->
-                    <Button Content="Logo  (F3)" Command="{Binding ToggleLogoCommand}" Margin="6,0,0,0"
+                    <Button Content="Logo" controls:ShortcutHint.Text="F3" Command="{Binding ToggleLogoCommand}" Margin="6,0,0,0"
                             ToolTip="{Binding ActiveLogoName, StringFormat='Muestra el logo a pantalla completa. Ahora está elegido: {0}'}">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
@@ -340,7 +347,7 @@
                             Command="{Binding UseLogoAsBackgroundCommand}"
                             IsEnabled="{Binding CanUseLogoAsBackground}"
                             ToolTip="Poner el logo de fondo, detrás de la letra, con el desenfoque que tenga configurado"/>
-                    <Button Content="Sin fondo  (F4)" Margin="6,0,0,0"
+                    <Button Content="Sin fondo" controls:ShortcutHint.Text="F4" Margin="6,0,0,0"
                             Style="{StaticResource DarkButton}"
                             Command="{Binding ClearBackgroundCommand}"
                             IsEnabled="{Binding HasBackground}"
@@ -420,7 +427,8 @@
                                 <Setter Property="BorderThickness" Value="0"/>
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsProjecting}" Value="True">
-                                        <Setter Property="Content" Value="Apagar salida  (Esc)"/>
+                                        <Setter Property="Content" Value="Apagar salida"/>
+                                        <Setter Property="controls:ShortcutHint.Text" Value="Esc"/>
                                         <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
                                         <Setter Property="BorderThickness" Value="1"/>
                                     </DataTrigger>
@@ -732,6 +740,7 @@
 
                                 <!-- Que el Ctrl+clic no quede escondido en el globito -->
                                 <TextBlock DockPanel.Dock="Top" Margin="12,0,12,6"
+                                           Style="{StaticResource LearningHint}"
                                            Text="Ctrl+clic: sumar una segunda versión"
                                            FontSize="10" Foreground="{StaticResource FaintBrush}"/>
 
@@ -1184,6 +1193,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <!-- Qué hay en la grilla y, si es otra cosa, qué está en pantalla -->
@@ -1229,7 +1239,8 @@
                             </TextBlock>
                             <ScrollViewer x:Name="SlidesScroll" VerticalScrollBarVisibility="Auto" Padding="6" Background="Transparent"
                                           AllowDrop="True" DragOver="SlidesScroll_DragOver"
-                                          DragLeave="SlidesScroll_DragLeave" Drop="SlidesScroll_Drop">
+                                          DragLeave="SlidesScroll_DragLeave" Drop="SlidesScroll_Drop"
+                                          PreviewMouseWheel="SlidesScroll_PreviewMouseWheel">
                                 <ItemsControl x:Name="SlideGrid" ItemsSource="{Binding Slides}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -1277,7 +1288,9 @@
                                                 </Button.ContextMenu>
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="Button">
-                                                        <Border x:Name="card" Width="220" Height="118" Margin="6"
+                                                        <Border x:Name="card" Margin="6"
+                                                                Width="{Binding DataContext.SlideCardWidth, ElementName=SlideGrid}"
+                                                                Height="{Binding DataContext.SlideCardHeight, ElementName=SlideGrid}"
                                                                 CornerRadius="6" Background="#10141E"
                                                                 BorderBrush="{StaticResource LineBrush}"
                                                                 BorderThickness="1" Padding="10">
@@ -1285,16 +1298,18 @@
                                                                 <!-- Todas las tarjetas del mismo tamaño: la letra
                                                                      se achica hasta que entra entera -->
                                                                 <TextBlock Text="{Binding PreviewText}"
-                                                                           FontSize="12" Foreground="White"
+                                                                           FontSize="{Binding DataContext.SlideCardFontSize, ElementName=SlideGrid}"
+                                                                           Foreground="White"
                                                                            TextWrapping="Wrap"
-                                                                           controls:TextFit.MaxFontSize="12"/>
+                                                                           controls:TextFit.MaxFontSize="{Binding DataContext.SlideCardFontSize, ElementName=SlideGrid}"/>
                                                                 <!-- El rótulo va en la esquina, encima del texto,
                                                                      para no robarle un renglón arriba -->
                                                                 <Border HorizontalAlignment="Right" VerticalAlignment="Bottom"
                                                                         Margin="0,0,-6,-6" Padding="5,1"
                                                                         CornerRadius="4" Background="#E6262D3D">
                                                                     <TextBlock Text="{Binding Label}"
-                                                                               FontSize="10" FontWeight="SemiBold"
+                                                                               FontSize="{Binding DataContext.SlideLabelFontSize, ElementName=SlideGrid}"
+                                                                               FontWeight="SemiBold"
                                                                                Foreground="{StaticResource MutedBrush}"/>
                                                                 </Border>
                                                             </Grid>
@@ -1351,7 +1366,18 @@
                     <!-- Una página web en lugar de la grilla («🌐 Web» en la barra de
                          medios). Se crea al abrirla por primera vez; mientras está en
                          vivo y cerrada sigue ahí, invisible: ver SyncWebPanel. -->
-                    <controls:WebPanel x:Name="WebPanelView" Grid.RowSpan="2" Visibility="Collapsed"/>
+                    <!-- Tamaño de las diapositivas: al pie de la grilla. Sólo cambia cómo se
+                         ven las tarjetas; Ctrl + rueda del mouse hace lo mismo. -->
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right"
+                                Margin="12,0,12,8">
+                        <TextBlock Text="🔍" FontSize="12" Foreground="{StaticResource MutedBrush}"
+                                   VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <Slider Width="110" Minimum="0.6" Maximum="1.8" TickFrequency="0.1"
+                                IsSnapToTickEnabled="True" Value="{Binding SlideCardScale}"
+                                AutomationProperties.Name="Tamaño de las diapositivas"
+                                ToolTip="Tamaño de las diapositivas. También: Ctrl + rueda del mouse sobre la grilla."/>
+                    </StackPanel>
+                    <controls:WebPanel x:Name="WebPanelView" Grid.RowSpan="3" Visibility="Collapsed"/>
                 </Grid>
             </Border>
 
@@ -1498,7 +1524,7 @@
                             <!-- ── Texto rápido ── -->
                             <DockPanel Visibility="{Binding IsChecked, ElementName=TabQuick, Converter={StaticResource BoolToVis}}">
                                 <Button DockPanel.Dock="Bottom"
-                                        Content="Proyectar ▶  (Ctrl+Enter)"
+                                        Content="Proyectar ▶" controls:ShortcutHint.Text="Ctrl+Enter"
                                         Style="{StaticResource AccentButton}"
                                         Command="{Binding GoLiveCommand}"
                                         Margin="12,8,12,12" Padding="10,8"
@@ -1531,6 +1557,7 @@
                             <!-- ── Aviso al pie ── -->
                             <DockPanel Visibility="{Binding IsChecked, ElementName=TabOverlay, Converter={StaticResource BoolToVis}}">
                                 <TextBlock DockPanel.Dock="Top"
+                                           Style="{StaticResource LearningHint}"
                                            Text="Aparece en una franja abajo, por encima de todo — incluso con Black puesto."
                                            FontSize="11" Foreground="{StaticResource FaintBrush}"
                                            TextWrapping="Wrap" Margin="12,0,12,8"/>
@@ -1572,6 +1599,7 @@
                             <!-- ── Resaltar en vivo ── -->
                             <DockPanel Visibility="{Binding IsChecked, ElementName=TabHighlight, Converter={StaticResource BoolToVis}}">
                                 <TextBlock DockPanel.Dock="Top"
+                                           Style="{StaticResource LearningHint}"
                                            Text="Escribí una o varias palabras o frases separadas por ; («gracia; fe») y se pintan al instante en todas las veces que aparecen. También podés marcar con el mouse sobre el LIVE: ahí se resalta sólo esa vez, y con Shift se suman más."
                                            FontSize="11" Foreground="{StaticResource FaintBrush}"
                                            TextWrapping="Wrap" Margin="12,0,12,8"/>
@@ -1783,7 +1811,8 @@
                                                 Tag="Mute" Click="MusicKey_Click"
                                                 AutomationProperties.Name="Silenciar" ToolTip="Silenciar o volver a oír"/>
                                     </UniformGrid>
-                                    <TextBlock Text="Estos botones manejan el Spotify instalado en esta computadora (o el reproductor que esté abierto). El volumen es el de toda la computadora, el mismo que sale por el proyector."
+                                    <TextBlock Style="{StaticResource LearningHint}"
+                                               Text="Estos botones manejan el Spotify instalado en esta computadora (o el reproductor que esté abierto). El volumen es el de toda la computadora, el mismo que sale por el proyector."
                                                FontSize="10.5" Foreground="{StaticResource FaintBrush}"
                                                TextWrapping="Wrap" Margin="0,8,0,0"/>
                                 </StackPanel>
@@ -1924,6 +1953,7 @@
                             <!-- ── Notas para la plataforma ── -->
                             <DockPanel Visibility="{Binding IsChecked, ElementName=TabNotes, Converter={StaticResource BoolToVis}}">
                                 <TextBlock DockPanel.Dock="Top"
+                                           Style="{StaticResource LearningHint}"
                                            Text="Sólo se ven en la pantalla de escenario: el guion del predicador, un aviso para la banda. La congregación nunca las ve."
                                            FontSize="11" Foreground="{StaticResource FaintBrush}"
                                            TextWrapping="Wrap" Margin="12,0,12,8"/>
@@ -2043,6 +2073,15 @@
                      Una lista en vez de una fila: entran más nombres, y se
                      lee cuál está elegida de un vistazo. -->
                 <DockPanel DockPanel.Dock="Left" Width="118" Margin="10,2,0,6">
+                    <!-- Tamaño de los medios: abajo de las pestañas (Ctrl + rueda también) -->
+                    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,6,0,0">
+                        <TextBlock Text="🔍" FontSize="11" Foreground="{StaticResource MutedBrush}"
+                                   VerticalAlignment="Center" Margin="0,0,4,0"/>
+                        <Slider Width="92" Minimum="0.7" Maximum="2.5" TickFrequency="0.1"
+                                IsSnapToTickEnabled="True" Value="{Binding MediaCardScale}"
+                                AutomationProperties.Name="Tamaño de los medios"
+                                ToolTip="Tamaño de las tarjetas de medios. También: Ctrl + rueda del mouse sobre la barra."/>
+                    </StackPanel>
                     <ListBox x:Name="MediaTabsList" ItemsSource="{Binding MediaTabs}" SelectedItem="{Binding SelectedMediaTab}"
                              Background="Transparent" BorderThickness="0"
                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -2126,7 +2165,8 @@
                                   PreviewMouseLeftButtonDown="MediaScroll_PreviewMouseLeftButtonDown"
                                   PreviewMouseMove="MediaScroll_PreviewMouseMove"
                                   PreviewMouseLeftButtonUp="MediaScroll_PreviewMouseLeftButtonUp"
-                                  LostMouseCapture="MediaScroll_LostMouseCapture">
+                                  LostMouseCapture="MediaScroll_LostMouseCapture"
+                                  PreviewMouseWheel="MediaScroll_PreviewMouseWheel">
                         <ItemsControl x:Name="MediaCards" ItemsSource="{Binding MediaItems}" Margin="0,0,0,6">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate><WrapPanel Orientation="Horizontal"/></ItemsPanelTemplate>
@@ -2149,7 +2189,9 @@
                                             ToolTip="{Binding Name}">
                                         <Button.Template>
                                             <ControlTemplate TargetType="Button">
-                                                <Border x:Name="card" Width="98" Height="56" CornerRadius="4"
+                                                <Border x:Name="card" CornerRadius="4"
+                                                        Width="{Binding DataContext.MediaCardWidth, ElementName=MediaScroll}"
+                                                        Height="{Binding DataContext.MediaCardHeight, ElementName=MediaScroll}"
                                                         Background="#10141E"
                                                         BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
                                                         Tag="{Binding DataContext, ElementName=MediaScroll}"
@@ -2157,9 +2199,10 @@
                                                     <Grid>
                                                         <!-- Con el encuadre real: escala, zoom, corrimiento, tamaño fijo, relleno,
                                                              brillo y tinte, igual que en la pantalla (sin desenfoque: no se nota acá) -->
-                                                        <controls:FramedMediaPreview x:Name="preview" Media="{Binding}" DecodeWidth="240"/>
+                                                        <controls:FramedMediaPreview x:Name="preview" Media="{Binding}" DecodeWidth="320"/>
                                                         <Border Background="#66000000" VerticalAlignment="Bottom" Padding="4,1">
-                                                            <TextBlock Text="{Binding Name}" FontSize="9" Foreground="White"
+                                                            <TextBlock Text="{Binding Name}" Foreground="White"
+                                                                       FontSize="{Binding DataContext.MediaNameFontSize, ElementName=MediaScroll}"
                                                                        TextTrimming="CharacterEllipsis"/>
                                                         </Border>
                                                         <TextBlock Text="🎞" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"

@@ -137,6 +137,7 @@ public partial class MainWindow : Window
         if (ReadDouble(LayoutMediaKey) is double media)
             _mediaHeight = media;
         RestoreLayoutOptions();
+        RestoreUiMode();
 
         if (settings.Get(LayoutWindowKey)?.Split(';') is [var w, var h, var state]
             && double.TryParse(w, out var width) && double.TryParse(h, out var height))

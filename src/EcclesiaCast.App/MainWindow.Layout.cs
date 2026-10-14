@@ -278,5 +278,8 @@ public partial class MainWindow
         _mediaHeight = 170;
         ApplyLayout();
         SaveLayoutOptions();
+
+        // Vuelve también al diseño de aprendizaje: es el que trae el programa.
+        SetUiMode(advanced: false);
     }
 }
