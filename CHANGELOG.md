@@ -446,6 +446,12 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   **ANTERIOR** y **SIGUIENTE** dicen a qué capítulo llevan. Las canciones
   siguen diciendo que se pueden arrastrar.
 
+- **La imagen del tema no tapa al medio elegido.** Si el tema tenía una imagen
+  de fondo (como el de la Biblia), esa imagen quedaba encima del video o de la
+  foto que el operador había puesto, y se veía la del tema. Ahora, mientras hay
+  un medio en pantalla, gana el medio; la imagen del tema vuelve cuando se
+  quita el medio.
+
 - **Varios cuadros de texto en una diapositiva del diseñador.** Con más de un
   cuadro sólo se podía editar el que elegías en la lista de la derecha, y el
   marco grande de la letra quedaba encima de los cuadros chicos sin dejar

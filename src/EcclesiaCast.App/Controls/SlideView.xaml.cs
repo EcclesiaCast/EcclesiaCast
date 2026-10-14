@@ -296,7 +296,7 @@ public partial class SlideView : UserControl
             ? Brushes.Transparent
             : BrushFromHex(theme.BackgroundColor, "#10141E");
         ApplyBackgroundImage(theme.BackgroundImagePath);
-        DimLayer.Opacity = Math.Clamp(theme.BackgroundDim, 0, 1);
+        ApplyThemeBackdrop();
 
         TextStack.HorizontalAlignment = EffectiveAlignH switch
         {
@@ -430,7 +430,6 @@ public partial class SlideView : UserControl
                 if (bitmap.CanFreeze)
                     bitmap.Freeze();
                 BackgroundImage.Source = bitmap;
-                BackgroundImage.Visibility = Visibility.Visible;
                 return;
             }
             catch
@@ -440,7 +439,22 @@ public partial class SlideView : UserControl
         }
 
         BackgroundImage.Source = null;
-        BackgroundImage.Visibility = Visibility.Collapsed;
+    }
+
+    /// <summary>
+    /// Shows the theme's image and dimmer behind the words, unless a media is
+    /// on screen: then the media wins and the image steps aside. The dimmer
+    /// only stays up while the words are shown, so it can't darken the media
+    /// alone.
+    /// </summary>
+    private void ApplyThemeBackdrop()
+    {
+        BackgroundImage.Visibility = !_overMedia && BackgroundImage.Source != null
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+        DimLayer.Opacity = _overMedia && State != OutputState.Content
+            ? 0
+            : Math.Clamp(CurrentTheme.BackgroundDim, 0, 1);
     }
 
     private static Brush BrushFromHex(string hex, string fallback) =>
@@ -782,6 +796,7 @@ public partial class SlideView : UserControl
         TextLayer.Visibility = contentVisible;
         CaptionLayer.Visibility = contentVisible;
         LogoLayer.Visibility = State == OutputState.Logo ? Visibility.Visible : Visibility.Collapsed;
+        ApplyThemeBackdrop();
 
         var blackTarget = State == OutputState.Black ? 1d : 0d;
         if (AnimateTransitions)
