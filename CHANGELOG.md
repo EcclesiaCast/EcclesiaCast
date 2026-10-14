@@ -451,6 +451,12 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Corregido
 
+- **El logo y el negro tapan también a un video de YouTube.** Con un YouTube
+  sin descargar en pantalla, F3 (logo) y F1 (negro) no lo tapaban: había que
+  cambiar a otro medio para que el logo se viera. Ahora, mientras el logo o el
+  negro están en pantalla, el YouTube se esconde y se pausa (no suena por
+  detrás), y al volver sigue desde donde estaba.
+
 - **El aviso de cada tarjeta de la grilla dice lo que hace.** En la Biblia el
   globo de ayuda decía «Arrastrar: cambiarla de lugar», pero los versículos y
   los capítulos no se pueden arrastrar. Ahora cada tarjeta muestra lo suyo: el

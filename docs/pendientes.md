@@ -156,6 +156,12 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
       6. Si decís que no al permiso de administrador de Windows, el aviso
          tiene que quedarse abierto diciendo que no se instaló nada.
 
+- [ ] **Tramo A (salida)** — programado sin abrir el programa:
+      1. **YouTube y el logo.** Poné un YouTube sin descargar y apretá F3: se
+         tiene que ver el logo (no el video) y el sonido tiene que callarse.
+         F3 de nuevo: el video vuelve y sigue donde estaba. Lo mismo con F1
+         (negro). Mirá que la barra de reproducción siga mandando al YouTube.
+
 ## 2. Para la v1.0.0
 
 - [ ] **Usar la beta.7 en la reunión del domingo** y anotar lo que falle o no

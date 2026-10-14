@@ -105,7 +105,35 @@ public partial class OutputWindow : Window
         else if (e.PropertyName == nameof(ProjectionViewModel.BackgroundBlur))
             SetBlur((DataContext as ProjectionViewModel)?.BackgroundBlur ?? 0);
         else if (e.PropertyName is nameof(ProjectionViewModel.ActiveLogo) or nameof(ProjectionViewModel.State))
+        {
             UpdateLogoVideo();
+            if (e.PropertyName == nameof(ProjectionViewModel.State))
+                UpdateYouTubeCover();
+        }
+    }
+
+    /// <summary>
+    /// YouTube runs in a WebView2, a native window that Windows always draws
+    /// above anything WPF paints — so the logo and the black screen, which are
+    /// WPF, cannot cover it. While one of them is meant to be on screen the
+    /// player is hidden (and paused, so it doesn't keep sounding behind it).
+    /// </summary>
+    private void UpdateYouTubeCover()
+    {
+        var vm = DataContext as ProjectionViewModel;
+        if (vm?.Background is not { Type: MediaType.YouTube })
+            return;
+
+        if (vm.State is OutputState.Logo or OutputState.Black)
+        {
+            YouTube.Visibility = Visibility.Hidden;
+            YouTube.PauseForCover();
+        }
+        else
+        {
+            YouTube.Visibility = Visibility.Visible;
+            YouTube.ResumeAfterCover();
+        }
     }
 
     /// <summary>
@@ -154,6 +182,7 @@ public partial class OutputWindow : Window
             Video.Show(null);
             YouTube.Visibility = Visibility.Visible;
             YouTube.Play(background);
+            UpdateYouTubeCover();
         }
         else
         {
@@ -238,7 +267,10 @@ public partial class OutputWindow : Window
 
     // ── Transporte y desenfoque del fondo ────────────────────────
 
-    private bool IsYouTubeShowing => YouTube.Visibility == Visibility.Visible;
+    // Not the surface's Visibility: while the logo or black covers it the player
+    // is hidden but still the one the play bar must talk to, not VLC.
+    private bool IsYouTubeShowing =>
+        (DataContext as ProjectionViewModel)?.Background?.Type == MediaType.YouTube;
 
     /// <summary>Where the projected video is, whichever player is showing it.</summary>
     public PlaybackState PlaybackState => IsYouTubeShowing ? YouTube.State : Video.State;
