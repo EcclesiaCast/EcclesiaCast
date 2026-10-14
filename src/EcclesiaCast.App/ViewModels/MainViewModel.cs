@@ -2479,12 +2479,13 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     [RelayCommand]
     private async Task UseMediaAsLogoAsync(MediaItem? item)
     {
-        // A rendered PDF/PPT page goes away with its media, which would leave
-        // the logo pointing at a missing file.
+        // A rendered PDF/PPT page, or the video made from a GIF, goes away
+        // with its media, which would leave the logo pointing at a missing file.
         if (item is null
             || item.Type is not (MediaType.Image or MediaType.Video)
             || string.IsNullOrWhiteSpace(item.Path)
-            || DocumentImporter.IsRenderedPage(item.Path))
+            || DocumentImporter.IsRenderedPage(item.Path)
+            || GifImporter.IsConverted(item.Path))
             return;
 
         var existing = Logos.FirstOrDefault(l =>
