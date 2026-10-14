@@ -137,6 +137,7 @@ public sealed partial class MainViewModel
         NoteAction($"Proyectar en vivo la ventana guardada «{saved.Name}»");
         if (!WindowCaptureService.Start(window, _settings.Get(WindowCursorKey) == "1", out var error))
         {
+            DropDeadWindowCapture();
             StatusText = error ?? "No se pudo proyectar esa ventana.";
             return;
         }
@@ -148,6 +149,18 @@ public sealed partial class MainViewModel
         ApplyBackgroundCore(live);
         LiveTitle = $"🖥 {window.Title} (en vivo)";
         StatusText = $"«{window.Title}» en vivo: la pantalla muestra esa ventana.";
+    }
+
+    /// <summary>
+    /// A capture that failed to start may have stopped the one that was live
+    /// (the video card gave up after the old one was freed): the screen is
+    /// black then, so the window card and the «en vivo» title must go too.
+    /// A refusal that left the old capture running changes nothing.
+    /// </summary>
+    private void DropDeadWindowCapture()
+    {
+        if (IsWindowLive && !WindowCaptureService.IsRunning)
+            ClearBackground();
     }
 
     /// <summary>Frees the capture when the program closes (it holds the video card's resources).</summary>
@@ -165,6 +178,7 @@ public sealed partial class MainViewModel
             NoteAction($"Proyectar en vivo la ventana «{window.Title}»");
             if (!capture.Start(window, pick.ShowCursor, out var error))
             {
+                DropDeadWindowCapture();
                 StatusText = error ?? "No se pudo proyectar esa ventana.";
                 return;
             }
@@ -179,8 +193,14 @@ public sealed partial class MainViewModel
             var (name, error) = await capture.StartFromPickerAsync(owner, pick.ShowCursor);
             if (name is null)
             {
+                // Cancelling the picker leaves the capture alone; a failure
+                // after it stopped the old one.
                 if (error is not null)
+                {
+                    DropDeadWindowCapture();
                     StatusText = error;
+                }
+
                 return;
             }
 

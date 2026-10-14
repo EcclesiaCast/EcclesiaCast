@@ -97,7 +97,13 @@ public sealed class WindowCapture : IWindowCapture
 
     public bool Start(RawWindow window, bool showCursor, out string? error)
     {
-        Stop();
+        const string refused = "Windows no dejó capturar esa ventana. Si es de un programa abierto «como administrador», " +
+                               "tiene que abrirse EcclesiaCast también así, o probá con otra.";
+
+        // The one already being captured keeps going until the new window is
+        // known to be capturable: a refusal must not leave the screen black
+        // while everything still says that window is live.
+        GraphicsCaptureItem item;
         try
         {
             if (!WindowNative.IsWindow((nint)window.Handle))
@@ -106,15 +112,25 @@ public sealed class WindowCapture : IWindowCapture
                 return false;
             }
 
-            var item = CreateItemForWindow((nint)window.Handle);
+            item = CreateItemForWindow((nint)window.Handle);
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "No se pudo capturar la ventana «{Title}»", window.Title);
+            error = refused;
+            return false;
+        }
+
+        Stop();
+        try
+        {
             return Begin(item, showCursor, (nint)window.Handle, out error);
         }
         catch (Exception ex)
         {
             Log.Warning(ex, "No se pudo capturar la ventana «{Title}»", window.Title);
             Stop();
-            error = "Windows no dejó capturar esa ventana. Si es de un programa abierto «como administrador», " +
-                    "tiene que abrirse EcclesiaCast también así, o probá con otra.";
+            error = refused;
             return false;
         }
     }
