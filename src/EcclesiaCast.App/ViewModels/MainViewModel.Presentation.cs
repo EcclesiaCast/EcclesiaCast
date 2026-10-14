@@ -272,6 +272,12 @@ public sealed partial class MainViewModel
     private void RemovePageForText()
     {
         var restore = NextSlideBackground.Resolve(_backgroundBeforePages);
+
+        // A live window or web page stopped the moment the first page took the
+        // screen: putting its item back would show a feed that no longer runs.
+        if (restore is { Type: MediaType.Window or MediaType.Web })
+            restore = null;
+
         _presentation.SetBackground(restore, restore is null ? null : ResolveFill(restore));
         _livePageId = 0;
         _backgroundBeforePages = null;
