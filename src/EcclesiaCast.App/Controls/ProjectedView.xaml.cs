@@ -493,21 +493,31 @@ public partial class ProjectedView : UserControl
     /// <summary>
     /// Keeps <paramref name="source"/> drawn underneath the background layer,
     /// with the framing and blur it had. If an older picture is already held
-    /// it stays: it is the one the screen still shows.
+    /// it is replaced only by one that now dominates the screen (see below);
+    /// otherwise it stays, because it is the one the screen still shows.
     /// </summary>
     private void HoldPreviousImage(ImageSource? source, MediaItem? media)
     {
         if (PreviousImage.Visibility == Visibility.Visible)
         {
-            // Already holding one (maybe halfway through fading away): it is
-            // what the screen still shows, so it goes back to full strength.
-            PreviousImage.BeginAnimation(OpacityProperty, null);
-            PreviousImage.Opacity = 1;
+            // Already holding one (A) while another (B) rises over it, and now
+            // a third is about to take B's place. If B is already more than
+            // half drawn it is what the screen shows: hold B and A goes, or
+            // the next fade would start from A and flash a page that was left
+            // behind. B still faint: A is what the screen shows, so it stays
+            // (maybe halfway through fading away, back to full strength).
+            var incomingDominates = source is not null && BackgroundImage.Opacity >= 0.5;
+            if (!incomingDominates)
+            {
+                PreviousImage.BeginAnimation(OpacityProperty, null);
+                PreviousImage.Opacity = 1;
+                return;
+            }
+        }
+        else if (source is null)
+        {
             return;
         }
-
-        if (source is null)
-            return;
 
         PreviousImage.BeginAnimation(OpacityProperty, null);
         PreviousImage.Opacity = 1;
