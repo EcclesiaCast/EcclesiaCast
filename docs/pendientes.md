@@ -181,6 +181,16 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
          vez queda muda, probá **Ver → Reiniciar el sonido**. Si ni eso la
          arregla, avisá: queda mirar el registro (`logs`), donde cada
          cambio de salida deja una línea.
+      4. **Transiciones en segundos.** Abrí **Proyección → Transiciones…**:
+         poné el logo en 2 s y apretá F3 / F3 (tiene que subir y bajar
+         despacio, también con un logo de video); el negro (F1) en 1 s;
+         «Apagar la salida» en 2 s y apretá Esc (la pantalla se va a negro y
+         recién después se cierra; si apretás algo para proyectar en el
+         medio, vuelve). Con un YouTube en pantalla, F3 y Esc lo esconden de
+         golpe: es lo esperado. «Valores de fábrica» vuelve a 0,5 / 0,4 /
+         0,25 / 0. En **Temas** mirá que la duración de la transición ahora
+         esté en segundos y que un tema viejo (280 ms) diga 0,28. Con el
+         modo de bajo rendimiento todo tiene que cortar de golpe.
 
 ## 2. Para la v1.0.0
 

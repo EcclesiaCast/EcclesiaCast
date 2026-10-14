@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Media.Animation;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.App.ViewModels;
 using EcclesiaCast.Core.Displays;
@@ -39,14 +40,19 @@ public partial class OutputWindow : Window
         Loaded += (_, _) =>
         {
             PerformanceMode.Changed += OnPerformanceChanged;
+            TransitionSettings.Changed += OnPerformanceChanged;
             ApplyPerformance();
         };
-        Closed += (_, _) => PerformanceMode.Changed -= OnPerformanceChanged;
+        Closed += (_, _) =>
+        {
+            PerformanceMode.Changed -= OnPerformanceChanged;
+            TransitionSettings.Changed -= OnPerformanceChanged;
+        };
     }
 
     /// <summary>How long one medium takes to give way to the next; zero in «bajo rendimiento».</summary>
     private static TimeSpan MediaFade =>
-        PerformanceMode.IsLow ? TimeSpan.Zero : TimeSpan.FromMilliseconds(320);
+        PerformanceMode.IsLow ? TimeSpan.Zero : TransitionSettings.Current.Media;
 
     private bool _forwardingFrames;
 
@@ -97,9 +103,75 @@ public partial class OutputWindow : Window
     /// <summary>Shows this window fullscreen on the given display.</summary>
     public void ShowOn(DisplayInfo display)
     {
+        // Something was projected while the screen was still fading to black
+        // to switch off: it stays on.
+        CancelFadeOut();
+
         _display = display;
         Show();
         MoveToDisplay();
+    }
+
+    // ── Apagar la salida con fundido ─────────────────────────────
+
+    private int _shutterVersion;
+
+    /// <summary>True while the screen is fading to black before the window closes.</summary>
+    public bool IsFadingOut { get; private set; }
+
+    /// <summary>
+    /// Switches the output off: fades to black over the time set in
+    /// «Transiciones» (if any) and then hides the window. YouTube, being a
+    /// native window that WPF cannot fade, is hidden right away.
+    /// </summary>
+    public void FadeOutAndHide()
+    {
+        if (IsFadingOut)
+            return;
+
+        var fade = PerformanceMode.IsLow ? TimeSpan.Zero : TransitionSettings.Current.Output;
+        if (fade <= TimeSpan.Zero || !IsVisible)
+        {
+            Hide();
+            return;
+        }
+
+        var version = ++_shutterVersion;
+        IsFadingOut = true;
+        if (YouTube.Visibility == Visibility.Visible)
+            YouTube.Visibility = Visibility.Hidden;
+
+        ShutterLayer.Visibility = Visibility.Visible;
+        var animation = new DoubleAnimation(0, 1, fade);
+        animation.Completed += (_, _) =>
+        {
+            if (version != _shutterVersion)
+                return;
+
+            IsFadingOut = false;
+            Hide();
+            ResetShutter();
+        };
+        ShutterLayer.BeginAnimation(OpacityProperty, animation);
+    }
+
+    private void CancelFadeOut()
+    {
+        // The window is hidden with the shutter closed: open it again too.
+        if (!IsFadingOut && ShutterLayer.Visibility != Visibility.Visible && YouTube.Visibility != Visibility.Hidden)
+            return;
+
+        _shutterVersion++;
+        IsFadingOut = false;
+        ResetShutter();
+        UpdateYouTubeCover();
+    }
+
+    private void ResetShutter()
+    {
+        ShutterLayer.BeginAnimation(OpacityProperty, null);
+        ShutterLayer.Opacity = 0;
+        ShutterLayer.Visibility = Visibility.Collapsed;
     }
 
     private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -162,9 +234,56 @@ public partial class OutputWindow : Window
             && logo is { Kind: LogoKind.Video }
             && !string.IsNullOrWhiteSpace(logo.Path);
 
-        LogoVideo.Visibility = showing ? Visibility.Visible : Visibility.Collapsed;
-        LogoVideo.Show(showing ? AsLoopingVideo(logo!) : null);
+        var fade = PerformanceMode.IsLow ? TimeSpan.Zero : TransitionSettings.Current.Logo;
+        var version = ++_logoVideoVersion;
+
+        if (showing)
+        {
+            var wasShown = LogoVideo.Visibility == Visibility.Visible;
+            var from = wasShown ? LogoVideo.Opacity : 0;
+            LogoVideo.Show(AsLoopingVideo(logo!));
+            LogoVideo.Visibility = Visibility.Visible;
+
+            // Fades in only when it was not already up (a change of logo while
+            // the logo is on screen must not blink).
+            if (fade > TimeSpan.Zero && (!wasShown || from < 1))
+            {
+                LogoVideo.BeginAnimation(OpacityProperty, new DoubleAnimation(from, 1, fade));
+            }
+            else
+            {
+                LogoVideo.BeginAnimation(OpacityProperty, null);
+                LogoVideo.Opacity = 1;
+            }
+            return;
+        }
+
+        void Remove()
+        {
+            // Asked for again in the meantime: leave it.
+            if (version != _logoVideoVersion)
+                return;
+
+            LogoVideo.BeginAnimation(OpacityProperty, null);
+            LogoVideo.Opacity = 1;
+            LogoVideo.Visibility = Visibility.Collapsed;
+            LogoVideo.Show(null);
+        }
+
+        // The video keeps playing under its fade; it is stopped when it is gone.
+        if (fade > TimeSpan.Zero && LogoVideo.Visibility == Visibility.Visible)
+        {
+            var away = new DoubleAnimation(LogoVideo.Opacity, 0, fade);
+            away.Completed += (_, _) => Remove();
+            LogoVideo.BeginAnimation(OpacityProperty, away);
+        }
+        else
+        {
+            Remove();
+        }
     }
+
+    private int _logoVideoVersion;
 
     /// <summary>Wraps a video logo as a media item so the VLC surface can play it.</summary>
     private static MediaItem AsLoopingVideo(Logo logo) => new()

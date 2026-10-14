@@ -377,14 +377,15 @@ public partial class ProjectedView : UserControl
                 // «Rellenar» depends on the shape of the picture just loaded.
                 MediaFraming.Apply(BackgroundImage, BackgroundMedia, ActualWidth, ActualHeight);
                 _shownMedia = BackgroundMedia;
-                if (AnimateTransitions && newPicture)
+                var mediaFade = TransitionSettings.Current.Media;
+                if (AnimateTransitions && newPicture && mediaFade > TimeSpan.Zero)
                 {
                     // The new picture rises over the old one, which stays put
                     // until it is fully covered: fading up from nothing made
                     // the old one vanish at once and the change flash black.
                     HoldPreviousImage(previousSource, previousMedia);
                     var version = ++_fadeVersion;
-                    var fade = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(320)) { EasingFunction = new QuadraticEase() };
+                    var fade = new DoubleAnimation(0, 1, mediaFade) { EasingFunction = new QuadraticEase() };
                     fade.Completed += (_, _) =>
                     {
                         if (version != _fadeVersion)
@@ -397,6 +398,8 @@ public partial class ProjectedView : UserControl
                 else if (newPicture)
                 {
                     _fadeVersion++;
+                    // A fade of zero seconds is a cut: no animation may linger.
+                    BackgroundImage.BeginAnimation(OpacityProperty, null);
                     ClearPreviousImage();
                     // After the picture has been drawn, not before.
                     Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded,

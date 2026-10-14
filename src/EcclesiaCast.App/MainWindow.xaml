@@ -240,6 +240,8 @@
                         </Style>
                     </MenuItem.Style>
                 </MenuItem>
+                <MenuItem Header="Transiciones…" Click="Transitions_Click"
+                          ToolTip="Cuántos segundos tardan en aparecer y desaparecer el logo, los cambios de imagen o video, la pantalla negra y el apagado de la salida."/>
                 <MenuItem Header="Controlar desde el celular…" Command="{Binding OpenRemoteCommand}"/>
                 <Separator/>
                 <MenuItem Header="Actualizar la lista de pantallas" Command="{Binding RefreshDisplaysCommand}"/>

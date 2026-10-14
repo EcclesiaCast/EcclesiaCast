@@ -164,6 +164,7 @@ public partial class App : Application
             DataContext = _services.GetRequiredService<MainViewModel>()
         };
         var settings = _services.GetRequiredService<ISettingsStore>();
+        TransitionSettings.Load(settings);
         mainWindow.AttachLayoutPersistence(settings);
 
         // The splash was the first window opened, so WPF took it for the main

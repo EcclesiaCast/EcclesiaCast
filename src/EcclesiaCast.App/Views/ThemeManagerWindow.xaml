@@ -216,10 +216,10 @@
                         <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
                             <TextBlock Text="Duración" FontSize="11" Width="70" VerticalAlignment="Center"
                                        Foreground="{StaticResource MutedBrush}"/>
-                            <controls:NumericField Minimum="0" Maximum="1500" Step="20"
-                                                   Value="{Binding TransitionMs}"
-                                                   ToolTip="En milisegundos. 280 es el fundido de siempre; más de 500 se siente lento"/>
-                            <TextBlock Text="ms" FontSize="11" VerticalAlignment="Center" Margin="6,0,0,0"
+                            <controls:NumericField Minimum="0" Maximum="5" Step="0.1" Decimals="2"
+                                                   Value="{Binding TransitionSeconds}"
+                                                   ToolTip="En segundos. 0,28 es el fundido de siempre; más de 0,5 se siente lento"/>
+                            <TextBlock Text="s" FontSize="11" VerticalAlignment="Center" Margin="6,0,0,0"
                                        Foreground="{StaticResource MutedBrush}"/>
                             <Button Content="▶ Ver ejemplo" FontSize="11" Padding="8,3" Margin="12,0,0,0"
                                     Style="{StaticResource DarkButton}"

@@ -9,6 +9,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Logos;
 using EcclesiaCast.Core.Media;
 using EcclesiaCast.Core.Presentation;
@@ -797,14 +798,22 @@ public partial class SlideView : UserControl
         TextLayer.Visibility = contentVisible;
         CaptionLayer.Visibility = contentVisible;
         ExtraBoxLayer.Visibility = contentVisible;
-        LogoLayer.Visibility = State == OutputState.Logo ? Visibility.Visible : Visibility.Collapsed;
         ApplyThemeBackdrop();
 
         var blackTarget = State == OutputState.Black ? 1d : 0d;
         if (AnimateTransitions)
         {
-            BlackLayer.BeginAnimation(OpacityProperty,
-                new DoubleAnimation(blackTarget, TimeSpan.FromMilliseconds(250)));
+            FadeLogoLayer(State == OutputState.Logo);
+
+            var blackFade = TransitionSettings.Current.Black;
+            if (blackFade > TimeSpan.Zero)
+                BlackLayer.BeginAnimation(OpacityProperty, new DoubleAnimation(blackTarget, blackFade));
+            else
+            {
+                BlackLayer.BeginAnimation(OpacityProperty, null);
+                BlackLayer.Opacity = blackTarget;
+            }
+
             if (State == OutputState.Content)
             {
                 TransitionIn(TextLayer);
@@ -815,8 +824,64 @@ public partial class SlideView : UserControl
         }
         else
         {
+            _logoFadeVersion++;
+            LogoLayer.BeginAnimation(OpacityProperty, null);
+            LogoLayer.Opacity = 1;
+            LogoLayer.Visibility = State == OutputState.Logo ? Visibility.Visible : Visibility.Collapsed;
             BlackLayer.Opacity = blackTarget;
         }
+    }
+
+    private int _logoFadeVersion;
+
+    /// <summary>
+    /// The logo comes in and goes out fading over the time set in «Transiciones».
+    /// On the way out the layer is only taken off once it is invisible, and only
+    /// if the logo has not been asked for again meanwhile.
+    /// </summary>
+    private void FadeLogoLayer(bool show)
+    {
+        var duration = TransitionSettings.Current.Logo;
+        var version = ++_logoFadeVersion;
+        var from = LogoLayer.Visibility == Visibility.Visible ? LogoLayer.Opacity : 0;
+
+        if (show)
+        {
+            LogoLayer.Visibility = Visibility.Visible;
+            if (duration <= TimeSpan.Zero)
+            {
+                LogoLayer.BeginAnimation(OpacityProperty, null);
+                LogoLayer.Opacity = 1;
+            }
+            else
+            {
+                LogoLayer.BeginAnimation(OpacityProperty, new DoubleAnimation(from, 1, duration));
+            }
+            return;
+        }
+
+        if (LogoLayer.Visibility != Visibility.Visible)
+            return;
+
+        void Remove()
+        {
+            if (version != _logoFadeVersion || State == OutputState.Logo)
+                return;
+
+            LogoLayer.BeginAnimation(OpacityProperty, null);
+            LogoLayer.Opacity = 1;
+            LogoLayer.Visibility = Visibility.Collapsed;
+        }
+
+        if (duration <= TimeSpan.Zero)
+        {
+            Remove();
+            return;
+        }
+
+        var fade = new DoubleAnimation(from, 0, duration);
+        fade.Completed += (_, _) => Remove();
+        LogoLayer.BeginAnimation(OpacityProperty, fade);
     }
 
     /// <summary>
@@ -830,10 +895,27 @@ public partial class SlideView : UserControl
         _countdownTicker ??= new DispatcherTimer(
             TimeSpan.FromMilliseconds(250), DispatcherPriority.Normal, (_, _) => RenderCountdown(), Dispatcher);
 
+        var version = ++_countdownVersion;
+
         if (Countdown is null)
         {
             _countdownTicker.Stop();
-            CountdownLayer.Visibility = Visibility.Collapsed;
+
+            void Remove()
+            {
+                if (version != _countdownVersion)
+                    return;
+
+                CountdownLayer.BeginAnimation(OpacityProperty, null);
+                CountdownLayer.Opacity = 1;
+                CountdownLayer.Visibility = Visibility.Collapsed;
+            }
+
+            // Stopped, it fades away with the last time it showed.
+            if (AnimateTransitions && CountdownLayer.Visibility == Visibility.Visible)
+                FadeOut(CountdownLayer, Remove);
+            else
+                Remove();
             return;
         }
 
@@ -844,8 +926,17 @@ public partial class SlideView : UserControl
         RenderCountdown();
 
         if (AnimateTransitions)
+        {
             FadeIn(CountdownLayer);
+        }
+        else
+        {
+            CountdownLayer.BeginAnimation(OpacityProperty, null);
+            CountdownLayer.Opacity = 1;
+        }
     }
+
+    private int _countdownVersion;
 
     private void RenderCountdown()
     {
@@ -874,29 +965,74 @@ public partial class SlideView : UserControl
         CountdownClock.MaxWidth = finished ? CanvasWidth - 220 : double.PositiveInfinity;
     }
 
+    private int _overlayVersion;
+
     private void OnOverlayChanged()
     {
         var hasMessage = !string.IsNullOrWhiteSpace(Overlay);
-        OverlayText.Text = Overlay ?? string.Empty;
-        OverlayLayer.Visibility = hasMessage ? Visibility.Visible : Visibility.Collapsed;
+        var version = ++_overlayVersion;
 
-        if (AnimateTransitions && hasMessage)
-            FadeIn(OverlayLayer);
+        if (hasMessage)
+        {
+            OverlayText.Text = Overlay!;
+            OverlayLayer.Visibility = Visibility.Visible;
+            if (AnimateTransitions)
+            {
+                FadeIn(OverlayLayer);
+            }
+            else
+            {
+                OverlayLayer.BeginAnimation(OpacityProperty, null);
+                OverlayLayer.Opacity = 1;
+            }
+            return;
+        }
+
+        // The message leaves the way it came: fading, with its words still on
+        // it until it is gone.
+        void Remove()
+        {
+            if (version != _overlayVersion)
+                return;
+
+            OverlayLayer.BeginAnimation(OpacityProperty, null);
+            OverlayLayer.Opacity = 1;
+            OverlayLayer.Visibility = Visibility.Collapsed;
+            OverlayText.Text = string.Empty;
+        }
+
+        if (AnimateTransitions && OverlayLayer.Visibility == Visibility.Visible)
+            FadeOut(OverlayLayer, Remove);
+        else
+            Remove();
     }
+
+    private static readonly TimeSpan MessageFade = TimeSpan.FromMilliseconds(280);
 
     private static void FadeIn(UIElement element) =>
         element.BeginAnimation(OpacityProperty,
-            new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(280))
+            new DoubleAnimation(0, 1, MessageFade)
             {
                 EasingFunction = new QuadraticEase()
             });
+
+    /// <summary>Fades an element out and calls <paramref name="done"/> when it is gone.</summary>
+    private static void FadeOut(UIElement element, Action done)
+    {
+        var fade = new DoubleAnimation(element.Opacity, 0, MessageFade)
+        {
+            EasingFunction = new QuadraticEase()
+        };
+        fade.Completed += (_, _) => done();
+        element.BeginAnimation(OpacityProperty, fade);
+    }
 
     // ── Transición entre diapositivas ────────────────────────────
 
     private SlideTransition EffectiveTransition => CurrentTheme.Transition;
 
-    /// <summary>Clamped: a transition longer than a second outlasts the change it covers.</summary>
-    private double EffectiveTransitionMs => Math.Clamp(CurrentTheme.TransitionMs, 0, 1500);
+    /// <summary>Clamped: a transition longer than five seconds outlasts the change it covers.</summary>
+    private double EffectiveTransitionMs => Math.Clamp(CurrentTheme.TransitionMs, 0, 5000);
 
     /// <summary>
     /// Brings the words in the way the theme asks. Each theme carries its own,

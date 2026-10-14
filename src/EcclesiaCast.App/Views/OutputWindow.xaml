@@ -39,5 +39,10 @@
                                 Logo="{Binding ActiveLogo}"
                                 IsLiveOutput="True"
                                 AnimateTransitions="True"/>
+
+        <!-- Cortina negra: al apagar la salida se funde por encima de todo
+             antes de cerrar la ventana (Proyección → Transiciones…) -->
+        <Rectangle x:Name="ShutterLayer" Fill="Black" Opacity="0" Visibility="Collapsed"
+                   IsHitTestVisible="False"/>
     </Grid>
 </Window>

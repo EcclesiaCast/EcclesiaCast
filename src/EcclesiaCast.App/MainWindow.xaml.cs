@@ -645,6 +645,14 @@ public partial class MainWindow : Window
     /// changed and nothing is heard even though the automatic reopening ran
     /// (or did not notice).
     /// </summary>
+    private void Transitions_Click(object sender, RoutedEventArgs e)
+    {
+        if (_settings is null)
+            return;
+
+        new Views.TransitionsWindow(_settings) { Owner = this }.ShowDialog();
+    }
+
     private void RestartSound_Click(object sender, RoutedEventArgs e)
     {
         AudioEndpointWatcher.RequestRestart();

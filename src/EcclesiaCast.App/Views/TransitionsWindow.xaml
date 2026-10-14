@@ -1,0 +1,97 @@
+<Window x:Class="EcclesiaCast.App.Views.TransitionsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:EcclesiaCast.App.Controls"
+        Title="Transiciones de la pantalla"
+        Width="500" SizeToContent="Height"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BgBrush}"
+        FontFamily="Segoe UI">
+    <Window.Resources>
+        <Style x:Key="RowLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="Hint" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="{StaticResource FaintBrush}"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Margin" Value="0,2,0,12"/>
+        </Style>
+    </Window.Resources>
+    <StackPanel Margin="20">
+        <TextBlock Foreground="{StaticResource MutedBrush}" FontSize="12" TextWrapping="Wrap"
+                   Text="Cuánto tarda en aparecer o desaparecer cada cosa, en segundos. Con 0 corta de golpe. La transición de la letra se elige en cada tema (Proyección → Temas…)."/>
+
+        <Grid Margin="0,16,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Style="{StaticResource RowLabel}" Text="Logo (F3)"/>
+            <controls:NumericField x:Name="LogoField" Grid.Column="1" Minimum="0" Maximum="10" Step="0.1" Decimals="1"/>
+            <TextBlock Grid.Column="2" Text="s" Margin="6,0,0,0" Style="{StaticResource RowLabel}"
+                       Foreground="{StaticResource MutedBrush}"/>
+        </Grid>
+        <TextBlock Style="{StaticResource Hint}"
+                   Text="El logo aparece y desaparece fundiéndose en este tiempo."/>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Style="{StaticResource RowLabel}" Text="Cambio de imagen o video"/>
+            <controls:NumericField x:Name="MediaField" Grid.Column="1" Minimum="0" Maximum="10" Step="0.1" Decimals="1"/>
+            <TextBlock Grid.Column="2" Text="s" Margin="6,0,0,0" Style="{StaticResource RowLabel}"
+                       Foreground="{StaticResource MutedBrush}"/>
+        </Grid>
+        <TextBlock Style="{StaticResource Hint}"
+                   Text="Cuánto tarda la imagen nueva en reemplazar a la anterior. Con un video pesado conviene dejarlo corto."/>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Style="{StaticResource RowLabel}" Text="Pantalla negra (F1)"/>
+            <controls:NumericField x:Name="BlackField" Grid.Column="1" Minimum="0" Maximum="10" Step="0.1" Decimals="1"/>
+            <TextBlock Grid.Column="2" Text="s" Margin="6,0,0,0" Style="{StaticResource RowLabel}"
+                       Foreground="{StaticResource MutedBrush}"/>
+        </Grid>
+        <TextBlock Style="{StaticResource Hint}"
+                   Text="La pantalla se va a negro y vuelve en este tiempo."/>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Style="{StaticResource RowLabel}" Text="Apagar la salida (Esc)"/>
+            <controls:NumericField x:Name="OutputField" Grid.Column="1" Minimum="0" Maximum="10" Step="0.1" Decimals="1"/>
+            <TextBlock Grid.Column="2" Text="s" Margin="6,0,0,0" Style="{StaticResource RowLabel}"
+                       Foreground="{StaticResource MutedBrush}"/>
+        </Grid>
+        <TextBlock Style="{StaticResource Hint}"
+                   Text="Al apagar la proyección, la pantalla se funde a negro antes de cerrarse. Con 0 se apaga de golpe."/>
+
+        <TextBlock Foreground="{StaticResource FaintBrush}" FontSize="11" TextWrapping="Wrap"
+                   Text="Con el modo PC de bajo rendimiento todo corta de golpe, sin importar estos tiempos."/>
+
+        <StackPanel Orientation="Horizontal" Margin="0,18,0,0">
+            <Button Content="Valores de fábrica" Style="{StaticResource DarkButton}" Padding="14,8"
+                    Click="Defaults_Click"/>
+            <Button Content="Guardar" Style="{StaticResource AccentButton}" IsDefault="True"
+                    Click="Save_Click" Padding="20,8" Margin="140,0,0,0"/>
+            <Button Content="Cancelar" Style="{StaticResource DarkButton}" IsCancel="True"
+                    Padding="20,8" Margin="8,0,0,0"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

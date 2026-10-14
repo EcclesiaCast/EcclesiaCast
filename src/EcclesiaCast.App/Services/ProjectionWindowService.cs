@@ -31,7 +31,9 @@ public sealed class ProjectionWindowService(ProjectionViewModel projectionViewMo
             _window.VideoFrameChanged += (_, frame) => projectionViewModel.LiveFrame = frame;
         }
 
-        var wasHidden = !_window.IsVisible;
+        // Still fading to black to switch off counts as hidden: its video was
+        // already paused, and it has to pick up again.
+        var wasHidden = !_window.IsVisible || _window.IsFadingOut;
         _window.ShowOn(display);
 
         // Coming back from "output off": pick the video up where it stopped.
@@ -46,7 +48,7 @@ public sealed class ProjectionWindowService(ProjectionViewModel projectionViewMo
     public void HideOutput()
     {
         _window?.PauseForHiddenOutput();
-        _window?.Hide();
+        _window?.FadeOutAndHide();
     }
 
     // ── Transporte del video proyectado ──────────────────────────

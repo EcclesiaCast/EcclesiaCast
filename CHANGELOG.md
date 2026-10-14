@@ -9,6 +9,18 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Transiciones en segundos para el logo, los medios, el negro y el apagado.**
+  En **Proyección → Transiciones…** se elige cuántos segundos tarda: el logo en
+  aparecer y desaparecer (antes aparecía de golpe), el cambio de una imagen o
+  video a otro (antes 0,32 s fijos), la pantalla negra (antes 0,25 s fijos) y
+  el apagado de la salida, que ahora puede irse a negro de a poco en lugar de
+  cerrarse seca (por defecto sigue cortando). El aviso al pie y la cuenta
+  regresiva también se funden al irse. Con 0 s cada cosa corta de golpe, y con
+  el modo de bajo rendimiento todo corta igual. En los temas, la duración de la
+  transición de la letra ahora se escribe en **segundos** (la de siempre, 0,28
+  s, queda igual) y el máximo sube a 5 s. Un YouTube no se puede fundir (es una
+  ventana aparte de Windows): se esconde de golpe.
+
 - **Tipografía para cada recuadro del escenario.** En el diseñador de
   escenarios, cada recuadro (las notas del predicador, la hora, un texto fijo…)
   puede tener su propia letra: se elige de la lista de las que tiene la
