@@ -892,15 +892,30 @@ public partial class MainWindow : Window
             return entry;
         }
 
+        var openPresentation = Entry("📑 Abrir como presentación", (vm, tab) => vm.OpenPresentationTabCommand.Execute(tab));
+        var presentationToPlaylist = Entry("Agregar a la playlist como presentación",
+            (vm, tab) => vm.AddPresentationToPlaylistCommand.Execute(tab));
+
         tabItem.ContextMenu = new ContextMenu
         {
             Items =
             {
+                openPresentation,
+                presentationToPlaylist,
+                new Separator(),
                 Entry("Cambiar nombre…", (vm, tab) => vm.RenameMediaTabCommand.Execute(tab)),
                 Entry("Configurar…", (vm, tab) => vm.ConfigureMediaTabCommand.Execute(tab)),
                 new Separator(),
                 Entry("Eliminar…", (vm, tab) => vm.DeleteMediaTabCommand.Execute(tab)),
             },
+        };
+
+        // Marked tabs just open; the others are marked by the same click.
+        tabItem.ContextMenu.Opened += (_, _) =>
+        {
+            var marked = DataContext is MainViewModel vm && tabItem.DataContext is string tab && vm.IsPresentationTab(tab);
+            openPresentation.Header = marked ? "📑 Abrir como presentación" : "📑 Usar como presentación y abrirla";
+            presentationToPlaylist.Visibility = marked ? Visibility.Visible : Visibility.Collapsed;
         };
     }
 
@@ -1206,6 +1221,24 @@ public partial class MainWindow : Window
     {
         if (sender is not FrameworkElement { DataContext: SlideItemViewModel slide } card)
             return;
+
+        // A page of a presentation has no text to edit: only its properties.
+        if (slide.Page is { } page)
+        {
+            e.Handled = true;
+            if (DataContext is MainViewModel pageVm)
+            {
+                var pageMenu = new ContextMenu { PlacementTarget = card };
+                pageMenu.Items.Add(new MenuItem
+                {
+                    Header = "Propiedades…",
+                    Command = pageVm.InspectMediaCommand,
+                    CommandParameter = page,
+                });
+                pageMenu.IsOpen = true;
+            }
+            return;
+        }
 
         if (slide.Verses is not null)
         {

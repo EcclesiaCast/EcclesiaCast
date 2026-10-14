@@ -231,4 +231,64 @@ public class PresentationServiceTests
 
         Assert.Equal(7, _service.Background!.Id);
     }
+
+    [Fact]
+    public void ClearText_forgets_the_live_slide_and_leaves_only_the_background()
+    {
+        _service.GoLive(new SlideContent("Letra"));
+        _service.SetBackground(new EcclesiaCast.Core.Media.MediaItem { Id = 7 });
+
+        _service.ClearText();
+
+        Assert.Null(_service.CurrentSlide);
+        Assert.Equal(OutputState.Clear, _service.State);
+        Assert.Equal(7, _service.Background!.Id);
+    }
+
+    [Fact]
+    public void After_ClearText_toggling_Clear_does_not_bring_the_old_words_back()
+    {
+        _service.GoLive(new SlideContent("Letra"));
+
+        _service.ClearText();
+        _service.ToggleClear();
+
+        Assert.Null(_service.CurrentSlide);
+        Assert.Equal(OutputState.Clear, _service.State);
+    }
+
+    [Fact]
+    public void ClearText_from_black_shows_the_background_again()
+    {
+        _service.GoLive(new SlideContent("Letra"));
+        _service.ToggleBlack();
+
+        _service.ClearText();
+
+        Assert.Equal(OutputState.Clear, _service.State);
+    }
+
+    [Fact]
+    public void ClearText_drops_the_marks_of_the_words_that_are_gone()
+    {
+        _service.GoLive(new SlideContent("Gracia y paz"));
+        _service.SetHighlight(HighlightSet.None.WithTerms(["paz"]));
+
+        _service.ClearText();
+
+        Assert.Equal(HighlightSet.None, _service.Highlight);
+    }
+
+    [Fact]
+    public void ClearText_raises_Changed_once_and_stays_quiet_when_there_is_nothing_to_clear()
+    {
+        _service.GoLive(new SlideContent("Letra"));
+        var raised = 0;
+        _service.Changed += (_, _) => raised++;
+
+        _service.ClearText();
+        _service.ClearText();
+
+        Assert.Equal(1, raised);
+    }
 }

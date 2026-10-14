@@ -9,6 +9,19 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Una pestaña de medios como presentación.** Al importar un PDF o una
+  presentación, el programa pregunta si las páginas van a una **pestaña nueva,
+  como presentación** (lo recomendado) o a la pestaña que está abierta. Una
+  pestaña marcada como presentación (casilla en **Configurar…**, o clic derecho
+  → **Abrir como presentación**) se abre en el cuadro central como una canción:
+  una tarjeta por página, con su miniatura. Un clic proyecta la página sola
+  (sin letra encima), las flechas pasan de una a otra, y el PREVIEW muestra la
+  que sigue. Al proyectar una estrofa o un texto rápido, vuelve el fondo que
+  había antes. **➕ Playlist** (junto al título de la grilla) agrega la
+  presentación entera a la playlist: las flechas la recorren y siguen con lo
+  que viene después. Entran las imágenes y los videos de la pestaña, no los de
+  YouTube ni las páginas web, y las imágenes no avanzan solas.
+
 - **Tipografía para cada recuadro del escenario.** En el diseñador de
   escenarios, cada recuadro (las notas del predicador, la hora, un texto fijo…)
   puede tener su propia letra: se elige de la lista de las que tiene la

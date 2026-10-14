@@ -67,6 +67,13 @@ public interface IPresentationService
     /// <summary>Puts a slide live and switches the output to content; a different slide drops every mark.</summary>
     void GoLive(SlideContent slide);
 
+    /// <summary>
+    /// Forgets the live slide and its marks and leaves the output on
+    /// background-only. A page of a presentation is a picture, not a slide:
+    /// the words shown before it must not come back when Clear is toggled.
+    /// </summary>
+    void ClearText();
+
     /// <summary>Toggles between background-only and the current content.</summary>
     void ToggleClear();
 

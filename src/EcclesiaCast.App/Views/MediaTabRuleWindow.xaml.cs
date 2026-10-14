@@ -10,9 +10,10 @@ namespace EcclesiaCast.App.Views;
 /// </summary>
 public partial class MediaTabRuleWindow : Window
 {
-    public MediaTabRuleWindow(string tab, MediaTabRule current)
+    public MediaTabRuleWindow(string tab, MediaTabRule current, bool presentation = false)
     {
         InitializeComponent();
+        PresentationCheck.IsChecked = presentation;
         Title = $"Configurar «{tab}»";
         Heading.Text = $"¿Cómo se usan los medios de la pestaña «{tab}»?";
 
@@ -29,6 +30,9 @@ public partial class MediaTabRuleWindow : Window
 
     /// <summary>The rule the operator chose; valid once the window closed with Guardar.</summary>
     public MediaTabRule Rule { get; private set; } = MediaTabRule.Default;
+
+    /// <summary>Whether the tab opens as a presentation in the central grid.</summary>
+    public bool Presentation { get; private set; }
 
     /// <summary>The logo at the end only makes sense for a foreground.</summary>
     private void Mode_Changed(object sender, RoutedEventArgs e)
@@ -48,6 +52,7 @@ public partial class MediaTabRuleWindow : Window
             : MediaTabMode.PerItem;
 
         Rule = new MediaTabRule(mode, mode == MediaTabMode.Foreground && LogoCheck.IsChecked == true);
+        Presentation = PresentationCheck.IsChecked == true;
         DialogResult = true;
     }
 }

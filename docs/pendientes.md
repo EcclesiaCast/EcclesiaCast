@@ -156,6 +156,32 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
       6. Si decís que no al permiso de administrador de Windows, el aviso
          tiene que quedarse abierto diciendo que no se instaló nada.
 
+- [ ] **Una pestaña de medios como presentación** (tramo D1; sólo hay pruebas
+      y dibujos de las tarjetas). Nada de esto se abrió con el programa.
+      1. Agregá un PDF o una presentación (📥 o arrastrándola): pregunta
+         «📑 Pestaña nueva «archivo», como presentación (recomendado)» o
+         «Agregar las páginas a «…»». Con la primera se crea la pestaña, y las
+         páginas aparecen en el cuadro central como tarjetas con la miniatura.
+      2. Clic en una página: va a la pantalla sola, sin letra. F2 no tiene que
+         traer la letra de antes. Las flechas ←→ pasan de página. En el
+         PREVIEW se ve la página que sigue.
+      3. Con una canción en pantalla, pasá a una página y volvé a proyectar una
+         estrofa: el fondo que había antes de la presentación tiene que volver.
+         Lo mismo con un texto rápido.
+      4. «Configurar…» de cualquier pestaña tiene la casilla «📑 Usar como
+         presentación»; el clic derecho de la pestaña tiene «Abrir como
+         presentación». Un clic en una tarjeta de una pestaña marcada abre la
+         presentación y proyecta esa página.
+      5. «➕ Playlist» junto al título de la grilla (o clic derecho en la
+         pestaña → «Agregar a la playlist como presentación»): en la playlist
+         sale con 📑. Un clic la abre sin proyectar, el doble clic proyecta la
+         primera página; las flechas pasan por las páginas y, al final, siguen
+         con el elemento que viene.
+      6. Clic derecho en una página del cuadro central: sólo «Propiedades…».
+         No se puede arrastrar. Renombrar o eliminar la pestaña con la
+         presentación abierta no tiene que dejar nada raro en la grilla.
+      7. Probá una pestaña con videos locales: entran como páginas.
+
 ## 2. Para la v1.0.0
 
 - [ ] **Usar la beta.7 en la reunión del domingo** y anotar lo que falle o no

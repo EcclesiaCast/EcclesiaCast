@@ -22,6 +22,17 @@ public sealed class PresentationService : IPresentationService
         OnChanged();
     }
 
+    public void ClearText()
+    {
+        if (CurrentSlide is null && State == OutputState.Clear && Highlight.Equals(HighlightSet.None))
+            return;
+
+        CurrentSlide = null;
+        Highlight = HighlightSet.None;
+        State = OutputState.Clear;
+        OnChanged();
+    }
+
     public void ToggleClear() =>
         SetState(State == OutputState.Clear ? OutputState.Content : OutputState.Clear);
 

@@ -1056,6 +1056,9 @@
                                             <DataTrigger Binding="{Binding Type}" Value="Media">
                                                 <Setter TargetName="icon" Property="Text" Value="🎞"/>
                                             </DataTrigger>
+                                            <DataTrigger Binding="{Binding Type}" Value="Presentation">
+                                                <Setter TargetName="icon" Property="Text" Value="📑"/>
+                                            </DataTrigger>
                                         </DataTemplate.Triggers>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
@@ -1090,6 +1093,12 @@
                     <!-- Qué hay en la grilla y, si es otra cosa, qué está en pantalla -->
                     <DockPanel Grid.Row="0" Margin="12,8,12,8" LastChildFill="False"
                                Visibility="{Binding HasGridTitle, Converter={StaticResource BoolToVis}}">
+                        <!-- Sólo con una presentación en la grilla -->
+                        <Button DockPanel.Dock="Right" Content="➕ Playlist" FontSize="11" Padding="8,3" Margin="10,0,0,0"
+                                Style="{StaticResource DarkButton}"
+                                Command="{Binding AddPresentationToPlaylistCommand}"
+                                Visibility="{Binding IsPresentationOpen, Converter={StaticResource BoolToVis}}"
+                                ToolTip="Agregar la presentación entera a la playlist: las flechas pasan por sus páginas y siguen con lo que viene después"/>
                         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center"
                                     Visibility="{Binding ShowOtherLive, Converter={StaticResource BoolToVis}}"
                                     ToolTip="Lo que se está viendo en la pantalla ahora">
@@ -1185,10 +1194,16 @@
                                                             <Grid>
                                                                 <!-- Todas las tarjetas del mismo tamaño: la letra
                                                                      se achica hasta que entra entera -->
-                                                                <TextBlock Text="{Binding PreviewText}"
+                                                                <TextBlock x:Name="cardText" Text="{Binding PreviewText}"
                                                                            FontSize="12" Foreground="White"
                                                                            TextWrapping="Wrap"
                                                                            controls:TextFit.MaxFontSize="12"/>
+                                                                <!-- Una página de presentación: la miniatura, no el texto -->
+                                                                <TextBlock x:Name="pageIcon" Text="🎞" FontSize="28" Visibility="Collapsed"
+                                                                           Foreground="{StaticResource MutedBrush}"
+                                                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                <Image x:Name="pageImage" Source="{Binding PageImage}" Stretch="Uniform"
+                                                                       Visibility="Collapsed"/>
                                                                 <!-- El rótulo va en la esquina, encima del texto,
                                                                      para no robarle un renglón arriba -->
                                                                 <Border HorizontalAlignment="Right" VerticalAlignment="Bottom"
@@ -1204,6 +1219,12 @@
                                                             <Trigger Property="IsMouseOver" Value="True">
                                                                 <Setter TargetName="card" Property="Background" Value="#1A2030"/>
                                                             </Trigger>
+                                                            <DataTrigger Binding="{Binding IsPage}" Value="True">
+                                                                <Setter TargetName="cardText" Property="Visibility" Value="Collapsed"/>
+                                                                <Setter TargetName="pageIcon" Property="Visibility" Value="Visible"/>
+                                                                <Setter TargetName="pageImage" Property="Visibility" Value="Visible"/>
+                                                                <Setter TargetName="card" Property="Padding" Value="4"/>
+                                                            </DataTrigger>
                                                             <DataTrigger Binding="{Binding IsPreviewed}" Value="True">
                                                                 <Setter TargetName="card" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
                                                                 <Setter TargetName="card" Property="BorderThickness" Value="2"/>
@@ -1295,11 +1316,19 @@
                                 <!-- El próximo texto va sobre el fondo que va a quedar: un
                                      anuncio en primer plano sale al proyectar la diapositiva -->
                                 <controls:ProjectedView Slide="{Binding PreviewSlide}"
-                                                        BackgroundMedia="{Binding Projection.PreviewBackground}"
                                                         FillMedia="{Binding Projection.PreviewBackgroundFill}"
                                                         BackgroundBlur="{Binding Projection.BackgroundBlur}"
                                                         Logo="{Binding Projection.ActiveLogo}"
-                                                        Visibility="{Binding PreviewIsStage, Converter={StaticResource InverseBoolToVis}}"/>
+                                                        Visibility="{Binding PreviewIsStage, Converter={StaticResource InverseBoolToVis}}">
+                                    <!-- La página que sigue en una presentación va primero; si no hay, el
+                                         fondo que va a quedar -->
+                                    <controls:ProjectedView.BackgroundMedia>
+                                        <MultiBinding Converter="{StaticResource FirstNonNull}">
+                                            <Binding Path="PreviewPageMedia"/>
+                                            <Binding Path="Projection.PreviewBackground"/>
+                                        </MultiBinding>
+                                    </controls:ProjectedView.BackgroundMedia>
+                                </controls:ProjectedView>
                                 <Viewbox Stretch="Uniform"
                                          Visibility="{Binding PreviewIsStage, Converter={StaticResource BoolToVis}}">
                                     <controls:StageView Width="1920" Height="1080"

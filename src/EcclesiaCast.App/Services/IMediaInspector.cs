@@ -14,7 +14,9 @@ public interface IMediaInspector
 
     /// <summary>
     /// Asks what the tab decides for all its media (right click on a tab →
-    /// Configurar). Null when the operator cancelled.
+    /// Configurar). Null when the operator cancelled. <paramref name="presentation"/>
+    /// says whether the tab opens as a presentation in the central grid, and
+    /// comes back with the operator's answer.
     /// </summary>
-    MediaTabRule? EditTabRule(string tab, MediaTabRule current);
+    MediaTabRule? EditTabRule(string tab, MediaTabRule current, ref bool presentation);
 }

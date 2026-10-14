@@ -971,6 +971,17 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 else
                     ShowMediaInCentre(media);
                 break;
+
+            case PlaylistItemType.Presentation:
+                // The entry remembers the first page; the tab is wherever that
+                // page is now (the tab may have been renamed since), or the
+                // name written when it was added.
+                var tab = _allMedia.FirstOrDefault(m => m.Id == item.MediaId)?.Category ?? item.Caption;
+                if (!IsPresentationTab(tab))
+                    SetPresentationTab(tab, true);
+                if (!OpenPresentation(tab, null))
+                    StatusText = $"La presentación \"{item.Caption}\" ya no tiene páginas en la biblioteca.";
+                break;
         }
     }
 
@@ -990,6 +1001,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         PreviewSlide = null;
 
         IsWebPanelOpen = false;
+        LeavePresentation();
         PreviewMedia = media;
         GridTitle = media.Name;
         StatusText = $"«{media.Name}» listo: doble clic en la playlist (o el botón Proyectar) lo pone en pantalla.";
@@ -1020,7 +1032,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         LoadPlaylistItem(item, projectMedia: true);
 
-        if (item.Type is PlaylistItemType.Song or PlaylistItemType.BiblePassage)
+        if (item.Type is PlaylistItemType.Song or PlaylistItemType.BiblePassage or PlaylistItemType.Presentation)
         {
             if (item.Type == PlaylistItemType.BiblePassage && PreviewSlideIndex >= 0)
                 GoLiveSlide(PreviewSlideIndex);
@@ -1062,7 +1074,13 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         string.IsNullOrWhiteSpace(tab) ? MediaTabRule.Default : MediaTabRule.Parse(_settings.Get(RuleKey(tab)));
 
     /// <summary>The media as it is to play: with the rule of its tab applied.</summary>
-    private MediaItem Playable(MediaItem item) => TabRule(item.Category).Resolve(item);
+    private MediaItem Playable(MediaItem item)
+    {
+        var resolved = TabRule(item.Category).Resolve(item);
+
+        // The pages of a presentation are not decoration: always the whole screen.
+        return IsPresentationTab(item.Category) ? AsPage(resolved) : resolved;
+    }
 
     private void SaveMediaTabs(IEnumerable<string> tabs) =>
         _settings.Set(MediaTabsKey, MediaTabNames.Serialize(tabs));
@@ -1264,6 +1282,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         SelectedMediaTab = MediaTabs.Contains(keepTab) ? keepTab : MediaTabs.FirstOrDefault() ?? "Fondos";
         FilterMediaByTab();
         SyncMediaTabOptions();
+
+        // A presentation open in the grid follows what the tab holds now.
+        RefreshPresentationTabs();
+        RefreshOpenPresentation();
     }
 
     partial void OnSelectedMediaTabChanged(string value)
@@ -1448,6 +1470,19 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             _settings.Set(RuleKey(name), rule);
             _settings.Set(RuleKey(tab), MediaTabRule.Default.ToSetting());
         }
+        if (_settings.Get(PresentationKey(tab)) is { } presentation)
+        {
+            _settings.Set(PresentationKey(name), presentation);
+            _settings.Set(PresentationKey(tab), "0");
+        }
+        if (string.Equals(_presentationTab, tab, StringComparison.OrdinalIgnoreCase))
+        {
+            // The grid keeps showing the same pages under the new name.
+            if (LiveTitle == GridTitle)
+                LiveTitle = "📑 " + name;
+            _presentationTab = name;
+            GridTitle = "📑 " + name;
+        }
         if (string.Equals(_settings.Get(RandomTabKey), tab, StringComparison.OrdinalIgnoreCase))
             _settings.Set(RandomTabKey, name);
 
@@ -1484,6 +1519,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         _settings.Set(ContinuousKey(tab), "0");
         _settings.Set(RuleKey(tab), MediaTabRule.Default.ToSetting());
+        _settings.Set(PresentationKey(tab), "0");
         SaveMediaTabs(MediaTabs.Where(t => !string.Equals(t, tab, StringComparison.OrdinalIgnoreCase)));
         LoadMedia(string.Equals(SelectedMediaTab, tab, StringComparison.OrdinalIgnoreCase)
             ? MediaTabs.FirstOrDefault(t => !string.Equals(t, tab, StringComparison.OrdinalIgnoreCase))
@@ -1498,10 +1534,21 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (string.IsNullOrWhiteSpace(tab))
             return;
 
-        if (_mediaInspector.EditTabRule(tab, TabRule(tab)) is not { } rule)
+        var presentation = IsPresentationTab(tab);
+        if (_mediaInspector.EditTabRule(tab, TabRule(tab), ref presentation) is not { } rule)
             return;
 
         _settings.Set(RuleKey(tab), rule.ToSetting());
+        if (presentation != IsPresentationTab(tab))
+        {
+            SetPresentationTab(tab, presentation);
+            if (presentation)
+            {
+                StatusText = $"«{tab}» es una presentación: un clic en una de sus tarjetas la abre en el cuadro central.";
+                return;
+            }
+        }
+
         StatusText = rule.Mode switch
         {
             MediaTabMode.Background => $"«{tab}»: todo va como fondo.",
@@ -1743,13 +1790,45 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     /// </summary>
     private async Task ImportDocumentsAsync(IReadOnlyList<string> paths)
     {
-        var tab = SelectedMediaTab;
+        var currentTab = SelectedMediaTab;
         var pagesAdded = 0;
         string? failure = null;
+        string? presentationToOpen = null;
+        string? lastTab = null;
+        int? sameForAll = null;
 
-        foreach (var path in paths)
+        for (var n = 0; n < paths.Count; n++)
         {
+            var path = paths[n];
             var name = Path.GetFileNameWithoutExtension(path);
+
+            // A document is best kept in a tab of its own, opened as a
+            // presentation: its pages then work in the central grid like a
+            // song does. The other way leaves them in the tab that is open.
+            int choice;
+            if (sameForAll is { } remembered)
+            {
+                choice = remembered;
+            }
+            else
+            {
+                var more = n < paths.Count - 1;
+                var (index, repeat) = _textPrompt.ChooseAndRemember(
+                    "Dónde poner las páginas",
+                    $"«{Path.GetFileName(path)}» se va a importar como una imagen por página. ¿Dónde las pongo?",
+                    [
+                        $"📑 Pestaña nueva «{name}», como presentación (recomendado)",
+                        $"Agregar las páginas a «{currentTab}»",
+                    ],
+                    more ? "Hacer lo mismo con los demás documentos" : null);
+                choice = index;
+                if (repeat)
+                    sameForAll = index;
+            }
+
+            if (choice < 0)
+                continue;
+
             var result = await DocumentImporter.ImportAsync(path);
 
             if (result.Error is not null)
@@ -1757,6 +1836,17 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 failure = result.Error;
                 continue;
             }
+
+            var tab = currentTab;
+            if (choice == 0)
+            {
+                tab = MediaTabNames.Unique(MediaTabs, name);
+                MediaTabs.Add(tab);
+                SaveMediaTabs(MediaTabs);
+                _settings.Set(PresentationKey(tab), "1");
+                presentationToOpen = tab;
+            }
+            lastTab = tab;
 
             for (var page = 0; page < result.Pages.Count; page++)
             {
@@ -1778,11 +1868,24 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             }
         }
 
-        LoadMedia();
+        // The new presentation shows its tab, and its pages fill the grid
+        // (without projecting anything).
+        LoadMedia(presentationToOpen);
+
+        if (presentationToOpen is not null)
+        {
+            OpenPresentation(presentationToOpen, null);
+            StatusText = failure is not null
+                ? failure
+                : $"{pagesAdded} página(s) en la pestaña «{presentationToOpen}», abierta como presentación: clic en una página la proyecta y las flechas pasan de a una.";
+            return;
+        }
 
         StatusText = failure is not null
             ? failure
-            : $"{pagesAdded} página(s) agregada(s) a «{tab}». Cada una es un fondo: arrastralas a la playlist para pasarlas con las flechas.";
+            : lastTab is null
+                ? "No se importó ningún documento."
+                : $"{pagesAdded} página(s) agregada(s) a «{lastTab}». Cada una es un fondo: arrastralas a la playlist para pasarlas con las flechas.";
     }
 
     /// <summary>
@@ -1895,6 +1998,14 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (item.Type == MediaType.Web)
         {
             OpenWebPage(item.Path, item.Name);
+            return;
+        }
+
+        // In a tab marked as a presentation the card is a page: the pages
+        // open in the grid and this one goes on screen.
+        if (item.Type is MediaType.Image or MediaType.Video && IsPresentationTab(item.Category))
+        {
+            ShowPage(item);
             return;
         }
 
@@ -2860,6 +2971,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 {
                     PlaylistItemType.BiblePassage => "📖",
                     PlaylistItemType.Media => "🎞",
+                    PlaylistItemType.Presentation => "📑",
                     _ => "🎵",
                 }))
             .ToList();
@@ -3585,6 +3697,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         IsWebPanelOpen = false;
         PreviewMedia = null;
         GridTitle = null;
+        LeavePresentation();
         if (!_openingPlaylistItem)
             _currentPlaylistIndex = -1;
 
@@ -4387,6 +4500,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         var bookName = verses[0].BookName;
         IsWebPanelOpen = false;
         PreviewMedia = null;
+        LeavePresentation();
         GridTitle = secondary is null
             ? $"{bookName} {reference.Chapter} · {primary.Abbreviation}"
             : $"{bookName} {reference.Chapter} · {primary.Abbreviation} + {secondary.Abbreviation}";
@@ -4908,6 +5022,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         {
             PlaylistItemType.Song => " de la canción",
             PlaylistItemType.BiblePassage => " del pasaje",
+            PlaylistItemType.Presentation => " de la presentación",
             _ => " del elemento",
         };
         var arrow = direction > 0 ? "→" : "←";
@@ -5015,6 +5130,14 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         }
 
         var item = Slides[index];
+
+        // A card of a presentation is a picture, never text.
+        if (item.Page is { } page)
+        {
+            GoLivePage(index, page);
+            return;
+        }
+
         NoteAction($"Proyectar la diapositiva {index + 1} de {Slides.Count}: {item.Label}");
 
         // A foreground media takes the whole screen and hides the text: it is
@@ -5023,7 +5146,11 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (_presentation.Background is { Behavior: MediaBehavior.Foreground } foreground
             && item.JumpTarget is null)
         {
-            _presentation.SetBackground(null);
+            // A presentation gives back what was behind before it.
+            if (IsPresentationPageOnAir)
+                RemovePageForText();
+            else
+                _presentation.SetBackground(null);
             Log.Debug("Fondo de primer plano «{Name}» retirado al proyectar texto", foreground.Name);
         }
 
@@ -5112,6 +5239,11 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     {
         if (string.IsNullOrWhiteSpace(QuickText) || SelectedDisplay is null)
             return;
+
+        // A page of a presentation would hide the words: it comes off, as it
+        // does for a song.
+        if (IsPresentationPageOnAir)
+            RemovePageForText();
 
         _presentation.GoLive(QuickSlide(QuickText.Trim()));
         SyncHighlightBox();
@@ -5250,6 +5382,11 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         IsCountdownRunning = _presentation.Countdown is not null;
         IsStageNotesActive = _presentation.StageNotes is not null;
         HasBackground = _presentation.Background is not null;
+
+        // A page of a presentation stops being «on screen» the moment
+        // anything else takes the background.
+        if (_livePageId != 0 && _presentation.Background?.Id != _livePageId)
+            _livePageId = 0;
 
         // The live page switches itself off the moment anything else takes the
         // background (or it is cleared): the button must follow.
