@@ -35,6 +35,14 @@ hacerlos, dónde está cada cosa en el código y cómo probarlos.
   Mensaje en inglés, en imperativo, explicando el porqué, y al final:
   `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`
 
+**Gastar pocos tokens**
+- Leé sólo lo que necesitás: buscá con grep y abrí los archivos por partes.
+  `MainViewModel` está partido por área (`MainViewModel.Bible.cs`,
+  `.Media.cs`, `.Playlist.cs`, `.Projection.cs`…): abrí sólo el de tu tema.
+- No vuelvas a leer un archivo que ya leíste ni lo copies entero en el
+  informe. El informe, corto: commit, qué cambió, cómo se verificó, qué falta
+  probar.
+
 **Idioma**
 - Todo lo que ve el usuario (botones, mensajes, tooltips), el `CHANGELOG.md`
   y `docs/` van en **castellano rioplatense** («elegí», «tocá», «podés»).
