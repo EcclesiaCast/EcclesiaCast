@@ -1148,7 +1148,7 @@
                                                     PreviewMouseMove="SlideCard_PreviewMouseMove"
                                                     AutomationProperties.Name="{Binding Label}"
                                                     AutomationProperties.HelpText="{Binding PreviewText}"
-                                                    ToolTip="Clic: proyectar · Arrastrar: cambiarla de lugar · Clic derecho: más opciones">
+                                                    ToolTip="{Binding CardToolTip}">
                                                 <Button.ContextMenu>
                                                     <ContextMenu>
                                                         <MenuItem Header="Editar canción (diseño)"

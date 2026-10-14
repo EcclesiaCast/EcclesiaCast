@@ -439,6 +439,13 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Corregido
 
+- **El aviso de cada tarjeta de la grilla dice lo que hace.** En la Biblia el
+  globo de ayuda decía «Arrastrar: cambiarla de lugar», pero los versículos y
+  los capítulos no se pueden arrastrar. Ahora cada tarjeta muestra lo suyo: el
+  versículo dice cómo agregarlo a la playlist o corregirlo, y las tarjetas
+  **ANTERIOR** y **SIGUIENTE** dicen a qué capítulo llevan. Las canciones
+  siguen diciendo que se pueden arrastrar.
+
 - **Varios cuadros de texto en una diapositiva del diseñador.** Con más de un
   cuadro sólo se podía editar el que elegías en la lista de la derecha, y el
   marco grande de la letra quedaba encima de los cuadros chicos sin dejar

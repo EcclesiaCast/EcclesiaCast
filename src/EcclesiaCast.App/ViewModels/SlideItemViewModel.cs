@@ -37,6 +37,27 @@ public sealed partial class SlideItemViewModel(
 
     public string PreviewText => Slide.MainText;
 
+    /// <summary>
+    /// Tooltip of the grid card. Only song cards can be dragged to another
+    /// place; Bible cards get the text that matches what their click and
+    /// right click really do.
+    /// </summary>
+    public string CardToolTip
+    {
+        get
+        {
+            if (JumpTarget != null)
+                return JumpToEnd
+                    ? "Clic: abre el capítulo anterior en su último versículo"
+                    : "Clic: abre el capítulo siguiente en su primer versículo";
+            if (Verses != null)
+                return "Clic: proyectar · Clic derecho: agregar a la playlist o corregir el texto";
+            if (SectionId != 0)
+                return "Clic: proyectar · Arrastrar: cambiarla de lugar · Clic derecho: más opciones";
+            return "Clic: proyectar";
+        }
+    }
+
     [ObservableProperty]
     private bool _isLive;
 
