@@ -354,6 +354,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         LoadPlaylists(null);
         InitializeAudio();
         InitializeWeb();
+        InitializeCardZoom();
         InitializeUpdates();
         StageNotesText = _settings.Get(StageNotesKey) ?? string.Empty;
         QuickTextFont = _settings.Get(QuickTextFontKey) ?? string.Empty;

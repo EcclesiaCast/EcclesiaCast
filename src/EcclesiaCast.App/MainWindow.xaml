@@ -1094,6 +1094,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <!-- Qué hay en la grilla y, si es otra cosa, qué está en pantalla -->
@@ -1139,7 +1140,8 @@
                             </TextBlock>
                             <ScrollViewer x:Name="SlidesScroll" VerticalScrollBarVisibility="Auto" Padding="6" Background="Transparent"
                                           AllowDrop="True" DragOver="SlidesScroll_DragOver"
-                                          DragLeave="SlidesScroll_DragLeave" Drop="SlidesScroll_Drop">
+                                          DragLeave="SlidesScroll_DragLeave" Drop="SlidesScroll_Drop"
+                                          PreviewMouseWheel="SlidesScroll_PreviewMouseWheel">
                                 <ItemsControl x:Name="SlideGrid" ItemsSource="{Binding Slides}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -1187,7 +1189,9 @@
                                                 </Button.ContextMenu>
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="Button">
-                                                        <Border x:Name="card" Width="220" Height="118" Margin="6"
+                                                        <Border x:Name="card" Margin="6"
+                                                                Width="{Binding DataContext.SlideCardWidth, ElementName=SlideGrid}"
+                                                                Height="{Binding DataContext.SlideCardHeight, ElementName=SlideGrid}"
                                                                 CornerRadius="6" Background="#10141E"
                                                                 BorderBrush="{StaticResource LineBrush}"
                                                                 BorderThickness="1" Padding="10">
@@ -1195,16 +1199,18 @@
                                                                 <!-- Todas las tarjetas del mismo tamaño: la letra
                                                                      se achica hasta que entra entera -->
                                                                 <TextBlock Text="{Binding PreviewText}"
-                                                                           FontSize="12" Foreground="White"
+                                                                           FontSize="{Binding DataContext.SlideCardFontSize, ElementName=SlideGrid}"
+                                                                           Foreground="White"
                                                                            TextWrapping="Wrap"
-                                                                           controls:TextFit.MaxFontSize="12"/>
+                                                                           controls:TextFit.MaxFontSize="{Binding DataContext.SlideCardFontSize, ElementName=SlideGrid}"/>
                                                                 <!-- El rótulo va en la esquina, encima del texto,
                                                                      para no robarle un renglón arriba -->
                                                                 <Border HorizontalAlignment="Right" VerticalAlignment="Bottom"
                                                                         Margin="0,0,-6,-6" Padding="5,1"
                                                                         CornerRadius="4" Background="#E6262D3D">
                                                                     <TextBlock Text="{Binding Label}"
-                                                                               FontSize="10" FontWeight="SemiBold"
+                                                                               FontSize="{Binding DataContext.SlideLabelFontSize, ElementName=SlideGrid}"
+                                                                               FontWeight="SemiBold"
                                                                                Foreground="{StaticResource MutedBrush}"/>
                                                                 </Border>
                                                             </Grid>
@@ -1261,7 +1267,18 @@
                     <!-- Una página web en lugar de la grilla («🌐 Web» en la barra de
                          medios). Se crea al abrirla por primera vez; mientras está en
                          vivo y cerrada sigue ahí, invisible: ver SyncWebPanel. -->
-                    <controls:WebPanel x:Name="WebPanelView" Grid.RowSpan="2" Visibility="Collapsed"/>
+                    <!-- Tamaño de las diapositivas: al pie de la grilla. Sólo cambia cómo se
+                         ven las tarjetas; Ctrl + rueda del mouse hace lo mismo. -->
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right"
+                                Margin="12,0,12,8">
+                        <TextBlock Text="🔍" FontSize="12" Foreground="{StaticResource MutedBrush}"
+                                   VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <Slider Width="110" Minimum="0.6" Maximum="1.8" TickFrequency="0.1"
+                                IsSnapToTickEnabled="True" Value="{Binding SlideCardScale}"
+                                AutomationProperties.Name="Tamaño de las diapositivas"
+                                ToolTip="Tamaño de las diapositivas. También: Ctrl + rueda del mouse sobre la grilla."/>
+                    </StackPanel>
+                    <controls:WebPanel x:Name="WebPanelView" Grid.RowSpan="3" Visibility="Collapsed"/>
                 </Grid>
             </Border>
 
@@ -1957,6 +1974,15 @@
                      Una lista en vez de una fila: entran más nombres, y se
                      lee cuál está elegida de un vistazo. -->
                 <DockPanel DockPanel.Dock="Left" Width="118" Margin="10,2,0,6">
+                    <!-- Tamaño de los medios: abajo de las pestañas (Ctrl + rueda también) -->
+                    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,6,0,0">
+                        <TextBlock Text="🔍" FontSize="11" Foreground="{StaticResource MutedBrush}"
+                                   VerticalAlignment="Center" Margin="0,0,4,0"/>
+                        <Slider Width="92" Minimum="0.7" Maximum="2.5" TickFrequency="0.1"
+                                IsSnapToTickEnabled="True" Value="{Binding MediaCardScale}"
+                                AutomationProperties.Name="Tamaño de los medios"
+                                ToolTip="Tamaño de las tarjetas de medios. También: Ctrl + rueda del mouse sobre la barra."/>
+                    </StackPanel>
                     <ListBox x:Name="MediaTabsList" ItemsSource="{Binding MediaTabs}" SelectedItem="{Binding SelectedMediaTab}"
                              Background="Transparent" BorderThickness="0"
                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -2025,7 +2051,8 @@
                                   PreviewMouseLeftButtonDown="MediaScroll_PreviewMouseLeftButtonDown"
                                   PreviewMouseMove="MediaScroll_PreviewMouseMove"
                                   PreviewMouseLeftButtonUp="MediaScroll_PreviewMouseLeftButtonUp"
-                                  LostMouseCapture="MediaScroll_LostMouseCapture">
+                                  LostMouseCapture="MediaScroll_LostMouseCapture"
+                                  PreviewMouseWheel="MediaScroll_PreviewMouseWheel">
                         <ItemsControl x:Name="MediaCards" ItemsSource="{Binding MediaItems}" Margin="0,0,0,6">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate><WrapPanel Orientation="Horizontal"/></ItemsPanelTemplate>
@@ -2048,7 +2075,9 @@
                                             ToolTip="{Binding Name}">
                                         <Button.Template>
                                             <ControlTemplate TargetType="Button">
-                                                <Border x:Name="card" Width="98" Height="56" CornerRadius="4"
+                                                <Border x:Name="card" CornerRadius="4"
+                                                        Width="{Binding DataContext.MediaCardWidth, ElementName=MediaScroll}"
+                                                        Height="{Binding DataContext.MediaCardHeight, ElementName=MediaScroll}"
                                                         Background="#10141E"
                                                         BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
                                                         Tag="{Binding DataContext, ElementName=MediaScroll}"
@@ -2056,9 +2085,10 @@
                                                     <Grid>
                                                         <!-- Con el encuadre real: escala, zoom, corrimiento, tamaño fijo, relleno,
                                                              brillo y tinte, igual que en la pantalla (sin desenfoque: no se nota acá) -->
-                                                        <controls:FramedMediaPreview x:Name="preview" Media="{Binding}" DecodeWidth="240"/>
+                                                        <controls:FramedMediaPreview x:Name="preview" Media="{Binding}" DecodeWidth="320"/>
                                                         <Border Background="#66000000" VerticalAlignment="Bottom" Padding="4,1">
-                                                            <TextBlock Text="{Binding Name}" FontSize="9" Foreground="White"
+                                                            <TextBlock Text="{Binding Name}" Foreground="White"
+                                                                       FontSize="{Binding DataContext.MediaNameFontSize, ElementName=MediaScroll}"
                                                                        TextTrimming="CharacterEllipsis"/>
                                                         </Border>
                                                         <TextBlock Text="🎞" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"

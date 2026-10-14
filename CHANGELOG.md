@@ -9,6 +9,10 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Tamaño de las tarjetas.** Al pie de la grilla de diapositivas y debajo de
+  las pestañas de medios hay una barra para agrandar o achicar las tarjetas.
+  Con Ctrl y la rueda del mouse sobre la grilla o la barra de medios se cambia
+  lo mismo. El tamaño queda guardado para la próxima vez.
 - **Diseño de aprendizaje o avanzado.** En Ver elegís si los botones muestran
   los atajos de teclado (F1, F2, Esc, Ctrl+Enter) y los textos de ayuda, o si
   los ocultan para ver menos texto. Los atajos andan igual en los dos.
