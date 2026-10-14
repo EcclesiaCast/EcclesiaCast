@@ -241,6 +241,47 @@ public sealed class RemoteControlServer : IDisposable
             return;
         }
 
+        // The poster of a page of a presentation. The phone only says which
+        // media it wants: the file is found on this side, from the library, and
+        // it is the small poster, never the full-size picture.
+        if (path == "/api/thumb" && method == "GET")
+        {
+            var check = CheckPin(QueryValue(target, "pin"), caller);
+            if (!check.Ok)
+            {
+                await WriteDeniedAsync(stream, check, cancellation);
+                return;
+            }
+
+            if (!int.TryParse(QueryValue(target, "id"), out var mediaId))
+            {
+                await WriteAsync(stream, 400, "application/json", """{"error":"id"}""", cancellation);
+                return;
+            }
+
+            var file = await OnUiThread(() => _host.GetThumbnailPath(mediaId));
+            if (file is null || !File.Exists(file))
+            {
+                await WriteAsync(stream, 404, "text/plain", "No encontrado", cancellation);
+                return;
+            }
+
+            // Read away from the UI thread: it is a file, and the operator is mid-service.
+            byte[] bytes;
+            try
+            {
+                bytes = await File.ReadAllBytesAsync(file, cancellation);
+            }
+            catch (IOException)
+            {
+                await WriteAsync(stream, 404, "text/plain", "No encontrado", cancellation);
+                return;
+            }
+
+            await WriteBytesAsync(stream, "image/png", bytes, cancellation);
+            return;
+        }
+
         if (path == "/api/cmd" && method == "POST")
         {
             Command? command = null;
@@ -373,6 +414,26 @@ public sealed class RemoteControlServer : IDisposable
             + $"Content-Length: {payload.Length}\r\n"
             + "Cache-Control: no-store\r\n"
             + extraHeaders
+            + "Connection: close\r\n\r\n");
+
+        await stream.WriteAsync(header, cancellation);
+        await stream.WriteAsync(payload, cancellation);
+        await stream.FlushAsync(cancellation);
+    }
+
+    /// <summary>
+    /// A picture. Unlike the data routes it may be kept by the phone for an
+    /// hour (<c>private</c>: not by anything in between): a page does not
+    /// change, and the phone asks for the same few posters over and over.
+    /// </summary>
+    private static async Task WriteBytesAsync(
+        NetworkStream stream, string contentType, byte[] payload, CancellationToken cancellation)
+    {
+        var header = Encoding.ASCII.GetBytes(
+            "HTTP/1.1 200 OK\r\n"
+            + $"Content-Type: {contentType}\r\n"
+            + $"Content-Length: {payload.Length}\r\n"
+            + "Cache-Control: private, max-age=3600\r\n"
             + "Connection: close\r\n\r\n");
 
         await stream.WriteAsync(header, cancellation);

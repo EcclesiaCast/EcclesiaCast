@@ -194,6 +194,16 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
       punto de las pestañas no cambie el tamaño ni el color del texto de la
       pestaña.
 
+- [ ] **Presentaciones en el celular** (tramo D3; el servidor y la página se
+      probaron con un programa de consola y node, sin celular real). Con el
+      control desde el celular prendido y una presentación abierta en la
+      grilla: en el celular las páginas salen como miniaturas y no parpadean
+      cada medio segundo; un toque proyecta la página y la marca roja la
+      sigue. Con una página en pantalla, «En vivo» del celular muestra su
+      miniatura y «Sigue» la próxima. La sección **Presentaciones** abre la
+      pestaña en la computadora. Una página sin miniatura (un video sin
+      póster) queda en blanco en el celular: avisar si molesta.
+
 ## 2. Para la v1.0.0
 
 - [ ] **Usar la beta.7 en la reunión del domingo** y anotar lo que falle o no

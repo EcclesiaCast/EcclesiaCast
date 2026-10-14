@@ -2967,7 +2967,12 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     {
         var slides = Slides
             .Where(s => s.JumpTarget is null)
-            .Select(s => new RemoteSlide(s.Index, s.Label, Shorten(s.Slide.MainText), s.IsLive && IsGridOnAir))
+            .Select(s => new RemoteSlide(
+                s.Index, s.Label, Shorten(s.Slide.MainText), s.IsLive && IsGridOnAir, s.Page?.Id))
+            .ToList();
+
+        var presentations = PresentationsForRemote()
+            .Select((p, index) => new RemotePresentation(index, p.Tab, p.Pages))
             .ToList();
 
         var playlist = PlaylistItems
@@ -2992,7 +2997,32 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             Status: StatusText,
             Slides: slides,
             Playlist: playlist,
-            SongTitle: SelectedSong?.Title ?? (IsBibleTabActive ? "Biblia" : "EcclesiaCast"));
+            SongTitle: SelectedSong?.Title ?? (IsBibleTabActive ? "Biblia" : "EcclesiaCast"),
+            Presentations: presentations,
+            // A page (or a media) on the air shows as its poster on the phone,
+            // not as the words that were up before it.
+            LiveMediaId: OnAir is OnAirSource.Presentation or OnAirSource.Media && LiveMediaId > 0 ? LiveMediaId : null,
+            NextMediaId: IsPresentationOpen ? PreviewPageMedia?.Id : null);
+    }
+
+    /// <summary>The marked tabs that have pages, in the order of the tabs: what the phone offers to open.</summary>
+    private List<(string Tab, int Pages)> PresentationsForRemote() =>
+        MediaTabs
+            .Where(IsPresentationTab)
+            .Select(t => (Tab: t, Pages: PresentationPages.For(t, _allMedia).Count))
+            .Where(p => p.Pages > 0)
+            .ToList();
+
+    string? IRemoteHost.GetThumbnailPath(int mediaId)
+    {
+        var poster = _allMedia.FirstOrDefault(m => m.Id == mediaId)?.ThumbnailPath;
+        if (string.IsNullOrWhiteSpace(poster) || !File.Exists(poster))
+            return null;
+
+        // Only what the program itself drew into its posters folder: whatever
+        // else a media's poster field might point to is not for the network.
+        var folder = Path.GetFullPath(MediaThumbnails.Directory).TrimEnd('\\') + "\\";
+        return Path.GetFullPath(poster).StartsWith(folder, StringComparison.OrdinalIgnoreCase) ? poster : null;
     }
 
     /// <summary>
@@ -3046,6 +3076,11 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             case "output": ToggleOutput(); break;
             case "nobackground": ClearBackground(); break;
             case "slide" when index is int slide: GoLiveSlide(slide); break;
+            case "presentation" when index is int shown:
+                // The phone opens it on the computer: the pages come back with the next poll.
+                if (PresentationsForRemote() is var offered && shown >= 0 && shown < offered.Count)
+                    OpenPresentation(offered[shown].Tab, null);
+                break;
             case "playlist" when index is int item && item >= 0 && item < PlaylistItems.Count:
                 ProjectPlaylistItem(PlaylistItems[item]);
                 break;

@@ -9,6 +9,16 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Ver y cambiar las presentaciones desde el celular.** La página del celular
+  ahora muestra las páginas de la presentación abierta como miniaturas (no
+  como texto), con la que está en pantalla marcada, y un toque en una la
+  proyecta. Aparece una sección **Presentaciones** con las pestañas marcadas
+  como presentación: un toque la abre en la computadora. Con una página en el
+  aire, el cuadro «En vivo» del celular muestra su miniatura en lugar de la
+  letra de antes, y «Sigue» muestra la página que viene. Las miniaturas se
+  piden una sola vez y el celular las guarda una hora; sólo se envía la
+  miniatura chica, nunca la imagen grande ni ningún otro archivo.
+
 - **«En vivo» por sección.** Antes, después de proyectar un versículo y pasar a
   una página de una presentación, la lista de versículos seguía diciendo «EN
   VIVO». Ahora la marca sigue lo que de verdad está en pantalla: la grilla

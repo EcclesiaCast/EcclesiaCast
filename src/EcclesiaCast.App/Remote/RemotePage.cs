@@ -43,6 +43,9 @@ internal static class RemotePage
           .slide .t{font-size:10px;color:#9aa1b2;margin-bottom:4px}
           .slide.live{background:#c43b3b;border-color:#c43b3b}
           .slide.live .t{color:#ffd9d9}
+          .slide img{width:100%;display:block;border-radius:4px;background:#0b0d12;
+                     aspect-ratio:16/9;object-fit:contain}
+          .shot{width:100%;max-height:38vh;object-fit:contain;display:none;border-radius:6px;background:#0b0d12}
           .item{text-align:left;padding:12px;font-size:14px;margin-bottom:6px;width:100%}
           .status{font-size:12px;color:#5b6070;padding:4px 2px 20px}
           .pin{max-width:320px;margin:60px auto;text-align:center}
@@ -74,11 +77,13 @@ internal static class RemotePage
             <div class="card">
               <div class="label" id="slideLabel">En vivo</div>
               <div class="live" id="live"></div>
+              <img class="shot" id="liveImg" alt="">
             </div>
 
             <div class="card">
               <div class="label">Sigue</div>
               <div class="next" id="next"></div>
+              <img class="shot" id="nextImg" alt="">
             </div>
 
             <div class="row" style="margin-bottom:12px">
@@ -95,6 +100,11 @@ internal static class RemotePage
             <div class="row" style="margin-bottom:12px">
               <button onclick="cmd('nobackground')">Sin fondo</button>
               <button id="bOutput" onclick="cmd('output')">Salida</button>
+            </div>
+
+            <div class="card hide" id="presCard">
+              <div class="label">Presentaciones</div>
+              <div id="presList"></div>
             </div>
 
             <div class="card">
@@ -173,6 +183,77 @@ internal static class RemotePage
           });
         }
 
+        function thumbUrl(id) {
+          return '/api/thumb?pin=' + encodeURIComponent(pin) + '&id=' + id;
+        }
+
+        // The poster is only asked for when the picture changes: setting the
+        // same address again would make the phone ask the computer every poll.
+        function showShot(elementId, mediaId) {
+          var img = document.getElementById(elementId);
+          if (!mediaId) { img.style.display = 'none'; img.removeAttribute('data-id'); return; }
+          if (img.getAttribute('data-id') !== String(mediaId)) {
+            img.setAttribute('data-id', String(mediaId));
+            img.src = thumbUrl(mediaId);
+          }
+          img.style.display = 'block';
+        }
+
+        var slidesKey = '';
+        var presentationsKey = '';
+
+        // The cards are rebuilt only when what they show changed; between
+        // polls only the mark of the live one moves. Rebuilding every 0.7 s
+        // would make the pages flicker and ask for their posters again.
+        function renderSlides(list) {
+          var slides = document.getElementById('slides');
+          var key = pin + '\n' + list.map(function (x) { return x.index + '|' + x.label + '|' + x.preview + '|' + (x.mediaId || ''); }).join('\n');
+          if (key !== slidesKey) {
+            slidesKey = key;
+            slides.innerHTML = '';
+            list.forEach(function (slide) {
+              var b = document.createElement('button');
+              b.className = 'slide';
+              var t = document.createElement('div');
+              t.className = 't';
+              t.textContent = slide.label;
+              b.appendChild(t);
+              if (slide.mediaId) {
+                var img = document.createElement('img');
+                img.alt = slide.label;
+                img.src = thumbUrl(slide.mediaId);
+                b.appendChild(img);
+              } else {
+                var p = document.createElement('div');
+                p.className = 'p';
+                p.textContent = slide.preview;
+                b.appendChild(p);
+              }
+              b.onclick = function () { cmd('slide', slide.index); };
+              slides.appendChild(b);
+            });
+          }
+          for (var i = 0; i < list.length && i < slides.children.length; i++) {
+            slides.children[i].className = 'slide' + (list[i].isLive ? ' live' : '');
+          }
+        }
+
+        function renderPresentations(list) {
+          document.getElementById('presCard').className = list.length ? 'card' : 'card hide';
+          var key = list.map(function (x) { return x.index + '|' + x.name + '|' + x.pages; }).join('\n');
+          if (key === presentationsKey) return;
+          presentationsKey = key;
+          var box = document.getElementById('presList');
+          box.innerHTML = '';
+          list.forEach(function (p) {
+            var b = document.createElement('button');
+            b.className = 'item';
+            b.textContent = '📑  ' + p.name + ' (' + p.pages + ')';
+            b.onclick = function () { cmd('presentation', p.index); };
+            box.appendChild(b);
+          });
+        }
+
         function render(s) {
           document.getElementById('song').textContent = s.songTitle || 'EcclesiaCast';
           document.getElementById('live').textContent = s.liveText || '';
@@ -187,17 +268,14 @@ internal static class RemotePage
           document.getElementById('bLogo').className = s.outputState === 'Logo' ? 'on' : '';
           document.getElementById('bOutput').className = s.isProjecting ? 'live' : '';
 
-          var slides = document.getElementById('slides');
-          slides.innerHTML = '';
-          (s.slides || []).forEach(function (slide) {
-            var b = document.createElement('button');
-            b.className = 'slide' + (slide.isLive ? ' live' : '');
-            b.innerHTML = '<div class="t"></div><div class="p"></div>';
-            b.querySelector('.t').textContent = slide.label;
-            b.querySelector('.p').textContent = slide.preview;
-            b.onclick = function () { cmd('slide', slide.index); };
-            slides.appendChild(b);
-          });
+          // A page on the air (or the next one) shows as its poster, not as text.
+          showShot('liveImg', s.liveMediaId);
+          showShot('nextImg', s.nextMediaId);
+          document.getElementById('live').style.display = s.liveMediaId ? 'none' : '';
+          document.getElementById('next').style.display = s.nextMediaId ? 'none' : '';
+
+          renderPresentations(s.presentations || []);
+          renderSlides(s.slides || []);
 
           var list = document.getElementById('playlist');
           list.innerHTML = '';
