@@ -172,6 +172,9 @@ public partial class App : Application
             // Once, the first time the program ever opens.
             if (OneTimeNotice.ShouldShow(settings, AboutSeenKey))
                 new Views.AboutWindow(Services.AppInfo.Version, firstRun: true) { Owner = mainWindow }.ShowDialog();
+
+            // A Bible package chosen on the installer's page opens its import window (once).
+            _ = _services.GetRequiredService<MainViewModel>().OfferInstalledBiblePackageAsync();
         };
         mainWindow.Show();
 

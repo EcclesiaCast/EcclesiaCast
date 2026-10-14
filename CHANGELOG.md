@@ -21,6 +21,17 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   aparecer. El origen y la licencia de cada una están en
   `installer/bibles/LICENCIAS.md`.
 
+- **Paquetes de Biblias (`.ecbiblias`).** Para llevar a otra computadora tuya
+  las Biblias con derechos que ya tenés: en **Archivo → Exportar paquete de
+  Biblias…** (o con clic derecho sobre una versión) marcás las versiones y se
+  guarda un solo archivo; en la otra, **Archivo → Importar paquete de
+  Biblias…** muestra lo que trae, con las que ya tenés destildadas y marcadas
+  «ya está en la biblioteca», e importa las que elijas. El instalador tiene
+  además una página opcional **Paquete de Biblias propio**: si elegís el
+  archivo ahí, la primera vez que abrís el programa aparece la ventana para
+  importarlo (una sola vez). Los paquetes son para usar en tus propias
+  computadoras: las versiones con derechos no se pueden repartir.
+
 - **Tipografía para cada recuadro del escenario.** En el diseñador de
   escenarios, cada recuadro (las notas del predicador, la hora, un texto fijo…)
   puede tener su propia letra: se elige de la lista de las que tiene la

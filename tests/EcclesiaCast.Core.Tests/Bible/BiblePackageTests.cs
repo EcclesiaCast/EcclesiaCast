@@ -2,6 +2,8 @@ using System.IO.Compression;
 using System.Text;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Bible;
+using EcclesiaCast.Core.Tests.Persistence;
+using EcclesiaCast.Data.Persistence;
 
 namespace EcclesiaCast.Core.Tests.Bible;
 
@@ -158,6 +160,42 @@ public class BiblePackageTests
         package.Position = 0;
 
         Assert.Empty(BiblePackage.ReadManifest(package));
+    }
+
+    [Fact]
+    public void Versions_saved_in_one_library_travel_in_a_package_to_another()
+    {
+        using var origin = new TempDatabase();
+        using var destination = new TempDatabase();
+        var from = new BibleRepository(origin.Path);
+        var to = new BibleRepository(destination.Path);
+        var a = from.Import("Reina Valera 1960", "RVR1960", "es", Sample("En el principio creó Dios los cielos y la tierra."));
+        var b = from.Import("Nueva Versión", "NVI", "es", Sample("Dios, en el principio, creó los cielos y la tierra."));
+        from.Import("No va", "XXX", "es", Sample("Esta no se elige."));
+
+        // What the export command does: the ticked versions, read one by one.
+        using var package = new MemoryStream();
+        var chosen = new[] { a.Id, b.Id };
+        var versions = from.GetVersions();
+        BiblePackage.Write(package, chosen.Select(id =>
+        {
+            var info = versions.Single(v => v.Id == id);
+            return (info.Name, info.Abbreviation, info.Language, from.ReadVersion(id));
+        }));
+        package.Position = 0;
+
+        // What the import command does on the other computer.
+        var offered = BiblePackage.ReadManifest(package);
+        foreach (var choice in BibleInstallPlanner.Offer(offered, to.GetVersions()).Where(c => !c.AlreadyInstalled))
+        {
+            package.Position = 0;
+            to.Import(choice.Entry.Name, choice.Entry.Abbreviation, choice.Entry.Language, BiblePackage.ReadVersion(package, choice.Entry));
+        }
+
+        Assert.Equal(["NVI", "RVR1960"], to.GetVersions().Select(v => v.Abbreviation).Order());
+        Assert.All(to.GetVersions(), v => Assert.Equal(3, v.VerseCount));
+        var again = BibleInstallPlanner.Offer(offered, to.GetVersions());
+        Assert.All(again, c => Assert.True(c.AlreadyInstalled));
     }
 
     [Fact]

@@ -191,6 +191,8 @@
             <MenuItem Header="Exportar a un archivo…"
                       Command="{Binding PlacementTarget.Tag.ExportBibleVersionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                       CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+            <MenuItem Header="Exportar un paquete de Biblias…"
+                      Command="{Binding PlacementTarget.Tag.ExportBiblePackageCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
             <Separator/>
             <MenuItem Header="Eliminar versión…"
                       Command="{Binding PlacementTarget.Tag.DeleteBibleVersionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"

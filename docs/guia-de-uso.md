@@ -55,6 +55,14 @@ desde la primera. Las flechas **←→** navegan en vivo.
 En la pestaña **Biblia**:
 
 - **📥** importa una Biblia en **JSON** o **Zefania XML**.
+- El instalador te deja elegir qué **Biblias libres** instalar (Reina-Valera
+  1909, Biblia libre para el mundo y Versión Biblia Libre); aparecen solas la
+  primera vez que abrís el programa. Las que tienen derechos (RVR1960, NVI…)
+  no vienen con el instalador: para llevarlas a otra computadora tuya, en
+  **Archivo → Exportar paquete de Biblias…** marcás las versiones y se guarda
+  un archivo `.ecbiblias`; en la otra, **Archivo → Importar paquete de
+  Biblias…** (o la página «Paquete de Biblias propio» del instalador) las
+  trae. Usá los paquetes sólo en tus propias computadoras.
 - Las versiones van en una fila de botones con su abreviatura. Un **clic**
   usa sólo esa versión; **Ctrl+clic suma o saca una segunda**, que se proyecta
   debajo de la primera (cada texto lleva su abreviatura entre corchetes,

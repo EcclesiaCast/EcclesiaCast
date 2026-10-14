@@ -368,7 +368,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         RefreshLightCopies();
 
         // The Bibles the installer left, once the window is up.
-        _ = ImportBundledBiblesAsync();
+        _bundledImport = ImportBundledBiblesAsync();
     }
 
     // ── Playlist del servicio ────────────────────────────────────

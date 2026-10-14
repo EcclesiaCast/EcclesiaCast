@@ -31,6 +31,19 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
          actualización automática): no tiene que duplicar ninguna ni traer de
          vuelta la que borraste. Ojo: quien actualiza desde una beta anterior
          recibe la RV1909 una vez, porque nunca eligió nada.
+- [ ] **Paquetes de Biblias (Tramo G, parte 2).**
+      1. **Archivo → Exportar paquete de Biblias…**: aparece la lista con las
+         versiones instaladas y el aviso amarillo. Marcá dos y guardá. También
+         está en el clic derecho sobre una versión.
+      2. En otra carpeta de datos (o borrando una versión antes), **Archivo →
+         Importar paquete de Biblias…**: la que ya está sale destildada y con
+         «ya está en la biblioteca»; las otras se importan y abajo lo dice.
+      3. En el instalador, la página **Paquete de Biblias propio** (después de
+         la de Biblias): elegí el archivo; al abrir el programa por primera
+         vez tiene que aparecer la ventana de importar, y **no** de nuevo al
+         abrirlo otra vez. Probá también escribir a mano un archivo que no
+         existe: el instalador tiene que avisar y no seguir.
+      4. Instalación en silencio con `/PAQUETE="C:\ruta\Biblias.ecbiblias"`.
 
 - [ ] **Zoom y corrimiento sobre la imagen entera («Rellenar»).** Es lo más
       importante de esta tanda. Poné una **página vertical** (la tapa de un
