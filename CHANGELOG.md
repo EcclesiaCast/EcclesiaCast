@@ -15,6 +15,12 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   computadora, o se escribe el nombre. Si no se elige ninguna, queda la de
   siempre, así que los escenarios que ya estaban guardados se ven igual.
 
+- **Tipografía para el texto rápido.** En la pestaña **Texto rápido** hay una
+  lista **Tipografía** arriba del cuadro: se elige la letra de las que tiene la
+  computadora, o se escribe el nombre. La vista previa cambia al instante, y se
+  recuerda aunque se cierre el programa. Si queda vacía, sigue la letra del
+  tema de las canciones, como antes.
+
 - **Actualizaciones automáticas.** Una vez por día, a los pocos segundos de
   abrir, EcclesiaCast mira en GitHub si hay una versión nueva y, si la hay,
   abre un aviso con lo que trae, en castellano, y tres botones: **Actualizar

@@ -31,6 +31,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 {
     private const string OutputDisplayKey = "output.display";
     private const string StageNotesKey = "stage.notes.text";
+    private const string QuickTextFontKey = "quicktext.font";
     private const string CountdownMinutesKey = "countdown.minutes";
     private const string CountdownClockKey = "countdown.clock";
     private const string CountdownHeadingKey = "countdown.heading";
@@ -130,6 +131,14 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
     [ObservableProperty]
     private string _quickText = string.Empty;
+
+    /// <summary>Typeface of the quick text. Empty keeps the songs' one from the theme.</summary>
+    [ObservableProperty]
+    private string _quickTextFont = string.Empty;
+
+    /// <summary>The installed typefaces, for the quick text's list, in alphabetical order.</summary>
+    public IReadOnlyList<string> SystemFonts { get; } =
+        System.Windows.Media.Fonts.SystemFontFamilies.Select(f => f.Source).OrderBy(n => n).ToList();
 
     /// <summary>What is being prepared; the Preview box binds to it.</summary>
     [ObservableProperty]
@@ -347,6 +356,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         InitializeWeb();
         InitializeUpdates();
         StageNotesText = _settings.Get(StageNotesKey) ?? string.Empty;
+        QuickTextFont = _settings.Get(QuickTextFontKey) ?? string.Empty;
         _previewShowsStage = _settings.Get(PreviewShowsStageKey) == "1";
         RestoreRemote();
         _ = RefreshVideoThumbnailsAsync();
@@ -5079,8 +5089,23 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     partial void OnQuickTextChanged(string value)
     {
         if (!string.IsNullOrWhiteSpace(value))
-            PreviewSlide = new SlideContent(value.Trim(), Theme: DefaultSongTheme);
+            PreviewSlide = QuickSlide(value.Trim());
     }
+
+    partial void OnQuickTextFontChanged(string value)
+    {
+        _settings.Set(QuickTextFontKey, value);
+        if (!string.IsNullOrWhiteSpace(QuickText))
+            PreviewSlide = QuickSlide(QuickText.Trim());
+    }
+
+    /// <summary>
+    /// The quick text as a slide: the songs' theme, with the typeface chosen
+    /// for the quick text when there is one.
+    /// </summary>
+    private SlideContent QuickSlide(string text) =>
+        new(text, Theme: DefaultSongTheme,
+            Override: string.IsNullOrWhiteSpace(QuickTextFont) ? null : new SlideOverride(FontFamily: QuickTextFont.Trim()));
 
     [RelayCommand]
     private void GoLive()
@@ -5088,7 +5113,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (string.IsNullOrWhiteSpace(QuickText) || SelectedDisplay is null)
             return;
 
-        _presentation.GoLive(new SlideContent(QuickText.Trim(), Theme: DefaultSongTheme));
+        _presentation.GoLive(QuickSlide(QuickText.Trim()));
         SyncHighlightBox();
         _projection.EnsureVisible(SelectedDisplay.Info);
         _settings.Set(OutputDisplayKey, SelectedDisplay.Info.DeviceName);
