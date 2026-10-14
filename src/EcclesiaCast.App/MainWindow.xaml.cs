@@ -10,6 +10,7 @@ using EcclesiaCast.App.Services;
 using EcclesiaCast.App.ViewModels;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Audio;
+using EcclesiaCast.Core.Bible;
 using EcclesiaCast.Core.Media;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Core.Songs;
@@ -1013,6 +1014,93 @@ public partial class MainWindow : Window
     {
         if (e.Key == Key.Enter)
             BibleQueryBox.CaretIndex = BibleQueryBox.Text.Length;
+    }
+
+    // ── Historial de versículos (🕘 junto a la caja de la Biblia) ──
+
+    private DateTime _historyClosedAt = DateTime.MinValue;
+
+    private void BibleHistoryButton_Click(object sender, RoutedEventArgs e)
+    {
+        // A popup that does not stay open closes on the mouse press that is
+        // about to click this button; without the check the click opened it
+        // again at once and the button could never close it.
+        if (DateTime.UtcNow - _historyClosedAt < TimeSpan.FromMilliseconds(250))
+            return;
+
+        BibleHistoryPopup.IsOpen = true;
+    }
+
+    /// <summary>↓ in the empty box opens the history, as a list of what was projected comes to hand there.</summary>
+    private void BibleQueryBox_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Down
+            || BibleQueryBox.Text.Length > 0
+            || Keyboard.Modifiers != ModifierKeys.None
+            || DataContext is not MainViewModel { BibleHistory.Count: > 0 })
+            return;
+
+        BibleHistoryPopup.IsOpen = true;
+        e.Handled = true;
+    }
+
+    /// <summary>Opens with the newest entry ready: arrows move, Enter projects.</summary>
+    private void BibleHistoryPopup_Opened(object? sender, EventArgs e) =>
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (HistoryListBox.Items.Count == 0)
+                return;
+
+            if (HistoryListBox.SelectedIndex < 0)
+                HistoryListBox.SelectedIndex = 0;
+
+            HistoryListBox.UpdateLayout();
+            if (HistoryListBox.ItemContainerGenerator.ContainerFromIndex(HistoryListBox.SelectedIndex) is ListBoxItem row)
+                row.Focus();
+        }, DispatcherPriority.Input);
+
+    private void BibleHistoryPopup_Closed(object? sender, EventArgs e) => _historyClosedAt = DateTime.UtcNow;
+
+    private void BibleHistoryPopup_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape)
+        {
+            BibleHistoryPopup.IsOpen = false;
+            BibleQueryBox.Focus();
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Enter
+            && HistoryListBox.SelectedItem is BibleHistoryEntry entry
+            && DataContext is MainViewModel vm)
+        {
+            BibleHistoryPopup.IsOpen = false;
+            vm.ProjectHistoryEntryCommand.Execute(entry);
+            e.Handled = true;
+        }
+    }
+
+    /// <summary>
+    /// One click loads the chapter and marks the verse; a double click
+    /// projects it. The double click is taken here (not a MouseBinding) for
+    /// the same reason as in the other lists.
+    /// </summary>
+    private void HistoryListBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm
+            || e.OriginalSource is not DependencyObject source
+            || ItemsControl.ContainerFromElement(HistoryListBox, source) is not ListBoxItem { DataContext: BibleHistoryEntry entry })
+            return;
+
+        if (e.ClickCount == 2)
+        {
+            BibleHistoryPopup.IsOpen = false;
+            vm.ProjectHistoryEntryCommand.Execute(entry);
+            e.Handled = true;
+        }
+        else
+        {
+            vm.OpenHistoryEntryCommand.Execute(entry);
+        }
     }
 
     /// <summary>A click puts the caret somewhere: the arrows are for the text again.</summary>

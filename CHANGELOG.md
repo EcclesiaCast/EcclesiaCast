@@ -9,6 +9,16 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Historial de versículos buscados, como en BibleShow.** Al lado de la caja
+  de búsqueda de la Biblia hay un botón **🕘** (o la flecha ↓ con la caja
+  vacía) que abre la lista de los últimos 30 versículos que proyectaste desde
+  ahí, el más reciente arriba, con la versión en que los leíste («Juan 3:16 ·
+  NTV»). Un clic carga el capítulo y marca el versículo (también vuelve a
+  poner la versión, y la segunda si había, siempre que sigan instaladas); doble
+  clic o Enter lo proyecta. **Borrar historial** la vacía. La lista se
+  recuerda aunque se cierre el programa. No se anotan los versículos a los que
+  se llega con las flechas ni con clics en las tarjetas.
+
 - **Tipografía para cada recuadro del escenario.** En el diseñador de
   escenarios, cada recuadro (las notas del predicador, la hora, un texto fijo…)
   puede tener su propia letra: se elige de la lista de las que tiene la

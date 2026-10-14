@@ -170,6 +170,25 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
          capítulos), **→** proyecta el primer versículo, no el capítulo
          anterior.
 
+- [ ] **Historial de versículos buscados (🕘).** No se pudo probar con el
+      programa abierto (sólo se dibujó la lista a imagen):
+      1. Proyectá con Enter «juan 3 16», «sal 23 1» y «1 co 13 4-7»: el botón
+         **🕘** a la derecha de la caja tiene que mostrarlos, el último arriba,
+         cada uno con la versión («Juan 3:16 · NTV»). Repetir uno lo sube al
+         primer lugar sin duplicarlo.
+      2. Avanzar con las flechas o hacer clic en una tarjeta **no** agrega
+         nada. Proyectar un resultado de «?palabra» (doble clic) sí.
+      3. Un clic en una entrada carga el capítulo y marca el versículo (la
+         lista queda abierta); doble clic o Enter (con la entrada elegida)
+         lo proyecta y cierra la lista. Esc la cierra. Tiene que poder cerrarse
+         tocando de nuevo el botón 🕘.
+      4. Con la caja vacía, la flecha ↓ abre la lista con la primera entrada
+         elegida; con texto en la caja, ↓ no hace nada raro.
+      5. Cambiá de versión (o sumá una segunda con Ctrl+clic) y elegí una
+         entrada guardada con otra versión: tiene que volver a esa versión.
+      6. Cerrá y abrí el programa: el historial sigue. «Borrar historial» lo
+         vacía y avisa en la barra de estado.
+
 ## 2. Para la v1.0.0
 
 - [ ] **Usar la beta.7 en la reunión del domingo** y anotar lo que falle o no
