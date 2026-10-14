@@ -203,6 +203,7 @@ public sealed partial class MainViewModel
         LiveSlideIndex = live?.Index ?? -1;
         foreach (var slide in Slides)
             slide.IsLive = slide.Index == LiveSlideIndex;
+        RefreshSlideOnAir();
 
         PreviewPageMedia = (live is null ? Slides.FirstOrDefault() : Slides.ElementAtOrDefault(live.Index + 1))?.Page;
     }
@@ -252,6 +253,7 @@ public sealed partial class MainViewModel
         _presentation.ClearText();
         ApplyBackgroundCore(page);
         _livePageId = page.Id;
+        UpdateOnAir();
         _settings.Set(OutputDisplayKey, SelectedDisplay!.Info.DeviceName);
 
         LiveTitle = GridTitle;
@@ -263,6 +265,7 @@ public sealed partial class MainViewModel
             slide.IsPreviewed = false;
         }
 
+        RefreshSlideOnAir();
         PreviewSlide = null;
         var next = Slides.ElementAtOrDefault(index + 1);
         PreviewPageMedia = next?.Page;

@@ -9,6 +9,18 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **«En vivo» por sección.** Antes, después de proyectar un versículo y pasar a
+  una página de una presentación, la lista de versículos seguía diciendo «EN
+  VIVO». Ahora la marca sigue lo que de verdad está en pantalla: la grilla
+  central tiene **borde rojo** y «EN VIVO» sólo mientras muestra lo que se
+  proyecta; la barra de medios tiene borde rojo cuando lo que está en pantalla
+  es un medio (y su tarjeta, también); las pestañas **Canciones** y **Biblia**
+  llevan un punto rojo cuando lo que sale viene de ahí. Con Black, el logo o la
+  salida apagada, nada queda en rojo. La tarjeta que se proyectó por última vez
+  pero ya no está en el aire queda con un borde apagado. Un medio en pantalla
+  completa aparece en «En vivo: …», y al volver la letra, vuelve su título. El
+  celular marca en vivo sólo lo que de verdad está en el aire.
+
 - **Una pestaña de medios como presentación.** Al importar un PDF o una
   presentación, el programa pregunta si las páginas van a una **pestaña nueva,
   como presentación** (lo recomendado) o a la pestaña que está abierta. Una

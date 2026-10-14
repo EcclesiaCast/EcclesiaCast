@@ -120,8 +120,13 @@ public sealed partial class SlideItemViewModel(
         }
     }
 
+    /// <summary>The card last projected from this grid; it may no longer be on the air.</summary>
     [ObservableProperty]
     private bool _isLive;
+
+    /// <summary>The card that is on the air right now.</summary>
+    [ObservableProperty]
+    private bool _isOnAir;
 
     /// <summary>Selected as "next up" (e.g. the verse a reference points to), not live yet.</summary>
     [ObservableProperty]

@@ -182,6 +182,18 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
          presentación abierta no tiene que dejar nada raro en la grilla.
       7. Probá una pestaña con videos locales: entran como páginas.
 
+- [ ] **«En vivo» por sección** (tramo D2; sólo pruebas y dibujos). Proyectá un
+      versículo: la grilla tiene borde rojo y «EN VIVO», y la pestaña **Biblia**
+      un punto rojo. Pasá a una página de una presentación: la grilla de
+      versículos ya no está en rojo, lo está la de la presentación. Un medio de
+      la barra (de una pestaña común): la barra de medios y su tarjeta quedan
+      con borde rojo. Black, logo, F2 con letra o apagar la salida: nada en
+      rojo. La tarjeta proyectada que ya no está en el aire queda con un borde
+      apagado. Con una estrofa en pantalla, poné un anuncio a pantalla completa
+      y sacalo con F4: «En vivo» vuelve a nombrar la canción. Mirá que el
+      punto de las pestañas no cambie el tamaño ni el color del texto de la
+      pestaña.
+
 ## 2. Para la v1.0.0
 
 - [ ] **Usar la beta.7 en la reunión del domingo** y anotar lo que falle o no

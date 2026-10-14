@@ -183,21 +183,24 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     /// or the name of a media waiting to be projected. Shown above the grid.
     /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsGridLive), nameof(HasGridTitle), nameof(ShowGridLiveBadge), nameof(ShowOtherLive))]
+    [NotifyPropertyChangedFor(nameof(IsGridLive), nameof(HasGridTitle), nameof(IsGridOnAir), nameof(ShowGridLiveBadge), nameof(ShowOtherLive))]
     private string? _gridTitle;
 
     /// <summary>The name of what was last put on screen, by the same naming.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsGridLive), nameof(ShowGridLiveBadge), nameof(ShowOtherLive))]
+    [NotifyPropertyChangedFor(nameof(IsGridLive), nameof(IsGridOnAir), nameof(ShowGridLiveBadge), nameof(ShowOtherLive))]
     private string? _liveTitle;
 
-    /// <summary>True when the grid shows the very thing that is on screen.</summary>
+    /// <summary>True when the grid shows the very thing that was last put on screen (by name).</summary>
     public bool IsGridLive => LiveTitle is not null && LiveTitle == GridTitle;
 
     public bool HasGridTitle => !string.IsNullOrEmpty(GridTitle);
 
-    /// <summary>The «EN VIVO» mark next to the grid's title.</summary>
-    public bool ShowGridLiveBadge => IsProjecting && IsGridLive;
+    /// <summary>
+    /// The «EN VIVO» mark next to the grid's title: only while what is on
+    /// screen really is what the grid holds (see <see cref="IsGridOnAir"/>).
+    /// </summary>
+    public bool ShowGridLiveBadge => IsGridOnAir;
 
     /// <summary>
     /// «En vivo: …» on the right of the header, when the screen shows
@@ -2033,6 +2036,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         NoteAction($"Poner el fondo «{item.Name}»");
         _presentation.SetBackground(item, ResolveFill(item));
 
+        // A media on the whole screen is what is live now: «En vivo: …» says it.
+        if (item.Behavior == MediaBehavior.Foreground)
+            LiveTitle = item.Name;
+
         // Foreground = the media alone (no text). Background with no live slide
         // also shows alone; Black/Logo would hide it, so drop back to showing
         // the media immediately.
@@ -2960,7 +2967,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     {
         var slides = Slides
             .Where(s => s.JumpTarget is null)
-            .Select(s => new RemoteSlide(s.Index, s.Label, Shorten(s.Slide.MainText), s.IsLive))
+            .Select(s => new RemoteSlide(s.Index, s.Label, Shorten(s.Slide.MainText), s.IsLive && IsGridOnAir))
             .ToList();
 
         var playlist = PlaylistItems
@@ -5174,6 +5181,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             return;
         }
 
+        _liveSlideOrigin = item.Verses is not null ? SlideOrigin.Bible
+            : item.SectionId != 0 ? SlideOrigin.Song
+            : SlideOrigin.None;
+        _textLiveTitle = GridTitle;
         _presentation.GoLive(item.Slide);
         SyncHighlightBox();
         LiveTitle = GridTitle;
@@ -5198,6 +5209,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             slide.IsPreviewed = false;
         }
 
+        RefreshSlideOnAir();
         PreviewSlide = index + 1 < Slides.Count ? Slides[index + 1].Slide : null;
 
         // The stage display needs the label of what is live and the text of
@@ -5245,6 +5257,8 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (IsPresentationPageOnAir)
             RemovePageForText();
 
+        _liveSlideOrigin = SlideOrigin.QuickText;
+        _textLiveTitle = "Texto rápido";
         _presentation.GoLive(QuickSlide(QuickText.Trim()));
         SyncHighlightBox();
         _projection.EnsureVisible(SelectedDisplay.Info);
@@ -5254,6 +5268,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         LiveSlideIndex = -1;
         foreach (var slide in Slides)
             slide.IsLive = false;
+        RefreshSlideOnAir();
 
         // Quick text stands alone: nothing follows it on the stage display.
         Projection.SlideLabel = "Texto rápido";
@@ -5387,6 +5402,8 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         // anything else takes the background.
         if (_livePageId != 0 && _presentation.Background?.Id != _livePageId)
             _livePageId = 0;
+
+        UpdateOnAir();
 
         // The live page switches itself off the moment anything else takes the
         // background (or it is cleared): the button must follow.

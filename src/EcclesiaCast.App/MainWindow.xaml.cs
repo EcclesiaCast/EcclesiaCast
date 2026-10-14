@@ -56,6 +56,8 @@ public partial class MainWindow : Window
                     ScrollSlideIntoView(vm.LiveSlideIndex);
                 else if (args.PropertyName == nameof(MainViewModel.PreviewSlideIndex))
                     ScrollSlideIntoView(vm.PreviewSlideIndex);
+                else if (args.PropertyName == nameof(MainViewModel.LiveMediaId))
+                    RefreshMediaLiveVisuals();
             };
 
             // A fresh chapter or passage always starts at the top.
@@ -522,6 +524,7 @@ public partial class MainWindow : Window
             return;
 
         MediaCardState.SetIsSelected(card, vm.MediaSelection.Contains(media.Id));
+        MediaCardState.SetIsLive(card, vm.LiveMediaId == media.Id);
         if (media.FillMediaId is int fillId
             && card.Template.FindName("preview", card) is FramedMediaPreview preview)
             preview.FillMedia = vm.FindMedia(fillId);
@@ -564,6 +567,22 @@ public partial class MainWindow : Window
                 && VisualTreeHelper.GetChild(holder, 0) is Button card
                 && card.DataContext is MediaItem media)
                 MediaCardState.SetIsSelected(card, vm.MediaSelection.Contains(media.Id));
+        }
+    }
+
+    /// <summary>Marks the card of the media that is on the screen now (red border) and unmarks the rest.</summary>
+    private void RefreshMediaLiveVisuals()
+    {
+        if (DataContext is not MainViewModel vm)
+            return;
+
+        for (var i = 0; i < MediaCards.Items.Count; i++)
+        {
+            if (MediaCards.ItemContainerGenerator.ContainerFromIndex(i) is ContentPresenter holder
+                && VisualTreeHelper.GetChildrenCount(holder) > 0
+                && VisualTreeHelper.GetChild(holder, 0) is Button card
+                && card.DataContext is MediaItem media)
+                MediaCardState.SetIsLive(card, vm.LiveMediaId == media.Id);
         }
     }
 
