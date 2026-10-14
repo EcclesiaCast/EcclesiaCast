@@ -283,6 +283,63 @@ dibujos a imagen):
          y la pantalla tienen que cambiar al instante, también si el aviso ya
          está puesto. Cerrá y abrí el programa: se tiene que acordar. Vacía la
          tipografía: vuelve a Segoe UI.
+- [ ] **Una pestaña de medios como presentación** (tramo D1; sólo hay pruebas
+      y dibujos de las tarjetas). Nada de esto se abrió con el programa.
+      1. Agregá un PDF o una presentación (📥 o arrastrándola): pregunta
+         «📑 Pestaña nueva «archivo», como presentación (recomendado)» o
+         «Agregar las páginas a «…»». Con la primera se crea la pestaña, y las
+         páginas aparecen en el cuadro central como tarjetas con la miniatura.
+      2. Clic en una página: va a la pantalla sola, sin letra. F2 no tiene que
+         traer la letra de antes. Las flechas ←→ pasan de página. En el
+         PREVIEW se ve la página que sigue.
+      3. Con una canción en pantalla, pasá a una página y volvé a proyectar una
+         estrofa: el fondo que había antes de la presentación tiene que volver.
+         Lo mismo con un texto rápido.
+      4. «Configurar…» de cualquier pestaña tiene la casilla «📑 Usar como
+         presentación»; el clic derecho de la pestaña tiene «Abrir como
+         presentación». Un clic en una tarjeta de una pestaña marcada abre la
+         presentación y proyecta esa página.
+      5. «➕ Playlist» junto al título de la grilla (o clic derecho en la
+         pestaña → «Agregar a la playlist como presentación»): en la playlist
+         sale con 📑. Un clic la abre sin proyectar, el doble clic proyecta la
+         primera página; las flechas pasan por las páginas y, al final, siguen
+         con el elemento que viene.
+      6. Clic derecho en una página del cuadro central: sólo «Propiedades…».
+         No se puede arrastrar. Renombrar o eliminar la pestaña con la
+         presentación abierta no tiene que dejar nada raro en la grilla.
+      7. Probá una pestaña con videos locales: entran como páginas.
+
+- [ ] **«En vivo» por sección** (tramo D2; sólo pruebas y dibujos). Proyectá un
+      versículo: la grilla tiene borde rojo y «EN VIVO», y la pestaña **Biblia**
+      un punto rojo. Pasá a una página de una presentación: la grilla de
+      versículos ya no está en rojo, lo está la de la presentación. Un medio de
+      la barra (de una pestaña común): la barra de medios y su tarjeta quedan
+      con borde rojo. Black, logo, F2 con letra o apagar la salida: nada en
+      rojo. La tarjeta proyectada que ya no está en el aire queda con un borde
+      apagado. Con una estrofa en pantalla, poné un anuncio a pantalla completa
+      y sacalo con F4: «En vivo» vuelve a nombrar la canción. Mirá que el
+      punto de las pestañas no cambie el tamaño ni el color del texto de la
+      pestaña.
+
+- [ ] **Presentaciones en el celular** (tramo D3; el servidor y la página se
+      probaron con un programa de consola y node, sin celular real). Con el
+      control desde el celular prendido y una presentación abierta en la
+      grilla: en el celular las páginas salen como miniaturas y no parpadean
+      cada medio segundo; un toque proyecta la página y la marca roja la
+      sigue. Con una página en pantalla, «En vivo» del celular muestra su
+      miniatura y «Sigue» la próxima. La sección **Presentaciones** abre la
+      pestaña en la computadora. Una página sin miniatura (un video sin
+      póster) queda en blanco en el celular: avisar si molesta.
+
+- [ ] **GIF animados** (tramo D4; la conversión se probó con un GIF armado a
+      mano y ffmpeg, sin abrir el programa). Agregá un GIF animado de verdad
+      (uno de internet): tiene que aparecer en la pestaña, después de unos
+      segundos, como un video con su miniatura; proyectado, se mueve en bucle y
+      sin sonido. Un GIF común (una sola imagen) sigue entrando como imagen.
+      Arrastrar varios GIF juntos los convierte de a uno. Clic derecho →
+      «Quitar de la biblioteca» no tiene que dejar archivos en
+      `%APPDATA%\EcclesiaCast\gifs`. Los GIF con transparencia quedan sobre
+      fondo negro (el video no tiene transparencia): mirá si molesta.
 
 ## 2. Para la v1.0.0
 

@@ -14,12 +14,16 @@ public sealed class MediaInspectorService : IMediaInspector
         return window.ShowDialog() == true && window.Saved;
     }
 
-    public MediaTabRule? EditTabRule(string tab, MediaTabRule current)
+    public MediaTabRule? EditTabRule(string tab, MediaTabRule current, ref bool presentation)
     {
-        var window = new MediaTabRuleWindow(tab, current)
+        var window = new MediaTabRuleWindow(tab, current, presentation)
         {
             Owner = System.Windows.Application.Current.MainWindow,
         };
-        return window.ShowDialog() == true ? window.Rule : null;
+        if (window.ShowDialog() != true)
+            return null;
+
+        presentation = window.Presentation;
+        return window.Rule;
     }
 }

@@ -67,6 +67,49 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   transición de la letra ahora se escribe en **segundos** (la de siempre, 0,28
   s, queda igual) y el máximo sube a 5 s. Un YouTube no se puede fundir (es una
   ventana aparte de Windows): se esconde de golpe.
+- **Los GIF animados se mueven.** Antes un GIF se veía como una foto fija (sólo
+  su primer cuadro). Ahora, al agregar un GIF animado (con 📥 o arrastrándolo),
+  el programa lo convierte en un video MP4, en bucle y sin sonido, que guarda
+  en su carpeta de datos y agrega a la pestaña; el GIF original queda donde
+  estaba. La conversión se hace en segundo plano (unos segundos) y la barra de
+  estado avisa. Si no se encuentra ffmpeg, o la conversión falla, el GIF entra
+  como imagen fija, como hasta ahora. Quitar el video de la biblioteca borra
+  también el MP4 convertido.
+
+- **Ver y cambiar las presentaciones desde el celular.** La página del celular
+  ahora muestra las páginas de la presentación abierta como miniaturas (no
+  como texto), con la que está en pantalla marcada, y un toque en una la
+  proyecta. Aparece una sección **Presentaciones** con las pestañas marcadas
+  como presentación: un toque la abre en la computadora. Con una página en el
+  aire, el cuadro «En vivo» del celular muestra su miniatura en lugar de la
+  letra de antes, y «Sigue» muestra la página que viene. Las miniaturas se
+  piden una sola vez y el celular las guarda una hora; sólo se envía la
+  miniatura chica, nunca la imagen grande ni ningún otro archivo.
+
+- **«En vivo» por sección.** Antes, después de proyectar un versículo y pasar a
+  una página de una presentación, la lista de versículos seguía diciendo «EN
+  VIVO». Ahora la marca sigue lo que de verdad está en pantalla: la grilla
+  central tiene **borde rojo** y «EN VIVO» sólo mientras muestra lo que se
+  proyecta; la barra de medios tiene borde rojo cuando lo que está en pantalla
+  es un medio (y su tarjeta, también); las pestañas **Canciones** y **Biblia**
+  llevan un punto rojo cuando lo que sale viene de ahí. Con Black, el logo o la
+  salida apagada, nada queda en rojo. La tarjeta que se proyectó por última vez
+  pero ya no está en el aire queda con un borde apagado. Un medio en pantalla
+  completa aparece en «En vivo: …», y al volver la letra, vuelve su título. El
+  celular marca en vivo sólo lo que de verdad está en el aire.
+
+- **Una pestaña de medios como presentación.** Al importar un PDF o una
+  presentación, el programa pregunta si las páginas van a una **pestaña nueva,
+  como presentación** (lo recomendado) o a la pestaña que está abierta. Una
+  pestaña marcada como presentación (casilla en **Configurar…**, o clic derecho
+  → **Abrir como presentación**) se abre en el cuadro central como una canción:
+  una tarjeta por página, con su miniatura. Un clic proyecta la página sola
+  (sin letra encima), las flechas pasan de una a otra, y el PREVIEW muestra la
+  que sigue. Al proyectar una estrofa o un texto rápido, vuelve el fondo que
+  había antes. **➕ Playlist** (junto al título de la grilla) agrega la
+  presentación entera a la playlist: las flechas la recorren y siguen con lo
+  que viene después. Entran las imágenes y los videos de la pestaña, no los de
+  YouTube ni las páginas web, y las imágenes no avanzan solas.
 
 - **Tipografía para cada recuadro del escenario.** En el diseñador de
   escenarios, cada recuadro (las notas del predicador, la hora, un texto fijo…)

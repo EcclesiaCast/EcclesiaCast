@@ -1,7 +1,14 @@
 namespace EcclesiaCast.App.Remote;
 
-/// <summary>One slide as the phone sees it.</summary>
-public sealed record RemoteSlide(int Index, string Label, string Preview, bool IsLive);
+/// <summary>
+/// One slide as the phone sees it. <paramref name="MediaId"/> is set on the
+/// cards of a presentation: the phone draws the page's poster (asking for it
+/// by this id) instead of the text.
+/// </summary>
+public sealed record RemoteSlide(int Index, string Label, string Preview, bool IsLive, int? MediaId = null);
+
+/// <summary>A tab marked as a presentation, which the phone can open on the computer.</summary>
+public sealed record RemotePresentation(int Index, string Name, int Pages);
 
 /// <summary>One playlist entry as the phone sees it.</summary>
 public sealed record RemotePlaylistItem(int Index, string Caption, string Kind);
@@ -19,7 +26,10 @@ public sealed record RemoteState(
     string Status,
     IReadOnlyList<RemoteSlide> Slides,
     IReadOnlyList<RemotePlaylistItem> Playlist,
-    string SongTitle);
+    string SongTitle,
+    IReadOnlyList<RemotePresentation>? Presentations = null,
+    int? LiveMediaId = null,
+    int? NextMediaId = null);
 
 /// <summary>
 /// What the phone is allowed to do. Implemented by the operator's view model;
@@ -28,6 +38,14 @@ public sealed record RemoteState(
 public interface IRemoteHost
 {
     RemoteState GetState();
+
+    /// <summary>
+    /// The small poster of a media the library knows, for the pages of a
+    /// presentation on the phone; null when there is none. It is the poster
+    /// only (never the full-size picture), and the path is never taken from
+    /// the request: the phone only names the media by its id.
+    /// </summary>
+    string? GetThumbnailPath(int mediaId);
 
     /// <summary>The words on the projector, for the broadcast page.</summary>
     RemoteOutput GetOutput();

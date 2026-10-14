@@ -5,6 +5,14 @@ public enum PlaylistItemType
     Song,
     BiblePassage,
     Media,
+
+    /// <summary>
+    /// A media tab opened as a presentation: its pages fill the grid and the
+    /// arrows walk them. Stored as the number 3, so no migration is needed;
+    /// <see cref="PlaylistItem.MediaId"/> holds its first page and
+    /// <see cref="PlaylistItem.Caption"/> the name of the tab.
+    /// </summary>
+    Presentation,
 }
 
 /// <summary>The order of a service: songs, passages, and media, in sequence.</summary>

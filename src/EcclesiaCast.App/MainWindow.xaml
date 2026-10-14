@@ -485,14 +485,29 @@
                                     Click="LibraryCollapse_Click"
                                     ToolTip="Achicar este panel para darle lugar a la playlist (o volver a agrandarlo)"/>
                             <StackPanel Orientation="Horizontal">
-                                <RadioButton Content="Canciones" Style="{StaticResource TabButton}"
+                                <!-- El punto rojo dice que lo que está en pantalla viene de esa sección -->
+                                <RadioButton Style="{StaticResource TabButton}"
                                              GroupName="LibraryTab"
                                              IsChecked="{Binding IsBibleTabActive, Converter={StaticResource InverseBool}}"
-                                             Command="{Binding ShowSongsTabCommand}"/>
-                                <RadioButton Content="Biblia" Style="{StaticResource TabButton}"
+                                             Command="{Binding ShowSongsTabCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Canciones"/>
+                                        <Ellipse Width="7" Height="7" Margin="6,0,0,0" VerticalAlignment="Center"
+                                                 Fill="{StaticResource LiveBrush}" ToolTip="En vivo"
+                                                 Visibility="{Binding IsSongsOnAir, Converter={StaticResource BoolToVis}}"/>
+                                    </StackPanel>
+                                </RadioButton>
+                                <RadioButton Style="{StaticResource TabButton}"
                                              GroupName="LibraryTab" Margin="4,0,0,0"
                                              IsChecked="{Binding IsBibleTabActive}"
-                                             Command="{Binding ShowBibleTabCommand}"/>
+                                             Command="{Binding ShowBibleTabCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Biblia"/>
+                                        <Ellipse Width="7" Height="7" Margin="6,0,0,0" VerticalAlignment="Center"
+                                                 Fill="{StaticResource LiveBrush}" ToolTip="En vivo"
+                                                 Visibility="{Binding IsBibleOnAir, Converter={StaticResource BoolToVis}}"/>
+                                    </StackPanel>
+                                </RadioButton>
                             </StackPanel>
                         </DockPanel>
 
@@ -1168,6 +1183,9 @@
                                             <DataTrigger Binding="{Binding Type}" Value="Media">
                                                 <Setter TargetName="icon" Property="Text" Value="🎞"/>
                                             </DataTrigger>
+                                            <DataTrigger Binding="{Binding Type}" Value="Presentation">
+                                                <Setter TargetName="icon" Property="Text" Value="📑"/>
+                                            </DataTrigger>
                                         </DataTemplate.Triggers>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
@@ -1192,7 +1210,18 @@
                           ToolTip="Arrastrá para agrandar o achicar la barra de medios"/>
 
             <!-- Panel central: la grilla de diapositivas -->
-            <Border x:Name="SlidesPanel" Grid.Column="2" Style="{StaticResource Panel}">
+            <Border x:Name="SlidesPanel" Grid.Column="2">
+                <!-- Borde rojo mientras lo que está en pantalla es lo de esta grilla -->
+                <Border.Style>
+                    <Style TargetType="Border" BasedOn="{StaticResource Panel}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsGridOnAir}" Value="True">
+                                <Setter Property="BorderBrush" Value="{StaticResource LiveBrush}"/>
+                                <Setter Property="BorderThickness" Value="2"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -1203,6 +1232,12 @@
                     <!-- Qué hay en la grilla y, si es otra cosa, qué está en pantalla -->
                     <DockPanel Grid.Row="0" Margin="12,8,12,8" LastChildFill="False"
                                Visibility="{Binding HasGridTitle, Converter={StaticResource BoolToVis}}">
+                        <!-- Sólo con una presentación en la grilla -->
+                        <Button DockPanel.Dock="Right" Content="➕ Playlist" FontSize="11" Padding="8,3" Margin="10,0,0,0"
+                                Style="{StaticResource DarkButton}"
+                                Command="{Binding AddPresentationToPlaylistCommand}"
+                                Visibility="{Binding IsPresentationOpen, Converter={StaticResource BoolToVis}}"
+                                ToolTip="Agregar la presentación entera a la playlist: las flechas pasan por sus páginas y siguen con lo que viene después"/>
                         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center"
                                     Visibility="{Binding ShowOtherLive, Converter={StaticResource BoolToVis}}"
                                     ToolTip="Lo que se está viendo en la pantalla ahora">
@@ -1301,11 +1336,17 @@
                                                             <Grid>
                                                                 <!-- Todas las tarjetas del mismo tamaño: la letra
                                                                      se achica hasta que entra entera -->
-                                                                <TextBlock Text="{Binding PreviewText}"
+                                                                <TextBlock x:Name="cardText" Text="{Binding PreviewText}"
                                                                            FontSize="{Binding DataContext.SlideCardFontSize, ElementName=SlideGrid}"
                                                                            Foreground="White"
                                                                            TextWrapping="Wrap"
                                                                            controls:TextFit.MaxFontSize="{Binding DataContext.SlideCardFontSize, ElementName=SlideGrid}"/>
+                                                                <!-- Una página de presentación: la miniatura, no el texto -->
+                                                                <TextBlock x:Name="pageIcon" Text="🎞" FontSize="28" Visibility="Collapsed"
+                                                                           Foreground="{StaticResource MutedBrush}"
+                                                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                <Image x:Name="pageImage" Source="{Binding PageImage}" Stretch="Uniform"
+                                                                       Visibility="Collapsed"/>
                                                                 <!-- El rótulo va en la esquina, encima del texto,
                                                                      para no robarle un renglón arriba -->
                                                                 <Border HorizontalAlignment="Right" VerticalAlignment="Bottom"
@@ -1322,11 +1363,23 @@
                                                             <Trigger Property="IsMouseOver" Value="True">
                                                                 <Setter TargetName="card" Property="Background" Value="#1A2030"/>
                                                             </Trigger>
+                                                            <DataTrigger Binding="{Binding IsPage}" Value="True">
+                                                                <Setter TargetName="cardText" Property="Visibility" Value="Collapsed"/>
+                                                                <Setter TargetName="pageIcon" Property="Visibility" Value="Visible"/>
+                                                                <Setter TargetName="pageImage" Property="Visibility" Value="Visible"/>
+                                                                <Setter TargetName="card" Property="Padding" Value="4"/>
+                                                            </DataTrigger>
                                                             <DataTrigger Binding="{Binding IsPreviewed}" Value="True">
                                                                 <Setter TargetName="card" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
                                                                 <Setter TargetName="card" Property="BorderThickness" Value="2"/>
                                                             </DataTrigger>
+                                                            <!-- El último proyectado de esta grilla, aunque ya no esté en el aire:
+                                                                 borde apagado; en el aire, rojo -->
                                                             <DataTrigger Binding="{Binding IsLive}" Value="True">
+                                                                <Setter TargetName="card" Property="BorderBrush" Value="#7A4048"/>
+                                                                <Setter TargetName="card" Property="BorderThickness" Value="2"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsOnAir}" Value="True">
                                                                 <Setter TargetName="card" Property="BorderBrush" Value="{StaticResource LiveBrush}"/>
                                                                 <Setter TargetName="card" Property="BorderThickness" Value="2"/>
                                                             </DataTrigger>
@@ -1424,11 +1477,19 @@
                                 <!-- El próximo texto va sobre el fondo que va a quedar: un
                                      anuncio en primer plano sale al proyectar la diapositiva -->
                                 <controls:ProjectedView Slide="{Binding PreviewSlide}"
-                                                        BackgroundMedia="{Binding Projection.PreviewBackground}"
                                                         FillMedia="{Binding Projection.PreviewBackgroundFill}"
                                                         BackgroundBlur="{Binding Projection.BackgroundBlur}"
                                                         Logo="{Binding Projection.ActiveLogo}"
-                                                        Visibility="{Binding PreviewIsStage, Converter={StaticResource InverseBoolToVis}}"/>
+                                                        Visibility="{Binding PreviewIsStage, Converter={StaticResource InverseBoolToVis}}">
+                                    <!-- La página que sigue en una presentación va primero; si no hay, el
+                                         fondo que va a quedar -->
+                                    <controls:ProjectedView.BackgroundMedia>
+                                        <MultiBinding Converter="{StaticResource FirstNonNull}">
+                                            <Binding Path="PreviewPageMedia"/>
+                                            <Binding Path="Projection.PreviewBackground"/>
+                                        </MultiBinding>
+                                    </controls:ProjectedView.BackgroundMedia>
+                                </controls:ProjectedView>
                                 <Viewbox Stretch="Uniform"
                                          Visibility="{Binding PreviewIsStage, Converter={StaticResource BoolToVis}}">
                                     <controls:StageView Width="1920" Height="1080"
@@ -2025,10 +2086,20 @@
 
             <!-- ══ Barra de medios ══ -->
             <Border x:Name="MediaPanel" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
-                    Style="{StaticResource Panel}"
                     PreviewKeyDown="MediaPanel_PreviewKeyDown"
                     AllowDrop="True" DragEnter="MediaPanel_DragOver" DragOver="MediaPanel_DragOver"
                     DragLeave="MediaPanel_DragLeave" Drop="MediaPanel_Drop">
+                <!-- Borde rojo mientras lo que está en pantalla es un medio de la barra -->
+                <Border.Style>
+                    <Style TargetType="Border" BasedOn="{StaticResource Panel}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsMediaOnAir}" Value="True">
+                                <Setter Property="BorderBrush" Value="{StaticResource LiveBrush}"/>
+                                <Setter Property="BorderThickness" Value="2"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
             <DockPanel>
                 <DockPanel DockPanel.Dock="Top">
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,6,10,2">
@@ -2238,6 +2309,10 @@
                                                         <Border x:Name="selected" Visibility="Collapsed" IsHitTestVisible="False"
                                                                 CornerRadius="3" Background="#552F63C9"
                                                                 BorderBrush="{StaticResource AccentBrush}" BorderThickness="2"/>
+                                                        <!-- En pantalla ahora: borde rojo -->
+                                                        <Border x:Name="onAir" Visibility="Collapsed" IsHitTestVisible="False"
+                                                                CornerRadius="3"
+                                                                BorderBrush="{StaticResource LiveBrush}" BorderThickness="2"/>
                                                         <!-- Se reproduce por internet: sin conexión no anda -->
                                                         <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="3"
                                                                 Padding="4,1" CornerRadius="3" Background="#B3000000"
@@ -2264,6 +2339,9 @@
                                                     <Trigger Property="controls:MediaCardState.IsSelected" Value="True">
                                                         <Setter TargetName="selected" Property="Visibility" Value="Visible"/>
                                                         <Setter TargetName="card" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                                    </Trigger>
+                                                    <Trigger Property="controls:MediaCardState.IsLive" Value="True">
+                                                        <Setter TargetName="onAir" Property="Visibility" Value="Visible"/>
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>

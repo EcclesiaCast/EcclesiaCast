@@ -1,5 +1,8 @@
+using System.IO;
+using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using EcclesiaCast.Core.Bible;
+using EcclesiaCast.Core.Media;
 using EcclesiaCast.Core.Presentation;
 
 namespace EcclesiaCast.App.ViewModels;
@@ -38,6 +41,63 @@ public sealed partial class SlideItemViewModel(
     public string PreviewText => Slide.MainText;
 
     /// <summary>
+    /// The media behind a card of a presentation (a page of a PDF, a picture,
+    /// a video); null on every other card. The <see cref="Slide"/> of such a
+    /// card only says «Página 3» for the stage and the phone: it never goes
+    /// on screen as text.
+    /// </summary>
+    public MediaItem? Page { get; init; }
+
+    public bool IsPage => Page is not null;
+
+    private System.Windows.Media.ImageSource? _pageImage;
+    private bool _pageImageLoaded;
+
+    /// <summary>
+    /// The picture of the card: the page's small poster, never the 4K file.
+    /// Without a poster the picture itself is read at the width of a card.
+    /// Read the first time the card is drawn.
+    /// </summary>
+    public System.Windows.Media.ImageSource? PageImage
+    {
+        get
+        {
+            if (!_pageImageLoaded)
+            {
+                _pageImageLoaded = true;
+                _pageImage = Page is null ? null : LoadPageImage(Page);
+            }
+
+            return _pageImage;
+        }
+    }
+
+    private static System.Windows.Media.ImageSource? LoadPageImage(MediaItem page)
+    {
+        var poster = !string.IsNullOrWhiteSpace(page.ThumbnailPath) && File.Exists(page.ThumbnailPath);
+        var path = poster ? page.ThumbnailPath : page.Type == MediaType.Image ? page.Path : null;
+        if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+            return null;
+
+        try
+        {
+            var bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.UriSource = new Uri(path);
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            if (!poster)
+                bitmap.DecodePixelWidth = 220;
+            bitmap.EndInit();
+            bitmap.Freeze();
+            return bitmap;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
     /// Tooltip of the grid card. Only song cards can be dragged to another
     /// place; Bible cards get the text that matches what their click and
     /// right click really do.
@@ -46,6 +106,8 @@ public sealed partial class SlideItemViewModel(
     {
         get
         {
+            if (Page != null)
+                return "Clic: proyectar esta página · Clic derecho: Propiedades";
             if (JumpTarget != null)
                 return JumpToEnd
                     ? "Clic: abre el capítulo anterior en su último versículo"
@@ -58,8 +120,13 @@ public sealed partial class SlideItemViewModel(
         }
     }
 
+    /// <summary>The card last projected from this grid; it may no longer be on the air.</summary>
     [ObservableProperty]
     private bool _isLive;
+
+    /// <summary>The card that is on the air right now.</summary>
+    [ObservableProperty]
+    private bool _isOnAir;
 
     /// <summary>Selected as "next up" (e.g. the verse a reference points to), not live yet.</summary>
     [ObservableProperty]

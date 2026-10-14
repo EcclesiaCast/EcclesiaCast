@@ -50,6 +50,11 @@
         <TextBlock Style="{StaticResource Hint}"
                    Text="Los videos de esta pestaña se proyectan sin sonido, aunque en sus Propiedades lo tengan prendido. Se nota en la pestaña con un 🔇."/>
 
+        <CheckBox x:Name="PresentationCheck" Content="📑 Usar como presentación" Margin="0,16,0,0"
+                  Foreground="White" FontSize="13"/>
+        <TextBlock Style="{StaticResource Hint}" Margin="22,2,0,0"
+                   Text="Las imágenes y los videos de la pestaña se abren en el cuadro central, uno por página, como una canción: un clic en una tarjeta la proyecta y las flechas pasan de página. Va bien con un PDF o una presentación importados."/>
+
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
             <Button Content="Guardar" Style="{StaticResource AccentButton}" IsDefault="True"
                     Click="Save_Click" Padding="20,8"/>

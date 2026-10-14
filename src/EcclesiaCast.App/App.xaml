@@ -12,6 +12,7 @@
         <converters:NonZeroToBooleanConverter x:Key="NonZeroToBool"/>
         <converters:IndexMatchConverter x:Key="IndexIs"/>
         <converters:TabMutedToVisibilityConverter x:Key="TabMutedToVis"/>
+        <converters:FirstNonNullConverter x:Key="FirstNonNull"/>
 
         <!-- Diseño de aprendizaje o avanzado (MainWindow.Hints.cs cambia estos
              dos al elegirlo): con los atajos a la vista, o sin ellos y con menos

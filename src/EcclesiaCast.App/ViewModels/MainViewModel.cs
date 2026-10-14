@@ -220,21 +220,24 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     /// or the name of a media waiting to be projected. Shown above the grid.
     /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsGridLive), nameof(HasGridTitle), nameof(ShowGridLiveBadge), nameof(ShowOtherLive))]
+    [NotifyPropertyChangedFor(nameof(IsGridLive), nameof(HasGridTitle), nameof(IsGridOnAir), nameof(ShowGridLiveBadge), nameof(ShowOtherLive))]
     private string? _gridTitle;
 
     /// <summary>The name of what was last put on screen, by the same naming.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsGridLive), nameof(ShowGridLiveBadge), nameof(ShowOtherLive))]
+    [NotifyPropertyChangedFor(nameof(IsGridLive), nameof(IsGridOnAir), nameof(ShowGridLiveBadge), nameof(ShowOtherLive))]
     private string? _liveTitle;
 
-    /// <summary>True when the grid shows the very thing that is on screen.</summary>
+    /// <summary>True when the grid shows the very thing that was last put on screen (by name).</summary>
     public bool IsGridLive => LiveTitle is not null && LiveTitle == GridTitle;
 
     public bool HasGridTitle => !string.IsNullOrEmpty(GridTitle);
 
-    /// <summary>The «EN VIVO» mark next to the grid's title.</summary>
-    public bool ShowGridLiveBadge => IsProjecting && IsGridLive;
+    /// <summary>
+    /// The «EN VIVO» mark next to the grid's title: only while what is on
+    /// screen really is what the grid holds (see <see cref="IsGridOnAir"/>).
+    /// </summary>
+    public bool ShowGridLiveBadge => IsGridOnAir;
 
     /// <summary>
     /// «En vivo: …» on the right of the header, when the screen shows
@@ -1011,6 +1014,17 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 else
                     ShowMediaInCentre(media);
                 break;
+
+            case PlaylistItemType.Presentation:
+                // The entry remembers the first page; the tab is wherever that
+                // page is now (the tab may have been renamed since), or the
+                // name written when it was added.
+                var tab = _allMedia.FirstOrDefault(m => m.Id == item.MediaId)?.Category ?? item.Caption;
+                if (!IsPresentationTab(tab))
+                    SetPresentationTab(tab, true);
+                if (!OpenPresentation(tab, null))
+                    StatusText = $"La presentación \"{item.Caption}\" ya no tiene páginas en la biblioteca.";
+                break;
         }
     }
 
@@ -1030,6 +1044,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         PreviewSlide = null;
 
         IsWebPanelOpen = false;
+        LeavePresentation();
         PreviewMedia = media;
         GridTitle = media.Name;
         StatusText = $"«{media.Name}» listo: doble clic en la playlist (o el botón Proyectar) lo pone en pantalla.";
@@ -1060,7 +1075,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         LoadPlaylistItem(item, projectMedia: true);
 
-        if (item.Type is PlaylistItemType.Song or PlaylistItemType.BiblePassage)
+        if (item.Type is PlaylistItemType.Song or PlaylistItemType.BiblePassage or PlaylistItemType.Presentation)
         {
             if (item.Type == PlaylistItemType.BiblePassage && PreviewSlideIndex >= 0)
                 GoLiveSlide(PreviewSlideIndex);
@@ -1102,7 +1117,13 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         string.IsNullOrWhiteSpace(tab) ? MediaTabRule.Default : MediaTabRule.Parse(_settings.Get(RuleKey(tab)));
 
     /// <summary>The media as it is to play: with the rule of its tab applied.</summary>
-    private MediaItem Playable(MediaItem item) => TabRule(item.Category).Resolve(item);
+    private MediaItem Playable(MediaItem item)
+    {
+        var resolved = TabRule(item.Category).Resolve(item);
+
+        // The pages of a presentation are not decoration: always the whole screen.
+        return IsPresentationTab(item.Category) ? AsPage(resolved) : resolved;
+    }
 
     /// <summary>
     /// Names of the tabs whose media play without sound. The tab list shows a
@@ -1354,6 +1375,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         FilterMediaByTab();
         SyncMediaTabOptions();
         RefreshMutedMediaTabs();
+
+        // A presentation open in the grid follows what the tab holds now.
+        RefreshPresentationTabs();
+        RefreshOpenPresentation();
     }
 
     partial void OnSelectedMediaTabChanged(string value)
@@ -1538,6 +1563,19 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             _settings.Set(RuleKey(name), rule);
             _settings.Set(RuleKey(tab), MediaTabRule.Default.ToSetting());
         }
+        if (_settings.Get(PresentationKey(tab)) is { } presentation)
+        {
+            _settings.Set(PresentationKey(name), presentation);
+            _settings.Set(PresentationKey(tab), "0");
+        }
+        if (string.Equals(_presentationTab, tab, StringComparison.OrdinalIgnoreCase))
+        {
+            // The grid keeps showing the same pages under the new name.
+            if (LiveTitle == GridTitle)
+                LiveTitle = "📑 " + name;
+            _presentationTab = name;
+            GridTitle = "📑 " + name;
+        }
         if (string.Equals(_settings.Get(RandomTabKey), tab, StringComparison.OrdinalIgnoreCase))
             _settings.Set(RandomTabKey, name);
 
@@ -1574,6 +1612,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         _settings.Set(ContinuousKey(tab), "0");
         _settings.Set(RuleKey(tab), MediaTabRule.Default.ToSetting());
+        _settings.Set(PresentationKey(tab), "0");
         SaveMediaTabs(MediaTabs.Where(t => !string.Equals(t, tab, StringComparison.OrdinalIgnoreCase)));
         LoadMedia(string.Equals(SelectedMediaTab, tab, StringComparison.OrdinalIgnoreCase)
             ? MediaTabs.FirstOrDefault(t => !string.Equals(t, tab, StringComparison.OrdinalIgnoreCase))
@@ -1588,10 +1627,21 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (string.IsNullOrWhiteSpace(tab))
             return;
 
-        if (_mediaInspector.EditTabRule(tab, TabRule(tab)) is not { } rule)
+        var presentation = IsPresentationTab(tab);
+        if (_mediaInspector.EditTabRule(tab, TabRule(tab), ref presentation) is not { } rule)
             return;
 
         SaveMediaTabRule(tab, rule);
+        if (presentation != IsPresentationTab(tab))
+        {
+            SetPresentationTab(tab, presentation);
+            if (presentation)
+            {
+                StatusText = $"«{tab}» es una presentación: un clic en una de sus tarjetas la abre en el cuadro central.";
+                return;
+            }
+        }
+
         StatusText = rule.Mode switch
         {
             MediaTabMode.Background => $"«{tab}»: todo va como fondo.",
@@ -1635,9 +1685,25 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         var skipped = 0;
         var documents = new List<string>();
         var newVideos = new List<(string Path, string Name)>();
+        var animatedGifs = new List<string>();
+        var stillGifs = 0;
 
         foreach (var path in paths)
         {
+            // An animated GIF would show only its first frame as a picture:
+            // with ffmpeg it is made into a looping video once the rest is in.
+            if (Path.GetExtension(path).Equals(".gif", StringComparison.OrdinalIgnoreCase)
+                && File.Exists(path) && GifFile.IsAnimated(path))
+            {
+                if (GifImporter.IsAvailable)
+                {
+                    animatedGifs.Add(path);
+                    continue;
+                }
+
+                stillGifs++;
+            }
+
             // A PDF or a deck becomes one image per page, but drawing them
             // takes a moment, so they are done after this loop rather than
             // freezing the window in the middle of an import.
@@ -1682,12 +1748,20 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         var ignored = skipped > 0
             ? $" {skipped} archivo(s) no se agregaron: sólo entran imágenes, videos, PDF y PowerPoint."
             : string.Empty;
+        var gifNote = animatedGifs.Count > 0
+            ? $" Convirtiendo {animatedGifs.Count} GIF animado(s) en video…"
+            : stillGifs > 0
+                ? $" {stillGifs} GIF animado(s) quedan quietos: para moverse hace falta ffmpeg y no se encontró en esta computadora."
+                : string.Empty;
         StatusText = documents.Count > 0
-            ? $"{added} medio(s) agregado(s). Preparando {documents.Count} documento(s)…{ignored}"
-            : added == 0 && skipped > 0
+            ? $"{added} medio(s) agregado(s). Preparando {documents.Count} documento(s)…{ignored}{gifNote}"
+            : added == 0 && skipped > 0 && animatedGifs.Count == 0
                 ? $"No se agregó nada: sólo entran imágenes, videos, PDF y PowerPoint."
-                : $"{added} medio(s) agregado(s) a «{SelectedMediaTab}».{ignored}";
+                : $"{added} medio(s) agregado(s) a «{SelectedMediaTab}».{ignored}{gifNote}";
         _ = RefreshVideoThumbnailsAsync();
+
+        if (animatedGifs.Count > 0)
+            _ = ImportGifsAsync(animatedGifs, SelectedMediaTab);
 
         // The new videos wait for their answer before the background work may
         // make (or skip) a copy of them.
@@ -1698,6 +1772,67 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         if (documents.Count > 0)
             _ = ImportDocumentsAsync(documents);
+    }
+
+    /// <summary>
+    /// Makes a looping, silent video of each animated GIF, in the background
+    /// (encoding takes a few seconds each), and adds it to the tab the GIFs
+    /// were brought into. A GIF that cannot be converted goes in as the still
+    /// picture it was, so nothing the operator dropped is lost.
+    /// </summary>
+    private async Task ImportGifsAsync(IReadOnlyList<string> gifs, string tab)
+    {
+        var converted = 0;
+        var kept = 0;
+        try
+        {
+            foreach (var gif in gifs)
+            {
+                var name = Path.GetFileNameWithoutExtension(gif);
+                var video = await GifImporter.ConvertAsync(gif);
+                if (video is null)
+                {
+                    // Left as a picture: it shows its first frame, as it always did.
+                    _media.Add(new MediaItem
+                    {
+                        Name = name,
+                        Path = gif,
+                        Type = MediaType.Image,
+                        ThumbnailPath = MediaThumbnails.Create(gif, MediaType.Image, videoEngine: null),
+                        Category = tab,
+                        Behavior = MediaBehavior.Background,
+                    });
+                    kept++;
+                    continue;
+                }
+
+                _media.Add(new MediaItem
+                {
+                    Name = name,
+                    Path = video,
+                    Type = MediaType.Video,
+                    Category = tab,
+                    Behavior = MediaBehavior.Background,
+
+                    // A GIF has no sound and never ends: it loops, silent.
+                    Muted = true,
+                    EndBehavior = VideoEndBehavior.Loop,
+                });
+                converted++;
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "No se pudieron convertir los GIF");
+        }
+
+        LoadMedia();
+        _ = RefreshVideoThumbnailsAsync();
+        RefreshLightCopies();
+
+        StatusText = kept == 0
+            ? $"{converted} GIF animado(s) convertido(s) en video, en bucle y sin sonido, en «{tab}»."
+            : $"{converted} GIF convertido(s) en video; {kept} no se pudo convertir y quedó como imagen fija (el detalle está en el registro).";
     }
 
     /// <summary>
@@ -1835,13 +1970,45 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     /// </summary>
     private async Task ImportDocumentsAsync(IReadOnlyList<string> paths)
     {
-        var tab = SelectedMediaTab;
+        var currentTab = SelectedMediaTab;
         var pagesAdded = 0;
         string? failure = null;
+        string? presentationToOpen = null;
+        string? lastTab = null;
+        int? sameForAll = null;
 
-        foreach (var path in paths)
+        for (var n = 0; n < paths.Count; n++)
         {
+            var path = paths[n];
             var name = Path.GetFileNameWithoutExtension(path);
+
+            // A document is best kept in a tab of its own, opened as a
+            // presentation: its pages then work in the central grid like a
+            // song does. The other way leaves them in the tab that is open.
+            int choice;
+            if (sameForAll is { } remembered)
+            {
+                choice = remembered;
+            }
+            else
+            {
+                var more = n < paths.Count - 1;
+                var (index, repeat) = _textPrompt.ChooseAndRemember(
+                    "Dónde poner las páginas",
+                    $"«{Path.GetFileName(path)}» se va a importar como una imagen por página. ¿Dónde las pongo?",
+                    [
+                        $"📑 Pestaña nueva «{name}», como presentación (recomendado)",
+                        $"Agregar las páginas a «{currentTab}»",
+                    ],
+                    more ? "Hacer lo mismo con los demás documentos" : null);
+                choice = index;
+                if (repeat)
+                    sameForAll = index;
+            }
+
+            if (choice < 0)
+                continue;
+
             var result = await DocumentImporter.ImportAsync(path);
 
             if (result.Error is not null)
@@ -1849,6 +2016,17 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 failure = result.Error;
                 continue;
             }
+
+            var tab = currentTab;
+            if (choice == 0)
+            {
+                tab = MediaTabNames.Unique(MediaTabs, name);
+                MediaTabs.Add(tab);
+                SaveMediaTabs(MediaTabs);
+                _settings.Set(PresentationKey(tab), "1");
+                presentationToOpen = tab;
+            }
+            lastTab = tab;
 
             for (var page = 0; page < result.Pages.Count; page++)
             {
@@ -1870,11 +2048,24 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             }
         }
 
-        LoadMedia();
+        // The new presentation shows its tab, and its pages fill the grid
+        // (without projecting anything).
+        LoadMedia(presentationToOpen);
+
+        if (presentationToOpen is not null)
+        {
+            OpenPresentation(presentationToOpen, null);
+            StatusText = failure is not null
+                ? failure
+                : $"{pagesAdded} página(s) en la pestaña «{presentationToOpen}», abierta como presentación: clic en una página la proyecta y las flechas pasan de a una.";
+            return;
+        }
 
         StatusText = failure is not null
             ? failure
-            : $"{pagesAdded} página(s) agregada(s) a «{tab}». Cada una es un fondo: arrastralas a la playlist para pasarlas con las flechas.";
+            : lastTab is null
+                ? "No se importó ningún documento."
+                : $"{pagesAdded} página(s) agregada(s) a «{lastTab}». Cada una es un fondo: arrastralas a la playlist para pasarlas con las flechas.";
     }
 
     /// <summary>
@@ -1990,6 +2181,14 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             return;
         }
 
+        // In a tab marked as a presentation the card is a page: the pages
+        // open in the grid and this one goes on screen.
+        if (item.Type is MediaType.Image or MediaType.Video && IsPresentationTab(item.Category))
+        {
+            ShowPage(item);
+            return;
+        }
+
         ApplyBackgroundCore(item);
     }
 
@@ -2013,6 +2212,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         NoteAction($"Poner el fondo «{item.Name}»");
         _presentation.SetBackground(item, ResolveFill(item));
+
+        // A media on the whole screen is what is live now: «En vivo: …» says it.
+        if (item.Behavior == MediaBehavior.Foreground)
+            LiveTitle = item.Name;
 
         // Foreground = the media alone (no text). Background with no live slide
         // also shows alone; Black/Logo would hide it, so drop back to showing
@@ -2895,6 +3098,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         // item out of the library has to take the image with it.
         if (DocumentImporter.IsRenderedPage(item.Path))
             DocumentImporter.Forget(item.Path);
+
+        // The same for the video made from a GIF.
+        if (GifImporter.IsConverted(item.Path))
+            GifImporter.Forget(item.Path);
     }
 
     // ── Control desde el celular ─────────────────────────────────
@@ -2990,7 +3197,12 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     {
         var slides = Slides
             .Where(s => s.JumpTarget is null)
-            .Select(s => new RemoteSlide(s.Index, s.Label, Shorten(s.Slide.MainText), s.IsLive))
+            .Select(s => new RemoteSlide(
+                s.Index, s.Label, Shorten(s.Slide.MainText), s.IsLive && IsGridOnAir, s.Page?.Id))
+            .ToList();
+
+        var presentations = PresentationsForRemote()
+            .Select((p, index) => new RemotePresentation(index, p.Tab, p.Pages))
             .ToList();
 
         var playlist = PlaylistItems
@@ -3001,6 +3213,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 {
                     PlaylistItemType.BiblePassage => "📖",
                     PlaylistItemType.Media => "🎞",
+                    PlaylistItemType.Presentation => "📑",
                     _ => "🎵",
                 }))
             .ToList();
@@ -3014,7 +3227,32 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             Status: StatusText,
             Slides: slides,
             Playlist: playlist,
-            SongTitle: SelectedSong?.Title ?? (IsBibleTabActive ? "Biblia" : "EcclesiaCast"));
+            SongTitle: SelectedSong?.Title ?? (IsBibleTabActive ? "Biblia" : "EcclesiaCast"),
+            Presentations: presentations,
+            // A page (or a media) on the air shows as its poster on the phone,
+            // not as the words that were up before it.
+            LiveMediaId: OnAir is OnAirSource.Presentation or OnAirSource.Media && LiveMediaId > 0 ? LiveMediaId : null,
+            NextMediaId: IsPresentationOpen ? PreviewPageMedia?.Id : null);
+    }
+
+    /// <summary>The marked tabs that have pages, in the order of the tabs: what the phone offers to open.</summary>
+    private List<(string Tab, int Pages)> PresentationsForRemote() =>
+        MediaTabs
+            .Where(IsPresentationTab)
+            .Select(t => (Tab: t, Pages: PresentationPages.For(t, _allMedia).Count))
+            .Where(p => p.Pages > 0)
+            .ToList();
+
+    string? IRemoteHost.GetThumbnailPath(int mediaId)
+    {
+        var poster = _allMedia.FirstOrDefault(m => m.Id == mediaId)?.ThumbnailPath;
+        if (string.IsNullOrWhiteSpace(poster) || !File.Exists(poster))
+            return null;
+
+        // Only what the program itself drew into its posters folder: whatever
+        // else a media's poster field might point to is not for the network.
+        var folder = Path.GetFullPath(MediaThumbnails.Directory).TrimEnd('\\') + "\\";
+        return Path.GetFullPath(poster).StartsWith(folder, StringComparison.OrdinalIgnoreCase) ? poster : null;
     }
 
     /// <summary>
@@ -3068,6 +3306,11 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             case "output": ToggleOutput(); break;
             case "nobackground": ClearBackground(); break;
             case "slide" when index is int slide: GoLiveSlide(slide); break;
+            case "presentation" when index is int shown:
+                // The phone opens it on the computer: the pages come back with the next poll.
+                if (PresentationsForRemote() is var offered && shown >= 0 && shown < offered.Count)
+                    OpenPresentation(offered[shown].Tab, null);
+                break;
             case "playlist" when index is int item && item >= 0 && item < PlaylistItems.Count:
                 ProjectPlaylistItem(PlaylistItems[item]);
                 break;
@@ -3726,6 +3969,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         IsWebPanelOpen = false;
         PreviewMedia = null;
         GridTitle = null;
+        LeavePresentation();
         if (!_openingPlaylistItem)
             _currentPlaylistIndex = -1;
 
@@ -4533,6 +4777,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         var bookName = verses[0].BookName;
         IsWebPanelOpen = false;
         PreviewMedia = null;
+        LeavePresentation();
         GridTitle = secondary is null
             ? $"{bookName} {reference.Chapter} · {primary.Abbreviation}"
             : $"{bookName} {reference.Chapter} · {primary.Abbreviation} + {secondary.Abbreviation}";
@@ -5199,6 +5444,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         {
             PlaylistItemType.Song => " de la canción",
             PlaylistItemType.BiblePassage => " del pasaje",
+            PlaylistItemType.Presentation => " de la presentación",
             _ => " del elemento",
         };
         var arrow = direction > 0 ? "→" : "←";
@@ -5306,6 +5552,14 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         }
 
         var item = Slides[index];
+
+        // A card of a presentation is a picture, never text.
+        if (item.Page is { } page)
+        {
+            GoLivePage(index, page);
+            return;
+        }
+
         NoteAction($"Proyectar la diapositiva {index + 1} de {Slides.Count}: {item.Label}");
 
         // A foreground media takes the whole screen and hides the text: it is
@@ -5314,7 +5568,11 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (_presentation.Background is { Behavior: MediaBehavior.Foreground } foreground
             && item.JumpTarget is null)
         {
-            _presentation.SetBackground(null);
+            // A presentation gives back what was behind before it.
+            if (IsPresentationPageOnAir)
+                RemovePageForText();
+            else
+                _presentation.SetBackground(null);
             Log.Debug("Fondo de primer plano «{Name}» retirado al proyectar texto", foreground.Name);
         }
 
@@ -5338,6 +5596,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             return;
         }
 
+        _liveSlideOrigin = item.Verses is not null ? SlideOrigin.Bible
+            : item.SectionId != 0 ? SlideOrigin.Song
+            : SlideOrigin.None;
+        _textLiveTitle = GridTitle;
         _presentation.GoLive(item.Slide);
         SyncHighlightBox();
         LiveTitle = GridTitle;
@@ -5362,6 +5624,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             slide.IsPreviewed = false;
         }
 
+        RefreshSlideOnAir();
         PreviewSlide = index + 1 < Slides.Count ? Slides[index + 1].Slide : null;
 
         // The stage display needs the label of what is live and the text of
@@ -5404,6 +5667,13 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (string.IsNullOrWhiteSpace(QuickText) || SelectedDisplay is null)
             return;
 
+        // A page of a presentation would hide the words: it comes off, as it
+        // does for a song.
+        if (IsPresentationPageOnAir)
+            RemovePageForText();
+
+        _liveSlideOrigin = SlideOrigin.QuickText;
+        _textLiveTitle = "Texto rápido";
         _presentation.GoLive(QuickSlide(QuickText.Trim()));
         SyncHighlightBox();
         _projection.EnsureVisible(SelectedDisplay.Info);
@@ -5413,6 +5683,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         LiveSlideIndex = -1;
         foreach (var slide in Slides)
             slide.IsLive = false;
+        RefreshSlideOnAir();
 
         // Quick text stands alone: nothing follows it on the stage display.
         Projection.SlideLabel = "Texto rápido";
@@ -5541,6 +5812,13 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         IsCountdownRunning = _presentation.Countdown is not null;
         IsStageNotesActive = _presentation.StageNotes is not null;
         HasBackground = _presentation.Background is not null;
+
+        // A page of a presentation stops being «on screen» the moment
+        // anything else takes the background.
+        if (_livePageId != 0 && _presentation.Background?.Id != _livePageId)
+            _livePageId = 0;
+
+        UpdateOnAir();
 
         // The live page switches itself off the moment anything else takes the
         // background (or it is cleared): the button must follow.

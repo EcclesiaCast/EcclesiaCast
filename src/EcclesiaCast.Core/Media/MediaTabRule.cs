@@ -144,6 +144,24 @@ public static class MediaTabNames
         return taken ? $"Ya hay una pestaña llamada «{wanted}»." : null;
     }
 
+    /// <summary>
+    /// A name for a new tab that no other tab has: <paramref name="baseName"/>
+    /// itself when it is free, otherwise «X (2)», «X (3)»… Capitals do not
+    /// tell tabs apart, as everywhere else in the bar.
+    /// </summary>
+    public static string Unique(IEnumerable<string> tabs, string baseName)
+    {
+        var taken = tabs.ToList();
+        var name = baseName.Trim();
+        if (name.Length == 0)
+            name = Starting[0];
+
+        var candidate = name;
+        for (var number = 2; taken.Contains(candidate, StringComparer.OrdinalIgnoreCase); number++)
+            candidate = $"{name} ({number})";
+        return candidate;
+    }
+
     public static string Serialize(IEnumerable<string> tabs) => JsonSerializer.Serialize(tabs);
 
     /// <summary>The saved list, or null when nothing (or something unreadable) was saved.</summary>

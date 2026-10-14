@@ -57,6 +57,8 @@ public partial class MainWindow : Window
                     ScrollSlideIntoView(vm.LiveSlideIndex);
                 else if (args.PropertyName == nameof(MainViewModel.PreviewSlideIndex))
                     ScrollSlideIntoView(vm.PreviewSlideIndex);
+                else if (args.PropertyName == nameof(MainViewModel.LiveMediaId))
+                    RefreshMediaLiveVisuals();
             };
 
             // A fresh chapter or passage always starts at the top.
@@ -524,6 +526,7 @@ public partial class MainWindow : Window
             return;
 
         MediaCardState.SetIsSelected(card, vm.MediaSelection.Contains(media.Id));
+        MediaCardState.SetIsLive(card, vm.LiveMediaId == media.Id);
         if (media.FillMediaId is int fillId
             && card.Template.FindName("preview", card) is FramedMediaPreview preview)
             preview.FillMedia = vm.FindMedia(fillId);
@@ -566,6 +569,22 @@ public partial class MainWindow : Window
                 && VisualTreeHelper.GetChild(holder, 0) is Button card
                 && card.DataContext is MediaItem media)
                 MediaCardState.SetIsSelected(card, vm.MediaSelection.Contains(media.Id));
+        }
+    }
+
+    /// <summary>Marks the card of the media that is on the screen now (red border) and unmarks the rest.</summary>
+    private void RefreshMediaLiveVisuals()
+    {
+        if (DataContext is not MainViewModel vm)
+            return;
+
+        for (var i = 0; i < MediaCards.Items.Count; i++)
+        {
+            if (MediaCards.ItemContainerGenerator.ContainerFromIndex(i) is ContentPresenter holder
+                && VisualTreeHelper.GetChildrenCount(holder) > 0
+                && VisualTreeHelper.GetChild(holder, 0) is Button card
+                && card.DataContext is MediaItem media)
+                MediaCardState.SetIsLive(card, vm.LiveMediaId == media.Id);
         }
     }
 
@@ -923,11 +942,17 @@ public partial class MainWindow : Window
         }
 
         var muteEntry = Entry("🔇 Silenciar la pestaña", (vm, tab) => vm.ToggleMediaTabMuteCommand.Execute(tab));
+        var openPresentation = Entry("📑 Abrir como presentación", (vm, tab) => vm.OpenPresentationTabCommand.Execute(tab));
+        var presentationToPlaylist = Entry("Agregar a la playlist como presentación",
+            (vm, tab) => vm.AddPresentationToPlaylistCommand.Execute(tab));
 
         var menu = new ContextMenu
         {
             Items =
             {
+                openPresentation,
+                presentationToPlaylist,
+                new Separator(),
                 Entry("Cambiar nombre…", (vm, tab) => vm.RenameMediaTabCommand.Execute(tab)),
                 Entry("Configurar…", (vm, tab) => vm.ConfigureMediaTabCommand.Execute(tab)),
                 muteEntry,
@@ -937,12 +962,19 @@ public partial class MainWindow : Window
         };
 
         // The wording follows the state of the tab at the moment of opening:
-        // it can change from «Configurar…» or from this very entry.
+        // it can change from «Configurar…» or from these very entries.
+        // Marked presentation tabs just open; the others are marked by the
+        // same click.
         menu.Opened += (_, _) =>
         {
-            muteEntry.Header = DataContext is MainViewModel vm && vm.IsMediaTabMuted(tabItem.DataContext as string)
+            var vm = DataContext as MainViewModel;
+            var tab = tabItem.DataContext as string;
+            muteEntry.Header = vm is not null && vm.IsMediaTabMuted(tab)
                 ? "🔊 Quitar el silencio"
                 : "🔇 Silenciar la pestaña";
+            var marked = vm is not null && tab is not null && vm.IsPresentationTab(tab);
+            openPresentation.Header = marked ? "📑 Abrir como presentación" : "📑 Usar como presentación y abrirla";
+            presentationToPlaylist.Visibility = marked ? Visibility.Visible : Visibility.Collapsed;
         };
         tabItem.ContextMenu = menu;
     }
@@ -1343,6 +1375,24 @@ public partial class MainWindow : Window
     {
         if (sender is not FrameworkElement { DataContext: SlideItemViewModel slide } card)
             return;
+
+        // A page of a presentation has no text to edit: only its properties.
+        if (slide.Page is { } page)
+        {
+            e.Handled = true;
+            if (DataContext is MainViewModel pageVm)
+            {
+                var pageMenu = new ContextMenu { PlacementTarget = card };
+                pageMenu.Items.Add(new MenuItem
+                {
+                    Header = "Propiedades…",
+                    Command = pageVm.InspectMediaCommand,
+                    CommandParameter = page,
+                });
+                pageMenu.IsOpen = true;
+            }
+            return;
+        }
 
         if (slide.Verses is not null)
         {

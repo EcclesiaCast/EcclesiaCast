@@ -16,4 +16,13 @@ public static class MediaCardState
     public static bool GetIsSelected(DependencyObject element) => (bool)element.GetValue(IsSelectedProperty);
 
     public static void SetIsSelected(DependencyObject element, bool value) => element.SetValue(IsSelectedProperty, value);
+
+    /// <summary>The card is the media that is on the screen right now.</summary>
+    public static readonly DependencyProperty IsLiveProperty =
+        DependencyProperty.RegisterAttached("IsLive", typeof(bool), typeof(MediaCardState),
+            new PropertyMetadata(false));
+
+    public static bool GetIsLive(DependencyObject element) => (bool)element.GetValue(IsLiveProperty);
+
+    public static void SetIsLive(DependencyObject element, bool value) => element.SetValue(IsLiveProperty, value);
 }
