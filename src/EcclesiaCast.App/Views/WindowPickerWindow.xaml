@@ -2,8 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Proyectar otra ventana"
-        Width="560" Height="520"
-        MinWidth="440" MinHeight="380"
+        Width="800" Height="520"
+        MinWidth="760" MinHeight="380"
         ShowInTaskbar="False"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource BgBrush}"
@@ -92,6 +92,9 @@
                     ToolTip="El selector de Windows: sirve también para proyectar una pantalla entera"/>
             <Button DockPanel.Dock="Right" Content="Cancelar" Style="{StaticResource DarkButton}"
                     Padding="14,8" IsCancel="True"/>
+            <Button x:Name="SaveButton" DockPanel.Dock="Right" Content="💾 Guardar en medios" Style="{StaticResource DarkButton}"
+                    Padding="12,8" Margin="0,0,8,0" IsEnabled="False" Click="Save_Click"
+                    ToolTip="Deja una tarjeta con el nombre de la ventana en la pestaña de medios elegida. Un clic en la tarjeta la proyecta, si el programa está abierto."/>
             <Button x:Name="ProjectButton" DockPanel.Dock="Right" Content="Proyectar ▶" Style="{StaticResource AccentButton}"
                     Padding="16,8" Margin="0,0,8,0" IsDefault="True" IsEnabled="False" Click="Project_Click"/>
         </DockPanel>

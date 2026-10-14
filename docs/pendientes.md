@@ -174,11 +174,11 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
          diseño original» las apaga. Con el riel prendido no se puede arrastrar
          el borde de la columna (es a propósito).
 
-- [ ] **Proyectar otra ventana (🪟 Ventana).** Se probó con un programa de
+- [ ] **Proyectar otra ventana (🖥 Ventana).** Se probó con un programa de
       consola que capturó una ventana ajena 5 s (22 cuadros por segundo, en
       12 con bajo rendimiento) y dibujando la vista a imagen; falta usarlo
       con la salida prendida:
-      1. Abrí un PowerPoint (o un video en un reproductor), tocá **🪟 Ventana**,
+      1. Abrí un PowerPoint (o un video en un reproductor), tocá **🖥 Ventana**,
          elegí la ventana y **Proyectar ▶**. La pantalla tiene que mostrarla
          entera, en movimiento, y el LIVE también. Moví la ventana, cambiale el
          tamaño: la imagen se acomoda sin parpadear.
@@ -193,7 +193,11 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
       5. **Elegir con la ventana de Windows…** y probar con una pantalla
          entera. Con **Mostrar el puntero** tildado, la flecha se ve en la
          pantalla.
-      6. Una ventana de un programa abierto «como administrador»: tiene que
+      6. **💾 Guardar en medios** (en la misma lista): aparece una tarjeta
+         🖥 en la pestaña. Con el programa abierto, un clic la proyecta; cerrá
+         el programa y probá de nuevo: tiene que decir que no la encuentra.
+         Agregala a la playlist y probá el doble clic y las flechas.
+      7. Una ventana de un programa abierto «como administrador»: tiene que
          avisar que Windows no la deja capturar (no pudo probarse).
 
 ## 2. Para la v1.0.0

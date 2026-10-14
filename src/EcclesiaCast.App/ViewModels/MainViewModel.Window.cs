@@ -48,7 +48,7 @@ public sealed partial class MainViewModel
             WindowCaptureService.Stop();
     }
 
-    /// <summary>The «🪟 Ventana» button: choose a window and put it on the screen.</summary>
+    /// <summary>The «🖥 Ventana» button: choose a window and put it on the screen.</summary>
     [RelayCommand]
     private async Task OpenWindowPicker()
     {
@@ -72,7 +72,82 @@ public sealed partial class MainViewModel
         if (pick.ShowCursor != showCursor)
             _settings.Set(WindowCursorKey, pick.ShowCursor ? "1" : "0");
 
+        if (pick is { SaveToMedia: true, Window: { } toSave })
+        {
+            SaveWindowToMedia(toSave);
+            return;
+        }
+
         await ProjectWindowAsync(pick);
+    }
+
+    // ── Guardar la ventana como tarjeta ──────────────────────────
+
+    /// <summary>
+    /// A card in the current tab that names a window — its program and its
+    /// title — and finds it again when it is clicked: a window is not a file
+    /// and a handle dies with it, so what is kept is how to look for it.
+    /// </summary>
+    private void SaveWindowToMedia(RawWindow window)
+    {
+        var tab = SelectedMediaTab;
+        var path = WindowTarget.Format(window.ProcessName, window.Title);
+        if (_allMedia.Any(m => m.Type == MediaType.Window && m.Path == path
+                               && string.Equals(m.Category, tab, StringComparison.OrdinalIgnoreCase)))
+        {
+            StatusText = $"Esa ventana ya está en «{tab}».";
+            return;
+        }
+
+        NoteAction($"Guardar la ventana «{window.Title}» en los medios");
+        _media.Add(new MediaItem
+        {
+            Name = window.Title,
+            Path = path,
+            Type = MediaType.Window,
+            Category = tab,
+            Scaling = MediaScaling.Fit,
+            Behavior = MediaBehavior.Foreground,
+            EndBehavior = VideoEndBehavior.Stop,
+        });
+        LoadMedia();
+        StatusText = $"Ventana «{window.Title}» guardada en «{tab}». Un clic en la tarjeta la proyecta, si el programa está abierto.";
+    }
+
+    /// <summary>
+    /// A click (or the playlist) on a saved window: look for the open window it
+    /// names and, if it is there, project it like one chosen from the list.
+    /// </summary>
+    private void ProjectSavedWindow(MediaItem saved)
+    {
+        if (!WindowCaptureService.IsSupported)
+        {
+            StatusText = "Esta versión de Windows no permite proyectar otra ventana.";
+            return;
+        }
+
+        if (!WindowTarget.TryParse(saved.Path, out var target)
+            || WindowTarget.Best(WindowCaptureService.ListWindows(), target) is not { } window)
+        {
+            StatusText = $"No encuentro la ventana «{saved.Name}»: abrí el programa y tocá la tarjeta de nuevo.";
+            return;
+        }
+
+        HookWindowEvents();
+        NoteAction($"Proyectar en vivo la ventana guardada «{saved.Name}»");
+        if (!WindowCaptureService.Start(window, _settings.Get(WindowCursorKey) == "1", out var error))
+        {
+            StatusText = error ?? "No se pudo proyectar esa ventana.";
+            return;
+        }
+
+        // The card's own settings go to the screen, under the id of the one
+        // window that can be live at a time.
+        var live = saved.Clone();
+        live.Id = WindowLiveId;
+        ApplyBackgroundCore(live);
+        LiveTitle = $"🖥 {window.Title} (en vivo)";
+        StatusText = $"«{window.Title}» en vivo: la pantalla muestra esa ventana.";
     }
 
     /// <summary>Frees the capture when the program closes (it holds the video card's resources).</summary>
@@ -126,7 +201,7 @@ public sealed partial class MainViewModel
             Behavior = MediaBehavior.Foreground,
             EndBehavior = VideoEndBehavior.Stop,
         });
-        LiveTitle = $"🪟 {title} (en vivo)";
+        LiveTitle = $"🖥 {title} (en vivo)";
         StatusText = $"«{title}» en vivo: la pantalla muestra esa ventana. Para dejar de proyectarla, sacá el fondo (F4) o poné otro.";
     }
 

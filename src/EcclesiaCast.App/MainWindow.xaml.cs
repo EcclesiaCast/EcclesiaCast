@@ -650,9 +650,9 @@ public partial class MainWindow : Window
         var count = vm.MediaTargets(media).Count;
         var suffix = count > 1 ? $" ({count})" : string.Empty;
 
-        // A saved web page has no file and no framing: only what makes sense
-        // for it stays (rename, move, playlist, remove).
-        var isWeb = media.IsWeb;
+        // A saved web page (or window) has no file and no framing: only what
+        // makes sense for it stays (rename, move, playlist, remove).
+        var isWeb = media.IsWeb || media.IsWindow;
         foreach (var separator in menu.Items.OfType<Separator>().Where(s => s.Name == "InspectSeparator"))
             separator.Visibility = isWeb ? Visibility.Collapsed : Visibility.Visible;
 

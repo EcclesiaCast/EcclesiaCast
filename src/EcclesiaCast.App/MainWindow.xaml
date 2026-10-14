@@ -1948,7 +1948,7 @@
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding OpenWebCommand}"
                                 ToolTip="Abrir una página web en el cuadro central y proyectarla: como foto o en vivo"/>
-                        <Button Content="🪟 Ventana" FontSize="11" Padding="8,4" Margin="6,0,0,0"
+                        <Button Content="🖥 Ventana" FontSize="11" Padding="8,4" Margin="6,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding OpenWindowPickerCommand}"
                                 ToolTip="Proyectar otra ventana de esta computadora (un PowerPoint, un reproductor, un navegador) en vivo, tal como se ve"/>
@@ -2138,6 +2138,13 @@
                                                                 Visibility="{Binding IsWeb, Converter={StaticResource BoolToVis}}"
                                                                 ToolTip="Una página web. Un clic la abre en el panel web; se proyecta con sus botones.">
                                                             <TextBlock Text="🌐 página" FontSize="8" FontWeight="SemiBold" Foreground="White"/>
+                                                        </Border>
+                                                        <!-- Una ventana de otro programa guardada: un clic la busca y la proyecta -->
+                                                        <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="3"
+                                                                Padding="4,1" CornerRadius="3" Background="#B3000000"
+                                                                Visibility="{Binding IsWindow, Converter={StaticResource BoolToVis}}"
+                                                                ToolTip="Una ventana de otro programa. Un clic la proyecta en vivo, si el programa está abierto.">
+                                                            <TextBlock Text="🖥 ventana" FontSize="8" FontWeight="SemiBold" Foreground="White"/>
                                                         </Border>
                                                     </Grid>
                                                 </Border>

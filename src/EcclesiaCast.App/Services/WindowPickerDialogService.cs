@@ -8,7 +8,8 @@ namespace EcclesiaCast.App.Services;
 /// <param name="Window">The window picked, or null when Windows' own picker is to be used.</param>
 /// <param name="UseWindowsPicker">Open Windows' picker (windows and whole screens) instead.</param>
 /// <param name="ShowCursor">Draw the mouse pointer on the captured picture.</param>
-public sealed record WindowPick(RawWindow? Window, bool UseWindowsPicker, bool ShowCursor);
+/// <param name="SaveToMedia">Keep the window as a card in the media bar instead of projecting it now.</param>
+public sealed record WindowPick(RawWindow? Window, bool UseWindowsPicker, bool ShowCursor, bool SaveToMedia = false);
 
 /// <summary>Opens the list of windows that can be projected.</summary>
 public interface IWindowPickerDialog
@@ -27,7 +28,7 @@ public sealed class WindowPickerDialogService : IWindowPickerDialog
         };
 
         return window.ShowDialog() == true
-            ? new WindowPick(window.Chosen, window.UseWindowsPicker, window.ShowCursor)
+            ? new WindowPick(window.Chosen, window.UseWindowsPicker, window.ShowCursor, window.SaveToMedia)
             : null;
     }
 }

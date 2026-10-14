@@ -9,7 +9,7 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
-- **Proyectar otra ventana de Windows.** El botón **🪟 Ventana** de la barra de
+- **Proyectar otra ventana de Windows.** El botón **🖥 Ventana** de la barra de
   medios abre la lista de ventanas abiertas (con ícono, título y programa);
   elegís una y se ve en la pantalla **en vivo**, tal como está: un PowerPoint
   en presentación, un reproductor, una planilla. También se puede usar el
@@ -17,7 +17,10 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   el puntero**. No sale a internet: es la captura de ventanas del propio
   Windows. Se apaga con F4 o al proyectar otro fondo; si cerrás la ventana se
   deja de proyectar sola, y si la minimizás queda el último cuadro. En
-  «bajo rendimiento» baja a 12 cuadros por segundo.
+  «bajo rendimiento» baja a 12 cuadros por segundo. Con **💾 Guardar en
+  medios** la ventana queda como una tarjeta 🖥 (guarda el nombre del programa
+  y de la ventana, no una imagen): un clic la busca y la proyecta, y también se
+  puede poner en la playlist.
 
 - **Secciones que se achican a íconos.** Además de canciones/Biblia y la
   playlist, ahora se pueden achicar la **barra de medios** (queda sólo su

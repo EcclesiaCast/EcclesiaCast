@@ -209,7 +209,7 @@ falta el componente WebView2 de Microsoft (el mismo de YouTube).
 
 ### Proyectar otra ventana
 
-El botón **🪟 Ventana** de la barra de medios pone en la pantalla **otra
+El botón **🖥 Ventana** de la barra de medios pone en la pantalla **otra
 ventana de esta computadora**, en vivo y tal como se ve: un PowerPoint en
 presentación, un reproductor de video, un navegador, una planilla. Sirve para lo
 que no se puede pasar por el programa. Usa la captura de ventanas del propio
@@ -224,6 +224,17 @@ internet.
   entera**.
 - **Mostrar el puntero.** Tildada, la flecha del mouse también se ve en la
   pantalla. Se recuerda; viene apagada.
+- **💾 Guardar en medios.** En vez de proyectarla ahora, deja en la pestaña
+  elegida una tarjeta **🖥 ventana** con el nombre de la ventana (el programa y
+  su título; no se guarda ninguna imagen). Un **clic** en la tarjeta busca esa
+  ventana entre las abiertas y la proyecta; si el programa no está abierto, lo
+  avisa. Si el título cambió un poco (un documento al que se le agregó
+  «[modificado]»), la encuentra igual; si el programa tiene varias ventanas y
+  ninguna se parece, prefiere avisar antes que mostrar la equivocada. Se puede
+  **agregar a la playlist** como cualquier medio: el doble clic la proyecta.
+  Su menú de clic derecho tiene sólo lo que sirve (cambiar nombre, mover de
+  pestaña, agregar a la playlist, quitar). No sirve para lo elegido con el
+  selector de Windows.
 - **Se ve entera.** La ventana se achica para entrar completa y va **en primer
   plano** (tapa la letra, como un anuncio). Se apaga con **F4** (sin fondo) o
   cuando proyectás otro fondo o una diapositiva.

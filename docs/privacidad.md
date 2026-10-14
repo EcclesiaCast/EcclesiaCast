@@ -19,7 +19,7 @@ nueva), y sólo con los sitios de esta lista:
 | Hacés clic en un enlace (la guía de uso, informar un error) | El sitio del enlace, en tu navegador | Lo mismo que si lo abrieras a mano. |
 | Instalás el programa y a la PC le falta WebView2 | [Microsoft](https://developer.microsoft.com/microsoft-edge/webview2/) | Nada tuyo: baja el componente de Microsoft que usa el programa para YouTube, para las páginas web y para buscar canciones. |
 
-**Proyectar otra ventana** (botón **🪟 Ventana**) tampoco sale a internet: usa
+**Proyectar otra ventana** (botón **🖥 Ventana**) tampoco sale a internet: usa
 la captura de ventanas del propio Windows y dibuja la imagen dentro del
 programa, en esta computadora. No se graba ni se guarda en disco, y no se manda
 a ningún lado; mientras dura, Windows rodea la ventana elegida con un borde

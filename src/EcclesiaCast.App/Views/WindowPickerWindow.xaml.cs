@@ -30,6 +30,9 @@ public partial class WindowPickerWindow : Window
 
     public bool ShowCursor => CursorBox.IsChecked == true;
 
+    /// <summary>«Guardar en medios»: keep the picked window as a card instead of projecting it.</summary>
+    public bool SaveToMedia { get; private set; }
+
     private void Reload()
     {
         var previous = (WindowList.SelectedItem as WindowChoice)?.Window.Handle;
@@ -46,13 +49,26 @@ public partial class WindowPickerWindow : Window
         WindowList.ItemsSource = choices;
         WindowList.SelectedItem = choices.FirstOrDefault(c => c.Window.Handle == previous);
         EmptyText.Visibility = choices.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-        ProjectButton.IsEnabled = WindowList.SelectedItem is not null;
+        SetPickEnabled();
     }
+
+    private void SetPickEnabled() =>
+        ProjectButton.IsEnabled = SaveButton.IsEnabled = WindowList.SelectedItem is not null;
 
     private void Refresh_Click(object sender, RoutedEventArgs e) => Reload();
 
     private void WindowList_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e) =>
-        ProjectButton.IsEnabled = WindowList.SelectedItem is not null;
+        SetPickEnabled();
+
+    private void Save_Click(object sender, RoutedEventArgs e)
+    {
+        if (WindowList.SelectedItem is not WindowChoice choice)
+            return;
+
+        Chosen = choice.Window;
+        SaveToMedia = true;
+        DialogResult = true;
+    }
 
     // A MouseBinding never fires on a ListBox row (it keeps the click), so the
     // double click is read from the first press.
