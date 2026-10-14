@@ -291,6 +291,12 @@ public sealed partial class MainViewModel
             _backgroundBeforePages = _presentation.Background;
 
         _presentation.ClearText();
+
+        // The words are gone, so they have no origin any more: when the page
+        // comes off (F4) or the screen is cleared and brought back (F2), the
+        // empty screen must not count as «Canciones/Biblia en vivo».
+        _liveSlideOrigin = SlideOrigin.None;
+        _textLiveTitle = null;
         ApplyBackgroundCore(page);
         _livePageId = page.Id;
         UpdateOnAir();
