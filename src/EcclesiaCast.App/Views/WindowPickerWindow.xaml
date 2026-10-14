@@ -1,0 +1,102 @@
+<Window x:Class="EcclesiaCast.App.Views.WindowPickerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Proyectar otra ventana"
+        Width="800" Height="520"
+        MinWidth="760" MinHeight="380"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BgBrush}"
+        FontFamily="Segoe UI">
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0"
+                   Text="Elegí la ventana que querés poner en la pantalla. Se ve en vivo, tal como está en esta computadora: la imagen no sale de ella."
+                   FontSize="12" Foreground="{StaticResource MutedBrush}"
+                   TextWrapping="Wrap" Margin="0,0,0,10"/>
+
+        <Border Grid.Row="1" Style="{StaticResource Panel}">
+            <Grid>
+                <ListBox x:Name="WindowList"
+                         Background="Transparent" BorderThickness="0" Margin="4"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         PreviewMouseLeftButtonDown="WindowList_PreviewMouseLeftButtonDown"
+                         SelectionChanged="WindowList_SelectionChanged"
+                         AutomationProperties.Name="Ventanas abiertas">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="bd" CornerRadius="4" Margin="0,1" Padding="8,6"
+                                                Background="Transparent" BorderBrush="Transparent" BorderThickness="1">
+                                            <ContentPresenter/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="bd" Property="Background" Value="#20242F"/>
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="bd" Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+                                                <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel LastChildFill="True">
+                                <Image DockPanel.Dock="Left" Source="{Binding Icon}" Width="20" Height="20"
+                                       Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Title}" FontSize="13" Foreground="White"
+                                               TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding ProcessLabel}" FontSize="11"
+                                               Foreground="{StaticResource FaintBrush}"/>
+                                </StackPanel>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <TextBlock x:Name="EmptyText" Visibility="Collapsed"
+                           Text="No hay otras ventanas abiertas para proyectar. Abrí el programa que querés mostrar y tocá «Actualizar»."
+                           Style="{StaticResource PlaceholderText}" Margin="16"/>
+            </Grid>
+        </Border>
+
+        <StackPanel Grid.Row="2" Margin="0,12,0,0">
+            <CheckBox x:Name="CursorBox" Content="Mostrar el puntero del mouse en la pantalla"
+                      Foreground="White" FontSize="12"
+                      ToolTip="Si está tildado, la flecha del mouse también se ve en la ventana proyectada."/>
+            <TextBlock Text="Windows rodea la ventana elegida con un borde amarillo: se ve sólo en esta pantalla, no en la de la congregación."
+                       FontSize="11" Foreground="{StaticResource FaintBrush}"
+                       TextWrapping="Wrap" Margin="0,6,0,0"/>
+        </StackPanel>
+
+        <DockPanel Grid.Row="3" Margin="0,14,0,0" LastChildFill="False">
+            <Button DockPanel.Dock="Left" Content="↻ Actualizar" Style="{StaticResource DarkButton}"
+                    Padding="12,8" Click="Refresh_Click"
+                    ToolTip="Volver a buscar las ventanas abiertas"/>
+            <Button DockPanel.Dock="Left" Content="Elegir con la ventana de Windows…" Style="{StaticResource DarkButton}"
+                    Padding="12,8" Margin="8,0,0,0" Click="UseWindowsPicker_Click"
+                    ToolTip="El selector de Windows: sirve también para proyectar una pantalla entera"/>
+            <Button DockPanel.Dock="Right" Content="Cancelar" Style="{StaticResource DarkButton}"
+                    Padding="14,8" IsCancel="True"/>
+            <Button x:Name="SaveButton" DockPanel.Dock="Right" Content="💾 Guardar en medios" Style="{StaticResource DarkButton}"
+                    Padding="12,8" Margin="0,0,8,0" IsEnabled="False" Click="Save_Click"
+                    ToolTip="Deja una tarjeta con el nombre de la ventana en la pestaña de medios elegida. Un clic en la tarjeta la proyecta, si el programa está abierto."/>
+            <Button x:Name="ProjectButton" DockPanel.Dock="Right" Content="Proyectar ▶" Style="{StaticResource AccentButton}"
+                    Padding="16,8" Margin="0,0,8,0" IsDefault="True" IsEnabled="False" Click="Project_Click"/>
+        </DockPanel>
+    </Grid>
+</Window>

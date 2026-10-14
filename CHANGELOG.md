@@ -110,6 +110,30 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   presentación entera a la playlist: las flechas la recorren y siguen con lo
   que viene después. Entran las imágenes y los videos de la pestaña, no los de
   YouTube ni las páginas web, y las imágenes no avanzan solas.
+- **Proyectar otra ventana de Windows.** El botón **🖥 Ventana** de la barra de
+  medios abre la lista de ventanas abiertas (con ícono, título y programa);
+  elegís una y se ve en la pantalla **en vivo**, tal como está: un PowerPoint
+  en presentación, un reproductor, una planilla. También se puede usar el
+  selector de Windows (que deja elegir una pantalla entera) y tildar **Mostrar
+  el puntero**. No sale a internet: es la captura de ventanas del propio
+  Windows. Se apaga con F4 o al proyectar otro fondo; si cerrás la ventana se
+  deja de proyectar sola, y si la minimizás queda el último cuadro. En
+  «bajo rendimiento» baja a 12 cuadros por segundo. Con **💾 Guardar en
+  medios** la ventana queda como una tarjeta 🖥 (guarda el nombre del programa
+  y de la ventana, no una imagen): un clic la busca y la proyecta, y también se
+  puede poner en la playlist.
+
+- **Secciones que se achican a íconos.** Además de canciones/Biblia y la
+  playlist, ahora se pueden achicar la **barra de medios** (queda sólo su
+  cabecera, con los botones 📥 ▶ 🌐 🔗 🎲: un clic en «MEDIOS» la achica y la
+  vuelve a agrandar) y las **herramientas de texto** (Texto rápido, Aviso,
+  Resaltar, Notas, Música y Tiempos quedan como una tira de íconos; un clic en
+  cualquiera la abre en esa pestaña). Y **canciones, Biblia y playlist** pueden
+  quedar juntas como una columna angosta de íconos (botón ⇤ del panel, o menú
+  **Ver**): cada ícono abre lo suyo. El menú **Ver** tiene una entrada para
+  cada una, y «Volver al diseño original» las apaga. Se recuerda para la
+  próxima reunión, y el alto o ancho que habías elegido no se pierde al
+  achicar.
 
 - **Tipografía para cada recuadro del escenario.** En el diseñador de
   escenarios, cada recuadro (las notas del predicador, la hora, un texto fijo…)

@@ -340,6 +340,49 @@ dibujos a imagen):
       «Quitar de la biblioteca» no tiene que dejar archivos en
       `%APPDATA%\EcclesiaCast\gifs`. Los GIF con transparencia quedan sobre
       fondo negro (el video no tiene transparencia): mirá si molesta.
+- [ ] **Secciones que se achican a íconos.** Se probó dibujando la ventana a
+      imágenes (sin abrirla); falta verla de verdad:
+      1. Clic en el título **▾ MEDIOS**: queda sólo la cabecera con los
+         botones y las diapositivas ocupan el lugar. Otro clic la devuelve
+         **con el alto que tenía**. Probalo con «Medios arriba de las
+         diapositivas» y con una pestaña con muchos medios.
+      2. En el panel de canciones, botón **⇤**: queda una columna de íconos
+         🎵 📖 📋. Cada ícono abre lo suyo y saca el panel del riel; **⇥** lo
+         devuelve. Probalo con «Canciones y playlist a la derecha». Cerrá y
+         abrí el programa: tiene que volver como lo dejaste, y al agrandar,
+         con el ancho de antes.
+      3. **▾** de las herramientas de texto (abajo a la derecha): queda una
+         tira de seis íconos; un clic en uno abre esa pestaña. Si estás
+         escribiendo un texto rápido, no se pierde lo escrito.
+      4. Menú **Ver**: las tres entradas nuevas se tildan solas y «Volver al
+         diseño original» las apaga. Con el riel prendido no se puede arrastrar
+         el borde de la columna (es a propósito).
+
+- [ ] **Proyectar otra ventana (🖥 Ventana).** Se probó con un programa de
+      consola que capturó una ventana ajena 5 s (22 cuadros por segundo, en
+      12 con bajo rendimiento) y dibujando la vista a imagen; falta usarlo
+      con la salida prendida:
+      1. Abrí un PowerPoint (o un video en un reproductor), tocá **🖥 Ventana**,
+         elegí la ventana y **Proyectar ▶**. La pantalla tiene que mostrarla
+         entera, en movimiento, y el LIVE también. Moví la ventana, cambiale el
+         tamaño: la imagen se acomoda sin parpadear.
+      2. Probá con una **presentación a pantalla completa** y con una ventana
+         de un **video con sonido** (el sonido sale de la PC, no de la
+         captura). Mirá si se nota que la computadora trabaja de más; si anda
+         lento, probá el modo de bajo rendimiento.
+      3. **Minimizá** la ventana: queda el último cuadro y el aviso de abajo lo
+         dice. Restauralá: sigue. **Cerrala**: se deja de proyectar sola.
+      4. F4, o proyectar un medio o una diapositiva: la captura se apaga (el
+         borde amarillo de la ventana desaparece).
+      5. **Elegir con la ventana de Windows…** y probar con una pantalla
+         entera. Con **Mostrar el puntero** tildado, la flecha se ve en la
+         pantalla.
+      6. **💾 Guardar en medios** (en la misma lista): aparece una tarjeta
+         🖥 en la pestaña. Con el programa abierto, un clic la proyecta; cerrá
+         el programa y probá de nuevo: tiene que decir que no la encuentra.
+         Agregala a la playlist y probá el doble clic y las flechas.
+      7. Una ventana de un programa abierto «como administrador»: tiene que
+         avisar que Windows no la deja capturar (no pudo probarse).
 
 ## 2. Para la v1.0.0
 

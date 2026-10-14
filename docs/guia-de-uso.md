@@ -207,6 +207,50 @@ falta el componente WebView2 de Microsoft (el mismo de YouTube).
 - La página con **protección de copia** (Netflix, Spotify) se ve negra en la
   pantalla; no es un problema del programa.
 
+### Proyectar otra ventana
+
+El botón **🖥 Ventana** de la barra de medios pone en la pantalla **otra
+ventana de esta computadora**, en vivo y tal como se ve: un PowerPoint en
+presentación, un reproductor de video, un navegador, una planilla. Sirve para lo
+que no se puede pasar por el programa. Usa la captura de ventanas del propio
+Windows (hace falta Windows 10 versión 1903 o más nueva) y no necesita
+internet.
+
+- **Elegir la ventana.** El botón abre la lista de ventanas abiertas, con el
+  ícono, el título y el programa de cada una (la de EcclesiaCast no está: se
+  vería a sí misma sin fin). Elegí una y tocá **Proyectar ▶** (o doble clic).
+  **↻ Actualizar** vuelve a buscarlas. **Elegir con la ventana de Windows…**
+  abre el selector de Windows, que sirve también para proyectar **una pantalla
+  entera**.
+- **Mostrar el puntero.** Tildada, la flecha del mouse también se ve en la
+  pantalla. Se recuerda; viene apagada.
+- **💾 Guardar en medios.** En vez de proyectarla ahora, deja en la pestaña
+  elegida una tarjeta **🖥 ventana** con el nombre de la ventana (el programa y
+  su título; no se guarda ninguna imagen). Un **clic** en la tarjeta busca esa
+  ventana entre las abiertas y la proyecta; si el programa no está abierto, lo
+  avisa. Si el título cambió un poco (un documento al que se le agregó
+  «[modificado]»), la encuentra igual; si el programa tiene varias ventanas y
+  ninguna se parece, prefiere avisar antes que mostrar la equivocada. Se puede
+  **agregar a la playlist** como cualquier medio: el doble clic la proyecta.
+  Su menú de clic derecho tiene sólo lo que sirve (cambiar nombre, mover de
+  pestaña, agregar a la playlist, quitar). No sirve para lo elegido con el
+  selector de Windows.
+- **Se ve entera.** La ventana se achica para entrar completa y va **en primer
+  plano** (tapa la letra, como un anuncio). Se apaga con **F4** (sin fondo) o
+  cuando proyectás otro fondo o una diapositiva.
+- **Tené en cuenta.**
+  - Windows dibuja un **borde amarillo** alrededor de la ventana elegida: se ve
+    sólo en la pantalla del operador, no en la de la congregación.
+  - Si **minimizás** la ventana, en la pantalla queda el **último cuadro**;
+    restaurala para que siga. Si la **cerrás**, se deja de proyectar sola.
+  - Si el programa de esa ventana está abierto **como administrador**, Windows
+    no deja capturarlo, salvo que EcclesiaCast también lo esté.
+  - La ventana con **protección de copia** (Netflix, algunos reproductores) se
+    ve negra.
+  - Con el **modo de PC de bajo rendimiento**, la captura baja a 12 cuadros por
+    segundo y tus paneles LIVE y PREVIEW muestran una foto que se renueva cada
+    2 segundos.
+
 ## 5. Temas: tipografía, colores y márgenes
 
 Botón **🎨 Temas** en la barra superior:

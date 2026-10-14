@@ -2195,6 +2195,14 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     /// <summary>Puts a media on the output, whatever it is (also what the web panel projects).</summary>
     private void ApplyBackgroundCore(MediaItem item)
     {
+        // A saved window card is only the name of a window: it has to be found
+        // among the open ones and captured before there is anything to show.
+        if (item.Type == MediaType.Window && item.Id != WindowLiveId)
+        {
+            ProjectSavedWindow(item);
+            return;
+        }
+
         // What its tab decides (everything a foreground, say) comes before
         // what the media says; the copy leaves the library untouched.
         item = Playable(item);
@@ -5823,6 +5831,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         // The live page switches itself off the moment anything else takes the
         // background (or it is cleared): the button must follow.
         IsWebLive = _presentation.Background is { Type: MediaType.Web };
+        IsWindowLive = _presentation.Background is { Type: MediaType.Window };
 
         // Show the blur the current background carries, without saving it back.
         var blur = _presentation.Background?.Blur ?? 0;
