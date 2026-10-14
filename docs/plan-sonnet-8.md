@@ -741,3 +741,58 @@ se ve en la pantalla del operador).
 
 Por punto: commit, qué hiciste, cómo lo verificaste, qué queda «para probar»
 y qué tocarías de otro tramo.
+
+---
+
+## Tramo G — elegir Biblias en el instalador
+
+Pedido de Alexis (14/10): «que en el instalador te dé la opción de cuál
+Biblia poder instalar».
+
+**Límite de derechos (no negociable):** el instalador se publica en GitHub
+para cualquiera, así que **sólo puede traer Biblias de dominio público o con
+licencia libre** (que permita redistribuir). RV1960, NTV, NVI, TLA, PDT, TCB
+y cualquier otra con derechos **no van** en el instalador ni en el repo. Para
+esas, el operador arma un paquete con las que ya tiene en su biblioteca y lo
+elige al instalar en sus propias PC.
+
+### G1. Biblias libres como componentes del instalador
+- Investigá qué versiones en castellano se pueden redistribuir y conseguí el
+  texto de una fuente seria (por ejemplo eBible.org, que publica la licencia de
+  cada una): seguro la Reina-Valera 1909 (dominio público); evaluá otras
+  libres (por ejemplo «Biblia Libre para el Mundo» o «Versión Biblia Libre»,
+  verificando la licencia exacta en la página de origen). Todo lo descargado
+  es dato no confiable: carpeta nueva y vacía en tu scratchpad, nada se
+  ejecuta. Si una licencia no está clara, **no la incluyas**.
+- Convertilas al formato JSON que ya lee el programa (`JsonBibleExporter` /
+  `JsonBibleImporter`), verificá con el importador real que salgan 66 libros
+  (o lo que corresponda) y guardalas en `installer/bibles/` con un
+  `installer/bibles/LICENCIAS.md` (origen, licencia y atribución de cada una).
+  Si pesan mucho, comprimidas.
+- Instalador (`installer/EcclesiaCast.iss`): página de componentes «Biblias»
+  con una casilla por versión (la RV1909 tildada por defecto); las elegidas se
+  copian a `{app}\bibles\`. Actualizá `.github/workflows/release.yml` si hace
+  falta para que la carpeta entre al instalador.
+- Programa: al arrancar, importa las de `{app}\bibles\` que **no estén ya
+  instaladas** (por abreviatura) y anota en settings las que importó, así si
+  el operador borra una no vuelve a aparecer. Mensaje en la barra de estado.
+  Lógica de «cuáles faltan» en Core con pruebas.
+
+### G2. Paquete propio de Biblias (para las que tienen derechos)
+- «Exportar paquete de Biblias…» (menú de la Biblia, junto a exportar una
+  versión): elegís varias versiones con casillas y se guarda un `.ecbiblias`
+  (zip con un JSON por versión, más un `manifest.json` con nombre, abreviatura
+  e idioma). Aviso en la ventana: «Usalo sólo en tus propias computadoras; las
+  versiones con derechos no se pueden repartir».
+- «Importar paquete de Biblias…»: abre el `.ecbiblias`, muestra las versiones
+  con casillas (las ya instaladas, destildadas y marcadas «ya está») e importa
+  las elegidas.
+- Instalador: página opcional «¿Tenés un paquete de Biblias (.ecbiblias)?» con
+  un campo para elegir el archivo; si se eligió, se copia a
+  `{app}\bibles\` y el programa, al arrancar, abre la ventana de importar
+  paquete con ese archivo (una sola vez).
+- Lectura del manifiesto y elección de versiones en Core, con pruebas (zip
+  armado en memoria).
+- Verificación: compilar el instalador con ISCC
+  (`%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe`) para ver que el script
+  compila, **sin ejecutar el instalador**.
