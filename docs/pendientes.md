@@ -174,6 +174,17 @@ dibujos a imagen):
       probar el `mute()` del reproductor). La pestaña muestra el 🔇 mientras
       está silenciada, y también se tilda en «Configurar…». Cambiá el nombre de
       la pestaña y cerrá y abrí el programa: sigue silenciada.
+- [ ] **Varios cuadros en el diseñador.** En una canción abrí el diseñador y
+      agregá tres cuadros con «➕ Cuadro de texto»: cada uno tiene que caer en
+      un lugar distinto. Los que no están elegidos se ven con contorno punteado
+      y nombre. Hacé clic sobre uno y después sobre otro (probá también
+      **mientras escribís** en uno con doble clic: el clic afuera tiene que
+      cerrar la edición y elegir el otro). **Tab** y **Shift+Tab** recorren los
+      cuadros con el cuadro elegido enfocado. «▲ Traer adelante» / «▼ Enviar
+      atrás» tienen que cambiar cuál tapa a cuál cuando se pisan. Escribí una
+      tipografía en el cuadro sin apretar Enter y cambiá de cuadro con la lista:
+      se tiene que conservar en el primero. Guardá, volvé a entrar y mirá que
+      todos se puedan editar.
 
 ## 2. Para la v1.0.0
 

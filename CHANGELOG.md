@@ -24,6 +24,16 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   escucha en el momento, sin reiniciar el video. Las Propiedades de cada medio
   no se tocan: al quitar el silencio, cada uno vuelve a sonar como estaba.
 
+- **Varios cuadros de texto en el diseñador de diapositivas, sin pisarse.** Antes
+  el segundo cuadro caía justo encima del primero y no se podía elegir ni
+  editar el de abajo. Ahora: cada cuadro nuevo aparece en un lugar libre (abajo
+  al centro, arriba al centro, las esquinas…); los otros cuadros se ven con un
+  contorno punteado y su nombre («Letra», «Cuadro 2»); un clic en cualquiera lo
+  elige, aunque se esté escribiendo en otro; **Tab** pasa al siguiente cuadro; y
+  **▲ Traer adelante** / **▼ Enviar atrás** cambian cuál se dibuja encima. Al
+  cambiar de cuadro con la lista, la tipografía escrita sin confirmar ya no se
+  pierde.
+
 - **Tipografía para cada recuadro del escenario.** En el diseñador de
   escenarios, cada recuadro (las notas del predicador, la hora, un texto fijo…)
   puede tener su propia letra: se elige de la lista de las que tiene la

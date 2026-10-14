@@ -144,7 +144,7 @@
         <!-- ── Lienzo de edición ── -->
         <DockPanel Grid.Row="0" Grid.Column="2">
             <Border DockPanel.Dock="Top" Style="{StaticResource Panel}" Padding="8,6" Margin="0,0,0,8">
-                <TextBlock Text="Arrastrá la caja para moverla · esquina inferior derecha para el tamaño · el panel derecho da formato · la caja de texto de abajo corrige la letra."
+                <TextBlock Text="Clic en un cuadro para elegirlo · doble clic para escribir · Tab pasa al siguiente · arrastrá la caja para moverla y las esquinas para el tamaño · el panel derecho da formato."
                            FontSize="11" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap"/>
             </Border>
 
@@ -176,6 +176,8 @@
                             <controls:SlideView x:Name="Preview"/>
                             <Canvas x:Name="Overlay" Background="Transparent"
                                     MouseLeftButtonDown="Overlay_MouseDown">
+                                <!-- Contornos punteados de los cuadros que no están elegidos -->
+                                <Canvas x:Name="GhostLayer" IsHitTestVisible="False"/>
                                 <Border x:Name="BoxBorder"
                                         BorderBrush="{StaticResource AccentBrush}" BorderThickness="1.5"
                                         Background="#11FFFFFF" Cursor="SizeAll"
@@ -237,6 +239,14 @@
                         <Button x:Name="RemoveBoxButton" Content="🗑" Style="{StaticResource DarkButton}" FontSize="11"
                                 Padding="10,4" Margin="6,0,0,0" IsEnabled="False" Click="RemoveTextBox_Click"
                                 ToolTip="Quita el cuadro elegido"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                        <Button x:Name="BringForwardButton" Content="▲ Traer adelante" Style="{StaticResource DarkButton}" FontSize="11"
+                                Padding="10,4" IsEnabled="False" Click="BringForward_Click"
+                                ToolTip="Dibuja el cuadro elegido encima de los demás, un lugar"/>
+                        <Button x:Name="SendBackButton" Content="▼ Enviar atrás" Style="{StaticResource DarkButton}" FontSize="11"
+                                Padding="10,4" Margin="6,0,0,0" IsEnabled="False" Click="SendBack_Click"
+                                ToolTip="Dibuja el cuadro elegido debajo de los demás, un lugar"/>
                     </StackPanel>
                 </StackPanel>
                 <TabControl DockPanel.Dock="Top" Background="Transparent" BorderThickness="0">
