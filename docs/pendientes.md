@@ -18,6 +18,20 @@ domingo 11/10 en la reunión. Lo que sigue se programó después y no se pudo
 abrir desde acá (la PC estaba en uso); se probó con compilación, pruebas y
 dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
 
+- [ ] **Biblias en el instalador (Tramo G).** Hace falta instalar de verdad (en
+      una PC de prueba o una máquina virtual, no sobre la tuya):
+      1. En el instalador aparece la página **Biblias** con cuatro tipos
+         (estándar, todas, ninguna, elegir una por una). Con «estándar» sólo
+         queda tildada la Reina-Valera 1909.
+      2. Al abrir el programa por primera vez, abajo dice qué Biblias se
+         instalaron, y están en la lista de versiones de la pestaña Biblia
+         (proyectá Juan 3:16 con cada una).
+      3. Borrá una versión, cerrá y abrí el programa: **no** tiene que volver.
+      4. Reinstalá o actualizá (también en silencio, como hace la
+         actualización automática): no tiene que duplicar ninguna ni traer de
+         vuelta la que borraste. Ojo: quien actualiza desde una beta anterior
+         recibe la RV1909 una vez, porque nunca eligió nada.
+
 - [ ] **Zoom y corrimiento sobre la imagen entera («Rellenar»).** Es lo más
       importante de esta tanda. Poné una **página vertical** (la tapa de un
       manual) en «Rellenar» y abrí Propiedades:

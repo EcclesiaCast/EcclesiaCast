@@ -366,6 +366,9 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         LightVideoCache.StatusChanged += message =>
             Application.Current?.Dispatcher.BeginInvoke(() => StatusText = message);
         RefreshLightCopies();
+
+        // The Bibles the installer left, once the window is up.
+        _ = ImportBundledBiblesAsync();
     }
 
     // ── Playlist del servicio ────────────────────────────────────

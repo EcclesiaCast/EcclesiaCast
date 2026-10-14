@@ -48,6 +48,42 @@ spanish.PerformanceGroup=Rendimiento:
 english.PerformanceGroup=Performance:
 spanish.LowPerformanceTask=Configurar para una PC de bajo rendimiento (recomendado en computadoras viejas o notebooks sin placa de video)
 english.LowPerformanceTask=Set up for a low-performance PC (recommended for old computers or laptops without a graphics card)
+spanish.TypeBiblesStandard=Instalación estándar (con la Reina-Valera 1909)
+english.TypeBiblesStandard=Standard installation (with the Reina-Valera 1909)
+spanish.TypeBiblesAll=Con todas las Biblias libres
+english.TypeBiblesAll=With all the free Bibles
+spanish.TypeBiblesNone=Sin ninguna Biblia (se pueden traer después desde el programa)
+english.TypeBiblesNone=With no Bible (they can be added later from the program)
+spanish.TypeBiblesCustom=Elegir una por una
+english.TypeBiblesCustom=Choose one by one
+spanish.BibleRv1909=Reina-Valera 1909 (dominio público)
+english.BibleRv1909=Reina-Valera 1909 (public domain)
+spanish.BibleBlm=Biblia libre para el mundo (dominio público; es un borrador que se sigue revisando)
+english.BibleBlm=Biblia libre para el mundo (public domain; a draft that is still being reviewed)
+spanish.BibleVbl=Versión Biblia Libre (licencia libre CC BY-SA 4.0)
+english.BibleVbl=Versión Biblia Libre (free license CC BY-SA 4.0)
+
+[Messages]
+; La página de componentes sólo sirve para elegir Biblias, así que habla de eso.
+spanish.WizardSelectComponents=Biblias
+english.WizardSelectComponents=Bibles
+spanish.SelectComponentsDesc=¿Qué Biblias querés tener instaladas?
+english.SelectComponentsDesc=Which Bibles do you want installed?
+spanish.SelectComponentsLabel2=Tildá las Biblias libres que querés. Las que tienen derechos (RVR1960, NVI...) no se pueden repartir con el instalador. Más adelante se pueden traer o borrar desde el programa.
+english.SelectComponentsLabel2=Tick the free Bibles you want. Bibles with copyright (RVR1960, NIV...) cannot be shipped with the installer. You can add or remove more later from the program.
+
+; Sólo Biblias de dominio público o con licencia que permite redistribuir (ver
+; installer\bibles\LICENCIAS.md). Una casilla por versión; la Reina-Valera 1909 viene tildada.
+[Types]
+Name: "estandar"; Description: "{cm:TypeBiblesStandard}"
+Name: "todas"; Description: "{cm:TypeBiblesAll}"
+Name: "ninguna"; Description: "{cm:TypeBiblesNone}"
+Name: "personalizada"; Description: "{cm:TypeBiblesCustom}"; Flags: iscustom
+
+[Components]
+Name: "rv1909"; Description: "{cm:BibleRv1909}"; Types: estandar todas
+Name: "blm"; Description: "{cm:BibleBlm}"; Types: todas
+Name: "vbl"; Description: "{cm:BibleVbl}"; Types: todas
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
@@ -64,6 +100,11 @@ Root: HKCU; Subkey: "Software\EcclesiaCast"; Flags: uninsdeletekeyifempty
 [Files]
 ; Todo el resultado de `dotnet publish` (incluye .NET y las librerías de VLC)
 Source: "..\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; Las Biblias que se eligieron: el programa las trae a su biblioteca al arrancar
+; (las que todavía no tiene) y deja anotado cuáles, para no volver a traer una borrada.
+Source: "bibles\RV1909.ecbiblias"; DestDir: "{app}\bibles"; Flags: ignoreversion; Components: rv1909
+Source: "bibles\BLM.ecbiblias"; DestDir: "{app}\bibles"; Flags: ignoreversion; Components: blm
+Source: "bibles\VBL.ecbiblias"; DestDir: "{app}\bibles"; Flags: ignoreversion; Components: vbl
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\EcclesiaCast.App.exe"

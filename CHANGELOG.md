@@ -9,6 +9,18 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Elegir qué Biblias instalar.** El instalador tiene ahora una página
+  **Biblias** con una casilla por versión: **Reina-Valera 1909** (viene
+  tildada), **Biblia libre para el mundo** y **Versión Biblia Libre**. Son las
+  únicas que se pueden repartir con el instalador: la primera es de dominio
+  público, la segunda también (es un borrador que sus autores siguen
+  revisando) y la tercera tiene una licencia libre (CC BY-SA 4.0). Las que
+  tienen derechos (RVR1960, NVI, NTV…) no vienen, porque el instalador se
+  publica para cualquiera. Al abrir el programa, trae a su biblioteca las que
+  todavía no tiene y avisa abajo cuáles; si después borrás una, no vuelve a
+  aparecer. El origen y la licencia de cada una están en
+  `installer/bibles/LICENCIAS.md`.
+
 - **Tipografía para cada recuadro del escenario.** En el diseñador de
   escenarios, cada recuadro (las notas del predicador, la hora, un texto fijo…)
   puede tener su propia letra: se elige de la lista de las que tiene la
