@@ -36,6 +36,7 @@ public partial class WebPanel : UserControl, IWebPageHost
     {
         InitializeComponent();
         AddressBox.IsKeyboardFocusWithinChanged += (_, _) => KeyboardFocusChanged?.Invoke(this, EventArgs.Empty);
+        ImageQueryBox.IsKeyboardFocusWithinChanged += (_, _) => KeyboardFocusChanged?.Invoke(this, EventArgs.Empty);
         UpdateButtons();
     }
 
@@ -82,12 +83,14 @@ public partial class WebPanel : UserControl, IWebPageHost
     /// must stay out of the way then: they are keys of the page.
     /// </summary>
     public bool HasKeyboardInside =>
-        AddressBox.IsKeyboardFocusWithin || (_web is { } web && (web.IsKeyboardFocusWithin || web.HasFocusWithin()));
+        AddressBox.IsKeyboardFocusWithin || ImageQueryBox.IsKeyboardFocusWithin || (_web is { } web && (web.IsKeyboardFocusWithin || web.HasFocusWithin()));
 
     /// <summary>Raised when <see cref="HasKeyboardInside"/> may have changed.</summary>
     public event EventHandler? KeyboardFocusChanged;
 
     // ── IWebPageHost ─────────────────────────────────────────────
+
+    public event EventHandler<WebImageChosen>? ImageChosen;
 
     public bool IsReady => _web?.CoreWebView2 is not null;
 
@@ -197,6 +200,8 @@ public partial class WebPanel : UserControl, IWebPageHost
                     core.Navigate(e.Uri);
             };
 
+            core.ContextMenuRequested += OnContextMenuRequested;
+
             AttachFeed();
 
             if (_pendingAddress is { } address)
@@ -218,6 +223,28 @@ public partial class WebPanel : UserControl, IWebPageHost
             Placeholder.Text = "No se pudo abrir el navegador.\n\nInstalá el runtime de WebView2 (Microsoft Edge WebView2) y volvé a probar.";
             PlaceholderCover.Visibility = Visibility.Visible;
         }
+    }
+
+    /// <summary>
+    /// Right click on a picture of a page: the browser's own menu gets one more
+    /// entry on top, «Agregar a medios». What it hands over is the picture's
+    /// address; the view model downloads it and puts it in the library.
+    /// </summary>
+    private void OnContextMenuRequested(object? sender, CoreWebView2ContextMenuRequestedEventArgs e)
+    {
+        if (_web?.CoreWebView2 is not { } core)
+            return;
+
+        var target = e.ContextMenuTarget;
+        if (target.Kind != CoreWebView2ContextMenuTargetKind.Image || string.IsNullOrEmpty(target.SourceUri))
+            return;
+
+        var source = target.SourceUri;
+        var page = core.Source;
+        var entry = core.Environment.CreateContextMenuItem("➕ Agregar a medios", null, CoreWebView2ContextMenuItemKind.Command);
+        entry.CustomItemSelected += (_, _) =>
+            Dispatcher.BeginInvoke(() => ImageChosen?.Invoke(this, new WebImageChosen(source, page)));
+        e.MenuItems.Insert(0, entry);
     }
 
     /// <summary>

@@ -2176,6 +2176,10 @@
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding OpenWebCommand}"
                                 ToolTip="Abrir una página web en el cuadro central y proyectarla: como foto o en vivo"/>
+                        <Button Content="🖼 Imágenes" FontSize="11" Padding="8,4" Margin="6,0,0,0"
+                                Style="{StaticResource DarkButton}"
+                                Command="{Binding OpenImageSearchCommand}"
+                                ToolTip="Buscar imágenes y GIF en Google Imágenes y agregarlos a la pestaña actual con clic derecho → Agregar a medios"/>
                         <Button Content="🖥 Ventana" FontSize="11" Padding="8,4" Margin="6,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding OpenWindowPickerCommand}"

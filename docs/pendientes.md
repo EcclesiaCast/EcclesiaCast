@@ -53,6 +53,30 @@ abrió desde acá: sólo hay compilación y pruebas.
       antes) todo sigue igual. Fijate que no quede un borde oscuro en las
       orillas de la pantalla y que no pese en la PC de la iglesia (en el modo de
       bajo rendimiento también se ve).
+- [ ] **Imágenes y GIF de Google (lo más incierto: no se pudo probar nada
+      con Google de verdad).**
+      1. En la barra de medios, **🖼 Imágenes** abre el panel web en Google
+         Imágenes, en castellano. Dentro del panel hay una fila nueva: escribí
+         «cruz» y Enter (o **🖼 Imágenes** / **🎞 GIF**): abre la búsqueda;
+         **🎞 GIF** muestra sólo animados. Con «Sólo licencia libre» tildada
+         se ve el filtro «Derechos de uso» de Google. Escribir en esa caja no
+         tiene que mover diapositivas ni apagar la pantalla (F1 sí anda).
+      2. En Google, clic en una imagen para verla grande y **clic derecho
+         sobre la grande**: el menú tiene arriba **➕ Agregar a medios**. Se baja
+         y entra a la pestaña de medios abierta, con el nombre de lo que
+         buscaste («cruz», «cruz (2)»…). **Lo importante:** mirá que lo que
+         entra sea la imagen grande y no la miniatura; si es chica, el estado
+         lo dice con su tamaño. Si el clic derecho sobre la grande no da
+         «Agregar a medios» (Google a veces tapa la imagen con un enlace),
+         avisame qué pasa y lo cambio.
+      3. Con un GIF animado: tiene que quedar como video en bucle y sin sonido
+         (como un GIF que arrastrás). Probá también con un webp animado: ése
+         queda quieto.
+      4. Clic derecho → «Quitar de la biblioteca» borra el archivo bajado de
+         `%APPDATA%\EcclesiaCast\imagenes-web`. Sin internet: «No se pudo
+         bajar la imagen».
+      5. Cuidado con los derechos: Google muestra imágenes de cualquiera; el
+         filtro de licencia es lo que declara Google, no una garantía.
 - [ ] **Buscar desde el celular.** Con el control desde el celular prendido,
       arriba de todo hay una caja «Buscar canción o versículo…». Escribí dos
       letras o más (por ejemplo «gracia» o «juan 3 16»): salen canciones (♪) y
@@ -118,10 +142,6 @@ abrió desde acá: sólo hay compilación y pruebas.
 
 ## 3. Para hacer después de la 1.0
 
-- [ ] **Buscador de GIFs e imágenes** (pedido de Alexis, 14/10/2026). Falta
-      decidir de dónde salen (qué servicio, con qué licencia) y si se busca en
-      castellano y el programa lo traduce por dentro, o se busca directo en
-      inglés.
 
 - [ ] **Ejemplo de formato para importar Biblias.** Un archivo de ejemplo en
       JSON y otro en Zefania XML (unos pocos versículos), y en la ventana de
@@ -163,6 +183,13 @@ abrió desde acá: sólo hay compilación y pruebas.
   sus condiciones de licencia, y el complemento de NDI en el OBS).
 
 ## 5. Decisiones tomadas
+
+Buscador de imágenes y GIF (14/10/2026): se hace con **Google Imágenes dentro
+del panel web**, sin API ni claves. Se descartó Tenor (Google cerró su API el
+30/6/2026), la API de Google (cerrada a clientes nuevos y sin imágenes como
+las de Google Imágenes) y Giphy (100 búsquedas por hora para todas las
+iglesias juntas con una clave compartida, o una clave por iglesia). Google
+entiende el castellano, así que tampoco hace falta traducir.
 
 Descartado: importar las Biblias de BibleShow. Sus archivos `.bib` son bases
 de Access protegidas con usuario y contraseña, y NTV, NVI y PDT son textos con

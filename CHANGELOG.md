@@ -9,6 +9,15 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Imágenes y GIF de Google.** El botón **🖼 Imágenes** de la barra de medios
+  abre Google Imágenes en el panel web (en castellano, con todos sus filtros), y
+  el panel tiene una fila para escribir qué buscás, con **🖼 Imágenes**, **🎞 GIF**
+  (sólo animados) y «Sólo licencia libre» (el filtro «Derechos de uso» de
+  Google). Con clic derecho sobre una imagen aparece **➕ Agregar a medios**: se
+  baja y entra a la pestaña abierta; un GIF animado se convierte en video en
+  bucle como los que arrastrás. Avisa si la imagen es chica para una pantalla
+  grande. Quitarla de la biblioteca borra el archivo bajado. No usa API ni
+  claves.
 - **Buscar desde el celular.** La página del celular tiene arriba una caja para
   buscar canciones y versículos (todas las versiones de la Biblia), con la
   misma búsqueda que Ctrl+K de la computadora, sin los medios. Tocar un

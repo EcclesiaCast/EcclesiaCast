@@ -16,9 +16,18 @@ public interface IWebPageHost
     /// <summary>The title of the page being shown, or null while it has none.</summary>
     string? CurrentTitle { get; }
 
+    /// <summary>Raised when the operator picks «Agregar a medios» on a picture of the page.</summary>
+    event EventHandler<WebImageChosen>? ImageChosen;
+
     /// <summary>Opens a page in the panel (it is created on the first call).</summary>
     void Open(string address);
 
     /// <summary>Takes a picture of what the page shows right now and writes it to <paramref name="pngPath"/>.</summary>
     Task<bool> CaptureAsync(string pngPath);
 }
+
+/// <summary>
+/// A picture the operator picked on a page («Agregar a medios» in the browser's
+/// right-click menu): where the picture is, and the page it was on.
+/// </summary>
+public sealed record WebImageChosen(string Source, string? Page);

@@ -81,6 +81,35 @@
                             Command="{Binding SaveWebToMediaCommand}"
                             ToolTip="Con una foto tomada de esta página, la guarda como imagen. Sin foto, guarda la página (con su miniatura) para abrirla de nuevo con un clic."/>
                 </WrapPanel>
+
+                <!-- Imágenes y GIF de Google: abre Google Imágenes en este mismo
+                     panel; con clic derecho sobre una imagen se agrega a los medios -->
+                <DockPanel Margin="0,2,0,0">
+                    <Button DockPanel.Dock="Right" Content="🎞 GIF" FontSize="12" Padding="10,4" Margin="6,0,0,0"
+                            Style="{StaticResource DarkButton}"
+                            Command="{Binding SearchWebImagesCommand}" CommandParameter="gifs"
+                            ToolTip="Buscar GIF animados en Google Imágenes"/>
+                    <Button DockPanel.Dock="Right" Content="🖼 Imágenes" FontSize="12" Padding="10,4" Margin="6,0,0,0"
+                            Style="{StaticResource DarkButton}"
+                            Command="{Binding SearchWebImagesCommand}" CommandParameter="images"
+                            ToolTip="Buscar imágenes en Google Imágenes"/>
+                    <CheckBox DockPanel.Dock="Right" Content="Sólo licencia libre" FontSize="11"
+                              Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="10,0,0,0"
+                              IsChecked="{Binding WebImageFreeOnly}"
+                              ToolTip="Usa el filtro «Derechos de uso» de Google: sólo imágenes que dice que se pueden usar y compartir. Es lo que declara Google, no una garantía."/>
+                    <TextBox x:Name="ImageQueryBox" FontSize="13" Padding="8,4" VerticalContentAlignment="Center"
+                             Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                             BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
+                             Text="{Binding WebImageQuery, UpdateSourceTrigger=PropertyChanged}"
+                             AutomationProperties.Name="Buscar imágenes"
+                             ToolTip="Qué imagen buscás (por ejemplo: cruz, paloma, fuego). Enter busca imágenes.">
+                        <TextBox.InputBindings>
+                            <KeyBinding Key="Return" Command="{Binding SearchWebImagesCommand}" CommandParameter="images"/>
+                        </TextBox.InputBindings>
+                    </TextBox>
+                </DockPanel>
+                <TextBlock Text="Para agregar una imagen: hacé clic en ella para verla grande y, sobre la grande, clic derecho → «Agregar a medios»."
+                           FontSize="10.5" Foreground="{StaticResource FaintBrush}" TextWrapping="Wrap" Margin="0,4,0,0"/>
             </StackPanel>
         </Border>
 

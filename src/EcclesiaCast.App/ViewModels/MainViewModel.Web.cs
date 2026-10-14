@@ -33,7 +33,20 @@ public sealed partial class MainViewModel
     private int _nextWebPhotoId = WebLiveId - 1;
 
     /// <summary>The panel in the central box, set by the window.</summary>
-    public IWebPageHost? WebHost { get; set; }
+    public IWebPageHost? WebHost
+    {
+        get => _webHost;
+        set
+        {
+            if (_webHost is not null)
+                _webHost.ImageChosen -= OnWebImageChosen;
+            _webHost = value;
+            if (_webHost is not null)
+                _webHost.ImageChosen += OnWebImageChosen;
+        }
+    }
+
+    private IWebPageHost? _webHost;
 
     /// <summary>True while the web panel is where the slide grid is.</summary>
     [ObservableProperty]

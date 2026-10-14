@@ -359,5 +359,18 @@ public sealed partial class MainViewModel
         // The same for the video made from a GIF.
         if (GifImporter.IsConverted(item.Path))
             GifImporter.Forget(item.Path);
+
+        // And the picture brought in from Google Images.
+        if (IsDownloadedWebImage(item.Path))
+        {
+            try
+            {
+                File.Delete(item.Path);
+            }
+            catch (IOException ex)
+            {
+                Log.Debug(ex, "No se pudo borrar la imagen bajada {Path}", item.Path);
+            }
+        }
     }
 }
