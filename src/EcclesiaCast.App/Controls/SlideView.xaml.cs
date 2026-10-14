@@ -281,6 +281,7 @@ public partial class SlideView : UserControl
         if (AnimateTransitions && State == OutputState.Content)
         {
             TransitionIn(TextLayer);
+            TransitionIn(ExtraBoxLayer);
             if (leaving is not null)
                 TransitionOut(leaving);
         }
@@ -795,6 +796,7 @@ public partial class SlideView : UserControl
         var contentVisible = State == OutputState.Content ? Visibility.Visible : Visibility.Hidden;
         TextLayer.Visibility = contentVisible;
         CaptionLayer.Visibility = contentVisible;
+        ExtraBoxLayer.Visibility = contentVisible;
         LogoLayer.Visibility = State == OutputState.Logo ? Visibility.Visible : Visibility.Collapsed;
         ApplyThemeBackdrop();
 
@@ -804,7 +806,10 @@ public partial class SlideView : UserControl
             BlackLayer.BeginAnimation(OpacityProperty,
                 new DoubleAnimation(blackTarget, TimeSpan.FromMilliseconds(250)));
             if (State == OutputState.Content)
+            {
                 TransitionIn(TextLayer);
+                TransitionIn(ExtraBoxLayer);
+            }
             if (leaving is not null)
                 TransitionOut(leaving);
         }

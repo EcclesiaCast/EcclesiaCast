@@ -452,6 +452,11 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   un medio en pantalla, gana el medio; la imagen del tema vuelve cuando se
   quita el medio.
 
+- **Con «Clear (F2)» se van también los cuadros de texto extra.** Al quitar la
+  letra de la pantalla se iba el texto principal, pero los cuadros que se le
+  agregaron a una diapositiva quedaban a la vista. Ahora se van y vuelven junto
+  con la letra.
+
 - **Varios cuadros de texto en una diapositiva del diseñador.** Con más de un
   cuadro sólo se podía editar el que elegías en la lista de la derecha, y el
   marco grande de la letra quedaba encima de los cuadros chicos sin dejar
