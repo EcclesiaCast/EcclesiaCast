@@ -2971,6 +2971,9 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (item is null)
             return;
 
+        // The menu of a card of a presentation holds the object the card was
+        // built with, which a reload may have replaced: edit the current one.
+        item = CurrentMedia(item);
         if (_mediaInspector.Edit(item, MediaTabs.ToList(), _media.GetAll()))
         {
             _media.Update(item);

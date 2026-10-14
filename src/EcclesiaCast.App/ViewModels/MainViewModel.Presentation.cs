@@ -192,8 +192,19 @@ public sealed partial class MainViewModel
         }
 
         var signature = PresentationPages.Signature(pages);
-        if (signature == _presentationSignature)
+        if (signature == _presentationSignature && Slides.Count == pages.Count)
+        {
+            // Nothing the grid shows changed, but the library handed out new
+            // objects: the cards must hold those (zoom, volume, mute, tab...),
+            // not the copies they were built with.
+            foreach (var slide in Slides)
+            {
+                if (slide.Page is { } old)
+                    slide.Page = pages.FirstOrDefault(p => p.Id == old.Id) ?? old;
+            }
+
             return;
+        }
 
         var liveId = LiveSlideIndex >= 0 && LiveSlideIndex < Slides.Count ? Slides[LiveSlideIndex].Page?.Id : null;
         _presentationSignature = signature;
@@ -214,6 +225,7 @@ public sealed partial class MainViewModel
     /// </summary>
     private void ShowPage(MediaItem media)
     {
+        media = CurrentMedia(media);
         if (!OpenPresentation(media.Category, media.Id))
             return;
 
@@ -221,6 +233,15 @@ public sealed partial class MainViewModel
         if (card is not null)
             GoLiveSlide(card.Index);
     }
+
+    /// <summary>
+    /// The library's current object for a media. A reload replaces every
+    /// object, so one kept anywhere (a card of the grid, a menu parameter)
+    /// may be an old copy: projecting it would bring back old settings and
+    /// saving it would write the old tab over the new one.
+    /// </summary>
+    private MediaItem CurrentMedia(MediaItem media) =>
+        _allMedia.FirstOrDefault(m => m.Id == media.Id) ?? media;
 
     private bool IsPresentationPageOnAir =>
         _livePageId != 0 && _presentation.Background?.Id == _livePageId;
@@ -245,6 +266,7 @@ public sealed partial class MainViewModel
     /// </summary>
     private void GoLivePage(int index, MediaItem page)
     {
+        page = CurrentMedia(page);
         NoteAction($"Proyectar la página {index + 1} de {Slides.Count}: {page.Name}");
 
         if (!IsPresentationPageOnAir)

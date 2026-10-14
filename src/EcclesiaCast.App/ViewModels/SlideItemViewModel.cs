@@ -44,9 +44,11 @@ public sealed partial class SlideItemViewModel(
     /// The media behind a card of a presentation (a page of a PDF, a picture,
     /// a video); null on every other card. The <see cref="Slide"/> of such a
     /// card only says «Página 3» for the stage and the phone: it never goes
-    /// on screen as text.
+    /// on screen as text. Settable because a reload of the library hands out
+    /// new objects for the same pages: the card follows them, so what it
+    /// projects or edits is never an old copy.
     /// </summary>
-    public MediaItem? Page { get; init; }
+    public MediaItem? Page { get; set; }
 
     public bool IsPage => Page is not null;
 
