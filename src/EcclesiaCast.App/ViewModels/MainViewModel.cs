@@ -2127,6 +2127,55 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             StatusText = $"Logo: {logo.Name}.";
     }
 
+    /// <summary>
+    /// Right-click on a picture or video → «Usar como logo». It only adds the
+    /// logo to the list: switching the screen to it is F3's job, and doing it
+    /// here would blank the output in the middle of a service.
+    /// </summary>
+    [RelayCommand]
+    private async Task UseMediaAsLogoAsync(MediaItem? item)
+    {
+        // A rendered PDF/PPT page goes away with its media, which would leave
+        // the logo pointing at a missing file.
+        if (item is null
+            || item.Type is not (MediaType.Image or MediaType.Video)
+            || string.IsNullOrWhiteSpace(item.Path)
+            || DocumentImporter.IsRenderedPage(item.Path))
+            return;
+
+        var existing = Logos.FirstOrDefault(l =>
+            l.Kind != LogoKind.Text && string.Equals(l.Path, item.Path, StringComparison.OrdinalIgnoreCase));
+        if (existing is not null)
+        {
+            SelectedLogo = existing;
+            StatusText = $"«{existing.Name}» ya era un logo; quedó elegido (F3 lo muestra).";
+            return;
+        }
+
+        var isVideo = item.Type == MediaType.Video;
+
+        // A brand-new poster, not the card's thumbnail: deleting the logo
+        // deletes its poster, and the card still needs its own.
+        var poster = isVideo
+            ? await Task.Run(() => MediaThumbnails.Create(item.Path, MediaType.Video, App.VideoEngine))
+            : null;
+
+        var created = _logos.Save(new Logo
+        {
+            Name = item.Name,
+            Kind = isVideo ? LogoKind.Video : LogoKind.Image,
+            Path = item.Path,
+            PosterPath = poster,
+            Scaling = item.Scaling,
+            Muted = true,
+            Order = Logos.Count,
+        });
+
+        LoadLogos(created.Id);
+        RefreshLightCopies();
+        StatusText = $"«{created.Name}» agregado como logo (F3 lo muestra).";
+    }
+
     // ── Búsqueda global ──────────────────────────────────────────
 
     /// <summary>

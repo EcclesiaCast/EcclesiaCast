@@ -99,6 +99,11 @@
             <MenuItem Header="Agregar a la playlist"
                       Command="{Binding PlacementTarget.Tag.AddMediaToPlaylistCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                       CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+            <!-- Sólo en una imagen o un video de archivo, con una sola tarjeta elegida -->
+            <MenuItem x:Name="UseAsLogoItem" Header="Usar como logo"
+                      Command="{Binding PlacementTarget.Tag.UseMediaAsLogoCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      ToolTip="Lo suma a la lista de logos para mostrarlo con F3. No cambia el logo que está en pantalla."/>
             <!-- Sus pestañas se llenan al abrirse -->
             <MenuItem x:Name="MoveToTabItem" Header="Mover a la pestaña…" SubmenuOpened="MoveToTab_SubmenuOpened">
                 <MenuItem Header="(cargando)" IsEnabled="False"/>

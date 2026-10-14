@@ -9,6 +9,13 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Usar una imagen o un video de la barra de medios como logo.** Con clic
+  derecho en la tarjeta, **Usar como logo** lo suma a la lista de logos sin
+  pasar por el administrador de logos. Si ese archivo ya era un logo, lo deja
+  elegido en vez de repetirlo. No cambia lo que hay en pantalla: **F3** lo
+  muestra. No aparece en las páginas de un PDF o de una presentación, porque se
+  borran junto con el medio.
+
 - **Tipografía para cada recuadro del escenario.** En el diseñador de
   escenarios, cada recuadro (las notas del predicador, la hora, un texto fijo…)
   puede tener su propia letra: se elige de la lista de las que tiene la

@@ -670,6 +670,14 @@ public partial class MainWindow : Window
                 case "OpenLocationItem":
                     item.Visibility = isWeb ? Visibility.Collapsed : Visibility.Visible;
                     break;
+                case "UseAsLogoItem":
+                    // A page drawn from a PDF or presentation is deleted with
+                    // its media, and the logo would be left pointing at nothing.
+                    item.Visibility = count == 1
+                        && media.Type is MediaType.Image or MediaType.Video
+                        && !DocumentImporter.IsRenderedPage(media.Path)
+                        ? Visibility.Visible : Visibility.Collapsed;
+                    break;
                 case "RemoveMediaItem":
                     item.Header = "Quitar de la biblioteca" + suffix;
                     break;

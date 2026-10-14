@@ -156,6 +156,17 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
       6. Si decís que no al permiso de administrador de Windows, el aviso
          tiene que quedarse abierto diciendo que no se instaló nada.
 
+Tramo B del plan del 13/10 (medios y diseñador; sólo compilación, pruebas y
+dibujos a imagen):
+
+- [ ] **Usar como logo.** Clic derecho en una imagen y en un video de la barra
+      de medios → «Usar como logo». Tiene que aparecer en Logo (la lista del
+      botón) con el nombre del archivo, y **F3** lo muestra. En un video, mirá
+      que el logo tenga su cuadro de muestra en el administrador de logos. Una
+      segunda vez con el mismo archivo no lo repite. No aparece en las páginas
+      de un PDF ni en un YouTube. Si borrás el medio de la barra, el logo
+      sigue andando.
+
 ## 2. Para la v1.0.0
 
 - [ ] **Usar la beta.7 en la reunión del domingo** y anotar lo que falle o no
