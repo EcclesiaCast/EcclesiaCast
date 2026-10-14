@@ -9,6 +9,9 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Diseño de aprendizaje o avanzado.** En Ver elegís si los botones muestran
+  los atajos de teclado (F1, F2, Esc, Ctrl+Enter) y los textos de ayuda, o si
+  los ocultan para ver menos texto. Los atajos andan igual en los dos.
 - **Tipografía para cada recuadro del escenario.** En el diseñador de
   escenarios, cada recuadro (las notas del predicador, la hora, un texto fijo…)
   puede tener su propia letra: se elige de la lista de las que tiene la

@@ -18,6 +18,15 @@ domingo 11/10 en la reunión. Lo que sigue se programó después y no se pudo
 abrir desde acá (la PC estaba en uso); se probó con compilación, pruebas y
 dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
 
+- [ ] **Diseño de aprendizaje o avanzado (Ver).** Probalo con el programa
+      abierto: 1) en Ver, «Diseño de aprendizaje» está tildado y Black, Clear,
+      Logo, Sin fondo, Apagar salida y Proyectar muestran su tecla al costado;
+      los textos de ayuda de Aviso al pie, Resaltar, Spotify y Notas están a
+      la vista. 2) Elegí «Diseño avanzado»: las teclas y esos textos se ocultan
+      de una vez, sin reiniciar, y los botones no cambian de lugar. 3) Las
+      teclas F1 a F4 y Esc siguen funcionando en los dos diseños. 4) Cerrá y
+      abrí el programa: queda el diseño que elegiste. 5) «Volver al diseño
+      original» vuelve al de aprendizaje.
 - [ ] **Zoom y corrimiento sobre la imagen entera («Rellenar»).** Es lo más
       importante de esta tanda. Poné una **página vertical** (la tapa de un
       manual) en «Rellenar» y abrí Propiedades:
