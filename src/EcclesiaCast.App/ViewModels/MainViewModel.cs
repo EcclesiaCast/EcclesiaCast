@@ -1029,10 +1029,18 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             case PlaylistItemType.Presentation:
                 // The entry remembers the first page; the tab is wherever that
                 // page is now (the tab may have been renamed since), or the
-                // name written when it was added.
-                var tab = _allMedia.FirstOrDefault(m => m.Id == item.MediaId)?.Category ?? item.Caption;
+                // name written when it was added. The page may also have been
+                // moved to a tab that is not a presentation: then the name
+                // written is the one to go by. A tab is never marked here —
+                // someone who unmarked it meant it.
+                var pageTab = _allMedia.FirstOrDefault(m => m.Id == item.MediaId)?.Category;
+                var tab = IsPresentationTab(pageTab) ? pageTab! : item.Caption;
                 if (!IsPresentationTab(tab))
-                    SetPresentationTab(tab, true);
+                {
+                    StatusText = $"«{item.Caption}» ya no es una presentación. Para volver a usarla: clic derecho en su pestaña → «Usar como presentación y abrirla».";
+                    return false;
+                }
+
                 if (!OpenPresentation(tab, null))
                 {
                     StatusText = $"La presentación \"{item.Caption}\" ya no tiene páginas en la biblioteca.";
