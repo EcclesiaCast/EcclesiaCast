@@ -56,12 +56,12 @@ public sealed class SongSaver(ISongRepository songs, ITextPrompt prompt)
 
         public SongSaveOutcome Save(Song song)
         {
-            var taken = SongTitles.FindSame(_library, song.Title);
+            var taken = SongTitles.FindSame(_library, song.Title, song.Artist);
             if (taken is null)
                 return new SongSaveOutcome(SongSaveResult.Saved, Add(song));
 
             var copyTitle = SongTitles.FreeTitle(_library.Select(s => s.Title), song.Title);
-            var choice = _remembered ?? Ask(song.Title, copyTitle);
+            var choice = _remembered ?? Ask(song.Title, taken.Artist, copyTitle);
 
             switch (choice)
             {
@@ -79,7 +79,7 @@ public sealed class SongSaver(ISongRepository songs, ITextPrompt prompt)
         }
 
         /// <summary>0 = keep both, 1 = replace, 2 = discard; closing the window discards.</summary>
-        private int Ask(string title, string copyTitle)
+        private int Ask(string title, string artist, string copyTitle)
         {
             string[] options =
             [
@@ -87,7 +87,8 @@ public sealed class SongSaver(ISongRepository songs, ITextPrompt prompt)
                 "Reemplazar la que ya está (se pierde su letra)",
                 "Descartar la nueva",
             ];
-            var message = $"Ya hay una canción llamada «{title}» en la biblioteca. ¿Qué hago con la nueva?";
+            var by = string.IsNullOrWhiteSpace(artist) ? "" : $" de {artist}";
+            var message = $"Ya hay una canción llamada «{title}»{by} en la biblioteca. ¿Qué hago con la nueva?";
 
             var (index, repeat) = _several
                 ? _prompt.ChooseAndRemember("Canción repetida", message, options, "Hacer lo mismo con las demás")
@@ -102,7 +103,7 @@ public sealed class SongSaver(ISongRepository songs, ITextPrompt prompt)
         private Song Add(Song song)
         {
             var saved = _songs.Save(song);
-            _library.Add(new SongTitle(saved.Id, saved.Title));
+            _library.Add(new SongTitle(saved.Id, saved.Title, saved.Artist));
             return saved;
         }
 
@@ -117,7 +118,7 @@ public sealed class SongSaver(ISongRepository songs, ITextPrompt prompt)
 
             var saved = _songs.Save(song);
             _library.RemoveAll(s => s.Id == taken.Id);
-            _library.Add(new SongTitle(saved.Id, saved.Title));
+            _library.Add(new SongTitle(saved.Id, saved.Title, saved.Artist));
             return saved;
         }
     }

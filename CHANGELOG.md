@@ -9,6 +9,19 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Mini reproductor en la pestaña Música.** Donde estaban los botones de
+  «Spotify u otro reproductor» ahora se ve la carátula, el título, el artista,
+  de qué programa viene y una barra de avance de lo que suene en la
+  computadora, con anterior, pausa y siguiente que le hablan directo al
+  reproductor (si no hay ninguno, mandan la tecla multimedia como antes). El
+  volumen sigue abajo. Lo lee de los controles multimedia de Windows: no pide
+  cuenta de Spotify. Sólo escucha mientras la pestaña está a la vista. No
+  muestra la fila de reproducción: Windows no la da.
+- **Dos canciones con el mismo título y distinto artista.** La «clave» de una
+  canción ahora es título + artista: «Hay Libertad» de IBI y «Hay Libertad» de
+  Christina Aguilera entran las dos sin preguntar. Sólo se pregunta qué hacer
+  si coinciden las dos cosas (o si una de las dos no tiene artista escrito),
+  y la pregunta nombra al artista.
 - **Historial de versículos buscados, como en BibleShow.** Al lado de la caja
   de búsqueda de la Biblia hay un botón **🕘** (o la flecha ↓ con la caja
   vacía) que abre la lista de los últimos 30 versículos que proyectaste desde

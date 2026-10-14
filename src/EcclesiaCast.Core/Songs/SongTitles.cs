@@ -4,8 +4,8 @@ using System.Text.RegularExpressions;
 
 namespace EcclesiaCast.Core.Songs;
 
-/// <summary>A song's id and title, enough to tell whether a title is taken.</summary>
-public sealed record SongTitle(int Id, string Title);
+/// <summary>A song's id, title and artist, enough to tell whether a song is already in the library.</summary>
+public sealed record SongTitle(int Id, string Title, string Artist = "");
 
 /// <summary>
 /// When two songs count as the same one, and what to call a new song whose
@@ -35,12 +35,27 @@ public static partial class SongTitles
     public static bool Same(string? a, string? b) =>
         Normalize(a) is { Length: > 0 } left && left == Normalize(b);
 
-    /// <summary>The first song whose title is the same as <paramref name="title"/>, or null.</summary>
-    public static SongTitle? FindSame(IEnumerable<SongTitle> library, string? title)
+    /// <summary>
+    /// Title and artist together are the song: «Hay Libertad» by one band and
+    /// «Hay Libertad» by another are two songs. When one of the two has no
+    /// artist written there is no way to tell them apart, so it counts as the
+    /// same song and the user is asked.
+    /// </summary>
+    public static bool SameSong(string? title, string? artist, string? otherTitle, string? otherArtist)
     {
-        var wanted = Normalize(title);
-        return wanted.Length == 0 ? null : library.FirstOrDefault(s => Normalize(s.Title) == wanted);
+        if (!Same(title, otherTitle))
+            return false;
+
+        var a = Normalize(artist);
+        var b = Normalize(otherArtist);
+        return a.Length == 0 || b.Length == 0 || a == b;
     }
+
+    /// <summary>The first song that is the same as <paramref name="title"/> by <paramref name="artist"/>, or null.</summary>
+    public static SongTitle? FindSame(IEnumerable<SongTitle> library, string? title, string? artist = null) =>
+        Normalize(title).Length == 0
+            ? null
+            : library.FirstOrDefault(s => SameSong(s.Title, s.Artist, title, artist));
 
     /// <summary>
     /// «Title (1)»: the title with the first number that is not taken yet. A

@@ -37,6 +37,30 @@ public class SongTitlesTests
     }
 
     [Fact]
+    public void The_same_title_by_another_artist_is_another_song()
+    {
+        var library = new[]
+        {
+            new SongTitle(1, "Hay Libertad", "IBI"),
+            new SongTitle(2, "Hay Libertad", "Christina Aguilera"),
+        };
+
+        Assert.Equal(2, SongTitles.FindSame(library, "hay libertad", "christina AGUILERA")!.Id);
+        Assert.Equal(1, SongTitles.FindSame(library, "Hay Libertad", "ibi")!.Id);
+        Assert.Null(SongTitles.FindSame(library, "Hay Libertad", "Otro Grupo"));
+    }
+
+    [Fact]
+    public void A_missing_artist_cannot_tell_songs_apart_so_it_counts_as_the_same()
+    {
+        var library = new[] { new SongTitle(1, "Hay Libertad", "IBI") };
+
+        Assert.Equal(1, SongTitles.FindSame(library, "Hay Libertad", "")!.Id);
+        Assert.Equal(1, SongTitles.FindSame(library, "Hay Libertad")!.Id);
+        Assert.Equal(1, SongTitles.FindSame([new SongTitle(1, "Hay Libertad")], "Hay Libertad", "IBI")!.Id);
+    }
+
+    [Fact]
     public void The_free_title_takes_the_first_number_that_is_not_used()
     {
         Assert.Equal("Mi Gozo (1)", SongTitles.FreeTitle(["Mi Gozo"], "Mi Gozo"));

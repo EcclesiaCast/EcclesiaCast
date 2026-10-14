@@ -234,6 +234,24 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
          entrada guardada con otra versión: tiene que volver a esa versión.
       6. Cerrá y abrí el programa: el historial sigue. «Borrar historial» lo
          vacía y avisa en la barra de estado.
+
+- [ ] **Mini reproductor en Música** (14/10/2026; sólo compilación, no se vio
+      con Spotify). Con Spotify sonando, en la pestaña Música: 1) se ven la
+      carátula, el título y el artista, y la barra avanza cada segundo; 2) el
+      ícono cambia entre ⏸ y ▶ al pausar desde Spotify o desde el botón; 3)
+      anterior, pausa y siguiente andan; 4) al cambiar de canción desde
+      Spotify se actualiza sola; 5) con Spotify cerrado dice «No hay nada
+      sonando» y los botones siguen mandando la tecla multimedia; 6) probalo
+      también con un video de YouTube en el navegador; 7) el volumen de abajo
+      sigue andando. La barra no se puede arrastrar y no hay fila de
+      reproducción (Windows no la da).
+- [ ] **Mismo título, distinto artista.** Guardá «Hay Libertad» con artista IBI
+      y otra con artista Christina Aguilera: quedan las dos, sin pregunta (probá
+      escribiéndola, importando un archivo y desde la búsqueda en internet). Si
+      repetís la misma con el mismo artista, o sin artista, tiene que
+      preguntar y nombrar al artista. En la lista se ve el artista debajo del
+      título.
+
 Tramo B del plan del 13/10 (medios y diseñador; sólo compilación, pruebas y
 dibujos a imagen):
 

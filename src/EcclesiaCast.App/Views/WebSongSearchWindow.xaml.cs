@@ -47,7 +47,7 @@ public partial class WebSongSearchWindow : Window
     private readonly WebSongClient _client = new();
     private readonly ObservableCollection<Row> _results = [];
     private readonly Dictionary<string, WebSong> _fetched = [];
-    private readonly List<string> _libraryTitles;
+    private readonly List<SongTitle> _libraryTitles;
     private readonly List<Song> _imported = [];
     private readonly HashSet<string> _importedUrls = [];
 
@@ -62,7 +62,7 @@ public partial class WebSongSearchWindow : Window
         _songSaver = songSaver;
         ResultsList.ItemsSource = _results;
 
-        _libraryTitles = songs.GetTitles().Select(s => s.Title).ToList();
+        _libraryTitles = songs.GetTitles().ToList();
 
         Loaded += (_, _) =>
         {
@@ -255,7 +255,8 @@ public partial class WebSongSearchWindow : Window
         var title = TitleBox.Text.Trim();
 
         var info = slides == 1 ? "1 diapositiva." : $"{slides} diapositivas.";
-        if (title.Length > 0 && _libraryTitles.Any(t => SongTitles.Same(t, title)))
+        var artist = ArtistBox.Text.Trim();
+        if (title.Length > 0 && SongTitles.FindSame(_libraryTitles, title, artist) is not null)
             info += $"  Ojo: ya tenés una canción llamada «{title}» en la biblioteca; al importar te pregunto qué hacer.";
 
         PreviewInfoText.Text = info;
@@ -319,7 +320,7 @@ public partial class WebSongSearchWindow : Window
             title = song.Title;
             _imported.RemoveAll(s => s.Id == song.Id);
             _imported.Add(song);
-            _libraryTitles.Add(title);
+            _libraryTitles.Add(new SongTitle(song.Id, title, song.Artist));
             if (_previewRow is not null)
             {
                 _previewRow.Imported = true;

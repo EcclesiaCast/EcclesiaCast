@@ -36,7 +36,7 @@ public sealed class SongRepository(string dbPath) : ISongRepository
     {
         using var db = new AppDbContext(dbPath);
         return db.Songs.AsNoTracking()
-            .Select(s => new SongTitle(s.Id, s.Title))
+            .Select(s => new SongTitle(s.Id, s.Title, s.Artist))
             .ToList();
     }
 
