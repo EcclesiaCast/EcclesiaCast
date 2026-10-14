@@ -1180,7 +1180,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             && _presentation.Background is { } onScreen
             && _allMedia.FirstOrDefault(m => m.Id == onScreen.Id) is { } original
             && string.Equals(original.Category, tab, StringComparison.OrdinalIgnoreCase))
-            _presentation.RefreshBackground(Playable(original).Clone(), ResolveFill(original));
+            _presentation.RefreshBackground(Resolved(original).Clone(), ResolveFill(original));
     }
 
     /// <summary>Right click on a tab → «Silenciar la pestaña» / «Quitar el silencio».</summary>
@@ -2215,6 +2215,29 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         ApplyBackgroundCore(item);
     }
 
+    /// <summary>
+    /// The media exactly as it goes to the output: what its tab decides
+    /// (everything a foreground, say) comes before what the media says, and a
+    /// tab set to play through can't have its videos looping, or they would
+    /// never reach the end that triggers the next one. Always a copy when it
+    /// changes anything, so the library's item stays as the operator left it.
+    /// Every path that puts a media on the output, or puts it there again
+    /// after a change, goes through this.
+    /// </summary>
+    private MediaItem Resolved(MediaItem item)
+    {
+        item = Playable(item);
+        if (item.Type != MediaType.Image
+            && item.EndBehavior == VideoEndBehavior.Loop
+            && IsContinuousTab(item.Category))
+        {
+            item = item.Clone();
+            item.EndBehavior = VideoEndBehavior.Stop;
+        }
+
+        return item;
+    }
+
     /// <summary>Puts a media on the output, whatever it is (also what the web panel projects).</summary>
     private void ApplyBackgroundCore(MediaItem item)
     {
@@ -2226,20 +2249,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             return;
         }
 
-        // What its tab decides (everything a foreground, say) comes before
-        // what the media says; the copy leaves the library untouched.
-        item = Playable(item);
-
-        // A tab set to play through can't have its videos looping, or they
-        // would never reach the end that triggers the next one. The change is
-        // made on a copy so the item's own setting stays as the operator left it.
-        if (item.Type != MediaType.Image
-            && item.EndBehavior == VideoEndBehavior.Loop
-            && IsContinuousTab(item.Category))
-        {
-            item = item.Clone();
-            item.EndBehavior = VideoEndBehavior.Stop;
-        }
+        item = Resolved(item);
 
         NoteAction($"Poner el fondo «{item.Name}»");
         _presentation.SetBackground(item, ResolveFill(item));
@@ -3002,7 +3012,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             // screen is this same object, edited in place, so nothing would
             // notice the change.
             if (_presentation.Background?.Id == item.Id)
-                _presentation.RefreshBackground(Playable(item).Clone(), ResolveFill(item));
+                _presentation.RefreshBackground(Resolved(item).Clone(), ResolveFill(item));
             StatusText = $"«{item.Name}» actualizado.";
         }
     }
@@ -3059,7 +3069,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         // A page on screen is shown again from the new file.
         if (pages.FirstOrDefault(p => p.Id == _presentation.Background?.Id) is { } onScreen)
-            _presentation.RefreshBackground(Playable(onScreen).Clone(), ResolveFill(onScreen));
+            _presentation.RefreshBackground(Resolved(onScreen).Clone(), ResolveFill(onScreen));
 
         StatusText = $"{pages.Count} página(s) dibujadas de nuevo en alta calidad.";
     }
