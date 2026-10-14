@@ -1057,7 +1057,11 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private void ProjectMedia(MediaItem media)
     {
         ApplyBackground(media);
-        if (media.Behavior == MediaBehavior.Foreground)
+
+        // A page of a presentation already named the screen after its tab
+        // (the red border and the phone mark follow that title).
+        var isPage = media.Type is MediaType.Image or MediaType.Video && IsPresentationTab(media.Category);
+        if (media.Behavior == MediaBehavior.Foreground && !isPage)
             LiveTitle = media.Name;
     }
 
@@ -5466,10 +5470,21 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         return $"{edge}: {arrow} otra vez {verb} «{neighbour.Caption}».";
     }
 
-    private bool CurrentPlaylistItemIsMedia =>
-        _currentPlaylistIndex >= 0
-        && _currentPlaylistIndex < PlaylistItems.Count
-        && PlaylistItems[_currentPlaylistIndex].Type == PlaylistItemType.Media;
+    private bool CurrentPlaylistItemIsMedia
+    {
+        get
+        {
+            if (_currentPlaylistIndex < 0
+                || _currentPlaylistIndex >= PlaylistItems.Count
+                || PlaylistItems[_currentPlaylistIndex] is not { Type: PlaylistItemType.Media } item)
+                return false;
+
+            // A page of a presentation added on its own: projecting it opened
+            // the whole presentation in the grid, so the arrows walk its pages
+            // like in any presentation instead of jumping to the next entry.
+            return !(IsPresentationOpen && Slides.Any(s => s.Page?.Id == item.MediaId));
+        }
+    }
 
     /// <summary>
     /// True when the live slide sits on the edge of the current playlist
