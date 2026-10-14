@@ -170,6 +170,17 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
          bien después de muchos cambios seguidos (el programa no debe
          cerrarse). Hacia YouTube sigue habiendo un instante negro: es lo
          esperado.
+      3. **Sonido al cambiar la salida de Windows** (no se pudo probar nada
+         de esto, hace falta el programa abierto y dos salidas de audio).
+         Con la **música** sonando, cambiá la salida en la barra de Windows
+         (parlantes → auriculares): después de un instante tiene que seguir
+         sonando por la salida nueva, más o menos en el mismo lugar. Volvé a
+         la anterior: lo mismo. Repetilo con un **video con sonido** (no
+         silenciado, sin repetir) y con **YouTube**. Después cambiá la salida
+         con la música **en pausa** y dale play: tiene que sonar. Si alguna
+         vez queda muda, probá **Ver → Reiniciar el sonido**. Si ni eso la
+         arregla, avisá: queda mirar el registro (`logs`), donde cada
+         cambio de salida deja una línea.
 
 ## 2. Para la v1.0.0
 

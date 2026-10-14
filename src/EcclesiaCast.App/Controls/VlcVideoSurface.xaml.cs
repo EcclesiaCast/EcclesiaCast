@@ -80,6 +80,11 @@ public partial class VlcVideoSurface : UserControl
     {
         InitializeComponent();
         Unloaded += (_, _) => Dispose();
+        Loaded += (_, _) =>
+        {
+            AudioEndpointWatcher.OutputChanged -= OnAudioOutputChanged;
+            AudioEndpointWatcher.OutputChanged += OnAudioOutputChanged;
+        };
 
         // The framing is given over a 1920×1080 canvas: a different window
         // size means different numbers.
@@ -145,47 +150,117 @@ public partial class VlcVideoSurface : UserControl
 
         try
         {
-            // Switching media on the SAME player: no player teardown and no
-            // delegate churn.
-            // A heavy video (4K, 60 frames) plays from its light copy when
-            // one is ready; the item itself always keeps the original's path.
-            var playable = LightVideoCache.PlayablePath(media);
-            using var m = new Media(engine, new Uri(playable));
-            if (media.EndBehavior == VideoEndBehavior.Loop)
-                m.AddOption(":input-repeat=65535");
-            // Medio segundo de cache alcanza para un archivo local y deja
-            // varios cientos de megas menos en juego que el segundo y medio
-            // que traía: el video de fondo se lee del disco de la misma PC.
-            m.AddOption(":file-caching=500");
-
-            // Trimming is handed to VLC rather than watched for in code: a
-            // loop then restarts at the trimmed start, which is the whole
-            // point of cutting a sting off the front of a stock loop.
-            if (media.TrimStart > 0)
-                m.AddOption($":start-time={media.TrimStart.ToString("0.###", CultureInfo.InvariantCulture)}");
-            if (media.TrimEnd > 0 && media.TrimEnd > media.TrimStart)
-                m.AddOption($":stop-time={media.TrimEnd.ToString("0.###", CultureInfo.InvariantCulture)}");
-
-            // With hardware decoding on, handing the player a new input while
-            // the old one is still decoding corrupts the native heap within a
-            // few dozen switches (measured: 0xC0000374 every run). Stopping
-            // first made it survive 264 switches in a row. Safe to block here:
-            // no callback waits on the UI thread.
-            player.Stop();
-            // After Stop returns VLC calls nothing more for the old input, so
-            // every frame of it still queued carries the old number.
-            Interlocked.Increment(ref _generation);
-            player.Play(m);
-            if (playable == media.Path)
-                Log.Information("Video de fondo: {Name} ({Path})", media.Name, media.Path);
-            else
-                Log.Information("Video de fondo: {Name} ({Path}) desde su copia liviana {Copy}",
-                    media.Name, media.Path, playable);
+            StartPlayback(engine, player, media, resumeAt: null);
+            _playing = media;
         }
         catch (Exception ex)
         {
             Log.Error(ex, "No se pudo reproducir el video {Path}", media.Path);
             _currentId = -1;
+        }
+    }
+
+    /// <summary>
+    /// Hands the player the video. Switching media happens on the SAME player:
+    /// no player teardown and no delegate churn.
+    /// </summary>
+    private void StartPlayback(LibVLC engine, MediaPlayer player, MediaItem media, TimeSpan? resumeAt)
+    {
+        // A heavy video (4K, 60 frames) plays from its light copy when
+        // one is ready; the item itself always keeps the original's path.
+        var playable = LightVideoCache.PlayablePath(media);
+        using var m = new Media(engine, new Uri(playable));
+        var loops = media.EndBehavior == VideoEndBehavior.Loop;
+        if (loops)
+            m.AddOption(":input-repeat=65535");
+        // Medio segundo de cache alcanza para un archivo local y deja
+        // varios cientos de megas menos en juego que el segundo y medio
+        // que traía: el video de fondo se lee del disco de la misma PC.
+        m.AddOption(":file-caching=500");
+
+        // Trimming is handed to VLC rather than watched for in code: a
+        // loop then restarts at the trimmed start, which is the whole
+        // point of cutting a sting off the front of a stock loop.
+        // Reopening in place (the sound device changed) picks up at the spot
+        // it was — except a loop, which would then restart from that spot
+        // every time round; it starts over, which nobody notices in a loop.
+        if (resumeAt is { } at && !loops && at > TimeSpan.Zero)
+            m.AddOption($":start-time={at.TotalSeconds.ToString("0.###", CultureInfo.InvariantCulture)}");
+        else if (media.TrimStart > 0)
+            m.AddOption($":start-time={media.TrimStart.ToString("0.###", CultureInfo.InvariantCulture)}");
+        if (media.TrimEnd > 0 && media.TrimEnd > media.TrimStart)
+            m.AddOption($":stop-time={media.TrimEnd.ToString("0.###", CultureInfo.InvariantCulture)}");
+
+        // With hardware decoding on, handing the player a new input while
+        // the old one is still decoding corrupts the native heap within a
+        // few dozen switches (measured: 0xC0000374 every run). Stopping
+        // first made it survive 264 switches in a row. Safe to block here:
+        // no callback waits on the UI thread.
+        player.Stop();
+        // After Stop returns VLC calls nothing more for the old input, so
+        // every frame of it still queued carries the old number.
+        Interlocked.Increment(ref _generation);
+
+        // Windows changed the audio device since this player opened its output:
+        // ask for a fresh one (the default device of the moment) now that it is
+        // stopped. The player itself is never rebuilt — its video callbacks
+        // must stay assigned for as long as it lives.
+        if (_audioGeneration != AudioEndpointWatcher.Generation)
+        {
+            _audioGeneration = AudioEndpointWatcher.Generation;
+            try
+            {
+                var ok = player.SetAudioOutput("mmdevice");
+                Log.Information("Se reabre la salida de audio del video ({Result})", ok ? "ok" : "no se pudo");
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "No se pudo reabrir la salida de audio del video");
+            }
+        }
+
+        player.Play(m);
+        if (resumeAt is not null)
+            return;
+
+        if (playable == media.Path)
+            Log.Information("Video de fondo: {Name} ({Path})", media.Name, media.Path);
+        else
+            Log.Information("Video de fondo: {Name} ({Path}) desde su copia liviana {Copy}",
+                media.Name, media.Path, playable);
+    }
+
+    // ── Cambio de dispositivo de audio de Windows ────────────────
+
+    /// <summary>The item playing now, to reopen it in place if the sound device changes.</summary>
+    private MediaItem? _playing;
+
+    /// <summary>The <see cref="AudioEndpointWatcher.Generation"/> this player's output was opened under.</summary>
+    private int _audioGeneration;
+
+    /// <summary>
+    /// Windows moved the sound to another device (or the operator asked to
+    /// restart it): a video that is playing with sound is reopened on the new
+    /// one, in the same place. A muted one has nothing to fix; a paused one is
+    /// fixed by the next time it is started.
+    /// </summary>
+    private void OnAudioOutputChanged(object? sender, EventArgs e)
+    {
+        var player = _player;
+        var media = _playing;
+        if (player is null || media is null || _currentId < 0 || media.Muted
+            || App.VideoEngine is not { } engine || !player.IsPlaying)
+            return;
+
+        try
+        {
+            var position = TimeSpan.FromMilliseconds(Math.Max(0, player.Time));
+            Log.Information("Se reabre la salida del audio del video {Name} en {Position}", media.Name, position);
+            StartPlayback(engine, player, media, position);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "No se pudo reabrir la salida de audio del video");
         }
     }
 
@@ -485,6 +560,7 @@ public partial class VlcVideoSurface : UserControl
 
     private void Dispose()
     {
+        AudioEndpointWatcher.OutputChanged -= OnAudioOutputChanged;
         _holdTimer.Stop();
         ClearHold();
 

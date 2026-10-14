@@ -451,6 +451,15 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Corregido
 
+- **El sonido vuelve solo si cambiás la salida de audio de Windows.** Al
+  cambiar los parlantes por los auriculares (o un parlante Bluetooth) y
+  volver, la música y los videos quedaban mudos hasta cerrar y abrir el
+  programa. Ahora el programa se entera del cambio: lo que está sonando se
+  vuelve a abrir en la salida nueva, en el mismo lugar, y lo que se ponga
+  después ya arranca bien. Por las dudas, en **Ver → Reiniciar el sonido**
+  hay un botón que hace lo mismo a mano. Los videos de YouTube siguen la
+  salida de Windows por su cuenta.
+
 - **Al elegir otro medio ya no hay un salto a negro.** Pasar de una imagen a
   otra, de un video a una imagen o de una imagen a un video hacía un
   parpadeo negro: la imagen vieja desaparecía de golpe y la nueva subía desde

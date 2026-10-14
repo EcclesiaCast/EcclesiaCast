@@ -114,6 +114,10 @@ public partial class App : Application
 
         VideoEngine = libVlc;
 
+        // Hears when Windows changes the audio device, so the players can open
+        // their sound output again instead of staying mute until a restart.
+        AudioEndpointWatcher.Start();
+
         var services = new ServiceCollection();
         services.AddSingleton<IDisplayProvider, ScreenDisplayProvider>();
         services.AddSingleton<IPresentationService, PresentationService>();
@@ -187,6 +191,7 @@ public partial class App : Application
     {
         Log.Information("EcclesiaCast exiting");
         _watchdog?.Stop();
+        AudioEndpointWatcher.Stop();
         LightVideoCache.Shutdown();
 
         // Stop listening on the network before the process goes away.
