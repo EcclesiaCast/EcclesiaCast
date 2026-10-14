@@ -74,6 +74,9 @@ public sealed class StageBoxView : Border
             // width of the box and shrinks only when it gets too tall.
             TextWrapping = single ? TextWrapping.NoWrap : TextWrapping.Wrap,
         };
+        // Without a typeface the text keeps the one it inherits, as before.
+        if (!string.IsNullOrWhiteSpace(Box.FontFamily))
+            _text.FontFamily = new FontFamily(Box.FontFamily);
         if (!single)
             _text.MaxWidth = Math.Max(20, Box.Width - Padding.Left - Padding.Right);
 

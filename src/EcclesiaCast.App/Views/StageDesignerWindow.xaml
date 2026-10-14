@@ -156,6 +156,10 @@
                     <TextBox x:Name="FixedTextBox" Style="{StaticResource Field}" AcceptsReturn="True" TextWrapping="Wrap"
                              MinHeight="54" MaxHeight="120" VerticalScrollBarVisibility="Auto" TextChanged="FixedText_Changed"/>
 
+                    <TextBlock Text="Tipografía" Style="{StaticResource FieldLabel}"/>
+                    <ComboBox x:Name="FontBox" IsEditable="True" FontSize="12"
+                              SelectionChanged="Font_Changed" LostFocus="Font_Changed"/>
+
                     <TextBlock Text="Tamaño de letra" Style="{StaticResource FieldLabel}"/>
                     <controls:NumericField x:Name="FontSizeField" Minimum="8" Maximum="600" Step="4" Decimals="0"
                                            HorizontalAlignment="Left" ValueChanged="FontSize_Changed"/>

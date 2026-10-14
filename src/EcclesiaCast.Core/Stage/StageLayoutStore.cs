@@ -84,6 +84,7 @@ public static class StageLayoutStore
         box.Y = Math.Clamp(box.Y, 0, StageLayout.CanvasHeight - box.Height);
         box.FontSize = Math.Clamp(box.FontSize, 8, 600);
         box.Text ??= string.Empty;
+        box.FontFamily = string.IsNullOrWhiteSpace(box.FontFamily) ? null : box.FontFamily.Trim();
         if (string.IsNullOrWhiteSpace(box.Id))
             box.Id = Guid.NewGuid().ToString("N")[..8];
         if (string.IsNullOrWhiteSpace(box.Color))

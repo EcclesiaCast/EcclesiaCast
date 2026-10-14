@@ -54,6 +54,7 @@ public partial class StageDesignerWindow : Window
         _current = _inUse;
 
         KindBox.ItemsSource = _kinds;
+        FontBox.ItemsSource = Fonts.SystemFontFamilies.Select(f => f.Source).OrderBy(n => n).ToList();
         BuildHandles();
         ReloadLayoutPicker();
     }
@@ -312,6 +313,7 @@ public partial class StageDesignerWindow : Window
         {
             KindBox.SelectedItem = _kinds.First(k => k.Kind == box.Kind);
             FixedTextBox.Text = box.Text;
+            FontBox.Text = box.FontFamily ?? "Segoe UI";
             FontSizeField.SetSilently(box.FontSize);
             ShowColor(box.Color);
             AlignLeft.IsChecked = box.Align == StageAlign.Left;
@@ -421,6 +423,16 @@ public partial class StageDesignerWindow : Window
 
         box.Text = FixedTextBox.Text;
         Touch(listChanged: true);
+    }
+
+    private void Font_Changed(object sender, RoutedEventArgs e)
+    {
+        if (_loading || _selected is not { } box)
+            return;
+
+        var typed = FontBox.Text.Trim();
+        box.FontFamily = string.IsNullOrWhiteSpace(typed) ? null : typed;
+        Touch();
     }
 
     private void FontSize_Changed(object sender, RoutedEventArgs e)

@@ -66,6 +66,12 @@ public sealed class StageBox
     /// <summary>Text colour as #RRGGBB.</summary>
     public string Color { get; set; } = "#FFFFFF";
 
+    /// <summary>
+    /// Typeface by its system name («Segoe UI»). Null means the box keeps the
+    /// default one, so layouts saved before this option look the same.
+    /// </summary>
+    public string? FontFamily { get; set; }
+
     public StageAlign Align { get; set; } = StageAlign.Center;
 
     public bool Bold { get; set; }

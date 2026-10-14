@@ -210,4 +210,41 @@ public class StageLayoutStoreTests
         Assert.NotEqual(999, original.Boxes[0].FontSize);
         Assert.Equal("Cantantes", original.Name);
     }
+
+    [Fact]
+    public void A_typeface_survives_a_trip_through_json()
+    {
+        var original = new StageLayout
+        {
+            Name = "Notas",
+            Boxes = [new StageBox { Kind = StageBoxKind.Notes, FontFamily = "Georgia" }],
+        };
+
+        var back = Assert.Single(StageLayoutStore.Parse(StageLayoutStore.Serialize([original])));
+
+        Assert.Equal("Georgia", Assert.Single(back.Boxes).FontFamily);
+    }
+
+    [Fact]
+    public void A_layout_saved_before_typefaces_reads_back_with_none()
+    {
+        var json = "[{\"name\":\"Viejo\",\"boxes\":[{\"kind\":\"Notes\",\"x\":0,\"y\":0,\"width\":400,\"height\":120,\"fontSize\":60}]}]";
+
+        var box = Assert.Single(Assert.Single(StageLayoutStore.Parse(json)).Boxes);
+
+        Assert.Null(box.FontFamily);
+    }
+
+    [Fact]
+    public void A_blank_typeface_is_read_as_none_and_spaces_are_trimmed()
+    {
+        var json = "[{\"name\":\"X\",\"boxes\":["
+            + "{\"kind\":\"Notes\",\"fontFamily\":\"   \"},"
+            + "{\"kind\":\"Notes\",\"fontFamily\":\"  Georgia  \"}]}]";
+
+        var boxes = Assert.Single(StageLayoutStore.Parse(json)).Boxes;
+
+        Assert.Null(boxes[0].FontFamily);
+        Assert.Equal("Georgia", boxes[1].FontFamily);
+    }
 }

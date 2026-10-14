@@ -9,6 +9,12 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Tipografía para cada recuadro del escenario.** En el diseñador de
+  escenarios, cada recuadro (las notas del predicador, la hora, un texto fijo…)
+  puede tener su propia letra: se elige de la lista de las que tiene la
+  computadora, o se escribe el nombre. Si no se elige ninguna, queda la de
+  siempre, así que los escenarios que ya estaban guardados se ven igual.
+
 - **Actualizaciones automáticas.** Una vez por día, a los pocos segundos de
   abrir, EcclesiaCast mira en GitHub si hay una versión nueva y, si la hay,
   abre un aviso con lo que trae, en castellano, y tres botones: **Actualizar
