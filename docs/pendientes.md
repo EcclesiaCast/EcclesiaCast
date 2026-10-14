@@ -156,6 +156,24 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
       6. Si decís que no al permiso de administrador de Windows, el aviso
          tiene que quedarse abierto diciendo que no se instaló nada.
 
+- [ ] **Secciones que se achican a íconos.** Se probó dibujando la ventana a
+      imágenes (sin abrirla); falta verla de verdad:
+      1. Clic en el título **▾ MEDIOS**: queda sólo la cabecera con los
+         botones y las diapositivas ocupan el lugar. Otro clic la devuelve
+         **con el alto que tenía**. Probalo con «Medios arriba de las
+         diapositivas» y con una pestaña con muchos medios.
+      2. En el panel de canciones, botón **⇤**: queda una columna de íconos
+         🎵 📖 📋. Cada ícono abre lo suyo y saca el panel del riel; **⇥** lo
+         devuelve. Probalo con «Canciones y playlist a la derecha». Cerrá y
+         abrí el programa: tiene que volver como lo dejaste, y al agrandar,
+         con el ancho de antes.
+      3. **▾** de las herramientas de texto (abajo a la derecha): queda una
+         tira de seis íconos; un clic en uno abre esa pestaña. Si estás
+         escribiendo un texto rápido, no se pierde lo escrito.
+      4. Menú **Ver**: las tres entradas nuevas se tildan solas y «Volver al
+         diseño original» las apaga. Con el riel prendido no se puede arrastrar
+         el borde de la columna (es a propósito).
+
 ## 2. Para la v1.0.0
 
 - [ ] **Usar la beta.7 en la reunión del domingo** y anotar lo que falle o no

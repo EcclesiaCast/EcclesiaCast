@@ -9,6 +9,18 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Secciones que se achican a íconos.** Además de canciones/Biblia y la
+  playlist, ahora se pueden achicar la **barra de medios** (queda sólo su
+  cabecera, con los botones 📥 ▶ 🌐 🔗 🎲: un clic en «MEDIOS» la achica y la
+  vuelve a agrandar) y las **herramientas de texto** (Texto rápido, Aviso,
+  Resaltar, Notas, Música y Tiempos quedan como una tira de íconos; un clic en
+  cualquiera la abre en esa pestaña). Y **canciones, Biblia y playlist** pueden
+  quedar juntas como una columna angosta de íconos (botón ⇤ del panel, o menú
+  **Ver**): cada ícono abre lo suyo. El menú **Ver** tiene una entrada para
+  cada una, y «Volver al diseño original» las apaga. Se recuerda para la
+  próxima reunión, y el alto o ancho que habías elegido no se pierde al
+  achicar.
+
 - **Tipografía para cada recuadro del escenario.** En el diseñador de
   escenarios, cada recuadro (las notas del predicador, la hora, un texto fijo…)
   puede tener su propia letra: se elige de la lista de las que tiene la

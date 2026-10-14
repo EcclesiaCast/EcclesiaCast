@@ -205,6 +205,15 @@
                           IsCheckable="True" Click="LibraryCollapsedItem_Click"/>
                 <MenuItem x:Name="PlaylistCollapsedItem" Header="Achicar la playlist"
                           IsCheckable="True" Click="PlaylistCollapsedItem_Click"/>
+                <MenuItem x:Name="MediaCollapsedItem" Header="Achicar la barra de medios"
+                          IsCheckable="True" Click="MediaCollapsedItem_Click"
+                          ToolTip="Deja sólo la cabecera de la barra de medios (con sus botones) y le da el lugar a las diapositivas."/>
+                <MenuItem x:Name="ToolsCollapsedItem" Header="Achicar las herramientas de texto"
+                          IsCheckable="True" Click="ToolsCollapsedItem_Click"
+                          ToolTip="Texto rápido, aviso al pie, resaltar, notas, música y tiempos quedan como una tira de íconos."/>
+                <MenuItem x:Name="LeftRailItem" Header="Canciones y playlist como íconos"
+                          IsCheckable="True" Click="LeftRailItem_Click"
+                          ToolTip="Achica canciones, Biblia y playlist a una columna angosta de íconos."/>
                 <Separator/>
                 <MenuItem Header="Modo PC de bajo rendimiento" IsCheckable="True"
                           IsChecked="{Binding IsLowPerformance, Mode=TwoWay}"
@@ -463,10 +472,15 @@
                         <DockPanel DockPanel.Dock="Top" Margin="10,10,10,8">
                             <Button x:Name="LibraryCollapseButton" DockPanel.Dock="Right"
                                     Content="▾" FontSize="11" Padding="7,2"
-                                    Style="{StaticResource DarkButton}"
+                                    Style="{StaticResource FoldButton}"
                                     AutomationProperties.Name="Achicar o agrandar canciones y Biblia"
                                     Click="LibraryCollapse_Click"
                                     ToolTip="Achicar este panel para darle lugar a la playlist (o volver a agrandarlo)"/>
+                            <Button DockPanel.Dock="Right" Content="⇤" FontSize="11" Padding="7,2"
+                                    Style="{StaticResource FoldButton}"
+                                    AutomationProperties.Name="Achicar canciones y playlist a una columna de íconos"
+                                    Click="LeftRail_Enter_Click"
+                                    ToolTip="Achicar canciones, Biblia y playlist a una columna de íconos, para darle lugar a las diapositivas"/>
                             <StackPanel Orientation="Horizontal">
                                 <RadioButton Content="Canciones" Style="{StaticResource TabButton}"
                                              GroupName="LibraryTab"
@@ -1070,6 +1084,36 @@
                 </Border>
             </Grid>
 
+            <!-- La misma celda que el panel izquierdo: cuando éste se achica a
+                 íconos, queda esta columna. Cada botón saca el panel del riel
+                 y abre lo suyo. -->
+            <Border x:Name="LeftRail" Grid.Column="0" Style="{StaticResource Panel}"
+                    Visibility="Collapsed">
+                <StackPanel Margin="3,8,3,8">
+                    <Button Content="🎵" FontSize="16" Width="36" Height="36" Padding="0"
+                            Style="{StaticResource FoldButton}"
+                            AutomationProperties.Name="Canciones"
+                            Click="LeftRail_Songs_Click"
+                            ToolTip="Canciones: sacar el panel del riel y ver la lista"/>
+                    <Button Content="📖" FontSize="16" Width="36" Height="36" Padding="0" Margin="0,4,0,0"
+                            Style="{StaticResource FoldButton}"
+                            AutomationProperties.Name="Biblia"
+                            Click="LeftRail_Bible_Click"
+                            ToolTip="Biblia: sacar el panel del riel y buscar un versículo"/>
+                    <Button Content="📋" FontSize="16" Width="36" Height="36" Padding="0" Margin="0,4,0,0"
+                            Style="{StaticResource FoldButton}"
+                            AutomationProperties.Name="Playlist"
+                            Click="LeftRail_Playlist_Click"
+                            ToolTip="Playlist: sacar el panel del riel y ver el orden de la reunión"/>
+                    <Border Height="1" Background="{StaticResource LineBrush}" Margin="6,8,6,8"/>
+                    <Button Content="⇥" FontSize="12" Width="36" Height="28" Padding="0"
+                            Style="{StaticResource FoldButton}"
+                            AutomationProperties.Name="Volver a mostrar canciones y playlist"
+                            Click="LeftRail_Exit_Click"
+                            ToolTip="Volver a mostrar canciones, Biblia y playlist"/>
+                </StackPanel>
+            </Border>
+
             <GridSplitter x:Name="LeftSplitter" Grid.Column="1" HorizontalAlignment="Stretch" Background="Transparent"/>
             <GridSplitter x:Name="RightSplitter" Grid.Column="3" Grid.RowSpan="3" HorizontalAlignment="Stretch" Background="Transparent"/>
 
@@ -1371,31 +1415,47 @@
                 </Border>
 
                 <!-- Las tres formas de escribir sobre lo proyectado, en pestañas -->
-                <Border Grid.Row="4" Style="{StaticResource Panel}">
+                <Border x:Name="ToolsPanel" Grid.Row="4" Style="{StaticResource Panel}">
                     <DockPanel>
-                        <WrapPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10,10,10,8">
+                        <!-- Achicadas, las pestañas quedan en su ícono (el código cambia
+                             el contenido) y un clic en cualquiera la vuelve a abrir -->
+                        <DockPanel DockPanel.Dock="Top" Margin="10,10,10,8">
+                            <Button x:Name="ToolsCollapseButton" DockPanel.Dock="Right" VerticalAlignment="Top"
+                                    Content="▾" FontSize="11" Padding="7,5"
+                                    Style="{StaticResource FoldButton}"
+                                    AutomationProperties.Name="Achicar o agrandar las herramientas de texto"
+                                    Click="ToolsCollapse_Click"
+                                    ToolTip="Achicar las herramientas de texto a una tira de íconos (o volver a agrandarlas)"/>
+                        <WrapPanel x:Name="ToolsTabs" Orientation="Horizontal" ButtonBase.Click="ToolsTab_Click">
                             <RadioButton x:Name="TabQuick" Content="Texto rápido"
                                          Style="{StaticResource TabButton}" GroupName="WriteTab"
                                          IsChecked="True"
+                                         AutomationProperties.Name="Texto rápido"
                                          ToolTip="Un anuncio a pantalla completa, con el tema de las canciones"/>
                             <RadioButton x:Name="TabOverlay" Content="Aviso al pie"
                                          Style="{StaticResource TabButton}" GroupName="WriteTab" Margin="4,0,0,0"
+                                         AutomationProperties.Name="Aviso al pie"
                                          ToolTip="Una franja al pie de la pantalla, encima de todo lo demás"/>
                             <RadioButton x:Name="TabHighlight" Content="Resaltar"
                                          Style="{StaticResource TabButton}" GroupName="WriteTab" Margin="4,0,0,0"
+                                         AutomationProperties.Name="Resaltar"
                                          ToolTip="Pinta una palabra como con marcador sobre lo que está proyectado"/>
                             <RadioButton x:Name="TabNotes" Content="Notas"
                                          Style="{StaticResource TabButton}" GroupName="WriteTab" Margin="4,0,0,0"
+                                         AutomationProperties.Name="Notas"
                                          ToolTip="Notas para quien predica: se ven sólo en la pantalla de escenario"/>
                             <RadioButton x:Name="TabMusic" Content="Música"
                                          Style="{StaticResource TabButton}" GroupName="WriteTab" Margin="4,0,0,0"
+                                         AutomationProperties.Name="Música"
                                          ToolTip="Pasar, pausar y bajar o subir la música del Spotify (o el reproductor) que esté abierto en esta computadora"/>
                             <RadioButton x:Name="TabTimes" Content="Tiempos"
                                          Style="{StaticResource TabButton}" GroupName="WriteTab" Margin="4,0,0,0"
+                                         AutomationProperties.Name="Tiempos"
                                          ToolTip="Cuánto dura cada parte de la reunión (alabanza, anuncios, prédica) y un cronómetro; el escenario muestra lo que queda"/>
                         </WrapPanel>
+                        </DockPanel>
 
-                        <Grid>
+                        <Grid x:Name="ToolsBody">
                             <!-- ── Texto rápido ── -->
                             <DockPanel Visibility="{Binding IsChecked, ElementName=TabQuick, Converter={StaticResource BoolToVis}}">
                                 <Button DockPanel.Dock="Bottom"
@@ -1897,24 +1957,31 @@
                                 Command="{Binding RandomBackgroundCommand}"
                                 ToolTip="Poner un fondo al azar de esta pestaña. No repite ninguno hasta haberlos usado a todos."/>
                     </StackPanel>
-                    <TextBlock Text="MEDIOS" Style="{StaticResource PanelTitle}" Margin="12,8,6,4" VerticalAlignment="Center"/>
+                    <!-- Clic en el título: achica la barra a sólo esta línea -->
+                    <TextBlock x:Name="MediaTitle" Text="▾  MEDIOS" Style="{StaticResource PanelTitle}"
+                               Margin="12,8,6,4" VerticalAlignment="Center"
+                               Cursor="Hand" Background="Transparent"
+                               MouseLeftButtonUp="MediaTitle_MouseLeftButtonUp"
+                               ToolTip="Clic: achicar la barra de medios a esta línea (o volver a agrandarla)"/>
                     <!-- Nueva pestaña: junto al título, para que la lista de pestañas
                          use todo el alto de la barra -->
-                    <Button Content="＋" FontSize="12" Padding="7,2"
+                    <Button x:Name="MediaNewTabButton" Content="＋" FontSize="12" Padding="7,2"
                             Style="{StaticResource DarkButton}"
                             Command="{Binding NewMediaTabCommand}"
                             AutomationProperties.Name="Nueva pestaña de medios"
                             ToolTip="Nueva pestaña (categoría)"/>
-                    <CheckBox Content="▶▶ continua" FontSize="11" Foreground="{StaticResource MutedBrush}"
+                    <CheckBox x:Name="MediaContinuousCheck" Content="▶▶ continua" FontSize="11" Foreground="{StaticResource MutedBrush}"
                               VerticalAlignment="Center" Margin="12,0,0,0"
                               IsChecked="{Binding ContinuousPlayback}"
                               ToolTip="En esta pestaña, al terminar un video arranca el siguiente, y al final vuelve al primero. Sirve para dejar un bucle de avisos antes de la reunión."/>
-                    <CheckBox Content="🎲 al azar por canción" FontSize="11" Foreground="{StaticResource MutedBrush}"
+                    <CheckBox x:Name="MediaRandomCheck" Content="🎲 al azar por canción" FontSize="11" Foreground="{StaticResource MutedBrush}"
                               VerticalAlignment="Center" Margin="10,0,0,0"
                               IsChecked="{Binding RandomBackgroundPerSong}"
                               ToolTip="Cada canción que proyectás se lleva un fondo distinto de esta pestaña, sin repetir hasta usarlos todos. Si elegís un fondo a mano, se respeta: el sorteo sólo elige cuando no hay fondo o cuando el que está salió sorteado."/>
                 </DockPanel>
 
+                <!-- Todo lo que está debajo de la cabecera: achicada la barra, sólo queda ésta -->
+                <DockPanel x:Name="MediaBody">
                 <!-- ── Controles del fondo que está en pantalla ── -->
                 <Border DockPanel.Dock="Bottom"
                         BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0"
@@ -2094,6 +2161,7 @@
                             HorizontalAlignment="Left" VerticalAlignment="Top"
                             Background="#332F63C9" BorderBrush="{StaticResource AccentBrush}" BorderThickness="1"/>
                 </Grid>
+                </DockPanel>
             </DockPanel>
             </Border>
         </Grid>
