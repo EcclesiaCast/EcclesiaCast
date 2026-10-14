@@ -214,6 +214,8 @@
                 <MenuItem Header="Modo PC de bajo rendimiento" IsCheckable="True"
                           IsChecked="{Binding IsLowPerformance, Mode=TwoWay}"
                           ToolTip="Para computadoras viejas o sin placa de video: las transiciones cortan, el panel LIVE muestra la imagen fija del video y las vistas previas se dibujan sin sombra ni contorno. Lo que ve la congregación conserva su diseño."/>
+                <MenuItem Header="Reiniciar el sonido" Click="RestartSound_Click"
+                          ToolTip="Si no suena nada después de cambiar la salida de audio de Windows (parlantes, auriculares, Bluetooth): vuelve a abrir el sonido de la música y de los videos, en el mismo lugar. Los videos de YouTube siguen solos la salida de Windows."/>
                 <Separator/>
                 <!-- Con los atajos a la vista (F1, Esc…) o sin ellos, con menos texto.
                      Cambia sólo lo que se lee en la ventana: los atajos andan en los dos. -->
@@ -250,6 +252,8 @@
                         </Style>
                     </MenuItem.Style>
                 </MenuItem>
+                <MenuItem Header="Transiciones…" Click="Transitions_Click"
+                          ToolTip="Cuántos segundos tardan en aparecer y desaparecer el logo, los cambios de imagen o video, la pantalla negra y el apagado de la salida."/>
                 <MenuItem Header="Controlar desde el celular…" Command="{Binding OpenRemoteCommand}"/>
                 <Separator/>
                 <MenuItem Header="Actualizar la lista de pantallas" Command="{Binding RefreshDisplaysCommand}"/>
@@ -1477,6 +1481,8 @@
                                                     ToolTip="Clic en una palabra: se resalta esa en la pantalla · Arrastrá sobre varias: se resalta la frase · Shift: suma otra marca sin sacar las anteriores · Clic otra vez sobre lo resaltado: se quita"
                                                     State="{Binding Projection.State}"
                                                     Overlay="{Binding Projection.Overlay}"
+                                                    OverlayFontFamily="{Binding Projection.OverlayFontFamily}"
+                                                    OverlayFontSize="{Binding Projection.OverlayFontSize}"
                                                     Countdown="{Binding Projection.Countdown}"
                                                     Highlight="{Binding Projection.Highlight}"
                                                     BackgroundMedia="{Binding Projection.Background}"
@@ -1561,6 +1567,27 @@
                                            Text="Aparece en una franja abajo, por encima de todo — incluso con Black puesto."
                                            FontSize="11" Foreground="{StaticResource FaintBrush}"
                                            TextWrapping="Wrap" Margin="12,0,12,8"/>
+                                <Grid DockPanel.Dock="Top" Margin="12,0,12,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Tipografía" Foreground="{StaticResource MutedBrush}"
+                                                   FontSize="11" Margin="0,0,0,4"/>
+                                        <ComboBox IsEditable="True" FontSize="12"
+                                                  ItemsSource="{Binding SystemFonts}"
+                                                  Text="{Binding OverlayFont, UpdateSourceTrigger=PropertyChanged}"
+                                                  ToolTip="Letra del aviso. Vacía: Segoe UI."/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                        <TextBlock Text="Tamaño" Foreground="{StaticResource MutedBrush}"
+                                                   FontSize="11" Margin="0,0,0,4"/>
+                                        <controls:NumericField Minimum="20" Maximum="160" Step="2"
+                                                               Value="{Binding OverlayFontSize}"
+                                                               ToolTip="Tamaño de la letra del aviso, de 20 a 160. El de siempre es 54."/>
+                                    </StackPanel>
+                                </Grid>
                                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="12,8,12,12">
                                     <Button Content="Mostrar" Command="{Binding ShowOverlayCommand}" Padding="16,8"
                                             ToolTip="Pone la franja en pantalla">

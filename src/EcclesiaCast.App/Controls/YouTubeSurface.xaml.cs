@@ -128,6 +128,7 @@ public partial class YouTubeSurface : UserControl
         _currentId = null;
         _state = PlaybackState.None;
         _pausedForHiddenOutput = false;
+        _pausedForCover = false;
         if (_ready)
             Browser.NavigateToString("<html><body style='margin:0;background:#000'></body></html>");
     }
@@ -136,6 +137,7 @@ public partial class YouTubeSurface : UserControl
 
     private PlaybackState _state = PlaybackState.None;
     private bool _pausedForHiddenOutput;
+    private bool _pausedForCover;
 
     /// <summary>Last position the page reported; it posts one every 300 ms.</summary>
     public PlaybackState State => _currentId is null ? PlaybackState.None : _state;
@@ -162,6 +164,31 @@ public partial class YouTubeSurface : UserControl
 
         _pausedForHiddenOutput = false;
         Resume();
+    }
+
+    /// <summary>
+    /// The logo or the black screen covers the video: it keeps its place and
+    /// stops making sound, to carry on when the cover goes away. Unlike the
+    /// hidden-output case this can start before the page has reported
+    /// anything, so the flag also silences a video that begins playing late.
+    /// </summary>
+    public void PauseForCover()
+    {
+        if (_currentId is null)
+            return;
+
+        _pausedForCover = true;
+        Pause();
+    }
+
+    public void ResumeAfterCover()
+    {
+        if (!_pausedForCover)
+            return;
+
+        _pausedForCover = false;
+        if (!_pausedForHiddenOutput)
+            Resume();
     }
 
     public void SeekTo(TimeSpan position) =>
@@ -218,6 +245,11 @@ public partial class YouTubeSurface : UserControl
                     IsPlaying: parts[2] == "1",
                     Position: TimeSpan.FromSeconds(Math.Max(0, position)),
                     Duration: TimeSpan.FromSeconds(Math.Max(0, duration)));
+
+                // A video that was asked to start while the logo or the black
+                // screen covered it begins on its own (autoplay): stop it again.
+                if (_pausedForCover && _state.IsPlaying)
+                    Pause();
             }
 
             // The first report means the page is alive: now the blur sticks

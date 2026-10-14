@@ -39,6 +39,15 @@ public partial class ProjectedView : UserControl
         DependencyProperty.Register(nameof(Overlay), typeof(string), typeof(ProjectedView),
             new PropertyMetadata(null, (d, e) => ((ProjectedView)d).SlideView.Overlay = (string?)e.NewValue));
 
+    /// <summary>Typeface and size of the lower-third announcement, handed to the slide view.</summary>
+    public static readonly DependencyProperty OverlayFontFamilyProperty =
+        DependencyProperty.Register(nameof(OverlayFontFamily), typeof(string), typeof(ProjectedView),
+            new PropertyMetadata(null, (d, e) => ((ProjectedView)d).SlideView.OverlayFontFamily = (string?)e.NewValue));
+
+    public static readonly DependencyProperty OverlayFontSizeProperty =
+        DependencyProperty.Register(nameof(OverlayFontSize), typeof(double), typeof(ProjectedView),
+            new PropertyMetadata(OverlayStyle.DefaultSize, (d, e) => ((ProjectedView)d).SlideView.OverlayFontSize = (double)e.NewValue));
+
     public static readonly DependencyProperty HighlightProperty =
         DependencyProperty.Register(nameof(Highlight), typeof(HighlightSet), typeof(ProjectedView),
             new PropertyMetadata(null, (d, e) => ((ProjectedView)d).SlideView.Highlight = (HighlightSet?)e.NewValue));
@@ -152,6 +161,18 @@ public partial class ProjectedView : UserControl
         set => SetValue(OverlayProperty, value);
     }
 
+    public string? OverlayFontFamily
+    {
+        get => (string?)GetValue(OverlayFontFamilyProperty);
+        set => SetValue(OverlayFontFamilyProperty, value);
+    }
+
+    public double OverlayFontSize
+    {
+        get => (double)GetValue(OverlayFontSizeProperty);
+        set => SetValue(OverlayFontSizeProperty, value);
+    }
+
     public HighlightSet? Highlight
     {
         get => (HighlightSet?)GetValue(HighlightProperty);
@@ -190,6 +211,8 @@ public partial class ProjectedView : UserControl
         _blurRadius = radius;
         // Through the framing, which knows how much it scales the picture.
         MediaFraming.SetBlur(BackgroundImage, radius);
+        if (PreviousImage.Visibility == Visibility.Visible)
+            MediaFraming.SetBlur(PreviousImage, radius);
         if (BackgroundMedia?.Type == MediaType.Web)
             MediaFraming.SetBlur(LiveVideo, radius);
     }
@@ -351,6 +374,10 @@ public partial class ProjectedView : UserControl
         {
             try
             {
+                // What is on screen now, to stay underneath while the new picture fades in.
+                var previousSource = BackgroundImage.Visibility == Visibility.Visible ? BackgroundImage.Source : null;
+                var previousMedia = _shownMedia;
+
                 var bitmap = new BitmapImage();
                 bitmap.BeginInit();
                 bitmap.UriSource = new Uri(path);
@@ -370,9 +397,35 @@ public partial class ProjectedView : UserControl
                 BackgroundImage.Visibility = Visibility.Visible;
                 // «Rellenar» depends on the shape of the picture just loaded.
                 MediaFraming.Apply(BackgroundImage, BackgroundMedia, ActualWidth, ActualHeight);
-                if (AnimateTransitions && newPicture)
-                    BackgroundImage.BeginAnimation(OpacityProperty,
-                        new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(320)) { EasingFunction = new QuadraticEase() });
+                _shownMedia = BackgroundMedia;
+                var mediaFade = TransitionSettings.Current.Media;
+                if (AnimateTransitions && newPicture && mediaFade > TimeSpan.Zero)
+                {
+                    // The new picture rises over the old one, which stays put
+                    // until it is fully covered: fading up from nothing made
+                    // the old one vanish at once and the change flash black.
+                    HoldPreviousImage(previousSource, previousMedia);
+                    var version = ++_fadeVersion;
+                    var fade = new DoubleAnimation(0, 1, mediaFade) { EasingFunction = new QuadraticEase() };
+                    fade.Completed += (_, _) =>
+                    {
+                        if (version != _fadeVersion)
+                            return;
+                        ClearPreviousImage();
+                        BackgroundImageSettled?.Invoke(this, EventArgs.Empty);
+                    };
+                    BackgroundImage.BeginAnimation(OpacityProperty, fade);
+                }
+                else if (newPicture)
+                {
+                    _fadeVersion++;
+                    // A fade of zero seconds is a cut: no animation may linger.
+                    BackgroundImage.BeginAnimation(OpacityProperty, null);
+                    ClearPreviousImage();
+                    // After the picture has been drawn, not before.
+                    Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded,
+                        () => BackgroundImageSettled?.Invoke(this, EventArgs.Empty));
+                }
                 return;
             }
             catch
@@ -381,9 +434,119 @@ public partial class ProjectedView : UserControl
             }
         }
 
+        // In the output window a video starts a moment after it is chosen
+        // (the decoder opens the file): until its first picture arrives the
+        // old image stays, and OutputWindow lets it go (ReleaseHeldImage).
+        var videoFollows = IsLiveOutput && media?.Type == MediaType.Video;
+        if (videoFollows && BackgroundImage.Visibility == Visibility.Visible && BackgroundImage.Source is { } held)
+        {
+            HoldPreviousImage(held, _shownMedia);
+            StartHeldImageTimer();
+        }
+        else if (!videoFollows)
+        {
+            _fadeVersion++;
+            ClearPreviousImage();
+        }
+
+        _shownMedia = null;
         BackgroundImage.Source = null;
         BackgroundImage.Visibility = Visibility.Collapsed;
         MediaFraming.Apply(BackgroundImage, BackgroundMedia, ActualWidth, ActualHeight);
+    }
+
+    // ── Cambio de medio sin pasar por negro ──────────────────────
+
+    /// <summary>The item whose framing the picture in <c>BackgroundImage</c> was drawn with.</summary>
+    private MediaItem? _shownMedia;
+
+    private MediaItem? _previousMedia;
+    private int _fadeVersion;
+    private System.Windows.Threading.DispatcherTimer? _heldImageTimer;
+
+    /// <summary>
+    /// Raised once the picture of a new image background is fully on screen
+    /// (its fade ended, or it was drawn at once). The output window waits for
+    /// it to let go of the last frame of the video that was there before.
+    /// </summary>
+    public event EventHandler? BackgroundImageSettled;
+
+    /// <summary>
+    /// Keeps <paramref name="source"/> drawn underneath the background layer,
+    /// with the framing and blur it had. If an older picture is already held
+    /// it stays: it is the one the screen still shows.
+    /// </summary>
+    private void HoldPreviousImage(ImageSource? source, MediaItem? media)
+    {
+        if (PreviousImage.Visibility == Visibility.Visible)
+        {
+            // Already holding one (maybe halfway through fading away): it is
+            // what the screen still shows, so it goes back to full strength.
+            PreviousImage.BeginAnimation(OpacityProperty, null);
+            PreviousImage.Opacity = 1;
+            return;
+        }
+
+        if (source is null)
+            return;
+
+        PreviousImage.BeginAnimation(OpacityProperty, null);
+        PreviousImage.Opacity = 1;
+        PreviousImage.Source = source;
+        _previousMedia = media;
+        MediaFraming.Apply(PreviousImage, media, ActualWidth, ActualHeight);
+        MediaFraming.SetBlur(PreviousImage, _blurRadius);
+        PreviousImage.Visibility = Visibility.Visible;
+    }
+
+    private void ClearPreviousImage()
+    {
+        _heldImageTimer?.Stop();
+        PreviousImage.BeginAnimation(OpacityProperty, null);
+        PreviousImage.Opacity = 1;
+        PreviousImage.Visibility = Visibility.Collapsed;
+        PreviousImage.Source = null;
+        _previousMedia = null;
+    }
+
+    /// <summary>
+    /// Lets go of the image kept for a video that has now drawn its first
+    /// picture, fading it out over <paramref name="fade"/> (zero cuts).
+    /// </summary>
+    public void ReleaseHeldImage(TimeSpan fade)
+    {
+        _heldImageTimer?.Stop();
+        if (PreviousImage.Visibility != Visibility.Visible)
+            return;
+
+        if (fade <= TimeSpan.Zero)
+        {
+            _fadeVersion++;
+            ClearPreviousImage();
+            return;
+        }
+
+        var version = ++_fadeVersion;
+        var animation = new DoubleAnimation(0, fade);
+        animation.Completed += (_, _) =>
+        {
+            if (version == _fadeVersion)
+                ClearPreviousImage();
+        };
+        PreviousImage.BeginAnimation(OpacityProperty, animation);
+    }
+
+    /// <summary>If the video never draws anything, the image is let go after two seconds.</summary>
+    private void StartHeldImageTimer()
+    {
+        if (_heldImageTimer is null)
+        {
+            _heldImageTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+            _heldImageTimer.Tick += (_, _) => ReleaseHeldImage(TimeSpan.FromMilliseconds(250));
+        }
+
+        _heldImageTimer.Stop();
+        _heldImageTimer.Start();
     }
 
     /// <summary>
@@ -482,6 +645,8 @@ public partial class ProjectedView : UserControl
     {
         var media = BackgroundMedia;
         MediaFraming.Apply(BackgroundImage, media, ActualWidth, ActualHeight);
+        if (PreviousImage.Visibility == Visibility.Visible)
+            MediaFraming.Apply(PreviousImage, _previousMedia, ActualWidth, ActualHeight);
 
         // This layer sits ON TOP of the output window's video surface, so it
         // may only paint the fill when it is the one drawing the picture —

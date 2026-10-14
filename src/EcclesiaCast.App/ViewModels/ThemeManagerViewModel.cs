@@ -44,7 +44,25 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
 
     partial void OnTransitionIndexChanged(int value) => PlayTransitionSampleCommand.Execute(null);
 
-    partial void OnTransitionMsChanged(double value) => PlayTransitionSampleCommand.Execute(null);
+    partial void OnTransitionMsChanged(double value)
+    {
+        OnPropertyChanged(nameof(TransitionSeconds));
+        PlayTransitionSampleCommand.Execute(null);
+    }
+
+    /// <summary>
+    /// The transition's length in seconds, as the operator thinks of it. The
+    /// theme keeps it in milliseconds (<see cref="TransitionMs"/>), so saved
+    /// themes need no conversion.
+    /// </summary>
+    public double TransitionSeconds
+    {
+        get => TransitionMs / 1000.0;
+        set => TransitionMs = Math.Round(Math.Clamp(value, 0, MaxTransitionMs / 1000.0) * 1000);
+    }
+
+    /// <summary>The longest a transition may take; also the most the slide view will play.</summary>
+    private const double MaxTransitionMs = 5000;
 
     /// <summary>
     /// Shows the chosen transition on the preview: the next text comes in and
@@ -57,7 +75,7 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
             return;
 
         var run = ++_sampleRun;
-        var pause = TimeSpan.FromMilliseconds(Math.Clamp(TransitionMs, 0, 1500) + 900);
+        var pause = TimeSpan.FromMilliseconds(Math.Clamp(TransitionMs, 0, MaxTransitionMs) + 900);
 
         AnimatePreview = true;
         _showingNextSample = true;
@@ -150,7 +168,7 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
             && e.PropertyName is not (nameof(PreviewSlide) or nameof(SelectedTheme) or nameof(DefaultsText)
                 or nameof(IsBibleKind) or nameof(StatusText) or nameof(AnimatePreview)
                 // The transition plays its own example (PlayTransitionSample).
-                or nameof(TransitionIndex) or nameof(TransitionMs)))
+                or nameof(TransitionIndex) or nameof(TransitionMs) or nameof(TransitionSeconds)))
             UpdatePreview();
 
         if (e.PropertyName == nameof(KindIndex))
@@ -236,7 +254,7 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         Italic = Italic,
         TextCase = (TextCase)Math.Clamp(CaseIndex, 0, 4),
         Transition = (SlideTransition)Math.Clamp(TransitionIndex, 0, 4),
-        TransitionMs = Math.Clamp(TransitionMs, 0, 1500),
+        TransitionMs = Math.Clamp(TransitionMs, 0, MaxTransitionMs),
         Shadow = Shadow,
         ShadowOpacity = Math.Clamp(ShadowOpacityPercent / 100, 0, 1),
         ShadowBlur = Math.Clamp(ShadowBlur, 0, 80),

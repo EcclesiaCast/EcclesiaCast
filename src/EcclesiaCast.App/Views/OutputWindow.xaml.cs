@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Media.Animation;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.App.ViewModels;
 using EcclesiaCast.Core.Displays;
@@ -23,6 +24,15 @@ public partial class OutputWindow : Window
         YouTube.Ended += (_, _) => VideoEnded?.Invoke(this, EventArgs.Empty);
         Video.Ended += (_, _) => VideoEnded?.Invoke(this, EventArgs.Empty);
 
+        // Changing media never goes through black: whatever was on screen stays
+        // until the new picture is up, then fades away.
+        // • Image to video: the image (kept by the projected view) goes when the
+        //   video draws its first picture.
+        Video.FirstFrame += (_, _) => Projected.ReleaseHeldImage(MediaFade);
+        // • Video to image: the video's last picture (kept by the surface) goes
+        //   when the image has finished fading in over it.
+        Projected.BackgroundImageSettled += (_, _) => Video.ReleaseHold(TimeSpan.Zero);
+
         // The operator's LIVE panel gets a small copy of the video frames,
         // which costs a shrink and a bitmap write on every one of them. With
         // «bajo rendimiento» nobody listens, so none of that work is done
@@ -30,10 +40,19 @@ public partial class OutputWindow : Window
         Loaded += (_, _) =>
         {
             PerformanceMode.Changed += OnPerformanceChanged;
+            TransitionSettings.Changed += OnPerformanceChanged;
             ApplyPerformance();
         };
-        Closed += (_, _) => PerformanceMode.Changed -= OnPerformanceChanged;
+        Closed += (_, _) =>
+        {
+            PerformanceMode.Changed -= OnPerformanceChanged;
+            TransitionSettings.Changed -= OnPerformanceChanged;
+        };
     }
+
+    /// <summary>How long one medium takes to give way to the next; zero in «bajo rendimiento».</summary>
+    private static TimeSpan MediaFade =>
+        PerformanceMode.IsLow ? TimeSpan.Zero : TransitionSettings.Current.Media;
 
     private bool _forwardingFrames;
 
@@ -58,6 +77,7 @@ public partial class OutputWindow : Window
     {
         var low = PerformanceMode.IsLow;
         Projected.AnimateTransitions = !low;
+        Video.HoldFade = LogoVideo.HoldFade = FillVideo.HoldFade = MediaFade;
 
         var forward = !low && !_backgroundIsHeavy;
         if (!forward && _forwardingFrames)
@@ -83,9 +103,75 @@ public partial class OutputWindow : Window
     /// <summary>Shows this window fullscreen on the given display.</summary>
     public void ShowOn(DisplayInfo display)
     {
+        // Something was projected while the screen was still fading to black
+        // to switch off: it stays on.
+        CancelFadeOut();
+
         _display = display;
         Show();
         MoveToDisplay();
+    }
+
+    // ── Apagar la salida con fundido ─────────────────────────────
+
+    private int _shutterVersion;
+
+    /// <summary>True while the screen is fading to black before the window closes.</summary>
+    public bool IsFadingOut { get; private set; }
+
+    /// <summary>
+    /// Switches the output off: fades to black over the time set in
+    /// «Transiciones» (if any) and then hides the window. YouTube, being a
+    /// native window that WPF cannot fade, is hidden right away.
+    /// </summary>
+    public void FadeOutAndHide()
+    {
+        if (IsFadingOut)
+            return;
+
+        var fade = PerformanceMode.IsLow ? TimeSpan.Zero : TransitionSettings.Current.Output;
+        if (fade <= TimeSpan.Zero || !IsVisible)
+        {
+            Hide();
+            return;
+        }
+
+        var version = ++_shutterVersion;
+        IsFadingOut = true;
+        if (YouTube.Visibility == Visibility.Visible)
+            YouTube.Visibility = Visibility.Hidden;
+
+        ShutterLayer.Visibility = Visibility.Visible;
+        var animation = new DoubleAnimation(0, 1, fade);
+        animation.Completed += (_, _) =>
+        {
+            if (version != _shutterVersion)
+                return;
+
+            IsFadingOut = false;
+            Hide();
+            ResetShutter();
+        };
+        ShutterLayer.BeginAnimation(OpacityProperty, animation);
+    }
+
+    private void CancelFadeOut()
+    {
+        // The window is hidden with the shutter closed: open it again too.
+        if (!IsFadingOut && ShutterLayer.Visibility != Visibility.Visible && YouTube.Visibility != Visibility.Hidden)
+            return;
+
+        _shutterVersion++;
+        IsFadingOut = false;
+        ResetShutter();
+        UpdateYouTubeCover();
+    }
+
+    private void ResetShutter()
+    {
+        ShutterLayer.BeginAnimation(OpacityProperty, null);
+        ShutterLayer.Opacity = 0;
+        ShutterLayer.Visibility = Visibility.Collapsed;
     }
 
     private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -105,7 +191,35 @@ public partial class OutputWindow : Window
         else if (e.PropertyName == nameof(ProjectionViewModel.BackgroundBlur))
             SetBlur((DataContext as ProjectionViewModel)?.BackgroundBlur ?? 0);
         else if (e.PropertyName is nameof(ProjectionViewModel.ActiveLogo) or nameof(ProjectionViewModel.State))
+        {
             UpdateLogoVideo();
+            if (e.PropertyName == nameof(ProjectionViewModel.State))
+                UpdateYouTubeCover();
+        }
+    }
+
+    /// <summary>
+    /// YouTube runs in a WebView2, a native window that Windows always draws
+    /// above anything WPF paints — so the logo and the black screen, which are
+    /// WPF, cannot cover it. While one of them is meant to be on screen the
+    /// player is hidden (and paused, so it doesn't keep sounding behind it).
+    /// </summary>
+    private void UpdateYouTubeCover()
+    {
+        var vm = DataContext as ProjectionViewModel;
+        if (vm?.Background is not { Type: MediaType.YouTube })
+            return;
+
+        if (vm.State is OutputState.Logo or OutputState.Black)
+        {
+            YouTube.Visibility = Visibility.Hidden;
+            YouTube.PauseForCover();
+        }
+        else
+        {
+            YouTube.Visibility = Visibility.Visible;
+            YouTube.ResumeAfterCover();
+        }
     }
 
     /// <summary>
@@ -120,9 +234,56 @@ public partial class OutputWindow : Window
             && logo is { Kind: LogoKind.Video }
             && !string.IsNullOrWhiteSpace(logo.Path);
 
-        LogoVideo.Visibility = showing ? Visibility.Visible : Visibility.Collapsed;
-        LogoVideo.Show(showing ? AsLoopingVideo(logo!) : null);
+        var fade = PerformanceMode.IsLow ? TimeSpan.Zero : TransitionSettings.Current.Logo;
+        var version = ++_logoVideoVersion;
+
+        if (showing)
+        {
+            var wasShown = LogoVideo.Visibility == Visibility.Visible;
+            var from = wasShown ? LogoVideo.Opacity : 0;
+            LogoVideo.Show(AsLoopingVideo(logo!));
+            LogoVideo.Visibility = Visibility.Visible;
+
+            // Fades in only when it was not already up (a change of logo while
+            // the logo is on screen must not blink).
+            if (fade > TimeSpan.Zero && (!wasShown || from < 1))
+            {
+                LogoVideo.BeginAnimation(OpacityProperty, new DoubleAnimation(from, 1, fade));
+            }
+            else
+            {
+                LogoVideo.BeginAnimation(OpacityProperty, null);
+                LogoVideo.Opacity = 1;
+            }
+            return;
+        }
+
+        void Remove()
+        {
+            // Asked for again in the meantime: leave it.
+            if (version != _logoVideoVersion)
+                return;
+
+            LogoVideo.BeginAnimation(OpacityProperty, null);
+            LogoVideo.Opacity = 1;
+            LogoVideo.Visibility = Visibility.Collapsed;
+            LogoVideo.Show(null);
+        }
+
+        // The video keeps playing under its fade; it is stopped when it is gone.
+        if (fade > TimeSpan.Zero && LogoVideo.Visibility == Visibility.Visible)
+        {
+            var away = new DoubleAnimation(LogoVideo.Opacity, 0, fade);
+            away.Completed += (_, _) => Remove();
+            LogoVideo.BeginAnimation(OpacityProperty, away);
+        }
+        else
+        {
+            Remove();
+        }
     }
+
+    private int _logoVideoVersion;
 
     /// <summary>Wraps a video logo as a media item so the VLC surface can play it.</summary>
     private static MediaItem AsLoopingVideo(Logo logo) => new()
@@ -154,12 +315,29 @@ public partial class OutputWindow : Window
             Video.Show(null);
             YouTube.Visibility = Visibility.Visible;
             YouTube.Play(background);
+            UpdateYouTubeCover();
         }
         else
         {
             YouTube.Clear();
             YouTube.Visibility = Visibility.Collapsed;
-            Video.Show(background);
+
+            if (background is { Type: MediaType.Image })
+            {
+                // The image fades in over the video's last picture; when it is
+                // fully up, BackgroundImageSettled lets that picture go.
+                Video.Stop(holdLastFrame: true);
+            }
+            else if (background is null)
+            {
+                // Nothing replaces it: the last picture fades out instead of cutting.
+                Video.Stop(holdLastFrame: true);
+                Video.ReleaseHold(MediaFade);
+            }
+            else
+            {
+                Video.Show(background);
+            }
         }
 
         UpdateFill();
@@ -238,7 +416,10 @@ public partial class OutputWindow : Window
 
     // ── Transporte y desenfoque del fondo ────────────────────────
 
-    private bool IsYouTubeShowing => YouTube.Visibility == Visibility.Visible;
+    // Not the surface's Visibility: while the logo or black covers it the player
+    // is hidden but still the one the play bar must talk to, not VLC.
+    private bool IsYouTubeShowing =>
+        (DataContext as ProjectionViewModel)?.Background?.Type == MediaType.YouTube;
 
     /// <summary>Where the projected video is, whichever player is showing it.</summary>
     public PlaybackState PlaybackState => IsYouTubeShowing ? YouTube.State : Video.State;

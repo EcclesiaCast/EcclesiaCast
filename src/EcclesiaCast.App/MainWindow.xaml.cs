@@ -642,6 +642,26 @@ public partial class MainWindow : Window
     /// many it acts on, and «Volver a importar» only shows on a page the
     /// program drew itself.
     /// </summary>
+    /// <summary>
+    /// «Reiniciar el sonido»: the escape hatch for when Windows' audio device
+    /// changed and nothing is heard even though the automatic reopening ran
+    /// (or did not notice).
+    /// </summary>
+    private void Transitions_Click(object sender, RoutedEventArgs e)
+    {
+        if (_settings is null)
+            return;
+
+        new Views.TransitionsWindow(_settings) { Owner = this }.ShowDialog();
+    }
+
+    private void RestartSound_Click(object sender, RoutedEventArgs e)
+    {
+        AudioEndpointWatcher.RequestRestart();
+        if (DataContext is MainViewModel vm)
+            vm.StatusText = "Sonido reiniciado: la música y los videos vuelven a abrir la salida de audio.";
+    }
+
     private void MediaMenu_Opened(object sender, RoutedEventArgs e)
     {
         if (sender is not ContextMenu menu

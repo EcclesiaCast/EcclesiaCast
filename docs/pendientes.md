@@ -243,6 +243,46 @@ dibujos a imagen):
       LIVE y el PREVIEW. Un cuadro chico en una esquina no tiene que cambiar
       nada. Mirá un par de canciones que ya tengan cuadros extra por si alguna
       cambió de tamaño de letra.
+- [ ] **Tramo A (salida)** — programado sin abrir el programa:
+      1. **YouTube y el logo.** Poné un YouTube sin descargar y apretá F3: se
+         tiene que ver el logo (no el video) y el sonido tiene que callarse.
+         F3 de nuevo: el video vuelve y sigue donde estaba. Lo mismo con F1
+         (negro). Mirá que la barra de reproducción siga mandando al YouTube.
+      2. **Cambiar de medio sin negro.** Con la salida prendida probá: imagen
+         → imagen (fundido sin oscurecerse), video → imagen, imagen → video,
+         video → video y video → «Sin fondo» (F4). No tiene que haber ningún
+         parpadeo negro. Con **bajo rendimiento** el cambio es directo, pero
+         tampoco tiene que haber negro entre medio. Probalo también con un
+         video pesado (copia liviana) y mirá que el sonido y el video sigan
+         bien después de muchos cambios seguidos (el programa no debe
+         cerrarse). Hacia YouTube sigue habiendo un instante negro: es lo
+         esperado.
+      3. **Sonido al cambiar la salida de Windows** (no se pudo probar nada
+         de esto, hace falta el programa abierto y dos salidas de audio).
+         Con la **música** sonando, cambiá la salida en la barra de Windows
+         (parlantes → auriculares): después de un instante tiene que seguir
+         sonando por la salida nueva, más o menos en el mismo lugar. Volvé a
+         la anterior: lo mismo. Repetilo con un **video con sonido** (no
+         silenciado, sin repetir) y con **YouTube**. Después cambiá la salida
+         con la música **en pausa** y dale play: tiene que sonar. Si alguna
+         vez queda muda, probá **Ver → Reiniciar el sonido**. Si ni eso la
+         arregla, avisá: queda mirar el registro (`logs`), donde cada
+         cambio de salida deja una línea.
+      4. **Transiciones en segundos.** Abrí **Proyección → Transiciones…**:
+         poné el logo en 2 s y apretá F3 / F3 (tiene que subir y bajar
+         despacio, también con un logo de video); el negro (F1) en 1 s;
+         «Apagar la salida» en 2 s y apretá Esc (la pantalla se va a negro y
+         recién después se cierra; si apretás algo para proyectar en el
+         medio, vuelve). Con un YouTube en pantalla, F3 y Esc lo esconden de
+         golpe: es lo esperado. «Valores de fábrica» vuelve a 0,5 / 0,4 /
+         0,25 / 0. En **Temas** mirá que la duración de la transición ahora
+         esté en segundos y que un tema viejo (280 ms) diga 0,28. Con el
+         modo de bajo rendimiento todo tiene que cortar de golpe.
+      5. **Aviso al pie.** En la pestaña «Aviso al pie» elegí otra
+         tipografía (Georgia, por ejemplo) y otro tamaño, y mostralo: el LIVE
+         y la pantalla tienen que cambiar al instante, también si el aviso ya
+         está puesto. Cerrá y abrí el programa: se tiene que acordar. Vacía la
+         tipografía: vuelve a Segoe UI.
 
 ## 2. Para la v1.0.0
 

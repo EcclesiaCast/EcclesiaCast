@@ -50,6 +50,24 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 - **Diseño de aprendizaje o avanzado.** En Ver elegís si los botones muestran
   los atajos de teclado (F1, F2, Esc, Ctrl+Enter) y los textos de ayuda, o si
   los ocultan para ver menos texto. Los atajos andan igual en los dos.
+- **Tipografía y tamaño para el aviso al pie.** En la pestaña **Aviso al pie**
+  hay una lista **Tipografía** (se elige de las que tiene la computadora, o se
+  escribe el nombre) y un **Tamaño** de 20 a 160. El LIVE y la pantalla lo
+  muestran al instante, y se recuerda aunque se cierre el programa. Si queda
+  vacía, sigue Segoe UI de tamaño 54, como antes.
+
+- **Transiciones en segundos para el logo, los medios, el negro y el apagado.**
+  En **Proyección → Transiciones…** se elige cuántos segundos tarda: el logo en
+  aparecer y desaparecer (antes aparecía de golpe), el cambio de una imagen o
+  video a otro (antes 0,32 s fijos), la pantalla negra (antes 0,25 s fijos) y
+  el apagado de la salida, que ahora puede irse a negro de a poco en lugar de
+  cerrarse seca (por defecto sigue cortando). El aviso al pie y la cuenta
+  regresiva también se funden al irse. Con 0 s cada cosa corta de golpe, y con
+  el modo de bajo rendimiento todo corta igual. En los temas, la duración de la
+  transición de la letra ahora se escribe en **segundos** (la de siempre, 0,28
+  s, queda igual) y el máximo sube a 5 s. Un YouTube no se puede fundir (es una
+  ventana aparte de Windows): se esconde de golpe.
+
 - **Tipografía para cada recuadro del escenario.** En el diseñador de
   escenarios, cada recuadro (las notas del predicador, la hora, un texto fijo…)
   puede tener su propia letra: se elige de la lista de las que tiene la
@@ -506,6 +524,28 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   caja, las flechas ← → siguen moviendo las diapositivas, como en BibleShow.
   Además, si marcabas un versículo sin proyectarlo y apretabas →, saltaba al
   capítulo anterior: ahora proyecta el versículo marcado (y ← el anterior).
+- **El sonido vuelve solo si cambiás la salida de audio de Windows.** Al
+  cambiar los parlantes por los auriculares (o un parlante Bluetooth) y
+  volver, la música y los videos quedaban mudos hasta cerrar y abrir el
+  programa. Ahora el programa se entera del cambio: lo que está sonando se
+  vuelve a abrir en la salida nueva, en el mismo lugar, y lo que se ponga
+  después ya arranca bien. Por las dudas, en **Ver → Reiniciar el sonido**
+  hay un botón que hace lo mismo a mano. Los videos de YouTube siguen la
+  salida de Windows por su cuenta.
+
+- **Al elegir otro medio ya no hay un salto a negro.** Pasar de una imagen a
+  otra, de un video a una imagen o de una imagen a un video hacía un
+  parpadeo negro: la imagen vieja desaparecía de golpe y la nueva subía desde
+  la nada. Ahora la anterior se queda en pantalla (la imagen, o el último
+  cuadro del video) y la nueva se funde por encima. Con **bajo rendimiento**
+  se mantiene lo anterior en pantalla pero el cambio es directo, sin fundido.
+  Hacia un video de YouTube todavía hay un instante negro mientras carga.
+
+- **El logo y el negro tapan también a un video de YouTube.** Con un YouTube
+  sin descargar en pantalla, F3 (logo) y F1 (negro) no lo tapaban: había que
+  cambiar a otro medio para que el logo se viera. Ahora, mientras el logo o el
+  negro están en pantalla, el YouTube se esconde y se pausa (no suena por
+  detrás), y al volver sigue desde donde estaba.
 
 - **El aviso de cada tarjeta de la grilla dice lo que hace.** En la Biblia el
   globo de ayuda decía «Arrastrar: cambiarla de lugar», pero los versículos y

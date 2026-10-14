@@ -151,6 +151,39 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     [ObservableProperty]
     private string _overlayText = string.Empty;
 
+    /// <summary>Typeface of the lower-third announcement. Empty keeps Segoe UI.</summary>
+    [ObservableProperty]
+    private string _overlayFont = string.Empty;
+
+    /// <summary>Size of the lower-third announcement's letters (20 to 160).</summary>
+    [ObservableProperty]
+    private double _overlayFontSize = OverlayStyle.DefaultSize;
+
+    partial void OnOverlayFontChanged(string value)
+    {
+        if (!_loadingOverlayStyle)
+            _settings.Set(OverlayStyle.FontSettingKey, value);
+        Projection.OverlayFontFamily = OverlayStyle.FontOrDefault(value);
+    }
+
+    partial void OnOverlayFontSizeChanged(double value)
+    {
+        var size = OverlayStyle.ClampSize(value);
+        if (!_loadingOverlayStyle)
+            _settings.Set(OverlayStyle.SizeSettingKey, OverlayStyle.FormatSize(size));
+        Projection.OverlayFontSize = size;
+    }
+
+    private bool _loadingOverlayStyle;
+
+    private void LoadOverlayStyle()
+    {
+        _loadingOverlayStyle = true;
+        OverlayFont = _settings.Get(OverlayStyle.FontSettingKey) ?? string.Empty;
+        OverlayFontSize = OverlayStyle.ParseSize(_settings.Get(OverlayStyle.SizeSettingKey));
+        _loadingOverlayStyle = false;
+    }
+
     [ObservableProperty]
     private bool _isOverlayActive;
 
@@ -363,6 +396,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         InitializeUpdates();
         StageNotesText = _settings.Get(StageNotesKey) ?? string.Empty;
         QuickTextFont = _settings.Get(QuickTextFontKey) ?? string.Empty;
+        LoadOverlayStyle();
         _previewShowsStage = _settings.Get(PreviewShowsStageKey) == "1";
         RestoreRemote();
         _ = RefreshVideoThumbnailsAsync();

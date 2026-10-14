@@ -10,6 +10,12 @@
         <Rectangle x:Name="FillColorLayer" Visibility="Collapsed"/>
         <Image x:Name="FillImage" Stretch="UniformToFill" Visibility="Collapsed"/>
 
+        <!-- La imagen anterior, que se queda debajo mientras la nueva se funde
+             encima (o mientras arranca el video que la reemplaza): así el
+             cambio de medio no pasa por negro -->
+        <Image x:Name="PreviousImage" Stretch="UniformToFill" Visibility="Collapsed"
+               RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False"/>
+
         <!-- Capa de fondo global (imagen; el video llega después) -->
         <Image x:Name="BackgroundImage" Stretch="UniformToFill" Visibility="Collapsed"
                RenderTransformOrigin="0.5,0.5"/>

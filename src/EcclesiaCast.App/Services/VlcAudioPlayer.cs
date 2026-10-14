@@ -16,6 +16,14 @@ public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
     private MediaPlayer? _player;
     private int _volume = 80;
 
+    /// <summary>The file being played, to reopen it in place when the output device changes.</summary>
+    private string? _path;
+
+    /// <summary>The <see cref="AudioEndpointWatcher.Generation"/> this player's output was opened under.</summary>
+    private int _audioGeneration;
+
+    private bool _listening;
+
     /// <summary>
     /// Bumped by every Play and Stop. An «ended» that VLC raised for a track
     /// which was replaced before the UI thread got to it carries the old
@@ -53,10 +61,20 @@ public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
         }
     }
 
-    public void Play(string path)
+    public void Play(string path) => PlayFrom(path, TimeSpan.Zero);
+
+    private void PlayFrom(string path, TimeSpan start)
     {
         if (engine() is not { } libVlc)
             throw new InvalidOperationException("El motor de audio no está disponible.");
+
+        // Windows changed the audio device since this player opened its output:
+        // LibVLC keeps that output inside the player and it can stay dead, so
+        // this one is replaced by a new player (it has no video callbacks to
+        // keep alive, unlike the video surface).
+        if (_player is not null && _audioGeneration != AudioEndpointWatcher.Generation)
+            DiscardPlayer();
+        _audioGeneration = AudioEndpointWatcher.Generation;
 
         var player = EnsurePlayer(libVlc);
 
@@ -68,13 +86,62 @@ public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
         using var media = new Media(libVlc, new Uri(path));
         // A cover picture or a video track inside the file must not open a window.
         media.AddOption(":no-video");
+        if (start > TimeSpan.Zero)
+            media.AddOption($":start-time={start.TotalSeconds.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)}");
         player.Volume = _volume;
+        _path = path;
         player.Play(media);
     }
 
     public void Pause() => SetPaused(true);
 
-    public void Resume() => SetPaused(false);
+    public void Resume()
+    {
+        // Paused while Windows changed the device: the old output is not
+        // trusted, so it is reopened at the same spot instead of unpaused.
+        if (_player is not null && _path is not null && State == AudioPlayerState.Paused
+            && _audioGeneration != AudioEndpointWatcher.Generation)
+        {
+            PlayFrom(_path, Position);
+            return;
+        }
+
+        SetPaused(false);
+    }
+
+    /// <summary>
+    /// Windows moved the sound to another device (or the operator asked to
+    /// restart it): what is playing is reopened on the new one, in the same place.
+    /// </summary>
+    private void OnOutputChanged(object? sender, EventArgs e)
+    {
+        if (_player is null || _path is null || State != AudioPlayerState.Playing)
+            return;
+
+        try
+        {
+            Log.Information("Se reabre la salida del audio en {Position}", Position);
+            PlayFrom(_path, Position);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "No se pudo reabrir la salida del audio");
+        }
+    }
+
+    private void DiscardPlayer()
+    {
+        var old = _player;
+        _player = null;
+        // Whatever the old player was about to report is not about the track
+        // that starts next.
+        Interlocked.Increment(ref _generation);
+        if (old is null)
+            return;
+
+        try { old.Stop(); } catch { /* el motor ya lo cerró */ }
+        try { old.Dispose(); } catch { /* ignore */ }
+    }
 
     private void SetPaused(bool paused)
     {
@@ -131,6 +198,12 @@ public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
         };
 
         _player = player;
+        if (!_listening)
+        {
+            _listening = true;
+            AudioEndpointWatcher.OutputChanged += OnOutputChanged;
+        }
+
         return player;
     }
 
@@ -144,6 +217,8 @@ public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
 
     public void Dispose()
     {
+        AudioEndpointWatcher.OutputChanged -= OnOutputChanged;
+        _listening = false;
         var player = _player;
         _player = null;
         if (player is null)

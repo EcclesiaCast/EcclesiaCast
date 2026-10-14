@@ -80,10 +80,23 @@ public partial class VlcVideoSurface : UserControl
     {
         InitializeComponent();
         Unloaded += (_, _) => Dispose();
+        Loaded += (_, _) =>
+        {
+            AudioEndpointWatcher.OutputChanged -= OnAudioOutputChanged;
+            AudioEndpointWatcher.OutputChanged += OnAudioOutputChanged;
+        };
 
         // The framing is given over a 1920×1080 canvas: a different window
         // size means different numbers.
         SizeChanged += (_, _) => MediaFraming.Apply(Surface, _framing, ActualWidth, ActualHeight);
+
+        // A held picture keeps the framing it was taken with, so it only needs
+        // the new size (it never lives long enough for anything else).
+        SizeChanged += (_, _) =>
+        {
+            if (Hold.Visibility == Visibility.Visible && Hold.Source is not null)
+                MediaFraming.Apply(Hold, _holdFraming, ActualWidth, ActualHeight);
+        };
     }
 
     /// <summary>Raised when a non-looping video reaches its end.</summary>
@@ -124,6 +137,12 @@ public partial class VlcVideoSurface : UserControl
             return;
         }
 
+        // The last picture of the old video stays on screen, frozen, until the
+        // first one of the new video arrives: the gap in between (the decoder
+        // opening the file) used to show as a flash of black. Taken before the
+        // framing changes, so it keeps the old video's own framing.
+        HoldLastFrame();
+
         _currentId = media.Id;
         _pausedForHiddenOutput = false;
         _framing = media;
@@ -131,42 +150,8 @@ public partial class VlcVideoSurface : UserControl
 
         try
         {
-            // Switching media on the SAME player: no player teardown and no
-            // delegate churn.
-            // A heavy video (4K, 60 frames) plays from its light copy when
-            // one is ready; the item itself always keeps the original's path.
-            var playable = LightVideoCache.PlayablePath(media);
-            using var m = new Media(engine, new Uri(playable));
-            if (media.EndBehavior == VideoEndBehavior.Loop)
-                m.AddOption(":input-repeat=65535");
-            // Medio segundo de cache alcanza para un archivo local y deja
-            // varios cientos de megas menos en juego que el segundo y medio
-            // que traía: el video de fondo se lee del disco de la misma PC.
-            m.AddOption(":file-caching=500");
-
-            // Trimming is handed to VLC rather than watched for in code: a
-            // loop then restarts at the trimmed start, which is the whole
-            // point of cutting a sting off the front of a stock loop.
-            if (media.TrimStart > 0)
-                m.AddOption($":start-time={media.TrimStart.ToString("0.###", CultureInfo.InvariantCulture)}");
-            if (media.TrimEnd > 0 && media.TrimEnd > media.TrimStart)
-                m.AddOption($":stop-time={media.TrimEnd.ToString("0.###", CultureInfo.InvariantCulture)}");
-
-            // With hardware decoding on, handing the player a new input while
-            // the old one is still decoding corrupts the native heap within a
-            // few dozen switches (measured: 0xC0000374 every run). Stopping
-            // first made it survive 264 switches in a row. Safe to block here:
-            // no callback waits on the UI thread.
-            player.Stop();
-            // After Stop returns VLC calls nothing more for the old input, so
-            // every frame of it still queued carries the old number.
-            Interlocked.Increment(ref _generation);
-            player.Play(m);
-            if (playable == media.Path)
-                Log.Information("Video de fondo: {Name} ({Path})", media.Name, media.Path);
-            else
-                Log.Information("Video de fondo: {Name} ({Path}) desde su copia liviana {Copy}",
-                    media.Name, media.Path, playable);
+            StartPlayback(engine, player, media, resumeAt: null);
+            _playing = media;
         }
         catch (Exception ex)
         {
@@ -175,10 +160,123 @@ public partial class VlcVideoSurface : UserControl
         }
     }
 
-    public void Stop()
+    /// <summary>
+    /// Hands the player the video. Switching media happens on the SAME player:
+    /// no player teardown and no delegate churn.
+    /// </summary>
+    private void StartPlayback(LibVLC engine, MediaPlayer player, MediaItem media, TimeSpan? resumeAt)
+    {
+        // A heavy video (4K, 60 frames) plays from its light copy when
+        // one is ready; the item itself always keeps the original's path.
+        var playable = LightVideoCache.PlayablePath(media);
+        using var m = new Media(engine, new Uri(playable));
+        var loops = media.EndBehavior == VideoEndBehavior.Loop;
+        if (loops)
+            m.AddOption(":input-repeat=65535");
+        // Medio segundo de cache alcanza para un archivo local y deja
+        // varios cientos de megas menos en juego que el segundo y medio
+        // que traía: el video de fondo se lee del disco de la misma PC.
+        m.AddOption(":file-caching=500");
+
+        // Trimming is handed to VLC rather than watched for in code: a
+        // loop then restarts at the trimmed start, which is the whole
+        // point of cutting a sting off the front of a stock loop.
+        // Reopening in place (the sound device changed) picks up at the spot
+        // it was — except a loop, which would then restart from that spot
+        // every time round; it starts over, which nobody notices in a loop.
+        if (resumeAt is { } at && !loops && at > TimeSpan.Zero)
+            m.AddOption($":start-time={at.TotalSeconds.ToString("0.###", CultureInfo.InvariantCulture)}");
+        else if (media.TrimStart > 0)
+            m.AddOption($":start-time={media.TrimStart.ToString("0.###", CultureInfo.InvariantCulture)}");
+        if (media.TrimEnd > 0 && media.TrimEnd > media.TrimStart)
+            m.AddOption($":stop-time={media.TrimEnd.ToString("0.###", CultureInfo.InvariantCulture)}");
+
+        // With hardware decoding on, handing the player a new input while
+        // the old one is still decoding corrupts the native heap within a
+        // few dozen switches (measured: 0xC0000374 every run). Stopping
+        // first made it survive 264 switches in a row. Safe to block here:
+        // no callback waits on the UI thread.
+        player.Stop();
+        // After Stop returns VLC calls nothing more for the old input, so
+        // every frame of it still queued carries the old number.
+        Interlocked.Increment(ref _generation);
+
+        // Windows changed the audio device since this player opened its output:
+        // ask for a fresh one (the default device of the moment) now that it is
+        // stopped. The player itself is never rebuilt — its video callbacks
+        // must stay assigned for as long as it lives.
+        if (_audioGeneration != AudioEndpointWatcher.Generation)
+        {
+            _audioGeneration = AudioEndpointWatcher.Generation;
+            try
+            {
+                var ok = player.SetAudioOutput("mmdevice");
+                Log.Information("Se reabre la salida de audio del video ({Result})", ok ? "ok" : "no se pudo");
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "No se pudo reabrir la salida de audio del video");
+            }
+        }
+
+        player.Play(m);
+        if (resumeAt is not null)
+            return;
+
+        if (playable == media.Path)
+            Log.Information("Video de fondo: {Name} ({Path})", media.Name, media.Path);
+        else
+            Log.Information("Video de fondo: {Name} ({Path}) desde su copia liviana {Copy}",
+                media.Name, media.Path, playable);
+    }
+
+    // ── Cambio de dispositivo de audio de Windows ────────────────
+
+    /// <summary>The item playing now, to reopen it in place if the sound device changes.</summary>
+    private MediaItem? _playing;
+
+    /// <summary>The <see cref="AudioEndpointWatcher.Generation"/> this player's output was opened under.</summary>
+    private int _audioGeneration;
+
+    /// <summary>
+    /// Windows moved the sound to another device (or the operator asked to
+    /// restart it): a video that is playing with sound is reopened on the new
+    /// one, in the same place. A muted one has nothing to fix; a paused one is
+    /// fixed by the next time it is started.
+    /// </summary>
+    private void OnAudioOutputChanged(object? sender, EventArgs e)
+    {
+        var player = _player;
+        var media = _playing;
+        if (player is null || media is null || _currentId < 0 || media.Muted
+            || App.VideoEngine is not { } engine || !player.IsPlaying)
+            return;
+
+        try
+        {
+            var position = TimeSpan.FromMilliseconds(Math.Max(0, player.Time));
+            Log.Information("Se reabre la salida del audio del video {Name} en {Position}", media.Name, position);
+            StartPlayback(engine, player, media, position);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "No se pudo reabrir la salida de audio del video");
+        }
+    }
+
+    /// <summary>
+    /// Stops the video. With <paramref name="holdLastFrame"/> its last picture
+    /// stays on screen, frozen, until <see cref="ReleaseHold"/> — for when
+    /// something else is about to fade in over it, so the change does not go
+    /// through black.
+    /// </summary>
+    public void Stop(bool holdLastFrame = false)
     {
         _currentId = -1;
         _pausedForHiddenOutput = false;
+
+        if (holdLastFrame)
+            HoldLastFrame();
 
         // A paused video counts too: left open, it kept its decoder and frame
         // buffers alive behind the image that replaced it.
@@ -192,7 +290,140 @@ public partial class VlcVideoSurface : UserControl
         // Frames already queued for the UI thread must not draw over the
         // clear (see _generation).
         Interlocked.Increment(ref _generation);
-        ClearSurface();
+        if (holdLastFrame)
+            Dispatcher.BeginInvoke(() => PreviewFrameChanged?.Invoke(this, null));
+        else
+            ClearSurface();
+    }
+
+    // ── Último cuadro retenido ───────────────────────────────────
+
+    /// <summary>
+    /// How long the held picture takes to fade away when the first frame of the
+    /// next video arrives. Zero cuts (the «bajo rendimiento» mode).
+    /// </summary>
+    public TimeSpan HoldFade { get; set; } = TimeSpan.FromMilliseconds(320);
+
+    /// <summary>Raised on the UI thread when a video draws its first picture.</summary>
+    public event EventHandler? FirstFrame;
+
+    private readonly DispatcherTimer _holdTimer = new() { Interval = TimeSpan.FromSeconds(2) };
+    private bool _holdTimerHooked;
+    private int _holdVersion;
+    private double _blurRadius;
+    private MediaItem? _holdFraming;
+
+    /// <summary>
+    /// Freezes a copy of the picture on screen into <see cref="Hold"/> and
+    /// empties the live surface. UI thread. Does nothing when no picture has
+    /// been drawn yet (then there is nothing to hold, and whatever is already
+    /// held stays).
+    /// </summary>
+    private void HoldLastFrame()
+    {
+        if (!Dispatcher.CheckAccess())
+        {
+            Dispatcher.Invoke(HoldLastFrame);
+            return;
+        }
+
+        WriteableBitmap? bitmap;
+        lock (_sync)
+            bitmap = _bitmap;
+
+        if (bitmap is null)
+            return;
+
+        try
+        {
+            // Only the UI thread writes into the bitmap, and this is the UI
+            // thread: the copy cannot catch it half drawn.
+            var copy = new WriteableBitmap(bitmap);
+            copy.Freeze();
+
+            _holdVersion++;
+            Hold.BeginAnimation(OpacityProperty, null);
+            Hold.Opacity = 1;
+            Hold.Source = copy;
+            _holdFraming = _framing;
+            MediaFraming.Apply(Hold, _holdFraming, ActualWidth, ActualHeight);
+            MediaFraming.SetBlur(Hold, _blurRadius);
+            Hold.Visibility = Visibility.Visible;
+            StartHoldTimer();
+        }
+        catch (Exception ex)
+        {
+            // Without the copy the change simply goes through black, as before.
+            Log.Debug(ex, "No se pudo retener el último cuadro del video");
+        }
+
+        lock (_sync)
+        {
+            Surface.Source = null;
+            _bitmap = null;
+            _bitmapWidth = _bitmapHeight = 0;
+            _previewBitmap = null;
+        }
+    }
+
+    /// <summary>
+    /// Lets go of the held picture, fading it out over <paramref name="fade"/>
+    /// (zero cuts). It is called when whatever replaces it is already on
+    /// screen; if that never happens, two seconds later this lets go anyway.
+    /// </summary>
+    public void ReleaseHold(TimeSpan fade)
+    {
+        if (!Dispatcher.CheckAccess())
+        {
+            Dispatcher.BeginInvoke(() => ReleaseHold(fade));
+            return;
+        }
+
+        _holdTimer.Stop();
+        if (Hold.Visibility != Visibility.Visible)
+            return;
+
+        if (fade <= TimeSpan.Zero)
+        {
+            ClearHold();
+            return;
+        }
+
+        var version = ++_holdVersion;
+        var animation = new System.Windows.Media.Animation.DoubleAnimation(0, fade);
+        animation.Completed += (_, _) =>
+        {
+            if (version == _holdVersion)
+                ClearHold();
+        };
+        Hold.BeginAnimation(OpacityProperty, animation);
+    }
+
+    private void ClearHold()
+    {
+        _holdTimer.Stop();
+        _holdVersion++;
+        Hold.BeginAnimation(OpacityProperty, null);
+        Hold.Opacity = 1;
+        Hold.Visibility = Visibility.Collapsed;
+        Hold.Source = null;
+    }
+
+    private void StartHoldTimer()
+    {
+        if (!_holdTimerHooked)
+        {
+            _holdTimerHooked = true;
+            _holdTimer.Tick += (_, _) =>
+            {
+                // The next picture never came (VLC failed to open it).
+                _holdTimer.Stop();
+                ReleaseHold(HoldFade);
+            };
+        }
+
+        _holdTimer.Stop();
+        _holdTimer.Start();
     }
 
     // ── Transporte (barra de reproducción del operador) ──────────
@@ -280,8 +511,11 @@ public partial class VlcVideoSurface : UserControl
     public void SetBlur(double amount)
     {
         var radius = Math.Clamp(amount, 0, 100) * 0.6;
+        _blurRadius = radius;
         // Through the framing, which knows how much it scales the picture.
         MediaFraming.SetBlur(Surface, radius);
+        if (Hold.Visibility == Visibility.Visible)
+            MediaFraming.SetBlur(Hold, radius);
     }
 
     private MediaPlayer? EnsurePlayer(LibVLC engine)
@@ -326,6 +560,10 @@ public partial class VlcVideoSurface : UserControl
 
     private void Dispose()
     {
+        AudioEndpointWatcher.OutputChanged -= OnAudioOutputChanged;
+        _holdTimer.Stop();
+        ClearHold();
+
         var player = _player;
         _player = null;
 
@@ -362,6 +600,7 @@ public partial class VlcVideoSurface : UserControl
     private void ClearSurface() =>
         Dispatcher.BeginInvoke(() =>
         {
+            ClearHold();
             Surface.Source = null;
             _bitmap = null;
             _bitmapWidth = _bitmapHeight = 0;
@@ -463,6 +702,7 @@ public partial class VlcVideoSurface : UserControl
 
         Dispatcher.BeginInvoke(DispatcherPriority.Render, () =>
         {
+            var firstFrame = false;
             try
             {
                 lock (_sync)
@@ -484,6 +724,7 @@ public partial class VlcVideoSurface : UserControl
                         _bitmapWidth = _width;
                         _bitmapHeight = _height;
                         Surface.Source = _bitmap;
+                        firstFrame = true;
 
                         // «Rellenar» depends on the shape of the picture, which
                         // is only known now (or has just changed).
@@ -509,6 +750,14 @@ public partial class VlcVideoSurface : UserControl
                             new Int32Rect(0, 0, _previewWidth, _previewHeight),
                             _previewPixels!, _previewWidth * 4, 0);
                     }
+                }
+
+                // The new picture is drawn: the old one held in front of it
+                // can fade away now, and so can whatever else was kept for it.
+                if (firstFrame)
+                {
+                    ReleaseHold(HoldFade);
+                    FirstFrame?.Invoke(this, EventArgs.Empty);
                 }
             }
             catch
