@@ -32,6 +32,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private const string OutputDisplayKey = "output.display";
     private const string StageNotesKey = "stage.notes.text";
     private const string QuickTextFontKey = "quicktext.font";
+    private const string BibleHistoryKey = "bible.history";
     private const string CountdownMinutesKey = "countdown.minutes";
     private const string CountdownClockKey = "countdown.clock";
     private const string CountdownHeadingKey = "countdown.heading";
@@ -85,6 +86,9 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     public ObservableCollection<BibleVersionOption> BibleVersionOptions { get; } = [];
 
     public ObservableCollection<BibleVerseResult> BibleSearchResults { get; } = [];
+
+    /// <summary>The verses projected from the search, newest first (the 🕘 list next to the search box).</summary>
+    public ObservableCollection<BibleHistoryEntry> BibleHistory { get; } = [];
 
     /// <summary>Books present in the primary version, in Bible order.</summary>
     public ObservableCollection<BibleBookInfo> BibleBooksAvailable { get; } = [];
@@ -349,6 +353,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         LoadSongs();
         IsBibleVersionsExpanded = _settings.Get(BibleVersionsExpandedKey) == "1";
         LoadBibleVersions();
+        LoadBibleHistory();
         LoadMedia();
         LoadLogos(null);
         LoadPlaylists(null);
@@ -4195,7 +4200,12 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         ShowBooksList = !ShowBibleResults && !ShowChaptersView;
     }
 
-    partial void OnBibleQueryChanged(string value) => RunBibleQuery();
+    partial void OnBibleQueryChanged(string value)
+    {
+        // The text changed, so the arrows are for editing it again.
+        ArrowsDriveSlidesFromSearch = false;
+        RunBibleQuery();
+    }
 
     private void RunBibleQuery()
     {
@@ -4529,14 +4539,38 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     [RelayCommand]
     private void ProjectReference()
     {
+        var projected = ProjectReferenceCore();
+
+        // "?words" remembers its verse in ProjectBibleResult.
+        if (projected && !(BibleQuery ?? string.Empty).TrimStart().StartsWith('?'))
+            RememberProjectedVerse();
+
+        // Set after the whole thing: the book name written into the box above
+        // fires OnBibleQueryChanged, which turns it off.
+        ArrowsDriveSlidesFromSearch = projected && LiveSlideIndex >= 0;
+    }
+
+    /// <summary>
+    /// True while the arrows belong to the slides even though the focus is
+    /// still in the search box: right after Enter projected a verse, the next
+    /// verse is one arrow away (as in BibleShow). Typing, or clicking the box,
+    /// gives the arrows back to the text.
+    /// </summary>
+    public bool ArrowsDriveSlidesFromSearch { get; set; }
+
+    /// <summary>True when something went live.</summary>
+    private bool ProjectReferenceCore()
+    {
         var query = (BibleQuery ?? string.Empty).Trim();
 
         // "?words": Enter projects the first verse that says them.
         if (query.StartsWith('?'))
         {
-            if (BibleSearchResults.FirstOrDefault() is { } firstResult)
-                ProjectBibleResult(firstResult);
-            return;
+            if (BibleSearchResults.FirstOrDefault() is not { } firstResult)
+                return false;
+
+            ProjectBibleResult(firstResult);
+            return true;
         }
 
         // Only part of a book typed ("ju"): Enter opens the first book that
@@ -4546,7 +4580,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             var book = BibleBooksAvailable.FirstOrDefault(b => BibleBookCatalog.StartsWith(b, query));
             if (book is not null)
                 BibleQuery = book.Name + " ";
-            return;
+            return false;
         }
 
         // The box can still hold a reference while the grid shows a song the
@@ -4561,7 +4595,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (PreviewSlideIndex >= 0)
         {
             GoLiveSlide(PreviewSlideIndex);
-            return;
+            return true;
         }
 
         // Going live consumed the preview, so a second Enter lands here.
@@ -4574,12 +4608,15 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             if (index >= 0)
             {
                 GoLiveSlide(index);
-                return;
+                return true;
             }
         }
 
-        if (Slides.FirstOrDefault(s => s.JumpTarget is null) is { } first)
-            GoLiveSlide(first.Index);
+        if (Slides.FirstOrDefault(s => s.JumpTarget is null) is not { } first)
+            return false;
+
+        GoLiveSlide(first.Index);
+        return true;
     }
 
     // ── Resaltado en vivo ────────────────────────────────────────
@@ -4636,8 +4673,123 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         LoadBiblePassage(new BibleReference(result.BookNumber, result.Chapter, null, null));
         var index = FindVerseSlide(result.Chapter, result.Verse);
-        if (index >= 0)
-            GoLiveSlide(index);
+        if (index < 0)
+            return;
+
+        GoLiveSlide(index);
+        if (LiveSlideIndex == index)
+            RememberVerse(new BibleReference(result.BookNumber, result.Chapter, result.Verse, null));
+    }
+
+    // ── Historial de versículos buscados ─────────────────────────
+
+    private void LoadBibleHistory()
+    {
+        BibleHistory.Clear();
+        foreach (var entry in BibleHistoryList.Parse(_settings.Get(BibleHistoryKey)))
+            BibleHistory.Add(entry);
+    }
+
+    /// <summary>
+    /// The verse that just went live from the search box: what was typed when
+    /// it points at the live slide, otherwise the verses the slide shows (a
+    /// paragraph of the TLA, or the chapter's first verse after a bare Enter).
+    /// </summary>
+    private void RememberProjectedVerse()
+    {
+        if (_currentPassage is null
+            || LiveSlideIndex < 0 || LiveSlideIndex >= Slides.Count
+            || Slides[LiveSlideIndex].Verses is not { } group)
+            return;
+
+        var typed = BibleReferenceParser.TryParse(BibleQuery ?? string.Empty);
+        if (typed is { VerseStart: int start }
+            && typed.BookNumber == _currentPassage.BookNumber
+            && typed.Chapter == group.Chapter
+            && group.Contains(start))
+            RememberVerse(typed);
+        else
+            RememberVerse(new BibleReference(_currentPassage.BookNumber, group.Chapter, group.FirstVerse, group.LastVerse));
+    }
+
+    /// <summary>Puts a projected verse on top of the history. Arrow steps and card clicks do not come through here.</summary>
+    private void RememberVerse(BibleReference reference)
+    {
+        if (reference.VerseStart is not int start)
+            return;
+
+        var primary = PrimaryVersion;
+        var entry = new BibleHistoryEntry(
+            reference.BookNumber, reference.Chapter, start,
+            reference.VerseEnd is int end && end != start ? end : null,
+            primary?.Id, primary?.Abbreviation ?? string.Empty,
+            SecondaryVersion?.Id, DateTimeOffset.Now);
+
+        var updated = BibleHistoryList.Add(BibleHistory, entry);
+        BibleHistory.Clear();
+        foreach (var kept in updated)
+            BibleHistory.Add(kept);
+
+        _settings.Set(BibleHistoryKey, BibleHistoryList.Serialize(BibleHistory));
+    }
+
+    /// <summary>
+    /// Brings a history entry back: its versions when they are installed, the
+    /// chapter loaded and the verse marked. Projecting is a separate step.
+    /// </summary>
+    [RelayCommand]
+    private void OpenHistoryEntry(BibleHistoryEntry? entry)
+    {
+        if (entry is null)
+            return;
+
+        RestoreHistoryVersions(entry);
+
+        // Typing the same text again would not reload anything.
+        var text = BibleReferenceFormatter.Format(entry.ToReference());
+        if (BibleQuery == text)
+            RunBibleQuery();
+        else
+            BibleQuery = text;
+    }
+
+    [RelayCommand]
+    private void ProjectHistoryEntry(BibleHistoryEntry? entry)
+    {
+        if (entry is null)
+            return;
+
+        OpenHistoryEntry(entry);
+        ProjectReference();
+    }
+
+    [RelayCommand]
+    private void ClearBibleHistory()
+    {
+        BibleHistory.Clear();
+        _settings.Set(BibleHistoryKey, BibleHistoryList.Serialize(BibleHistory));
+        StatusText = "Historial de versículos borrado.";
+    }
+
+    /// <summary>
+    /// The version the verse was read in becomes the main one, and the second
+    /// version comes back too, as long as they are still installed. When the
+    /// main one is already right and the entry had no second, nothing moves.
+    /// </summary>
+    private void RestoreHistoryVersions(BibleHistoryEntry entry)
+    {
+        var primary = entry.VersionId is int primaryId
+            ? BibleVersionOptions.FirstOrDefault(o => o.Info.Id == primaryId)
+            : null;
+        var secondary = entry.SecondaryVersionId is int secondaryId
+            ? BibleVersionOptions.FirstOrDefault(o => o.Info.Id == secondaryId)
+            : null;
+
+        if (primary is not null && PrimaryVersion?.Id != primary.Info.Id)
+            SelectSoloVersion(primary);
+
+        if (secondary is not null && secondary.Info.Id != PrimaryVersion?.Id && SecondaryVersion?.Id != secondary.Info.Id)
+            secondary.IsSelected = true;
     }
 
     private void LoadBibleVersions()
@@ -4869,7 +5021,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         // A media item has no slides of its own: the arrows move between
         // playlist items (the slide grid still shows the previous item), so
         // every press is at the edge.
-        var target = LiveSlideIndex < 0 && direction > 0 ? 0 : LiveSlideIndex + direction;
+        // With nothing live it starts from the verse marked in the search (or
+        // the first real slide), never from a chapter-jump card.
+        var target = SlideStep.Target(LiveSlideIndex, PreviewSlideIndex, direction,
+            Slides.Select(s => s.JumpTarget is not null).ToList());
         var atEdge = CurrentPlaylistItemIsMedia
             || target < 0 || target >= Slides.Count || LeavesPassage(direction);
 
