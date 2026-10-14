@@ -149,6 +149,24 @@ public sealed partial class MainViewModel
             GridTitle = "📑 " + tab;
             BuildPageCards(pages);
             StatusText = $"Presentación «{tab}»: {pages.Count} página(s). Clic en una la proyecta · flechas ←→ pasan de página.";
+
+            // The grid was left (a song went in) while a page of this tab
+            // stayed on the screen: coming back, that page is the live one,
+            // so the arrows go on from it instead of starting at page 1.
+            if (IsPresentationPageOnAir
+                && Slides.FirstOrDefault(s => s.Page?.Id == _livePageId) is { } onAir)
+            {
+                LiveSlideIndex = onAir.Index;
+                foreach (var slide in Slides)
+                    slide.IsLive = slide.Index == onAir.Index;
+                RefreshSlideOnAir();
+
+                var following = Slides.ElementAtOrDefault(onAir.Index + 1);
+                PreviewPageMedia = following?.Page;
+                Projection.SlideLabel = $"Página {onAir.Index + 1} de {Slides.Count}";
+                Projection.NextSlide = following?.Slide;
+                return true;
+            }
         }
 
         var start = Slides.FirstOrDefault(s => s.Page?.Id == startMediaId) ?? Slides.FirstOrDefault();
