@@ -451,6 +451,13 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Corregido
 
+- **La flecha pasa al versículo siguiente después de buscar uno.** Escribías
+  «juan 3 16», Enter, y al apretar → el cursor se movía dentro de la caja en
+  lugar de ir al 17. Ahora, mientras no escribas nada más ni hagas clic en la
+  caja, las flechas ← → siguen moviendo las diapositivas, como en BibleShow.
+  Además, si marcabas un versículo sin proyectarlo y apretabas →, saltaba al
+  capítulo anterior: ahora proyecta el versículo marcado (y ← el anterior).
+
 - **El aviso de cada tarjeta de la grilla dice lo que hace.** En la Biblia el
   globo de ayuda decía «Arrastrar: cambiarla de lugar», pero los versículos y
   los capítulos no se pueden arrastrar. Ahora cada tarjeta muestra lo suyo: el

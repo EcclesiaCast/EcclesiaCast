@@ -784,6 +784,7 @@
                                          FontSize="13"
                                          Text="{Binding BibleQuery, UpdateSourceTrigger=PropertyChanged}"
                                          KeyUp="BibleQueryBox_KeyUp"
+                                         PreviewMouseDown="BibleQueryBox_PreviewMouseDown"
                                          ToolTip="Escribí el libro y se filtra la lista («ju» → Jueces, Juan, Judas; Enter abre el primero). «juan 3» abre el capítulo, «juan 3 16» marca el versículo y Enter lo proyecta. Con ? adelante busca palabras en los versículos (?paz). Ctrl+K busca en canciones, Biblia y medios a la vez.">
                                     <TextBox.InputBindings>
                                         <KeyBinding Key="Enter" Command="{Binding ProjectReferenceCommand}"/>

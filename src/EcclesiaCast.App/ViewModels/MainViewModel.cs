@@ -4195,7 +4195,12 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         ShowBooksList = !ShowBibleResults && !ShowChaptersView;
     }
 
-    partial void OnBibleQueryChanged(string value) => RunBibleQuery();
+    partial void OnBibleQueryChanged(string value)
+    {
+        // The text changed, so the arrows are for editing it again.
+        ArrowsDriveSlidesFromSearch = false;
+        RunBibleQuery();
+    }
 
     private void RunBibleQuery()
     {
@@ -4529,14 +4534,34 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     [RelayCommand]
     private void ProjectReference()
     {
+        var projected = ProjectReferenceCore();
+
+        // Set after the whole thing: the book name written into the box above
+        // fires OnBibleQueryChanged, which turns it off.
+        ArrowsDriveSlidesFromSearch = projected && LiveSlideIndex >= 0;
+    }
+
+    /// <summary>
+    /// True while the arrows belong to the slides even though the focus is
+    /// still in the search box: right after Enter projected a verse, the next
+    /// verse is one arrow away (as in BibleShow). Typing, or clicking the box,
+    /// gives the arrows back to the text.
+    /// </summary>
+    public bool ArrowsDriveSlidesFromSearch { get; set; }
+
+    /// <summary>True when something went live.</summary>
+    private bool ProjectReferenceCore()
+    {
         var query = (BibleQuery ?? string.Empty).Trim();
 
         // "?words": Enter projects the first verse that says them.
         if (query.StartsWith('?'))
         {
-            if (BibleSearchResults.FirstOrDefault() is { } firstResult)
-                ProjectBibleResult(firstResult);
-            return;
+            if (BibleSearchResults.FirstOrDefault() is not { } firstResult)
+                return false;
+
+            ProjectBibleResult(firstResult);
+            return true;
         }
 
         // Only part of a book typed ("ju"): Enter opens the first book that
@@ -4546,7 +4571,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             var book = BibleBooksAvailable.FirstOrDefault(b => BibleBookCatalog.StartsWith(b, query));
             if (book is not null)
                 BibleQuery = book.Name + " ";
-            return;
+            return false;
         }
 
         // The box can still hold a reference while the grid shows a song the
@@ -4561,7 +4586,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         if (PreviewSlideIndex >= 0)
         {
             GoLiveSlide(PreviewSlideIndex);
-            return;
+            return true;
         }
 
         // Going live consumed the preview, so a second Enter lands here.
@@ -4574,12 +4599,15 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             if (index >= 0)
             {
                 GoLiveSlide(index);
-                return;
+                return true;
             }
         }
 
-        if (Slides.FirstOrDefault(s => s.JumpTarget is null) is { } first)
-            GoLiveSlide(first.Index);
+        if (Slides.FirstOrDefault(s => s.JumpTarget is null) is not { } first)
+            return false;
+
+        GoLiveSlide(first.Index);
+        return true;
     }
 
     // ── Resaltado en vivo ────────────────────────────────────────
@@ -4869,7 +4897,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         // A media item has no slides of its own: the arrows move between
         // playlist items (the slide grid still shows the previous item), so
         // every press is at the edge.
-        var target = LiveSlideIndex < 0 && direction > 0 ? 0 : LiveSlideIndex + direction;
+        // With nothing live it starts from the verse marked in the search (or
+        // the first real slide), never from a chapter-jump card.
+        var target = SlideStep.Target(LiveSlideIndex, PreviewSlideIndex, direction,
+            Slides.Select(s => s.JumpTarget is not null).ToList());
         var atEdge = CurrentPlaylistItemIsMedia
             || target < 0 || target >= Slides.Count || LeavesPassage(direction);
 

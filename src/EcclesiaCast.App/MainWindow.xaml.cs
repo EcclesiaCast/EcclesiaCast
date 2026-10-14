@@ -1015,6 +1015,13 @@ public partial class MainWindow : Window
             BibleQueryBox.CaretIndex = BibleQueryBox.Text.Length;
     }
 
+    /// <summary>A click puts the caret somewhere: the arrows are for the text again.</summary>
+    private void BibleQueryBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (DataContext is MainViewModel vm)
+            vm.ArrowsDriveSlidesFromSearch = false;
+    }
+
     // ── La cajita del ➕ Playlist de la Biblia ───────────────────
 
     /// <summary>The box opens ready to type: the proposal is selected, so typing replaces it.</summary>
@@ -1279,12 +1286,17 @@ public partial class MainWindow : Window
         if (e.Handled || (e.Key != Key.Left && e.Key != Key.Right))
             return;
 
-        // Leave the arrows alone while the operator is typing — in a box, or in
-        // the web page, whose arrows scroll it and move its cursor.
-        if (e.OriginalSource is TextBox || WebHasKeyboard)
+        if (DataContext is not MainViewModel vm)
             return;
 
-        if (DataContext is not MainViewModel vm)
+        // Leave the arrows alone while the operator is typing — in a box, or in
+        // the web page, whose arrows scroll it and move its cursor. The one
+        // exception is the Bible search box right after Enter projected a
+        // verse: there the arrows go on to the next verse until a key is typed.
+        var searchDrivesSlides = ReferenceEquals(e.OriginalSource, BibleQueryBox)
+            && vm.ArrowsDriveSlidesFromSearch
+            && Keyboard.Modifiers == ModifierKeys.None;
+        if ((e.OriginalSource is TextBox && !searchDrivesSlides) || WebHasKeyboard)
             return;
 
         // IsRepeat tells a held key from a new press: the view model stops the

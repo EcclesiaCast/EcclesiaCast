@@ -156,6 +156,20 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
       6. Si decís que no al permiso de administrador de Windows, el aviso
          tiene que quedarse abierto diciendo que no se instaló nada.
 
+- [ ] **La flecha después de buscar un versículo (Biblia).** No se pudo probar
+      con el programa abierto:
+      1. En la caja de la Biblia escribí «juan 3 16» y Enter: se proyecta el
+         16. Sin tocar nada más, apretá **→**: tiene que proyectar el 17 (y
+         **←** el 15), con el cursor todavía en la caja.
+      2. Apenas escribas una letra, o hagas clic en la caja, las flechas
+         vuelven a mover el cursor del texto.
+      3. Escribí «juan 3 16» **sin** Enter, sacá el foco de la caja (clic en
+         un lado vacío) y apretá **→**: proyecta el 16 (antes saltaba al
+         capítulo anterior). **←** proyecta el 15.
+      4. Con nada en vivo ni marcado (abriendo un capítulo desde la grilla de
+         capítulos), **→** proyecta el primer versículo, no el capítulo
+         anterior.
+
 ## 2. Para la v1.0.0
 
 - [ ] **Usar la beta.7 en la reunión del domingo** y anotar lo que falle o no
