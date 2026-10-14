@@ -133,6 +133,10 @@ public partial class VlcVideoSurface : UserControl
         if (media.Id == _currentId)
         {
             _framing = media;
+
+            // The mute just applied above must be the one a change of sound
+            // device looks at, or lifting the mute never reopens the sound.
+            _playing = media;
             ApplyStretch();
             return;
         }
