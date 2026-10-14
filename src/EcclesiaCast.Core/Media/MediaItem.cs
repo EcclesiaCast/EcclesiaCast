@@ -160,6 +160,16 @@ public sealed class MediaItem
     /// </summary>
     public int? FillMediaId { get; set; }
 
+    /// <summary>
+    /// <see cref="FillMediaId"/> of «the same picture, blurred»: the bars are
+    /// painted with a soft, enlarged copy of the image itself, so it looks like
+    /// one picture with no border. Only images use it.
+    /// </summary>
+    public const int FillWithSelfId = -1;
+
+    /// <summary>True when the bars are filled with a blurred copy of this very image.</summary>
+    public bool FillsWithSelf => FillMediaId == FillWithSelfId && Type == MediaType.Image;
+
     // ── Recorte y color ──────────────────────────────────────────
 
     /// <summary>

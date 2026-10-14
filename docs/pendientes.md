@@ -13,421 +13,54 @@ Hay cuatro tipos de cosas, cada una en su sección:
 
 ## 1. Para probar (lo prueba Alexis)
 
-La beta.7 se probó entera el 8/10/2026 y quedó **dada por buena**: se usa el
-domingo 11/10 en la reunión. Lo que sigue se programó después y no se pudo
-abrir desde acá (la PC estaba en uso); se probó con compilación, pruebas y
-dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
+Todo lo anterior se probó el 14/10/2026 con la beta.10 y quedó dado por bueno
+(salvo lo que se anotó como falla). Lo que sigue se programó después y no se
+abrió desde acá: sólo hay compilación y pruebas.
 
-- [ ] **Tamaño de las tarjetas (diapositivas y medios).** Probalo con el
-      programa abierto: 1) el deslizador 🔍 al pie de la grilla de
-      diapositivas agranda o achica las tarjetas, y el texto se achica para
-      entrar; 2) el deslizador 🔍 debajo de las pestañas de medios hace lo
-      mismo con las miniaturas, y los nombres se leen; 3) Ctrl + rueda del
-      mouse sobre la grilla o sobre la barra de medios cambia el tamaño de a
-      un paso; sin Ctrl la rueda sigue bajando la lista; 4) cerrá y abrí el
-      programa: queda el tamaño que dejaste; 5) con una página web abierta en
-      el cuadro central, la página tapa la grilla y el deslizador de
-      diapositivas, y vuelven a verse al cerrarla.
-- [ ] **Diseño de aprendizaje o avanzado (Ver).** Probalo con el programa
-      abierto: 1) en Ver, «Diseño de aprendizaje» está tildado y Black, Clear,
-      Logo, Sin fondo, Apagar salida y Proyectar muestran su tecla al costado;
-      los textos de ayuda de Aviso al pie, Resaltar, Spotify y Notas están a
-      la vista. 2) Elegí «Diseño avanzado»: las teclas y esos textos se ocultan
-      de una vez, sin reiniciar, y los botones no cambian de lugar. 3) Las
-      teclas F1 a F4 y Esc siguen funcionando en los dos diseños. 4) Cerrá y
-      abrí el programa: queda el diseño que elegiste. 5) «Volver al diseño
-      original» vuelve al de aprendizaje.
-- [ ] **Biblias en el instalador (Tramo G).** Hace falta instalar de verdad (en
-      una PC de prueba o una máquina virtual, no sobre la tuya):
-      1. En el instalador aparece la página **Biblias** con cuatro tipos
-         (estándar, todas, ninguna, elegir una por una). Con «estándar» sólo
-         queda tildada la Reina-Valera 1909.
-      2. Al abrir el programa por primera vez, abajo dice qué Biblias se
-         instalaron, y están en la lista de versiones de la pestaña Biblia
-         (proyectá Juan 3:16 con cada una).
-      3. Borrá una versión, cerrá y abrí el programa: **no** tiene que volver.
-      4. Reinstalá o actualizá (también en silencio, como hace la
-         actualización automática): no tiene que duplicar ninguna ni traer de
-         vuelta la que borraste. Ojo: quien actualiza desde una beta anterior
-         recibe la RV1909 una vez, porque nunca eligió nada.
-- [ ] **Paquetes de Biblias (Tramo G, parte 2).**
-      1. **Archivo → Exportar paquete de Biblias…**: aparece la lista con las
-         versiones instaladas y el aviso amarillo. Marcá dos y guardá. También
-         está en el clic derecho sobre una versión.
-      2. En otra carpeta de datos (o borrando una versión antes), **Archivo →
-         Importar paquete de Biblias…**: la que ya está sale destildada y con
-         «ya está en la biblioteca»; las otras se importan y abajo lo dice.
-      3. En el instalador, la página **Paquete de Biblias propio** (después de
-         la de Biblias): elegí el archivo; al abrir el programa por primera
-         vez tiene que aparecer la ventana de importar, y **no** de nuevo al
-         abrirlo otra vez. Probá también escribir a mano un archivo que no
-         existe: el instalador tiene que avisar y no seguir.
-      4. Instalación en silencio con `/PAQUETE="C:\ruta\Biblias.ecbiblias"`.
-
-- [ ] **Zoom y corrimiento sobre la imagen entera («Rellenar»).** Es lo más
-      importante de esta tanda. Poné una **página vertical** (la tapa de un
-      manual) en «Rellenar» y abrí Propiedades:
-      1. Sin tocar nada, tiene que verse **centrada**: se ve el medio de la
-         página, no la parte de arriba como antes (las imágenes anchas
-         recortan igual a los dos costados). Las imágenes 16:9, «Ajustar» y
-         «Estirar» se ven igual que antes. Si alguna imagen ya tenía un
-         corrimiento puesto, puede que haya que acomodarla de nuevo.
-      2. **Alejá el zoom** (ruedita sobre el cuadro, o el número): se tiene que
-         ver **más de la página**, achicándose, con el color de relleno donde no
-         llega. Antes se achicaba el recorte con negro alrededor.
-      3. **Corré hacia arriba y hacia abajo** (arrastrando, o «Correr» ↕ con
-         un número negativo o positivo): tiene que llegar hasta **el final**
-         y hasta **el principio de la página**. «Correr» ahora admite hasta
-         ±1000 %.
-      4. Acercá el zoom (por ejemplo 200 %) y corré: se mueve sobre la página
-         entera. El zoom gira alrededor del centro de la pantalla.
-      5. Proyectala de verdad (clic en la tarjeta) y mirá que la pantalla, el
-         LIVE y el PREVIEW se vean igual que el cuadro de Propiedades. Probá con
-         un **video** en «Rellenar» con zoom y corrimiento (no se pudo probar
-         con la app abierta: el video sólo se verificó leyendo el código), con
-         **desenfoque**, y con «Tamaño fijo en pantalla» (el cuadro queda
-         quieto y la imagen se mueve y se agranda detrás).
-- [ ] **Lo que queda afuera, en Propiedades.** El cuadro de arriba a la derecha
-      muestra la imagen entera con lo de afuera **oscurecido** y la pantalla
-      marcada con un **rectángulo blanco**. Arrastrar y la ruedita tienen que
-      seguir andando (la imagen se mueve lo mismo que el mouse). Mirá que la
-      ventana siga entrando en la pantalla de la notebook: ahora es unos 15
-      píxeles más alta. Las tarjetas de la barra de medios no muestran lo de
-      afuera, sólo lo que sale en pantalla.
-- [ ] **Miniaturas con su forma.** Al abrir el programa por primera vez con esta
-      versión, las miniaturas de imágenes y de páginas se rehacen solas, en
-      segundo plano (puede verse un instante de cambio). Una página vertical
-      tiene que verse en su tarjeta como en la pantalla. Las de video no
-      cambian. Las miniaturas que ya existían ya eran de la forma de la imagen
-      (se comprobó mirando la carpeta, sin tocarla); el cambio las deja de un
-      tamaño parejo y sin depender de Windows.
-- [ ] **Miniatura fiel en Propiedades.** Clic derecho sobre un medio →
-      Propiedades. Arriba a la derecha hay un cuadro 16:9. Cambiá zoom,
-      «Correr», escala, tamaño fijo, color de relleno, brillo, tinte y
-      desenfoque: el cuadro tiene que cambiar al instante (sin guardar).
-      **Arrastrá** sobre el cuadro: la imagen se corre y los números de
-      «Correr» se mueven. **Ruedita** sobre el cuadro: cambia el «Zoom» de a 5.
-      Probalo con una imagen, con un video y con uno de YouTube. Mirá que la
-      ventana entre entera en la pantalla de la notebook.
-- [ ] **Tarjetas con el encuadre.** Después de guardar, la tarjeta de la barra
-      de medios muestra el encuadre (por ejemplo una página de PDF con
-      «Ajustar», con sus barras negras; una imagen con zoom, acercada).
-      Abrí una pestaña con muchos medios y fijate que no tarde más que antes.
-- [ ] **Selección múltiple.** Ctrl+clic suma o saca; Mayús+clic elige el
-      tramo; Ctrl+A elige todos los de la pestaña; arrastrar un rectángulo en
-      el espacio vacío elige los que toca (con Ctrl suma a los ya elegidos);
-      clic en un espacio vacío limpia; Esc limpia cuando hay varios. Los
-      elegidos se ven con borde y fondo azul. Con varios elegidos: Supr (o
-      clic derecho → Quitar de la biblioteca) pregunta **una sola vez** y dice
-      cuántos; arrastrar uno a otra pestaña mueve todos; arrastrarlos a la
-      playlist los agrega todos, en orden; clic derecho → «Mover a la
-      pestaña…» muestra la lista. Un clic común sigue proyectando. Mirá que el
-      Esc siga apagando la pantalla después de proyectar un medio con un clic.
-- [ ] **Páginas de PDF nítidas.** Importá un PDF o una presentación de
-      PowerPoint (las páginas nuevas se dibujan al doble, 4K), ponele zoom
-      160 % en Propiedades y compará con el navegador: no tiene que
-      pixelarse. Una imagen común sin zoom tiene que proyectarse igual que
-      siempre, sin demora nueva.
-- [ ] **Volver a importar en alta calidad.** Clic derecho sobre una página de
-      un documento **ya importado antes** → «Volver a importar en alta
-      calidad…»: pide elegir el PDF o la presentación original y dibuja de
-      nuevo todas las páginas de ese documento. En un documento importado con
-      esta versión no pide nada. Si hay una página en pantalla, tiene que
-      cambiar sola a la versión nítida.
-
-- [ ] **Proyectar una página web** (pedido de Alexis, 8/10/2026). Claude lo
-      probó con la app abierta el 8/10 a la noche, sin mouse ni teclado (los
-      botones por automatización): la página en el monitor grande, el en vivo
-      (A+ se ve al instante), la foto que queda quieta, el panel cerrado en
-      vivo, otro fondo que lo apaga, «Guardar en medios» con una foto, y la app
-      minimizada un minuto sin que la pantalla se apague. Ahí apareció un
-      error que quedó arreglado: con otra ventana encima, la página se ponía
-      **negra** en la pantalla. Quedan para vos el mouse, el teclado y el
-      puntero.
-      1. «🌐 Web» → escribí `google.com` y buscá algo. Probá escribir en el
-         buscador de la página: las flechas, la barra espaciadora y Esc **no**
-         tienen que mover las diapositivas ni apagar la pantalla. F1 (negro)
-         sí tiene que andar aunque estés escribiendo en la página.
-         Mirá que el **mouse** apunte bien (clics, ruedita, seleccionar texto)
-         aunque el panel sea más chico que 1920×1080: la página se achica con
-         un Viewbox.
-      2. «📷 Proyectar foto»: la pantalla muestra esa foto, entera y tapando la
-         letra. Seguí navegando: la pantalla no cambia hasta la próxima foto.
-      3. «🔴 En vivo»: la pantalla sigue lo que hacés (desplazarte, un video de
-         la página) y muestra el puntero (probá con la casilla destildada).
-         Volvé a las diapositivas con «✕ Cerrar»: tiene que seguir en vivo.
-         Proyectá otro fondo, o una diapositiva: el en vivo se apaga y el
-         botón se despinta. Probá F1, F2, F3 con una página en vivo. Abrí
-         otro programa a pantalla completa encima de EcclesiaCast: la página
-         tiene que seguir viéndose en la pantalla grande.
-         Con el modo de PC de bajo rendimiento, LIVE y PREVIEW muestran una
-         foto que se renueva cada 2 segundos.
-      4. A− / A+ agrandan la letra de la página en la pantalla.
-      5. «Guardar en medios» → aparece una tarjeta 🌐; un clic la abre; agregala
-         a la playlist: al elegirla se abre el panel y el doble clic la pone en
-         vivo. Con una foto tomada, «Guardar en medios» la guarda como imagen.
-         Clic derecho en la tarjeta 🌐: sólo cambiar nombre, mover de pestaña,
-         playlist y quitar.
-      6. Probalo con **Canva** o **Google Slides** con la sesión iniciada, y con
-         un video de la página en vivo (los videos con protección, como
-         Netflix o Spotify, se ven negros: ya se sabe).
-      7. Cuántos cuadros por segundo da en la PC de la iglesia con el proyector
-         real (en la notebook de prueba dio 55 a 58 con una animación a 60).
-
-- [ ] **Actualizaciones automáticas** (se programaron sin abrir el programa:
-      sólo hay pruebas y dibujos). Hace falta que esté publicada en GitHub una
-      versión **mayor** que la instalada, con su instalador (la 1.0.0-beta.6 y
-      la beta.7 todavía no están: por ahora lo último publicado es la beta.5).
-      Con la beta.7 instalada:
-      1. Abrí el programa: a los pocos segundos (15) aparece el aviso con lo
-         que trae la versión nueva, en castellano. Si hoy ya buscó, no busca
-         de nuevo: usá Ayuda → «Buscar actualizaciones…».
-      2. «Más tarde» → cierra el aviso y queda el botón **⬆ Versión nueva** en
-         la fila del menú; no vuelve a avisar hasta mañana. «Saltar esta
-         versión» → el botón desaparece y no avisa más por esa.
-      3. Con la salida prendida, no aparece ninguna ventana: aparece «⬆ Versión
-         nueva» arriba a la derecha, y tocándolo se abre el aviso.
-      4. «Actualizar ahora» → baja con la barra de avance (probá «Cancelar»),
-         se cierra, Windows pide permiso, el instalador actualiza y el
-         programa se vuelve a abrir solo. Las canciones y todo lo demás siguen
-         ahí, y hay una copia en `%APPDATA%\EcclesiaCast\respaldos`
-         (`antes-de-<versión>.db`). Con la salida prendida, antes pregunta
-         «Se va a cerrar la proyección para actualizar. ¿Seguimos?».
-         Mirá sobre todo que **el programa se reabra solo** y que lo haga
-         **sin permisos de administrador** (no pudo probarse).
-      5. Ayuda → «Buscar actualizaciones…» sin nada nuevo dice «Tenés la
-         última versión». Sin internet: «No se pudo buscar: revisá la
-         conexión a internet». Destildá «Buscar actualizaciones al abrir» y
-         reabrí: no busca.
-      6. Si decís que no al permiso de administrador de Windows, el aviso
-         tiene que quedarse abierto diciendo que no se instaló nada.
-
-- [ ] **La flecha después de buscar un versículo (Biblia).** No se pudo probar
-      con el programa abierto:
-      1. En la caja de la Biblia escribí «juan 3 16» y Enter: se proyecta el
-         16. Sin tocar nada más, apretá **→**: tiene que proyectar el 17 (y
-         **←** el 15), con el cursor todavía en la caja.
-      2. Apenas escribas una letra, o hagas clic en la caja, las flechas
-         vuelven a mover el cursor del texto.
-      3. Escribí «juan 3 16» **sin** Enter, sacá el foco de la caja (clic en
-         un lado vacío) y apretá **→**: proyecta el 16 (antes saltaba al
-         capítulo anterior). **←** proyecta el 15.
-      4. Con nada en vivo ni marcado (abriendo un capítulo desde la grilla de
-         capítulos), **→** proyecta el primer versículo, no el capítulo
-         anterior.
-
-- [ ] **Historial de versículos buscados (🕘).** No se pudo probar con el
-      programa abierto (sólo se dibujó la lista a imagen):
-      1. Proyectá con Enter «juan 3 16», «sal 23 1» y «1 co 13 4-7»: el botón
-         **🕘** a la derecha de la caja tiene que mostrarlos, el último arriba,
-         cada uno con la versión («Juan 3:16 · NTV»). Repetir uno lo sube al
-         primer lugar sin duplicarlo.
-      2. Avanzar con las flechas o hacer clic en una tarjeta **no** agrega
-         nada. Proyectar un resultado de «?palabra» (doble clic) sí.
-      3. Un clic en una entrada carga el capítulo y marca el versículo (la
-         lista queda abierta); doble clic o Enter (con la entrada elegida)
-         lo proyecta y cierra la lista. Esc la cierra. Tiene que poder cerrarse
-         tocando de nuevo el botón 🕘.
-      4. Con la caja vacía, la flecha ↓ abre la lista con la primera entrada
-         elegida; con texto en la caja, ↓ no hace nada raro.
-      5. Cambiá de versión (o sumá una segunda con Ctrl+clic) y elegí una
-         entrada guardada con otra versión: tiene que volver a esa versión.
-      6. Cerrá y abrí el programa: el historial sigue. «Borrar historial» lo
-         vacía y avisa en la barra de estado.
-
-- [ ] **Mini reproductor en Música** (14/10/2026; sólo compilación, no se vio
-      con Spotify). Con Spotify sonando, en la pestaña Música: 1) se ven la
-      carátula, el título y el artista, y la barra avanza cada segundo; 2) el
-      ícono cambia entre ⏸ y ▶ al pausar desde Spotify o desde el botón; 3)
-      anterior, pausa y siguiente andan; 4) al cambiar de canción desde
-      Spotify se actualiza sola; 5) con Spotify cerrado dice «No hay nada
+- [ ] **Mini reproductor en Música.** Con Spotify sonando, en la pestaña Música:
+      1) se ven la carátula, el título y el artista, y la barra avanza cada
+      segundo; 2) el ícono cambia entre ⏸ y ▶ al pausar desde Spotify o desde
+      el botón; 3) anterior, pausa y siguiente andan; 4) al cambiar de canción
+      desde Spotify se actualiza sola; 5) con Spotify cerrado dice «No hay nada
       sonando» y los botones siguen mandando la tecla multimedia; 6) probalo
       también con un video de YouTube en el navegador; 7) el volumen de abajo
       sigue andando. La barra no se puede arrastrar y no hay fila de
       reproducción (Windows no la da).
 - [ ] **Mismo título, distinto artista.** Guardá «Hay Libertad» con artista IBI
-      y otra con artista Christina Aguilera: quedan las dos, sin pregunta (probá
-      escribiéndola, importando un archivo y desde la búsqueda en internet). Si
-      repetís la misma con el mismo artista, o sin artista, tiene que
-      preguntar y nombrar al artista. En la lista se ve el artista debajo del
-      título.
-
-Tramo B del plan del 13/10 (medios y diseñador; sólo compilación, pruebas y
-dibujos a imagen):
-
-- [ ] **Usar como logo.** Clic derecho en una imagen y en un video de la barra
-      de medios → «Usar como logo». Tiene que aparecer en Logo (la lista del
-      botón) con el nombre del archivo, y **F3** lo muestra. En un video, mirá
-      que el logo tenga su cuadro de muestra en el administrador de logos. Una
-      segunda vez con el mismo archivo no lo repite. No aparece en las páginas
-      de un PDF ni en un YouTube. Si borrás el medio de la barra, el logo
-      sigue andando.
-- [ ] **Silenciar una pestaña.** Poné un video con sonido en una pestaña,
-      proyectalo y, con clic derecho en la pestaña, «🔇 Silenciar la pestaña»:
-      el sonido tiene que cortarse en el momento y el video **no** debe
-      reiniciarse. Al abrir el menú otra vez dice «🔊 Quitar el silencio» y el
-      sonido vuelve. Lo mismo con un video de YouTube sin descargar (no se pudo
-      probar el `mute()` del reproductor). La pestaña muestra el 🔇 mientras
-      está silenciada, y también se tilda en «Configurar…». Cambiá el nombre de
-      la pestaña y cerrá y abrí el programa: sigue silenciada.
-- [ ] **Varios cuadros en el diseñador.** En una canción abrí el diseñador y
-      agregá tres cuadros con «➕ Cuadro de texto»: cada uno tiene que caer en
-      un lugar distinto. Los que no están elegidos se ven con contorno punteado
-      y nombre. Hacé clic sobre uno y después sobre otro (probá también
-      **mientras escribís** en uno con doble clic: el clic afuera tiene que
-      cerrar la edición y elegir el otro). **Tab** y **Shift+Tab** recorren los
-      cuadros con el cuadro elegido enfocado. «▲ Traer adelante» / «▼ Enviar
-      atrás» tienen que cambiar cuál tapa a cuál cuando se pisan. Escribí una
-      tipografía en el cuadro sin apretar Enter y cambiá de cuadro con la lista:
-      se tiene que conservar en el primero. Guardá, volvé a entrar y mirá que
-      todos se puedan editar.
-- [ ] **La letra no pisa los cuadros extra.** Poné en una canción de letra
-      larga un cuadro a lo ancho abajo (por ejemplo una traducción o una
-      referencia de 1500 px de ancho): al proyectarla, la letra tiene que
-      terminar arriba del cuadro y achicarse si hace falta, en la pantalla, el
-      LIVE y el PREVIEW. Un cuadro chico en una esquina no tiene que cambiar
-      nada. Mirá un par de canciones que ya tengan cuadros extra por si alguna
-      cambió de tamaño de letra.
-- [ ] **Tramo A (salida)** — programado sin abrir el programa:
-      1. **YouTube y el logo.** Poné un YouTube sin descargar y apretá F3: se
-         tiene que ver el logo (no el video) y el sonido tiene que callarse.
-         F3 de nuevo: el video vuelve y sigue donde estaba. Lo mismo con F1
-         (negro). Mirá que la barra de reproducción siga mandando al YouTube.
-      2. **Cambiar de medio sin negro.** Con la salida prendida probá: imagen
-         → imagen (fundido sin oscurecerse), video → imagen, imagen → video,
-         video → video y video → «Sin fondo» (F4). No tiene que haber ningún
-         parpadeo negro. Con **bajo rendimiento** el cambio es directo, pero
-         tampoco tiene que haber negro entre medio. Probalo también con un
-         video pesado (copia liviana) y mirá que el sonido y el video sigan
-         bien después de muchos cambios seguidos (el programa no debe
-         cerrarse). Hacia YouTube sigue habiendo un instante negro: es lo
-         esperado.
-      3. **Sonido al cambiar la salida de Windows** (no se pudo probar nada
-         de esto, hace falta el programa abierto y dos salidas de audio).
-         Con la **música** sonando, cambiá la salida en la barra de Windows
-         (parlantes → auriculares): después de un instante tiene que seguir
-         sonando por la salida nueva, más o menos en el mismo lugar. Volvé a
-         la anterior: lo mismo. Repetilo con un **video con sonido** (no
-         silenciado, sin repetir) y con **YouTube**. Después cambiá la salida
-         con la música **en pausa** y dale play: tiene que sonar. Si alguna
-         vez queda muda, probá **Ver → Reiniciar el sonido**. Si ni eso la
-         arregla, avisá: queda mirar el registro (`logs`), donde cada
-         cambio de salida deja una línea.
-      4. **Transiciones en segundos.** Abrí **Proyección → Transiciones…**:
-         poné el logo en 2 s y apretá F3 / F3 (tiene que subir y bajar
-         despacio, también con un logo de video); el negro (F1) en 1 s;
-         «Apagar la salida» en 2 s y apretá Esc (la pantalla se va a negro y
-         recién después se cierra; si apretás algo para proyectar en el
-         medio, vuelve). Con un YouTube en pantalla, F3 y Esc lo esconden de
-         golpe: es lo esperado. «Valores de fábrica» vuelve a 0,5 / 0,4 /
-         0,25 / 0. En **Temas** mirá que la duración de la transición ahora
-         esté en segundos y que un tema viejo (280 ms) diga 0,28. Con el
-         modo de bajo rendimiento todo tiene que cortar de golpe.
-      5. **Aviso al pie.** En la pestaña «Aviso al pie» elegí otra
-         tipografía (Georgia, por ejemplo) y otro tamaño, y mostralo: el LIVE
-         y la pantalla tienen que cambiar al instante, también si el aviso ya
-         está puesto. Cerrá y abrí el programa: se tiene que acordar. Vacía la
-         tipografía: vuelve a Segoe UI.
-- [ ] **Una pestaña de medios como presentación** (tramo D1; sólo hay pruebas
-      y dibujos de las tarjetas). Nada de esto se abrió con el programa.
-      1. Agregá un PDF o una presentación (📥 o arrastrándola): pregunta
-         «📑 Pestaña nueva «archivo», como presentación (recomendado)» o
-         «Agregar las páginas a «…»». Con la primera se crea la pestaña, y las
-         páginas aparecen en el cuadro central como tarjetas con la miniatura.
-      2. Clic en una página: va a la pantalla sola, sin letra. F2 no tiene que
-         traer la letra de antes. Las flechas ←→ pasan de página. En el
-         PREVIEW se ve la página que sigue.
-      3. Con una canción en pantalla, pasá a una página y volvé a proyectar una
-         estrofa: el fondo que había antes de la presentación tiene que volver.
-         Lo mismo con un texto rápido.
-      4. «Configurar…» de cualquier pestaña tiene la casilla «📑 Usar como
-         presentación»; el clic derecho de la pestaña tiene «Abrir como
-         presentación». Un clic en una tarjeta de una pestaña marcada abre la
-         presentación y proyecta esa página.
-      5. «➕ Playlist» junto al título de la grilla (o clic derecho en la
-         pestaña → «Agregar a la playlist como presentación»): en la playlist
-         sale con 📑. Un clic la abre sin proyectar, el doble clic proyecta la
-         primera página; las flechas pasan por las páginas y, al final, siguen
-         con el elemento que viene.
-      6. Clic derecho en una página del cuadro central: sólo «Propiedades…».
-         No se puede arrastrar. Renombrar o eliminar la pestaña con la
-         presentación abierta no tiene que dejar nada raro en la grilla.
-      7. Probá una pestaña con videos locales: entran como páginas.
-
-- [ ] **«En vivo» por sección** (tramo D2; sólo pruebas y dibujos). Proyectá un
-      versículo: la grilla tiene borde rojo y «EN VIVO», y la pestaña **Biblia**
-      un punto rojo. Pasá a una página de una presentación: la grilla de
-      versículos ya no está en rojo, lo está la de la presentación. Un medio de
-      la barra (de una pestaña común): la barra de medios y su tarjeta quedan
-      con borde rojo. Black, logo, F2 con letra o apagar la salida: nada en
-      rojo. La tarjeta proyectada que ya no está en el aire queda con un borde
-      apagado. Con una estrofa en pantalla, poné un anuncio a pantalla completa
-      y sacalo con F4: «En vivo» vuelve a nombrar la canción. Mirá que el
-      punto de las pestañas no cambie el tamaño ni el color del texto de la
-      pestaña.
-
-- [ ] **Presentaciones en el celular** (tramo D3; el servidor y la página se
-      probaron con un programa de consola y node, sin celular real). Con el
-      control desde el celular prendido y una presentación abierta en la
-      grilla: en el celular las páginas salen como miniaturas y no parpadean
-      cada medio segundo; un toque proyecta la página y la marca roja la
-      sigue. Con una página en pantalla, «En vivo» del celular muestra su
-      miniatura y «Sigue» la próxima. La sección **Presentaciones** abre la
-      pestaña en la computadora. Una página sin miniatura (un video sin
-      póster) queda en blanco en el celular: avisar si molesta.
-
-- [ ] **GIF animados** (tramo D4; la conversión se probó con un GIF armado a
-      mano y ffmpeg, sin abrir el programa). Agregá un GIF animado de verdad
-      (uno de internet): tiene que aparecer en la pestaña, después de unos
-      segundos, como un video con su miniatura; proyectado, se mueve en bucle y
-      sin sonido. Un GIF común (una sola imagen) sigue entrando como imagen.
-      Arrastrar varios GIF juntos los convierte de a uno. Clic derecho →
-      «Quitar de la biblioteca» no tiene que dejar archivos en
-      `%APPDATA%\EcclesiaCast\gifs`. Los GIF con transparencia quedan sobre
-      fondo negro (el video no tiene transparencia): mirá si molesta.
-- [ ] **Secciones que se achican a íconos.** Se probó dibujando la ventana a
-      imágenes (sin abrirla); falta verla de verdad:
-      1. Clic en el título **▾ MEDIOS**: queda sólo la cabecera con los
-         botones y las diapositivas ocupan el lugar. Otro clic la devuelve
-         **con el alto que tenía**. Probalo con «Medios arriba de las
-         diapositivas» y con una pestaña con muchos medios.
-      2. En el panel de canciones, botón **⇤**: queda una columna de íconos
-         🎵 📖 📋. Cada ícono abre lo suyo y saca el panel del riel; **⇥** lo
-         devuelve. Probalo con «Canciones y playlist a la derecha». Cerrá y
-         abrí el programa: tiene que volver como lo dejaste, y al agrandar,
-         con el ancho de antes.
-      3. **▾** de las herramientas de texto (abajo a la derecha): queda una
-         tira de seis íconos; un clic en uno abre esa pestaña. Si estás
-         escribiendo un texto rápido, no se pierde lo escrito.
-      4. Menú **Ver**: las tres entradas nuevas se tildan solas y «Volver al
-         diseño original» las apaga. Con el riel prendido no se puede arrastrar
-         el borde de la columna (es a propósito).
-
-- [ ] **Proyectar otra ventana (🖥 Ventana).** Se probó con un programa de
-      consola que capturó una ventana ajena 5 s (22 cuadros por segundo, en
-      12 con bajo rendimiento) y dibujando la vista a imagen; falta usarlo
-      con la salida prendida:
-      1. Abrí un PowerPoint (o un video en un reproductor), tocá **🖥 Ventana**,
-         elegí la ventana y **Proyectar ▶**. La pantalla tiene que mostrarla
-         entera, en movimiento, y el LIVE también. Moví la ventana, cambiale el
-         tamaño: la imagen se acomoda sin parpadear.
-      2. Probá con una **presentación a pantalla completa** y con una ventana
-         de un **video con sonido** (el sonido sale de la PC, no de la
-         captura). Mirá si se nota que la computadora trabaja de más; si anda
-         lento, probá el modo de bajo rendimiento.
-      3. **Minimizá** la ventana: queda el último cuadro y el aviso de abajo lo
-         dice. Restauralá: sigue. **Cerrala**: se deja de proyectar sola.
-      4. F4, o proyectar un medio o una diapositiva: la captura se apaga (el
-         borde amarillo de la ventana desaparece).
-      5. **Elegir con la ventana de Windows…** y probar con una pantalla
-         entera. Con **Mostrar el puntero** tildado, la flecha se ve en la
-         pantalla.
-      6. **💾 Guardar en medios** (en la misma lista): aparece una tarjeta
-         🖥 en la pestaña. Con el programa abierto, un clic la proyecta; cerrá
-         el programa y probá de nuevo: tiene que decir que no la encuentra.
-         Agregala a la playlist y probá el doble clic y las flechas.
-      7. Una ventana de un programa abierto «como administrador»: tiene que
-         avisar que Windows no la deja capturar (no pudo probarse).
+      y otra con artista Christina Aguilera: quedan las dos, sin pregunta
+      (probá escribiéndola, importando un archivo y desde la búsqueda en
+      internet). Si repetís la misma con el mismo artista, o sin artista,
+      tiene que preguntar y nombrar al artista. En la lista se ve el artista
+      debajo del título.
+- [ ] **Achicar la lista de audios.** En la pestaña Música, un clic en el título
+      **▾ AUDIOS** esconde la lista y sus botones (queda el reproductor); otro
+      clic la devuelve. También está en Ver → «Achicar la lista de audios»
+      (se tilda sola). Cerrá y abrí el programa: queda como lo dejaste, y
+      «Volver al diseño original» la despliega.
+- [ ] **Flechas del teclado en Propiedades.** Clic derecho en una imagen →
+      Propiedades: el cuadro de vista previa arranca elegido. Las flechas
+      corren la imagen de a 0,1 % (con Mayús, de a 1 %) y los números de
+      «Correr» se mueven. Si hacés clic en un campo de texto o en una lista,
+      las flechas vuelven a hacer lo de siempre ahí; un clic o un arrastre
+      sobre el cuadro las devuelve a la imagen.
+- [ ] **Relleno con la misma imagen desenfocada.** En Propiedades de una
+      **imagen**, «Los bordes se rellenan con»: la lista tiene **(la misma
+      imagen, desenfocada)** (en videos y YouTube no aparece). Elegila con una
+      imagen en «Ajustar» (o con un tamaño fijo, o con zoom menor a 100 %): en
+      vez de barras negras, los costados se ven con la misma imagen agrandada y
+      borrosa, como una sola imagen. Mirá la vista previa, la tarjeta de la
+      barra de medios, el LIVE y la pantalla; con un color sólido (la opción de
+      antes) todo sigue igual. Fijate que no quede un borde oscuro en las
+      orillas de la pantalla y que no pese en la PC de la iglesia (en el modo de
+      bajo rendimiento también se ve).
+- [ ] **Buscar desde el celular.** Con el control desde el celular prendido,
+      arriba de todo hay una caja «Buscar canción o versículo…». Escribí dos
+      letras o más (por ejemplo «gracia» o «juan 3 16»): salen canciones (♪) y
+      versículos (†) de todas las versiones, como en Ctrl+K pero sin medios.
+      Tocar un resultado lo **carga** en la computadora (no lo proyecta) y la
+      página baja a las diapositivas de esa canción o de ese capítulo, para
+      elegir cuál proyectar. Mirá que la búsqueda no trabe la computadora
+      mientras se escribe y que, sin resultados, diga «No encontré nada».
 
 ## 2. Para la v1.0.0
 
@@ -484,6 +117,11 @@ dibujos a imagen):
 - [ ] Actualizar README y CHANGELOG (hoy dicen «Beta») y taguear `v1.0.0`.
 
 ## 3. Para hacer después de la 1.0
+
+- [ ] **Buscador de GIFs e imágenes** (pedido de Alexis, 14/10/2026). Falta
+      decidir de dónde salen (qué servicio, con qué licencia) y si se busca en
+      castellano y el programa lo traduce por dentro, o se busca directo en
+      inglés.
 
 - [ ] **Ejemplo de formato para importar Biblias.** Un archivo de ejemplo en
       JSON y otro en Zefania XML (unos pocos versículos), y en la ventana de

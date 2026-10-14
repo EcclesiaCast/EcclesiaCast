@@ -705,6 +705,7 @@ public partial class ProjectedView : UserControl
             FillImage.Source = LoadBitmap(fillPath);
         }
 
+        MediaFraming.SetFillLook(FillImage, needsFill ? media : null, ActualWidth);
         var showFillImage = needsFill && FillImage.Source is not null;
         FillImage.Visibility = showFillImage ? Visibility.Visible : Visibility.Collapsed;
 

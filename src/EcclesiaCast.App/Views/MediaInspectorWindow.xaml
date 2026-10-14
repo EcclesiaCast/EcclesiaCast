@@ -123,7 +123,7 @@
                                 Padding="10,3" Margin="8,0,0,0" Click="PickFillColor_Click"/>
                         <ComboBox x:Name="FillMediaBox" SelectionChanged="Field_SelectionChanged" Width="180" Margin="8,0,0,0" FontSize="11"
                                   DisplayMemberPath="Name"
-                                  ToolTip="O una imagen o video de la biblioteca detrás: el truco de siempre es una copia desenfocada del mismo video"/>
+                                  ToolTip="O, en lugar del color: la misma imagen desenfocada (así parece una sola imagen, sin bordes), o una imagen o video de la biblioteca detrás"/>
                     </StackPanel>
                 </StackPanel>
             </Border>
@@ -140,15 +140,17 @@
             <controls:AspectFitBox AspectRatio="1.66" MaxBoxHeight="232">
             <Border x:Name="PreviewFrame" CornerRadius="4" Background="#10141E" Cursor="SizeAll"
                     BorderBrush="{StaticResource LineBrush}" BorderThickness="1" ClipToBounds="True"
+                    Focusable="True" FocusVisualStyle="{x:Null}"
+                    PreviewKeyDown="PreviewFrame_PreviewKeyDown"
                     MouseLeftButtonDown="PreviewFrame_MouseLeftButtonDown"
                     MouseMove="PreviewFrame_MouseMove"
                     MouseLeftButtonUp="PreviewFrame_MouseLeftButtonUp"
                     MouseWheel="PreviewFrame_MouseWheel"
-                    ToolTip="El rectángulo con borde blanco es la pantalla; lo oscurecido queda afuera. Arrastrá para correr la imagen; la ruedita hace zoom.">
+                    ToolTip="El rectángulo con borde blanco es la pantalla; lo oscurecido queda afuera. Arrastrá para correr la imagen; la ruedita hace zoom. Con el cuadro elegido, las flechas del teclado la corren de a poquito (con Mayús, más).">
                 <controls:FramedMediaPreview x:Name="Preview" UseOriginal="True" ShowOutside="True" DecodeWidth="960"/>
             </Border>
             </controls:AspectFitBox>
-            <TextBlock Text="Blanco = la pantalla · arrastrá para correr · ruedita = zoom" FontSize="10"
+            <TextBlock Text="Blanco = la pantalla · arrastrá para correr · ruedita = zoom · flechas = ajuste fino (Mayús: más)" FontSize="10"
                        Foreground="{StaticResource FaintBrush}" Margin="0,4,0,0"/>
 
             <!-- ── Color: oscurecer, aclarar, teñir ── -->

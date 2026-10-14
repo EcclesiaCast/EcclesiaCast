@@ -53,6 +53,13 @@ internal static class RemotePage
                      background:#232630;border:1px solid #2a2e3a;border-radius:10px;color:#fff}
           .err{color:#e08a8a;font-size:14px;min-height:1.3em;margin-top:10px}
           .hide{display:none}
+          .search input{width:100%;font:inherit;padding:12px 14px;background:#232630;border:1px solid #2a2e3a;
+                        border-radius:10px;color:#fff}
+          .hits{margin-top:8px;max-height:46vh;overflow-y:auto}
+          .hit{display:block;text-align:left;padding:10px 12px;margin-bottom:6px;width:100%}
+          .hit .h{font-size:14px;font-weight:600}
+          .hit .d{font-size:12px;color:#9aa1b2;margin-top:2px}
+          .none{font-size:13px;color:#5b6070;padding:6px 2px}
         </style>
         </head>
         <body>
@@ -74,6 +81,12 @@ internal static class RemotePage
           </header>
 
           <main>
+            <div class="card search">
+              <input id="q" type="search" placeholder="Buscar canción o versículo…" autocomplete="off"
+                     enterkeyhint="search" oninput="searchSoon()">
+              <div class="hits" id="hits"></div>
+            </div>
+
             <div class="card">
               <div class="label" id="slideLabel">En vivo</div>
               <div class="live" id="live"></div>
@@ -138,7 +151,65 @@ internal static class RemotePage
           document.getElementById('app').className = ok ? '' : 'hide';
         }
 
-        function cmd(action, index) {
+        // ── Buscar una canción o un versículo (como Ctrl+K en la computadora) ──
+        // Se espera un momento después de la última letra, y una respuesta tardía
+        // de una búsqueda vieja no pisa a la más nueva.
+        var searchTimer = null;
+        var searchSeq = 0;
+
+        function searchSoon() {
+          clearTimeout(searchTimer);
+          var text = document.getElementById('q').value.trim();
+          if (text.length < 2) { searchSeq++; showHits([], ''); return; }
+          searchTimer = setTimeout(function () { runSearch(text); }, 350);
+        }
+
+        function runSearch(text) {
+          var mine = ++searchSeq;
+          fetch('/api/search?pin=' + encodeURIComponent(pin) + '&q=' + encodeURIComponent(text))
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (list) { if (list && mine === searchSeq) showHits(list, text); })
+            .catch(function () {});
+        }
+
+        function showHits(list, text) {
+          var box = document.getElementById('hits');
+          box.innerHTML = '';
+          if (!list.length && text) {
+            var none = document.createElement('div');
+            none.className = 'none';
+            none.textContent = 'No encontré nada.';
+            box.appendChild(none);
+            return;
+          }
+          list.forEach(function (hit) {
+            var b = document.createElement('button');
+            b.className = 'hit';
+            var h = document.createElement('div');
+            h.className = 'h';
+            h.textContent = (hit.kind === 'song' ? '♪  ' : '†  ') + hit.title;
+            var d = document.createElement('div');
+            d.className = 'd';
+            d.textContent = hit.detail;
+            b.appendChild(h);
+            b.appendChild(d);
+            b.onclick = function () { openHit(hit.index); };
+            box.appendChild(b);
+          });
+        }
+
+        // Carga la canción o el capítulo en la computadora: sus diapositivas
+        // aparecen abajo y ahí se elige cuál proyectar.
+        function openHit(index) {
+          cmd('hit', index, function () {
+            document.getElementById('q').value = '';
+            searchSeq++;
+            showHits([], '');
+            document.getElementById('slides').scrollIntoView({behavior: 'smooth', block: 'start'});
+          });
+        }
+
+        function cmd(action, index, done) {
           if (busy) return;
           busy = true;
           // The phone can be a room away from the laptop; vibrate so the
@@ -149,7 +220,7 @@ internal static class RemotePage
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({pin: pin, action: action, index: index === undefined ? null : index})
           }).then(function (r) { return r.ok ? r.json() : null; })
-            .then(function (s) { if (s) render(s); })
+            .then(function (s) { if (s) { render(s); if (done) done(); } })
             .catch(function () {})
             .then(function () { busy = false; });
         }

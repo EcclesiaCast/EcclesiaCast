@@ -157,6 +157,30 @@ public sealed partial class MainViewModel
             NextMediaId: IsPresentationOpen ? PreviewPageMedia?.Id : null);
     }
 
+    /// <summary>What the last phone search found, so a result can be opened by its place in the list.</summary>
+    private IReadOnlyList<SearchHit> _remoteHits = [];
+
+    IReadOnlyList<RemoteHit> IRemoteHost.Search(string query)
+    {
+        query = query.Trim();
+        if (query.Length < 2)
+        {
+            _remoteHits = [];
+            return [];
+        }
+
+        // Songs and verses only: a phone has no use for a video in the middle of a search.
+        _remoteHits = SearchEverywhere(query[..Math.Min(query.Length, 80)])
+            .Where(h => h.Kind is SearchHitKind.Song or SearchHitKind.Verse)
+            .Take(30)
+            .ToList();
+
+        return _remoteHits
+            .Select((h, index) => new RemoteHit(
+                index, h.Kind == SearchHitKind.Song ? "song" : "verse", h.Title, h.Detail))
+            .ToList();
+    }
+
     /// <summary>The marked tabs that have pages, in the order of the tabs: what the phone offers to open.</summary>
     private List<(string Tab, int Pages)> PresentationsForRemote() =>
         MediaTabs
@@ -232,6 +256,10 @@ public sealed partial class MainViewModel
                 // The phone opens it on the computer: the pages come back with the next poll.
                 if (PresentationsForRemote() is var offered && shown >= 0 && shown < offered.Count)
                     OpenPresentation(offered[shown].Tab, null);
+                break;
+            case "hit" when index is int hit && hit >= 0 && hit < _remoteHits.Count:
+                // Loaded, not projected: its slides come back with the next poll for the phone to pick.
+                OpenSearchHit(_remoteHits[hit]);
                 break;
             case "playlist" when index is int item && item >= 0 && item < PlaylistItems.Count:
                 ProjectPlaylistItem(PlaylistItems[item]);

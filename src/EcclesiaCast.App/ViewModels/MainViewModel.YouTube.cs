@@ -203,7 +203,10 @@ public sealed partial class MainViewModel
     /// because the presentation layer knows nothing about the library.
     /// </summary>
     private MediaItem? ResolveFill(MediaItem? item) =>
-        item?.FillMediaId is { } id ? _media.GetAll().FirstOrDefault(m => m.Id == id) : null;
+        item is null ? null
+        : item.FillsWithSelf ? item
+        : item.FillMediaId is { } id and > 0 ? _media.GetAll().FirstOrDefault(m => m.Id == id)
+        : null;
 
     [RelayCommand]
     private void InspectMedia(MediaItem? item)

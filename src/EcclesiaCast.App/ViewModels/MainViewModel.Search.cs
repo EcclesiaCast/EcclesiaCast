@@ -37,9 +37,13 @@ public sealed partial class MainViewModel
     private void SearchEverything()
     {
         var hit = _globalSearch.Show(SearchEverywhere, SearchText);
-        if (hit is null)
-            return;
+        if (hit is not null)
+            OpenSearchHit(hit);
+    }
 
+    /// <summary>Loads what a search result points at (song, verse or media), as the operator's box and the phone's both do.</summary>
+    private void OpenSearchHit(SearchHit hit)
+    {
         switch (hit.Kind)
         {
             case SearchHitKind.Song when Songs.FirstOrDefault(s => s.Id == hit.Id) is { } song:

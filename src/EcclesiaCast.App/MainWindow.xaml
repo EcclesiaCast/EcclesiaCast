@@ -219,6 +219,9 @@
                 <MenuItem x:Name="ToolsCollapsedItem" Header="Achicar las herramientas de texto"
                           IsCheckable="True" Click="ToolsCollapsedItem_Click"
                           ToolTip="Texto rápido, aviso al pie, resaltar, notas, música y tiempos quedan como una tira de íconos."/>
+                <MenuItem x:Name="AudioListCollapsedItem" Header="Achicar la lista de audios"
+                          IsCheckable="True" Click="AudioListCollapsedItem_Click"
+                          ToolTip="En la pestaña Música, deja sólo el reproductor y esconde la lista de audios."/>
                 <MenuItem x:Name="LeftRailItem" Header="Canciones y playlist como íconos"
                           IsCheckable="True" Click="LeftRailItem_Click"
                           ToolTip="Achica canciones, Biblia y playlist a una columna angosta de íconos."/>
@@ -1778,7 +1781,7 @@
                                 <StackPanel Margin="12,0,12,10">
                                     <!-- Título y botones de la lista -->
                                     <DockPanel Margin="0,0,0,6">
-                                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                        <StackPanel x:Name="AudioButtons" DockPanel.Dock="Right" Orientation="Horizontal">
                                             <Button Content="➕" FontSize="11" Padding="7,3" Style="{StaticResource DarkButton}"
                                                     Command="{Binding ImportAudioCommand}"
                                                     AutomationProperties.Name="Agregar audios"
@@ -1799,11 +1802,14 @@
                                                     AutomationProperties.Name="Quitar el audio elegido"
                                                     ToolTip="Quitar el audio elegido de la lista (el archivo no se borra)"/>
                                         </StackPanel>
-                                        <TextBlock Text="AUDIOS" Style="{StaticResource PanelTitle}" Margin="0" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="AudioTitle" Text="▾  AUDIOS" Style="{StaticResource PanelTitle}" Margin="0" VerticalAlignment="Center"
+                                                   Cursor="Hand" Background="Transparent"
+                                                   MouseLeftButtonUp="AudioTitle_MouseLeftButtonUp"
+                                                   ToolTip="Clic: achicar la lista de audios (o volver a agrandarla)"/>
                                     </DockPanel>
 
                                     <!-- La lista: doble clic o Enter reproduce, Supr quita -->
-                                    <Border Background="{StaticResource BgBrush}" BorderBrush="{StaticResource LineBrush}"
+                                    <Border x:Name="AudioListBox" Background="{StaticResource BgBrush}" BorderBrush="{StaticResource LineBrush}"
                                             BorderThickness="1" CornerRadius="4" MinHeight="110" MaxHeight="210">
                                         <Grid>
                                             <ListBox x:Name="AudioList" ItemsSource="{Binding AudioTracks}"

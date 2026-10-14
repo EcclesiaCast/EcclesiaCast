@@ -28,6 +28,7 @@ public partial class MainWindow
     private const string MediaCollapsedKey = "layout.media.collapsed";
     private const string ToolsCollapsedKey = "layout.tools.collapsed";
     private const string LeftRailKey = "layout.left.rail";
+    private const string AudioListCollapsedKey = "layout.audiolist.collapsed";
 
     private const double LibraryMinWidth = 200;
     private const double RightMinWidth = 260;
@@ -70,6 +71,9 @@ public partial class MainWindow
     /// <summary>Library and playlist shrunk to a narrow column of icons.</summary>
     private bool _leftRail;
 
+    /// <summary>The Music tab without its list of audios: only the players are left.</summary>
+    private bool _audioListCollapsed;
+
     // Sizes of the blocks themselves, whichever slot they sit in.
     private double _libraryWidth = 270;
     private double _rightWidth = 320;
@@ -93,6 +97,7 @@ public partial class MainWindow
         new(MediaCollapsedKey, () => _mediaCollapsed, v => _mediaCollapsed = v, () => MediaCollapsedItem),
         new(ToolsCollapsedKey, () => _toolsCollapsed, v => _toolsCollapsed = v, () => ToolsCollapsedItem),
         new(LeftRailKey, () => _leftRail, v => _leftRail = v, () => LeftRailItem),
+        new(AudioListCollapsedKey, () => _audioListCollapsed, v => _audioListCollapsed = v, () => AudioListCollapsedItem),
     ];
 
     /// <summary>The tabs of the text tools and the icon each one shrinks to.</summary>
@@ -223,6 +228,11 @@ public partial class MainWindow
                 tab.ClearValue(Control.FontSizeProperty);
         }
 
+        // ── Music tab: the list of audios folds to its title ──
+        AudioListBox.Visibility = _audioListCollapsed ? Visibility.Collapsed : Visibility.Visible;
+        AudioButtons.Visibility = _audioListCollapsed ? Visibility.Collapsed : Visibility.Visible;
+        AudioTitle.Text = _audioListCollapsed ? "▸  AUDIOS" : "▾  AUDIOS";
+
         // The media bar sits under (or over) the library and the slides.
         var mediaStart = _mirrored ? 2 : 0;
         Grid.SetColumn(MediaPanel, mediaStart);
@@ -306,6 +316,10 @@ public partial class MainWindow
     private void PlaylistTitle_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) => ToggleFold(PlaylistCollapsedKey);
 
     private void MediaTitle_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) => ToggleFold(MediaCollapsedKey);
+
+    private void AudioTitle_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) => ToggleFold(AudioListCollapsedKey);
+
+    private void AudioListCollapsedItem_Click(object sender, RoutedEventArgs e) => ToggleFold(AudioListCollapsedKey);
 
     private void ToolsCollapse_Click(object sender, RoutedEventArgs e) => ToggleFold(ToolsCollapsedKey);
 

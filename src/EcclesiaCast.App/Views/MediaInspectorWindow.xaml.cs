@@ -48,6 +48,12 @@ public partial class MediaInspectorWindow : Window
         // "Sin nada" first, then everything except this very item — filling a
         // background with itself would be a mirror facing a mirror.
         var options = new List<MediaItem> { new() { Id = 0, Name = "(sólo el color)" } };
+
+        // A picture can fill its own bars with a soft copy of itself, which makes
+        // it look like one image with no border. A video would need a second player.
+        if (item.Type == MediaType.Image)
+            options.Add(new MediaItem { Id = MediaItem.FillWithSelfId, Name = "(la misma imagen, desenfocada)" });
+
         options.AddRange(library
             .Where(m => m.Id != item.Id && m.Type != MediaType.YouTube)
             .OrderBy(m => m.Name));
@@ -95,6 +101,9 @@ public partial class MediaInspectorWindow : Window
 
         // From here on the fields drive the preview.
         _ready = true;
+
+        // Opens with the picture's frame picked, so the arrow keys work at once.
+        Loaded += (_, _) => PreviewFrame.Focus();
         RefreshPreview();
     }
 
@@ -172,7 +181,9 @@ public partial class MediaInspectorWindow : Window
         shown.Tint = TintField.Value > 0 ? _tint : null;
         shown.FillColor = _fillColor;
 
-        Preview.FillMedia = FillMediaBox.SelectedItem is MediaItem { Id: > 0 } fill ? fill : null;
+        var chosenFill = FillMediaBox.SelectedItem as MediaItem;
+        shown.FillMediaId = chosenFill is { Id: not 0 } ? chosenFill.Id : null;
+        Preview.FillMedia = chosenFill is { Id: > 0 } fill ? fill : shown.FillsWithSelf ? shown : null;
         Preview.Blur = BlurField.Value;
         Preview.Media = shown;
     }
@@ -181,8 +192,30 @@ public partial class MediaInspectorWindow : Window
     private double _dragStartX;
     private double _dragStartY;
 
+    /// <summary>
+    /// The arrow keys nudge the picture by 0.1 % of the screen (about two
+    /// pixels on a 1920-wide one), or 1 % with Shift: the fine adjustment a
+    /// mouse drag cannot give. They write the «Correr» fields, as the drag does.
+    /// </summary>
+    private void PreviewFrame_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        var step = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) ? 1.0 : 0.1;
+        switch (e.Key)
+        {
+            case Key.Left: OffsetXField.Value -= step; break;
+            case Key.Right: OffsetXField.Value += step; break;
+            case Key.Up: OffsetYField.Value -= step; break;
+            case Key.Down: OffsetYField.Value += step; break;
+            default: return;
+        }
+
+        e.Handled = true;
+    }
+
     private void PreviewFrame_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
+        // The arrow keys only work with the frame picked, so a click on it takes the focus.
+        PreviewFrame.Focus();
         _dragFrom = e.GetPosition(PreviewFrame);
         _dragStartX = OffsetXField.Value;
         _dragStartY = OffsetYField.Value;
@@ -346,7 +379,7 @@ public partial class MediaInspectorWindow : Window
         _item.TrimEnd = Math.Max(0, TrimEndField.Value);
 
         _item.FillColor = _fillColor;
-        _item.FillMediaId = (FillMediaBox.SelectedItem as MediaItem)?.Id is int fillId and > 0 ? fillId : null;
+        _item.FillMediaId = (FillMediaBox.SelectedItem as MediaItem)?.Id is int fillId and not 0 ? fillId : null;
 
         Saved = true;
         DialogResult = true;

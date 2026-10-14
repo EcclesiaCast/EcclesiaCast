@@ -9,6 +9,24 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Buscar desde el celular.** La página del celular tiene arriba una caja para
+  buscar canciones y versículos (todas las versiones de la Biblia), con la
+  misma búsqueda que Ctrl+K de la computadora, sin los medios. Tocar un
+  resultado lo carga en la computadora y la página baja a sus diapositivas
+  para elegir cuál proyectar.
+- **Rellenar los bordes con la misma imagen, desenfocada.** En Propiedades de
+  una imagen, «Los bordes se rellenan con» ofrece **(la misma imagen,
+  desenfocada)** además del color sólido: donde la imagen no llega (en
+  «Ajustar», con un tamaño fijo o con zoom menor a 100 %) se ve una copia
+  agrandada y borrosa de ella misma, para que parezca una sola imagen sin
+  borde negro. Se ve igual en la vista previa, las tarjetas, el LIVE y la
+  pantalla.
+- **Ajuste fino con las flechas del teclado en Propiedades.** Con el cuadro de
+  vista previa elegido (arranca así), las flechas corren la imagen de a 0,1 %
+  de la pantalla, y con Mayús de a 1 %.
+- **Achicar la lista de audios.** En la pestaña Música, un clic en el título
+  **AUDIOS** (o Ver → «Achicar la lista de audios») esconde la lista y sus
+  botones y deja sólo el reproductor. Se recuerda al cerrar el programa.
 - **Mini reproductor en la pestaña Música.** Donde estaban los botones de
   «Spotify u otro reproductor» ahora se ve la carátula, el título, el artista,
   de qué programa viene y una barra de avance de lo que suene en la

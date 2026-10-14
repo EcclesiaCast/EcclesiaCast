@@ -241,6 +241,22 @@ public sealed class RemoteControlServer : IDisposable
             return;
         }
 
+        if (path == "/api/search" && method == "GET")
+        {
+            var check = CheckPin(QueryValue(target, "pin"), caller);
+            if (!check.Ok)
+            {
+                await WriteDeniedAsync(stream, check, cancellation);
+                return;
+            }
+
+            var query = QueryValue(target, "q") ?? string.Empty;
+            var hits = await OnUiThread(() => _host.Search(query));
+            await WriteAsync(stream, 200, "application/json; charset=utf-8",
+                JsonSerializer.Serialize(hits, Json), cancellation);
+            return;
+        }
+
         // The poster of a page of a presentation. The phone only says which
         // media it wants: the file is found on this side, from the library, and
         // it is the small poster, never the full-size picture.

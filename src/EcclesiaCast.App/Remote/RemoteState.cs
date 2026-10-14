@@ -14,6 +14,13 @@ public sealed record RemotePresentation(int Index, string Name, int Pages);
 public sealed record RemotePlaylistItem(int Index, string Caption, string Kind);
 
 /// <summary>
+/// One result of the phone's search: a song or a verse. <paramref name="Index"/>
+/// is the place in the list the computer kept, which is all the phone sends
+/// back to open it.
+/// </summary>
+public sealed record RemoteHit(int Index, string Kind, string Title, string Detail);
+
+/// <summary>
 /// Everything the phone needs to draw itself. Sent as JSON on every poll, so
 /// it stays small: slide previews are trimmed and nothing binary travels.
 /// </summary>
@@ -46,6 +53,13 @@ public interface IRemoteHost
     /// the request: the phone only names the media by its id.
     /// </summary>
     string? GetThumbnailPath(int mediaId);
+
+    /// <summary>
+    /// Songs and Bible verses that match what was typed (the same search as
+    /// Ctrl+K, without the media). The list is remembered: the phone opens a
+    /// result by its place in it with the <c>hit</c> action.
+    /// </summary>
+    IReadOnlyList<RemoteHit> Search(string query);
 
     /// <summary>The words on the projector, for the broadcast page.</summary>
     RemoteOutput GetOutput();

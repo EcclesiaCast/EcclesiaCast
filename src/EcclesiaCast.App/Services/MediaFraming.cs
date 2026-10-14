@@ -252,6 +252,37 @@ public static class MediaFraming
         };
     }
 
+    /// <summary>
+    /// Gives the fill picture its look: soft and a little enlarged when the
+    /// bars are painted with a copy of the image itself (the enlargement keeps
+    /// the blur's faded edge off-screen), as it comes otherwise. The radius is
+    /// in pixels of a 1920-wide screen, kept in proportion at any size.
+    /// </summary>
+    public static void SetFillLook(Image fill, MediaItem? media, double screenWidth)
+    {
+        if (media is null || !media.FillsWithSelf)
+        {
+            fill.Effect = null;
+            fill.RenderTransform = Transform.Identity;
+            return;
+        }
+
+        var scale = screenWidth > 0 ? screenWidth / 1920 : 1;
+        var radius = 60 * scale;
+        if (fill.Effect is not BlurEffect existing || Math.Abs(existing.Radius - radius) > 0.01)
+        {
+            fill.Effect = new BlurEffect
+            {
+                Radius = radius,
+                KernelType = KernelType.Gaussian,
+                RenderingBias = RenderingBias.Performance,
+            };
+        }
+
+        fill.RenderTransformOrigin = new Point(0.5, 0.5);
+        fill.RenderTransform = new ScaleTransform(1.2, 1.2);
+    }
+
     /// <summary>True when the picture leaves part of the output uncovered.</summary>
     public static bool NeedsFill(MediaItem? media) =>
         media is not null
