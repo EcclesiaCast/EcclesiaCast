@@ -204,6 +204,16 @@ dibujando a imágenes. Para la **beta.7 reconstruida** (instalador nuevo):
       pestaña en la computadora. Una página sin miniatura (un video sin
       póster) queda en blanco en el celular: avisar si molesta.
 
+- [ ] **GIF animados** (tramo D4; la conversión se probó con un GIF armado a
+      mano y ffmpeg, sin abrir el programa). Agregá un GIF animado de verdad
+      (uno de internet): tiene que aparecer en la pestaña, después de unos
+      segundos, como un video con su miniatura; proyectado, se mueve en bucle y
+      sin sonido. Un GIF común (una sola imagen) sigue entrando como imagen.
+      Arrastrar varios GIF juntos los convierte de a uno. Clic derecho →
+      «Quitar de la biblioteca» no tiene que dejar archivos en
+      `%APPDATA%\EcclesiaCast\gifs`. Los GIF con transparencia quedan sobre
+      fondo negro (el video no tiene transparencia): mirá si molesta.
+
 ## 2. Para la v1.0.0
 
 - [ ] **Usar la beta.7 en la reunión del domingo** y anotar lo que falle o no

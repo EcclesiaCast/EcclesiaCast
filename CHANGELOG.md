@@ -9,6 +9,15 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Los GIF animados se mueven.** Antes un GIF se veía como una foto fija (sólo
+  su primer cuadro). Ahora, al agregar un GIF animado (con 📥 o arrastrándolo),
+  el programa lo convierte en un video MP4, en bucle y sin sonido, que guarda
+  en su carpeta de datos y agrega a la pestaña; el GIF original queda donde
+  estaba. La conversión se hace en segundo plano (unos segundos) y la barra de
+  estado avisa. Si no se encuentra ffmpeg, o la conversión falla, el GIF entra
+  como imagen fija, como hasta ahora. Quitar el video de la biblioteca borra
+  también el MP4 convertido.
+
 - **Ver y cambiar las presentaciones desde el celular.** La página del celular
   ahora muestra las páginas de la presentación abierta como miniaturas (no
   como texto), con la que está en pantalla marcada, y un toque en una la

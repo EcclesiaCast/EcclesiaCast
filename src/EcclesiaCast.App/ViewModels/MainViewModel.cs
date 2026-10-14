@@ -1593,9 +1593,25 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         var skipped = 0;
         var documents = new List<string>();
         var newVideos = new List<(string Path, string Name)>();
+        var animatedGifs = new List<string>();
+        var stillGifs = 0;
 
         foreach (var path in paths)
         {
+            // An animated GIF would show only its first frame as a picture:
+            // with ffmpeg it is made into a looping video once the rest is in.
+            if (Path.GetExtension(path).Equals(".gif", StringComparison.OrdinalIgnoreCase)
+                && File.Exists(path) && GifFile.IsAnimated(path))
+            {
+                if (GifImporter.IsAvailable)
+                {
+                    animatedGifs.Add(path);
+                    continue;
+                }
+
+                stillGifs++;
+            }
+
             // A PDF or a deck becomes one image per page, but drawing them
             // takes a moment, so they are done after this loop rather than
             // freezing the window in the middle of an import.
@@ -1640,12 +1656,20 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         var ignored = skipped > 0
             ? $" {skipped} archivo(s) no se agregaron: sólo entran imágenes, videos, PDF y PowerPoint."
             : string.Empty;
+        var gifNote = animatedGifs.Count > 0
+            ? $" Convirtiendo {animatedGifs.Count} GIF animado(s) en video…"
+            : stillGifs > 0
+                ? $" {stillGifs} GIF animado(s) quedan quietos: para moverse hace falta ffmpeg y no se encontró en esta computadora."
+                : string.Empty;
         StatusText = documents.Count > 0
-            ? $"{added} medio(s) agregado(s). Preparando {documents.Count} documento(s)…{ignored}"
-            : added == 0 && skipped > 0
+            ? $"{added} medio(s) agregado(s). Preparando {documents.Count} documento(s)…{ignored}{gifNote}"
+            : added == 0 && skipped > 0 && animatedGifs.Count == 0
                 ? $"No se agregó nada: sólo entran imágenes, videos, PDF y PowerPoint."
-                : $"{added} medio(s) agregado(s) a «{SelectedMediaTab}».{ignored}";
+                : $"{added} medio(s) agregado(s) a «{SelectedMediaTab}».{ignored}{gifNote}";
         _ = RefreshVideoThumbnailsAsync();
+
+        if (animatedGifs.Count > 0)
+            _ = ImportGifsAsync(animatedGifs, SelectedMediaTab);
 
         // The new videos wait for their answer before the background work may
         // make (or skip) a copy of them.
@@ -1656,6 +1680,67 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         if (documents.Count > 0)
             _ = ImportDocumentsAsync(documents);
+    }
+
+    /// <summary>
+    /// Makes a looping, silent video of each animated GIF, in the background
+    /// (encoding takes a few seconds each), and adds it to the tab the GIFs
+    /// were brought into. A GIF that cannot be converted goes in as the still
+    /// picture it was, so nothing the operator dropped is lost.
+    /// </summary>
+    private async Task ImportGifsAsync(IReadOnlyList<string> gifs, string tab)
+    {
+        var converted = 0;
+        var kept = 0;
+        try
+        {
+            foreach (var gif in gifs)
+            {
+                var name = Path.GetFileNameWithoutExtension(gif);
+                var video = await GifImporter.ConvertAsync(gif);
+                if (video is null)
+                {
+                    // Left as a picture: it shows its first frame, as it always did.
+                    _media.Add(new MediaItem
+                    {
+                        Name = name,
+                        Path = gif,
+                        Type = MediaType.Image,
+                        ThumbnailPath = MediaThumbnails.Create(gif, MediaType.Image, videoEngine: null),
+                        Category = tab,
+                        Behavior = MediaBehavior.Background,
+                    });
+                    kept++;
+                    continue;
+                }
+
+                _media.Add(new MediaItem
+                {
+                    Name = name,
+                    Path = video,
+                    Type = MediaType.Video,
+                    Category = tab,
+                    Behavior = MediaBehavior.Background,
+
+                    // A GIF has no sound and never ends: it loops, silent.
+                    Muted = true,
+                    EndBehavior = VideoEndBehavior.Loop,
+                });
+                converted++;
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "No se pudieron convertir los GIF");
+        }
+
+        LoadMedia();
+        _ = RefreshVideoThumbnailsAsync();
+        RefreshLightCopies();
+
+        StatusText = kept == 0
+            ? $"{converted} GIF animado(s) convertido(s) en video, en bucle y sin sonido, en «{tab}»."
+            : $"{converted} GIF convertido(s) en video; {kept} no se pudo convertir y quedó como imagen fija (el detalle está en el registro).";
     }
 
     /// <summary>
@@ -2872,6 +2957,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         // item out of the library has to take the image with it.
         if (DocumentImporter.IsRenderedPage(item.Path))
             DocumentImporter.Forget(item.Path);
+
+        // The same for the video made from a GIF.
+        if (GifImporter.IsConverted(item.Path))
+            GifImporter.Forget(item.Path);
     }
 
     // ── Control desde el celular ─────────────────────────────────
