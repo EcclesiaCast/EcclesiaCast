@@ -426,9 +426,17 @@ public partial class VlcVideoSurface : UserControl
             };
         }
 
+        // The fail-safe has to outlast the fade of whatever replaces this
+        // picture: with a longer fade configured, letting go at two seconds
+        // would show what is underneath before the new one is fully drawn.
+        _holdTimer.Interval = HoldTimeout(HoldFade);
         _holdTimer.Stop();
         _holdTimer.Start();
     }
+
+    /// <summary>How long a held picture waits for its replacement: two seconds, or the fade and a margin if that is longer.</summary>
+    internal static TimeSpan HoldTimeout(TimeSpan fade) =>
+        TimeSpan.FromSeconds(Math.Max(2, fade.TotalSeconds + 1));
 
     // ── Transporte (barra de reproducción del operador) ──────────
 

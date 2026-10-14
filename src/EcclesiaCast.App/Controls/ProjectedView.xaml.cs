@@ -424,6 +424,11 @@ public partial class ProjectedView : UserControl
                     // until it is fully covered: fading up from nothing made
                     // the old one vanish at once and the change flash black.
                     HoldPreviousImage(previousSource, previousMedia);
+
+                    // An image is taking over from what was held for a video
+                    // that never came: the fail-safe timer must not let the
+                    // held picture go in the middle of this fade.
+                    _heldImageTimer?.Stop();
                     var version = ++_fadeVersion;
                     var fade = new DoubleAnimation(0, 1, mediaFade) { EasingFunction = new QuadraticEase() };
                     fade.Completed += (_, _) =>
@@ -565,15 +570,19 @@ public partial class ProjectedView : UserControl
         PreviousImage.BeginAnimation(OpacityProperty, animation);
     }
 
-    /// <summary>If the video never draws anything, the image is let go after two seconds.</summary>
+    /// <summary>
+    /// If the video never draws anything, the image is let go after two seconds
+    /// (longer when the media fade is: see <see cref="VlcVideoSurface.HoldTimeout"/>).
+    /// </summary>
     private void StartHeldImageTimer()
     {
         if (_heldImageTimer is null)
         {
-            _heldImageTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+            _heldImageTimer = new System.Windows.Threading.DispatcherTimer();
             _heldImageTimer.Tick += (_, _) => ReleaseHeldImage(TimeSpan.FromMilliseconds(250));
         }
 
+        _heldImageTimer.Interval = VlcVideoSurface.HoldTimeout(TransitionSettings.Current.Media);
         _heldImageTimer.Stop();
         _heldImageTimer.Start();
     }
