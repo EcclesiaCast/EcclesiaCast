@@ -18,8 +18,8 @@ no lo sea, porque la solicitud la revisa una persona.
 | **Category*** | la que más se parezca a *multimedia / presentaciones*; si no hay, *Other*. Si dudás, mandame la lista de opciones. |
 | **Description*** | ya la pegaste (ver «Description» abajo) |
 | **Reputation*** | ver «Reputation» abajo |
-| **Maintainer Type** | *Individual* (o lo más parecido: una sola persona mantiene el proyecto) |
-| **Build System*** | *GitHub Actions* |
+| **Maintainer Type** | *Individual maintainer(s)* (las otras opciones: proyecto comunitario independiente, fundación sin fines de lucro, empresa, otro) |
+| **Build System*** | *GitHub Actions* (la otra opción es GitLab CI/CD) |
 | **First Name* / Last Name*** | los tuyos |
 | **Email*** | el tuyo |
 | **Company Name** | vacío |
