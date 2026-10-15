@@ -48,6 +48,26 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       programita que arma sirve); 4) «Importar una Biblia…» de esa ventana abre
       el selector de archivos; 5) con un archivo que no sirve (por ejemplo un
       .txt renombrado a .json), el mensaje de error ahora manda a esa ventana.
+- [ ] **Cuatro funciones de antes que nunca tuvieron pasos de prueba** (si ya las
+      viste, tildalas y listo):
+      1. **Tipografía de cada recuadro del escenario.** En el diseñador de
+         escenarios, elegí una letra distinta para las notas del predicador y
+         otra para la hora: cada una cambia sólo la suya, en la vista previa y
+         en la pantalla de los músicos. Un escenario guardado de antes se ve
+         igual que antes.
+      2. **Tipografía del texto rápido.** En la pestaña Texto rápido, la lista
+         «Tipografía» cambia la letra de la vista previa al instante, y queda
+         elegida al cerrar y abrir el programa. Vacía, sigue la del tema.
+      3. **«Selah» y títulos de los Salmos.** En el editor de temas, tema de
+         Biblia, la casilla «Mostrar Selah y los títulos de los Salmos» viene
+         destildada. Hoy ninguna Biblia instalada trae esos textos, así que sólo
+         se nota con una importada que los tenga (el ejemplo de «Cómo preparar
+         una Biblia» no los trae): verificá al menos que la casilla se guarda.
+      4. **Corregir el texto de un versículo.** Clic derecho sobre un versículo
+         de la grilla → «Corregir el texto…»: cambiá una palabra, guardá, y se
+         ve en la diapositiva (también en pantalla si está proyectado) y sigue
+         ahí al cerrar y abrir el programa. Probalo en una Biblia importada de
+         prueba, no en la que usás en el servicio.
 - [ ] **Teclas en los tooltips (diseño avanzado).** Pasá el mouse por Black,
       Clear, Logo, Sin fondo, Poner en vivo / Apagar salida y Proyectar ▶: el
       globito dice la tecla (F1, F2, F3, F4, Esc, Ctrl+Enter) aunque estés en
