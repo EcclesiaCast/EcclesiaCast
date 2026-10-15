@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacidad · EcclesiaCast</title>
+<meta name="description" content="EcclesiaCast no tiene cuentas, no junta estadísticas y no manda datos de uso a nadie. Qué se conecta a internet y cuándo.">
+<link rel="canonical" href="https://ecclesiacast.github.io/EcclesiaCast/privacidad.html">
+<meta name="theme-color" content="#0B1A33">
+<link rel="icon" href="img/logo.svg" type="image/svg+xml">
+<link rel="icon" href="img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="img/icono-180.png">
+<meta property="og:title" content="Privacidad · EcclesiaCast">
+<meta property="og:description" content="EcclesiaCast no tiene cuentas, no junta estadísticas y no manda datos de uso a nadie.">
+<meta property="og:image" content="https://ecclesiacast.github.io/EcclesiaCast/img/tarjeta.png">
+<link rel="stylesheet" href="estilos.css">
+<script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+
+<a class="saltar" href="#contenido">Saltar al contenido</a>
+
+<header class="barra">
+  <div class="barra-dentro">
+    <a class="marca" href="./" aria-label="EcclesiaCast, inicio">
+      <img src="img/logo.svg" alt="" width="34" height="34">
+      <span>EcclesiaCast</span>
+    </a>
+    <a class="boton boton-chico" href="https://github.com/EcclesiaCast/EcclesiaCast/releases/download/v1.0.0-beta.15/EcclesiaCast-1.0.0-beta.15-setup.exe" data-release="url">Descargar</a>
+  </div>
+</header>
+
+<main id="contenido" class="texto">
+  <a class="volver" href="./">← Volver al inicio</a>
+  <h1>Política de privacidad</h1>
+
+  <p>EcclesiaCast <strong>no tiene cuentas, no junta estadísticas y no manda datos de uso a nadie</strong>. Todo lo tuyo (canciones, Biblias, medios, playlists, temas y ajustes) queda en tu PC, en <code>%APPDATA%\EcclesiaCast</code>, y el registro de errores también (<code>%APPDATA%\EcclesiaCast\logs</code>).</p>
+
+  <p>El programa se conecta a internet <strong>sólo cuando usás una función que lo necesita</strong> (y una vez por día, al abrirlo, para saber si hay una versión nueva), y sólo con los sitios de esta lista:</p>
+
+  <div class="tabla">
+    <table>
+      <thead>
+        <tr><th scope="col">Cuándo</th><th scope="col">Con quién</th><th scope="col">Qué se manda</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Buscás una canción en internet</th><td data-titulo="Con quién"><a href="https://www.musica.com">musica.com</a> (su buscador completo usa Google) y <a href="https://lrclib.net">lrclib.net</a></td><td data-titulo="Qué se manda">Lo que escribiste para buscar.</td></tr>
+        <tr><th scope="row">Agregás, mirás o descargás un video de YouTube</th><td data-titulo="Con quién"><a href="https://www.youtube.com">YouTube</a></td><td data-titulo="Qué se manda">El enlace del video. Si iniciaste sesión en YouTube dentro del programa, se usa esa sesión; sus datos se guardan sólo en tu PC.</td></tr>
+        <tr><th scope="row">Abrís una página web en el programa</th><td data-titulo="Con quién">La página que abrís (y Google, si escribís algo que no es una dirección)</td><td data-titulo="Qué se manda">Lo mismo que si la abrieras en un navegador. Si iniciás sesión en esa página (Google, Canva…), la sesión se guarda sólo en tu PC, la misma que usa YouTube.</td></tr>
+        <tr><th scope="row">Descargás de YouTube por primera vez, y después cada tres días al descargar</th><td data-titulo="Con quién"><a href="https://github.com">GitHub</a></td><td data-titulo="Qué se manda">Nada tuyo: baja o actualiza el descargador (<a href="https://github.com/yt-dlp/yt-dlp">yt-dlp</a> y <a href="https://github.com/denoland/deno">deno</a>).</td></tr>
+        <tr><th scope="row">Al abrir el programa (una vez por día; se apaga en Ayuda)</th><td data-titulo="Con quién"><a href="https://github.com">GitHub</a></td><td data-titulo="Qué se manda">Nada tuyo: pregunta cuál es la última versión. Al actualizar, baja el instalador nuevo.</td></tr>
+        <tr><th scope="row">Hacés clic en un enlace (la guía de uso, informar un error)</th><td data-titulo="Con quién">El sitio del enlace, en tu navegador</td><td data-titulo="Qué se manda">Lo mismo que si lo abrieras a mano.</td></tr>
+        <tr><th scope="row">Instalás el programa y a la PC le falta WebView2</th><td data-titulo="Con quién"><a href="https://developer.microsoft.com/microsoft-edge/webview2/">Microsoft</a></td><td data-titulo="Qué se manda">Nada tuyo: baja el componente de Microsoft que usa el programa para YouTube, para las páginas web y para buscar canciones.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p><strong>Proyectar otra ventana</strong> (botón <strong>🖥 Ventana</strong>) tampoco sale a internet: usa la captura de ventanas del propio Windows y dibuja la imagen dentro del programa, en esta computadora. No se graba ni se guarda en disco, y no se manda a ningún lado; mientras dura, Windows rodea la ventana elegida con un borde amarillo (se ve sólo en la pantalla del operador). Lo que esa ventana muestre se ve, tal cual, en la pantalla de la congregación: conviene cerrar antes lo que no quieras mostrar (el correo, las notificaciones).</p>
+
+  <p>El <strong>control remoto</strong> y la <strong>salida para OBS o vMix</strong> no salen a internet: abren una dirección dentro de tu red local, protegida con un PIN, y sólo mientras los tengas prendidos.</p>
+
+  <p>Cada uno de esos sitios tiene su propia política de privacidad: <a href="https://policies.google.com/privacy">Google y YouTube</a>, <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement">GitHub</a>, <a href="https://privacy.microsoft.com">Microsoft</a>, <a href="https://www.musica.com">musica.com</a> y <a href="https://lrclib.net">lrclib.net</a>.</p>
+
+  <h2>Esta página web</h2>
+  <p>Esta página tampoco junta nada: no usa cookies, no cuenta visitas y no carga nada de otros sitios. La sirve GitHub Pages, que como cualquier servidor recibe la dirección de quien la visita (<a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement">política de privacidad de GitHub</a>).</p>
+</main>
+
+<footer class="pie">
+  <div class="pie-dentro">
+    <p class="pie-marca"><img src="img/logo.svg" alt="" width="28" height="28"> <strong>EcclesiaCast</strong></p>
+    <p>Hecho por Alexis Pérez (<a href="https://github.com/alexisperez7">@alexisperez7</a>)</p>
+    <nav class="pie-enlaces" aria-label="Enlaces del pie">
+      <a href="https://github.com/EcclesiaCast/EcclesiaCast">Código en GitHub</a>
+      <a href="./">Inicio</a>
+      <a href="mailto:alexissebastianperez@gmail.com">Escribirme</a>
+      <a href="https://github.com/EcclesiaCast/EcclesiaCast/blob/main/LICENSE">Licencia GPL-3.0</a>
+    </nav>
+    <p class="pie-chico">Para fallas y preguntas, mejor en <a href="https://github.com/EcclesiaCast/EcclesiaCast/issues">GitHub</a>: así le sirve a todos.</p>
+  </div>
+</footer>
+
+</body>
+</html>
