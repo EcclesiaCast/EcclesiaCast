@@ -1,0 +1,57 @@
+name: pages
+
+# Publishes the website (sitio/) to GitHub Pages:
+# https://ecclesiacast.github.io/EcclesiaCast/
+# It runs when the site changes and after each release, so the download
+# buttons always point at the newest installer.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "sitio/**"
+      - ".github/workflows/pages.yml"
+      - ".github/scripts/datos-del-sitio.py"
+  workflow_run:
+    workflows: [release]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+
+      - name: Put the newest installer into the download buttons
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/datos-del-sitio.py
+
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: sitio
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
