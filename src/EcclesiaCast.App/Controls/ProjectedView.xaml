@@ -5,16 +5,21 @@
     <!-- Transparent root so the video (behind, in the output window) shows
          through where there is no image background. -->
     <Grid Background="Transparent" ClipToBounds="True">
+        <!-- La imagen anterior, entera (con su relleno), que se queda debajo
+             mientras la nueva se funde encima (o mientras arranca el video que
+             la reemplaza): así el cambio de medio no pasa por negro. -->
+        <Grid x:Name="PreviousLayer" IsHitTestVisible="False">
+            <Rectangle x:Name="PreviousFillColor" Visibility="Collapsed"/>
+            <Image x:Name="PreviousFillImage" Stretch="UniformToFill" Visibility="Collapsed"/>
+            <Image x:Name="PreviousImage" Stretch="UniformToFill" Visibility="Collapsed"
+                   RenderTransformOrigin="0.5,0.5"/>
+        </Grid>
+
         <!-- Relleno: lo que se ve donde la imagen no llega, por zoom hacia
-             afuera o por un tamaño fijo más chico que la pantalla. -->
+             afuera o por un tamaño fijo más chico que la pantalla. Va encima de
+             la imagen anterior: sube junto con la nueva en el fundido. -->
         <Rectangle x:Name="FillColorLayer" Visibility="Collapsed"/>
         <Image x:Name="FillImage" Stretch="UniformToFill" Visibility="Collapsed"/>
-
-        <!-- La imagen anterior, que se queda debajo mientras la nueva se funde
-             encima (o mientras arranca el video que la reemplaza): así el
-             cambio de medio no pasa por negro -->
-        <Image x:Name="PreviousImage" Stretch="UniformToFill" Visibility="Collapsed"
-               RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False"/>
 
         <!-- Capa de fondo global (imagen; el video llega después) -->
         <Image x:Name="BackgroundImage" Stretch="UniformToFill" Visibility="Collapsed"

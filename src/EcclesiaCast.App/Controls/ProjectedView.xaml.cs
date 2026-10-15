@@ -415,6 +415,9 @@ public partial class ProjectedView : UserControl
             return;
         }
 
+        // The fill on screen now is about to change: it is kept for the old
+        // picture, which may stay underneath while the new one fades in.
+        NoteOutgoingFill();
         ApplyFraming();
 
         if (path == _lastImagePath && decodeWidth == _lastDecodeWidth && stamp == _lastImageStamp)
@@ -576,8 +579,8 @@ public partial class ProjectedView : UserControl
             var incomingDominates = source is not null && BackgroundImage.Opacity >= 0.5;
             if (!incomingDominates)
             {
-                PreviousImage.BeginAnimation(OpacityProperty, null);
-                PreviousImage.Opacity = 1;
+                PreviousLayer.BeginAnimation(OpacityProperty, null);
+                PreviousLayer.Opacity = 1;
                 return;
             }
         }
@@ -586,23 +589,44 @@ public partial class ProjectedView : UserControl
             return;
         }
 
-        PreviousImage.BeginAnimation(OpacityProperty, null);
-        PreviousImage.Opacity = 1;
+        PreviousLayer.BeginAnimation(OpacityProperty, null);
+        PreviousLayer.Opacity = 1;
         PreviousImage.Source = source;
         _previousMedia = media;
         MediaFraming.Apply(PreviousImage, media, ActualWidth, ActualHeight);
         MediaFraming.SetBlur(PreviousImage, _blurRadius);
         PreviousImage.Visibility = Visibility.Visible;
+
+        // The bars go with the picture they belong to: what filled them a moment
+        // ago stays under it, and the new fill rises with the new picture.
+        PreviousFillImage.Source = _outgoingFillImage;
+        PreviousFillImage.Visibility = _outgoingFillImage is null ? Visibility.Collapsed : Visibility.Visible;
+        PreviousFillColor.Fill = _outgoingFillColor;
+        PreviousFillColor.Visibility = _outgoingFillColor is null ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private void ClearPreviousImage()
     {
         _heldImageTimer?.Stop();
-        PreviousImage.BeginAnimation(OpacityProperty, null);
-        PreviousImage.Opacity = 1;
+        PreviousLayer.BeginAnimation(OpacityProperty, null);
+        PreviousLayer.Opacity = 1;
         PreviousImage.Visibility = Visibility.Collapsed;
         PreviousImage.Source = null;
+        PreviousFillImage.Visibility = Visibility.Collapsed;
+        PreviousFillImage.Source = null;
+        PreviousFillColor.Visibility = Visibility.Collapsed;
         _previousMedia = null;
+    }
+
+    /// <summary>What filled the bars just before a change of background: it is held with the old picture.</summary>
+    private ImageSource? _outgoingFillImage;
+
+    private Brush? _outgoingFillColor;
+
+    private void NoteOutgoingFill()
+    {
+        _outgoingFillImage = FillImage.Visibility == Visibility.Visible ? FillImage.Source : null;
+        _outgoingFillColor = FillColorLayer.Visibility == Visibility.Visible ? FillColorLayer.Fill : null;
     }
 
     /// <summary>
@@ -629,7 +653,7 @@ public partial class ProjectedView : UserControl
             if (version == _fadeVersion)
                 ClearPreviousImage();
         };
-        PreviousImage.BeginAnimation(OpacityProperty, animation);
+        PreviousLayer.BeginAnimation(OpacityProperty, animation);
     }
 
     /// <summary>
@@ -741,7 +765,9 @@ public partial class ProjectedView : UserControl
         // A video used as fill can only play in the output window, which owns
         // the VLC surfaces; here its poster stands in, exactly like the
         // background video's poster does in the previews.
-        var fillPath = fill?.Type == MediaType.Image ? fill.Path : fill?.ThumbnailPath;
+        var fillPath = needsFill && media is { FillsWithSelf: true }
+            ? media.Path
+            : fill?.Type == MediaType.Image ? fill.Path : fill?.ThumbnailPath;
 
         // An image that fills its own bars shows itself, already blurred; any
         // other fill is the picture as it is.
