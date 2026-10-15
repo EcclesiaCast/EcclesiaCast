@@ -1,8 +1,8 @@
 # Publicar la 1.0 — lista para el día
 
-Todo lo de abajo ya está pensado. **No se hace nada de esto hasta que**: la firma
-de firma esté resuelta **o se haya decidido publicar sin firma** (ver «Firma digital del instalador» en
-[pendientes.md](pendientes.md)), una beta firmada se haya instalado y probado, y
+Todo lo de abajo ya está pensado. **No se hace nada de esto hasta que** la firma
+esté resuelta **o se haya decidido publicar sin firma** (ver «Firma digital del instalador» en
+[pendientes.md](pendientes.md)), la última beta se haya instalado y probado, y
 Alexis haya usado el programa en un servicio real sin fallas graves.
 
 ## 1. CHANGELOG
