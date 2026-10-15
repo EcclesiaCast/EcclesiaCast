@@ -483,3 +483,7 @@ $RECYCLE.BIN/
 
 # Instaladores generados
 dist/
+
+# Website design reviews (screenshots) and local preview settings
+.impeccable/review/
+.claude/launch.json
