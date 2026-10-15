@@ -54,7 +54,7 @@ desde la primera. Las flechas **←→** navegan en vivo.
 
 En la pestaña **Biblia**:
 
-- **📥** importa una Biblia en **JSON** o **Zefania XML**.
+- **📥** importa una Biblia en **JSON** o **Zefania XML**. Si la tuya está en otro formato (Word, PDF, texto), **Archivo → Cómo preparar una Biblia para importar…** trae un ejemplo de cada formato y unas instrucciones para pedirle a una IA que la convierta.
 - El instalador te deja elegir qué **Biblias libres** instalar (Reina-Valera
   1909, Biblia libre para el mundo y Versión Biblia Libre); aparecen solas la
   primera vez que abrís el programa. Las que tienen derechos (RVR1960, NVI…)

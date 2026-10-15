@@ -9,6 +9,15 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Cómo preparar una Biblia para importar.** En **Archivo → Cómo preparar una
+  Biblia para importar…** hay una ventana que explica los dos formatos que se
+  leen (JSON y Zefania XML), con un ejemplo de cada uno que se puede guardar y
+  abrir con el Bloc de notas, y un botón **📋 Copiar instrucciones para una IA**:
+  un texto para pegar en un chat de IA junto con unas líneas de tu archivo, para
+  que arme un programita que convierta tu Biblia (Word, PDF, texto) al formato
+  del programa. Los ejemplos se arman con el mismo escritor del programa y las
+  pruebas comprueban que el importador los lee, así que no pueden quedar
+  desactualizados. Si una importación falla, el mensaje manda a esa ventana.
 - **Vencimiento de una imagen.** En Propiedades, «Fecha del evento (opcional)»
   y «se queda N días más» (10 por defecto): cuando llega ese día, la imagen pasa
   sola a la pestaña **Eventos pasados** (que se crea sola) y el programa lo

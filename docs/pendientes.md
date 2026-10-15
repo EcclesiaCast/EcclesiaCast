@@ -34,6 +34,20 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       PC: sin ninguna imagen abierta, «➕ Agregar la abierta» pone la barra de
       abajo en rojo, con letra blanca, pulsando unos segundos, y a los ~8 s
       vuelve a la normalidad.
+- [ ] **Cómo preparar una Biblia para importar** (se dibujó la ventana a imagen;
+      falta abrirla en el programa). **Archivo → Cómo preparar una Biblia para
+      importar…** abre una ventana con los dos formatos que se leen, un ejemplo
+      de cada uno (Génesis 1:1-3 y Juan 3:16-17, Reina-Valera 1909) y un
+      recuadro «¿Tu Biblia está en otro formato?». Probá: 1) **Guardar este
+      ejemplo…** del JSON y del XML: se guardan y se abren bien con el Bloc de
+      notas, con los acentos bien; 2) **importá cada ejemplo** con «Importar una
+      Biblia» (cada uno trae 5 versículos: Génesis 1:1-3 y Juan 3:16-17) y
+      proyectá Juan 3:16; 3) **📋 Copiar instrucciones para una IA** y pegalas en
+      el Bloc de notas: se leen enteras y en castellano (idealmente probalas con
+      una IA de verdad y una Biblia tuya en Word o texto, y contame si el
+      programita que arma sirve); 4) «Importar una Biblia…» de esa ventana abre
+      el selector de archivos; 5) con un archivo que no sirve (por ejemplo un
+      .txt renombrado a .json), el mensaje de error ahora manda a esa ventana.
 - [ ] **Teclas en los tooltips (diseño avanzado).** Pasá el mouse por Black,
       Clear, Logo, Sin fondo, Poner en vivo / Apagar salida y Proyectar ▶: el
       globito dice la tecla (F1, F2, F3, F4, Esc, Ctrl+Enter) aunque estés en
@@ -195,11 +209,6 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
 ## 3. Para hacer después de la 1.0
 
 
-- [ ] **Ejemplo de formato para importar Biblias.** Un archivo de ejemplo en
-      JSON y otro en Zefania XML (unos pocos versículos), y en la ventana de
-      importar: «Ver un ejemplo» y «Copiar instrucciones para una IA» (un
-      texto listo para pegar en un chat de IA, que explica el formato para
-      que convierta o revise un archivo).
 - [ ] **Biblias: cómo distribuirlas, al menos en Uruguay.** Lo averiguado el
       7/10/2026: las versiones con derechos (RVR1960, NVI, NTV, TLA, y
       también la TCB y la PDT que Alexis quiere sumar) no se pueden repartir con el programa ni desde un
@@ -215,14 +224,6 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
         Biblia Libre).
       - Una carpeta privada `biblias` junto al instalador, para las PCs de la
         iglesia.
-- [ ] **Canva y Google Slides.** Los PDF y los PowerPoint ya se importan: cada
-      página queda como una imagen en la pestaña de medios elegida, en orden.
-      Para Canva y Google Slides hoy hay que descargarlos como PDF y
-      agregarlos. Mejora posible: pegar el enlace de una presentación pública
-      de Google Slides y que el programa la baje como PDF sola (Canva pide
-      iniciar sesión, así que ahí sigue siendo descargar el PDF). Mientras
-      tanto, con el panel **🌐 Web** se puede abrir Canva o Google Slides con la
-      sesión iniciada y proyectarlos como foto o en vivo.
 
 ## 4. Para versiones futuras
 
@@ -235,6 +236,11 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
   sus condiciones de licencia, y el complemento de NDI en el OBS).
 
 ## 5. Decisiones tomadas
+
+Descartado (15/10/2026): bajar una presentación de Google Slides pegando su
+enlace. Quien lo necesite descarga el PDF y lo agrega (los PDF y PowerPoint ya
+se importan), o abre Canva o Google Slides en el panel **🌐 Web** con la sesión
+iniciada y los proyecta como foto o en vivo.
 
 Buscador de imágenes y GIF (14/10/2026): se hace con **Google Imágenes dentro
 del panel web**, sin API ni claves. Se descartó Tenor (Google cerró su API el

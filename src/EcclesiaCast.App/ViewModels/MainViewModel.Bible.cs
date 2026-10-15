@@ -843,6 +843,23 @@ public sealed partial class MainViewModel
         LoadBibleBooksAvailable();
     }
 
+    /// <summary>Added to the messages of an import that did not work: where the formats are explained.</summary>
+    private const string HelpHint =
+        "\n\nEn «Archivo → Cómo preparar una Biblia para importar…» hay un ejemplo de cada formato.";
+
+    /// <summary>
+    /// «Cómo preparar una Biblia para importar…»: the two formats, an example of
+    /// each and the instructions for an AI. It can lead straight into the import.
+    /// </summary>
+    [RelayCommand]
+    private void ShowBibleFormatHelp()
+    {
+        var window = new Views.BibleFormatHelpWindow { Owner = Application.Current.MainWindow };
+        window.ShowDialog();
+        if (window.ImportRequested)
+            ImportBible();
+    }
+
     [RelayCommand]
     private void ImportBible()
     {
@@ -866,7 +883,7 @@ public sealed partial class MainViewModel
         {
             Log.Error(ex, "Falló el análisis de la Biblia {Path}", dialog.FileName);
             MessageBox.Show(
-                $"No se pudo leer el archivo:\n\n{ex.Message}",
+                $"No se pudo leer el archivo:\n\n{ex.Message}" + HelpHint,
                 "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
@@ -874,7 +891,8 @@ public sealed partial class MainViewModel
         if (parsed.VerseCount == 0)
         {
             MessageBox.Show(
-                "El archivo no contiene versículos reconocibles.",
+                "El archivo no contiene versículos reconocibles."
+                + HelpHint,
                 "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }

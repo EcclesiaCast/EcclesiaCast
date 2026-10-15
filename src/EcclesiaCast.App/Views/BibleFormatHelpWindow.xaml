@@ -1,0 +1,81 @@
+<Window x:Class="EcclesiaCast.App.Views.BibleFormatHelpWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Cómo preparar una Biblia para importar"
+        Width="760" SizeToContent="Height" MaxHeight="900"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BgBrush}"
+        FontFamily="Segoe UI">
+    <!-- Ayuda para quien trae su propia Biblia: los dos formatos que se leen, un
+         ejemplo real de cada uno (para guardar y mirar en el Bloc de notas) y
+         un texto para pegarle a una IA cuando la Biblia está en otro formato. -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="22,18,22,20">
+            <TextBlock TextWrapping="Wrap" Foreground="White" FontSize="13">
+                <Run Text="EcclesiaCast lee Biblias en dos formatos de archivo."/>
+                <Run Text=" Si la tuya ya está en uno de los dos, usá «Archivo → Importar una Biblia»."
+                     Foreground="{StaticResource MutedBrush}"/>
+            </TextBlock>
+
+            <!-- JSON -->
+            <TextBlock Text="1.  JSON (el más simple)" FontSize="14" FontWeight="SemiBold" Foreground="White" Margin="0,18,0,2"/>
+            <TextBlock TextWrapping="Wrap" FontSize="12" Foreground="{StaticResource MutedBrush}">
+                Un arreglo con los 66 libros, de Génesis a Apocalipsis. Cada libro tiene su nombre y sus
+                capítulos; cada capítulo es la lista de los textos de sus versículos. Es el mismo formato
+                que usa el programa al exportar una versión.
+            </TextBlock>
+            <TextBox x:Name="JsonPreview" IsReadOnly="True" Margin="0,8,0,0" Height="125"
+                     FontFamily="Consolas" FontSize="11.5"
+                     VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                     Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                     BorderBrush="{StaticResource LineBrush}" Padding="8,6"/>
+            <Button Content="Guardar este ejemplo…" HorizontalAlignment="Left" Margin="0,8,0,0"
+                    Style="{StaticResource DarkButton}" Padding="12,6" Click="SaveJson_Click"
+                    ToolTip="Guarda un archivo de ejemplo (Salmo 23 y Juan 3:16-17, Reina-Valera 1909) para abrirlo con el Bloc de notas"/>
+
+            <!-- Zefania -->
+            <TextBlock Text="2.  Zefania XML" FontSize="14" FontWeight="SemiBold" Foreground="White" Margin="0,20,0,2"/>
+            <TextBlock TextWrapping="Wrap" FontSize="12" Foreground="{StaticResource MutedBrush}">
+                Un formato muy usado por los programas de Biblia gratuitos. Cada libro lleva su número (de 1 a 66),
+                y adentro los capítulos y los versículos.
+            </TextBlock>
+            <TextBox x:Name="XmlPreview" IsReadOnly="True" Margin="0,8,0,0" Height="150"
+                     FontFamily="Consolas" FontSize="11.5"
+                     VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                     Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                     BorderBrush="{StaticResource LineBrush}" Padding="8,6"/>
+            <Button Content="Guardar este ejemplo…" HorizontalAlignment="Left" Margin="0,8,0,0"
+                    Style="{StaticResource DarkButton}" Padding="12,6" Click="SaveXml_Click"/>
+
+            <!-- Otro formato -->
+            <Border Margin="0,22,0,0" Padding="14,12" CornerRadius="6"
+                    Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="¿Tu Biblia está en otro formato (Word, PDF, un texto, una página)?"
+                               FontSize="13" FontWeight="SemiBold" Foreground="White" TextWrapping="Wrap"/>
+                    <TextBlock TextWrapping="Wrap" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,4,0,0">
+                        Una IA (ChatGPT, Claude, Gemini…) te puede armar un programita que la convierta.
+                        Copiá estas instrucciones, pegalas en el chat y contale cómo es tu archivo.
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <Button Content="📋 Copiar instrucciones para una IA" Style="{StaticResource AccentButton}"
+                                Padding="14,7" Click="CopyInstructions_Click"/>
+                        <TextBlock x:Name="CopiedText" VerticalAlignment="Center" Margin="12,0,0,0" FontSize="12"
+                                   Foreground="{StaticResource AccentSoftBrush}"/>
+                    </StackPanel>
+                    <TextBlock TextWrapping="Wrap" FontSize="11" Foreground="{StaticResource FaintBrush}" Margin="0,10,0,0">
+                        Usá sólo una Biblia que tengas derecho a usar: una versión libre, o una que ya tenga licencia
+                        para tu iglesia. Las instrucciones no incluyen ningún texto de Biblia, ni lo mandan a ningún lado:
+                        sólo las pegás vos donde quieras.
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                <Button Content="Cerrar" Style="{StaticResource DarkButton}" IsCancel="True" Padding="18,8"/>
+                <Button Content="Importar una Biblia…" Style="{StaticResource AccentButton}" Margin="10,0,0,0"
+                        Padding="18,8" Click="Import_Click"/>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Window>
