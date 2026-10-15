@@ -15,7 +15,7 @@ no lo sea, porque la solicitud la revisa una persona.
 | **Privacy Policy URL** | `https://github.com/EcclesiaCast/EcclesiaCast/blob/main/docs/privacidad.md` |
 | **Wikipedia URL** | vacío (no tiene) |
 | **Tagline*** | `Free, open source Windows software to project song lyrics, Bible verses, announcements and videos in churches.` |
-| **Category*** | la que más se parezca a *multimedia / presentaciones*; si no hay, *Other*. Si dudás, mandame la lista de opciones. |
+| **Category*** | *Productivity* (opciones: Accessibility, AI Tools, Audio, Developer Tools, Educational, Gaming, Graphics, Productivity, Science, Other) |
 | **Description*** | ya la pegaste (ver «Description» abajo) |
 | **Reputation*** | ver «Reputation» abajo |
 | **Maintainer Type** | *Individual maintainer(s)* (las otras opciones: proyecto comunitario independiente, fundación sin fines de lucro, empresa, otro) |
