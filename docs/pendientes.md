@@ -167,10 +167,10 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
          sección «Code signing policy» en el README, [política de
          privacidad](privacidad.md), firma en `.github/workflows/release.yml`
          (apagada hasta tener las claves) y `.signpath/`.
-      2. [ ] Alexis: verificación en dos pasos activada en GitHub (la piden
-         para todo el equipo). Llenar el formulario de
-         https://signpath.org/apply.html (los textos están en
-         [signpath-solicitud.md](signpath-solicitud.md)) y esperar la respuesta.
+      2. [x] Alexis activó la verificación en dos pasos en GitHub y **mandó la
+         solicitud a SignPath el 15/10/2026** (los textos están en
+         [signpath-solicitud.md](signpath-solicitud.md)). **Esperando la
+         respuesta** por correo (mirar también el correo no deseado).
       3. [ ] Cuando aprueben: en GitHub, *Settings → Secrets and variables →
          Actions*, el secreto `SIGNPATH_API_TOKEN` y la variable
          `SIGNPATH_ORGANIZATION_ID`; en SignPath, el proyecto con el nombre
