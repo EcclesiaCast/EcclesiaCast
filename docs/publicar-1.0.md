@@ -1,7 +1,7 @@
 # Publicar la 1.0 — lista para el día
 
 Todo lo de abajo ya está pensado. **No se hace nada de esto hasta que**: la firma
-de SignPath esté funcionando (ver «Firma digital del instalador» en
+de firma esté resuelta **o se haya decidido publicar sin firma** (ver «Firma digital del instalador» en
 [pendientes.md](pendientes.md)), una beta firmada se haya instalado y probado, y
 Alexis haya usado el programa en un servicio real sin fallas graves.
 
@@ -30,9 +30,9 @@ Cambiar el aviso del principio (hoy dice «Beta»):
 > [contanos](https://github.com/EcclesiaCast/EcclesiaCast/issues).
 ```
 
-Y en «Instalar y firma digital», comprobar que lo que dice sigue siendo verdad (que
-cada versión se aprueba a mano, dos pedidos por versión: el programa y el
-instalador).
+Y en «Instalar y firma digital», comprobar que lo que dice sigue siendo verdad:
+hoy dice que el instalador **no** está firmado. Si para entonces se consiguió
+un certificado, cambiarlo.
 
 ## 3. Etiqueta
 
@@ -43,8 +43,8 @@ git push origin v1.0.0
 ```
 
 El flujo (`.github/workflows/release.yml`) corre las pruebas, arma el programa,
-pide la firma del programa (hay que **aprobarla en SignPath**), arma el
-instalador con el programa ya firmado, pide la firma del instalador (**otra
+pide la firma del programa (sólo si hay firma configurada; si no, se saltea), arma el
+instalador, pide la firma del instalador (**otra
 aprobación**) y publica. Como la etiqueta no lleva guion (`v1.0.0`, no
 `v1.0.0-beta.16`), GitHub la publica como versión estable y no como pre-versión.
 
