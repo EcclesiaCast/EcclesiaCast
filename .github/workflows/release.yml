@@ -145,7 +145,7 @@ jobs:
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          $signing = '[Code signing policy](https://github.com/EcclesiaCast/EcclesiaCast#code-signing-policy) · [Política de privacidad](https://github.com/EcclesiaCast/EcclesiaCast/blob/main/docs/privacidad.md)'
+          $signing = '[Política de privacidad](https://github.com/EcclesiaCast/EcclesiaCast/blob/main/docs/privacidad.md) · El instalador todavía no está firmado digitalmente: ver [Instalar y firma digital](https://github.com/EcclesiaCast/EcclesiaCast#instalar-y-firma-digital)'
           $lines = @(Get-Content -Path CHANGELOG.md -Encoding UTF8)
 
           function Get-Section([string]$name) {

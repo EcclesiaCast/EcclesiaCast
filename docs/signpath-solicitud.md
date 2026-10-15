@@ -1,3 +1,5 @@
+> **Rechazada el 15/10/2026**: SignPath Foundation pidió más visibilidad pública antes de firmar. Este archivo queda como referencia por si se vuelve a pedir; el estado y las opciones están en [pendientes.md](pendientes.md).
+
 # Solicitud a SignPath Foundation (para pegar en https://signpath.org/apply.html)
 
 El formulario es en inglés: los textos de abajo están listos para pegar, campo

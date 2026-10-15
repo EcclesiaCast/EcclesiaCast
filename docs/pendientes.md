@@ -198,48 +198,44 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       encuentra usa `[Sin publicar]`.
 - [ ] **Firma digital del instalador.** Hoy Windows muestra «Editor
       desconocido» y hay que darle a «Más información → Ejecutar de todas
-      formas». Opciones averiguadas el 8/10/2026:
-      - **SignPath Foundation** (recomendada): firma gratis para proyectos de
-        código abierto con licencia aprobada (GPL-3.0 lo es). Firma desde
-        GitHub Actions, en el mismo workflow que arma el instalador. Pide
-        publicar una «política de firma» en la página del proyecto, y en
-        Windows el editor aparece como «SignPath Foundation». Se pide en
-        https://signpath.org/apply.html.
-      - **Certum, certificado para código abierto**: a nombre de Alexis,
-        unos 50 a 70 euros por año (precio a confirmar en shop.certum.eu).
-        Windows igual puede avisar al principio, hasta que el programa junta
-        «reputación».
-      - **Azure Artifact Signing** (Microsoft): no está disponible para
-        personas de Uruguay (sólo Estados Unidos y Canadá).
+      formas».
 
-      Se eligió SignPath. Pasos:
-      1. [x] Preparado en el repositorio y **subido a `main`** (14/10/2026):
-         sección «Code signing policy» en el README, [política de
-         privacidad](privacidad.md), firma en `.github/workflows/release.yml`
-         (apagada hasta tener las claves) y `.signpath/`.
-      2. [x] Alexis activó la verificación en dos pasos en GitHub y **mandó la
-         solicitud a SignPath el 15/10/2026** (los textos están en
-         [signpath-solicitud.md](signpath-solicitud.md)). **Esperando la
-         respuesta** por correo (mirar también el correo no deseado).
-      3. [ ] Cuando aprueben: en GitHub, *Settings → Secrets and variables →
-         Actions*, el secreto `SIGNPATH_API_TOKEN` y la variable
-         `SIGNPATH_ORGANIZATION_ID`; en SignPath, el proyecto con el nombre
-         `EcclesiaCast`, la política `release-signing` (con aprobación
-         manual) y **dos configuraciones de artefacto**: la de instalador,
-         por defecto (`.signpath/artifact-configuration.xml`), y otra con el
-         identificador `app-exe` (`.signpath/artifact-configuration-app.xml`).
-         Desde ahí cada versión pide **dos firmas**, una detrás de la otra, y
-         las dos esperan que las apruebes en SignPath (una hora de plazo cada
-         una) antes de publicarse.
-      4. [x] **Para que las actualizaciones comprueben la firma** (preparado el
-         14/10/2026, sin probar con SignPath real). El programa sólo exige que
-         el instalador nuevo tenga el mismo firmante cuando el programa
-         **instalado** está firmado (`EcclesiaCast.App.exe` o `unins000.exe`).
-         Por eso el flujo firma primero `EcclesiaCast.App.exe` y recién
-         después arma el instalador con el programa ya firmado, y luego firma
-         el instalador. Si SignPath devolviera algo sin firma, el flujo se
-         corta en vez de publicar. Mientras SignPath no esté configurado, la
-         comprobación que queda es el tamaño y el SHA-256 que publica GitHub.
+      **Estado (15/10/2026): SignPath Foundation rechazó la solicitud.** No
+      dijeron nada contra el programa: piden que el proyecto ya tenga
+      «visibilidad pública» (estrellas, bifurcaciones, colaboradores, notas de
+      prensa, menciones en Reddit, YouTube o Stack Overflow, respaldo de una
+      institución) y hoy el repositorio tiene 0 estrellas y 5 descargas. Se
+      puede **volver a pedir** cuando haya más. El README ya no dice que el
+      instalador está firmado: explica cómo instalarlo igual.
+
+      El flujo de GitHub que firma el programa y el instalador **queda armado y
+      apagado** (no hace nada sin las claves), por si algún día se consigue un
+      certificado, sea el que sea.
+
+      Opciones que quedan (averiguadas el 15/10/2026):
+      1. **Seguir sin firmar y juntar visibilidad** (costo 0). La 1.0 sale sin
+         firma, con las instrucciones del README. Para volver a pedir a SignPath:
+         un video corto mostrando el programa, contarlo en comunidades de iglesias y
+         de tecnología para iglesias, y que otras iglesias lo usen y lo
+         marquen con estrella. Nada de estrellas compradas: lo notan.
+      2. **Certificado propio de Certum, en la nube** (SimplySign): desde unos
+         49 € según su tienda, a **tu nombre** (Windows mostraría tu nombre como
+         editor), con un plazo más corto desde marzo de 2026 que hay que mirar
+         antes de comprar. Windows igual puede avisar al principio, hasta que el
+         programa junta «reputación». Habría que averiguar cómo firmar desde
+         GitHub (lo más probable es firmar en tu PC al armar el instalador).
+      3. **SignPath con suscripción paga**
+         (<https://docs.signpath.io/change-subscription>): no hay precios
+         públicos que se vean (los planes dependen de cuántos proyectos), hay que
+         pedir cotización, y falta confirmar si el certificado viene incluido o
+         hay que comprarlo aparte.
+      4. **Azure Artifact Signing** (Microsoft): **no sirve**, sólo da firma a
+         personas de Estados Unidos y Canadá y a organizaciones de EE.UU., Canadá,
+         la Unión Europea y el Reino Unido.
+      5. Sin averiguar: distribuir por la Microsoft Store (Microsoft firma el
+         paquete), que cambiaría cómo se instala y se actualiza el programa.
+
+      **Decisión pendiente de Alexis:** cuál de estas.
 - [ ] Actualizar README y CHANGELOG (hoy dicen «Beta») y taguear `v1.0.0`. La
       lista paso a paso, ya redactada, está en [publicar-1.0.md](publicar-1.0.md).
 

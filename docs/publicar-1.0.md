@@ -30,7 +30,7 @@ Cambiar el aviso del principio (hoy dice «Beta»):
 > [contanos](https://github.com/EcclesiaCast/EcclesiaCast/issues).
 ```
 
-Y en «Code signing policy», comprobar que lo que dice sigue siendo verdad (que
+Y en «Instalar y firma digital», comprobar que lo que dice sigue siendo verdad (que
 cada versión se aprueba a mano, dos pedidos por versión: el programa y el
 instalador).
 

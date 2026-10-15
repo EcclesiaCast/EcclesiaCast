@@ -57,24 +57,19 @@ Todo vive en `%APPDATA%\EcclesiaCast\ecclesiacast.db` — copiá ese archivo y t
 
 Qué se conecta a internet y cuándo: [política de privacidad](docs/privacidad.md).
 
-## Code signing policy
+## Instalar y firma digital
 
-*Política de firma de código.*
+Los instaladores de EcclesiaCast **todavía no están firmados digitalmente**
+(*the installers are not code-signed yet*). Por eso, la primera vez que lo
+abrís, Windows puede mostrar «Windows protegió su PC» o «Editor desconocido».
+Si lo bajaste de la [página de versiones](https://github.com/EcclesiaCast/EcclesiaCast/releases)
+de este repositorio, tocá **Más información → Ejecutar de todas formas**.
 
-Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/).
+Para comprobar que el archivo es el que se publicó, GitHub muestra su huella
+**SHA-256** junto a cada instalador, y el programa la verifica antes de
+actualizarse solo. El instalador lo compila GitHub Actions a partir del código de
+este repositorio (`.github/workflows/release.yml`).
 
-*(Firma de código gratuita de SignPath.io, con certificado de SignPath Foundation.)*
-
-- **Autores y revisores** (*committers and reviewers*): los
-  [miembros de la organización EcclesiaCast](https://github.com/orgs/EcclesiaCast/people);
-  hoy, Alexis Pérez ([@alexisperez7](https://github.com/alexisperez7)). Los
-  cambios de cualquier otra persona entran sólo por *pull request*, revisados
-  por un autor.
-- **Aprobadores** (*approvers*): los dueños de la organización; hoy, Alexis
-  Pérez ([@alexisperez7](https://github.com/alexisperez7)).
-- Sólo se firman el programa y el instalador que GitHub Actions compila desde el código de
-  este repositorio, y **cada versión se aprueba a mano** antes de firmarse (el
-  programa y el instalador, uno por uno).
 - **Privacidad:** [política de privacidad](docs/privacidad.md).
 
 ## Contribuir
