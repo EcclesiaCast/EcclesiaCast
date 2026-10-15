@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- What SignPath signs in the first request of a release: the program itself.
+     The release workflow uploads EcclesiaCast.App.exe alone (a zip with that one
+     file) before it builds the installer, so the signed program is what the
+     installer carries. Create it in the SignPath project as an extra artifact
+     configuration with the slug «app-exe» (the installer's is the default one,
+     artifact-configuration.xml). -->
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <zip-file>
+    <pe-file path="EcclesiaCast.App.exe">
+      <authenticode-sign/>
+    </pe-file>
+  </zip-file>
+</artifact-configuration>

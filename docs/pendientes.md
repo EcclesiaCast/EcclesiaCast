@@ -163,29 +163,32 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
         personas de Uruguay (sólo Estados Unidos y Canadá).
 
       Se eligió SignPath. Pasos:
-      1. [x] Preparado en el repositorio (8/10/2026): sección «Code signing
-         policy» en el README, [política de privacidad](privacidad.md),
-         firma en `.github/workflows/release.yml` (apagada hasta tener las
-         claves) y `.signpath/artifact-configuration.xml`. **Falta subirlo a
-         GitHub** (push a `main`), porque SignPath lo mira ahí.
+      1. [x] Preparado en el repositorio y **subido a `main`** (14/10/2026):
+         sección «Code signing policy» en el README, [política de
+         privacidad](privacidad.md), firma en `.github/workflows/release.yml`
+         (apagada hasta tener las claves) y `.signpath/`.
       2. [ ] Alexis: verificación en dos pasos activada en GitHub (la piden
          para todo el equipo). Llenar el formulario de
-         https://signpath.org/apply.html y esperar la respuesta.
+         https://signpath.org/apply.html (los textos están en
+         [signpath-solicitud.md](signpath-solicitud.md)) y esperar la respuesta.
       3. [ ] Cuando aprueben: en GitHub, *Settings → Secrets and variables →
          Actions*, el secreto `SIGNPATH_API_TOKEN` y la variable
          `SIGNPATH_ORGANIZATION_ID`; en SignPath, el proyecto con el nombre
-         `EcclesiaCast`, la política `release-signing` y la configuración
-         del archivo de `.signpath/`. Desde ahí cada versión espera que la
-         apruebes en SignPath (hay una hora de plazo) antes de publicarse.
-      4. [ ] **Para que las actualizaciones comprueben la firma.** El programa
-         sólo exige que el instalador nuevo tenga el mismo firmante cuando el
-         programa **instalado** está firmado (`EcclesiaCast.App.exe` o
-         `unins000.exe`). La configuración actual de `.signpath/` firma sólo
-         el `setup.exe`, y los archivos que el instalador deja en la
-         carpeta del programa quedan sin firma, así que esa comprobación nunca
-         se activaría. Falta firmar también `EcclesiaCast.App.exe` (en el mismo
-         pedido de SignPath, antes de armar el instalador) o que el instalador
-         firme el desinstalador (`SignedUninstaller`). Mientras tanto, la
+         `EcclesiaCast`, la política `release-signing` (con aprobación
+         manual) y **dos configuraciones de artefacto**: la de instalador,
+         por defecto (`.signpath/artifact-configuration.xml`), y otra con el
+         identificador `app-exe` (`.signpath/artifact-configuration-app.xml`).
+         Desde ahí cada versión pide **dos firmas**, una detrás de la otra, y
+         las dos esperan que las apruebes en SignPath (una hora de plazo cada
+         una) antes de publicarse.
+      4. [x] **Para que las actualizaciones comprueben la firma** (preparado el
+         14/10/2026, sin probar con SignPath real). El programa sólo exige que
+         el instalador nuevo tenga el mismo firmante cuando el programa
+         **instalado** está firmado (`EcclesiaCast.App.exe` o `unins000.exe`).
+         Por eso el flujo firma primero `EcclesiaCast.App.exe` y recién
+         después arma el instalador con el programa ya firmado, y luego firma
+         el instalador. Si SignPath devolviera algo sin firma, el flujo se
+         corta en vez de publicar. Mientras SignPath no esté configurado, la
          comprobación que queda es el tamaño y el SHA-256 que publica GitHub.
 - [ ] Actualizar README y CHANGELOG (hoy dicen «Beta») y taguear `v1.0.0`.
 

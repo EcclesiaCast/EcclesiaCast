@@ -72,8 +72,9 @@ Free code signing provided by [SignPath.io](https://about.signpath.io/), certifi
   por un autor.
 - **Aprobadores** (*approvers*): los dueños de la organización; hoy, Alexis
   Pérez ([@alexisperez7](https://github.com/alexisperez7)).
-- Sólo se firman los instaladores que GitHub Actions compila desde el código de
-  este repositorio, y **cada versión se aprueba a mano** antes de firmarse.
+- Sólo se firman el programa y el instalador que GitHub Actions compila desde el código de
+  este repositorio, y **cada versión se aprueba a mano** antes de firmarse (el
+  programa y el instalador, uno por uno).
 - **Privacidad:** [política de privacidad](docs/privacidad.md).
 
 ## Contribuir

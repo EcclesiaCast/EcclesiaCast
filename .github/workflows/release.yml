@@ -49,6 +49,45 @@ jobs:
           -p:Version=${{ steps.version.outputs.version }}
           --output publish
 
+      # The program itself is signed BEFORE the installer is built, so the
+      # signed EcclesiaCast.App.exe is what goes inside it. The updater only
+      # checks that a new installer has the same publisher as the installed
+      # program when that program is signed, so this is what turns the check on.
+      # Two requests per release: this one (artifact configuration «app-exe»,
+      # see .signpath/artifact-configuration-app.xml) and the installer's below.
+      # Both wait for a hand approval in SignPath. Off until SignPath is set up.
+      - name: Upload unsigned application
+        id: unsigned-app
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: EcclesiaCast-app-unsigned
+          path: publish/EcclesiaCast.App.exe
+
+      - name: Sign application (SignPath)
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: EcclesiaCast
+          signing-policy-slug: release-signing
+          artifact-configuration-slug: app-exe
+          github-artifact-id: ${{ steps.unsigned-app.outputs.artifact-id }}
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: signed-app
+
+      - name: Use the signed application
+        if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        shell: pwsh
+        run: |
+          Copy-Item signed-app\EcclesiaCast.App.exe publish\ -Force
+          $signature = Get-AuthenticodeSignature publish\EcclesiaCast.App.exe
+          $signature | Format-List Path, Status, SignerCertificate
+          # An installer must never go out with an unsigned program inside it
+          # when signing is on: that would turn the updater's check into a lie.
+          if (-not $signature.SignerCertificate) { throw 'EcclesiaCast.App.exe came back from SignPath without a signature.' }
+
       - name: Build installer
         shell: pwsh
         run: |
@@ -85,7 +124,9 @@ jobs:
         shell: pwsh
         run: |
           Copy-Item signed\*.exe dist\ -Force
-          Get-AuthenticodeSignature dist\*.exe | Format-List Path, Status, SignerCertificate
+          $signatures = Get-AuthenticodeSignature dist\*.exe
+          $signatures | Format-List Path, Status, SignerCertificate
+          if ($signatures | Where-Object { -not $_.SignerCertificate }) { throw 'The installer came back from SignPath without a signature.' }
 
       - uses: actions/upload-artifact@v4
         with:
