@@ -61,11 +61,12 @@ public class SignatureTests
         while (directory is not null && !Directory.Exists(Path.Combine(directory.FullName, "src", "EcclesiaCast.App")))
             directory = directory.Parent;
 
-        var app = directory is null
+        var bin = directory is null ? null : Path.Combine(directory.FullName, "src", "EcclesiaCast.App", "bin");
+        var app = bin is null || !Directory.Exists(bin)
             ? null
-            : Directory.EnumerateFiles(Path.Combine(directory.FullName, "src", "EcclesiaCast.App", "bin"), "EcclesiaCast.App.exe", SearchOption.AllDirectories).FirstOrDefault();
+            : Directory.EnumerateFiles(bin, "EcclesiaCast.App.exe", SearchOption.AllDirectories).FirstOrDefault();
         if (app is null)
-            return; // not built here
+            return; // not built here (a clean checkout only builds what the tests need)
 
         Assert.False(Reader.Read(app).IsSigned);
     }

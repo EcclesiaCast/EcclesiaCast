@@ -112,11 +112,20 @@ public class BeforeUpdateBackupTests : IDisposable
     [Fact]
     public void The_original_library_is_left_as_it_was()
     {
-        var before = new FileInfo(_database.Path).Length;
+        // With something in it, so «as it was» means something. The size of the
+        // file is not the measure: SQLite moves what its journal holds into the
+        // main file whenever it is opened, which changes the size and nothing else.
+        new MediaRepository(_database.Path).Add(new EcclesiaCast.Core.Media.MediaItem
+        {
+            Name = "Afiche", Path = "C:/x/afiche.png", Category = "Anuncios",
+        });
+        var before = DatabaseBackup.Inspect(_database.Path);
+        Assert.Equal(1, before!.MediaItems);
 
         DatabaseBackup.CreateBeforeUpdate(_database.Path, _folder, "1.0.0");
 
-        Assert.Equal(before, new FileInfo(_database.Path).Length);
-        Assert.NotNull(DatabaseBackup.Inspect(_database.Path));
+        Assert.Equal(before, DatabaseBackup.Inspect(_database.Path));
+        var copy = DatabaseBackup.Inspect(Path.Combine(_folder, "antes-de-1.0.0.db"));
+        Assert.Equal(before, copy);
     }
 }
