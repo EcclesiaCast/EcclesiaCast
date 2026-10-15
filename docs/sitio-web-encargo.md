@@ -48,6 +48,26 @@ proyecto no maneja inglés), simple y sin jerga.
   preguntas, preferir los *issues* de GitHub, que quedan a la vista de todos.
 - La página no pide ni guarda datos de nadie: ni formularios ni correo propio.
 
+## Decisiones (15/10/2026)
+
+- **La iglesia** se nombra: Iglesia Pan de Vida (Iglesia de Dios Misiones
+  Mundiales es la denominación), Montevideo, Uruguay.
+- **Las capturas y el video** los saca Claude del programa real, con una
+  biblioteca de prueba aparte (Biblias libres y un himno sin derechos).
+- **Logo nuevo, sin la cruz.** Lo diseña Claude; el ícono actual no le gusta
+  a Alexis.
+- **Requisitos:** mínimo y recomendado los estima Claude (y la página dice que
+  el mínimo es una estimación). Probado en la PC de la iglesia (i5-10400F,
+  16 GB, RTX 3050) y en la notebook de Alexis (Lenovo Slim 5 16, Ryzen AI 7
+  350, 16 GB, SSD de 1 TB).
+- **Funciones:** sólo las que ya se usaron en un servicio.
+- **El video** va como archivo en la página (no un YouTube incrustado, que
+  rastrea); la página puede salir antes que el video.
+- **GitHub Pages y el campo «Website»** del repositorio los configura Claude,
+  avisando antes.
+- **La privacidad** va como página propia del sitio.
+- **Textos:** la propuesta está en [sitio-web-propuesta.md](sitio-web-propuesta.md).
+
 ## Cosas que NO se pueden decir
 
 - Que el instalador está firmado o que lo avala SignPath.
