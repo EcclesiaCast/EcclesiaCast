@@ -59,7 +59,7 @@ jobs:
       - name: Upload unsigned application
         id: unsigned-app
         if: vars.SIGNPATH_ORGANIZATION_ID != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: EcclesiaCast-app-unsigned
           path: publish/EcclesiaCast.App.exe
@@ -101,7 +101,7 @@ jobs:
       - name: Upload unsigned installer
         id: unsigned
         if: vars.SIGNPATH_ORGANIZATION_ID != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: EcclesiaCast-installer-unsigned
           path: dist/*.exe
@@ -128,7 +128,7 @@ jobs:
           $signatures | Format-List Path, Status, SignerCertificate
           if ($signatures | Where-Object { -not $_.SignerCertificate }) { throw 'The installer came back from SignPath without a signature.' }
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: EcclesiaCast-installer
           path: dist/*.exe
