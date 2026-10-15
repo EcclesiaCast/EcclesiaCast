@@ -36,6 +36,13 @@ public static class OutputPage
             #canvas.centro { justify-content: center; }
             #canvas.abajo  { justify-content: flex-end; }
 
+            /* The picture or video of the announcements page, behind the words
+               (the words ride over it, as on the projector). */
+            #media {
+              position: absolute; inset: 0; width: 100%; height: 100%;
+              background: transparent;
+            }
+
             #main, #secondary { margin: 0; white-space: pre-wrap; line-height: 1.15; }
             /* The marker pen, the same yellow as on the projector. */
             mark { background: #E8C34A; color: #000; text-shadow: none; }
@@ -70,6 +77,7 @@ public static class OutputPage
           </style>
         </head>
         <body>
+          <div id="mediaBox"></div>
           <div id="canvas" class="centro">
             <div id="main"></div>
             <div id="secondary" class="oculto"></div>
@@ -86,7 +94,15 @@ public static class OutputPage
             var pin = params.get('pin') || '';
             if (params.get('fondo') === 'negro') document.body.classList.add('opaco');
 
+            // The page has one address per channel: /salida (everything),
+            // /salida/biblia, /salida/canciones and /salida/anuncios. The server
+            // does the choosing; the page only says which one it is.
+            var canal = (location.pathname.replace(/\/+$/, '').split('/')[2] || '').toLowerCase();
+            var sound = params.get('sonido') === '1';
+
             var canvas = document.getElementById('canvas');
+            var mediaBox = document.getElementById('mediaBox');
+            var mediaKey = '';
             var main = document.getElementById('main');
             var secondary = document.getElementById('secondary');
             var caption = document.getElementById('caption');
@@ -112,7 +128,34 @@ public static class OutputPage
               if (at < text.length) el.appendChild(document.createTextNode(text.substring(at)));
             }
 
+            // Draws the picture or video that is alone on the screen, and takes it
+            // away when it goes. The element is only rebuilt when the media
+            // changes, or the video would start over at every poll. The video is
+            // muted: the projector already plays its sound, and a second copy of
+            // it in the stream would be an echo (add «&sonido=1» to hear it).
+            function paintMedia(media) {
+              var key = media ? media.kind + ':' + media.id + ':' + media.fit + ':' + media.loop : '';
+              if (key === mediaKey) return;
+              mediaKey = key;
+              mediaBox.textContent = '';
+              if (!media) return;
+
+              var el = document.createElement(media.kind === 'video' ? 'video' : 'img');
+              el.id = 'media';
+              el.src = '/api/media?pin=' + encodeURIComponent(pin) + '&id=' + media.id;
+              el.style.objectFit = media.fit || 'cover';
+              if (media.kind === 'video') {
+                el.autoplay = true;
+                el.loop = !!media.loop;
+                el.muted = !sound;
+                el.playsInline = true;
+                el.addEventListener('canplay', function () { el.play().catch(function () {}); });
+              }
+              mediaBox.appendChild(el);
+            }
+
             function paint(s) {
+              paintMedia(s.media);
               // Sizes come over as points on the 1080-high canvas the
               // projector renders to, so they are turned into viewport
               // units and the stream can be any resolution.
@@ -161,7 +204,7 @@ public static class OutputPage
             var espera = 300;
 
             function poll() {
-              fetch('/api/output?pin=' + encodeURIComponent(pin))
+              fetch('/api/output?pin=' + encodeURIComponent(pin) + '&canal=' + encodeURIComponent(canal))
                 .then(function (r) {
                   if (r.status === 403 || r.status === 429) {
                     espera = Math.min(espera * 2, 10000);

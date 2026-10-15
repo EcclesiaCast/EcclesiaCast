@@ -435,6 +435,29 @@ poner encima de la cámara. No hace falta placa capturadora ni otra computadora.
 - Si tu programa no maneja transparencia, agregale `&fondo=negro` al final de
   la dirección.
 
+#### Cada cosa en su propia capa
+
+La dirección de arriba muestra **todo junto**. Si querés ponerlas en capas
+separadas de la transmisión (y mostrar u ocultar cada una por su cuenta), en la
+misma ventana hay tres botones que copian la dirección de cada una. Se pegan en
+un **Browser Source** distinto cada una:
+
+| Dirección | Qué muestra |
+|---|---|
+| `/salida/biblia` | sólo los versículos |
+| `/salida/canciones` | sólo la letra de las canciones |
+| `/salida/anuncios` | el texto rápido, las **imágenes y videos** que están solos en pantalla (también las páginas de una presentación), el aviso al pie y la cuenta regresiva |
+
+- Cada página muestra lo suyo sólo cuando eso está al aire en el proyector, y
+  queda vacía (transparente) el resto del tiempo.
+- Las imágenes y los videos se ajustan como en el proyector (Rellenar, Ajustar o
+  Estirar). El zoom y el corrimiento de Propiedades **no** se aplican.
+- El video **va sin sonido** en la transmisión, porque el sonido ya sale por la
+  computadora del proyector. Si lo querés ahí, agregá `&sonido=1` al final.
+- Un video en la transmisión empieza cuando aparece, no necesariamente al mismo
+  tiempo que en el proyector: son dos reproducciones separadas.
+- La dirección que no lleva nada atrás (`/salida`) sigue siendo la de siempre.
+
 > El PIN existe porque cualquiera conectado a la wifi podría, si no, manejar la
 > proyección. Cambiá de PIN apagando y volviendo a prender el control remoto.
 

@@ -57,6 +57,9 @@ public sealed class RemoteControlServer : IDisposable
     /// </summary>
     public string BroadcastAddress => $"{Address}/salida?pin={Pin}";
 
+    /// <summary>The streaming page of one channel (everything, or only the Bible, the songs or the announcements), with the PIN.</summary>
+    public string BroadcastAddressFor(OutputChannel channel) => $"{Address}{OutputChannels.Path(channel)}?pin={Pin}";
+
     /// <summary>Starts listening. Returns false when no port could be opened.</summary>
     public bool Start(int preferredPort, string pin)
     {
@@ -166,8 +169,13 @@ public sealed class RemoteControlServer : IDisposable
                 var target = parts[1];
 
                 var contentLength = 0;
+                string? range = null;
                 while (await reader.ReadLineAsync(cancellation) is { } header && header.Length > 0)
                 {
+                    // A video asks for the piece it needs, and to loop it asks again.
+                    if (header.StartsWith("Range:", StringComparison.OrdinalIgnoreCase))
+                        range = header[6..].Trim();
+
                     if (header.StartsWith("Content-Length:", StringComparison.OrdinalIgnoreCase)
                         && int.TryParse(header[15..].Trim(), out var length))
                         contentLength = Math.Clamp(length, 0, 64 * 1024);
@@ -181,7 +189,7 @@ public sealed class RemoteControlServer : IDisposable
                     body = new string(buffer, 0, read);
                 }
 
-                await RespondAsync(stream, method, target, body, caller, cancellation);
+                await RespondAsync(stream, method, target, body, caller, range, cancellation);
             }
             catch (Exception ex)
             {
@@ -191,7 +199,7 @@ public sealed class RemoteControlServer : IDisposable
     }
 
     private async Task RespondAsync(
-        NetworkStream stream, string method, string target, string body, string caller,
+        NetworkStream stream, string method, string target, string body, string caller, string? range,
         CancellationToken cancellation)
     {
         var path = target.Split('?')[0];
@@ -205,7 +213,9 @@ public sealed class RemoteControlServer : IDisposable
         // The streaming page and its data. It is the same PIN, carried in the
         // URL the operator copies into OBS, because a Browser Source has
         // nowhere to type one.
-        if (method == "GET" && path is "/salida" or "/output")
+        // The same page at four addresses: everything, or only the Bible, the
+        // songs or the announcements (the page reads which from its own address).
+        if (method == "GET" && OutputChannels.FromPath(path) is not null)
         {
             await WriteAsync(stream, 200, "text/html; charset=utf-8", OutputPage.Html, cancellation);
             return;
@@ -220,9 +230,39 @@ public sealed class RemoteControlServer : IDisposable
                 return;
             }
 
-            var output = await OnUiThread(() => _host.GetOutput());
+            var channel = OutputChannels.FromName(QueryValue(target, "canal"));
+            var output = await OnUiThread(() => _host.GetOutput(channel));
             await WriteAsync(stream, 200, "application/json; charset=utf-8",
                 JsonSerializer.Serialize(output, Json), cancellation);
+            return;
+        }
+
+        // A picture or video of the library for the announcements page. Like the
+        // posters, it is asked for by id: the path is found on this side, and only
+        // images and videos of the library can be fetched.
+        if (path == "/api/media" && method == "GET")
+        {
+            var check = CheckPin(QueryValue(target, "pin"), caller);
+            if (!check.Ok)
+            {
+                await WriteDeniedAsync(stream, check, cancellation);
+                return;
+            }
+
+            if (!int.TryParse(QueryValue(target, "id"), out var mediaId))
+            {
+                await WriteAsync(stream, 400, "application/json", """{"error":"id"}""", cancellation);
+                return;
+            }
+
+            var file = await OnUiThread(() => _host.GetMediaFile(mediaId));
+            if (file is null)
+            {
+                await WriteAsync(stream, 404, "text/plain", "No encontrado", cancellation);
+                return;
+            }
+
+            await WriteFileAsync(stream, file, range, cancellation);
             return;
         }
 
@@ -436,6 +476,86 @@ public sealed class RemoteControlServer : IDisposable
         await stream.WriteAsync(payload, cancellation);
         await stream.FlushAsync(cancellation);
     }
+
+    /// <summary>
+    /// A file, whole or the piece a browser asked for with «Range». A video
+    /// needs it to start from the middle and to loop; without it the player in
+    /// OBS plays once and stops. The file is sent in pieces, never read whole
+    /// into memory (a video can be hundreds of megabytes).
+    /// </summary>
+    private static async Task WriteFileAsync(NetworkStream stream, string path, string? rangeHeader, CancellationToken cancellation)
+    {
+        FileStream file;
+        try
+        {
+            file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete, 81920, useAsync: true);
+        }
+        catch (IOException)
+        {
+            await WriteAsync(stream, 404, "text/plain", "No encontrado", cancellation);
+            return;
+        }
+
+        await using (file)
+        {
+            var length = file.Length;
+            if (ByteRange.IsPastTheEnd(rangeHeader, length))
+            {
+                var refusal = Encoding.ASCII.GetBytes(
+                    "HTTP/1.1 416 Range Not Satisfiable\r\n"
+                    + $"Content-Range: bytes */{length}\r\n"
+                    + "Content-Length: 0\r\nConnection: close\r\n\r\n");
+                await stream.WriteAsync(refusal, cancellation);
+                return;
+            }
+
+            var range = ByteRange.Parse(rangeHeader, length);
+            var start = range?.Start ?? 0;
+            var end = range?.End ?? length - 1;
+            var count = length == 0 ? 0 : end - start + 1;
+
+            var header = new StringBuilder()
+                .Append(range is null ? "HTTP/1.1 200 OK\r\n" : "HTTP/1.1 206 Partial Content\r\n")
+                .Append($"Content-Type: {ContentTypeOf(path)}\r\n")
+                .Append($"Content-Length: {count}\r\n")
+                .Append("Accept-Ranges: bytes\r\n")
+                .Append("Cache-Control: private, max-age=60\r\n");
+            if (range is not null)
+                header.Append($"Content-Range: bytes {start}-{end}/{length}\r\n");
+            header.Append("Connection: close\r\n\r\n");
+            await stream.WriteAsync(Encoding.ASCII.GetBytes(header.ToString()), cancellation);
+
+            file.Seek(start, SeekOrigin.Begin);
+            var buffer = new byte[81920];
+            var left = count;
+            while (left > 0)
+            {
+                var read = await file.ReadAsync(buffer.AsMemory(0, (int)Math.Min(buffer.Length, left)), cancellation);
+                if (read == 0)
+                    break;
+
+                // The player closes the connection whenever it has what it wanted
+                // (every seek): that surfaces as an error here, handled by the caller.
+                await stream.WriteAsync(buffer.AsMemory(0, read), cancellation);
+                left -= read;
+            }
+
+            await stream.FlushAsync(cancellation);
+        }
+    }
+
+    private static string ContentTypeOf(string path) => Path.GetExtension(path).ToLowerInvariant() switch
+    {
+        ".jpg" or ".jpeg" => "image/jpeg",
+        ".png" => "image/png",
+        ".gif" => "image/gif",
+        ".webp" => "image/webp",
+        ".bmp" => "image/bmp",
+        ".mp4" or ".m4v" => "video/mp4",
+        ".webm" => "video/webm",
+        ".mov" => "video/quicktime",
+        _ => "application/octet-stream",
+    };
 
     /// <summary>
     /// A picture. Unlike the data routes it may be kept by the phone for an

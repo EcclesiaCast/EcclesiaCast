@@ -68,6 +68,22 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
          ve en la diapositiva (también en pantalla si está proyectado) y sigue
          ahí al cerrar y abrir el programa. Probalo en una Biblia importada de
          prueba, no en la que usás en el servicio.
+- [ ] **Biblia, canciones y anuncios en capas separadas para OBS** (el servidor y
+      la página se comprobaron con un banco de pruebas y un navegador, sin el
+      programa abierto y sin OBS: 20 comprobaciones del servidor y las tres
+      páginas dibujadas con una imagen y un video). Con el 📱 prendido, en la
+      ventana hay tres botones **Copiar: Biblia / Canciones / Anuncios**. Probá en
+      OBS con tres *Browser Source* (uno por dirección, con el ancho y alto de tu
+      escena): 1) proyectá un versículo: sale **sólo** en el de Biblia; 2) una
+      canción: sólo en el de canciones; 3) un texto rápido, una imagen o un video
+      en primer plano, una página de una presentación, un aviso al pie y la cuenta
+      regresiva: sólo en el de anuncios; 4) Clear, Black y Logo vacían las tres;
+      5) el video se ve, se repite si está en bucle y no hace eco (sin sonido);
+      con `&sonido=1` suena; 6) la dirección vieja (`/salida`) sigue mostrando
+      lo mismo que antes, sin imágenes. **Lo que no se probó:** cómo se ve en OBS
+      de verdad (que el fondo quede transparente y que el video no se corte), y si
+      una imagen con zoom o corrimiento se ve distinto que en el proyector (en la
+      transmisión no se aplican).
 - [ ] **Teclas en los tooltips (diseño avanzado).** Pasá el mouse por Black,
       Clear, Logo, Sin fondo, Poner en vivo / Apagar salida y Proyectar ▶: el
       globito dice la tecla (F1, F2, F3, F4, Esc, Ctrl+Enter) aunque estés en
@@ -249,12 +265,10 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
 ## 4. Para versiones futuras
 
 - **Acerca de: una forma de colaborar.**
-- **Salidas separadas para OBS (NDI).** Mandar al OBS, por separado, la
-  Biblia, las canciones y los anuncios (imágenes y videos). Primero con
-  páginas web separadas (`/salida/biblia`, `/salida/canciones`,
-  `/salida/anuncios`, con fondo transparente, sobre la página `/salida` que ya
-  existe); NDI de verdad después, si hace falta (necesita el kit de NDI, con
-  sus condiciones de licencia, y el complemento de NDI en el OBS).
+- **NDI para OBS.** Las salidas separadas ya están como páginas web
+  (`/salida/biblia`, `/salida/canciones`, `/salida/anuncios`). NDI de verdad, si
+  hace falta más adelante, necesita el kit de NDI (con sus condiciones de
+  licencia) y el complemento de NDI en el OBS.
 
 ## 5. Decisiones tomadas
 

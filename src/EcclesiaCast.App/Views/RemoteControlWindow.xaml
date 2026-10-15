@@ -65,6 +65,20 @@
                 <Button Content="Copiar la dirección" Style="{StaticResource DarkButton}"
                         FontSize="11" Padding="10,4" Margin="0,8,0,0"
                         HorizontalAlignment="Left" Click="CopyBroadcast_Click"/>
+
+                <TextBlock Text="¿Querés cada cosa en su propia capa de la transmisión? Hay una dirección para cada una: la Biblia, las canciones y los anuncios (texto rápido, imágenes, videos, el aviso al pie y la cuenta regresiva). Así podés mostrar u ocultar cada una por separado."
+                           FontSize="11" Foreground="{StaticResource FaintBrush}"
+                           TextWrapping="Wrap" Margin="0,12,0,6"/>
+                <WrapPanel>
+                    <Button Content="Copiar: Biblia" Tag="Bible" Style="{StaticResource DarkButton}"
+                            FontSize="11" Padding="10,4" Margin="0,0,6,0" Click="CopyChannel_Click"/>
+                    <Button Content="Copiar: Canciones" Tag="Songs" Style="{StaticResource DarkButton}"
+                            FontSize="11" Padding="10,4" Margin="0,0,6,0" Click="CopyChannel_Click"/>
+                    <Button Content="Copiar: Anuncios" Tag="Announcements" Style="{StaticResource DarkButton}"
+                            FontSize="11" Padding="10,4" Click="CopyChannel_Click"
+                            ToolTip="Con el video se oye el sonido en la transmisión sólo si agregás «&amp;sonido=1» al final: por defecto va sin sonido para no repetir el que sale por el proyector."/>
+                </WrapPanel>
+                <TextBlock x:Name="ChannelCopied" FontSize="11" Foreground="{StaticResource AccentSoftBrush}" Margin="0,6,0,0"/>
             </StackPanel>
         </Border>
 

@@ -1,3 +1,5 @@
+using EcclesiaCast.Core.Remote;
+
 namespace EcclesiaCast.App.Remote;
 
 /// <summary>
@@ -62,7 +64,14 @@ public interface IRemoteHost
     IReadOnlyList<RemoteHit> Search(string query);
 
     /// <summary>The words on the projector, for the broadcast page.</summary>
-    RemoteOutput GetOutput();
+    RemoteOutput GetOutput(OutputChannel channel);
+
+    /// <summary>
+    /// The file of a picture or video of the library, for the announcements page
+    /// of the stream; null when it is not an image or video that exists. The path
+    /// is never taken from the request: the page only names the media by its id.
+    /// </summary>
+    string? GetMediaFile(int mediaId);
 
     /// <summary>Runs one action; <paramref name="index"/> is used by the ones that take a target.</summary>
     void Execute(string action, int? index);
@@ -95,4 +104,12 @@ public sealed record RemoteOutput(
     string AlignH,
     string AlignV,
     IReadOnlyList<int[]> MainMarks,
-    IReadOnlyList<int[]> SecondaryMarks);
+    IReadOnlyList<int[]> SecondaryMarks,
+    RemoteOutputMedia? Media = null);
+
+/// <summary>
+/// The picture or video that is alone on the screen, for the announcements page
+/// of the stream. <paramref name="Fit"/> is a CSS «object-fit» (the projector's
+/// Rellenar, Ajustar and Estirar); the page asks for the file by <paramref name="Id"/>.
+/// </summary>
+public sealed record RemoteOutputMedia(int Id, string Kind, string Fit, bool Loop);

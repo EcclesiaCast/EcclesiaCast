@@ -15,6 +15,7 @@ using EcclesiaCast.Core.Media;
 using EcclesiaCast.Core.Performance;
 using EcclesiaCast.Core.Playlists;
 using EcclesiaCast.Core.Presentation;
+using EcclesiaCast.Core.Remote;
 using EcclesiaCast.Core.Songs;
 using EcclesiaCast.Core.Stage;
 using EcclesiaCast.Core.Timing;
@@ -207,21 +208,27 @@ public sealed partial class MainViewModel
     /// Logo all mean "no words on screen" here — a clean feed follows the
     /// projector rather than second-guessing it.
     /// </summary>
-    RemoteOutput IRemoteHost.GetOutput()
+    RemoteOutput IRemoteHost.GetOutput(OutputChannel channel)
     {
         var slide = Projection.Slide;
         var theme = slide?.Theme ?? SlideTheme.Fallback;
         var over = slide?.Override;
         var countdown = _presentation.Countdown;
 
+        // Each page of the stream shows only its own kind of thing: the words
+        // of a verse go to the Bible page and nowhere else, and so on. The page
+        // with everything keeps showing what it always did.
+        var belongs = channel == OutputChannel.All || OutputChannels.Shows(channel, OnAir);
+        var overlays = OutputChannels.ShowsOverlays(channel);
+
         return new RemoteOutput(
-            ShowText: IsProjecting && _presentation.State == OutputState.Content && slide is not null,
+            ShowText: belongs && IsProjecting && _presentation.State == OutputState.Content && slide is not null,
             MainText: slide?.MainText ?? string.Empty,
             SecondaryText: slide?.SecondaryText ?? string.Empty,
             Caption: theme.ShowCaption ? slide?.Caption ?? string.Empty : string.Empty,
-            Overlay: _presentation.OverlayMessage ?? string.Empty,
-            Countdown: countdown?.Format(DateTimeOffset.Now) ?? string.Empty,
-            CountdownHeading: countdown is null || countdown.HasFinished(DateTimeOffset.Now)
+            Overlay: overlays ? _presentation.OverlayMessage ?? string.Empty : string.Empty,
+            Countdown: overlays ? countdown?.Format(DateTimeOffset.Now) ?? string.Empty : string.Empty,
+            CountdownHeading: !overlays || countdown is null || countdown.HasFinished(DateTimeOffset.Now)
                 ? string.Empty
                 : countdown.Heading,
             FontFamily: over?.FontFamily ?? theme.FontFamily,
@@ -234,10 +241,57 @@ public sealed partial class MainViewModel
             AlignH: (over?.AlignH ?? theme.AlignH).ToString().ToLowerInvariant(),
             AlignV: (over?.AlignV ?? theme.AlignV).ToString().ToLowerInvariant(),
             MainMarks: Marks(_presentation.Highlight.Resolve(slide?.MainText)),
-            SecondaryMarks: Marks(_presentation.Highlight.Resolve(slide?.SecondaryText, includeSpans: false)));
+            SecondaryMarks: Marks(_presentation.Highlight.Resolve(slide?.SecondaryText, includeSpans: false)),
+            Media: channel == OutputChannel.Announcements ? OnAirMedia() : null);
 
         static IReadOnlyList<int[]> Marks(IReadOnlyList<TextSpan> spans) =>
             spans.Select(s => new[] { s.Start, s.Length }).ToList();
+    }
+
+    /// <summary>
+    /// The picture or video that is alone on the screen right now, if it is one
+    /// of the library's (a photo of a web page, a logo or a captured window has
+    /// no file to hand over). The page draws it behind the words, fitted the
+    /// way the projector fits it.
+    /// </summary>
+    private RemoteOutputMedia? OnAirMedia()
+    {
+        if (OnAir is not (OnAirSource.Media or OnAirSource.Presentation)
+            || _presentation.Background is not { Id: > 0 } media
+            || media.Type is not (MediaType.Image or MediaType.Video)
+            || ((IRemoteHost)this).GetMediaFile(media.Id) is null)
+            return null;
+
+        return new RemoteOutputMedia(
+            media.Id,
+            media.Type == MediaType.Video ? "video" : "image",
+            media.Scaling switch
+            {
+                MediaScaling.Fit => "contain",
+                MediaScaling.Stretch => "fill",
+                _ => "cover",
+            },
+            Loop: media.Type == MediaType.Video && media.EndBehavior == VideoEndBehavior.Loop);
+    }
+
+    /// <summary>The kinds of file the stream page may be handed: what a browser plays.</summary>
+    private static readonly HashSet<string> StreamableExtensions = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".mp4", ".m4v", ".webm", ".mov",
+    };
+
+    string? IRemoteHost.GetMediaFile(int mediaId)
+    {
+        var media = _allMedia.FirstOrDefault(m => m.Id == mediaId);
+        if (media is null || media.Type is not (MediaType.Image or MediaType.Video))
+            return null;
+
+        var path = media.Path;
+        return !string.IsNullOrWhiteSpace(path)
+               && StreamableExtensions.Contains(Path.GetExtension(path))
+               && File.Exists(path)
+            ? path
+            : null;
     }
 
     void IRemoteHost.Execute(string action, int? index)

@@ -9,6 +9,18 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **La Biblia, las canciones y los anuncios, cada uno en su capa de la
+  transmisión.** Además de la dirección de siempre (`/salida`, todo junto), hay
+  tres más para pegar en un **Browser Source** distinto de OBS (o un Web Input de
+  vMix): `/salida/biblia`, `/salida/canciones` y `/salida/anuncios`. Cada una
+  muestra sólo lo suyo, con el fondo transparente, y queda vacía mientras eso no
+  está al aire. La de anuncios incluye el texto rápido, las **imágenes y videos**
+  que están solos en pantalla (también las páginas de una presentación), el
+  aviso al pie y la cuenta regresiva. En la ventana del 📱 hay un botón que copia
+  la dirección de cada una. El video va sin sonido (agregando `&sonido=1` suena) y
+  se repite si el medio está en bucle. Por dentro, el servidor ahora entrega los
+  archivos por tramos, que es lo que hace falta para que un video se repita en
+  el navegador de OBS.
 - **Cómo preparar una Biblia para importar.** En **Archivo → Cómo preparar una
   Biblia para importar…** hay una ventana que explica los dos formatos que se
   leen (JSON y Zefania XML), con un ejemplo de cada uno que se puede guardar y
