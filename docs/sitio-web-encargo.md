@@ -39,6 +39,15 @@ proyecto no maneja inglés), simple y sin jerga.
    transmisión.
 7. Enlace a la política de privacidad (`docs/privacidad.md`).
 
+## Quién firma y cómo contactarlo
+
+- **Autor y mantenedor:** Alexis Pérez (@alexisperez7 en GitHub).
+- **Correo de contacto:** alexissebastianperez@gmail.com. Alexis lo dio para que
+  figure en la página. Va a quedar **público** (se puede llenar de correo no
+  deseado): ponerlo como enlace «Escribirme» al pie y, para las fallas y
+  preguntas, preferir los *issues* de GitHub, que quedan a la vista de todos.
+- La página no pide ni guarda datos de nadie: ni formularios ni correo propio.
+
 ## Cosas que NO se pueden decir
 
 - Que el instalador está firmado o que lo avala SignPath.
