@@ -715,9 +715,9 @@ public partial class ProjectedView : UserControl
 
     private void ApplyLiveVideo()
     {
-        // On the real output, with the logo up, a live page or window is not
+        // On the real output, with the logo or black up, a live page or window is not
         // listened to nor redrawn: nobody can see it.
-        var logoCovers = IsLiveOutput && State == OutputState.Logo;
+        var logoCovers = IsLiveOutput && State is OutputState.Logo or OutputState.Black;
         var isFeed = !logoCovers && BackgroundMedia?.Type is MediaType.Web or MediaType.Window;
         HookFeed(isFeed ? BackgroundMedia!.Type : null);
 

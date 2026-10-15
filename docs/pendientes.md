@@ -25,10 +25,11 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       probarlo con el proyector real y con los casos que no se probaron: el
       video que rellena los bordes, una página web o una ventana en vivo, y un
       logo que es un video (ése tiene que seguir moviéndose). Apagar y prender
-      la salida con el logo puesto no tiene que arrancar el video. **Black (F1)
-      no se tocó**: el video de atrás sigue corriendo; decime si querés lo
-      mismo. Ojo: elegir un fondo con el logo puesto saca el logo solo (así
-      funcionó siempre).
+      la salida con el logo puesto no tiene que arrancar el video. **Lo mismo
+      con Black (F1)** (se agregó después, no se vio andar): el video se pausa y
+      su sonido se corta mientras la pantalla está en negro, y al sacar el negro
+      sigue donde estaba. Ojo: elegir un fondo con el logo puesto saca el logo
+      solo (así funcionó siempre).
 - [x] **El error de una imagen de Google parpadea.** Comprobado el 14/10 en la
       PC: sin ninguna imagen abierta, «➕ Agregar la abierta» pone la barra de
       abajo en rojo, con letra blanca, pulsando unos segundos, y a los ~8 s

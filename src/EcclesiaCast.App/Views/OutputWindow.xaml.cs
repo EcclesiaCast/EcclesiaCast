@@ -226,7 +226,7 @@ public partial class OutputWindow : Window
 
 
     /// <summary>
-    /// With the logo up nothing behind it needs to move: the background video
+    /// With the logo or the black screen up nothing behind them needs to move: the background video
     /// and the video that fills its bars are paused (they pick up where they
     /// were when the logo goes), and the page or window that is live stops
     /// being redrawn (see <see cref="ProjectedView"/>). The logo's own video
@@ -234,7 +234,7 @@ public partial class OutputWindow : Window
     /// </summary>
     private void UpdateLogoCover()
     {
-        var covered = (DataContext as ProjectionViewModel)?.State == OutputState.Logo;
+        var covered = (DataContext as ProjectionViewModel)?.State is OutputState.Logo or OutputState.Black;
         Video.SetCovered(covered);
         FillVideo.SetCovered(covered);
     }
