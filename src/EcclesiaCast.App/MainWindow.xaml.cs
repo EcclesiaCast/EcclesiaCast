@@ -42,6 +42,11 @@ public partial class MainWindow : Window
             // The web panel: the view model decides when it is open or live;
             // this window shows or hides it and keeps the keyboard honest.
             vm.WebHost = WebPanelView;
+            vm.PropertyChanged += (_, args) =>
+            {
+                if (args.PropertyName == nameof(MainViewModel.StatusAlert))
+                    FlashStatusBar();
+            };
             WebPanelView.KeyboardFocusChanged += (_, _) => SyncShortcutsWithWebFocus();
             vm.PropertyChanged += (_, args) =>
             {
@@ -220,6 +225,64 @@ public partial class MainWindow : Window
 
         menu.IsOpen = true;
     }
+
+    // ── Errores que se ven ───────────────────────────────────────
+
+    private System.Windows.Media.Animation.Storyboard? _statusFlash;
+
+    /// <summary>
+    /// The status bar flashes red three times and the message turns white and
+    /// bold for a few seconds. It is for what the operator must notice (a
+    /// picture that could not be brought in), which a line of grey text at the
+    /// bottom of the window never was.
+    /// </summary>
+    private void FlashStatusBar()
+    {
+        _statusFlash?.Stop(this);
+
+        var red = System.Windows.Media.Color.FromRgb(0xC4, 0x3B, 0x3B);
+        var brush = new System.Windows.Media.SolidColorBrush(red);
+        StatusBorder.Background = brush;
+        StatusLine.Foreground = System.Windows.Media.Brushes.White;
+        StatusLine.FontWeight = FontWeights.SemiBold;
+
+        var pulse = new System.Windows.Media.Animation.ColorAnimation(
+            red, System.Windows.Media.Color.FromArgb(0x30, red.R, red.G, red.B), TimeSpan.FromMilliseconds(450))
+        {
+            AutoReverse = true,
+            RepeatBehavior = new System.Windows.Media.Animation.RepeatBehavior(3),
+        };
+
+        var board = new System.Windows.Media.Animation.Storyboard();
+        board.Children.Add(pulse);
+        System.Windows.Media.Animation.Storyboard.SetTarget(pulse, StatusBorder);
+        System.Windows.Media.Animation.Storyboard.SetTargetProperty(pulse, new PropertyPath("(Border.Background).(SolidColorBrush.Color)"));
+        _statusFlash = board;
+
+        board.Completed += (_, _) =>
+        {
+            if (!ReferenceEquals(_statusFlash, board))
+                return;
+
+            // After the flashing the message stays in a soft red for a while, then back to normal.
+            StatusBorder.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(0x30, red.R, red.G, red.B));
+            var timer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(6) };
+            timer.Tick += (_, _) =>
+            {
+                timer.Stop();
+                if (!ReferenceEquals(_statusFlash, board))
+                    return;
+
+                StatusBorder.Background = System.Windows.Media.Brushes.Transparent;
+                StatusLine.ClearValue(System.Windows.Controls.TextBlock.ForegroundProperty);
+                StatusLine.ClearValue(System.Windows.Controls.TextBlock.FontWeightProperty);
+                StatusLine.SetResourceReference(System.Windows.Controls.TextBlock.ForegroundProperty, "MutedBrush");
+            };
+            timer.Start();
+        };
+        board.Begin(this, true);
+    }
+
 
     // ── Música ───────────────────────────────────────────────────
 

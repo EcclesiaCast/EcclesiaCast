@@ -2448,9 +2448,13 @@
         </Grid>
 
         <!-- ══ Barra de estado ══ -->
-        <TextBlock Grid.Row="3"
-                   Text="{Binding StatusText}"
-                   FontSize="12" Foreground="{StaticResource MutedBrush}"
-                   Margin="14,8,14,10" TextWrapping="Wrap"/>
+        <!-- Un error (por ejemplo una imagen de Google que no se pudo bajar) la hace
+             parpadear en rojo unos segundos: ver FlashStatusBar -->
+        <Border x:Name="StatusBorder" Grid.Row="3" Background="Transparent" CornerRadius="4" Margin="8,2,8,4">
+            <TextBlock x:Name="StatusLine"
+                       Text="{Binding StatusText}"
+                       FontSize="12" Foreground="{StaticResource MutedBrush}"
+                       Margin="6,6,6,8" TextWrapping="Wrap"/>
+        </Border>
     </Grid>
 </Window>

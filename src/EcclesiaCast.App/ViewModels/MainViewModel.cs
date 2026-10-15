@@ -129,6 +129,17 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private string _statusText =
         "Creá una canción con ➕, o escribí un texto rápido y presioná Ctrl+Enter.";
 
+    /// <summary>Goes up by one every time something went wrong that the operator has to see: the window makes the status bar flash.</summary>
+    [ObservableProperty]
+    private int _statusAlert;
+
+    /// <summary>Says what went wrong in the status bar and makes it flash red, because a message nobody notices is a failure nobody hears about.</summary>
+    private void ShowStatusError(string message)
+    {
+        StatusText = message;
+        StatusAlert++;
+    }
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowGridLiveBadge), nameof(ShowOtherLive))]
     private bool _isProjecting;

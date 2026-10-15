@@ -96,8 +96,8 @@ public sealed partial class MainViewModel
     {
         if (string.IsNullOrEmpty(chosen.Source))
         {
-            StatusText = "No encontré una imagen para agregar. Hacé clic en una imagen de Google para abrirla en grande "
-                         + "a la derecha y probá de nuevo (clic derecho sobre ella o «➕ Agregar la abierta»).";
+            ShowStatusError("No encontré una imagen para agregar. Hacé clic en una imagen de Google para abrirla en grande "
+                         + "a la derecha y probá de nuevo (clic derecho sobre ella o «➕ Agregar la abierta»).");
             return;
         }
 
@@ -105,8 +105,8 @@ public sealed partial class MainViewModel
         // in the library. Better to say how to get the real one.
         if (chosen.IsThumbnail)
         {
-            StatusText = "Eso es la miniatura de Google y se vería borrosa. Hacé clic en la imagen para verla grande "
-                         + "a la derecha y probá con clic derecho sobre la grande.";
+            ShowStatusError("Eso es la miniatura de Google y se vería borrosa. Hacé clic en la imagen para verla grande "
+                         + "a la derecha y probá con clic derecho sobre la grande.");
             return;
         }
 
@@ -116,14 +116,14 @@ public sealed partial class MainViewModel
             var bytes = WebImages.FromDataUri(chosen.Source) ?? await DownloadWebImageAsync(chosen);
             if (bytes is null)
             {
-                StatusText = "No se pudo bajar la imagen: el sitio no la dejó. Probá con otra.";
+                ShowStatusError("No se pudo bajar la imagen: el sitio no la dejó. Probá con otra.");
                 return;
             }
 
             var extension = WebImages.ExtensionFor(bytes.AsSpan(0, Math.Min(bytes.Length, 16)));
             if (extension is null)
             {
-                StatusText = "Eso no es una imagen que se pueda agregar. Hacé clic en la imagen para verla grande y probá sobre la grande.";
+                ShowStatusError("Eso no es una imagen que se pueda agregar. Hacé clic en la imagen para verla grande y probá sobre la grande.");
                 return;
             }
 
@@ -145,7 +145,7 @@ public sealed partial class MainViewModel
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or IOException or UnauthorizedAccessException)
         {
             Log.Warning(ex, "No se pudo agregar la imagen {Source}", chosen.Source);
-            StatusText = "No se pudo bajar la imagen. Revisá la conexión a internet y probá de nuevo.";
+            ShowStatusError("No se pudo bajar la imagen. Revisá la conexión a internet y probá de nuevo.");
         }
     }
 
