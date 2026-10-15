@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="EcclesiaCast">
+  <rect width="200" height="200" rx="44" fill="#13294B"/>
+  <rect x="38" y="54" width="124" height="92" rx="13" fill="none" stroke="#FFFFFF" stroke-width="10"/>
+  <path d="M100 66 C107 79 124 92 124 110 C124 124 113 134 100 134 C87 134 76 124 76 110 C76 99 83 91 88 83 C89 91 93 96 98 97 C95 87 96 76 100 66 Z" fill="#F4B942"/>
+  <path d="M100 106 C104 112 111 116 111 122 C111 128 106 132 100 132 C94 132 89 128 89 122 C89 116 95 112 100 106 Z" fill="#FFE2A0"/>
+</svg>
