@@ -240,11 +240,27 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       (opción 5) queda como proyecto para después.
 - [ ] **Página web y visibilidad** (decidido el 15/10/2026: se sigue sin firma y
       se junta visibilidad). Una página en GitHub Pages que muestre el programa
-      (gratis, a hacer en un chat nuevo): el encargo completo está en
-      [sitio-web-encargo.md](sitio-web-encargo.md). Después: un video de
+      (gratis): el encargo completo está en
+      [sitio-web-encargo.md](sitio-web-encargo.md). **Estado (15/10/2026):
+      hecha en `sitio/`, con logo nuevo, capturas y un video de 40 segundos;
+      falta subirla (git push), activar GitHub Pages y poner la dirección en el
+      campo «Website» del repositorio.** Falta también la captura de «Ejecutar
+      de todas formas» del aviso de Windows (hoy la página explica ese paso sin
+      imagen). Después: un video de
       demostración, contarlo en comunidades de iglesias y que otras iglesias lo
       usen y lo marquen con estrella. Volver a pedir la firma a SignPath cuando
       haya señales.
+- [ ] **Textos de ejemplo con derechos de autor dentro del programa** (visto el
+      15/10/2026 al sacar las capturas de la página). La vista previa del editor
+      de temas muestra «[RVC] Porque de tal manera amó Dios…» con una línea
+      «[NTV] For God so loved the world…», y la de canciones «Grande es tu
+      fidelidad — Marcos Witt»; el editor de escenarios muestra «Sublime gracia
+      del Señor». Cambiarlos por textos libres (por ejemplo Juan 3:16 en la
+      RV1909 y un himno de dominio público), como las Biblias del instalador.
+- [ ] **Detalles vistos en las capturas** (15/10/2026): la página del celular
+      dice «Content» arriba a la derecha (el estado de la salida sale en inglés,
+      sin traducir), y en la playlist el ícono ♪ de cada canción se ve negro
+      sobre el fondo oscuro.
 - [ ] Actualizar README y CHANGELOG (hoy dicen «Beta») y taguear `v1.0.0`. La
       lista paso a paso, ya redactada, está en [publicar-1.0.md](publicar-1.0.md).
 
