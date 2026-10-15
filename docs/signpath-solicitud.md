@@ -1,54 +1,70 @@
 # Solicitud a SignPath Foundation (para pegar en https://signpath.org/apply.html)
 
-El formulario es en inglés: los textos de abajo ya están listos para pegar.
-Lo único que va a pedir de tu parte es tu nombre y tu correo; eso lo escribís
-vos. **Antes de mandarlo**, mirá la lista de «Lo que tiene que estar listo».
+El formulario es en inglés: los textos de abajo están listos para pegar, campo
+por campo y en el mismo orden que el formulario (revisado contra el formulario
+del 15/10/2026). Los campos de datos tuyos (nombre, correo, casillas y el
+reCAPTCHA) los llenás vos. **Todo lo de abajo es verdad**: no agregues nada que
+no lo sea, porque la solicitud la revisa una persona.
 
-## Textos para pegar
+## Campos
 
-**Project name:** EcclesiaCast
+| Campo | Qué poner |
+|---|---|
+| **Homepage URL*** | `https://github.com/EcclesiaCast/EcclesiaCast` |
+| **Download URL*** | `https://github.com/EcclesiaCast/EcclesiaCast` (el formulario pide que esa página diga que el proyecto usa SignPath Foundation: el README lo dice en «Code signing policy», y desde ahí se baja el instalador en «Releases») |
+| **Privacy Policy URL** | `https://github.com/EcclesiaCast/EcclesiaCast/blob/main/docs/privacidad.md` |
+| **Wikipedia URL** | vacío (no tiene) |
+| **Tagline*** | `Free, open source Windows software to project song lyrics, Bible verses, announcements and videos in churches.` |
+| **Category*** | la que más se parezca a *multimedia / presentaciones*; si no hay, *Other*. Si dudás, mandame la lista de opciones. |
+| **Description*** | ya la pegaste (ver «Description» abajo) |
+| **Reputation*** | ver «Reputation» abajo |
+| **Maintainer Type** | *Individual* (o lo más parecido: una sola persona mantiene el proyecto) |
+| **Build System*** | *GitHub Actions* |
+| **First Name* / Last Name*** | los tuyos |
+| **Email*** | el tuyo |
+| **Company Name** | vacío |
+| **Primary Discovery Channel*** | si hay una opción de asistente de IA / chatbot, esa; si no, *Other* |
+| **Exact source (optional)** | `Claude (AI assistant) while researching free code signing options for an open source project` |
+| Casilla del *Code of Conduct** | **la tildás vos después de leerlo**: dice que el certificado se emite a nombre de SignPath Foundation y que puede revocarse si se rompen las reglas |
+| Casilla de *other communications* | como prefieras (es opcional) |
+| Casilla de *store and process my personal data** | la tildás vos |
+| reCAPTCHA | lo hacés vos |
 
-**Repository URL:** https://github.com/EcclesiaCast/EcclesiaCast
+## Description
 
-**Homepage / download page:** https://github.com/EcclesiaCast/EcclesiaCast/releases
-
-**License:** GPL-3.0 (OSI-approved), no dual licensing.
-
-**Short description:**
 EcclesiaCast is a free, open source Windows application for projecting song
 lyrics, multi-version Bible verses, announcements, images and videos in
 churches. It replaces two or three paid programs with a single free one. It is
 written in C# / .NET 8 (WPF) and is used every week in a real church service.
 
-**What would be signed:** the Windows installer (`EcclesiaCast-<version>-setup.exe`,
-built with Inno Setup) and the application executable inside it
-(`EcclesiaCast.App.exe`), built by GitHub Actions from the public repository
-(`.github/workflows/release.yml`) and approved by hand before each release.
+## Reputation
 
-**Build system:** GitHub Actions (windows-latest). The signing request is sent
-from the same workflow with the official `signpath/github-action-submit-signing-request` action.
+EcclesiaCast is a young project, and I would rather say so plainly. The
+repository was created in July 2026; the first public pre-release was on
+19 July 2026, and there have been five releases since (the latest on
+15 October 2026), all built by GitHub Actions from the public repository.
+It is under active development (more than 240 commits, almost daily), licensed
+GPL-3.0, and has more than a thousand automated tests, a user guide, a privacy
+policy and a published code signing policy.
 
-**Code signing policy page:** https://github.com/EcclesiaCast/EcclesiaCast#code-signing-policy
+It is used every week at my church's services in Uruguay, in place of paid
+projection software. It has no media coverage, stars or download statistics
+yet: its users are small churches, a community that often cannot afford
+commercial licenses and that today sees a "Unknown publisher" warning on every
+install. Signing would remove that obstacle and let the in-app updater verify
+who published each update.
 
-**Privacy policy:** https://github.com/EcclesiaCast/EcclesiaCast/blob/main/docs/privacidad.md
-
-**Team / approvers:** one maintainer, Alexis Pérez (@alexisperez7); approver: the
-same person. Contributions from anyone else come in by pull request and are
-reviewed by the maintainer.
+Repository and releases: https://github.com/EcclesiaCast/EcclesiaCast
+Code signing policy: https://github.com/EcclesiaCast/EcclesiaCast#code-signing-policy
 
 ## Lo que tiene que estar listo antes de mandarlo
 
-- [ ] El código de este repositorio (rama `beta6`) **subido a `main`** en GitHub:
-      hoy `main` está 145 cambios atrás y SignPath mira ahí el flujo de
-      publicación, la política de firma y la política de privacidad.
-- [ ] Tener publicada una versión con instalador (SignPath pide que el
-      proyecto «ya esté publicado en la forma que se va a firmar»). La última
-      publicada es la `v1.0.0-beta.5`.
-- [ ] Verificación en dos pasos activada en tu cuenta de GitHub (se la piden a
-      todo el equipo).
-- [ ] Que el proyecto no incluya ninguna parte que no sea libre. El instalador
-      sólo trae Biblias libres (RV1909, BLM, VBL) y librerías libres (VLC es LGPL);
-      las Biblias con derechos (RVR1960, NVI…) **no** van adentro.
+- [x] El código en `main` en GitHub (hecho el 14/10/2026).
+- [x] Una versión publicada con instalador (`v1.0.0-beta.15`).
+- [x] Verificación en dos pasos en GitHub (hecho por Alexis).
+- [x] El README tiene la sección «Code signing policy» y la política de privacidad.
+- [x] El instalador sólo trae Biblias libres (RV1909, BLM, VBL) y librerías libres
+      (VLC es LGPL); las Biblias con derechos (RVR1960, NVI…) **no** van adentro.
 
 ## Después de la aprobación
 
