@@ -235,7 +235,16 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       5. Sin averiguar: distribuir por la Microsoft Store (Microsoft firma el
          paquete), que cambiaría cómo se instala y se actualiza el programa.
 
-      **Decisión pendiente de Alexis:** cuál de estas.
+      **Decidido (15/10/2026): la opción 1.** La 1.0 sale sin firma y se junta
+      visibilidad (ver «Página web y visibilidad», abajo). La Microsoft Store
+      (opción 5) queda como proyecto para después.
+- [ ] **Página web y visibilidad** (decidido el 15/10/2026: se sigue sin firma y
+      se junta visibilidad). Una página en GitHub Pages que muestre el programa
+      (gratis, a hacer en un chat nuevo): el encargo completo está en
+      [sitio-web-encargo.md](sitio-web-encargo.md). Después: un video de
+      demostración, contarlo en comunidades de iglesias y que otras iglesias lo
+      usen y lo marquen con estrella. Volver a pedir la firma a SignPath cuando
+      haya señales.
 - [ ] Actualizar README y CHANGELOG (hoy dicen «Beta») y taguear `v1.0.0`. La
       lista paso a paso, ya redactada, está en [publicar-1.0.md](publicar-1.0.md).
 
