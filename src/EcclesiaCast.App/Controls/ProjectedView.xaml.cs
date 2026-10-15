@@ -789,17 +789,9 @@ public partial class ProjectedView : UserControl
         FillColorLayer.Visibility = needsFill && !showFillImage ? Visibility.Visible : Visibility.Collapsed;
         FillColorLayer.Fill = MediaFraming.FillBrush(media);
 
-        ApplyColourAdjustments(media);
         ApplyLiveVideo();
     }
 
-    /// <summary>
-    /// Darkening and tinting ride on this layer, which sits above both the
-    /// image drawn here and the video playing behind the control — so one
-    /// implementation covers photos, loops and YouTube alike.
-    /// </summary>
-    private void ApplyColourAdjustments(MediaItem? media) =>
-        MediaFraming.ApplyColour(BrightnessLayer, TintLayer, media);
 
     private static BitmapImage? LoadBitmap(string? path)
     {

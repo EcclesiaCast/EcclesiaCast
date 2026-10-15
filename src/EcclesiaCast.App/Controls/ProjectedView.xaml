@@ -30,11 +30,6 @@
         <Image x:Name="LiveVideo" Stretch="UniformToFill" Visibility="Collapsed"
                RenderTransformOrigin="0.5,0.5"/>
 
-        <!-- Ajustes de imagen del medio: se aplican tanto a la imagen de acá
-             como al video que corre detrás, porque esta capa va encima -->
-        <Rectangle x:Name="BrightnessLayer" Visibility="Collapsed" IsHitTestVisible="False"/>
-        <Rectangle x:Name="TintLayer" Visibility="Collapsed" IsHitTestVisible="False"/>
-
         <!-- Una página web proyectada: la flecha del mouse del operador sobre
              ella. Va sobre la imagen y bajo el texto. -->
         <Canvas x:Name="WebPointerLayer" Visibility="Collapsed" IsHitTestVisible="False" ClipToBounds="True">

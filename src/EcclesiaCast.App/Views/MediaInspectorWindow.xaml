@@ -21,6 +21,28 @@
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontSize" Value="12"/>
         </Style>
+        <!-- La fecha del evento: oscura como el resto, y sólo se elige en el calendario -->
+        <Style TargetType="DatePicker">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
+            <Setter Property="Padding" Value="4,2"/>
+        </Style>
+        <Style TargetType="DatePickerTextBox">
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DatePickerTextBox">
+                        <Grid Background="{StaticResource SurfaceAltBrush}">
+                            <ContentControl x:Name="PART_Watermark" Opacity="0" IsHitTestVisible="False" Focusable="False"/>
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="4,2" VerticalAlignment="Center"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     <Grid Margin="18">
         <Grid.RowDefinitions>
@@ -49,10 +71,15 @@
 
             <TextBlock Text="Fecha del evento (opcional)" Style="{StaticResource L}"/>
             <StackPanel Orientation="Horizontal">
-                <TextBox x:Name="EventDateBox" Width="104" Background="{StaticResource SurfaceAltBrush}" Foreground="White"
-                         BorderBrush="{StaticResource LineBrush}" CaretBrush="White" Padding="6,4" FontSize="13"
-                         TextChanged="EventDateBox_TextChanged"
-                         ToolTip="El día del evento que anuncia (por ejemplo 17/10/2026). Vacío: no vence nunca."/>
+                <!-- Un selector de fecha: se elige en el calendario, no se escribe -->
+                <DatePicker x:Name="EventDatePicker" Width="132" FontSize="13" Language="es-UY"
+                            FirstDayOfWeek="Monday" SelectedDateFormat="Short"
+                            SelectedDateChanged="EventDatePicker_SelectedDateChanged"
+                            PreviewMouseLeftButtonUp="EventDatePicker_PreviewMouseLeftButtonUp"
+                            ToolTip="El día del evento que anuncia. Se elige en el calendario. Sin fecha: no vence nunca."/>
+                <Button Content="✕" FontSize="11" Padding="7,3" Margin="4,0,0,0" Style="{StaticResource DarkButton}"
+                        Click="ClearEventDate_Click" AutomationProperties.Name="Sacar la fecha del evento"
+                        ToolTip="Sacar la fecha: no vence nunca"/>
                 <TextBlock Text="se queda" FontSize="11" Margin="10,0,6,0" VerticalAlignment="Center"
                            Foreground="{StaticResource MutedBrush}"/>
                 <controls:NumericField x:Name="ArchiveDaysField" ValueChanged="EventDate_Changed" Minimum="0" Maximum="365" Step="1" Decimals="0"
@@ -169,35 +196,6 @@
             <TextBlock Text="Blanco = la pantalla · arrastrá para correr · ruedita = zoom · flechas = ajuste fino (Mayús: más)" FontSize="10"
                        Foreground="{StaticResource FaintBrush}" Margin="0,4,0,0"/>
 
-            <!-- ── Color: oscurecer, aclarar, teñir ── -->
-            <Border Background="{StaticResource SurfaceAltBrush}" CornerRadius="4"
-                    Padding="12,4,12,12" Margin="0,6,0,0">
-                <StackPanel>
-                    <TextBlock Text="Color" Style="{StaticResource L}"/>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Brillo" FontSize="11" Width="64" VerticalAlignment="Center"
-                                   Foreground="{StaticResource MutedBrush}"/>
-                        <controls:NumericField x:Name="BrightnessField" ValueChanged="Field_Changed" Minimum="-100" Maximum="100" Step="5" Decimals="0"
-                                               ToolTip="Negativo oscurece (ayuda a leer la letra encima), positivo aclara"/>
-                        <TextBlock Text="%" FontSize="11" VerticalAlignment="Center" Margin="6,0,0,0"
-                                   Foreground="{StaticResource MutedBrush}"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                        <TextBlock Text="Tinte" FontSize="11" Width="64" VerticalAlignment="Center"
-                                   Foreground="{StaticResource MutedBrush}"/>
-                        <Border x:Name="TintSwatch" Width="28" Height="24" CornerRadius="3"
-                                BorderBrush="{StaticResource LineBrush}" BorderThickness="1"/>
-                        <Button Content="Color…" Style="{StaticResource DarkButton}" FontSize="11"
-                                Padding="10,3" Margin="8,0,0,0" Click="PickTintColor_Click"/>
-                        <controls:NumericField x:Name="TintField" ValueChanged="Field_Changed" Minimum="0" Maximum="100" Step="5" Decimals="0"
-                                               Margin="8,0,0,0"
-                                               ToolTip="Cuánto pesa el tinte. 0 = sin tinte."/>
-                        <TextBlock Text="%" FontSize="11" VerticalAlignment="Center" Margin="6,0,0,0"
-                                   Foreground="{StaticResource MutedBrush}"/>
-                    </StackPanel>
-                </StackPanel>
-            </Border>
-
             <StackPanel x:Name="TrimOptions">
                 <TextBlock Text="Recorte del video (segundos)" Style="{StaticResource L}"/>
                 <StackPanel Orientation="Horizontal">
@@ -234,10 +232,10 @@
             </StackPanel>
 
             <StackPanel x:Name="ImageOptions">
-                <TextBlock Text="Cuánto se ve en primer plano" Style="{StaticResource L}"/>
+                <TextBlock Text="Cuánto tiempo se ve" Style="{StaticResource L}"/>
                 <StackPanel Orientation="Horizontal">
                     <controls:NumericField x:Name="ShowSecondsField" Minimum="0" Maximum="3600" Step="1" Decimals="0"
-                                           ToolTip="0 = se queda hasta que cambies. Sólo cuenta cuando la imagen va en primer plano."/>
+                                           ToolTip="0 = se queda hasta que cambies. Con un tiempo, se ve correr en la barra de reproducción (como un video): se puede pausar, adelantar o volver al principio."/>
                     <TextBlock Text="segundos (0 = hasta que cambies)" FontSize="11" VerticalAlignment="Center"
                                TextWrapping="Wrap" Foreground="{StaticResource FaintBrush}" Margin="8,0,0,0"/>
                 </StackPanel>

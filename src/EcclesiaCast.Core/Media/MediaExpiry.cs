@@ -26,12 +26,5 @@ public static class MediaExpiry
         && today.Date >= day
         && !string.Equals(media.Category, ArchiveTab, StringComparison.OrdinalIgnoreCase);
 
-    private static readonly string[] Formats =
-        ["d/M/yyyy", "d-M-yyyy", "d.M.yyyy", "d/M/yy", "d-M-yy", "d.M.yy", "yyyy-M-d"];
-
-    /// <summary>Reads a date the way it is written here (17/10/2026, 17-10-26, 17.10.26). False for anything else, and for an empty text.</summary>
-    public static bool TryParseDate(string? text, out DateTime date) =>
-        DateTime.TryParseExact(text?.Trim(), Formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out date);
-
     public static string Format(DateTime date) => date.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
 }

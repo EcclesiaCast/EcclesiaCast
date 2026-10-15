@@ -76,8 +76,6 @@ public sealed class FramedMediaPreview : Grid
     // the first time they are needed.
     private const int FillLayer = 0;
     private const int PictureLayer = 1;
-    private const int BrightnessLayer = 2;
-    private const int TintLayer = 3;
 
     private readonly Image _picture = new()
     {
@@ -96,8 +94,6 @@ public sealed class FramedMediaPreview : Grid
 
     private Rectangle? _fillColour;
     private Image? _fillImage;
-    private Rectangle? _brightness;
-    private Rectangle? _tint;
 
     public FramedMediaPreview()
     {
@@ -210,16 +206,6 @@ public sealed class FramedMediaPreview : Grid
             _fillImage.Visibility = Visibility.Collapsed;
         }
 
-        if (MediaFraming.HasColour(media))
-        {
-            MediaFraming.ApplyColour(EnsureBrightness(), EnsureTint(), media);
-        }
-        else if (_brightness is not null && _tint is not null)
-        {
-            _brightness.Visibility = Visibility.Collapsed;
-            _tint.Visibility = Visibility.Collapsed;
-        }
-
         ApplyBlur();
     }
 
@@ -257,12 +243,6 @@ public sealed class FramedMediaPreview : Grid
 
     private Image EnsureFillImage() =>
         _fillImage ??= AddLayer(new Image { Stretch = Stretch.UniformToFill }, FillLayer);
-
-    private Rectangle EnsureBrightness() =>
-        _brightness ??= AddLayer(new Rectangle(), BrightnessLayer);
-
-    private Rectangle EnsureTint() =>
-        _tint ??= AddLayer(new Rectangle(), TintLayer);
 
     private T AddLayer<T>(T layer, int z) where T : UIElement
     {

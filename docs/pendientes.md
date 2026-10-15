@@ -22,30 +22,40 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       Clear, Logo, Sin fondo, Poner en vivo / Apagar salida y Proyectar ▶: el
       globito dice la tecla (F1, F2, F3, F4, Esc, Ctrl+Enter) aunque estés en
       el diseño avanzado, que las esconde de los botones.
-- [ ] **Cambio de una imagen a otra, sin demora.** (Medido el 14/10 con
-      OverFlow y una página 4K: leer la imagen en el momento del cambio
-      bloqueaba la ventana 120 ms y el relleno desenfocado en vivo costaba 250
-      ms.) Ahora la imagen nueva se lee en segundo plano y el cambio sigue
-      mostrando la vieja hasta que la nueva está lista; al apoyar el mouse
-      150 ms sobre una tarjeta la imagen ya se va leyendo, así que el clic la
-      encuentra lista; no se agranda una imagen chica al leerla; y el relleno
-      desenfocado es una imagen chica ya desenfocada (~9 ms). Probalo pasando de
-      «26-10-09 Encuentro» a «OverFlow» y de vuelta, con el mouse sobre la
-      tarjeta un instante y con un clic rápido sin esperar: no tiene que haber
-      un tirón ni quedar la imagen vieja mal encuadrada un instante. Probalo
-      también con el modo de bajo rendimiento y con una imagen que se edita
-      (zoom) mientras está en pantalla.
+- [ ] **Cambio de una imagen a otra (arreglado y comprobado en la PC).** El
+      14/10 a la noche Claude grabó la Pantalla 2 a 30 cuadros por segundo
+      pasando de OverFlow a «26-10-09 Encuentro» y de vuelta: al empezar el
+      cambio el relleno desenfocado de la imagen vieja desaparecía de golpe
+      (bordes negros) y al terminar el de la nueva aparecía de golpe (estaba
+      tapado por la vieja). Ahora la imagen vieja queda entera, con su relleno,
+      y la nueva se funde encima con el suyo. Con el arreglo se grabó de nuevo:
+      sin cuadro negro y sin tirón. Mirá si a vos también te parece bien, con
+      la salida en el proyector de verdad.
+- [ ] **Fecha del evento con calendario.** En Propiedades, la fecha ya no se
+      escribe: se elige en un calendario (en castellano, la semana empieza el
+      lunes), y la ✕ la saca. Se comprobó en la PC que abre y que la nota de
+      abajo dice el día en que pasa a «Eventos pasados». Falta ver que una
+      fecha vieja (por ejemplo del mes pasado) mueva la imagen al guardar.
+- [ ] **Sin Color ni Brillo.** En Propiedades ya no está la sección Color
+      (brillo y tinte), y no se dibujan más. Una imagen que tenía brillo o tinte
+      puestos se ve sin ellos.
+- [ ] **El tiempo de una imagen en la barra de reproducción.** «Cuánto tiempo
+      se ve» ahora vale para cualquier imagen (antes sólo en primer plano).
+      Con un tiempo puesto, al proyectarla aparece la misma barra que con un
+      video: «0:03 / 0:08» avanzando. Se comprobó en la PC con 8 segundos (al
+      terminar hizo lo que dice la pestaña: el logo). Probá también ⏸ (pausa
+      el tiempo), ±10 s, arrastrar la barra y volver al principio, y que al
+      poner otra cosa en pantalla la barra se vaya.
 - [ ] **Vencimiento de una imagen («Eventos pasados»).** En Propiedades hay
       «Fecha del evento (opcional)» y «se queda N días más» (10 por defecto).
-      Poné 17/10/2026: la nota de abajo dice «Pasa a «Eventos pasados» el
+      Elegí el 17/10/2026 en el calendario: la nota de abajo dice «Pasa a «Eventos pasados» el
       27/10/2026». Cuando llega ese día (al abrir el programa o al cambiar la
       biblioteca) la imagen pasa sola a la pestaña **Eventos pasados** (se
       crea sola) y la barra de estado lo avisa. Para probarlo sin esperar: una
-      fecha vieja (por ejemplo 1/1/2026) se mueve al guardar. Una fecha mal
-      escrita no deja guardar. Si la sacás de «Eventos pasados» a mano, no
-      vuelve (la fecha se borra al archivarla). Mirá que la ventana de
-      Propiedades siga entrando en la pantalla de la notebook: ahora es unos
-      70 píxeles más alta.
+      fecha vieja (por ejemplo 1/1/2026) se mueve al guardar. Si la sacás de
+      «Eventos pasados» a mano, no vuelve (la fecha se borra al archivarla).
+      La ventana de Propiedades entra en la pantalla de la notebook (se vio el
+      14/10).
 - [ ] **Imágenes nuevas: «Ajustar» y relleno desenfocado por defecto.** Agregá
       una imagen con ➕ o arrastrándola, o con «Agregar a medios» de Google: en
       Propiedades tiene que venir con Escala «Ajustar» y «Los bordes se rellenan

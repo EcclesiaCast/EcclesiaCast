@@ -490,6 +490,15 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Cambiado
 
+- **La fecha del evento se elige en un calendario.** Ya no se escribe a mano:
+  un selector de fecha en castellano, con ✕ para sacarla.
+- **Se sacaron el brillo y el tinte de Propiedades.** Ya no se dibujan; un
+  medio que los tenía se ve sin ellos.
+- **El tiempo de una imagen se ve en la barra de reproducción.** «Cuánto tiempo
+  se ve» vale ahora para cualquier imagen (antes sólo en primer plano), y
+  mientras está en pantalla la misma barra de los videos muestra el tiempo
+  que pasa: se puede pausar, adelantar, atrasar, arrastrar y volver al
+  principio.
 - **Las Biblias del instalador se traen antes de abrir la ventana.** La
   primera vez que abrís el programa después de instalarlo, mientras se ve la
   pantalla de carga, se copian a tu biblioteca las Biblias que elegiste (unos
@@ -673,6 +682,11 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Corregido
 
+- **El cambio de una imagen a otra es un fundido limpio.** Grabando la salida
+  cuadro por cuadro se vio que el relleno desenfocado de la imagen vieja
+  desaparecía de golpe al empezar el cambio (bordes negros) y el de la nueva
+  aparecía de golpe al terminar. Ahora la imagen vieja queda entera, con su
+  relleno, mientras la nueva se funde encima con el suyo.
 - **El cambio de una imagen a otra ya no se demora.** Se midió: la imagen nueva
   se leía en el momento del cambio y bloqueaba la ventana (120 ms una portada
   de 1350 px, 60 ms una página 4K), la agrandaba al leerla aunque fuera más

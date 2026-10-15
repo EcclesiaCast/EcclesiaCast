@@ -15,7 +15,6 @@ public partial class MediaInspectorWindow : Window
     private bool _ready;
 
     private string _fillColor = "#000000";
-    private string _tint = "#2F63C9";
 
     public MediaInspectorWindow(MediaItem item, IReadOnlyList<string> categories, IReadOnlyList<MediaItem> library)
     {
@@ -36,11 +35,7 @@ public partial class MediaInspectorWindow : Window
         _fillColor = string.IsNullOrWhiteSpace(item.FillColor) ? "#000000" : item.FillColor;
         UpdateFillSwatch();
 
-        // Color y recorte.
-        BrightnessField.SetSilently(item.Brightness);
-        _tint = string.IsNullOrWhiteSpace(item.Tint) ? "#2F63C9" : item.Tint;
-        TintField.SetSilently(item.TintStrength);
-        UpdateTintSwatch();
+        // Recorte.
         TrimStartField.SetSilently(item.TrimStart);
         TrimEndField.SetSilently(item.TrimEnd);
         TrimOptions.Visibility = item.Type == MediaType.Video ? Visibility.Visible : Visibility.Collapsed;
@@ -100,7 +95,7 @@ public partial class MediaInspectorWindow : Window
         BlurField.SetSilently(item.Blur);
 
         // Vencimiento: the day of the event and how long it stays after it.
-        EventDateBox.Text = item.EventDate is { } eventDate ? MediaExpiry.Format(eventDate) : string.Empty;
+        EventDatePicker.SelectedDate = item.EventDate?.Date;
         ArchiveDaysField.SetSilently(item.EventDate is null ? MediaExpiry.DefaultDays : item.ArchiveAfterDays);
         UpdateEventNote();
 
@@ -118,8 +113,8 @@ public partial class MediaInspectorWindow : Window
 
     /// <summary>
     /// Shows the box that picks the next media only when «seguir con otro
-    /// medio» is chosen, and lets an image's seconds be set only when it goes
-    /// on the whole screen: a background image never ends.
+    /// medio» is chosen. An image's seconds count whether it goes in front of
+    /// the words or behind them.
     /// </summary>
     private void UpdateAfterOptions()
     {
@@ -129,7 +124,6 @@ public partial class MediaInspectorWindow : Window
         var isVideo = _item.Type is MediaType.Video or MediaType.YouTube;
         var follows = isVideo ? EndBox.SelectedIndex == 3 : ImageEndBox.SelectedIndex == 2;
         NextPanel.Visibility = follows ? Visibility.Visible : Visibility.Collapsed;
-        ImageOptions.IsEnabled = BehaviorBox.SelectedIndex == 1;
     }
 
     private void Vol_Changed(object sender, RoutedPropertyChangedEventArgs<double> e) =>
@@ -162,26 +156,28 @@ public partial class MediaInspectorWindow : Window
 
     private void Field_Changed(object sender, RoutedEventArgs e) => RefreshPreview();
 
-    private void EventDateBox_TextChanged(object sender, TextChangedEventArgs e) => UpdateEventNote();
+    private void EventDatePicker_SelectedDateChanged(object? sender, SelectionChangedEventArgs e) => UpdateEventNote();
 
     private void EventDate_Changed(object sender, RoutedEventArgs e) => UpdateEventNote();
 
-    /// <summary>Says, under the date, what it will do: «pasa a Eventos pasados el 27/10/2026», or what is wrong with what was typed.</summary>
+    /// <summary>A click anywhere on the date opens the calendar: the date is chosen there, never typed.</summary>
+    private void EventDatePicker_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        if (!EventDatePicker.IsDropDownOpen)
+            EventDatePicker.IsDropDownOpen = true;
+    }
+
+    private void ClearEventDate_Click(object sender, RoutedEventArgs e) => EventDatePicker.SelectedDate = null;
+
+    /// <summary>Says, under the date, what it will do: «pasa a Eventos pasados el 27/10/2026».</summary>
     private void UpdateEventNote()
     {
         if (EventDateNote is null)
             return;
 
-        var text = EventDateBox.Text.Trim();
-        if (text.Length == 0)
+        if (EventDatePicker.SelectedDate is not { } date)
         {
             EventDateNote.Text = "Sin fecha: no vence. Con la fecha de un evento, pasa sola a «Eventos pasados» unos días después.";
-            return;
-        }
-
-        if (!MediaExpiry.TryParseDate(text, out var date))
-        {
-            EventDateNote.Text = "No entiendo la fecha: escribila así, 17/10/2026.";
             return;
         }
 
@@ -210,9 +206,6 @@ public partial class MediaInspectorWindow : Window
         shown.OffsetY = Math.Clamp(OffsetYField.Value / 100, -MediaFraming.MaxOffset, MediaFraming.MaxOffset);
         shown.FrameWidth = FixedSizeCheck.IsChecked == true ? (int)Math.Clamp(FrameWidthField.Value, 16, 1920) : null;
         shown.FrameHeight = FixedSizeCheck.IsChecked == true ? (int)Math.Clamp(FrameHeightField.Value, 16, 1080) : null;
-        shown.Brightness = Math.Clamp(BrightnessField.Value, -100, 100);
-        shown.TintStrength = Math.Clamp(TintField.Value, 0, 100);
-        shown.Tint = TintField.Value > 0 ? _tint : null;
         shown.FillColor = _fillColor;
 
         var chosenFill = FillMediaBox.SelectedItem as MediaItem;
@@ -327,18 +320,6 @@ public partial class MediaInspectorWindow : Window
         }
     }
 
-    private void PickTintColor_Click(object sender, RoutedEventArgs e)
-    {
-        if (ColorPickerHelper.Pick(_tint) is { } picked)
-        {
-            _tint = picked;
-            UpdateTintSwatch();
-            RefreshPreview();
-        }
-    }
-
-    private void UpdateTintSwatch() => TintSwatch.Background = SwatchBrush(_tint);
-
     private static System.Windows.Media.Brush SwatchBrush(string hex)
     {
         try
@@ -367,25 +348,9 @@ public partial class MediaInspectorWindow : Window
 
     private void Save_Click(object sender, RoutedEventArgs e)
     {
-        // The date is checked first: nothing is saved with one that cannot be read.
-        DateTime? eventDate = null;
-        if (EventDateBox.Text.Trim().Length > 0)
-        {
-            if (!MediaExpiry.TryParseDate(EventDateBox.Text, out var parsed))
-            {
-                MessageBox.Show(this,
-                    "No entiendo la fecha del evento. Escribila así: 17/10/2026 (o dejala vacía para que no venza).",
-                    "Fecha del evento", MessageBoxButton.OK, MessageBoxImage.Information);
-                EventDateBox.Focus();
-                return;
-            }
-
-            eventDate = parsed;
-        }
-
-        _item.EventDate = eventDate;
+        _item.EventDate = EventDatePicker.SelectedDate?.Date;
         _item.ArchiveAfterDays = (int)Math.Clamp(ArchiveDaysField.Value, 0, 365);
-        _item.Name =string.IsNullOrWhiteSpace(NameBox.Text) ? _item.Name : NameBox.Text.Trim();
+        _item.Name = string.IsNullOrWhiteSpace(NameBox.Text) ? _item.Name : NameBox.Text.Trim();
         _item.Category = string.IsNullOrWhiteSpace(CategoryBox.Text) ? "Fondos" : CategoryBox.Text.Trim();
         _item.Behavior = (MediaBehavior)Math.Max(0, BehaviorBox.SelectedIndex);
         _item.Scaling = (MediaScaling)Math.Max(0, ScalingBox.SelectedIndex);
@@ -424,9 +389,10 @@ public partial class MediaInspectorWindow : Window
             _item.FrameHeight = null;
         }
 
-        _item.Brightness = Math.Clamp(BrightnessField.Value, -100, 100);
-        _item.Tint = TintField.Value > 0 ? _tint : null;
-        _item.TintStrength = Math.Clamp(TintField.Value, 0, 100);
+        // Brillo y tinte se sacaron (15/10/2026): lo que hubiera quedado guardado se borra.
+        _item.Brightness = 0;
+        _item.Tint = null;
+        _item.TintStrength = 0;
         _item.TrimStart = Math.Max(0, TrimStartField.Value);
         _item.TrimEnd = Math.Max(0, TrimEndField.Value);
 

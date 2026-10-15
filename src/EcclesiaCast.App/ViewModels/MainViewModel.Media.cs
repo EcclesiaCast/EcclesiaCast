@@ -1225,50 +1225,57 @@ public sealed partial class MainViewModel
 
     // ── Qué sigue después de un medio ────────────────────────────
 
-    private System.Windows.Threading.DispatcherTimer? _afterImageTimer;
+    /// <summary>
+    /// The time of the image on the screen when it has seconds set, and the
+    /// image itself. It drives the same playback bar as a video (see
+    /// <see cref="OnPlaybackTick"/>): it can be paused, moved and started over.
+    /// </summary>
+    private ImageClock? _imageClock;
+
+    private MediaItem? _imageClockItem;
 
     private void StopAfterImageTimer()
     {
-        _afterImageTimer?.Stop();
-        _afterImageTimer = null;
+        _imageClock = null;
+        _imageClockItem = null;
     }
 
     /// <summary>
-    /// An image on the whole screen with seconds set goes on to what follows
-    /// it once they are up, as a video does when it ends. Anything else that
-    /// takes the screen in the meantime cancels it.
+    /// An image with seconds set goes on to what follows it once they are up,
+    /// as a video does when it ends, and the playback bar shows them going by.
+    /// Anything else that takes the screen in the meantime cancels it.
     /// </summary>
     private void StartAfterImageTimer(MediaItem item)
     {
         StopAfterImageTimer();
-        if (item.Type != MediaType.Image || item.Behavior != MediaBehavior.Foreground || item.ShowSeconds <= 0)
+        if (item.Type != MediaType.Image || item.ShowSeconds <= 0)
             return;
 
-        var timer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(item.ShowSeconds) };
-        timer.Tick += (_, _) =>
+        _imageClock = new ImageClock(TimeSpan.FromSeconds(item.ShowSeconds), DateTime.UtcNow);
+        _imageClockItem = item;
+        SyncPlaybackTimer();
+        OnPlaybackTick(null, EventArgs.Empty);
+    }
+
+    /// <summary>The image's seconds are up: what its Propiedades say comes next.</summary>
+    private void FinishImage(MediaItem item)
+    {
+        StopAfterImageTimer();
+        NoteAction($"Pasar de la imagen «{item.Name}» a lo que sigue");
+        if (item.EndBehavior == VideoEndBehavior.NextMedia && GoToNextMedia(item))
+            return;
+
+        if (item.EndBehavior == VideoEndBehavior.Logo)
         {
-            StopAfterImageTimer();
-            if (_presentation.Background?.Id != item.Id)
-                return;
-
-            NoteAction($"Pasar de la imagen «{item.Name}» a lo que sigue");
-            if (item.EndBehavior == VideoEndBehavior.NextMedia && GoToNextMedia(item))
-                return;
-
-            if (item.EndBehavior == VideoEndBehavior.Logo)
-            {
-                _presentation.SetBackground(null);
-                if (!IsLogoActive)
-                    _presentation.ToggleLogo();
-                StatusText = $"\"{item.Name}\" terminó → logo.";
-            }
-            else
-            {
-                ClearBackground();
-            }
-        };
-        _afterImageTimer = timer;
-        timer.Start();
+            _presentation.SetBackground(null);
+            if (!IsLogoActive)
+                _presentation.ToggleLogo();
+            StatusText = $"\"{item.Name}\" terminó → logo.";
+        }
+        else
+        {
+            ClearBackground();
+        }
     }
 
     /// <summary>Puts on the media that follows <paramref name="media"/>; false when none is chosen or it is gone.</summary>

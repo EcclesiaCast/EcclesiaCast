@@ -181,7 +181,7 @@ public sealed class MediaItem
     /// <summary>Days after <see cref="EventDate"/> that it stays in its tab before going to the tab of past events.</summary>
     public int ArchiveAfterDays { get; set; } = MediaExpiry.DefaultDays;
 
-    // ── Recorte y color ──────────────────────────────────────────
+    // ── Recorte ───────────────────────────────────────────────────────────────────────────────────────────
 
     /// <summary>
     /// Second the video starts at, skipping whatever comes before — the
@@ -193,16 +193,14 @@ public sealed class MediaItem
     /// <summary>Second the video stops at; 0 plays to the end.</summary>
     public double TrimEnd { get; set; }
 
-    /// <summary>
-    /// -100 to 100: darkens or lightens the picture. Darkening a busy loop is
-    /// the other half of blurring it — it is what makes lyrics readable.
-    /// </summary>
+    // Brightness and tint were taken out of Propiedades on 15/10/2026 and are
+    // no longer drawn. The columns stay so libraries from before still open;
+    // saving a media clears them.
+
     public double Brightness { get; set; }
 
-    /// <summary>Colour laid over the picture; null or blank for none.</summary>
     public string? Tint { get; set; }
 
-    /// <summary>How much of the tint shows, 0-100.</summary>
     public double TintStrength { get; set; }
 
     /// <summary>True when the picture does not cover the whole output on its own.</summary>

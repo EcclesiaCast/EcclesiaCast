@@ -53,30 +53,6 @@ public class MediaExpiryTests
         Assert.False(MediaExpiry.IsDue(poster, new DateTime(2026, 10, 17)));
     }
 
-    [Theory]
-    [InlineData("17/10/2026", 2026, 10, 17)]
-    [InlineData("17-10-26", 2026, 10, 17)]
-    [InlineData("1.2.27", 2027, 2, 1)]
-    [InlineData(" 7/3/2026 ", 2026, 3, 7)]
-    [InlineData("2026-10-17", 2026, 10, 17)]
-    public void Dates_are_read_as_they_are_written_here(string text, int year, int month, int day)
-    {
-        Assert.True(MediaExpiry.TryParseDate(text, out var date));
-        Assert.Equal(new DateTime(year, month, day), date);
-    }
-
-    [Theory]
-    [InlineData("")]
-    [InlineData("   ")]
-    [InlineData(null)]
-    [InlineData("mañana")]
-    [InlineData("32/1/2026")]
-    [InlineData("10/17/2026")]
-    public void Anything_else_is_not_a_date(string? text)
-    {
-        Assert.False(MediaExpiry.TryParseDate(text, out _));
-    }
-
     [Fact]
     public void A_date_is_written_day_month_year()
     {
