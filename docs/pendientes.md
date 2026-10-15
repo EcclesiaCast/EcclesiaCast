@@ -18,6 +18,20 @@ reproductor de Spotify, «mismo título, distinto artista» y las flechas del
 teclado en Propiedades. Lo que sigue se corrigió o se agregó después de esa
 prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
 
+- [ ] **Con el logo puesto no queda nada corriendo detrás** (no se pudo probar con
+      el programa abierto). Poné un video de fondo y apretá **Logo (F3)**: el
+      video se pausa (se ve en el administrador de tareas que baja el uso de la
+      PC), y al sacar el logo sigue **donde estaba**. Lo mismo con el video que
+      rellena los bordes y con una página web o una ventana en vivo (dejan de
+      redibujarse con el logo puesto). Poné un video nuevo mientras el logo está
+      puesto: tiene que quedar pausado debajo y arrancar al sacar el logo. Con
+      un logo que es un video, ése sigue moviéndose. Apagar y prender la salida
+      con el logo puesto no tiene que arrancar el video. **Black (F1) no se
+      tocó**: el video de atrás sigue corriendo; decime si querés lo mismo.
+- [ ] **El error de una imagen de Google parpadea.** Con «➕ Agregar la abierta»
+      sin ninguna imagen abierta (o probando una miniatura), la barra de abajo
+      tiene que parpadear en rojo tres veces y el mensaje quedar en blanco y
+      negrita unos segundos.
 - [ ] **Teclas en los tooltips (diseño avanzado).** Pasá el mouse por Black,
       Clear, Logo, Sin fondo, Poner en vivo / Apagar salida y Proyectar ▶: el
       globito dice la tecla (F1, F2, F3, F4, Esc, Ctrl+Enter) aunque estés en

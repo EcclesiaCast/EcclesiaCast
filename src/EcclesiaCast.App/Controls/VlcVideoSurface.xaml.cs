@@ -149,6 +149,7 @@ public partial class VlcVideoSurface : UserControl
 
         _currentId = media.Id;
         _pausedForHiddenOutput = false;
+        _pausedForCover = false;
         _framing = media;
         ApplyStretch();
 
@@ -156,6 +157,7 @@ public partial class VlcVideoSurface : UserControl
         {
             StartPlayback(engine, player, media, resumeAt: null);
             _playing = media;
+            TryPauseForCover();
         }
         catch (Exception ex)
         {
@@ -278,6 +280,8 @@ public partial class VlcVideoSurface : UserControl
     {
         _currentId = -1;
         _pausedForHiddenOutput = false;
+        _pausedForCover = false;
+        _coverRetry?.Stop();
 
         if (holdLastFrame)
             HoldLastFrame();
@@ -476,6 +480,73 @@ public partial class VlcVideoSurface : UserControl
         try { player.SetPause(paused); } catch { /* ignore */ }
     }
 
+
+    // ── Tapado por el logo ───────────────────────────────────────
+
+    /// <summary>True while something that hides this video (the logo) is on the screen.</summary>
+    private bool _covered;
+
+    /// <summary>Set when this control paused the video because it is covered, to resume only that.</summary>
+    private bool _pausedForCover;
+
+    private DispatcherTimer? _coverRetry;
+    private int _coverTries;
+
+    /// <summary>
+    /// A video nobody can see does not have to be decoded and drawn: with the
+    /// logo up it is paused, and it picks up where it was when the logo goes.
+    /// A video that is still opening when the cover arrives (the operator chose
+    /// another one under the logo) is paused as soon as it starts.
+    /// </summary>
+    public void SetCovered(bool covered)
+    {
+        _covered = covered;
+        if (covered)
+        {
+            TryPauseForCover();
+            return;
+        }
+
+        _coverRetry?.Stop();
+        if (!_pausedForCover)
+            return;
+
+        _pausedForCover = false;
+        Resume();
+    }
+
+    private void TryPauseForCover()
+    {
+        if (!_covered || _pausedForCover || _currentId < 0)
+            return;
+
+        if (_player?.IsPlaying == true)
+        {
+            _coverRetry?.Stop();
+            _pausedForCover = true;
+            Pause();
+            return;
+        }
+
+        // Still opening: look again in a moment.
+        _coverTries = 0;
+        _coverRetry ??= new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(150) };
+        _coverRetry.Tick -= OnCoverRetry;
+        _coverRetry.Tick += OnCoverRetry;
+        _coverRetry.Start();
+    }
+
+    private void OnCoverRetry(object? sender, EventArgs e)
+    {
+        if (!_covered || _pausedForCover || _currentId < 0 || ++_coverTries > 20)
+        {
+            _coverRetry?.Stop();
+            return;
+        }
+
+        TryPauseForCover();
+    }
+
     /// <summary>Pauses because the output was switched off, remembering to resume later.</summary>
     public void PauseForHiddenOutput()
     {
@@ -493,6 +564,14 @@ public partial class VlcVideoSurface : UserControl
             return;
 
         _pausedForHiddenOutput = false;
+
+        // Switched on again while the logo is up: it stays paused until the logo goes.
+        if (_covered)
+        {
+            _pausedForCover = true;
+            return;
+        }
+
         Resume();
     }
 

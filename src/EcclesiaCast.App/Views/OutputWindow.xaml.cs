@@ -182,6 +182,7 @@ public partial class OutputWindow : Window
             newVm.PropertyChanged += OnProjectionChanged;
         UpdateVideo();
         UpdateLogoVideo();
+        UpdateLogoCover();
     }
 
     private void OnProjectionChanged(object? sender, PropertyChangedEventArgs e)
@@ -193,6 +194,7 @@ public partial class OutputWindow : Window
         else if (e.PropertyName is nameof(ProjectionViewModel.ActiveLogo) or nameof(ProjectionViewModel.State))
         {
             UpdateLogoVideo();
+            UpdateLogoCover();
             if (e.PropertyName == nameof(ProjectionViewModel.State))
                 UpdateYouTubeCover();
         }
@@ -220,6 +222,21 @@ public partial class OutputWindow : Window
             YouTube.Visibility = Visibility.Visible;
             YouTube.ResumeAfterCover();
         }
+    }
+
+
+    /// <summary>
+    /// With the logo up nothing behind it needs to move: the background video
+    /// and the video that fills its bars are paused (they pick up where they
+    /// were when the logo goes), and the page or window that is live stops
+    /// being redrawn (see <see cref="ProjectedView"/>). The logo's own video
+    /// keeps playing, of course. YouTube has its own cover, above.
+    /// </summary>
+    private void UpdateLogoCover()
+    {
+        var covered = (DataContext as ProjectionViewModel)?.State == OutputState.Logo;
+        Video.SetCovered(covered);
+        FillVideo.SetCovered(covered);
     }
 
     /// <summary>
@@ -342,6 +359,9 @@ public partial class OutputWindow : Window
 
         UpdateFill();
         SetBlur((DataContext as ProjectionViewModel)?.BackgroundBlur ?? 0);
+
+        // A video put on while the logo is up stays paused under it.
+        UpdateLogoCover();
     }
 
     /// <summary>

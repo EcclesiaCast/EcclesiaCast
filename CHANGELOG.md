@@ -490,6 +490,13 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Cambiado
 
+- **Con el logo puesto, el video de fondo se pausa.** Antes seguía
+  decodificándose y dibujándose detrás del logo sin que nadie lo viera. Ahora el
+  video de fondo, el video que rellena los bordes y la página web o ventana en
+  vivo se detienen mientras el logo está en pantalla, y al sacarlo siguen donde
+  estaban. Usa menos procesador y placa de video durante el logo.
+- **El error de una imagen de Google se nota.** Si no se pudo agregar, la barra
+  de abajo parpadea en rojo y el mensaje se destaca unos segundos.
 - **La fecha del evento se elige en un calendario.** Ya no se escribe a mano:
   un selector de fecha en castellano, con ✕ para sacarla.
 - **Se sacaron el brillo y el tinte de Propiedades.** Ya no se dibujan; un

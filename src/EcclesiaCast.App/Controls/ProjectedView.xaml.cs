@@ -28,7 +28,13 @@ public partial class ProjectedView : UserControl
 
     public static readonly DependencyProperty StateProperty =
         DependencyProperty.Register(nameof(State), typeof(OutputState), typeof(ProjectedView),
-            new PropertyMetadata(OutputState.Content, (d, e) => ((ProjectedView)d).SlideView.State = (OutputState)e.NewValue));
+            new PropertyMetadata(OutputState.Content, (d, e) =>
+            {
+                var view = (ProjectedView)d;
+                view.SlideView.State = (OutputState)e.NewValue;
+                // With the logo up a live page or window is not redrawn (see ApplyLiveVideo).
+                view.ApplyLiveVideo();
+            }));
 
     /// <summary>The pre-service countdown, handed straight to the slide view.</summary>
     public static readonly DependencyProperty CountdownProperty =
@@ -709,7 +715,10 @@ public partial class ProjectedView : UserControl
 
     private void ApplyLiveVideo()
     {
-        var isFeed = BackgroundMedia?.Type is MediaType.Web or MediaType.Window;
+        // On the real output, with the logo up, a live page or window is not
+        // listened to nor redrawn: nobody can see it.
+        var logoCovers = IsLiveOutput && State == OutputState.Logo;
+        var isFeed = !logoCovers && BackgroundMedia?.Type is MediaType.Web or MediaType.Window;
         HookFeed(isFeed ? BackgroundMedia!.Type : null);
 
         // Only a video background has frames to show. Anything else (an
