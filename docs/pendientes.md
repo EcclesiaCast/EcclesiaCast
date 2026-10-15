@@ -224,7 +224,8 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
          el instalador. Si SignPath devolviera algo sin firma, el flujo se
          corta en vez de publicar. Mientras SignPath no esté configurado, la
          comprobación que queda es el tamaño y el SHA-256 que publica GitHub.
-- [ ] Actualizar README y CHANGELOG (hoy dicen «Beta») y taguear `v1.0.0`.
+- [ ] Actualizar README y CHANGELOG (hoy dicen «Beta») y taguear `v1.0.0`. La
+      lista paso a paso, ya redactada, está en [publicar-1.0.md](publicar-1.0.md).
 
 ## 3. Para hacer después de la 1.0
 
