@@ -36,47 +36,26 @@
         <SolidColorBrush x:Key="AccentBrush" Color="#2F63C9"/>
         <SolidColorBrush x:Key="LiveBrush" Color="#C43B3B"/>
 
-        <!-- The program's logo (a projector lamp casting a beam with a cross in
-             it), drawn as vectors so it stays sharp at any size. It repeats
-             installer\make-icon.ps1 in a 100 x 100 box: if the artwork changes
-             there, change it here too. -->
+        <!-- The program's logo (a screen with a flame in it, on a navy rounded
+             square), drawn as vectors so it stays sharp at any size. It is the
+             same drawing as sitio/img/logo.svg in a 100 x 100 box; the icon file
+             (installer/make-icon.ps1) is made from that same SVG. -->
         <DrawingImage x:Key="AppLogoImage">
             <DrawingImage.Drawing>
                 <DrawingGroup>
-                    <GeometryDrawing Geometry="M 22,0 H 78 A 22,22 0 0 1 100,22 V 78 A 22,22 0 0 1 78,100 H 22 A 22,22 0 0 1 0,78 V 22 A 22,22 0 0 1 22,0 Z">
-                        <GeometryDrawing.Brush>
-                            <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                                <GradientStop Color="#2E4A7D" Offset="0"/>
-                                <GradientStop Color="#121C2E" Offset="1"/>
-                            </LinearGradientBrush>
-                        </GeometryDrawing.Brush>
-                    </GeometryDrawing>
-                    <DrawingGroup>
-                        <DrawingGroup.ClipGeometry>
-                            <RectangleGeometry Rect="0,0,100,100" RadiusX="22" RadiusY="22"/>
-                        </DrawingGroup.ClipGeometry>
-                        <GeometryDrawing Geometry="M 13,50 L 98,14 L 98,86 Z">
-                            <GeometryDrawing.Brush>
-                                <LinearGradientBrush MappingMode="Absolute" StartPoint="13,0" EndPoint="100,0">
-                                    <GradientStop Color="#96FFECBE" Offset="0"/>
-                                    <GradientStop Color="#28FFECBE" Offset="1"/>
-                                </LinearGradientBrush>
-                            </GeometryDrawing.Brush>
-                        </GeometryDrawing>
-                    </DrawingGroup>
-                    <GeometryDrawing Brush="#FFECBE">
+                    <GeometryDrawing Brush="#13294B" Geometry="M 22,0 H 78 A 22,22 0 0 1 100,22 V 78 A 22,22 0 0 1 78,100 H 22 A 22,22 0 0 1 0,78 V 22 A 22,22 0 0 1 22,0 Z"/>
+                    <GeometryDrawing>
+                        <GeometryDrawing.Pen>
+                            <Pen Brush="White" Thickness="5"/>
+                        </GeometryDrawing.Pen>
                         <GeometryDrawing.Geometry>
-                            <EllipseGeometry Center="13,50" RadiusX="7.5" RadiusY="7.5"/>
+                            <RectangleGeometry Rect="19,27,62,46" RadiusX="6.5" RadiusY="6.5"/>
                         </GeometryDrawing.Geometry>
                     </GeometryDrawing>
-                    <GeometryDrawing Brush="White">
-                        <GeometryDrawing.Geometry>
-                            <GeometryGroup FillRule="Nonzero">
-                                <RectangleGeometry Rect="59.75,21.5,11.5,57"/>
-                                <RectangleGeometry Rect="43.5,37.5,44,11.5"/>
-                            </GeometryGroup>
-                        </GeometryDrawing.Geometry>
-                    </GeometryDrawing>
+                    <GeometryDrawing Brush="#F4B942"
+                                     Geometry="M 50,33 C 53.5,39.5 62,46 62,55 C 62,62 56.5,67 50,67 C 43.5,67 38,62 38,55 C 38,49.5 41.5,45.5 44,41.5 C 44.5,45.5 46.5,48 49,48.5 C 47.5,43.5 48,38 50,33 Z"/>
+                    <GeometryDrawing Brush="#FFE2A0"
+                                     Geometry="M 50,53 C 52,56 55.5,58 55.5,61 C 55.5,64 53,66 50,66 C 47,66 44.5,64 44.5,61 C 44.5,58 47.5,56 50,53 Z"/>
                 </DrawingGroup>
             </DrawingImage.Drawing>
         </DrawingImage>
