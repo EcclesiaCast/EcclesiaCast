@@ -9,6 +9,17 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado
 
+- **Una Biblia libre más en el instalador: «Palabra de Dios para ti»** (PDDPT, de
+  la Asociación Bíblica Latinoamericana; licencia libre CC BY-SA 4.0). Se tilda
+  en la página de Biblias del instalador, junto a la Reina-Valera 1909, la Biblia
+  libre para el mundo y la Versión Biblia Libre. Sigue el texto crítico, así que
+  algunos versículos difieren de la Reina-Valera (en Marcos 16 el texto termina
+  en el versículo 9).
+- **Logo nuevo.** El ícono del programa, la ventana «Acerca de» y la pantalla de
+  carga ya no llevan la cruz: ahora es una pantalla con una llama sobre azul
+  noche. La pantalla de carga se rehízo: un haz de luz de proyector sobre el
+  nombre y la versión, con el lema del programa.
+
 - **La Biblia, las canciones y los anuncios, cada uno en su capa de la
   transmisión.** Además de la dirección de siempre (`/salida`, todo junto), hay
   tres más para pegar en un **Browser Source** distinto de OBS (o un Web Input de
@@ -710,6 +721,15 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   de ocupar un renglón arriba.
 
 ### Corregido
+
+- **Textos de ejemplo libres.** Las vistas previas del editor de temas y de
+  escenarios mostraban «Grande es tu fidelidad», «Sublime gracia» y la RVC/NTV,
+  que tienen derechos de autor. Ahora muestran «Santo, santo, santo» y Juan 3:16
+  en la Reina-Valera 1909 y la Biblia libre para el mundo.
+- **La página del celular decía «Content»** (en inglés) arriba a la derecha:
+  ahora dice «En pantalla».
+- **El ícono de cada ítem de la playlist se veía negro** sobre el fondo oscuro:
+  ahora es blanco.
 
 - **El cambio de una imagen a otra es un fundido limpio.** Grabando la salida
   cuadro por cuadro se vio que el relleno desenfocado de la imagen vieja

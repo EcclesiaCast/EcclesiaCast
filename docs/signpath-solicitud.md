@@ -65,7 +65,7 @@ Code signing policy: https://github.com/EcclesiaCast/EcclesiaCast#code-signing-p
 - [x] Una versión publicada con instalador (`v1.0.0-beta.15`).
 - [x] Verificación en dos pasos en GitHub (hecho por Alexis).
 - [x] El README tiene la sección «Code signing policy» y la política de privacidad.
-- [x] El instalador sólo trae Biblias libres (RV1909, BLM, VBL) y librerías libres
+- [x] El instalador sólo trae Biblias libres (RV1909, BLM, VBL, PDDPT) y librerías libres
       (VLC es LGPL); las Biblias con derechos (RVR1960, NVI…) **no** van adentro.
 
 ## Después de la aprobación
