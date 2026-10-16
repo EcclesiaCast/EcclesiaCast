@@ -264,6 +264,24 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
 - [ ] Actualizar README y CHANGELOG (hoy dicen «Beta») y taguear `v1.0.0`. La
       lista paso a paso, ya redactada, está en [publicar-1.0.md](publicar-1.0.md).
 
+## Pedidos de permiso para Biblias con derechos (enviados el 15/10/2026)
+
+Alexis pidió permiso para ofrecer estas versiones dentro del programa. Hasta
+que haya un sí por escrito, no se incluyen ni se ofrecen para bajar.
+
+| Versión | A quién | Cómo | Respuesta |
+|---|---|---|---|
+| RVR1960 y TLA | Sociedad Bíblica del Uruguay | info@sociedadbiblica.org.uy | — |
+| RVR1960 | American Bible Society | licensing@americanbible.org (sin el formulario adjunto: los datos van en el correo) | — |
+| NVI | Biblica, Inc. | formulario en biblica.com (sin las capturas) | Respuesta automática: mínimo 15 días hábiles, no escribir para apurar |
+| NTV | Tyndale | permisos@tyndale.com → reenviado a pedidos-tyndale@tyndale.com | Respuesta automática: la persona se jubiló |
+| PDT | Bible League International | formulario en bibleleague.org/contact-us | — |
+| TCB | Proyecto Evanggelio | jcontreras@ con copia a edarocha@proyectoevanggelio.org | — |
+
+Si para el 5/11/2026 no contestaron: llamar a la Sociedad Bíblica del Uruguay
+(2411 0034) y escribir a Proyecto Evanggelio por Facebook o Instagram. A Biblica
+no escribirle antes de esa fecha.
+
 ## 3. Para hacer después de la 1.0
 
 
