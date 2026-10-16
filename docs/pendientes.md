@@ -242,9 +242,9 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       se junta visibilidad). Una página en GitHub Pages que muestre el programa
       (gratis): el encargo completo está en
       [sitio-web-encargo.md](sitio-web-encargo.md). **Estado (15/10/2026):
-      hecha en `sitio/`, con logo nuevo, capturas y un video de 40 segundos;
-      falta subirla (git push), activar GitHub Pages y poner la dirección en el
-      campo «Website» del repositorio.** Falta también la captura de «Ejecutar
+      publicada en <https://ecclesiacast.github.io/EcclesiaCast/>, con logo
+      nuevo, capturas y un video de 40 segundos; el flujo `pages` la vuelve a
+      publicar con cada cambio en `sitio/` y después de cada versión.** Falta también la captura de «Ejecutar
       de todas formas» del aviso de Windows (hoy la página explica ese paso sin
       imagen). Después: un video de
       demostración, contarlo en comunidades de iglesias y que otras iglesias lo
