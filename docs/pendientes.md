@@ -261,15 +261,6 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       desde el programa (Archivo → Exportar paquete de Biblias…) y después se
       arma el instalador con `/PAQUETE=`. Claude no pudo copiar tu biblioteca
       por su cuenta.
-- [ ] **Captura de «Ejecutar de todas formas»** del aviso de Windows para la
-      página. El 16/10 el instalador se abrió directo, sin aviso (bajado con
-      PowerShell, que no marca el archivo como de internet); lo cancelaste y no
-      se instaló nada (sigue la beta.15). Para que salga el aviso hay que bajarlo
-      desde el navegador, con la PC libre, y dar permiso a `chxsmartscreen.exe`
-      y al Explorador.
-- [ ] **El enlace que había que volver a subir** (16/10): Alexis dijo que compartió
-      un enlace para tener visibilidad y que Claude lo «bajó»; no se encontró
-      cuál era (no hay artefactos ni versiones borradas). Preguntarle cuál es.
 - [ ] Actualizar README y CHANGELOG (hoy dicen «Beta») y taguear `v1.0.0`. La
       lista paso a paso, ya redactada, está en [publicar-1.0.md](publicar-1.0.md).
 
