@@ -250,17 +250,20 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       demostración, contarlo en comunidades de iglesias y que otras iglesias lo
       usen y lo marquen con estrella. Volver a pedir la firma a SignPath cuando
       haya señales.
-- [ ] **Textos de ejemplo con derechos de autor dentro del programa** (visto el
-      15/10/2026 al sacar las capturas de la página). La vista previa del editor
-      de temas muestra «[RVC] Porque de tal manera amó Dios…» con una línea
-      «[NTV] For God so loved the world…», y la de canciones «Grande es tu
-      fidelidad — Marcos Witt»; el editor de escenarios muestra «Sublime gracia
-      del Señor». Cambiarlos por textos libres (por ejemplo Juan 3:16 en la
-      RV1909 y un himno de dominio público), como las Biblias del instalador.
-- [ ] **Detalles vistos en las capturas** (15/10/2026): la página del celular
-      dice «Content» arriba a la derecha (el estado de la salida sale en inglés,
-      sin traducir), y en la playlist el ícono ♪ de cada canción se ve negro
-      sobre el fondo oscuro.
+- [ ] **Probar la beta.16 con el programa abierto** (salió el 16/10/2026): la
+      pantalla de carga nueva (se dibujó a imagen, pero no se vio abrir de
+      verdad), el ícono nuevo en la barra de tareas y el instalador con la
+      «Palabra de Dios para ti» (que aparezca entre las Biblias y que entre al
+      abrir el programa). Los textos de ejemplo del editor de temas y de
+      escenarios ahora son libres: mirar que se vean bien.
+- [ ] **Instalador privado con tus Biblias** (para las computadoras de la iglesia,
+      sin subirlo a ningún lado). Falta el archivo `.ecbiblias`: exportarlo
+      desde el programa (Archivo → Exportar paquete de Biblias…) y después se
+      arma el instalador con `/PAQUETE=`. Claude no pudo copiar tu biblioteca
+      por su cuenta.
+- [ ] **Captura de «Ejecutar de todas formas»** del aviso de Windows para la
+      página (la PC tiene que estar libre y hace falta dar permiso a la ventana
+      del aviso).
 - [ ] Actualizar README y CHANGELOG (hoy dicen «Beta») y taguear `v1.0.0`. La
       lista paso a paso, ya redactada, está en [publicar-1.0.md](publicar-1.0.md).
 
