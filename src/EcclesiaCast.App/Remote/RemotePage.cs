@@ -332,7 +332,7 @@ internal static class RemotePage
           document.getElementById('slideLabel').textContent = s.slideLabel || 'En vivo';
           document.getElementById('status').textContent = s.status || '';
           document.getElementById('dot').className = 'dot' + (s.isProjecting ? ' on' : '');
-          document.getElementById('stateLabel').textContent = s.outputState;
+          document.getElementById('stateLabel').textContent = s.outputState === 'Content' ? 'En pantalla' : s.outputState;
 
           document.getElementById('bClear').className = s.outputState === 'Clear' ? 'on' : '';
           document.getElementById('bBlack').className = s.outputState === 'Black' ? 'on' : '';

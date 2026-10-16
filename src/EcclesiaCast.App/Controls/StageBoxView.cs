@@ -186,8 +186,8 @@ public sealed class StageBoxView : Border
 
     private string SampleContent() => Box.Kind switch
     {
-        StageBoxKind.LiveText => "Sublime gracia del Señor\nque a un infeliz salvó",
-        StageBoxKind.NextSlide => "Yo ciego fui, mas veo hoy",
+        StageBoxKind.LiveText => "Santo, santo, santo, Señor omnipotente,\nsiempre el labio mío loores te dará.",
+        StageBoxKind.NextSlide => "Santo, santo, santo, te adoro reverente",
         StageBoxKind.LiveName => "Coro",
         StageBoxKind.Clock => "10:30",
         StageBoxKind.Timer => "12:45",

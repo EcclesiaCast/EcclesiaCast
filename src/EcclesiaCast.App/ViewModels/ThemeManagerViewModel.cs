@@ -297,10 +297,10 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         // something to watch come in and go out.
         var text = (isBible, _showingNextSample) switch
         {
-            (true, false) => "Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito",
+            (true, false) => "Porque de tal manera amó Dios al mundo, que ha dado á su Hijo unigénito",
             (true, true) => "para que todo aquel que en él cree, no se pierda, mas tenga vida eterna",
-            (false, false) => "Grande es tu fidelidad\noh Dios mi Padre",
-            (false, true) => "Tu amor me sostiene\ncada día de mi vida",
+            (false, false) => "Santo, santo, santo, Señor omnipotente,\nsiempre el labio mío loores te dará.",
+            (false, true) => "Santo, santo, santo, te adoro reverente,\nDios en tres personas, bendita Trinidad.",
         };
         if (isBible && theme.ShowVerseNumbers)
             text = "16 " + text;
@@ -309,20 +309,20 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         // with two versions each text carries its abbreviation inline.
         var secondary = isBible
             ? _showingNextSample
-                ? "that whoever believes in him should not perish but have eternal life"
-                : "For God so loved the world, that he gave his only Son"
+                ? "para que todo el que crea en él no perezca, sino que tenga vida eterna"
+                : "Porque tanto amó Dios al mundo, que dio a su Hijo unigénito"
             : null;
 
         string caption;
         if (isBible)
         {
-            text = $"[RVC] {text}";
-            secondary = $"[NTV] {secondary}";
+            text = $"[RV1909] {text}";
+            secondary = $"[BLM] {secondary}";
             caption = "Juan 3:16";
         }
         else
         {
-            caption = "Grande es tu fidelidad — Marcos Witt";
+            caption = "Santo, santo, santo — Reginald Heber";
         }
 
         PreviewSlide = new SlideContent(text, caption, secondary, theme);
