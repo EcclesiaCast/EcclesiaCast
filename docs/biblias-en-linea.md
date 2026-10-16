@@ -1,5 +1,20 @@
 # Biblias en línea con API.Bible (investigación del 16/10/2026)
 
+> **Descartado el 16/10/2026 (Alexis).** Se creó una cuenta gratis, se vieron la lista de
+> Biblias y todos los contratos, y se decidió no seguir: demasiado complicado y con
+> demasiado riesgo personal para un programa gratuito de una sola persona. Lo que
+> pesó: el contrato propio de cada dueño del texto (el de Biblica exige encriptación,
+> permiso previo por cada versión nueva del programa y confidencialidad, y sólo
+> cubre sitios web y apps de celular), la exigencia de protección contra copia en un
+> programa de código abierto, la responsabilidad personal de quien se registra y que
+> pueden cancelar el acceso sin motivo (hay que borrar todo en 72 horas). En
+> castellano sólo se vieron la NTV, la LBLA y la NBLA; la RVR1960, la NVI suelta, la
+> TLA, la PDT y la TCB no estaban. **No volver a investigarlo** salvo que cambien las
+> condiciones o Tyndale dé un permiso directo. Camino elegido: los permisos pedidos
+> por correo (ver docs/pendientes.md) y las Biblias libres del instalador. La
+> investigación de abajo queda como referencia.
+
+
 **Por qué:** Tyndale contestó el 16/10/2026 que no puede dar un permiso para meter
 la NTV dentro del programa y mandó a pedirla por [API.Bible](https://api.bible)
 (un servicio de la American Bible Society que reparte textos con licencia). La
