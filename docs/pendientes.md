@@ -256,11 +256,6 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       «Palabra de Dios para ti» (que aparezca entre las Biblias y que entre al
       abrir el programa). Los textos de ejemplo del editor de temas y de
       escenarios ahora son libres: mirar que se vean bien.
-- [ ] **Instalador privado con tus Biblias** (para las computadoras de la iglesia,
-      sin subirlo a ningún lado). Falta el archivo `.ecbiblias`: exportarlo
-      desde el programa (Archivo → Exportar paquete de Biblias…) y después se
-      arma el instalador con `/PAQUETE=`. Claude no pudo copiar tu biblioteca
-      por su cuenta.
 - [ ] Actualizar README y CHANGELOG (hoy dicen «Beta») y taguear `v1.0.0`. La
       lista paso a paso, ya redactada, está en [publicar-1.0.md](publicar-1.0.md).
 
