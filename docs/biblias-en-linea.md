@@ -124,3 +124,42 @@ límite de 5.000 consultas es el de cada iglesia; los términos pueden cambiar; 
 **falta confirmar con API.Bible** el tema del FUMS y qué versiones en castellano
 están disponibles. Esas dos preguntas se pueden hacer en su Discord (el enlace
 está en el panel de cada cuenta) o a support@api.bible.
+
+## Lo que dicen los Términos y Condiciones (leídos el 16/10/2026)
+
+Los términos generales de API.Bible (los públicos, que se ven al crear la cuenta)
+cambian algunas cosas de arriba. **No se resumen acá los contratos aparte de cada
+dueño del texto** (por ejemplo el de Biblica): ese contrato exige mantenerse en
+secreto y no se publica.
+
+- **Una cuenta gratis por persona o entidad** (9.6): crear varias cuentas o
+  aplicaciones para juntar cupos está prohibido. Por eso cada iglesia tiene que
+  crear la suya; EcclesiaCast no puede repartir cuentas.
+- **La clave es personal** (9.5 y 12): no se puede dar a un tercero. Una clave
+  metida en el programa para todos los usuarios está prohibida. Cada iglesia pone
+  la suya.
+- **Texto guardado:** se puede guardar sin conexión, pero hay que revisar si
+  cambió **al menos cada 30 días** (sección 11) y borrarlo en 24 horas si lo piden.
+  Si la cuenta se corta o la dejan de pagar, hay que borrar todo el contenido en
+  **72 horas** (sección 10).
+- **Protección contra copia (sección 12):** hay que usar «tecnología de gestión
+  de derechos digitales» de la industria que impida copiar y repartir el texto, y
+  no imprimir más de 100 versículos. Es la parte más difícil para un programa de
+  código abierto: el texto guardado tendría que ir cifrado, y cualquiera con el
+  código fuente puede ver cómo se descifra. Hay que preguntar a API.Bible si un
+  cifrado simple de la caché alcanza.
+- **Citas (sección 7):** hay que mostrar el nombre y la abreviatura de la versión
+  en todo lo que se muestre, y tener una pantalla de «derechos de autor» con el
+  dueño y un enlace a su sitio y a api.bible. El programa ya muestra la
+  abreviatura entre corchetes.
+- **Sólo sin fines de lucro** (9.3 y 17.3): hay que avisar antes de cobrar o poner
+  publicidad. **La cuenta se puede cancelar cuando quieran, sin motivo** (3.5 y 18).
+- **Auditoría** (16): pueden pedir acceso a los registros y a la aplicación hasta
+  dos veces por año.
+- **Quien se registra responde por los daños** que cause a API.Bible o a los dueños
+  del texto (19.1). **Peleas:** mediación y arbitraje en Filadelfia (Pensilvania),
+  con leyes de Pensilvania (25 y 26).
+- Los dueños del texto (por ejemplo Biblica o Tyndale) **pueden recibir tus datos
+  y contactarte** (19.2).
+- **FUMS:** obligatorio para aplicaciones web (3.3 y 14); no queda claro si cuenta
+  un programa de escritorio. Consultar.
