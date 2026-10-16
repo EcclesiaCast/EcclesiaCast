@@ -16,6 +16,7 @@ publica la licencia de su versión.
 | `RV1909.ecbiblias` | Reina-Valera 1909 (RV1909) | Dominio público | <https://ebible.org/Scriptures/details.php?id=spaRV1909> |
 | `BLM.ecbiblias` | Biblia libre para el mundo (BLM) | Dominio público (CC0) | <https://ebible.org/Scriptures/details.php?id=spablm> |
 | `VBL.ecbiblias` | Versión Biblia Libre (VBL) | Creative Commons Atribución-CompartirIgual 4.0 (CC BY-SA 4.0) | <https://ebible.org/Scriptures/details.php?id=spavbl> |
+| `PDDPT.ecbiblias` | Palabra de Dios para ti (PDDPT) | Creative Commons Atribución 4.0 / CC BY-SA 4.0 (ver abajo) | <https://ebible.org/Scriptures/details.php?id=spapddpt> |
 
 ## Reina-Valera 1909
 
@@ -50,6 +51,24 @@ publica la licencia de su versión.
   notas, títulos y marcas). El texto de los versículos no se tocó. Este
   archivo conserva la licencia CC BY-SA 4.0 del original.
 - Versión de la fuente: 5.2 de octubre de 2025.
+
+## Palabra de Dios para ti (PDDPT)
+
+- Traducción: «Biblia Latinoamericana Textual», de la Asociación Bíblica
+  Latinoamericana (<https://rnova2.com>); © 2020. Se abrevia **PDDPT** para no
+  confundirla con la «Palabra de Dios para Todos» (PDT), que tiene derechos y no
+  entra.
+- Licencia: la página de eBible.org la publica con Creative Commons Atribución 4.0
+  y la introducción del propio texto dice CC BY-SA 4.0. Se cumple la más
+  exigente (BY-SA): se conserva esta nota de copyright y la fuente, se indica
+  cualquier cambio y lo que se redistribuya lleva la misma licencia.
+- Cambios hechos acá: sólo de formato (del USFX a JSON; se quitaron notas, títulos
+  y marcas). El texto de los versículos no se tocó.
+- Origen: <https://ebible.org/Scriptures/details.php?id=spapddpt>, bajada el
+  16/10/2026 (fuente del 13/10/2026). Si encuentra algún error: spapddpt@eBible.org.
+- Observación: sigue el texto crítico, así que algunos versículos difieren de la
+  Reina-Valera (por ejemplo Marcos 16 termina en el versículo 9) y 11 versículos
+  vienen vacíos en la fuente.
 
 ## Qué no entra (y por qué)
 

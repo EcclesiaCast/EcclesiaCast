@@ -62,6 +62,8 @@ spanish.BibleBlm=Biblia libre para el mundo (dominio público; es un borrador qu
 english.BibleBlm=Biblia libre para el mundo (public domain; a draft that is still being reviewed)
 spanish.BibleVbl=Versión Biblia Libre (licencia libre CC BY-SA 4.0)
 english.BibleVbl=Versión Biblia Libre (free license CC BY-SA 4.0)
+spanish.BiblePdt=Palabra de Dios para ti (licencia libre CC BY-SA 4.0)
+english.BiblePdt=Palabra de Dios para ti (free license CC BY-SA 4.0)
 spanish.PackagePageTitle=Paquete de Biblias propio
 english.PackagePageTitle=Your own Bible package
 spanish.PackagePageSubtitle=¿Tenés un paquete de Biblias (.ecbiblias)?
@@ -96,6 +98,7 @@ Name: "personalizada"; Description: "{cm:TypeBiblesCustom}"; Flags: iscustom
 Name: "rv1909"; Description: "{cm:BibleRv1909}"; Types: estandar todas
 Name: "blm"; Description: "{cm:BibleBlm}"; Types: todas
 Name: "vbl"; Description: "{cm:BibleVbl}"; Types: todas
+Name: "pddpt"; Description: "{cm:BiblePdt}"; Types: todas
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
@@ -117,6 +120,7 @@ Source: "..\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs cr
 Source: "bibles\RV1909.ecbiblias"; DestDir: "{app}\bibles"; Flags: ignoreversion; Components: rv1909
 Source: "bibles\BLM.ecbiblias"; DestDir: "{app}\bibles"; Flags: ignoreversion; Components: blm
 Source: "bibles\VBL.ecbiblias"; DestDir: "{app}\bibles"; Flags: ignoreversion; Components: vbl
+Source: "bibles\PDDPT.ecbiblias"; DestDir: "{app}\bibles"; Flags: ignoreversion; Components: pddpt
 ; El paquete propio del operador (con las Biblias con derechos que ya tiene) va a una
 ; carpeta aparte: las libres se traen solas al arrancar, éste en cambio abre la ventana
 ; de importar, una sola vez. Se puede pasar por línea de comandos: /PAQUETE="C:\ruta\x.ecbiblias"
