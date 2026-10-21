@@ -5,6 +5,41 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+## [1.0.0] - 2026-10-21
+
+Primera versión estable: todo lo que se fue sumando en las betas, probado en los
+servicios de la Iglesia Pan de Vida. Si tenés una beta instalada, se actualiza
+sin perder canciones, Biblias, medios ni ajustes.
+
+### Qué trae
+
+- **Canciones:** biblioteca con búsqueda al instante, importación desde `.txt` y
+  desde ProPresenter 7, y búsqueda de letras en internet.
+- **Biblia:** varias versiones, búsqueda por referencia («jn 3:16», «sal 23») o
+  por texto, dos versiones a la vez e historial de versículos. El instalador trae
+  Biblias libres para elegir (Reina-Valera 1909, Biblia libre para el mundo,
+  Versión Biblia Libre y Palabra de Dios para ti); las demás se importan, o se
+  llevan de otra computadora tuya con un paquete de Biblias.
+- **Medios:** imágenes, videos, GIF, PDF y PowerPoint, en pestañas, como fondo o
+  en primer plano. Imágenes y GIF de Google, páginas web y otras ventanas de
+  Windows en pantalla, y las imágenes de un evento pasan solas a «Eventos
+  pasados» cuando termina.
+- **Proyección:** Clear, Black, Logo, aviso al pie, cuenta regresiva,
+  transiciones y resaltado de palabras desde el LIVE.
+- **Temas y diseño:** tipografía, color, contorno, márgenes y fondo, con un
+  editor visual y varios cuadros de texto por diapositiva.
+- **Pantalla de escenario** para los músicos, con varios escenarios y su editor.
+- **Playlist del servicio**, que se maneja entera con el teclado, y búsqueda de
+  todo junto con Ctrl+K.
+- **Música:** lista de audios y mini reproductor de Spotify.
+- **Desde el celular:** manejar la proyección y buscar canciones o versículos.
+- **Para la transmisión (OBS o vMix):** la salida como página transparente, todo
+  junto o en tres capas (Biblia, canciones y anuncios).
+- **Copia de seguridad**, modo para PC de bajo rendimiento y actualizaciones
+  automáticas.
+
+## [1.0.0-beta.5 a 1.0.0-beta.16] — 2026-10-03 a 2026-10-16
+
 Lo que salió del primer servicio en vivo (27/9/2026).
 
 ### Agregado

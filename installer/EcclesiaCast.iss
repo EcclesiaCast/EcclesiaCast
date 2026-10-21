@@ -1,6 +1,12 @@
 ﻿; Instalador de EcclesiaCast (Inno Setup 6)
 ; Se compila con:  iscc installer\EcclesiaCast.iss
 ; Espera la publicación self-contained en:  publish\
+;
+; Instalador privado, para las computadoras de la iglesia (no se sube a ningún lado):
+;   iscc /DPaqueteBiblias="C:\ruta\Biblias.ecbiblias" installer\EcclesiaCast.iss
+; lleva adentro ese paquete de Biblias (las que tienen derechos) y se llama
+; EcclesiaCast-<versión>-con-biblias-setup.exe. La primera vez que se abre el
+; programa ofrece traerlas, igual que con un paquete elegido al instalar.
 
 #define AppName "EcclesiaCast"
 #define AppPublisher "EcclesiaCast"
@@ -21,7 +27,11 @@ DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
 LicenseFile=..\LICENSE
 OutputDir=..\dist
+#ifdef PaqueteBiblias
+OutputBaseFilename=EcclesiaCast-{#AppVersion}-con-biblias-setup
+#else
 OutputBaseFilename=EcclesiaCast-{#AppVersion}-setup
+#endif
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
@@ -124,8 +134,13 @@ Source: "bibles\PDDPT.ecbiblias"; DestDir: "{app}\bibles"; Flags: ignoreversion;
 ; El paquete propio del operador (con las Biblias con derechos que ya tiene) va a una
 ; carpeta aparte: las libres se traen solas al arrancar, éste en cambio abre la ventana
 ; de importar, una sola vez. Se puede pasar por línea de comandos: /PAQUETE="C:\ruta\x.ecbiblias"
+#ifdef PaqueteBiblias
+; El instalador privado ya lo lleva adentro (ver arriba), y no pregunta por otro.
+Source: "{#PaqueteBiblias}"; DestDir: "{app}\bibles\paquete"; DestName: "paquete-de-biblias.ecbiblias"; Flags: ignoreversion
+#else
 Source: "{code:PackagePath}"; DestDir: "{app}\bibles\paquete"; DestName: "paquete-de-biblias.ecbiblias"; \
     Flags: external ignoreversion; Check: HasPackage
+#endif
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\EcclesiaCast.App.exe"
@@ -181,6 +196,16 @@ begin
   Path := PackagePath('');
   Result := (Path <> '') and FileExists(Path) and
             (CompareText(ExtractFileExt(Path), '.ecbiblias') = 0);
+end;
+
+{ The private installer carries its package, so the page that asks for one is left out. }
+function ShouldSkipPage(PageID: Integer): Boolean;
+begin
+#ifdef PaqueteBiblias
+  Result := PageID = PackagePage.ID;
+#else
+  Result := False;
+#endif
 end;
 
 { A file typed by hand that is not there (or is not a package) is told, not ignored. }
