@@ -91,6 +91,11 @@ En la barra **MEDIOS**, abajo:
   pestaña va como *fondo*, como *primer plano* o *como diga cada medio*; para
   primer plano, «Al terminar, mostrar el logo») y **Eliminar…** (los medios
   dejan de verse en el programa; los archivos no se borran).
+- **Fondos de ejemplo.** Si en el instalador dejaste tildado «Agregar 12 fondos
+  de ejemplo», la primera vez que abrís el programa aparecen en una pestaña
+  **Fondos de ejemplo**: cielos, luces fuera de foco, una aurora, tres cruces
+  al atardecer y otros, pensados para poner letra encima. Son de dominio
+  público. Si quitás uno de la biblioteca no vuelve a aparecer.
 - **📥 Agregar** importa imágenes y videos a la pestaña activa, y también
   **PDF** y **presentaciones de PowerPoint**: cada página entra como un medio
   de pantalla completa, numerado y en orden. El PDF lo dibuja Windows sin

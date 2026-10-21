@@ -403,6 +403,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         // The Bibles the installer left, before anything reads the library:
         // the window is not up yet, so there is no one to keep waiting.
         var bundledNote = ImportBundledBibles();
+        var backgroundsNote = ImportBundledBackgrounds();
         LoadBibleVersions();
         LoadBibleHistory();
         LoadMedia();
@@ -425,7 +426,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
             Application.Current?.Dispatcher.BeginInvoke(() => StatusText = message);
         RefreshLightCopies();
 
-        if (bundledNote is not null)
-            StatusText = bundledNote;
+        if (bundledNote is not null || backgroundsNote is not null)
+            StatusText = string.Join(" ", new[] { bundledNote, backgroundsNote }.OfType<string>());
     }
 }

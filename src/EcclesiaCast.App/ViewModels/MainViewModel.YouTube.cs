@@ -360,8 +360,9 @@ public sealed partial class MainViewModel
         if (GifImporter.IsConverted(item.Path))
             GifImporter.Forget(item.Path);
 
-        // And the picture brought in from Google Images.
-        if (IsDownloadedWebImage(item.Path))
+        // And the picture brought in from Google Images, or the library's copy
+        // of a sample background (it stays out: see BundledBackgrounds).
+        if (IsDownloadedWebImage(item.Path) || IsSampleBackground(item.Path))
         {
             try
             {

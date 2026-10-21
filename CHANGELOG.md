@@ -5,6 +5,15 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+### Agregado
+
+- **Fondos de ejemplo.** El instalador trae una casilla nueva, tildada, «Agregar
+  12 fondos de ejemplo»: cielos, luces fuera de foco, una aurora, tres cruces al
+  atardecer y otros, pensados para poner letra encima. La primera vez que abrís
+  el programa aparecen en su propia pestaña, **Fondos de ejemplo**. Los dibujó el
+  proyecto y son de dominio público. Si quitás uno, no vuelve. Suman menos de
+  1 MB al instalador.
+
 ## [1.0.0] - 2026-10-21
 
 Primera versión estable: todo lo que se fue sumando en las betas, probado en los

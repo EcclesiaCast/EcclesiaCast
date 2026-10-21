@@ -58,6 +58,10 @@ spanish.PerformanceGroup=Rendimiento:
 english.PerformanceGroup=Performance:
 spanish.LowPerformanceTask=Configurar para una PC de bajo rendimiento (recomendado en computadoras viejas o notebooks sin placa de video)
 english.LowPerformanceTask=Set up for a low-performance PC (recommended for old computers or laptops without a graphics card)
+spanish.BackgroundsGroup=Fondos:
+english.BackgroundsGroup=Backgrounds:
+spanish.BackgroundsTask=Agregar 12 fondos de ejemplo (imágenes para poner detrás de la letra, en su propia pestaña)
+english.BackgroundsTask=Add 12 sample backgrounds (pictures to put behind the words, in a tab of their own)
 spanish.TypeBiblesStandard=Instalación estándar (con la Reina-Valera 1909)
 english.TypeBiblesStandard=Standard installation (with the Reina-Valera 1909)
 spanish.TypeBiblesAll=Con todas las Biblias libres
@@ -115,6 +119,9 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 ; Sin tildar por defecto: sólo las computadoras viejas lo necesitan. Si se tilda,
 ; el programa arranca con el «Modo PC de bajo rendimiento» prendido (ver [Registry]).
 Name: "lowperformance"; Description: "{cm:LowPerformanceTask}"; GroupDescription: "{cm:PerformanceGroup}"; Flags: unchecked
+; Hechos por el proyecto (ver installer\fondos\LICENCIA.md). El programa los trae a una
+; pestaña propia la primera vez, y no vuelve a traer uno que se haya quitado.
+Name: "fondos"; Description: "{cm:BackgroundsTask}"; GroupDescription: "{cm:BackgroundsGroup}"
 
 [Registry]
 ; La respuesta del instalador. El programa la lee al arrancar y, si todavía no hay
@@ -131,6 +138,7 @@ Source: "bibles\RV1909.ecbiblias"; DestDir: "{app}\bibles"; Flags: ignoreversion
 Source: "bibles\BLM.ecbiblias"; DestDir: "{app}\bibles"; Flags: ignoreversion; Components: blm
 Source: "bibles\VBL.ecbiblias"; DestDir: "{app}\bibles"; Flags: ignoreversion; Components: vbl
 Source: "bibles\PDDPT.ecbiblias"; DestDir: "{app}\bibles"; Flags: ignoreversion; Components: pddpt
+Source: "fondos\*.jpg"; DestDir: "{app}\fondos"; Flags: ignoreversion; Tasks: fondos
 ; El paquete propio del operador (con las Biblias con derechos que ya tiene) va a una
 ; carpeta aparte: las libres se traen solas al arrancar, éste en cambio abre la ventana
 ; de importar, una sola vez. Se puede pasar por línea de comandos: /PAQUETE="C:\ruta\x.ecbiblias"
