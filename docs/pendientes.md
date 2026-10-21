@@ -186,8 +186,8 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       4. Tocar un resultado lo **carga** sin proyectarlo; la página baja a las
          diapositivas. Sin resultados dice «No encontré nada».
 
-- [ ] **Fondos en video** (sin publicar; hay pruebas y se armó un instalador
-      de prueba, pero no se instaló). En el instalador, la casilla «Agregar 10
+- [ ] **Fondos en video** (salieron en la 1.0.1, el 21/10/2026; hay pruebas,
+      pero no se instaló ni se vio andar). En el instalador, la casilla «Agregar 10
       fondos en video» viene tildada. Al abrir el programa: pestaña nueva
       **Fondos de ejemplo** con los 10, en orden alfabético, con su miniatura, y
       la barra de abajo lo avisa. Proyectá varios con una canción encima: que la

@@ -5,6 +5,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+## [1.0.1] - 2026-10-21
+
 ### Agregado
 
 - **Fondos en video.** El instalador trae una casilla nueva, tildada, «Agregar
