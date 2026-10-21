@@ -186,13 +186,15 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       4. Tocar un resultado lo **carga** sin proyectarlo; la página baja a las
          diapositivas. Sin resultados dice «No encontré nada».
 
-- [ ] **Fondos de ejemplo** (sin publicar; hay pruebas y se armó un instalador
-      de prueba, pero no se instaló). En el instalador, la casilla «Agregar 12
-      fondos de ejemplo» viene tildada. Al abrir el programa: pestaña nueva
-      **Fondos de ejemplo** con los 12, en orden alfabético, y la barra de abajo
-      lo avisa. Proyectá varios con una canción encima: que la letra se lea bien.
-      Quitá uno de la biblioteca, cerrá y abrí: no vuelve. Instalando sin la
-      casilla, la pestaña no aparece.
+- [ ] **Fondos en video** (sin publicar; hay pruebas y se armó un instalador
+      de prueba, pero no se instaló). En el instalador, la casilla «Agregar 10
+      fondos en video» viene tildada. Al abrir el programa: pestaña nueva
+      **Fondos de ejemplo** con los 10, en orden alfabético, con su miniatura, y
+      la barra de abajo lo avisa. Proyectá varios con una canción encima: que la
+      letra se lea bien, que no tengan sonido y que **el bucle no se note** (mirá
+      el momento en que vuelve a empezar, a los 20 segundos). Mirá también que no
+      tironeen en la PC del proyector. Quitá uno de la biblioteca, cerrá y abrí:
+      no vuelve. Instalando sin la casilla, la pestaña no aparece.
 
 ## 2. Después de publicar la v1.0.0
 
@@ -296,16 +298,14 @@ no escribirle antes de esa fecha.
 
 ## 3. Para hacer después de la 1.0
 
-- [ ] **Fondos en video y un botón «Agregar fondos»** (decidido el 21/10/2026).
-      Ya hay 12 imágenes de fondo hechas por el proyecto dentro del instalador
-      (`installer\fondos`, menos de 1 MB). Los videos en bucle pesan de 10 a 30
-      MB cada uno, así que no van en el instalador: irían en un paquete aparte
-      que se baja desde el programa con un botón «Agregar fondos». Es el mismo
-      mecanismo que el catálogo de Biblias libres de abajo, así que conviene
-      hacer los dos juntos. Los videos también se pueden dibujar acá (degradés
-      que se mueven, partículas, luces) con el generador de
-      `installer\fondos\generador`. Fotos de Pexels o Pixabay **no**: sus
-      licencias no dejan repartirlas dentro de otro programa.
+- [ ] **Más fondos y un botón «Agregar fondos»** (21/10/2026). Ya vienen 10
+      fondos en video dentro del instalador (`installer\fondos`, dibujados por
+      el generador de esa carpeta; pesan de 2 a 6 MB cada uno). Si se quieren
+      más sin engordar el instalador, irían en un paquete aparte que se baja
+      desde el programa con un botón «Agregar fondos»: es el mismo mecanismo que
+      el catálogo de Biblias libres de abajo, así que conviene hacer los dos
+      juntos. Fotos o videos de Pexels o Pixabay **no**: sus licencias no dejan
+      repartirlos dentro de otro programa.
 
 - [ ] **Biblias: cómo distribuirlas, al menos en Uruguay.** Lo averiguado el
       7/10/2026: las versiones con derechos (RVR1960, NVI, NTV, TLA, y

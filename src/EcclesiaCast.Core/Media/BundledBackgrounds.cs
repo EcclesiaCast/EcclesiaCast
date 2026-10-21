@@ -1,7 +1,7 @@
 namespace EcclesiaCast.Core.Media;
 
 /// <summary>
-/// The sample backgrounds the installer leaves in the <c>fondos</c> folder
+/// The sample video backgrounds the installer leaves in the <c>fondos</c> folder
 /// next to the program. At start-up the ones not brought in yet go to the
 /// library, in a tab of their own. What was brought in is written down, so a
 /// background the operator takes out stays out instead of coming back at every
@@ -15,8 +15,8 @@ public static class BundledBackgrounds
     /// <summary>The tab they go to, so they don't mix with the church's own backgrounds.</summary>
     public const string Tab = "Fondos de ejemplo";
 
-    /// <summary>The kind of file the installer leaves.</summary>
-    public const string Extension = ".jpg";
+    /// <summary>The kind of file the installer leaves: looping videos, made by installer/fondos/generador.</summary>
+    public const string Extension = ".mp4";
 
     private const char Separator = '|';
 
@@ -49,7 +49,7 @@ public static class BundledBackgrounds
         return string.Join(Separator, all);
     }
 
-    /// <summary>The name a background gets in the library: its file's name, without «.jpg».</summary>
+    /// <summary>The name a background gets in the library: its file's name, without «.mp4».</summary>
     public static string DisplayName(string fileName) => Path.GetFileNameWithoutExtension(fileName);
 
     private static IReadOnlyList<string> ParseRemembered(string? setting) =>

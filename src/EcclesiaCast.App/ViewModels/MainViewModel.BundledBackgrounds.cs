@@ -6,7 +6,7 @@ using Serilog;
 namespace EcclesiaCast.App.ViewModels;
 
 /// <summary>
-/// The sample backgrounds that come with the installer (the «Fondos de
+/// The sample video backgrounds that come with the installer (the «Fondos de
 /// ejemplo» box), brought into the library the first time the program opens.
 /// </summary>
 public sealed partial class MainViewModel
@@ -26,8 +26,8 @@ public sealed partial class MainViewModel
 
     /// <summary>
     /// Brings the sample backgrounds the library does not have yet into their
-    /// own tab. Twelve small pictures: it takes a moment, behind the loading
-    /// screen and before the library is read.
+    /// own tab. Ten short videos (about 30 MB) to copy: a moment, behind the
+    /// loading screen and before the library is read.
     /// </summary>
     /// <returns>What the status bar should say, or null when nothing came in.</returns>
     private string? ImportBundledBackgrounds()
@@ -53,16 +53,20 @@ public sealed partial class MainViewModel
                 if (!known.Contains(copy))
                 {
                     File.Copy(Path.Combine(source, file), copy, overwrite: true);
+                    // The poster comes from the shell; the ones it cannot make
+                    // are made with VLC afterwards (RefreshVideoThumbnailsAsync).
                     _media.Add(new MediaItem
                     {
                         Name = BundledBackgrounds.DisplayName(file),
                         Path = copy,
-                        Type = MediaType.Image,
-                        ThumbnailPath = MediaThumbnails.Create(copy, MediaType.Image, videoEngine: null),
+                        Type = MediaType.Video,
+                        ThumbnailPath = MediaThumbnails.Create(copy, MediaType.Video, videoEngine: null),
                         Category = BundledBackgrounds.Tab,
                         Behavior = MediaBehavior.Background,
-                        // They are drawn at 1920×1080: they fill the screen as they are.
+                        // Drawn at 1920×1080 to loop without a seam, and silent.
                         Scaling = MediaScaling.Fill,
+                        EndBehavior = VideoEndBehavior.Loop,
+                        Muted = true,
                     });
                     added++;
                 }

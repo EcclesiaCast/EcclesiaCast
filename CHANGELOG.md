@@ -7,12 +7,12 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
-- **Fondos de ejemplo.** El instalador trae una casilla nueva, tildada, «Agregar
-  12 fondos de ejemplo»: cielos, luces fuera de foco, una aurora, tres cruces al
-  atardecer y otros, pensados para poner letra encima. La primera vez que abrís
-  el programa aparecen en su propia pestaña, **Fondos de ejemplo**. Los dibujó el
-  proyecto y son de dominio público. Si quitás uno, no vuelve. Suman menos de
-  1 MB al instalador.
+- **Fondos en video.** El instalador trae una casilla nueva, tildada, «Agregar
+  10 fondos en video»: videos de 20 segundos que se mueven en bucle sin que se
+  note el corte (luces que flotan, una aurora, un cielo con estrellas, tres
+  cruces al atardecer y otros), pensados para poner letra encima. La primera vez
+  que abrís el programa aparecen en su propia pestaña, **Fondos de ejemplo**. Los
+  dibujó el proyecto y son de dominio público. Si quitás uno, no vuelve.
 
 ## [1.0.0] - 2026-10-21
 

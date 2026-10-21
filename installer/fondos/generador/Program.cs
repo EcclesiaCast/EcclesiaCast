@@ -1,41 +1,40 @@
-// Dibuja los fondos de ejemplo que vienen con el instalador. Todo sale de
-// fórmulas (degradés, ruido, círculos), sin fotos de nadie, así que los fondos
-// son del proyecto y se reparten con él.
+// Dibuja los fondos en video que vienen con el instalador. Todo sale de
+// fórmulas (degradés, ruido, círculos), sin fotos ni filmaciones de nadie, así
+// que los fondos son del proyecto y se reparten con él.
 //
-// Uso:  dotnet run --project installer\fondos\generador -- <carpeta>
-// Deja un .rgb crudo por fondo; installer\fondos\generar.ps1 los pasa a JPG.
+// Uso:  dotnet run -c Release --project installer\fondos\generador -- <carpeta> [segundos] [nombre]
+// Arma cada video con ffmpeg (tiene que estar en el PATH). Con un nombre, sólo
+// ése. Cada dibujo recibe en qué punto del bucle está (de 0 a 1), y todo lo que
+// se mueve da vueltas enteras en ese tiempo: el último cuadro empalma con el
+// primero y el bucle no se nota.
 
 using System.Diagnostics;
 
 var outDir = args.Length > 0 ? args[0] : ".";
+var seconds = args.Length > 1 ? int.Parse(args[1]) : 20;
+var only = args.Length > 2 ? args[2] : null;
 Directory.CreateDirectory(outDir);
 
-var designs = new (string Name, Func<Img> Draw)[]
+var videos = new (string Name, Func<float, Img> Frame)[]
 {
     ("Amanecer", Designs.Sunrise),
-    ("Noche estrellada", Designs.StarryNight),
-    ("Luces doradas", () => Designs.Bokeh(Col.Hex("2A1708"), Col.Hex("0B0603"),
-        [Col.Hex("FFC870"), Col.Hex("FFB050"), Col.Hex("FFE2A8"), Col.Hex("F59A3C")], 31)),
-    ("Luces azules", () => Designs.Bokeh(Col.Hex("0A1A33"), Col.Hex("02050C"),
-        [Col.Hex("5AB8FF"), Col.Hex("3D7BFF"), Col.Hex("8FE3FF"), Col.Hex("9A7BFF")], 41)),
-    ("Rayos de luz", Designs.LightRays),
-    ("Ondas violeta", Designs.VioletWaves),
     ("Aurora", Designs.Aurora),
-    ("Profundo", Designs.Deep),
-    ("Cálido", Designs.Warm),
+    ("Luces azules", t => Designs.Bokeh(Col.Hex("0A1A33"), Col.Hex("02050C"),
+        [Col.Hex("5AB8FF"), Col.Hex("3D7BFF"), Col.Hex("8FE3FF"), Col.Hex("9A7BFF")], 41, t)),
+    ("Luces doradas", t => Designs.Bokeh(Col.Hex("2A1708"), Col.Hex("0B0603"),
+        [Col.Hex("FFC870"), Col.Hex("FFB050"), Col.Hex("FFE2A8"), Col.Hex("F59A3C")], 31, t)),
     ("Niebla", Designs.Mist),
-    ("Mosaico azul", Designs.LowPoly),
+    ("Noche estrellada", Designs.StarryNight),
+    ("Ondas violeta", Designs.VioletWaves),
+    ("Profundo", Designs.Deep),
+    ("Rayos de luz", Designs.LightRays),
     ("Tres cruces", Designs.ThreeCrosses),
 };
 
-for (int n = 0; n < designs.Length; n++)
+foreach (var (name, frame) in videos)
 {
-    var (name, draw) = designs[n];
-    var watch = Stopwatch.StartNew();
-    var img = draw();
-    img.Dither(1000 + n);
-    File.WriteAllBytes(Path.Combine(outDir, name + ".rgb"), img.ToBytes());
-    Console.WriteLine($"{name}  ({watch.ElapsedMilliseconds} ms)");
+    if (only is null || string.Equals(only, name, StringComparison.OrdinalIgnoreCase))
+        Video.Render(Path.Combine(outDir, name + ".mp4"), seconds, frame);
 }
 
 static class Designs
@@ -43,9 +42,22 @@ static class Designs
     const int W = 1920, H = 1080;
     const float Aspect = (float)W / H;
 
-    public static Img Sunrise()
+    /// <summary>
+    /// A point that goes once round a circle of radius <paramref name="r"/> per
+    /// loop. Added to where a noise is read, the noise changes along the loop
+    /// and comes back to where it started.
+    /// </summary>
+    static (float X, float Y) Orbit(float t, float r) => (r * MathF.Cos(MathF.Tau * t), r * MathF.Sin(MathF.Tau * t));
+
+    /// <summary>A gentle swell, once (or <paramref name="times"/>) per loop: 1 at the start.</summary>
+    static float Breath(float t, float depth, int times = 1, float phase = 0) =>
+        1 + depth * (MathF.Sin(MathF.Tau * times * t + phase) - MathF.Sin(phase));
+
+    public static Img Sunrise(float t)
     {
         var img = new Img(W, H);
+        var drift = Orbit(t, 0.35f);
+        float sun = Breath(t, 0.06f);
         img.Fill((u, v) =>
         {
             var sky = M.Grad(v, (0f, Col.Hex("0A1433")), (0.42f, Col.Hex("2B2F6B")), (0.68f, Col.Hex("A04E6E")),
@@ -54,10 +66,10 @@ static class Designs
             // The sun, just under the bottom edge.
             float dx = (u - 0.5f) * Aspect, dy = v - 1.06f;
             float d2 = dx * dx + dy * dy;
-            sky += Col.Hex("FFB866") * (MathF.Exp(-d2 / 0.09f) * 0.5f + MathF.Exp(-d2 / 0.012f) * 0.3f);
+            sky += Col.Hex("FFB866") * ((MathF.Exp(-d2 / 0.09f) * 0.5f + MathF.Exp(-d2 / 0.012f) * 0.3f) * sun);
 
             // Long thin clouds, lit from below.
-            float n = Noise.Fbm(u * 3.2f, v * 16f, 6, 11);
+            float n = Noise.Fbm(u * 3.2f + drift.X, v * 16f + drift.Y * 0.25f, 6, 11);
             float band = M.Smooth(0.3f, 0.5f, v) * (1 - M.Smooth(0.8f, 0.92f, v));
             float cloud = M.Smooth(0.52f, 0.78f, n) * band;
             var cloudCol = M.Grad(v, (0.3f, Col.Hex("5E4A86")), (0.85f, Col.Hex("FF9C78")));
@@ -67,9 +79,10 @@ static class Designs
         return img;
     }
 
-    public static Img StarryNight()
+    public static Img StarryNight(float t)
     {
         var img = new Img(W, H);
+        var drift = Orbit(t, 0.25f);
         img.Fill((u, v) =>
         {
             var sky = M.Grad(v, (0f, Col.Hex("02040D")), (0.6f, Col.Hex("07132D")), (1f, Col.Hex("0F2448")));
@@ -77,31 +90,34 @@ static class Designs
             // A faint band of the galaxy, across the sky.
             float across = v - (0.15f + 0.55f * u);
             float bandMask = MathF.Exp(-across * across / 0.03f);
-            float neb = Noise.Fbm(u * 5 + 3, v * 3, 6, 21);
+            float neb = Noise.Fbm(u * 5 + 3 + drift.X, v * 3 + drift.Y, 6, 21);
             var nebCol = Col.Lerp(Col.Hex("3B2170"), Col.Hex("1E5592"), Noise.Fbm(u * 2, v * 2, 4, 22));
             return Col.Lerp(sky, nebCol, M.Smooth(0.42f, 0.8f, neb) * bandMask * 0.45f);
         });
-        Stars(img, 1900, 5, 1f);
+        Stars(img, 1900, 5, 1f, t);
         img.Vignette(0.3f);
         return img;
     }
 
-    static void Stars(Img img, int count, int seed, float strength)
+    /// <summary>Stars that twinkle, each at its own pace (a whole number of times per loop).</summary>
+    static void Stars(Img img, int count, int seed, float strength, float t)
     {
         var rng = new Random(seed);
+        var twinkle = new Random(seed + 500);
         for (int i = 0; i < count; i++)
         {
             float x = rng.NextSingle() * W, y = rng.NextSingle() * H;
             float b = MathF.Pow(rng.NextSingle(), 7) * 0.9f + 0.06f;
             float size = 0.45f + b * 1.3f;
             var tint = Col.Lerp(Col.Hex("BFD4FF"), Col.Hex("FFE6C4"), rng.NextSingle());
+            b *= Breath(t, 0.3f, 1 + twinkle.Next(3), twinkle.NextSingle() * MathF.Tau);
             img.Splat(x, y, size, tint * (b * 1.6f * strength));
             if (b > 0.6f)
                 img.Splat(x, y, 7f, tint * (0.05f * strength));
         }
     }
 
-    public static Img Bokeh(Col center, Col edge, Col[] palette, int seed)
+    public static Img Bokeh(Col center, Col edge, Col[] palette, int seed, float t)
     {
         var img = new Img(W, H);
         img.Fill((u, v) =>
@@ -111,12 +127,14 @@ static class Designs
         });
 
         var rng = new Random(seed);
+        var drift = new Random(seed + 500);
         // Far, small and blurred; then nearer and bigger; then a few huge and faint.
-        (int Count, float RMin, float RMax, float AMin, float AMax, int Blur)[] layers =
+        // The nearer, the more it drifts.
+        (int Count, float RMin, float RMax, float AMin, float AMax, int Blur, float Drift)[] layers =
         [
-            (90, 8, 34, 0.25f, 0.6f, 5),
-            (45, 36, 100, 0.12f, 0.32f, 3),
-            (12, 120, 230, 0.05f, 0.12f, 1),
+            (90, 8, 34, 0.25f, 0.6f, 5, 30),
+            (45, 36, 100, 0.12f, 0.32f, 3, 55),
+            (12, 120, 230, 0.05f, 0.12f, 1, 90),
         ];
         foreach (var layer in layers)
         {
@@ -128,7 +146,14 @@ static class Designs
                 float v = 0.25f + 0.45f * u + M.Gauss(rng) * 0.2f;
                 float r = layer.RMin + rng.NextSingle() * (layer.RMax - layer.RMin);
                 float a = layer.AMin + rng.NextSingle() * (layer.AMax - layer.AMin);
-                lights.Disk(u * W, v * H, r, palette[rng.Next(palette.Length)] * a);
+
+                // Each light goes round a small oval once (or twice) per loop, and breathes.
+                float amp = layer.Drift * (0.5f + drift.NextSingle()), phase = drift.NextSingle() * MathF.Tau;
+                float turns = 1 + drift.Next(2), breath = drift.NextSingle() * MathF.Tau;
+                float angle = MathF.Tau * turns * t + phase;
+                float x = u * W + amp * (MathF.Sin(angle) - MathF.Sin(phase));
+                float y = v * H + amp * 0.6f * (MathF.Cos(angle) - MathF.Cos(phase));
+                lights.Disk(x, y, r, palette[rng.Next(palette.Length)] * (a * Breath(t, 0.3f, 2, breath)));
             }
             lights.Blur(layer.Blur);
             img.AddImage(lights);
@@ -137,9 +162,12 @@ static class Designs
         return img;
     }
 
-    public static Img LightRays()
+    public static Img LightRays(float t)
     {
         var img = new Img(W, H);
+        var sway = Orbit(t, 0.6f);
+        var shimmer = Orbit(2 * t, 0.5f);
+        float haze = Breath(t, 0.12f);
         img.Fill((u, v) =>
         {
             var col = M.Grad(v, (0f, Col.Hex("16264A")), (0.6f, Col.Hex("0A1226")), (1f, Col.Hex("03050C")));
@@ -147,19 +175,20 @@ static class Designs
             float angle = MathF.Atan2(dx, dy);
             float dist = MathF.Sqrt(dx * dx + dy * dy);
 
-            float rays = 0.6f * Noise.Value(angle * 16, 0.5f, 51) + 0.4f * Noise.Value(angle * 37, 3.5f, 52);
+            float rays = 0.6f * Noise.Value(angle * 16 + sway.X, 0.5f + sway.Y, 51)
+                         + 0.4f * Noise.Value(angle * 37 + shimmer.X, 3.5f + shimmer.Y, 52);
             rays = M.Smooth(0.45f, 0.9f, rays);
             float cone = MathF.Exp(-angle * angle / 0.35f);
             float fall = MathF.Exp(-dist * 1.2f);
-            float haze = MathF.Exp(-((u - 0.5f) * (u - 0.5f) * 4 + v * v * 7));
-            return col + Col.Hex("FFE3B4") * (rays * cone * fall * 0.55f) + Col.Hex("FFD9A0") * (haze * 0.16f);
+            float glow = MathF.Exp(-((u - 0.5f) * (u - 0.5f) * 4 + v * v * 7)) * haze;
+            return col + Col.Hex("FFE3B4") * (rays * cone * fall * 0.55f) + Col.Hex("FFD9A0") * (glow * 0.16f);
         });
         img.Blur(2);
         img.Vignette(0.3f);
         return img;
     }
 
-    public static Img VioletWaves()
+    public static Img VioletWaves(float t)
     {
         var img = new Img(W, H);
         img.Fill((u, v) =>
@@ -167,16 +196,17 @@ static class Designs
             var col = Col.Lerp(Col.Hex("12041D"), Col.Hex("3A0B46"), M.Clamp01(u * 0.55f + v * 0.45f));
             for (int i = 0; i < 8; i++)
             {
-                float t = i / 7f;
-                float freq = 0.6f + i * 0.12f, phase = i * 0.8f;
-                float center = 0.66f + (i - 3.5f) * 0.022f - 0.12f * (u - 0.5f);
+                // Each wave travels a whole number of times per loop, so it closes.
+                float freq = 0.6f + i * 0.12f, phase = i * 0.8f + MathF.Tau * (1 + i % 2) * t;
+                float center = 0.66f + (i - 3.5f) * 0.022f - 0.12f * (u - 0.5f)
+                               + 0.012f * (MathF.Sin(MathF.Tau * t + i) - MathF.Sin(i));
                 float y = center + (0.07f + 0.015f * (i % 3)) * MathF.Sin(u * freq * MathF.Tau + phase)
                           + 0.025f * MathF.Sin(u * freq * 5.1f + phase * 2);
                 float thick = 0.0025f + 0.0015f * (i % 3);
                 float d = (v - y) / thick;
                 float line = MathF.Exp(-d * d);
                 float glow = MathF.Exp(-MathF.Abs(v - y) / 0.05f);
-                col += Col.Lerp(Col.Hex("FF4FA8"), Col.Hex("8C6BFF"), t) * (line * 0.45f + glow * 0.07f);
+                col += Col.Lerp(Col.Hex("FF4FA8"), Col.Hex("8C6BFF"), i / 7f) * (line * 0.45f + glow * 0.07f);
             }
             return col;
         });
@@ -184,24 +214,28 @@ static class Designs
         return img;
     }
 
-    public static Img Aurora()
+    public static Img Aurora(float t)
     {
         var img = new Img(W, H);
+        var foot = Orbit(t, 0.3f);
+        var fold = Orbit(t, 0.6f);
+        var sway = Orbit(t, 2f);
+        var glow = Orbit(t, 0.5f);
         img.Fill((u, v) =>
         {
             var sky = M.Grad(v, (0f, Col.Hex("01040B")), (0.7f, Col.Hex("030E18")), (1f, Col.Hex("04141C")));
             // The curtain folds: its foot wanders up and down, and the folds
             // themselves bend the streaks.
-            float yc = 0.5f + 0.3f * (Noise.Fbm(u * 2.5f, 0.3f, 3, 61) - 0.5f) + 0.06f * MathF.Sin(u * 9 + 1);
-            float bend = (Noise.Value(u * 4, v * 2, 66) - 0.5f) * 0.08f;
-            float streak = Noise.Fbm((u + bend) * 70, v * 1.4f, 3, 62);
+            float yc = 0.5f + 0.3f * (Noise.Fbm(u * 2.5f + foot.X, 0.3f + foot.Y, 3, 61) - 0.5f) + 0.06f * MathF.Sin(u * 9 + 1);
+            float bend = (Noise.Value(u * 4 + fold.X, v * 2 + fold.Y, 66) - 0.5f) * 0.08f;
+            float streak = Noise.Fbm((u + bend) * 70 + sway.X, v * 1.4f + sway.Y * 0.25f, 3, 62);
             float profile = v < yc ? MathF.Exp(-(yc - v) / 0.24f) : MathF.Exp(-MathF.Pow((v - yc) / 0.09f, 2));
-            float strength = (0.3f + 0.7f * streak) * profile * M.Smooth(0.15f, 0.7f, Noise.Fbm(u * 3, 1, 3, 63));
+            float strength = (0.3f + 0.7f * streak) * profile * M.Smooth(0.15f, 0.7f, Noise.Fbm(u * 3 + glow.X, 1 + glow.Y, 3, 63));
             float height = M.Clamp01((yc - v) / 0.3f);
             var light = Col.Lerp(Col.Hex("2BEA9A"), Col.Hex("7A4BD8"), height);
             return sky + light * (strength * 0.7f);
         });
-        Stars(img, 700, 64, 0.6f);
+        Stars(img, 700, 64, 0.6f, t);
         img.Blur(1);
 
         // Distant hills, black against the sky.
@@ -215,56 +249,54 @@ static class Designs
         return img;
     }
 
-    public static Img Deep()
+    public static Img Deep(float t)
     {
         var img = new Img(W, H);
+        var warpDrift = Orbit(t, 0.4f);
+        var ripple1 = Orbit(t, 1f);
+        var ripple2 = Orbit(-t, 1f);
+        var shaftDrift = Orbit(t, 0.6f);
         img.Fill((u, v) =>
         {
             var col = M.Grad(v, (0f, Col.Hex("0B4A63")), (0.5f, Col.Hex("05273A")), (1f, Col.Hex("01070D")));
             // Two ripples of light crossing make the net of the sea floor's caustics.
-            float warp = Noise.Fbm(u * 2, v * 2, 3, 71) * 1.2f;
-            float c1 = 1 - MathF.Abs(Noise.Value(u * 7 + warp, v * 5, 72) * 2 - 1);
-            float c2 = 1 - MathF.Abs(Noise.Value(u * 6, v * 7 + warp, 75) * 2 - 1);
+            float warp = Noise.Fbm(u * 2 + warpDrift.X, v * 2 + warpDrift.Y, 3, 71) * 1.2f;
+            float c1 = 1 - MathF.Abs(Noise.Value(u * 7 + warp + ripple1.X, v * 5 + ripple1.Y, 72) * 2 - 1);
+            float c2 = 1 - MathF.Abs(Noise.Value(u * 6 + ripple2.X, v * 7 + warp + ripple2.Y, 75) * 2 - 1);
             float c = MathF.Pow(c1, 6) * 0.5f + MathF.Pow(c2, 6) * 0.5f;
             float top = (1 - v) * (1 - v);
             float dx = (u - 0.3f) * Aspect, dy = v + 0.3f;
             float angle = MathF.Atan2(dx, dy);
-            float shafts = M.Smooth(0.5f, 0.95f, Noise.Value(angle * 22, 0.5f, 73)) * MathF.Exp(-MathF.Sqrt(dx * dx + dy * dy) * 1.3f);
+            float shafts = M.Smooth(0.5f, 0.95f, Noise.Value(angle * 22 + shaftDrift.X, 0.5f + shaftDrift.Y, 73))
+                           * MathF.Exp(-MathF.Sqrt(dx * dx + dy * dy) * 1.3f);
             return col + Col.Hex("8FE8FF") * (c * top * 0.18f + shafts * 0.25f);
         });
         img.Blur(4);
+
+        // Specks floating up: each rises one screen per loop and comes in again from below.
         var rng = new Random(74);
         for (int i = 0; i < 160; i++)
-            img.Splat(rng.NextSingle() * W, rng.NextSingle() * H, 0.8f + rng.NextSingle() * 1.5f, Col.Hex("A8F0FF") * (0.05f + rng.NextSingle() * 0.15f));
+        {
+            float x0 = rng.NextSingle() * W, y0 = rng.NextSingle() * H;
+            float size = 0.8f + rng.NextSingle() * 1.5f, a = 0.05f + rng.NextSingle() * 0.15f;
+            float y = ((y0 - t * H) % H + H) % H;
+            float x = x0 + 12 * MathF.Sin(MathF.Tau * t + i);
+            img.Splat(x, y, size, Col.Hex("A8F0FF") * a);
+        }
         img.Vignette(0.4f);
         return img;
     }
 
-    public static Img Warm()
+    public static Img Mist(float t)
     {
         var img = new Img(W, H);
-        img.Fill((u, v) =>
-        {
-            float dx = (u - 0.5f) * Aspect, dy = v - 0.45f;
-            float d = MathF.Sqrt(dx * dx + dy * dy);
-            var col = M.Grad(d, (0f, Col.Hex("6B4426")), (0.6f, Col.Hex("3A2213")), (1.1f, Col.Hex("140A04")));
-            float warp = Noise.Fbm(u * 2, v * 2, 4, 81);
-            col *= 0.88f + 0.24f * Noise.Fbm(u * 3 + warp, v * 3 + warp, 6, 82);
-            float leak = MathF.Exp(-((u - 0.12f) * (u - 0.12f) * Aspect * Aspect + (v - 0.08f) * (v - 0.08f)) / 0.09f);
-            return col + Col.Hex("FFB060") * (leak * 0.22f);
-        });
-        img.Vignette(0.5f);
-        return img;
-    }
-
-    public static Img Mist()
-    {
-        var img = new Img(W, H);
+        var slow = Orbit(t, 0.3f);
+        var drift = Orbit(t, 0.8f);
         img.Fill((u, v) =>
         {
             float px = u * 1.6f * Aspect, py = v * 1.6f;
-            float warp = Noise.Fbm(px * 0.7f, py * 0.7f, 3, 91) * 0.8f;
-            float f = Noise.Fbm(px + warp, py * 1.6f + warp, 6, 92);
+            float warp = Noise.Fbm(px * 0.7f + slow.X, py * 0.7f + slow.Y, 3, 91) * 0.8f;
+            float f = Noise.Fbm(px + warp + drift.X, py * 1.6f + warp + drift.Y, 6, 92);
             float dx = (u - 0.5f) * Aspect, dy = v - 0.45f;
             float glow = MathF.Exp(-(dx * dx + dy * dy) / 0.35f);
 
@@ -276,50 +308,20 @@ static class Designs
         return img;
     }
 
-    public static Img LowPoly()
+    public static Img ThreeCrosses(float t)
     {
         var img = new Img(W, H);
-        const int nx = 16, ny = 9;
-        var rng = new Random(101);
-        var pts = new (float X, float Y)[nx + 1, ny + 1];
-        float cw = (float)W / nx, ch = (float)H / ny;
-        for (int i = 0; i <= nx; i++)
-            for (int j = 0; j <= ny; j++)
-            {
-                float jx = i is 0 or nx ? 0 : (rng.NextSingle() - 0.5f) * 0.7f * cw;
-                float jy = j is 0 or ny ? 0 : (rng.NextSingle() - 0.5f) * 0.7f * ch;
-                pts[i, j] = (i * cw + jx, j * ch + jy);
-            }
-
-        for (int i = 0; i < nx; i++)
-            for (int j = 0; j < ny; j++)
-            {
-                var a = pts[i, j]; var b = pts[i + 1, j]; var c = pts[i + 1, j + 1]; var d = pts[i, j + 1];
-                // Alternate the diagonal so the pattern has no grain.
-                var tris = (i + j) % 2 == 0 ? new[] { (a, b, c), (a, c, d) } : new[] { (a, b, d), (b, c, d) };
-                foreach (var (p, q, r) in tris)
-                {
-                    float cx = (p.X + q.X + r.X) / 3 / W, cy = (p.Y + q.Y + r.Y) / 3 / H;
-                    var col = M.Grad(cx * 0.6f + cy * 0.4f, (0f, Col.Hex("0A1A38")), (0.55f, Col.Hex("174E70")), (1f, Col.Hex("0B2440")));
-                    img.Triangle(p, q, r, col * (0.86f + 0.26f * rng.NextSingle()));
-                }
-            }
-        img.Blur(1);
-        img.Vignette(0.4f);
-        return img;
-    }
-
-    public static Img ThreeCrosses()
-    {
-        var img = new Img(W, H);
+        var drift = Orbit(t, 0.5f);
+        float sun = Breath(t, 0.06f);
         img.Fill((u, v) =>
         {
             var sky = M.Grad(v, (0f, Col.Hex("1A0B2E")), (0.35f, Col.Hex("55204C")), (0.6f, Col.Hex("BC4639")),
                 (0.76f, Col.Hex("F08A39")), (0.84f, Col.Hex("FFC766")));
             float dx = (u - 0.64f) * Aspect, dy = v - 0.8f;
             float d2 = dx * dx + dy * dy;
-            sky += Col.Hex("FFD27A") * (MathF.Exp(-d2 / 0.05f) * 0.45f + MathF.Exp(-d2 / 0.004f) * 0.35f);
-            float streaks = M.Smooth(0.55f, 0.8f, Noise.Fbm(u * 2.2f, v * 30, 5, 111)) * M.Smooth(0.2f, 0.4f, v) * (1 - M.Smooth(0.68f, 0.78f, v));
+            sky += Col.Hex("FFD27A") * ((MathF.Exp(-d2 / 0.05f) * 0.45f + MathF.Exp(-d2 / 0.004f) * 0.35f) * sun);
+            float streaks = M.Smooth(0.55f, 0.8f, Noise.Fbm(u * 2.2f + drift.X, v * 30 + drift.Y * 0.3f, 5, 111))
+                            * M.Smooth(0.2f, 0.4f, v) * (1 - M.Smooth(0.68f, 0.78f, v));
             return Col.Lerp(sky, Col.Lerp(Col.Hex("3A1A44"), Col.Hex("FF8A5C"), v), streaks * 0.55f);
         });
 
@@ -335,16 +337,53 @@ static class Designs
             float cover = M.Smooth(ground - 0.8f, ground + 0.8f, y);
             foreach (var (cu, height, post) in crosses)
             {
-                float foot = Hill(cu) * H + 6, top = foot - height * H;
+                float footY = Hill(cu) * H + 6, top = footY - height * H;
                 float cx = cu * W;
                 float arm = height * H * 0.36f, armY = top + height * H * 0.27f;
-                cover = MathF.Max(cover, M.Box(x, y, cx - post / 2, top, cx + post / 2, foot));
+                cover = MathF.Max(cover, M.Box(x, y, cx - post / 2, top, cx + post / 2, footY));
                 cover = MathF.Max(cover, M.Box(x, y, cx - arm, armY - post / 2, cx + arm, armY + post / 2));
             }
             return Col.Lerp(before, ink, cover);
         });
         img.Vignette(0.3f);
         return img;
+    }
+}
+
+static class Video
+{
+    const int Fps = 30;
+
+    /// <summary>Draws every frame of the loop and hands them to ffmpeg, which makes the MP4.</summary>
+    public static void Render(string path, int seconds, Func<float, Img> frame)
+    {
+        var watch = Stopwatch.StartNew();
+        var frames = seconds * Fps;
+        var ffmpeg = Process.Start(new ProcessStartInfo("ffmpeg",
+            $"-loglevel error -y -f rawvideo -pix_fmt rgb24 -s 1920x1080 -r {Fps} -i - " +
+            "-c:v libx264 -preset slow -crf 22 -x264-params aq-mode=3 -pix_fmt yuv420p " +
+            $"-movflags +faststart -an \"{path}\"")
+        {
+            RedirectStandardInput = true,
+            UseShellExecute = false,
+        }) ?? throw new InvalidOperationException("No se encontró ffmpeg.");
+
+        using (var input = ffmpeg.StandardInput.BaseStream)
+        {
+            for (int f = 0; f < frames; f++)
+            {
+                var img = frame((float)f / frames);
+                // The same dither on every frame: it stops the banding without
+                // making the still parts of the picture change.
+                img.Dither(7);
+                input.Write(img.ToBytes());
+            }
+        }
+
+        ffmpeg.WaitForExit();
+        if (ffmpeg.ExitCode != 0)
+            throw new InvalidOperationException($"ffmpeg no pudo armar {path}");
+        Console.WriteLine($"{Path.GetFileName(path)}  ({watch.Elapsed.TotalSeconds:0} s, {new FileInfo(path).Length / 1024 / 1024.0:0.0} MB)");
     }
 }
 
@@ -475,25 +514,6 @@ sealed class Img(int w, int h)
                 float inside = 1 - M.Smooth(radius - 2.5f, radius, d);
                 float rim = 0.7f + 0.3f * M.Smooth(radius * 0.55f, radius, d);
                 if (inside > 0) Add(x, y, c * (inside * rim));
-            }
-    }
-
-    public void Triangle((float X, float Y) p, (float X, float Y) q, (float X, float Y) s, Col c)
-    {
-        int x0 = (int)MathF.Floor(MathF.Min(p.X, MathF.Min(q.X, s.X))), x1 = (int)MathF.Ceiling(MathF.Max(p.X, MathF.Max(q.X, s.X)));
-        int y0 = (int)MathF.Floor(MathF.Min(p.Y, MathF.Min(q.Y, s.Y))), y1 = (int)MathF.Ceiling(MathF.Max(p.Y, MathF.Max(q.Y, s.Y)));
-        float area = (q.X - p.X) * (s.Y - p.Y) - (q.Y - p.Y) * (s.X - p.X);
-        for (int y = Math.Max(0, y0); y <= Math.Min(H - 1, y1); y++)
-            for (int x = Math.Max(0, x0); x <= Math.Min(W - 1, x1); x++)
-            {
-                float px = x + 0.5f, py = y + 0.5f;
-                float w0 = ((q.X - px) * (s.Y - py) - (q.Y - py) * (s.X - px)) / area;
-                float w1 = ((s.X - px) * (p.Y - py) - (s.Y - py) * (p.X - px)) / area;
-                float w2 = 1 - w0 - w1;
-                // A hair of overlap, so no seam shows between neighbours.
-                if (w0 < -0.002f || w1 < -0.002f || w2 < -0.002f) continue;
-                int i = y * W + x;
-                r[i] = c.R; g[i] = c.G; b[i] = c.B;
             }
     }
 
