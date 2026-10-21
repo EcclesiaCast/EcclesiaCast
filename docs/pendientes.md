@@ -299,10 +299,33 @@ no escribirle antes de esa fecha.
 ## 4. Para versiones futuras
 
 - **Acerca de: una forma de colaborar.**
-- **NDI para OBS.** Las salidas separadas ya están como páginas web
-  (`/salida/biblia`, `/salida/canciones`, `/salida/anuncios`). NDI de verdad, si
-  hace falta más adelante, necesita el kit de NDI (con sus condiciones de
-  licencia) y el complemento de NDI en el OBS.
+- **La Biblia y las canciones como texto sin formato para OBS** (lo pidió
+  Alexis el 20/10/2026; quedó en pausa para verlo bien después). Quiere que el
+  versículo y la letra que se están proyectando lleguen a OBS como texto plano,
+  o con un formato mínimo, para acomodarlos como quiera. Hoy `/salida/biblia` y
+  `/salida/canciones` mandan texto, pero con el formato del tema (tipografía,
+  tamaño, color, contorno y alineación), así que en OBS se ven igual que en el
+  proyector. Dos formas de hacerlo (se pueden hacer las dos; falta saber cuál va
+  a usar primero):
+  1. **Archivo de texto para la fuente «Texto (GDI+)» de OBS**, con «Leer desde
+     archivo»: el programa escribe `biblia.txt` y `canciones.txt` con lo que está
+     al aire y los vacía con Clear, Black y Logo. El estilo se elige con los
+     menús de OBS. Contras: OBS tiene que estar en la misma computadora, y el
+     tamaño de letra queda fijo (un versículo largo no se achica solo como en el
+     proyector).
+  2. **Las mismas páginas «sin formato»** (por ejemplo `&formato=no`): sólo el
+     texto blanco, sin el tema, y el estilo se pone en «CSS personalizado» del
+     Browser Source, con unas líneas listas para copiar en la guía. Sirve con OBS
+     en otra computadora, por la red. Contra: el estilo se cambia tocando esas
+     líneas, no con menús.
+
+  En las dos, la cita del versículo puede ir en una línea aparte.
+- **NDI para OBS: no sirve para lo de arriba.** NDI manda una imagen (como una
+  cámara), con la letra ya dibujada: en OBS no se le puede cambiar la letra ni
+  el tamaño. Las salidas separadas ya están como páginas web (`/salida/biblia`,
+  `/salida/canciones`, `/salida/anuncios`). NDI de verdad, si algún día hace
+  falta para otra cosa, necesita el kit de NDI (con sus condiciones de licencia)
+  y el complemento de NDI en el OBS.
 
 ## 5. Decisiones tomadas
 
