@@ -7,7 +7,8 @@ Hay cuatro tipos de cosas, cada una en su sección:
 
 1. **Para probar**: ya está programado; falta que Alexis lo pruebe con el
    programa abierto, porque desde acá no se pudo.
-2. **Para la v1.0.0**: lo que falta para dejar de ser beta.
+2. **Después de publicar la v1.0.0**: comprobar la versión publicada,
+   la firma digital y la página web.
 3. **Para hacer después de la 1.0**: cambios que todavía hay que programar.
 4. **Para versiones futuras**: ideas que quedan para más adelante.
 
@@ -185,17 +186,27 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       4. Tocar un resultado lo **carga** sin proyectarlo; la página baja a las
          diapositivas. Sin resultados dice «No encontré nada».
 
-## 2. Para la v1.0.0
+## 2. Después de publicar la v1.0.0
 
-- [ ] **Usar la beta.7 en la reunión del domingo** y anotar lo que falle o no
+**La 1.0.0 salió el 21/10/2026** como versión estable, sin firma:
+<https://github.com/EcclesiaCast/EcclesiaCast/releases/tag/v1.0.0>. Además se
+armó en esta PC `dist\EcclesiaCast-1.0.0-con-biblias-setup.exe`, que lleva
+adentro el paquete `Biblias.ecbiblias` del Escritorio (del 16/10), **sólo para
+las computadoras de la iglesia**: no se sube a ningún lado. Para armarlo de
+nuevo (con otro paquete o con otra versión), después de `dotnet publish`:
+`iscc /DAppVersion=<versión> /DPaqueteBiblias="<ruta del .ecbiblias>" installer\EcclesiaCast.iss`.
+
+- [ ] **Comprobar la 1.0 instalada** (lo de «Después de publicar» de
+      [publicar-1.0.md](publicar-1.0.md), salvo la firma): instalarla **sobre**
+      una beta y ver que conserva canciones, Biblias y medios; con una beta
+      instalada, que Ayuda → «Buscar actualizaciones…» ofrezca la 1.0 con las
+      notas nuevas en castellano; y el instalador con tus Biblias en una PC de
+      la iglesia (que al abrir el programa ofrezca traerlas).
+- [ ] **Usar la 1.0 en la reunión del domingo** y anotar lo que falle o no
       guste.
-- [x] **Actualizaciones automáticas.** Hechas (programadas y probadas con
-      pruebas y dibujos; falta probarlas con el programa abierto, ver §1).
-      Para que las notas de cada versión salgan en castellano, al publicar la
-      1.0 hay que **renombrar `[Sin publicar]` a `[1.0.0] - fecha`** en el
-      `CHANGELOG.md` (y dejar arriba un `[Sin publicar]` vacío): el workflow
-      toma de ahí la sección de la versión que se publica, y si no la
-      encuentra usa `[Sin publicar]`.
+- Para las próximas versiones: el flujo de publicación toma las notas de la
+  sección `## [<versión>]` del `CHANGELOG.md` (por ejemplo `## [1.0.1] - fecha`)
+  y, si no la hay, de `## [Sin publicar]`.
 - [ ] **Firma digital del instalador.** Hoy Windows muestra «Editor
       desconocido» y hay que darle a «Más información → Ejecutar de todas
       formas».
@@ -250,14 +261,12 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       demostración, contarlo en comunidades de iglesias y que otras iglesias lo
       usen y lo marquen con estrella. Volver a pedir la firma a SignPath cuando
       haya señales.
-- [ ] **Probar la beta.16 con el programa abierto** (salió el 16/10/2026): la
-      pantalla de carga nueva (se dibujó a imagen, pero no se vio abrir de
-      verdad), el ícono nuevo en la barra de tareas y el instalador con la
-      «Palabra de Dios para ti» (que aparezca entre las Biblias y que entre al
-      abrir el programa). Los textos de ejemplo del editor de temas y de
-      escenarios ahora son libres: mirar que se vean bien.
-- [ ] Actualizar README y CHANGELOG (hoy dicen «Beta») y taguear `v1.0.0`. La
-      lista paso a paso, ya redactada, está en [publicar-1.0.md](publicar-1.0.md).
+- [ ] **Probar lo que llegó con la beta.16, ahora en la 1.0**: la pantalla de
+      carga nueva (se dibujó a imagen, pero no se vio abrir de verdad), el ícono
+      nuevo en la barra de tareas y el instalador con la «Palabra de Dios para
+      ti» (que aparezca entre las Biblias y que entre al abrir el programa). Los
+      textos de ejemplo del editor de temas y de escenarios ahora son libres:
+      mirar que se vean bien.
 
 ## Pedidos de permiso para Biblias con derechos (enviados el 15/10/2026)
 
