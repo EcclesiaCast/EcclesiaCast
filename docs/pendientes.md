@@ -200,7 +200,8 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
 
 **La 1.0.0 salió el 21/10/2026** como versión estable, sin firma:
 <https://github.com/EcclesiaCast/EcclesiaCast/releases/tag/v1.0.0>. Además se
-armó en esta PC `dist\EcclesiaCast-1.0.0-con-biblias-setup.exe`, que lleva
+armó en esta PC el instalador con Biblias (el último:
+`dist\EcclesiaCast-1.0.1-con-biblias-setup.exe`, de la 1.0.1), que lleva
 adentro el paquete `Biblias.ecbiblias` del Escritorio (del 16/10), **sólo para
 las computadoras de la iglesia**: no se sube a ningún lado. Para armarlo de
 nuevo (con otro paquete o con otra versión), después de `dotnet publish`:
@@ -214,6 +215,11 @@ nuevo (con otro paquete o con otra versión), después de `dotnet publish`:
       la iglesia (que al abrir el programa ofrezca traerlas).
 - [ ] **Usar la 1.0 en la reunión del domingo** y anotar lo que falle o no
       guste.
+- [ ] **Una prueba que a veces falla en GitHub.** Al publicar la 1.0.1,
+      `ReleaseFeedTests.A_server_error_is_a_failure` tardó 17 segundos en la
+      máquina de GitHub y dio «sin conexión» en vez de «error del servidor»;
+      volviendo a correrla pasó. Acá nunca falló. Si se repite, mirar el
+      servidor de prueba (`LocalHttpServer`) con una respuesta 500 sin cuerpo.
 - Para las próximas versiones: el flujo de publicación toma las notas de la
   sección `## [<versión>]` del `CHANGELOG.md` (por ejemplo `## [1.0.1] - fecha`)
   y, si no la hay, de `## [Sin publicar]`.
