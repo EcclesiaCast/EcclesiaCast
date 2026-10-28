@@ -141,10 +141,11 @@ public partial class SongImportWindow : Window
         if (EasyWorshipDatabase.FindFiles(folder) is not { } files)
             return;
 
-        // «Easyworship  v6.1», read from the folders above Databases\Data.
-        var version = Directory.GetParent(folder)?.Parent;
-        var product = version?.Parent?.Parent;
-        var title = product is null || version is null ? Path.GetFileName(folder) : $"{product.Name} {version.Name}";
+        // «Easyworship · Default»: the folder above the version one is the profile. The version
+        // folder (v6.1) names the format of the data, not the program: EasyWorship 8 keeps its
+        // songs in a folder called v6.1, so it is left out of the name.
+        var profile = Directory.GetParent(folder)?.Parent?.Parent;
+        var title = profile?.Parent is { } product ? $"{product.Name} · {profile.Name}" : Path.GetFileName(folder);
 
         _rows[Source.EasyWorship].Add(new Row(
             title, folder, EasyWorshipDatabase.CountSongs(files.Songs), 0,

@@ -21,11 +21,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   ventana.** En el menú del **➕** de Canciones (y en Archivo), **Traer de otro
   programa…** abre una ventana donde elegís arriba ProPresenter o EasyWorship;
   cada opción dice cuántas canciones encontró. Busca solo dónde están instalados
-  (EasyWorship 6 y 7), muestra sus bibliotecas con la cantidad, deja marcar cuáles
+  (EasyWorship 6, 7 y 8), muestra sus bibliotecas con la cantidad, deja marcar cuáles
   traer y pregunta lo de siempre si una canción ya está. «Elegir carpeta…» sirve
   para una copia en otro lado. De EasyWorship trae título, autor, derechos y las
   diapositivas como las separó, sin tocar su base. Se probó con una biblioteca
-  real de EasyWorship 6.1.
+  real de EasyWorship 8 (que guarda sus datos en una carpeta llamada «v6.1»: es la versión del formato, no del programa).
 - **Salir al aire sólo en la transmisión, sin ventana de salida.** La lista
   «Salida:» tiene una opción nueva, **📡 Sólo la transmisión (sin ventana)**. Con
   ella, «Poner en vivo» (y proyectar una canción, un versículo, Black, Clear o
