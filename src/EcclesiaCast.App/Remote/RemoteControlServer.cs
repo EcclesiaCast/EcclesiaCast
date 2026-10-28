@@ -4,6 +4,7 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Windows;
 using EcclesiaCast.Core.Remote;
 using Serilog;
@@ -26,6 +27,8 @@ public sealed class RemoteControlServer : IDisposable
     private static readonly JsonSerializerOptions Json = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        // The style of a layer travels with its plate and position as words.
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
     };
 
     private readonly IRemoteHost _host;
@@ -256,6 +259,29 @@ public sealed class RemoteControlServer : IDisposable
             }
 
             var file = await OnUiThread(() => _host.GetMediaFile(mediaId));
+            if (file is null)
+            {
+                await WriteAsync(stream, 404, "text/plain", "No encontrado", cancellation);
+                return;
+            }
+
+            await WriteFileAsync(stream, file, range, cancellation);
+            return;
+        }
+
+        // The fixed background of a layer of the stream. Only the file saved in
+        // that layer's style can be fetched: the request names a layer, never a path.
+        if (path == "/api/fondo" && method == "GET")
+        {
+            var check = CheckPin(QueryValue(target, "pin"), caller);
+            if (!check.Ok)
+            {
+                await WriteDeniedAsync(stream, check, cancellation);
+                return;
+            }
+
+            var channel = OutputChannels.FromName(QueryValue(target, "canal"));
+            var file = await OnUiThread(() => _host.GetBackgroundFile(channel));
             if (file is null)
             {
                 await WriteAsync(stream, 404, "text/plain", "No encontrado", cancellation);
