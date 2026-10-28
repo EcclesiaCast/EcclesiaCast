@@ -360,6 +360,55 @@ no escribirle antes de esa fecha.
 
 ## 3. Para hacer después de la 1.0
 
+- [ ] **Etiqueta de los versículos en la transmisión: tamaño y lugar**
+      (28/10/2026, pedido de Alexis tras probar los estilos para OBS). La
+      etiqueta («Juan 3:16 RVR 1960») hoy no se puede agrandar ni achicar ni
+      mover. Agregar en **Transmisión → Estilos de la transmisión…**, por capa:
+      el **tamaño** de la etiqueta y **dónde va**: izquierda, centro o derecha,
+      y arriba o abajo (de la letra o de la pantalla, a definir al programarlo).
+      Con vista previa en el editor, como lo demás.
+- [ ] **Cuántas líneas mostrar por diapositiva en una canción**
+      (28/10/2026, pedido de Alexis). Hoy cada párrafo de la letra es una
+      diapositiva. Quiere elegir un **máximo de 1, 2, 3 o 4 líneas por
+      diapositiva** y que el programa parta el párrafo solo, sin cambiar la
+      letra guardada. Ejemplo: el párrafo
+      «¡Oh Señor! / quiero que ardas en mi ser. / Como la zarza / quiero arder
+      con tu poder, / a los perdidos ganaré como señal» (5 líneas) con máximo 2
+      queda en tres diapositivas: «¡Oh Señor! / quiero que ardas en mi ser.»,
+      «Como la zarza / quiero arder con tu poder,» y «a los perdidos ganaré como
+      señal». Para el editor sigue siendo **un solo párrafo**: la partición se
+      hace sólo al armar las diapositivas (en la grilla, el proyector y la
+      transmisión). Decidir al programarlo: si es un ajuste general, por
+      canción o por tema; cómo se parte un párrafo impar (acá sobra una línea
+      al final); y que los coros y estribillos se partan igual.
+- [ ] **Escribirle a YouVersion para ver cómo integrar su plataforma**
+      (28/10/2026). Lo averiguado: YouVersion tiene una **Plataforma para
+      desarrolladores** (https://platform.youversion.com, documentación en
+      https://developers.youversion.com) con una API y kits de desarrollo
+      gratis; se entra con una cuenta, se registra la aplicación y dan una
+      clave. Dicen que ofrece más de 1.400 versiones de la Biblia, con
+      licencias de las editoriales ya resueltas («Fast-track Licensing»), pero
+      cada versión tiene sus reglas de atribución y de uso. **No se pudo leer**
+      sus términos (la página no se descarga sin navegador): hay que leer
+      `platform.youversion.com/terms` y ver si dejan **guardar el texto sin
+      internet**, **proyectarlo en una pantalla** y usarlo en un **programa
+      de escritorio** de una iglesia. Eso es lo que decide si sirve, porque el
+      programa funciona sin internet. Contacto: la página tiene «Support»
+      (`platform.youversion.com/support`) y «Partners» (`/partners`); el único
+      correo público que se vio es `press@youversion.com`, que es de prensa.
+      Primero usar «Support»; no escribirles hasta que Alexis lo apruebe.
+      Borrador (en inglés, porque es a ellos):
+      > Hello, I'm Alexis, a volunteer in a church in Uruguay. I'm building
+      > EcclesiaCast, a free and open-source program (WPF/.NET 8, on GitHub:
+      > https://github.com/EcclesiaCast/EcclesiaCast) to project song lyrics and
+      > Bible verses in church services and to feed a livestream (OBS). We'd
+      > like to let churches use YouVersion Bibles inside it, especially
+      > Spanish versions such as RVR1960, NVI and NTV. Three questions:
+      > (1) Do the Platform terms allow a desktop app to show verses on a
+      > projector or livestream? (2) May the verse text be cached on the
+      > computer, since services often run without reliable internet? (3) Is
+      > there a way for a free, non-profit app like ours to be approved as a
+      > partner, and what attribution do you require? Thank you very much.
 - [ ] **Importar canciones de EasyWorship** (28/10/2026). Muchas iglesias
       vienen de ahí. EasyWorship 6 y 7 guardan las canciones en bases SQLite
       (`Songs.db` y `SongWords.db`, con la letra en RTF) dentro de su carpeta
