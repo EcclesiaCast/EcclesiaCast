@@ -7,6 +7,20 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Etiqueta de los versículos en la transmisión: tamaño y lugar.** En
+  **Transmisión → Estilos de la transmisión…**, cada capa tiene un deslizador
+  **Etiqueta** (de 50 a 300 %, 100 es el tamaño de siempre) y dónde va:
+  izquierda, centro o derecha, arriba o abajo de la letra. Sirve para
+  «Juan 3:16 RVR 1960» y para «CORO».
+- **Líneas por diapositiva en las canciones.** Con una canción abierta aparece,
+  arriba de la grilla, **Líneas por diapositiva: Todas / 1 / 2 / 3 / 4**. Un
+  párrafo más largo se parte en diapositivas de ese máximo (cinco líneas con 2
+  quedan 2 + 2 + 1) sin cambiar la canción guardada: el editor sigue mostrando el
+  párrafo entero. Se recuerda al cerrar el programa.
+- **Importar canciones de EasyWorship.** **Archivo → Importar canciones de
+  EasyWorship…** lee `Songs.db` y `SongWords.db` de EasyWorship 6 o 7 (sin
+  cambiarlos) y trae título, autor, derechos y las partes (Verse 1, Coro).
+  Todavía no se probó con una base real de EasyWorship.
 - **Salir al aire sólo en la transmisión, sin ventana de salida.** La lista
   «Salida:» tiene una opción nueva, **📡 Sólo la transmisión (sin ventana)**. Con
   ella, «Poner en vivo» (y proyectar una canción, un versículo, Black, Clear o

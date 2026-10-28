@@ -19,6 +19,7 @@ using EcclesiaCast.Core.Songs;
 using EcclesiaCast.Core.Stage;
 using EcclesiaCast.Core.Timing;
 using EcclesiaCast.Core.Themes;
+using EcclesiaCast.Data;
 using EcclesiaCast.Data.Persistence;
 using Serilog;
 
@@ -515,6 +516,85 @@ public sealed partial class MainViewModel
             parts.Add($"{skipped} omitidas (vacías)");
         if (failed > 0)
             parts.Add($"{failed} con error (ver log)");
+        StatusText = string.Join(" · ", parts) + ".";
+    }
+
+    /// <summary>
+    /// Imports the library of EasyWorship 6 or 7: the operator picks its
+    /// <c>Songs.db</c> and the words (<c>SongWords.db</c>) are read from beside it.
+    /// </summary>
+    [RelayCommand]
+    private void ImportEasyWorship()
+    {
+        var common = new[]
+        {
+            @"C:\Users\Public\Documents\Softouch\EasyWorship\Default\Databases\Data",
+            @"C:\Users\Public\Documents\Softouch\EasyWorship 6\Default\Databases\Data",
+        };
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = "Importar de EasyWorship: elegí el archivo Songs.db",
+            Filter = "Canciones de EasyWorship (Songs.db)|Songs.db",
+            InitialDirectory = common.FirstOrDefault(Directory.Exists) ?? string.Empty,
+        };
+        if (dialog.ShowDialog() != true)
+            return;
+
+        var files = EasyWorshipDatabase.FindFiles(Path.GetDirectoryName(dialog.FileName) ?? string.Empty);
+        if (files is null)
+        {
+            ShowStatusError("No encontré SongWords.db al lado de Songs.db: tienen que estar en la misma carpeta.");
+            return;
+        }
+
+        List<Song> songs;
+        int unreadable;
+        try
+        {
+            songs = EasyWorshipDatabase.ReadSongs(files.Value.Songs, files.Value.Words, out unreadable);
+        }
+        catch (Exception ex) when (ex is InvalidDataException or Microsoft.Data.Sqlite.SqliteException or IOException)
+        {
+            Log.Error(ex, "No se pudo leer la base de EasyWorship {Path}", dialog.FileName);
+            ShowStatusError("No se pudo leer esa base de EasyWorship (ver el registro). ¿Está EasyWorship abierto?");
+            return;
+        }
+
+        if (songs.Count == 0)
+        {
+            StatusText = "La base de EasyWorship no tiene canciones con letra.";
+            return;
+        }
+
+        int imported = 0, replaced = 0, discarded = 0, failed = 0;
+        var session = _songSaver.Begin(several: songs.Count > 1);
+        foreach (var song in songs)
+        {
+            try
+            {
+                switch (session.Save(song).Result)
+                {
+                    case SongSaveResult.Replaced: replaced++; break;
+                    case SongSaveResult.Discarded: discarded++; break;
+                    default: imported++; break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Falló la importación de «{Title}» de EasyWorship", song.Title);
+                failed++;
+            }
+        }
+
+        LoadSongs();
+
+        var parts = new List<string> { $"{imported} canciones importadas de EasyWorship" };
+        if (replaced > 0)
+            parts.Add($"{replaced} reemplazadas");
+        if (discarded > 0)
+            parts.Add($"{discarded} descartadas por repetidas");
+        if (unreadable + failed > 0)
+            parts.Add($"{unreadable + failed} con error (ver log)");
         StatusText = string.Join(" · ", parts) + ".";
     }
 

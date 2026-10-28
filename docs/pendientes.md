@@ -250,6 +250,31 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       6. Lo que no anda en este modo: un **video de fondo** o una página web
          proyectada se mueven sólo en la ventana de salida; la página de anuncios
          de la transmisión sí reproduce los videos de la biblioteca por su cuenta.
+- [ ] **Etiqueta de los versículos en la transmisión** (28/10/2026; hay pruebas
+      de lo que se guarda, no se vio dibujada). **Transmisión → Estilos de la
+      transmisión…**, capa Biblia (y las otras): bajo «Mostrar la etiqueta» hay un
+      deslizador **Etiqueta** (50 a 300 %, 100 es el tamaño de siempre), tres
+      botones **Izquierda / Centro / Derecha** y **Arriba / Abajo de la letra**.
+      Mirá en la vista previa que «Juan 3:16 RVR 1960» cambie de tamaño y de
+      lugar con cada placa (Pestaña, Vidrio, Sólida, Línea…), que abajo de la
+      letra la pestaña quede pegada a la placa, y que en OBS se vea igual.
+- [ ] **Líneas por diapositiva en las canciones** (28/10/2026; hay pruebas de
+      cómo se parte, no se vio en el programa). Con una canción abierta, arriba
+      de la grilla aparece **Líneas por diapositiva: Todas / 1 / 2 / 3 / 4**.
+      Probalo con «Ardiendo en fuego»: con 2, el párrafo de cinco líneas queda en
+      tres diapositivas (2 + 2 + 1). Mirá que la canción, abierta en el editor,
+      siga con el párrafo entero; que cambiar el valor con una canción en vivo la
+      vuelva a poner; que al cambiar de canción siga el mismo valor; que se
+      recuerde al cerrar y abrir; y que en la transmisión y el escenario salgan
+      las mismas partes. La etiqueta (Coro, Verso 1) se repite en cada parte.
+- [ ] **Importar de EasyWorship** (28/10/2026). **Archivo → Importar canciones de
+      EasyWorship…**: elegís `Songs.db` (`SongWords.db` tiene que estar al lado).
+      **Está probado sólo contra una base armada a mano con lo que se sabe del
+      formato, no contra una de verdad**: puede fallar con la real. Hace falta una
+      carpeta `Databases\Data` de EasyWorship 6 o 7 (copiala con EasyWorship
+      cerrado). Mirá que importe todas, con título, autor, derechos y las partes
+      (Verse 1, Coro) bien separadas, y que repetidas pregunte como las demás. Si
+      falla, mandame esa carpeta (o el mensaje del registro) y lo ajusto.
 
 ## 2. Después de publicar la v1.0.0
 
@@ -360,27 +385,6 @@ no escribirle antes de esa fecha.
 
 ## 3. Para hacer después de la 1.0
 
-- [ ] **Etiqueta de los versículos en la transmisión: tamaño y lugar**
-      (28/10/2026, pedido de Alexis tras probar los estilos para OBS). La
-      etiqueta («Juan 3:16 RVR 1960») hoy no se puede agrandar ni achicar ni
-      mover. Agregar en **Transmisión → Estilos de la transmisión…**, por capa:
-      el **tamaño** de la etiqueta y **dónde va**: izquierda, centro o derecha,
-      y arriba o abajo (de la letra o de la pantalla, a definir al programarlo).
-      Con vista previa en el editor, como lo demás.
-- [ ] **Cuántas líneas mostrar por diapositiva en una canción**
-      (28/10/2026, pedido de Alexis). Hoy cada párrafo de la letra es una
-      diapositiva. Quiere elegir un **máximo de 1, 2, 3 o 4 líneas por
-      diapositiva** y que el programa parta el párrafo solo, sin cambiar la
-      letra guardada. Ejemplo: el párrafo
-      «¡Oh Señor! / quiero que ardas en mi ser. / Como la zarza / quiero arder
-      con tu poder, / a los perdidos ganaré como señal» (5 líneas) con máximo 2
-      queda en tres diapositivas: «¡Oh Señor! / quiero que ardas en mi ser.»,
-      «Como la zarza / quiero arder con tu poder,» y «a los perdidos ganaré como
-      señal». Para el editor sigue siendo **un solo párrafo**: la partición se
-      hace sólo al armar las diapositivas (en la grilla, el proyector y la
-      transmisión). Decidir al programarlo: si es un ajuste general, por
-      canción o por tema; cómo se parte un párrafo impar (acá sobra una línea
-      al final); y que los coros y estribillos se partan igual.
 - [ ] **Escribirle a YouVersion para ver cómo integrar su plataforma**
       (28/10/2026). Lo averiguado: YouVersion tiene una **Plataforma para
       desarrolladores** (https://platform.youversion.com, documentación en
@@ -437,12 +441,6 @@ no escribirle antes de esa fecha.
       > open source and installed on many computers, can one key be distributed
       > with it, or must each church register its own? (5) What is the request
       > rate limit per key? Thank you very much.
-- [ ] **Importar canciones de EasyWorship** (28/10/2026). Muchas iglesias
-      vienen de ahí. EasyWorship 6 y 7 guardan las canciones en bases SQLite
-      (`Songs.db` y `SongWords.db`, con la letra en RTF) dentro de su carpeta
-      de datos; la 2009 usa bases Paradox. Empezar por la 6/7. OpenLP tiene un
-      importador para mirar cómo lo resuelve. Si Alexis tiene una base de
-      EasyWorship de alguien, sirve para probar.
 - [ ] **Botón «Donar» con PayPal** (28/10/2026), en la página web y en el
       programa (Ayuda → «Colaborar con EcclesiaCast» y en «Acerca de»; reemplaza
       la idea «Acerca de: una forma de colaborar»). Cuando se haga, darle a
