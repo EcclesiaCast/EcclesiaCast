@@ -269,12 +269,12 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       las mismas partes. La etiqueta (Coro, Verso 1) se repite en cada parte.
 - [ ] **Importar de EasyWorship** (28/10/2026). **Archivo → Importar canciones de
       EasyWorship…**: elegís `Songs.db` (`SongWords.db` tiene que estar al lado).
-      **Está probado sólo contra una base armada a mano con lo que se sabe del
-      formato, no contra una de verdad**: puede fallar con la real. Hace falta una
-      carpeta `Databases\Data` de EasyWorship 6 o 7 (copiala con EasyWorship
-      cerrado). Mirá que importe todas, con título, autor, derechos y las partes
-      (Verse 1, Coro) bien separadas, y que repetidas pregunte como las demás. Si
-      falla, mandame esa carpeta (o el mensaje del registro) y lo ajusto.
+      Se probó (28/10/2026) con la biblioteca de EasyWorship 6.1 que Alexis
+      instaló en esta PC, con 2 canciones: la lee bien, con las diapositivas
+      separadas. El selector se abre solo en la carpeta de EasyWorship. Falta
+      probarlo con una biblioteca grande y con EasyWorship 7 u 8 (en esta PC hay
+      también datos de una v8, pero sin canciones). Mirá que importe todas, con
+      título, autor y derechos, y que las repetidas pregunten como las demás.
 
 ## 2. Después de publicar la v1.0.0
 
@@ -385,6 +385,20 @@ no escribirle antes de esa fecha.
 
 ## 3. Para hacer después de la 1.0
 
+- [ ] **Letras de letras.com en la búsqueda de canciones** (28/10/2026, pedido
+      de Alexis: ponerla primera). Hoy se busca en musica.com primero y en
+      LRCLIB como respaldo. **No se hizo, por lo que se vio de letras.com**:
+      1) Le niega el acceso a cualquier programa que no sea un navegador
+      (responde «Access Denied», 403, a un pedido normal con la identificación
+      del programa; en un navegador real anda). 2) Sus condiciones de uso (en
+      `letras.com/aviso-legal.html`) prohíben «eludir medidas de seguridad» y
+      reservan el contenido a quien lo publica. 3) Su `robots.txt` sí deja leer
+      las páginas de canciones, pero el bloqueo es otra cosa. Disimular el
+      programa para pasar el bloqueo no es un camino limpio. Opciones: **(a)**
+      un botón «Buscar en letras.com» en la ventana de búsqueda que abra el sitio
+      en el navegador, y la persona pegue la letra (ya existe «pegar letra»);
+      **(b)** pedirles permiso por escrito (el sitio es de Vignoli Comunicação
+      Ltda.); **(c)** buscar otra fuente con permiso. Decide Alexis.
 - [ ] **Escribirle a YouVersion para ver cómo integrar su plataforma**
       (28/10/2026). Lo averiguado: YouVersion tiene una **Plataforma para
       desarrolladores** (https://platform.youversion.com, documentación en

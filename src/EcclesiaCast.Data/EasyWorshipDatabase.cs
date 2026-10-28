@@ -31,6 +31,35 @@ public static class EasyWorshipDatabase
         return songs is null || words is null ? null : (songs, words);
     }
 
+    /// <summary>
+    /// The libraries EasyWorship left under its «Softouch» folder (for example
+    /// <c>Easyworship\Default\v6.1\Databases\Data</c>), newest first. The version
+    /// folder is read from disk, not assumed, so 6.x and 7.x are both found.
+    /// </summary>
+    public static IReadOnlyList<string> FindLibraries(string softouchRoot)
+    {
+        if (!Directory.Exists(softouchRoot))
+            return [];
+
+        var found = new List<string>();
+        foreach (var product in Directory.EnumerateDirectories(softouchRoot, "Easyworship*"))
+        {
+            foreach (var profile in Directory.EnumerateDirectories(product))
+            {
+                foreach (var version in Directory.EnumerateDirectories(profile))
+                {
+                    var data = Path.Combine(version, "Databases", "Data");
+                    if (FindFiles(data) is not null)
+                        found.Add(data);
+                }
+            }
+        }
+
+        return found
+            .OrderByDescending(d => File.GetLastWriteTimeUtc(FindFiles(d)!.Value.Songs))
+            .ToList();
+    }
+
     /// <summary>Every song with words. Rows that cannot be read are counted in <paramref name="unreadable"/>.</summary>
     public static List<Song> ReadSongs(string songsPath, string wordsPath, out int unreadable)
     {

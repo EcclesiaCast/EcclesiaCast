@@ -116,3 +116,71 @@ public class EasyWorshipImportTests : IDisposable
         Assert.Throws<InvalidDataException>(() => Read(out _));
     }
 }
+
+public class EasyWorshipRealFormatTests
+{
+    // Taken from a real EasyWorship 6.1 library: one paragraph per line,
+    // and an empty paragraph with \sdslidemarker between one slide and the next.
+    private const string Real =
+        @"{\rtf1\ansi\deff0\sdeasyworship2
+{\fonttbl{\f0 Tahoma;}}
+{\colortbl ;}
+{\pard\qc\qdef\sdewparatemplatestyle101{\*\sdasfactor 1}{\*\sdasbaseline 58.3199996948242}\sdastextstyle101\plain\sdewtemplatestyle101\fs116{\*\sdfsreal 58.3199996948242}{\*\sdfsdef 58.3199996948242}\sdfsauto Quiero m\u225?s de Ti\par}
+{\pard\qc\qdef\sdewparatemplatestyle101\plain\sdewtemplatestyle101\fs116{\*\sdfsreal 58.3199996948242}{\*\sdfsdef 58.3199996948242}\sdfsauto Que T\u250? ere' el Dios fuerte\par}
+{\pard\sdslidemarker\qc\qdef\sdewparatemplatestyle101\plain\sdewtemplatestyle101\fs116{\*\sdfsreal 58.3199996948242}{\*\sdfsdef 58.3199996948242}\sdfsauto\par}
+{\pard\qc\qdef\sdewparatemplatestyle101\plain\sdewtemplatestyle101\fs116{\*\sdfsreal 58.3199996948242}{\*\sdfsdef 58.3199996948242}\sdfsauto Contigo hice un trato\par}
+}";
+
+    [Fact]
+    public void The_slide_markers_of_a_real_library_separate_the_slides()
+    {
+        var song = EasyWorshipImporter.FromRtf("Trato", "", "", [Real]);
+
+        Assert.Equal(2, song.Sections.Count);
+        Assert.Equal("Quiero más de Ti\nQue Tú ere' el Dios fuerte", song.Sections[0].Text);
+        Assert.Equal("Contigo hice un trato", song.Sections[1].Text);
+    }
+}
+
+public class EasyWorshipLibraryFinderTests : IDisposable
+{
+    private readonly string _root = Path.Combine(Path.GetTempPath(), "ecclesia-softouch-" + Guid.NewGuid().ToString("N"));
+
+    public void Dispose()
+    {
+        if (Directory.Exists(_root))
+            Directory.Delete(_root, recursive: true);
+    }
+
+    private void Library(string product, string version, bool withWords = true)
+    {
+        var data = Path.Combine(_root, product, "Default", version, "Databases", "Data");
+        Directory.CreateDirectory(data);
+        File.WriteAllText(Path.Combine(data, "Songs.db"), "");
+        if (withWords)
+            File.WriteAllText(Path.Combine(data, "SongWords.db"), "");
+    }
+
+    [Fact]
+    public void Finds_a_library_whatever_the_version_folder_is_called()
+    {
+        Library("Easyworship", "v6.1");
+        Library("Easyworship 7", "v7.2");
+
+        Assert.Equal(2, EasyWorshipDatabase.FindLibraries(_root).Count);
+    }
+
+    [Fact]
+    public void A_library_without_the_words_file_is_not_offered()
+    {
+        Library("Easyworship", "v6.1", withWords: false);
+
+        Assert.Empty(EasyWorshipDatabase.FindLibraries(_root));
+    }
+
+    [Fact]
+    public void Without_the_folder_it_finds_nothing()
+    {
+        Assert.Empty(EasyWorshipDatabase.FindLibraries(Path.Combine(_root, "no-existe")));
+    }
+}

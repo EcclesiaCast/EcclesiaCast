@@ -20,7 +20,7 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 - **Importar canciones de EasyWorship.** **Archivo → Importar canciones de
   EasyWorship…** lee `Songs.db` y `SongWords.db` de EasyWorship 6 o 7 (sin
   cambiarlos) y trae título, autor, derechos y las partes (Verse 1, Coro).
-  Todavía no se probó con una base real de EasyWorship.
+  Se probó con una biblioteca real de EasyWorship 6.1 (el selector abre solo en la carpeta de EasyWorship, `PublicDocumentsSoftouch`).
 - **Salir al aire sólo en la transmisión, sin ventana de salida.** La lista
   «Salida:» tiene una opción nueva, **📡 Sólo la transmisión (sin ventana)**. Con
   ella, «Poner en vivo» (y proyectar una canción, un versículo, Black, Clear o

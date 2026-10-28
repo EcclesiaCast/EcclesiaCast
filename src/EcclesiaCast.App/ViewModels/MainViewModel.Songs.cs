@@ -526,16 +526,14 @@ public sealed partial class MainViewModel
     [RelayCommand]
     private void ImportEasyWorship()
     {
-        var common = new[]
-        {
-            @"C:\Users\Public\Documents\Softouch\EasyWorship\Default\Databases\Data",
-            @"C:\Users\Public\Documents\Softouch\EasyWorship 6\Default\Databases\Data",
-        };
+        // Where EasyWorship keeps its libraries (the newest first): the picker opens there.
+        var libraries = EasyWorshipDatabase.FindLibraries(
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), "Softouch"));
         var dialog = new Microsoft.Win32.OpenFileDialog
         {
             Title = "Importar de EasyWorship: elegí el archivo Songs.db",
             Filter = "Canciones de EasyWorship (Songs.db)|Songs.db",
-            InitialDirectory = common.FirstOrDefault(Directory.Exists) ?? string.Empty,
+            InitialDirectory = libraries.FirstOrDefault() ?? string.Empty,
         };
         if (dialog.ShowDialog() != true)
             return;
