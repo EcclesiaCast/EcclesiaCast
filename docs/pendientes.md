@@ -385,20 +385,6 @@ no escribirle antes de esa fecha.
 
 ## 3. Para hacer después de la 1.0
 
-- [ ] **Letras de letras.com en la búsqueda de canciones** (28/10/2026, pedido
-      de Alexis: ponerla primera). Hoy se busca en musica.com primero y en
-      LRCLIB como respaldo. **No se hizo, por lo que se vio de letras.com**:
-      1) Le niega el acceso a cualquier programa que no sea un navegador
-      (responde «Access Denied», 403, a un pedido normal con la identificación
-      del programa; en un navegador real anda). 2) Sus condiciones de uso (en
-      `letras.com/aviso-legal.html`) prohíben «eludir medidas de seguridad» y
-      reservan el contenido a quien lo publica. 3) Su `robots.txt` sí deja leer
-      las páginas de canciones, pero el bloqueo es otra cosa. Disimular el
-      programa para pasar el bloqueo no es un camino limpio. Opciones: **(a)**
-      un botón «Buscar en letras.com» en la ventana de búsqueda que abra el sitio
-      en el navegador, y la persona pegue la letra (ya existe «pegar letra»);
-      **(b)** pedirles permiso por escrito (el sitio es de Vignoli Comunicação
-      Ltda.); **(c)** buscar otra fuente con permiso. Decide Alexis.
 - [ ] **Escribirle a YouVersion para ver cómo integrar su plataforma**
       (28/10/2026). Lo averiguado: YouVersion tiene una **Plataforma para
       desarrolladores** (https://platform.youversion.com, documentación en
@@ -546,6 +532,12 @@ no escribirle antes de esa fecha.
 
 ## 5. Decisiones tomadas
 
+
+Descartado (28/10/2026): agregar letras.com a la búsqueda de canciones. Le niega
+el acceso a todo lo que no sea un navegador (403) y sus condiciones prohíben
+eludir medidas de seguridad. La búsqueda sigue con musica.com primero y LRCLIB de
+respaldo. Si algún día se quiere, la salida limpia es pedirles permiso por
+escrito (Vignoli Comunicação Ltda.).
 Descartado (15/10/2026): bajar una presentación de Google Slides pegando su
 enlace. Quien lo necesite descarga el PDF y lo agrega (los PDF y PowerPoint ya
 se importan), o abre Canva o Google Slides en el panel **🌐 Web** con la sesión
