@@ -265,17 +265,17 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       tres diapositivas (2 + 2 + 1). Mirá que la canción, abierta en el editor,
       siga con el párrafo entero; que cambiar el valor con una canción en vivo la
       vuelva a poner; que al cambiar de canción siga el mismo valor; que se
+- [ ] **Traer de otro programa (ProPresenter y EasyWorship)** (28/10/2026). En el
+      **➕** de Canciones hay una sola entrada, **Traer de otro programa…** (y la
+      misma en Archivo). La ventana tiene arriba dos botones, **ProPresenter** y
+      **EasyWorship**, cada uno con la cantidad de canciones que encontró; abre
+      con el que tiene canciones. Probá los dos: ProPresenter tiene que listar sus
+      9 bibliotecas y el aviso de OneDrive como antes; EasyWorship, «Easyworship
+      v6.1 · 2 canción(es)». Importá una de cada una (si repetís, pregunta qué
+      hacer) y probá «Elegir carpeta…» con cada programa. Falta una biblioteca
+      grande de EasyWorship y la 7 u 8 (en esta PC hay datos de una v8 sin
+      canciones).
       recuerde al cerrar y abrir; y que en la transmisión y el escenario salgan
-- [ ] **Traer de EasyWorship** (28/10/2026). En el **➕** de Canciones: **Traer de
-      EasyWorship…** (o Archivo → Traer canciones de EasyWorship…). Tiene que
-      abrir una ventana como la de ProPresenter: «Encontré N canciones en 1
-      biblioteca de EasyWorship», con la carpeta `Easyworship v6.1` y su
-      cantidad. Importá con «Importar»: las canciones aparecen con sus
-      diapositivas separadas; si repetís, pregunta qué hacer. Probá también
-      «Elegir carpeta…» con una copia de `Databases\Data`. Se probó la lectura con
-      la biblioteca de 2 canciones de esta PC; falta una grande y EasyWorship 7 u
-      8 (en esta PC hay datos de una v8 sin canciones).
-      las mismas partes. La etiqueta (Coro, Verso 1) se repite en cada parte.
 ## 2. Después de publicar la v1.0.0
 
 **La 1.0.0 salió el 21/10/2026** como versión estable, sin firma:

@@ -143,7 +143,7 @@ public partial class App : Application
         services.AddSingleton<IYouTubeBrowser, YouTubeBrowserService>();
         services.AddSingleton<ILogoRepository>(_ => new LogoRepository(dbPath));
         services.AddSingleton<ILogoManagerDialog, LogoManagerDialogService>();
-        services.AddSingleton<IProPresenterImportDialog, ProPresenterImportDialogService>();
+        services.AddSingleton<ISongImportDialog, SongImportDialogService>();
         services.AddSingleton<IWebSongSearchDialog, WebSongSearchDialogService>();
         services.AddSingleton<IStageWindowService, StageWindowService>();
         services.AddSingleton<IStageDesigner, StageDesignerService>();

@@ -170,9 +170,8 @@
 
             <MenuItem Header="_Archivo">
                 <MenuItem Header="Buscar canciones en internet…" Command="{Binding SearchSongsOnlineCommand}"/>
-                <MenuItem Header="Traer canciones de ProPresenter…" Command="{Binding ImportFromProPresenterCommand}"/>
+                <MenuItem Header="Traer canciones de otro programa…" Command="{Binding ImportFromOtherProgramCommand}"/>
                 <MenuItem Header="Importar canciones (.txt, .pro)…" Command="{Binding ImportSongsCommand}"/>
-                <MenuItem Header="Traer canciones de EasyWorship…" Command="{Binding ImportFromEasyWorshipCommand}"/>
                 <MenuItem Header="Importar una Biblia (JSON o Zefania XML)…" Command="{Binding ImportBibleCommand}"/>
                 <MenuItem Header="Cómo preparar una Biblia para importar…" Command="{Binding ShowBibleFormatHelpCommand}"
                           ToolTip="Los dos formatos que se leen, un ejemplo de cada uno y unas instrucciones para pedirle a una IA que convierta tu archivo."/>

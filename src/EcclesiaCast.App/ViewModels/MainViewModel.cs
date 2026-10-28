@@ -71,7 +71,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private readonly IYouTubeBrowser _youTube;
     private readonly ILogoRepository _logos;
     private readonly ILogoManagerDialog _logoManager;
-    private readonly IProPresenterImportDialog _proPresenterImport;
+    private readonly ISongImportDialog _songImport;
     private readonly IWebSongSearchDialog _webSongSearch;
     private readonly IStageWindowService _stage;
     private readonly IBackupDialog _backup;
@@ -352,7 +352,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         IYouTubeBrowser youTube,
         ILogoRepository logos,
         ILogoManagerDialog logoManager,
-        IProPresenterImportDialog proPresenterImport,
+        ISongImportDialog songImport,
         IWebSongSearchDialog webSongSearch,
         IStageWindowService stage,
         IStageDesigner stageDesigner,
@@ -384,7 +384,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _youTube = youTube;
         _logos = logos;
         _logoManager = logoManager;
-        _proPresenterImport = proPresenterImport;
+        _songImport = songImport;
         _webSongSearch = webSongSearch;
         _stage = stage;
         _stageDesigner = stageDesigner;

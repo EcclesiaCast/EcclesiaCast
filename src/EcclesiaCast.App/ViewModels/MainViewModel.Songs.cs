@@ -430,11 +430,11 @@ public sealed partial class MainViewModel
         StatusText = "Canción eliminada.";
     }
 
-    /// <summary>Brings the whole ProPresenter library over in one step.</summary>
+    /// <summary>Brings the libraries of another program (ProPresenter, EasyWorship) over, on the window's own choice.</summary>
     [RelayCommand]
-    private void ImportFromProPresenter()
+    private void ImportFromOtherProgram()
     {
-        if (_proPresenterImport.Show() is not { } summary)
+        if (_songImport.Show() is not { } summary)
             return;
 
         LoadSongs();
@@ -519,23 +519,6 @@ public sealed partial class MainViewModel
         StatusText = string.Join(" · ", parts) + ".";
     }
 
-    /// <summary>
-    /// Brings the libraries of EasyWorship over: the window looks where
-    /// EasyWorship keeps them, as it does for ProPresenter.
-    /// </summary>
-    [RelayCommand]
-    private void ImportFromEasyWorship()
-    {
-        var window = new Views.EasyWorshipImportWindow(_songSaver)
-        {
-            Owner = System.Windows.Application.Current.MainWindow,
-        };
-        if (window.ShowDialog() != true || window.Imported == 0)
-            return;
-
-        LoadSongs();
-        StatusText = window.Summary;
-    }
 
     /// <summary>Reads a text file as UTF-8, falling back to Latin-1.</summary>
     private static string ReadTextFile(string path)
