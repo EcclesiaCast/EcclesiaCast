@@ -1,0 +1,244 @@
+<Window x:Class="EcclesiaCast.App.Views.BroadcastStyleWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Estilos de la transmisión"
+        Width="1120" Height="740" MinWidth="900" MinHeight="600"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BgBrush}"
+        FontFamily="Segoe UI">
+    <Window.Resources>
+        <Style x:Key="Section" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,16,0,6"/>
+        </Style>
+        <Style x:Key="FieldLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="CheckBox">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Margin" Value="0,4,14,4"/>
+        </Style>
+        <!-- Botón de elección única (posición, placa, fondo) -->
+        <Style x:Key="Choice" TargetType="RadioButton">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Margin" Value="0,0,6,6"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="bd" CornerRadius="4"
+                                Background="{StaticResource SurfaceAltBrush}"
+                                BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource AccentSoftBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{StaticResource AccentBrush}"/>
+                                <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource AccentSoftBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="Swatch" TargetType="Button" BasedOn="{StaticResource DarkButton}">
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="FontSize" Value="11"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Las tres capas -->
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+            <RadioButton x:Name="TabBible" Content="Biblia" Tag="Bible" GroupName="Layer" IsChecked="True"
+                         Style="{StaticResource TabButton}" Padding="16,6" Checked="Layer_Checked"/>
+            <RadioButton x:Name="TabSongs" Content="Canciones" Tag="Songs" GroupName="Layer"
+                         Style="{StaticResource TabButton}" Padding="16,6" Checked="Layer_Checked"/>
+            <RadioButton x:Name="TabAnnouncements" Content="Anuncios" Tag="Announcements" GroupName="Layer"
+                         Style="{StaticResource TabButton}" Padding="16,6" Checked="Layer_Checked"/>
+        </StackPanel>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="400"/>
+                <ColumnDefinition Width="18"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Controles -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
+                <StackPanel>
+                    <CheckBox x:Name="FollowCheck" Content="Igual que en el proyector"
+                              ToolTip="Esta capa usa el diseño de la diapositiva, como antes. Apaga todo lo demás."
+                              Checked="Control_Changed" Unchecked="Control_Changed"/>
+
+                    <StackPanel x:Name="Controls">
+                        <TextBlock Style="{StaticResource Section}" Text="1 · Posición" Margin="0,10,0,6"/>
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton x:Name="PosTop" Content="Superior" Tag="Top" GroupName="Pos"
+                                         Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                            <RadioButton x:Name="PosCenter" Content="Centro" Tag="Center" GroupName="Pos"
+                                         Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                            <RadioButton x:Name="PosBottom" Content="Inferior" Tag="Bottom" GroupName="Pos"
+                                         Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                        </StackPanel>
+
+                        <TextBlock Style="{StaticResource Section}" Text="2 · Placa"/>
+                        <UniformGrid Columns="4">
+                            <RadioButton x:Name="PlNone" Content="Ninguna" Tag="None" GroupName="Plate" Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                            <RadioButton x:Name="PlTab" Content="Pestaña" Tag="Tab" GroupName="Plate" Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                            <RadioButton x:Name="PlGlass" Content="Vidrio" Tag="Glass" GroupName="Plate" Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                            <RadioButton x:Name="PlSolid" Content="Sólida" Tag="Solid" GroupName="Plate" Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                            <RadioButton x:Name="PlGradient" Content="Degradé" Tag="Gradient" GroupName="Plate" Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                            <RadioButton x:Name="PlHalo" Content="Halo" Tag="Halo" GroupName="Plate" Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                            <RadioButton x:Name="PlFillet" Content="Filete" Tag="Fillet" GroupName="Plate" Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                            <RadioButton x:Name="PlLine" Content="Línea" Tag="Line" GroupName="Plate" Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                        </UniformGrid>
+
+                        <TextBlock Style="{StaticResource Section}" Text="3 · Letra"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Tipografía"/>
+                            <ComboBox x:Name="FontCombo" Grid.Column="1" SelectionChanged="Control_Changed"/>
+                        </Grid>
+                        <Grid Margin="0,8,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="40"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Tamaño"/>
+                            <Slider x:Name="SizeSlider" Grid.Column="1" Minimum="20" Maximum="120" SmallChange="1" LargeChange="5"
+                                    IsSnapToTickEnabled="True" TickFrequency="1" ValueChanged="Slider_Changed"/>
+                            <TextBlock x:Name="SizeText" Grid.Column="2" Style="{StaticResource FieldLabel}" TextAlignment="Right"/>
+                        </Grid>
+                        <WrapPanel Margin="0,6,0,0">
+                            <CheckBox x:Name="BoldCheck" Content="Negrita" Checked="Control_Changed" Unchecked="Control_Changed"/>
+                            <CheckBox x:Name="UpperCheck" Content="MAYÚSCULAS" Checked="Control_Changed" Unchecked="Control_Changed"/>
+                        </WrapPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Color del texto" Width="80"/>
+                            <Button x:Name="TextColorButton" Style="{StaticResource Swatch}" Click="PickColor_Click" Tag="Text"/>
+                        </StackPanel>
+
+                        <TextBlock Style="{StaticResource Section}" Text="Colores"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Acento" Width="80"/>
+                            <Button x:Name="AccentButton" Style="{StaticResource Swatch}" Click="PickColor_Click" Tag="Accent"
+                                    ToolTip="La pestaña, el filete y la línea"/>
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Placa" Width="50" Margin="18,0,0,0"/>
+                            <Button x:Name="PlateButton" Style="{StaticResource Swatch}" Click="PickColor_Click" Tag="Plate"/>
+                        </StackPanel>
+                        <Grid Margin="0,8,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="40"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Opacidad"/>
+                            <Slider x:Name="OpacitySlider" Grid.Column="1" Minimum="0" Maximum="100" SmallChange="1" LargeChange="10"
+                                    IsSnapToTickEnabled="True" TickFrequency="1" ValueChanged="Slider_Changed"/>
+                            <TextBlock x:Name="OpacityText" Grid.Column="2" Style="{StaticResource FieldLabel}" TextAlignment="Right"/>
+                        </Grid>
+
+                        <TextBlock Style="{StaticResource Section}" Text="Tamaño de la placa"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="40"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Ancho"/>
+                            <Slider x:Name="WidthSlider" Grid.Column="1" Minimum="30" Maximum="100" SmallChange="1" LargeChange="5"
+                                    IsSnapToTickEnabled="True" TickFrequency="1" ValueChanged="Slider_Changed"/>
+                            <TextBlock x:Name="WidthText" Grid.Column="2" Style="{StaticResource FieldLabel}" TextAlignment="Right"/>
+                        </Grid>
+                        <Grid Margin="0,8,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="40"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Margen" ToolTip="Distancia que se deja libre desde el borde de la pantalla"/>
+                            <Slider x:Name="MarginSlider" Grid.Column="1" Minimum="0" Maximum="15" SmallChange="1" LargeChange="2"
+                                    IsSnapToTickEnabled="True" TickFrequency="1" ValueChanged="Slider_Changed"/>
+                            <TextBlock x:Name="MarginText" Grid.Column="2" Style="{StaticResource FieldLabel}" TextAlignment="Right"/>
+                        </Grid>
+                        <CheckBox x:Name="LabelCheck" Content="Mostrar la etiqueta (CORO / la cita)" Margin="0,10,0,0"
+                                  Checked="Control_Changed" Unchecked="Control_Changed"/>
+
+                        <TextBlock Style="{StaticResource Section}" Text="Fondo fijo"/>
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton x:Name="BgNone" Content="Transparente" Tag="None" GroupName="Bg" Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                            <RadioButton x:Name="BgColor" Content="Color" Tag="Color" GroupName="Bg" Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                            <RadioButton x:Name="BgFile" Content="Imagen o video…" Tag="File" GroupName="Bg" Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                        </StackPanel>
+                        <StackPanel x:Name="BgColorRow" Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Color del fondo" Width="100"/>
+                            <Button x:Name="BgColorButton" Style="{StaticResource Swatch}" Click="PickColor_Click" Tag="Background"/>
+                        </StackPanel>
+                        <StackPanel x:Name="BgFileRow" Orientation="Horizontal">
+                            <Button Content="Elegir archivo…" Style="{StaticResource DarkButton}" Padding="10,5" FontSize="11"
+                                    Click="PickFile_Click"/>
+                            <TextBlock x:Name="BgFileName" Style="{StaticResource FieldLabel}" Margin="10,0,0,0"
+                                       MaxWidth="240" TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+                        <TextBlock Style="{StaticResource FieldLabel}" TextWrapping="Wrap" Margin="0,6,0,0"
+                                   Text="El fondo queda fijo detrás de la letra mientras la transmisión esté prendida. Un video va en bucle y sin sonido."/>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Vista previa -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Style="{StaticResource FieldLabel}" Text="Vista previa (sobre una cámara de ejemplo)" Margin="0,0,0,6"/>
+                <Border Grid.Row="1" Background="#0B0D12" BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
+                        CornerRadius="6" SizeChanged="PreviewHost_SizeChanged" x:Name="PreviewHost">
+                    <Grid>
+                        <ContentControl x:Name="PreviewSlot" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="PreviewMessage" Foreground="{StaticResource MutedBrush}" FontSize="13"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"
+                                   TextWrapping="Wrap" Margin="20" Text="Preparando la vista previa…"/>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!-- Botones -->
+        <DockPanel Grid.Row="2" Margin="0,14,0,0">
+            <Button DockPanel.Dock="Left" Content="Volver a los de fábrica" Style="{StaticResource DarkButton}"
+                    Padding="14,8" Click="Defaults_Click"
+                    ToolTip="Sólo de la pestaña que tenés abierta"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Cancelar" Style="{StaticResource DarkButton}" IsCancel="True" Padding="20,8"/>
+                <Button Content="Guardar" Style="{StaticResource AccentButton}" IsDefault="True"
+                        Click="Save_Click" Padding="20,8" Margin="8,0,0,0"/>
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</Window>

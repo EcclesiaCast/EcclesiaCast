@@ -73,6 +73,13 @@ public interface IRemoteHost
     /// </summary>
     string? GetMediaFile(int mediaId);
 
+    /// <summary>
+    /// The fixed picture or video behind the words of one layer of the stream
+    /// (the one saved in its style); null when the layer has none or the file is
+    /// gone. The path is the one in the saved style, never one taken from the request.
+    /// </summary>
+    string? GetBackgroundFile(OutputChannel channel);
+
     /// <summary>Runs one action; <paramref name="index"/> is used by the ones that take a target.</summary>
     void Execute(string action, int? index);
 }
@@ -85,6 +92,12 @@ public interface IRemoteHost
 /// It carries style rather than a picture because that is what a stream
 /// wants — clean text over transparency, to sit on top of the camera. The
 /// marker-pen highlight goes as [start, length] pairs over each text.
+///
+/// <paramref name="Style"/> is the layer's own design (null when it follows the
+/// projector) and <paramref name="Label"/> the small tag over the plate: the part
+/// of a song or the reference of a verse. <paramref name="Blank"/> is true on Clear,
+/// Black and Logo, when the layer is emptied whole (its fixed background too). The style travels with the file name of
+/// its background, never the full path.
 /// </summary>
 public sealed record RemoteOutput(
     bool ShowText,
@@ -105,7 +118,10 @@ public sealed record RemoteOutput(
     string AlignV,
     IReadOnlyList<int[]> MainMarks,
     IReadOnlyList<int[]> SecondaryMarks,
-    RemoteOutputMedia? Media = null);
+    RemoteOutputMedia? Media = null,
+    BroadcastStyle? Style = null,
+    string Label = "",
+    bool Blank = false);
 
 /// <summary>
 /// The picture or video that is alone on the screen, for the announcements page

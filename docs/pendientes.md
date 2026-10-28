@@ -69,9 +69,48 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
          ve en la diapositiva (también en pantalla si está proyectado) y sigue
          ahí al cerrar y abrir el programa. Probalo en una Biblia importada de
          prueba, no en la que usás en el servicio.
+- [ ] **Menú «Transmisión» y estilos propios para OBS** (28/10/2026; hay
+      compilación, pruebas y dibujos a imagen de las placas, pero no se abrió
+      desde acá). Plan en [plan-obs-estilos.md](plan-obs-estilos.md). Probalo con
+      OBS abierto, en este orden:
+      1. **El menú.** Entre «Proyección» y «Ayuda» está **Transmisión**, con
+         «Salida para OBS o vMix…» y «Estilos de la transmisión…». La ventana
+         del celular ya no trae la caja de OBS: sólo dice que ahora está en el
+         menú Transmisión.
+      2. **Salida para OBS o vMix.** Abre con la dirección general y los
+         botones Copiar: Biblia / Canciones / Anuncios, igual que antes, más
+         «🎨 Editar los estilos…». Si el control del celular estaba apagado, se
+         prende solo. Pegá la dirección de Canciones en un Navegador de OBS
+         (1920 × 1080) arriba de la cámara.
+      3. **El estilo de cada capa.** En «Estilos de la transmisión…» elegí
+         Canciones, placa **Pestaña**, posición **Inferior**, y Guardar. Proyectá
+         una canción: la letra sale en mayúsculas dentro de una placa oscura con
+         una línea turquesa abajo y la pestañita «CORO» arriba. Al pasar de una
+         diapositiva a otra hay un fundido corto, y una estrofa larga se achica
+         sola en vez de salirse de la pantalla. En OBS cambia a lo sumo 0,3 s
+         después de guardar, sin tocar nada.
+      4. **Las ocho placas.** Probá cada una en la vista previa y en OBS: Ninguna,
+         Pestaña, Vidrio (se ve la cámara borrosa detrás), Sólida, Degradé,
+         Halo, Filete (línea fina que se desvanece) y Línea (vertical a la
+         izquierda). Probá también Superior y Centro, y el ancho y el margen.
+      5. **Biblia y Anuncios.** Proyectá un versículo: arriba de la placa va la
+         cita («JUAN 3:16 · RVR1909») y no aparece aparte. Con un texto rápido,
+         la placa de Anuncios sale en el centro. Con «Mostrar la etiqueta»
+         destildada no sale ni la cita ni «CORO».
+      6. **Fondo fijo.** En una capa elegí «Color» y después «Imagen o video…»
+         con un video: tiene que verse siempre mientras la página esté prendida,
+         moverse en bucle y sin sonido, y desaparecer con Black (F1), Clear (F2)
+         y Logo (F3). Un video grande no tiene que trabarse al pasar de una
+         diapositiva a otra.
+      7. **«Igual que en el proyector».** Tildala en una capa: esa capa vuelve a
+         verse como hasta ahora (con el tema de la diapositiva) y el resto de
+         los controles se apagan. «Volver a los de fábrica» sólo cambia la
+         pestaña abierta, y Cancelar no guarda nada.
+      8. **Si WebView2 no está**, la vista previa dice «No se pudo mostrar la
+         vista previa» y lo demás anda igual.
 - [x] **Biblia, canciones y anuncios en capas separadas para OBS.** Alexis lo
       probó en OBS el 28/10/2026: llega bien. Ahora se le hace un editor de
-      estilos propio (ver §3, «Estilos propios para OBS»).
+      estilos propio (el punto de arriba, «Menú Transmisión y estilos propios»).
 - [ ] **Teclas en los tooltips (diseño avanzado).** Pasá el mouse por Black,
       Clear, Logo, Sin fondo, Poner en vivo / Apagar salida y Proyectar ▶: el
       globito dice la tecla (F1, F2, F3, F4, Esc, Ctrl+Enter) aunque estés en
@@ -292,12 +331,6 @@ no escribirle antes de esa fecha.
 
 ## 3. Para hacer después de la 1.0
 
-- [ ] **Estilos propios para OBS y menú «Transmisión»** (28/10/2026, en curso).
-      El plan completo está en [plan-obs-estilos.md](plan-obs-estilos.md): cada
-      capa (Biblia, canciones, anuncios) con su diseño, posición superior,
-      centro o inferior, placas como las de Reuna (Pestaña, Vidrio, Sólida,
-      Degradé, Halo, Filete, Línea), etiqueta «CORO» o la cita, y fondo fijo.
-      Lo de OBS sale de la ventana del celular y pasa al menú de arriba.
 - [ ] **Importar canciones de EasyWorship** (28/10/2026). Muchas iglesias
       vienen de ahí. EasyWorship 6 y 7 guardan las canciones en bases SQLite
       (`Songs.db` y `SongWords.db`, con la letra en RTF) dentro de su carpeta

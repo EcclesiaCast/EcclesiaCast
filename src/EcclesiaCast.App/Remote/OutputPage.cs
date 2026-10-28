@@ -74,10 +74,119 @@ public static class OutputPage
             #countdownClock { font-size: 18vh; font-weight: 600; line-height: 1; }
 
             .oculto { display: none !important; }
+
+            /* ── Own design of a layer (Transmisión → Estilos…) ──────────────
+               With a style the page draws #plate instead of #canvas: the words
+               sit top, centre or bottom with a safety margin, over the plate
+               the operator chose. Sizes are em of #stage, so the whole plate
+               scales with the font size. */
+            body.estilo #canvas, body.estilo #caption { display: none !important; }
+            body:not(.estilo) #stage, body:not(.estilo) #sbg, body:not(.estilo) #sgrad { display: none !important; }
+
+            #sbg { position: absolute; inset: 0; background: transparent; overflow: hidden; }
+            #sbg img, #sbg video { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+            #sgrad { position: absolute; left: 0; right: 0; opacity: 0; transition: opacity .2s; pointer-events: none; }
+
+            #stage {
+              position: absolute; inset: 0; box-sizing: border-box;
+              display: flex; flex-direction: column; align-items: center;
+              pointer-events: none;
+            }
+            #stage.p-top { justify-content: flex-start; }
+            #stage.p-center { justify-content: center; }
+            #stage.p-bottom { justify-content: flex-end; }
+            #stage.k-line { align-items: flex-start; }
+
+            #swrap { position: relative; width: max-content; opacity: 0; }
+            #plate {
+              position: relative; box-sizing: border-box;
+              padding: .4em .85em; text-align: center; line-height: 1.18;
+            }
+            #stage.k-line #plate { text-align: left; }
+            #smain, #ssecondary { margin: 0; white-space: pre-wrap; overflow-wrap: break-word; }
+            #ssecondary { font-size: .62em; opacity: .92; margin-top: .35em; }
+
+            /* The small tag over the plate: «CORO», or the reference of a verse. */
+            #label {
+              width: fit-content; margin: 0 auto .18em;
+              font-size: .36em; font-weight: 700; letter-spacing: .16em; line-height: 1;
+              text-transform: uppercase; white-space: nowrap;
+              color: var(--accent); text-shadow: 0 .1em .4em rgba(0,0,0,.85), 0 0 .15em rgba(0,0,0,.7);
+            }
+            #stage.k-line #label { margin-left: 0; }
+
+            /* Pestaña: dark rounded plate, a thick accent line under it, the
+               label as an accent tab centred on top. */
+            #stage.k-tab #plate {
+              background: var(--plate); border: 1px solid rgba(255,255,255,.13);
+              border-bottom: .12em solid var(--accent); border-radius: .3em;
+              padding: .5em 1em .42em; box-shadow: 0 .3em 1em rgba(0,0,0,.38);
+            }
+            #stage.k-tab #label {
+              margin: 0 auto -1px; padding: .42em 1.5em .4em;
+              background: var(--accent); color: var(--onaccent); text-shadow: none;
+              border-radius: .5em .5em 0 0; position: relative; z-index: 1;
+            }
+
+            /* Vidrio: translucent plate that blurs the camera behind it. */
+            #stage.k-glass #plate {
+              background: linear-gradient(rgba(255,255,255,.1), rgba(255,255,255,.03)), var(--plateglass);
+              -webkit-backdrop-filter: blur(1.8vh) saturate(1.35); backdrop-filter: blur(1.8vh) saturate(1.35);
+              border: 1px solid rgba(255,255,255,.3); border-radius: .34em;
+              box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 .3em 1em rgba(0,0,0,.25);
+              padding: .5em 1em; text-shadow: 0 .04em .12em rgba(0,0,0,.45);
+            }
+            #stage.k-glass #label {
+              margin-bottom: .45em; padding: .45em 1.2em; border-radius: 2em; color: #fff;
+              background: var(--plateglass); border: 1px solid rgba(255,255,255,.3);
+              -webkit-backdrop-filter: blur(1.8vh); backdrop-filter: blur(1.8vh); text-shadow: none;
+            }
+
+            /* Sólida: no plate, one strong even shadow to read over any camera. */
+            #stage.k-solid #plate, #stage.k-line #plate {
+              text-shadow: 0 .04em .06em rgba(0,0,0,.95), 0 0 .2em rgba(0,0,0,.85), 0 0 .5em rgba(0,0,0,.6);
+            }
+
+            /* Degradé: no box, the colour fades in from the edge (#sgrad). */
+            #stage.k-gradient #plate { text-shadow: 0 .04em .14em rgba(0,0,0,.55); }
+
+            /* Halo: a soft dark glow behind the letters. */
+            #stage.k-halo #plate {
+              text-shadow: 0 0 .22em var(--halo), 0 0 .5em var(--halo), 0 0 1em var(--halo), 0 0 1.6em var(--halo);
+            }
+
+            /* Filete: soft shadow and a thin accent line that fades out sideways. */
+            #stage.k-fillet #plate { text-shadow: 0 .04em .12em rgba(0,0,0,.8), 0 0 .5em rgba(0,0,0,.45); padding-bottom: .5em; }
+            #stage.k-fillet #plate::after {
+              content: ''; position: absolute; left: -4%; right: -4%; bottom: 0; height: max(2px, .04em);
+              background: linear-gradient(90deg, transparent, var(--accent) 18%, var(--accent) 82%, transparent);
+            }
+
+            /* Línea: like Sólida, with a vertical accent line to the left. */
+            #stage.k-line #plate { border-left: .1em solid var(--accent); padding: .1em .7em .1em .6em; }
+
+            /* Ninguna: the thin outline the projector has always had. */
+            #stage.k-none #plate {
+              text-shadow: -.035em -.035em 0 #000, .035em -.035em 0 #000, -.035em .035em 0 #000, .035em .035em 0 #000,
+                           0 -.05em 0 #000, 0 .05em 0 #000, -.05em 0 0 #000, .05em 0 0 #000;
+            }
+            #stage.k-none #label { text-shadow: -.05em -.05em 0 #000, .05em -.05em 0 #000, -.05em .05em 0 #000, .05em .05em 0 #000; }
           </style>
         </head>
         <body>
+          <div id="sbg"></div>
           <div id="mediaBox"></div>
+          <div id="sgrad"></div>
+          <div id="stage" class="p-bottom k-tab">
+            <div id="swrap">
+              <div id="label" class="oculto"></div>
+              <div id="plate">
+                <div id="smain"></div>
+                <div id="ssecondary" class="oculto"></div>
+              </div>
+            </div>
+          </div>
           <div id="canvas" class="centro">
             <div id="main"></div>
             <div id="secondary" class="oculto"></div>
@@ -154,8 +263,155 @@ public static class OutputPage
               mediaBox.appendChild(el);
             }
 
+            // Draws what the computer sent (also called by the style editor's
+            // preview). With a style the layer has its own design; without one
+            // it is drawn as the projector draws it.
             function paint(s) {
               paintMedia(s.media);
+              document.body.classList.toggle('estilo', !!s.style);
+              paintBackground(s);
+              if (s.style) paintStyled(s); else paintLegacy(s);
+
+              show(countdown, !!s.countdown);
+              countdownHeading.textContent = s.countdownHeading || '';
+              show(countdownHeading, !!s.countdownHeading);
+              countdownClock.textContent = s.countdown || '';
+
+              show(overlay, !!s.overlay);
+              overlay.textContent = s.overlay || '';
+            }
+
+            var stage = document.getElementById('stage');
+            var swrap = document.getElementById('swrap');
+            var plate = document.getElementById('plate');
+            var smain = document.getElementById('smain');
+            var ssecondary = document.getElementById('ssecondary');
+            var label = document.getElementById('label');
+            var sgrad = document.getElementById('sgrad');
+            var sbg = document.getElementById('sbg');
+            var bgKey = '';
+            var plateKey = '';
+
+            function rgba(hex, a) {
+              var h = String(hex || '').replace('#', '');
+              if (h.length !== 6 || isNaN(parseInt(h, 16))) h = '000000';
+              var n = parseInt(h, 16);
+              return 'rgba(' + (n >> 16 & 255) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')';
+            }
+
+            // Dark text over a light accent, light over a dark one: the tab
+            // stays readable whatever colour the operator picks.
+            function onColor(hex) {
+              var h = String(hex || '').replace('#', '');
+              var n = parseInt(h.length === 6 ? h : '000000', 16);
+              var l = 0.299 * (n >> 16 & 255) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255);
+              return l > 150 ? '#0A1114' : '#FFFFFF';
+            }
+
+            // The fixed picture, video or colour behind everything. It is there
+            // while the page is on, and leaves with Black, Clear and Logo like
+            // everything else. Rebuilt only when it changes, or the video would
+            // start over at every poll.
+            function paintBackground(s) {
+              var st = s.style;
+              var key = '';
+              if (st && !s.blank && st.background === 'color') key = 'c:' + st.backgroundColor;
+              else if (st && !s.blank && st.background === 'file' && st.backgroundFile)
+                key = 'f:' + st.backgroundFile + ':' + (st.backgroundUrl || canal);
+              if (key === bgKey) return;
+              bgKey = key;
+              sbg.textContent = '';
+              sbg.style.background = 'transparent';
+              if (!key) return;
+              if (key.charAt(0) === 'c') { sbg.style.background = st.backgroundColor; return; }
+
+              var video = /\.(mp4|m4v|webm|mov)$/i.test(st.backgroundFile);
+              var el = document.createElement(video ? 'video' : 'img');
+              el.src = st.backgroundUrl || '/api/fondo?pin=' + encodeURIComponent(pin) + '&canal=' + encodeURIComponent(canal);
+              if (video) {
+                el.autoplay = true; el.loop = true; el.muted = true; el.playsInline = true;
+                el.addEventListener('canplay', function () { el.play().catch(function () {}); });
+              }
+              sbg.appendChild(el);
+            }
+
+            // The layer with its own design: the words inside #plate, set top,
+            // centre or bottom with the safety margin.
+            function paintStyled(s) {
+              var st = s.style;
+              var text = s.showText ? (s.mainText || '') : '';
+              var tag = st.showLabel ? (s.label || '') : '';
+              var kind = st.plate || 'tab';
+              var pos = st.position || 'bottom';
+              var op = (st.plateOpacity == null ? 85 : st.plateOpacity) / 100;
+              var base = st.fontSize / 1080 * 100;
+
+              // Nothing changed: leave it alone, or the fade would replay at every poll.
+              var key = JSON.stringify([st, text, s.secondaryText, tag, s.mainMarks, s.secondaryMarks, !!s.overlay]);
+              if (key === plateKey) return;
+              plateKey = key;
+
+              if (!text) {
+                swrap.style.transition = 'opacity .2s';
+                swrap.style.opacity = '0';
+                sgrad.style.opacity = '0';
+                return;
+              }
+
+              // A short fade between one text and the next instead of a jump.
+              swrap.style.transition = 'none';
+              swrap.style.opacity = '0';
+              void swrap.offsetWidth;
+
+              var m = st.marginPercent || 0;
+              stage.className = 'p-' + pos + ' k-' + kind;
+              stage.style.padding = m + 'vh ' + m + 'vw ' + (s.overlay && pos === 'bottom' ? Math.max(m, 14) : m) + 'vh';
+              stage.style.setProperty('--accent', st.accentColor);
+              stage.style.setProperty('--onaccent', onColor(st.accentColor));
+              stage.style.setProperty('--plate', rgba(st.plateColor, op));
+              stage.style.setProperty('--plateglass', rgba(st.plateColor, Math.min(op, 1) * 0.55));
+              stage.style.setProperty('--halo', rgba(st.plateColor, Math.max(op, 0.6) * 0.95));
+              stage.style.color = st.textColor;
+              stage.style.fontFamily = "'" + (st.fontFamily || 'Segoe UI') + "', 'Segoe UI', sans-serif";
+              stage.style.fontWeight = st.bold ? '700' : '400';
+              stage.style.textTransform = st.uppercase ? 'uppercase' : 'none';
+              swrap.style.maxWidth = 'min(' + st.widthPercent + 'vw, 100%)';
+
+              setText(smain, text, s.mainMarks);
+              show(ssecondary, !!s.secondaryText);
+              setText(ssecondary, s.secondaryText || '', s.secondaryMarks);
+              show(label, !!tag);
+              label.textContent = tag;
+
+              // The words shrink in steps of 5 % until the plate fits in the
+              // top half of the screen, as the projector does.
+              var scale = 1;
+              stage.style.fontSize = base.toFixed(2) + 'vh';
+              for (var i = 0; i < 20 && swrap.offsetHeight > window.innerHeight * 0.5 && scale > 0.3; i++) {
+                scale -= 0.05;
+                stage.style.fontSize = (base * scale).toFixed(2) + 'vh';
+              }
+
+              // The gradient: the third of the screen on the side of the position.
+              if (kind === 'gradient') {
+                var c = rgba(st.plateColor, op), c0 = rgba(st.plateColor, 0);
+                sgrad.style.top = pos === 'top' ? '0' : pos === 'center' ? '32%' : 'auto';
+                sgrad.style.bottom = pos === 'bottom' ? '0' : 'auto';
+                sgrad.style.height = pos === 'center' ? '36%' : '38%';
+                sgrad.style.background = pos === 'top' ? 'linear-gradient(to bottom,' + c + ' 0%,' + rgba(st.plateColor, op * 0.55) + ' 55%,' + c0 + ' 100%)'
+                  : pos === 'center' ? 'linear-gradient(to bottom,' + c0 + ' 0%,' + c + ' 50%,' + c0 + ' 100%)'
+                  : 'linear-gradient(to top,' + c + ' 0%,' + rgba(st.plateColor, op * 0.55) + ' 55%,' + c0 + ' 100%)';
+                sgrad.style.opacity = '1';
+              } else {
+                sgrad.style.opacity = '0';
+              }
+
+              void swrap.offsetWidth;
+              swrap.style.transition = 'opacity .2s';
+              swrap.style.opacity = '1';
+            }
+
+            function paintLegacy(s) {
               // Sizes come over as points on the 1080-high canvas the
               // projector renders to, so they are turned into viewport
               // units and the stream can be any resolution.
@@ -184,14 +440,6 @@ public static class OutputPage
               caption.textContent = s.caption || '';
               caption.style.color = s.color || '#FFFFFF';
 
-              show(countdown, !!s.countdown);
-              countdownHeading.textContent = s.countdownHeading || '';
-              show(countdownHeading, !!s.countdownHeading);
-              countdownClock.textContent = s.countdown || '';
-
-              show(overlay, !!s.overlay);
-              overlay.textContent = s.overlay || '';
-
               // The lower third owns the bottom of the screen while it is up,
               // so the caption steps out of its way instead of under it.
               caption.style.bottom = s.overlay ? '13vh' : '4vh';
@@ -218,7 +466,9 @@ public static class OutputPage
                 .then(function () { setTimeout(poll, espera); });
             }
 
-            poll();
+            // The style editor's preview (WebView2) calls paint() itself and has
+            // no server to ask.
+            if (!(window.chrome && window.chrome.webview)) poll();
           </script>
         </body>
         </html>

@@ -47,40 +47,11 @@
             </StackPanel>
         </Border>
 
-        <!-- Salida limpia para el que transmite -->
-        <Border Background="{StaticResource SurfaceBrush}"
-                BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
-                CornerRadius="6" Padding="14,10" Margin="0,14,0,0">
-            <StackPanel>
-                <TextBlock Text="Para la transmisión (OBS o vMix)"
-                           FontSize="12" FontWeight="SemiBold" Foreground="White"/>
-                <TextBlock Text="Pegá esta dirección en un «Browser Source» de OBS o en un «Web Input» de vMix: sale la letra sola, con el fondo transparente, para ponerla encima de la cámara."
-                           FontSize="11" Foreground="{StaticResource FaintBrush}"
-                           TextWrapping="Wrap" Margin="0,4,0,6"/>
-                <TextBox x:Name="BroadcastBox" IsReadOnly="True"
-                         Background="{StaticResource SurfaceAltBrush}" Foreground="White"
-                         BorderBrush="{StaticResource LineBrush}"
-                         FontSize="12" Padding="8,6" TextWrapping="Wrap"
-                         ToolTip="Agregale «&amp;fondo=negro» al final si tu programa no maneja transparencia"/>
-                <Button Content="Copiar la dirección" Style="{StaticResource DarkButton}"
-                        FontSize="11" Padding="10,4" Margin="0,8,0,0"
-                        HorizontalAlignment="Left" Click="CopyBroadcast_Click"/>
-
-                <TextBlock Text="¿Querés cada cosa en su propia capa de la transmisión? Hay una dirección para cada una: la Biblia, las canciones y los anuncios (texto rápido, imágenes, videos, el aviso al pie y la cuenta regresiva). Así podés mostrar u ocultar cada una por separado."
-                           FontSize="11" Foreground="{StaticResource FaintBrush}"
-                           TextWrapping="Wrap" Margin="0,12,0,6"/>
-                <WrapPanel>
-                    <Button Content="Copiar: Biblia" Tag="Bible" Style="{StaticResource DarkButton}"
-                            FontSize="11" Padding="10,4" Margin="0,0,6,0" Click="CopyChannel_Click"/>
-                    <Button Content="Copiar: Canciones" Tag="Songs" Style="{StaticResource DarkButton}"
-                            FontSize="11" Padding="10,4" Margin="0,0,6,0" Click="CopyChannel_Click"/>
-                    <Button Content="Copiar: Anuncios" Tag="Announcements" Style="{StaticResource DarkButton}"
-                            FontSize="11" Padding="10,4" Click="CopyChannel_Click"
-                            ToolTip="Con el video se oye el sonido en la transmisión sólo si agregás «&amp;sonido=1» al final: por defecto va sin sonido para no repetir el que sale por el proyector."/>
-                </WrapPanel>
-                <TextBlock x:Name="ChannelCopied" FontSize="11" Foreground="{StaticResource AccentSoftBrush}" Margin="0,6,0,0"/>
-            </StackPanel>
-        </Border>
+        <TextBlock FontSize="11" Foreground="{StaticResource FaintBrush}"
+                   TextWrapping="Wrap" Margin="0,14,0,0">
+            <Run Text="La salida para OBS o vMix ahora está en el menú"/>
+            <Run Text="Transmisión" FontWeight="SemiBold"/><Run Text="."/>
+        </TextBlock>
 
         <TextBlock x:Name="FirewallNote"
                    Text="La primera vez, Windows puede preguntar si permitís que EcclesiaCast use la red: aceptá para redes privadas."

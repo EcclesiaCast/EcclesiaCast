@@ -5,6 +5,21 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+### Agregado
+
+- **Menú «Transmisión» y estilos propios para OBS.** Hay un menú nuevo entre
+  «Proyección» y «Ayuda». **Salida para OBS o vMix…** reúne las direcciones de la
+  transmisión (la general y la de la Biblia, las canciones y los anuncios), que
+  antes estaban en la ventana del celular, y prende el servidor si estaba
+  apagado. **Estilos de la transmisión…** deja diseñar cada capa por separado, sin
+  copiar el proyector: dónde va la letra (arriba, al centro o abajo), la placa
+  (Pestaña, Vidrio, Sólida, Degradé, Halo, Filete, Línea o ninguna), la tipografía,
+  el tamaño, los colores, el ancho, el margen, la etiqueta (CORO o la cita) y un
+  fondo fijo de color, imagen o video. Tiene vista previa sobre una cámara de
+  ejemplo y la opción «Igual que en el proyector» para que la capa se comporte
+  como hasta ahora. El texto cambia con un fundido corto y se achica solo si no
+  entra.
+
 ## [1.0.1] - 2026-10-21
 
 ### Agregado
