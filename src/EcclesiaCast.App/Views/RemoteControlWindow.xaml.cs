@@ -20,43 +20,7 @@ public partial class RemoteControlWindow : Window
 
         AddressBox.Text = server.Address;
         PinText.Text = server.Pin;
-        BroadcastBox.Text = server.BroadcastAddress;
-        _server = server;
         ShowQr(server.Address);
-    }
-
-    private RemoteControlServer? _server;
-
-    /// <summary>Copies the address of the page of one channel of the stream (the button names it).</summary>
-    private void CopyChannel_Click(object sender, RoutedEventArgs e)
-    {
-        if (_server is null || sender is not FrameworkElement { Tag: string name }
-            || !Enum.TryParse<EcclesiaCast.Core.Remote.OutputChannel>(name, out var channel))
-            return;
-
-        try
-        {
-            Clipboard.SetText(_server.BroadcastAddressFor(channel));
-            ChannelCopied.Text = "✓ Copiada. Pegala en un «Browser Source» nuevo de OBS.";
-        }
-        catch (Exception ex)
-        {
-            Log.Debug(ex, "No se pudo copiar la dirección del canal {Channel}", name);
-            ChannelCopied.Text = "No se pudo copiar ahora: probá de nuevo.";
-        }
-    }
-
-    private void CopyBroadcast_Click(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            Clipboard.SetText(BroadcastBox.Text);
-        }
-        catch (Exception ex)
-        {
-            // El portapapeles lo puede tener tomado otro programa.
-            Log.Debug(ex, "No se pudo copiar la dirección de transmisión");
-        }
     }
 
     /// <summary>True when the operator asked to switch the remote off.</summary>

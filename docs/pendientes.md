@@ -69,22 +69,52 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
          ve en la diapositiva (también en pantalla si está proyectado) y sigue
          ahí al cerrar y abrir el programa. Probalo en una Biblia importada de
          prueba, no en la que usás en el servicio.
-- [ ] **Biblia, canciones y anuncios en capas separadas para OBS** (el servidor y
-      la página se comprobaron con un banco de pruebas y un navegador, sin el
-      programa abierto y sin OBS: 20 comprobaciones del servidor y las tres
-      páginas dibujadas con una imagen y un video). Con el 📱 prendido, en la
-      ventana hay tres botones **Copiar: Biblia / Canciones / Anuncios**. Probá en
-      OBS con tres *Browser Source* (uno por dirección, con el ancho y alto de tu
-      escena): 1) proyectá un versículo: sale **sólo** en el de Biblia; 2) una
-      canción: sólo en el de canciones; 3) un texto rápido, una imagen o un video
-      en primer plano, una página de una presentación, un aviso al pie y la cuenta
-      regresiva: sólo en el de anuncios; 4) Clear, Black y Logo vacían las tres;
-      5) el video se ve, se repite si está en bucle y no hace eco (sin sonido);
-      con `&sonido=1` suena; 6) la dirección vieja (`/salida`) sigue mostrando
-      lo mismo que antes, sin imágenes. **Lo que no se probó:** cómo se ve en OBS
-      de verdad (que el fondo quede transparente y que el video no se corte), y si
-      una imagen con zoom o corrimiento se ve distinto que en el proyector (en la
-      transmisión no se aplican).
+- [ ] **Menú «Transmisión» y estilos propios para OBS** (28/10/2026; hay
+      compilación, pruebas y dibujos a imagen de las placas, pero no se abrió
+      desde acá). Plan en [plan-obs-estilos.md](plan-obs-estilos.md). Probalo con
+      OBS abierto, en este orden:
+      1. **El menú.** Entre «Proyección» y «Ayuda» está **Transmisión**, con
+         «Salida para OBS o vMix…» y «Estilos de la transmisión…». La ventana
+         del celular ya no trae la caja de OBS: sólo dice que ahora está en el
+         menú Transmisión.
+      2. **Salida para OBS o vMix.** Abre con la dirección general y los
+         botones Copiar: Biblia / Canciones / Anuncios, igual que antes, más
+         «🎨 Editar los estilos…». Si el control del celular estaba apagado, se
+         prende solo. Pegá la dirección de Canciones en un Navegador de OBS
+         (1920 × 1080) arriba de la cámara.
+      3. **El estilo de cada capa.** Arriba de «Estilos de la transmisión…» hay
+         seis plantillas listas: tocá cada una y mirá que cambie la vista previa
+         sin mover la posición ni las mayúsculas; retocá algo (el tamaño) y la
+         plantilla deja de verse marcada; «Volver a los de fábrica» la marca de
+         nuevo como Moderna. Después elegí
+         Canciones, placa **Pestaña**, posición **Inferior**, y Guardar. Proyectá
+         una canción: la letra sale en mayúsculas dentro de una placa oscura con
+         una línea turquesa abajo y la pestañita «CORO» arriba. Al pasar de una
+         diapositiva a otra hay un fundido corto, y una estrofa larga se achica
+         sola en vez de salirse de la pantalla. En OBS cambia a lo sumo 0,3 s
+         después de guardar, sin tocar nada.
+      4. **Las ocho placas.** Probá cada una en la vista previa y en OBS: Ninguna,
+         Pestaña, Vidrio (se ve la cámara borrosa detrás), Sólida, Degradé,
+         Halo, Filete (línea fina que se desvanece) y Línea (vertical a la
+         izquierda). Probá también Superior y Centro, y el ancho y el margen.
+      5. **Biblia y Anuncios.** Proyectá un versículo: arriba de la placa va la
+         cita («JUAN 3:16 · RVR1909») y no aparece aparte. Con un texto rápido,
+         la placa de Anuncios sale en el centro. Con «Mostrar la etiqueta»
+         destildada no sale ni la cita ni «CORO».
+      6. **Fondo fijo.** En una capa elegí «Color» y después «Imagen o video…»
+         con un video: tiene que verse siempre mientras la página esté prendida,
+         moverse en bucle y sin sonido, y desaparecer con Black (F1), Clear (F2)
+         y Logo (F3). Un video grande no tiene que trabarse al pasar de una
+         diapositiva a otra.
+      7. **«Igual que en el proyector».** Tildala en una capa: esa capa vuelve a
+         verse como hasta ahora (con el tema de la diapositiva) y el resto de
+         los controles se apagan. «Volver a los de fábrica» sólo cambia la
+         pestaña abierta, y Cancelar no guarda nada.
+      8. **Si WebView2 no está**, la vista previa dice «No se pudo mostrar la
+         vista previa» y lo demás anda igual.
+- [x] **Biblia, canciones y anuncios en capas separadas para OBS.** Alexis lo
+      probó en OBS el 28/10/2026: llega bien. Ahora se le hace un editor de
+      estilos propio (el punto de arriba, «Menú Transmisión y estilos propios»).
 - [ ] **Teclas en los tooltips (diseño avanzado).** Pasá el mouse por Black,
       Clear, Logo, Sin fondo, Poner en vivo / Apagar salida y Proyectar ▶: el
       globito dice la tecla (F1, F2, F3, F4, Esc, Ctrl+Enter) aunque estés en
@@ -273,7 +303,8 @@ nuevo (con otro paquete o con otra versión), después de `dotnet publish`:
       nuevo, capturas y un video de 40 segundos; el flujo `pages` la vuelve a
       publicar con cada cambio en `sitio/` y después de cada versión.** Falta también la captura de «Ejecutar
       de todas formas» del aviso de Windows (hoy la página explica ese paso sin
-      imagen). Después: un video de
+      imagen); es sólo para la página, no tiene que ver con la firma (para la
+      firma lo que falta es visibilidad). Después: un video de
       demostración, contarlo en comunidades de iglesias y que otras iglesias lo
       usen y lo marquen con estrella. Volver a pedir la firma a SignPath cuando
       haya señales.
@@ -304,6 +335,43 @@ no escribirle antes de esa fecha.
 
 ## 3. Para hacer después de la 1.0
 
+- [ ] **Proyectar sólo para la transmisión, sin pantalla** (28/10/2026, lo
+      primero). Le pasó a Alexis el fin de semana del 24-25/10: se rompió el
+      proyector, quería que la transmisión mostrara la Biblia y las letras, pero
+      con una sola pantalla «Poner en vivo» abrió la salida encima del programa
+      y tapó todo. Hace falta una forma de salir al aire **sólo para OBS**: por
+      ejemplo, en la lista de pantallas una opción «Sólo transmisión (sin
+      pantalla)», o que con una sola pantalla «Poner en vivo» pregunte. Así no
+      se abre ninguna ventana de salida, pero el programa funciona como si
+      estuviera proyectando: las páginas de `/salida` muestran lo que está al
+      aire, el LIVE del programa también, y Black, Clear y Logo andan igual. El
+      escenario y el celular siguen como siempre. Avisar claro en la barra de
+      abajo que se está «en vivo sólo en la transmisión».
+- [ ] **Importar canciones de EasyWorship** (28/10/2026). Muchas iglesias
+      vienen de ahí. EasyWorship 6 y 7 guardan las canciones en bases SQLite
+      (`Songs.db` y `SongWords.db`, con la letra en RTF) dentro de su carpeta
+      de datos; la 2009 usa bases Paradox. Empezar por la 6/7. OpenLP tiene un
+      importador para mirar cómo lo resuelve. Si Alexis tiene una base de
+      EasyWorship de alguien, sirve para probar.
+- [ ] **Botón «Donar» con PayPal** (28/10/2026), en la página web y en el
+      programa (Ayuda → «Colaborar con EcclesiaCast» y en «Acerca de»; reemplaza
+      la idea «Acerca de: una forma de colaborar»). Cuando se haga, darle a
+      Alexis el paso a paso para crear el enlace de PayPal (la cuenta la crea
+      él) y confirmar antes que desde Uruguay se puede retirar lo que llegue.
+- [ ] **Saber si alguien usa el programa** (28/10/2026, falta decidir cómo).
+      Lo respetuoso: al abrir por primera vez, preguntar «¿Nos dejás contar que
+      usás EcclesiaCast?» y, si dice que sí, mandar una vez por día sólo un número
+      al azar, la versión y el país, nada personal. Hay que anotarlo en
+      [privacidad.md](privacidad.md) y en la web. Sin preguntar, lo único que
+      hay son las descargas de GitHub.
+- [ ] **Que lo encuentren en Google, por partes** (28/10/2026). 1) Registrar
+      la página en Google Search Console y Bing Webmaster y mandar el sitemap
+      (con la cuenta de Alexis). 2) Un video en YouTube. 3) Páginas cortas para
+      lo que la gente busca («programa gratis para proyectar letras en la
+      iglesia», «alternativa gratis a ProPresenter / EasyWorship», «letra en
+      OBS»). 4) Contarlo en grupos de iglesias. 5) Ver si conviene un dominio
+      propio (unos 10–12 dólares por año).
+
 - [ ] **Más fondos y un botón «Agregar fondos»** (21/10/2026). Ya vienen 10
       fondos en video dentro del instalador (`installer\fondos`, dibujados por
       el generador de esa carpeta; pesan de 2 a 6 MB cada uno). Si se quieren
@@ -322,16 +390,30 @@ no escribirle antes de esa fecha.
         Uruguay, American Bible Society para la RVR1960, Biblica para la NVI,
         Tyndale para la NTV, Liga Bíblica para la PDT). Un mail explicando
         que es un programa libre y gratuito para iglesias.
-      - Un botón «Agregar Biblias» con un catálogo de Biblias libres de
-        varios idiomas (https://github.com/seven1m/open-bibles: en castellano
-        RV1909, Biblia en Español Sencillo, Palabra de Dios para ti, Versión
-        Biblia Libre).
+      - ~~Un botón «Agregar Biblias» con un catálogo de Biblias libres~~
+        (https://github.com/seven1m/open-bibles): Alexis (28/10/2026) dice que
+        nadie las quiere, las iglesias usan la RVR1960, la NVI y la NTV. En pausa.
+      - Cómo lo resuelven otros: G-Presenter trae sólo Biblias libres (KJV, ASV
+        y Tagalog) e importa Zefania, igual que nosotros. EasyWorship vende las
+        versiones con derechos porque les paga licencias a las editoriales. El
+        camino legal sigue siendo el permiso de cada editorial.
       - Una carpeta privada `biblias` junto al instalador, para las PCs de la
         iglesia.
 
 ## 4. Para versiones futuras
 
-- **Acerca de: una forma de colaborar.**
+- **Ideas tomadas de G-Presenter** (gpresenter.com, mirado el 28/10/2026;
+  Alexis dijo que sí a las seis, para más adelante):
+  1. **Cámara o capturadora como diapositiva**, o de fondo detrás de la letra
+     o de la cuenta regresiva (sin sonido hasta que el operador lo prenda).
+  2. **Mensajes al escenario** que escribe el operador en el momento
+     («Próxima canción», «Oración»), aparte de las notas.
+  3. **Cualquier pantalla extra desde un navegador**: una TV o tablet de la
+     red local abre una dirección y muestra lo mismo que el proyector, sin
+     cables. Las páginas de `/salida` ya son media parte.
+  4. **Agrandar o achicar la interfaz**, para notebooks de pantalla chica.
+  5. **Exportar canciones a .txt** (hoy sólo se importan).
+  6. **Otros idiomas** de la interfaz; el primero sería el portugués (Brasil).
 - **La Biblia y las canciones como texto sin formato para OBS** (lo pidió
   Alexis el 20/10/2026; quedó en pausa para verlo bien después). Quiere que el
   versículo y la letra que se están proyectando lleguen a OBS como texto plano,

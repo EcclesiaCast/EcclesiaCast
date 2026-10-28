@@ -39,6 +39,31 @@ public sealed partial class MainViewModel
     private bool _isRemoteRunning;
 
     /// <summary>
+    /// «Transmisión → Salida para OBS o vMix…»: the addresses of the stream's
+    /// layers. Turns the server on if it was off and leaves it on, since a
+    /// Browser Source in OBS is useless with nobody listening.
+    /// </summary>
+    [RelayCommand]
+    private void OpenBroadcast()
+    {
+        if (!StartRemote())
+        {
+            MessageBox.Show(
+                "No se pudo abrir ningún puerto para la salida de OBS. "
+                + "Puede que otro programa los esté usando.",
+                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        new Views.BroadcastWindow(_remote!, _settings) { Owner = Application.Current.MainWindow }.ShowDialog();
+    }
+
+    /// <summary>«Transmisión → Estilos de la transmisión…».</summary>
+    [RelayCommand]
+    private void OpenBroadcastStyles() =>
+        new Views.BroadcastStyleWindow(_settings) { Owner = Application.Current.MainWindow }.ShowDialog();
+
+    /// <summary>
     /// Starts listening. Left on between sessions on purpose: whoever set the
     /// phone up on Sunday shouldn't have to do it again next Sunday.
     /// </summary>
@@ -220,6 +245,7 @@ public sealed partial class MainViewModel
         // with everything keeps showing what it always did.
         var belongs = channel == OutputChannel.All || OutputChannels.Shows(channel, OnAir);
         var overlays = OutputChannels.ShowsOverlays(channel);
+        var style = StyleOf(channel);
 
         return new RemoteOutput(
             ShowText: belongs && IsProjecting && _presentation.State == OutputState.Content && slide is not null,
@@ -242,7 +268,15 @@ public sealed partial class MainViewModel
             AlignV: (over?.AlignV ?? theme.AlignV).ToString().ToLowerInvariant(),
             MainMarks: Marks(_presentation.Highlight.Resolve(slide?.MainText)),
             SecondaryMarks: Marks(_presentation.Highlight.Resolve(slide?.SecondaryText, includeSpans: false)),
-            Media: channel == OutputChannel.Announcements ? OnAirMedia() : null);
+            Media: channel == OutputChannel.Announcements ? OnAirMedia() : null,
+            Style: style is { FollowProjector: false } ? style with { BackgroundFile = Path.GetFileName(style.BackgroundFile) } : null,
+            Blank: _presentation.State != OutputState.Content,
+            Label: OnAir switch
+            {
+                OnAirSource.Song => (Projection.SlideLabel ?? string.Empty).ToUpperInvariant(),
+                OnAirSource.Bible => slide?.Caption ?? string.Empty,
+                _ => string.Empty,
+            });
 
         static IReadOnlyList<int[]> Marks(IReadOnlyList<TextSpan> spans) =>
             spans.Select(s => new[] { s.Start, s.Length }).ToList();
@@ -272,6 +306,38 @@ public sealed partial class MainViewModel
                 _ => "cover",
             },
             Loop: media.Type == MediaType.Video && media.EndBehavior == VideoEndBehavior.Loop);
+    }
+
+    /// <summary>
+    /// The design a layer of the stream is drawn with. The page with everything
+    /// takes the one of whatever is on air (the Bible, a song, or the rest).
+    /// </summary>
+    private BroadcastStyle StyleOf(OutputChannel channel)
+    {
+        if (channel == OutputChannel.All)
+        {
+            channel = OnAir switch
+            {
+                OnAirSource.Bible => OutputChannel.Bible,
+                OnAirSource.Song => OutputChannel.Songs,
+                _ => OutputChannel.Announcements,
+            };
+        }
+
+        return BroadcastStyleSettings.Current.For(channel);
+    }
+
+    string? IRemoteHost.GetBackgroundFile(OutputChannel channel)
+    {
+        var style = StyleOf(channel);
+        var path = style.BackgroundFile;
+        return !style.FollowProjector
+               && style.Background == BroadcastBackground.File
+               && !string.IsNullOrWhiteSpace(path)
+               && StreamableExtensions.Contains(Path.GetExtension(path))
+               && File.Exists(path)
+            ? path
+            : null;
     }
 
     /// <summary>The kinds of file the stream page may be handed: what a browser plays.</summary>

@@ -276,6 +276,13 @@
                 <MenuItem Header="Actualizar la lista de pantallas" Command="{Binding RefreshDisplaysCommand}"/>
             </MenuItem>
 
+            <MenuItem Header="_Transmisión">
+                <MenuItem Header="Salida para OBS o vMix…" Command="{Binding OpenBroadcastCommand}"
+                          ToolTip="Las direcciones para pegar en OBS o vMix: la Biblia, las canciones y los anuncios, cada uno en su capa."/>
+                <MenuItem Header="Estilos de la transmisión…" Command="{Binding OpenBroadcastStylesCommand}"
+                          ToolTip="El diseño de cada capa de la transmisión: dónde va la letra, la placa, los colores y el fondo."/>
+            </MenuItem>
+
             <MenuItem Header="A_yuda">
                 <MenuItem Header="Guía de uso (en internet)" Click="Guide_Click"/>
                 <Separator/>
