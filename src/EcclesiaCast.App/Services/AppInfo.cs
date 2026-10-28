@@ -10,4 +10,13 @@ public static class AppInfo
         typeof(AppInfo).Assembly
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
             ?.InformationalVersion.Split('+')[0] ?? "?";
+
+    /// <summary>
+    /// The page where people can chip in (the PayPal link). Empty until Alexis
+    /// creates it: while it is empty the «Colaborar» entries stay hidden, so
+    /// there is never a button that leads nowhere.
+    /// </summary>
+    public const string DonateUrl = "";
+
+    public static bool HasDonateUrl => DonateUrl.StartsWith("https://", StringComparison.Ordinal);
 }

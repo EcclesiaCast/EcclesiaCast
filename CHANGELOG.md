@@ -7,6 +7,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Lugar para colaborar.** Ayuda → «Colaborar con EcclesiaCast…» y una línea
+  en «Acerca de» abren la página donde se puede ayudar a que el programa siga.
+  Quedan ocultos hasta que se cargue el enlace, así no hay un botón vacío.
 - **Etiqueta de los versículos en la transmisión: tamaño y lugar.** En
   **Transmisión → Estilos de la transmisión…**, cada capa tiene un deslizador
   **Etiqueta** (de 50 a 300 %, 100 es el tamaño de siempre) y dónde va:

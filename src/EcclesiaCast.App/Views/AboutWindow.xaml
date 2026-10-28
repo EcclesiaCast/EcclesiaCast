@@ -45,6 +45,11 @@
                        RequestNavigate="Link_Navigate" Foreground="{StaticResource AccentBrush}">github.com/EcclesiaCast</Hyperlink>
         </TextBlock>
 
+        <TextBlock x:Name="DonateLine" Visibility="Collapsed" FontSize="12" Foreground="{StaticResource FaintBrush}" Margin="0,6,0,0">
+            <Run Text="Si te sirve y querés ayudar a que siga:  "/>
+            <Hyperlink x:Name="DonateLink" RequestNavigate="Link_Navigate" Foreground="{StaticResource AccentBrush}">colaborar con EcclesiaCast</Hyperlink>
+        </TextBlock>
+
         <Button x:Name="CloseButton" Content="Cerrar" Style="{StaticResource AccentButton}" IsDefault="True" IsCancel="True"
                 HorizontalAlignment="Right" Padding="22,8" Margin="0,18,0,0"/>
     </StackPanel>
