@@ -427,7 +427,7 @@
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="Salida:" Foreground="{StaticResource MutedBrush}"
                                FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                    <ComboBox Width="220"
+                    <ComboBox Width="260"
                               ItemsSource="{Binding Displays}"
                               SelectedItem="{Binding SelectedDisplay}"
                               DisplayMemberPath="Label"
@@ -447,12 +447,22 @@
                                 <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
                                 <Setter Property="BorderThickness" Value="0"/>
                                 <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsBroadcastOnly}" Value="True">
+                                        <Setter Property="Content" Value="📡  Salir al aire en la transmisión"/>
+                                    </DataTrigger>
                                     <DataTrigger Binding="{Binding IsProjecting}" Value="True">
                                         <Setter Property="Content" Value="Apagar salida"/>
                                         <Setter Property="controls:ShortcutHint.Text" Value="Esc"/>
                                         <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
                                         <Setter Property="BorderThickness" Value="1"/>
                                     </DataTrigger>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding IsBroadcastOnly}" Value="True"/>
+                                            <Condition Binding="{Binding IsProjecting}" Value="True"/>
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Content" Value="Apagar la transmisión"/>
+                                    </MultiDataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </Button.Style>
@@ -2453,10 +2463,19 @@
         <!-- Un error (por ejemplo una imagen de Google que no se pudo bajar) la hace
              parpadear en rojo unos segundos: ver FlashStatusBar -->
         <Border x:Name="StatusBorder" Grid.Row="3" Background="Transparent" CornerRadius="4" Margin="8,2,8,4">
-            <TextBlock x:Name="StatusLine"
-                       Text="{Binding StatusText}"
-                       FontSize="12" Foreground="{StaticResource MutedBrush}"
-                       Margin="6,6,6,8" TextWrapping="Wrap"/>
+            <DockPanel>
+                <!-- Sin ventana de salida: lo único que está en vivo es la transmisión -->
+                <Border DockPanel.Dock="Left" Background="{StaticResource LiveBrush}" CornerRadius="3"
+                        Margin="6,6,4,6" Padding="8,2" VerticalAlignment="Center"
+                        Visibility="{Binding IsBroadcastOnlyLive, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="📡 EN VIVO SÓLO EN LA TRANSMISIÓN · sin ventana de salida"
+                               FontSize="12" FontWeight="SemiBold" Foreground="White"/>
+                </Border>
+                <TextBlock x:Name="StatusLine"
+                           Text="{Binding StatusText}"
+                           FontSize="12" Foreground="{StaticResource MutedBrush}"
+                           Margin="6,6,6,8" TextWrapping="Wrap"/>
+            </DockPanel>
         </Border>
     </Grid>
 </Window>

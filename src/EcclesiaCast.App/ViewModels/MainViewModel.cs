@@ -25,7 +25,11 @@ using Serilog;
 namespace EcclesiaCast.App.ViewModels;
 
 /// <summary>A display plus the label shown to the operator.</summary>
-public sealed record DisplayOption(DisplayInfo Info, string Label);
+public sealed record DisplayOption(DisplayInfo Info, string Label)
+{
+    /// <summary>The «only the stream» entry: going live with it opens no output window.</summary>
+    public bool BroadcastOnly => BroadcastOnlyOutput.IsBroadcastOnly(Info);
+}
 
 public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 {
@@ -117,8 +121,14 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     public ObservableCollection<SlideItemViewModel> Slides { get; } = [];
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(OutputAspectRatio))]
+    [NotifyPropertyChangedFor(nameof(OutputAspectRatio), nameof(IsBroadcastOnly), nameof(IsBroadcastOnlyLive))]
     private DisplayOption? _selectedDisplay;
+
+    /// <summary>The output is set to «only the stream»: no window opens, the pages for OBS carry the words.</summary>
+    public bool IsBroadcastOnly => SelectedDisplay?.BroadcastOnly == true;
+
+    /// <summary>Live with no output window: what the status bar says in red.</summary>
+    public bool IsBroadcastOnlyLive => IsProjecting && IsBroadcastOnly;
 
     /// <summary>Width over height of the output screen: LIVE and PREVIEW are drawn at this proportion.</summary>
     public double OutputAspectRatio => SelectedDisplay is { Info: var info }
@@ -141,7 +151,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ShowGridLiveBadge), nameof(ShowOtherLive))]
+    [NotifyPropertyChangedFor(nameof(ShowGridLiveBadge), nameof(ShowOtherLive), nameof(IsBroadcastOnlyLive))]
     private bool _isProjecting;
 
     [ObservableProperty]
@@ -388,7 +398,14 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
         _presentation.Changed += (_, _) => UpdateStateFlags();
         _playbackTimer.Tick += OnPlaybackTick;
-        _projection.VisibilityChanged += (_, _) => IsProjecting = _projection.IsOutputVisible;
+        // With «only the stream» there is no window to follow: going live is
+        // the program's own state, and a window closing as the choice changes
+        // must not switch it off.
+        _projection.VisibilityChanged += (_, _) =>
+        {
+            if (!IsBroadcastOnly)
+                IsProjecting = _projection.IsOutputVisible;
+        };
         _projection.VideoEnded += (_, _) => OnProjectedVideoEnded();
         _stage.VisibilityChanged += (_, _) => IsStageVisible = _stage.IsVisible;
         LoadStageLayouts();
