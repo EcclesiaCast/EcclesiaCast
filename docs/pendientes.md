@@ -335,6 +335,18 @@ no escribirle antes de esa fecha.
 
 ## 3. Para hacer después de la 1.0
 
+- [ ] **Proyectar sólo para la transmisión, sin pantalla** (28/10/2026, lo
+      primero). Le pasó a Alexis el fin de semana del 24-25/10: se rompió el
+      proyector, quería que la transmisión mostrara la Biblia y las letras, pero
+      con una sola pantalla «Poner en vivo» abrió la salida encima del programa
+      y tapó todo. Hace falta una forma de salir al aire **sólo para OBS**: por
+      ejemplo, en la lista de pantallas una opción «Sólo transmisión (sin
+      pantalla)», o que con una sola pantalla «Poner en vivo» pregunte. Así no
+      se abre ninguna ventana de salida, pero el programa funciona como si
+      estuviera proyectando: las páginas de `/salida` muestran lo que está al
+      aire, el LIVE del programa también, y Black, Clear y Logo andan igual. El
+      escenario y el celular siguen como siempre. Avisar claro en la barra de
+      abajo que se está «en vivo sólo en la transmisión».
 - [ ] **Importar canciones de EasyWorship** (28/10/2026). Muchas iglesias
       vienen de ahí. EasyWorship 6 y 7 guardan las canciones en bases SQLite
       (`Songs.db` y `SongWords.db`, con la letra en RTF) dentro de su carpeta
