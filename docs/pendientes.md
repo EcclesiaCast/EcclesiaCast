@@ -436,7 +436,11 @@ no escribirle antes de esa fecha.
       el catálogo de Biblias libres de abajo, así que conviene hacer los dos
       juntos. Fotos o videos de Pexels o Pixabay **no**: sus licencias no dejan
       repartirlos dentro de otro programa.
-**Hecho el 28/10/2026:** el programa ya abre un paquete .zip de fondos      (Archivo → Agregar paquete de fondos). **Falta:** armar el paquete con más      fondos propios (con el generador de `installerondos`), subirlo como      archivo de un *release* de GitHub (decidido: ahí se aloja) y el botón que      lo baje solo; subir un release es algo que Alexis tiene que aprobar.
+      **Hecho el 28/10/2026:** el programa ya abre un paquete .zip de fondos
+      (Archivo → Agregar paquete de fondos). **Falta:** armar el paquete con más
+      fondos propios (con el generador de `installer\fondos`), subirlo como
+      archivo de un *release* de GitHub (decidido: ahí se aloja) y el botón que
+      lo baje solo; subir un release es algo que Alexis tiene que aprobar.
 
 - [ ] **Biblias: cómo distribuirlas, al menos en Uruguay.** Lo averiguado el
       7/10/2026: las versiones con derechos (RVR1960, NVI, NTV, TLA, y
