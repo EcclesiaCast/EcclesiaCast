@@ -109,6 +109,9 @@ public partial class BroadcastStyleWindow : Window
         WidthSlider.Value = s.WidthPercent;
         MarginSlider.Value = s.MarginPercent;
         LabelCheck.IsChecked = s.ShowLabel;
+        LabelSizeSlider.Value = s.LabelSize;
+        Pick(s.LabelAlign.ToString(), LabLeft, LabCenter, LabRight);
+        Pick(s.LabelBelow ? "Below" : "Above", LabAbove, LabBelow);
 
         _loading = false;
         Refresh();
@@ -141,6 +144,9 @@ public partial class BroadcastStyleWindow : Window
         WidthPercent = (int)WidthSlider.Value,
         MarginPercent = (int)MarginSlider.Value,
         ShowLabel = LabelCheck.IsChecked == true,
+        LabelSize = (int)LabelSizeSlider.Value,
+        LabelAlign = Chosen(Current.LabelAlign, LabLeft, LabCenter, LabRight),
+        LabelBelow = LabBelow.IsChecked == true,
     };
 
     private void Control_Changed(object sender, RoutedEventArgs e)
@@ -183,6 +189,7 @@ public partial class BroadcastStyleWindow : Window
         OpacityText.Text = s.PlateOpacity + " %";
         WidthText.Text = s.WidthPercent + " %";
         MarginText.Text = s.MarginPercent + " %";
+        LabelSizeText.Text = s.LabelSize + " %";
 
         Controls.IsEnabled = !s.FollowProjector;
         Controls.Opacity = s.FollowProjector ? 0.4 : 1;

@@ -8,6 +8,9 @@ namespace EcclesiaCast.Core.Remote;
 /// <summary>Where the words sit on a layer of the stream.</summary>
 public enum BroadcastPosition { Top, Center, Bottom }
 
+/// <summary>Where the label sits along the plate.</summary>
+public enum BroadcastLabelAlign { Left, Center, Right }
+
 /// <summary>The plate drawn behind (or around) the words of a layer of the stream.</summary>
 public enum BroadcastPlate { None, Tab, Glass, Solid, Gradient, Halo, Fillet, Line }
 
@@ -53,6 +56,15 @@ public sealed record BroadcastStyle
     /// <summary>The small label over the plate: the part of a song («CORO») or the reference of a verse.</summary>
     public bool ShowLabel { get; init; } = true;
 
+    /// <summary>Size of the label as a percentage of its usual size (100 is the usual one).</summary>
+    public int LabelSize { get; init; } = 100;
+
+    /// <summary>Which side of the plate the label sits on.</summary>
+    public BroadcastLabelAlign LabelAlign { get; init; } = BroadcastLabelAlign.Center;
+
+    /// <summary>True to put the label under the plate instead of over it.</summary>
+    public bool LabelBelow { get; init; }
+
     /// <summary>The widest the plate may get, as a percentage of the screen.</summary>
     public int WidthPercent { get; init; } = 70;
 
@@ -71,6 +83,8 @@ public sealed record BroadcastStyle
     public const int MinWidthPercent = 30;
     public const int MaxWidthPercent = 100;
     public const int MaxMarginPercent = 15;
+    public const int MinLabelSize = 50;
+    public const int MaxLabelSize = 300;
 
     private static readonly JsonSerializerOptions Options = new()
     {
@@ -92,6 +106,8 @@ public sealed record BroadcastStyle
         Position = Enum.IsDefined(Position) ? Position : BroadcastPosition.Bottom,
         Plate = Enum.IsDefined(Plate) ? Plate : BroadcastPlate.Tab,
         Background = Enum.IsDefined(Background) ? Background : BroadcastBackground.None,
+        LabelAlign = Enum.IsDefined(LabelAlign) ? LabelAlign : BroadcastLabelAlign.Center,
+        LabelSize = Math.Clamp(LabelSize, MinLabelSize, MaxLabelSize),
         AccentColor = Color(AccentColor, DefaultAccentColor),
         PlateColor = Color(PlateColor, DefaultPlateColor),
         TextColor = Color(TextColor, "#FFFFFF"),
@@ -154,6 +170,9 @@ public sealed record BroadcastStyle
         "bold" => IsBool(value) ? style with { Bold = value.GetBoolean() } : style,
         "uppercase" => IsBool(value) ? style with { Uppercase = value.GetBoolean() } : style,
         "showlabel" => IsBool(value) ? style with { ShowLabel = value.GetBoolean() } : style,
+        "labelbelow" => IsBool(value) ? style with { LabelBelow = value.GetBoolean() } : style,
+        "labelalign" => Enum.TryParse<BroadcastLabelAlign>(Text(value), true, out var la) ? style with { LabelAlign = la } : style,
+        "labelsize" => value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var ls) ? style with { LabelSize = ls } : style,
         _ => style,
     };
 
