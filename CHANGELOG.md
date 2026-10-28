@@ -18,7 +18,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   fondo fijo de color, imagen o video. Tiene vista previa sobre una cámara de
   ejemplo y la opción «Igual que en el proyector» para que la capa se comporte
   como hasta ahora. El texto cambia con un fundido corto y se achica solo si no
-  entra.
+  entra. Arriba del editor hay seis **plantillas listas** (Moderna, Vidrio,
+  Clásica, Minimalista, Noticiero y Elegante) que cambian la placa, los colores y
+  la letra de un clic, y **Volver a los de fábrica** deja la capa como venía.
 
 ## [1.0.1] - 2026-10-21
 

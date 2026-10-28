@@ -90,6 +90,12 @@
                               ToolTip="Esta capa usa el diseño de la diapositiva, como antes. Apaga todo lo demás."
                               Checked="Control_Changed" Unchecked="Control_Changed"/>
 
+                    <!-- Plantillas listas: un clic y después se retoca abajo -->
+                    <TextBlock Style="{StaticResource Section}" Text="Plantillas listas" Margin="0,10,0,2"/>
+                    <TextBlock Style="{StaticResource FieldLabel}" TextWrapping="Wrap" Margin="0,0,0,6"
+                               Text="Un clic cambia la placa, los colores y la letra. La posición, las mayúsculas y el fondo quedan como están."/>
+                    <UniformGrid x:Name="PresetPanel" Columns="3"/>
+
                     <StackPanel x:Name="Controls">
                         <TextBlock Style="{StaticResource Section}" Text="1 · Posición" Margin="0,10,0,6"/>
                         <StackPanel Orientation="Horizontal">

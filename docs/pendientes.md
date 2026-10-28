@@ -82,7 +82,11 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
          «🎨 Editar los estilos…». Si el control del celular estaba apagado, se
          prende solo. Pegá la dirección de Canciones en un Navegador de OBS
          (1920 × 1080) arriba de la cámara.
-      3. **El estilo de cada capa.** En «Estilos de la transmisión…» elegí
+      3. **El estilo de cada capa.** Arriba de «Estilos de la transmisión…» hay
+         seis plantillas listas: tocá cada una y mirá que cambie la vista previa
+         sin mover la posición ni las mayúsculas; retocá algo (el tamaño) y la
+         plantilla deja de verse marcada; «Volver a los de fábrica» la marca de
+         nuevo como Moderna. Después elegí
          Canciones, placa **Pestaña**, posición **Inferior**, y Guardar. Proyectá
          una canción: la letra sale en mayúsculas dentro de una placa oscura con
          una línea turquesa abajo y la pestañita «CORO» arriba. Al pasar de una

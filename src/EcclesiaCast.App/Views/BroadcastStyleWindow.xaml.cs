@@ -60,6 +60,21 @@ public partial class BroadcastStyleWindow : Window
             .OrderBy(name => name)
             .ToList();
 
+        foreach (var preset in BroadcastPresets.All)
+        {
+            var button = new RadioButton
+            {
+                Content = preset.Name,
+                ToolTip = preset.Description,
+                Tag = preset,
+                GroupName = "Preset",
+                Style = (Style)FindResource("Choice"),
+            };
+            // Click, not Checked: clicking the look already chosen puts it back after a touch-up.
+            button.Click += Preset_Click;
+            PresetPanel.Children.Add(button);
+        }
+
         Loaded += async (_, _) => await StartPreviewAsync();
         Closed += (_, _) => _web?.Dispose();
 
@@ -180,6 +195,10 @@ public partial class BroadcastStyleWindow : Window
         SetSwatch(PlateButton, s.PlateColor);
         SetSwatch(BgColorButton, s.BackgroundColor);
 
+        // The look the layer wears is marked; none is once it has been touched up.
+        foreach (var button in PresetPanel.Children.OfType<RadioButton>())
+            button.IsChecked = button.Tag is BroadcastPreset preset && preset.Matches(s);
+
         PushPreview();
     }
 
@@ -252,6 +271,15 @@ public partial class BroadcastStyleWindow : Window
 
         _draft = _draft.With(_channel, Current with { BackgroundFile = dialog.FileName, Background = BroadcastBackground.File });
         return true;
+    }
+
+    private void Preset_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not FrameworkElement { Tag: BroadcastPreset preset })
+            return;
+
+        _draft = _draft.With(_channel, preset.ApplyTo(Current));
+        Fill();
     }
 
     private void Defaults_Click(object sender, RoutedEventArgs e)
