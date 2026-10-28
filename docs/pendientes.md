@@ -225,31 +225,6 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       el momento en que vuelve a empezar, a los 20 segundos). Mirá también que no
       tironeen en la PC del proyector. Quitá uno de la biblioteca, cerrá y abrí:
       no vuelve. Instalando sin la casilla, la pestaña no aparece.
-- [ ] **Salir al aire sólo en la transmisión, sin ventana de salida**
-      (28/10/2026; hay pruebas de la lista de pantallas, no se abrió el programa).
-      Probalo con OBS abierto y, si podés, con el proyector prendido:
-      1. En **Salida:** (arriba a la derecha) la lista tiene una opción nueva al
-         final, **📡 Sólo la transmisión (sin ventana)**. Elegila: el botón pasa a
-         decir «📡 Salir al aire en la transmisión».
-      2. Poné en vivo una canción o un versículo (o apretá el botón). **No tiene
-         que abrirse ninguna ventana** en ninguna pantalla. En la barra de abajo
-         tiene que aparecer, en rojo, «📡 EN VIVO SÓLO EN LA TRANSMISIÓN · sin
-         ventana de salida», y el botón pasa a «Apagar la transmisión».
-      3. En OBS, las páginas de `/salida` (la general, Biblia, canciones y
-         anuncios) tienen que mostrar la letra y el versículo. Probá también
-         **Black (F1)**, **Clear (F2)** y **Logo (F3)**: la transmisión se queda sin
-         letra, como cuando proyectás. El LIVE del programa, el escenario y el
-         celular tienen que andar igual.
-      4. Con la ventana ya abierta en el proyector y en vivo, cambiá la lista a
-         «Sólo la transmisión»: la ventana tiene que bajar y la transmisión
-         seguir. Al volver a elegir la pantalla, la ventana vuelve a abrirse ahí.
-      5. **Esc** o «Apagar la transmisión» apaga todo y la barra dice
-         «Transmisión apagada». Cerrá y abrí el programa: tiene que volver a la
-         pantalla de siempre, **no** a «Sólo la transmisión» (no se recuerda a
-         propósito, para no quedarte sin proyector un domingo).
-      6. Lo que no anda en este modo: un **video de fondo** o una página web
-         proyectada se mueven sólo en la ventana de salida; la página de anuncios
-         de la transmisión sí reproduce los videos de la biblioteca por su cuenta.
 - [ ] **Etiqueta de los versículos en la transmisión** (28/10/2026; hay pruebas
       de lo que se guarda, no se vio dibujada). **Transmisión → Estilos de la
       transmisión…**, capa Biblia (y las otras): bajo «Mostrar la etiqueta» hay un
