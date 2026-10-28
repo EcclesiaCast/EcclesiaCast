@@ -409,9 +409,14 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _projection.VideoEnded += (_, _) => OnProjectedVideoEnded();
         _stage.VisibilityChanged += (_, _) => IsStageVisible = _stage.IsVisible;
         LoadStageLayouts();
+        LoadSongMaxLines();
         LoadLowPerformance();
         LoadMeetingSections();
-        Slides.CollectionChanged += (_, _) => HasSlides = Slides.Count > 0;
+        Slides.CollectionChanged += (_, _) =>
+        {
+            HasSlides = Slides.Count > 0;
+            IsSongOpen = Slides.Any(s => s.SectionId != 0);
+        };
         UpdateStateFlags();
         RefreshDisplays();
         LoadSongs();

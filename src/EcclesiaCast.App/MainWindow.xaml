@@ -1301,6 +1301,21 @@
                     <!-- Qué hay en la grilla y, si es otra cosa, qué está en pantalla -->
                     <DockPanel Grid.Row="0" Margin="12,8,12,8" LastChildFill="False"
                                Visibility="{Binding HasGridTitle, Converter={StaticResource BoolToVis}}">
+                        <!-- Sólo con una canción en la grilla: cuántas líneas lleva cada diapositiva -->
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0"
+                                    Visibility="{Binding IsSongOpen, Converter={StaticResource BoolToVis}}"
+                                    ToolTip="Cuántas líneas como máximo muestra cada diapositiva. Un párrafo largo se parte en varias; la canción guardada no cambia.">
+                            <TextBlock Text="Líneas por diapositiva:" FontSize="11" Foreground="{StaticResource MutedBrush}"
+                                       VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <ComboBox Width="68" FontSize="11" SelectedIndex="{Binding SongMaxLines}"
+                                      AutomationProperties.Name="Líneas por diapositiva">
+                                <ComboBoxItem Content="Todas"/>
+                                <ComboBoxItem Content="1"/>
+                                <ComboBoxItem Content="2"/>
+                                <ComboBoxItem Content="3"/>
+                                <ComboBoxItem Content="4"/>
+                            </ComboBox>
+                        </StackPanel>
                         <!-- Sólo con una presentación en la grilla -->
                         <Button DockPanel.Dock="Right" Content="➕ Playlist" FontSize="11" Padding="8,3" Margin="10,0,0,0"
                                 Style="{StaticResource DarkButton}"

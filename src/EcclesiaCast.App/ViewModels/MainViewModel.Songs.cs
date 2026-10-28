@@ -36,6 +36,51 @@ public sealed partial class MainViewModel
 
     // ── Canciones ────────────────────────────────────────────────
 
+    private const string SongMaxLinesKey = "songs.maxLinesPerSlide";
+
+    /// <summary>
+    /// The most lines a slide of a song shows (1 to 4; 0 is all of the block).
+    /// The song keeps its blocks whole: only the slides are cut, so the editor,
+    /// the stream and the stage all see the same pieces.
+    /// </summary>
+    [ObservableProperty]
+    private int _songMaxLines;
+
+    /// <summary>The grid holds a song: the only case where the lines-per-slide choice applies.</summary>
+    [ObservableProperty]
+    private bool _isSongOpen;
+
+    private void LoadSongMaxLines()
+    {
+        // The field, not the property: nothing is open yet to rebuild.
+        _songMaxLines = int.TryParse(_settings.Get(SongMaxLinesKey), out var lines)
+            ? Math.Clamp(lines, 0, SlideSplitter.MaxLinesLimit)
+            : 0;
+    }
+
+    partial void OnSongMaxLinesChanged(int value)
+    {
+        _settings.Set(SongMaxLinesKey, value.ToString());
+        if (SelectedSong is null || !IsSongOpen)
+            return;
+
+        // A song in the grid is cut again, keeping the playlist place and the live slide.
+        var wasOpening = _openingPlaylistItem;
+        _openingPlaylistItem = true;
+        try
+        {
+            RebuildSlidesPreservingLive(BuildSongSlides);
+        }
+        finally
+        {
+            _openingPlaylistItem = wasOpening;
+        }
+
+        StatusText = value == 0
+            ? "Las canciones se ven con todas sus líneas por diapositiva."
+            : $"Las canciones se parten en diapositivas de hasta {value} {(value == 1 ? "línea" : "líneas")}.";
+    }
+
     partial void OnSearchTextChanged(string value) => LoadSongs();
 
     partial void OnSelectedSongChanged(Song? value) => BuildSongSlides();
@@ -74,11 +119,14 @@ public sealed partial class MainViewModel
 
         foreach (var section in SelectedSong.Sections)
         {
-            Slides.Add(new SlideItemViewModel(
-                Slides.Count,
-                section.Label,
-                new SlideContent(section.Text, caption, Theme: theme, Override: section.GetOverride()),
-                sectionId: section.Id));
+            foreach (var piece in SlideSplitter.Split(section.Text, SongMaxLines))
+            {
+                Slides.Add(new SlideItemViewModel(
+                    Slides.Count,
+                    section.Label,
+                    new SlideContent(piece, caption, Theme: theme, Override: section.GetOverride()),
+                    sectionId: section.Id));
+            }
         }
 
         PreviewSlide = Slides.FirstOrDefault()?.Slide;
