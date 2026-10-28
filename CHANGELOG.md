@@ -7,6 +7,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Agregar paquete de fondos.** **Archivo → Agregar paquete de fondos (.zip)…**
+  abre un .zip con videos o imágenes y los deja en la pestaña «Fondos agregados»,
+  en bucle y sin sonido. Sirve para sumar fondos sin agrandar el instalador.
 - **Etiqueta de los versículos en la transmisión: tamaño y lugar.** En
   **Transmisión → Estilos de la transmisión…**, cada capa tiene un deslizador
   **Etiqueta** (de 50 a 300 %, 100 es el tamaño de siempre) y dónde va:

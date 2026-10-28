@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.Input;
 using System.IO;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Media;
@@ -89,6 +90,65 @@ public sealed partial class MainViewModel
         {
             Log.Warning(ex, "No se pudieron traer los fondos de ejemplo del instalador");
             return null;
+        }
+    }
+
+    /// <summary>Where the packs are unzipped: the library's own copy, like the sample backgrounds.</summary>
+    private static string PackBackgroundsFolder => Path.Combine(App.DataDir, "fondos-agregados");
+
+    /// <summary>
+    /// «Archivo → Agregar paquete de fondos…»: unzips a pack of backgrounds
+    /// into the library's own folder and brings each one into the «Fondos
+    /// agregados» tab, looping and silent, like the sample ones.
+    /// </summary>
+    [RelayCommand]
+    private async Task ImportBackgroundPack()
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = "Agregar paquete de fondos",
+            Filter = "Paquete de fondos (.zip)|*.zip",
+        };
+        if (dialog.ShowDialog() != true)
+            return;
+
+        try
+        {
+            StatusText = "Abriendo el paquete de fondos…";
+            var files = await Task.Run(() => BackgroundPack.Extract(dialog.FileName, PackBackgroundsFolder));
+            if (files.Count == 0)
+            {
+                StatusText = "El paquete no tiene videos ni imágenes para usar de fondo.";
+                return;
+            }
+
+            foreach (var file in files)
+            {
+                var type = MediaFiles.Classify(file) == MediaFileKind.Image ? MediaType.Image : MediaType.Video;
+                _media.Add(new MediaItem
+                {
+                    Name = Path.GetFileNameWithoutExtension(file),
+                    Path = file,
+                    Type = type,
+                    ThumbnailPath = MediaThumbnails.Create(file, type, videoEngine: null),
+                    Category = BackgroundPack.Tab,
+                    Behavior = MediaBehavior.Background,
+                    Scaling = MediaScaling.Fill,
+                    EndBehavior = VideoEndBehavior.Loop,
+                    Muted = true,
+                });
+            }
+
+            LoadMedia();
+            Log.Information("Paquete de fondos agregado: {Count}", files.Count);
+            StatusText = files.Count == 1
+                ? $"Se agregó un fondo en la pestaña «{BackgroundPack.Tab}»."
+                : $"Se agregaron {files.Count} fondos en la pestaña «{BackgroundPack.Tab}».";
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException)
+        {
+            Log.Warning(ex, "No se pudo agregar el paquete de fondos");
+            StatusText = "No se pudo abrir el paquete: tiene que ser un .zip de fondos.";
         }
     }
 }
