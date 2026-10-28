@@ -388,15 +388,40 @@ no escribirle antes de esa fecha.
       gratis; se entra con una cuenta, se registra la aplicación y dan una
       clave. Dicen que ofrece más de 1.400 versiones de la Biblia, con
       licencias de las editoriales ya resueltas («Fast-track Licensing»), pero
-      cada versión tiene sus reglas de atribución y de uso. **No se pudo leer**
-      sus términos (la página no se descarga sin navegador): hay que leer
-      `platform.youversion.com/terms` y ver si dejan **guardar el texto sin
-      internet**, **proyectarlo en una pantalla** y usarlo en un **programa
-      de escritorio** de una iglesia. Eso es lo que decide si sirve, porque el
-      programa funciona sin internet. Contacto: la página tiene «Support»
-      (`platform.youversion.com/support`) y «Partners» (`/partners`); el único
-      correo público que se vio es `press@youversion.com`, que es de prensa.
-      Primero usar «Support»; no escribirles hasta que Alexis lo apruebe.
+      cada versión tiene sus reglas de atribución y de uso. **Términos leídos
+      el 28/10/2026** (`platform.youversion.com/terms`, versión del 17/8/2026):
+      - Es gratis, pero hay que registrarse, aceptar los términos (mayor de 18
+        años; persona o entidad) y usar una **clave que no se puede compartir con
+        nadie**. Un programa libre en GitHub **no puede llevar una clave
+        adentro**: cada iglesia tendría que sacar la suya, o habría que pasar por
+        un servidor propio. Es el problema más grande.
+      - Hay que **dejar prendido el reporte de uso** que traen sus herramientas
+        (mandan datos de uso a YouVersion), o sea que necesita internet.
+      - Para las Biblias con derechos, YouVersion **pasa datos del desarrollador
+        a las editoriales** para que verifiquen que cumple su licencia.
+      - Dejan **distribuir la aplicación** a los usuarios. No dicen nada, en los
+        términos generales, de proyectar en pantalla ni de guardar el texto sin
+        internet: eso lo fijan los «términos de cada herramienta» (se ven al
+        registrarse) y las reglas de cada editorial. **Preguntarlo.**
+      - No dejan usar sus cosas para hacer un servicio que **compita** con
+        YouVersion, ni usar sus marcas. Pueden cortar el acceso con 30 días de
+        aviso, o al instante si creen que se incumplió.
+      - Los derechos de los textos bíblicos **no los dan ellos**: salen de las
+        editoriales («Fast-track Licensing» las tramita).
+      Versiones en la Aplicación de la Biblia (`bible.com`; **no es lo mismo que
+      lo que la Plataforma deja usar con una clave**, eso se ve registrándose):
+      **español 30** (RVR1960, RVR09, RVR95, RVC, RVA2015, NVI, NVIs, NBV,
+      NTV, TLA, TLAI, DHH94 y otras, LBLA, NBLA, PDT, TCB, VBL), **inglés 88**
+      (KJV, NIV, ESV, NKJV, NLT, NASB, AMP, MSG, CSB, NET y muchas más) y
+      **portugués 17** (ARA, ARC, A21, NAA, NVI, NVT, NTLH, NBV-P, TB y otras).
+      Conclusión provisoria: serviría, a lo sumo, como una fuente **opcional
+      con internet**, no como reemplazo de las Biblias del programa.
+      Contacto: la página tiene «Support»
+      (`platform.youversion.com/support`) y «Partners» (`/partners`); los
+      términos dan **`platform-support@youversion.com`** (avisos y consultas de
+      la plataforma) y **`help@youversion.com`** (comentarios y soporte); el
+      `press@youversion.com` es de prensa.
+      No escribirles hasta que Alexis lo apruebe.
       Borrador (en inglés, porque es a ellos):
       > Hello, I'm Alexis, a volunteer in a church in Uruguay. I'm building
       > EcclesiaCast, a free and open-source program (WPF/.NET 8, on GitHub:
