@@ -60,6 +60,26 @@ public static class EasyWorshipDatabase
             .ToList();
     }
 
+    /// <summary>How many songs a library holds, to list it before importing; 0 when it cannot be read.</summary>
+    public static int CountSongs(string songsPath)
+    {
+        try
+        {
+            using var connection = Open(songsPath);
+            var table = FindTable(connection, ["title"]);
+            if (table is null)
+                return 0;
+
+            using var command = connection.CreateCommand();
+            command.CommandText = $"SELECT COUNT(*) FROM {Quote(table)}";
+            return Convert.ToInt32(command.ExecuteScalar());
+        }
+        catch (Exception ex) when (ex is SqliteException or IOException or InvalidCastException)
+        {
+            return 0;
+        }
+    }
+
     /// <summary>Every song with words. Rows that cannot be read are counted in <paramref name="unreadable"/>.</summary>
     public static List<Song> ReadSongs(string songsPath, string wordsPath, out int unreadable)
     {

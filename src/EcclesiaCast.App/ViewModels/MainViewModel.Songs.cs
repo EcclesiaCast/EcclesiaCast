@@ -520,80 +520,21 @@ public sealed partial class MainViewModel
     }
 
     /// <summary>
-    /// Imports the library of EasyWorship 6 or 7: the operator picks its
-    /// <c>Songs.db</c> and the words (<c>SongWords.db</c>) are read from beside it.
+    /// Brings the libraries of EasyWorship over: the window looks where
+    /// EasyWorship keeps them, as it does for ProPresenter.
     /// </summary>
     [RelayCommand]
-    private void ImportEasyWorship()
+    private void ImportFromEasyWorship()
     {
-        // Where EasyWorship keeps its libraries (the newest first): the picker opens there.
-        var libraries = EasyWorshipDatabase.FindLibraries(
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), "Softouch"));
-        var dialog = new Microsoft.Win32.OpenFileDialog
+        var window = new Views.EasyWorshipImportWindow(_songSaver)
         {
-            Title = "Importar de EasyWorship: elegí el archivo Songs.db",
-            Filter = "Canciones de EasyWorship (Songs.db)|Songs.db",
-            InitialDirectory = libraries.FirstOrDefault() ?? string.Empty,
+            Owner = System.Windows.Application.Current.MainWindow,
         };
-        if (dialog.ShowDialog() != true)
+        if (window.ShowDialog() != true || window.Imported == 0)
             return;
-
-        var files = EasyWorshipDatabase.FindFiles(Path.GetDirectoryName(dialog.FileName) ?? string.Empty);
-        if (files is null)
-        {
-            ShowStatusError("No encontré SongWords.db al lado de Songs.db: tienen que estar en la misma carpeta.");
-            return;
-        }
-
-        List<Song> songs;
-        int unreadable;
-        try
-        {
-            songs = EasyWorshipDatabase.ReadSongs(files.Value.Songs, files.Value.Words, out unreadable);
-        }
-        catch (Exception ex) when (ex is InvalidDataException or Microsoft.Data.Sqlite.SqliteException or IOException)
-        {
-            Log.Error(ex, "No se pudo leer la base de EasyWorship {Path}", dialog.FileName);
-            ShowStatusError("No se pudo leer esa base de EasyWorship (ver el registro). ¿Está EasyWorship abierto?");
-            return;
-        }
-
-        if (songs.Count == 0)
-        {
-            StatusText = "La base de EasyWorship no tiene canciones con letra.";
-            return;
-        }
-
-        int imported = 0, replaced = 0, discarded = 0, failed = 0;
-        var session = _songSaver.Begin(several: songs.Count > 1);
-        foreach (var song in songs)
-        {
-            try
-            {
-                switch (session.Save(song).Result)
-                {
-                    case SongSaveResult.Replaced: replaced++; break;
-                    case SongSaveResult.Discarded: discarded++; break;
-                    default: imported++; break;
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Falló la importación de «{Title}» de EasyWorship", song.Title);
-                failed++;
-            }
-        }
 
         LoadSongs();
-
-        var parts = new List<string> { $"{imported} canciones importadas de EasyWorship" };
-        if (replaced > 0)
-            parts.Add($"{replaced} reemplazadas");
-        if (discarded > 0)
-            parts.Add($"{discarded} descartadas por repetidas");
-        if (unreadable + failed > 0)
-            parts.Add($"{unreadable + failed} con error (ver log)");
-        StatusText = string.Join(" · ", parts) + ".";
+        StatusText = window.Summary;
     }
 
     /// <summary>Reads a text file as UTF-8, falling back to Latin-1.</summary>

@@ -266,16 +266,16 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       siga con el párrafo entero; que cambiar el valor con una canción en vivo la
       vuelva a poner; que al cambiar de canción siga el mismo valor; que se
       recuerde al cerrar y abrir; y que en la transmisión y el escenario salgan
+- [ ] **Traer de EasyWorship** (28/10/2026). En el **➕** de Canciones: **Traer de
+      EasyWorship…** (o Archivo → Traer canciones de EasyWorship…). Tiene que
+      abrir una ventana como la de ProPresenter: «Encontré N canciones en 1
+      biblioteca de EasyWorship», con la carpeta `Easyworship v6.1` y su
+      cantidad. Importá con «Importar»: las canciones aparecen con sus
+      diapositivas separadas; si repetís, pregunta qué hacer. Probá también
+      «Elegir carpeta…» con una copia de `Databases\Data`. Se probó la lectura con
+      la biblioteca de 2 canciones de esta PC; falta una grande y EasyWorship 7 u
+      8 (en esta PC hay datos de una v8 sin canciones).
       las mismas partes. La etiqueta (Coro, Verso 1) se repite en cada parte.
-- [ ] **Importar de EasyWorship** (28/10/2026). **Archivo → Importar canciones de
-      EasyWorship…**: elegís `Songs.db` (`SongWords.db` tiene que estar al lado).
-      Se probó (28/10/2026) con la biblioteca de EasyWorship 6.1 que Alexis
-      instaló en esta PC, con 2 canciones: la lee bien, con las diapositivas
-      separadas. El selector se abre solo en la carpeta de EasyWorship. Falta
-      probarlo con una biblioteca grande y con EasyWorship 7 u 8 (en esta PC hay
-      también datos de una v8, pero sin canciones). Mirá que importe todas, con
-      título, autor y derechos, y que las repetidas pregunten como las demás.
-
 ## 2. Después de publicar la v1.0.0
 
 **La 1.0.0 salió el 21/10/2026** como versión estable, sin firma:

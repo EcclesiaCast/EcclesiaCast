@@ -184,3 +184,41 @@ public class EasyWorshipLibraryFinderTests : IDisposable
         Assert.Empty(EasyWorshipDatabase.FindLibraries(Path.Combine(_root, "no-existe")));
     }
 }
+
+public class EasyWorshipCountTests : IDisposable
+{
+    private readonly string _folder = Path.Combine(Path.GetTempPath(), "ecclesia-ewc-" + Guid.NewGuid().ToString("N"));
+
+    public EasyWorshipCountTests() => Directory.CreateDirectory(_folder);
+
+    public void Dispose()
+    {
+        SqliteConnection.ClearAllPools();
+        Directory.Delete(_folder, recursive: true);
+    }
+
+    [Fact]
+    public void Counts_the_songs_of_a_library()
+    {
+        var path = Path.Combine(_folder, "Songs.db");
+        using (var connection = new SqliteConnection($"Data Source={path};Pooling=False"))
+        {
+            connection.Open();
+            using var command = connection.CreateCommand();
+            command.CommandText = "CREATE TABLE song (title TEXT); INSERT INTO song VALUES ('Uno'), ('Dos'), ('Tres')";
+            command.ExecuteNonQuery();
+        }
+
+        Assert.Equal(3, EasyWorshipDatabase.CountSongs(path));
+    }
+
+    [Fact]
+    public void A_file_that_cannot_be_read_counts_zero()
+    {
+        var path = Path.Combine(_folder, "Songs.db");
+        File.WriteAllText(path, "esto no es una base");
+
+        Assert.Equal(0, EasyWorshipDatabase.CountSongs(path));
+        Assert.Equal(0, EasyWorshipDatabase.CountSongs(Path.Combine(_folder, "no-existe.db")));
+    }
+}

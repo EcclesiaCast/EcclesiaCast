@@ -426,6 +426,12 @@ public partial class MainWindow : Window
         });
         menu.Items.Add(new MenuItem
         {
+            Header = "Traer de EasyWorship…",
+            Command = vm.ImportFromEasyWorshipCommand,
+            ToolTip = "Busca solo dónde está instalado EasyWorship y trae sus bibliotecas enteras",
+        });
+        menu.Items.Add(new MenuItem
+        {
             Header = "Importar archivo (.txt, .pro)…",
             Command = vm.ImportSongsCommand,
             ToolTip = "Elegir archivos sueltos de texto o de ProPresenter",

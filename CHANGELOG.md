@@ -17,10 +17,13 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   párrafo más largo se parte en diapositivas de ese máximo (cinco líneas con 2
   quedan 2 + 2 + 1) sin cambiar la canción guardada: el editor sigue mostrando el
   párrafo entero. Se recuerda al cerrar el programa.
-- **Importar canciones de EasyWorship.** **Archivo → Importar canciones de
-  EasyWorship…** lee `Songs.db` y `SongWords.db` de EasyWorship 6 o 7 (sin
-  cambiarlos) y trae título, autor, derechos y las partes (Verse 1, Coro).
-  Se probó con una biblioteca real de EasyWorship 6.1 (el selector abre solo en la carpeta de EasyWorship, `PublicDocumentsSoftouch`).
+- **Traer canciones de EasyWorship.** En el menú del **➕** de Canciones, **Traer de
+  EasyWorship…** (también en Archivo) busca solo dónde está instalado EasyWorship
+  6 o 7, muestra sus bibliotecas con la cantidad de canciones, deja marcar cuáles
+  traer y pregunta lo de siempre si una canción ya está. «Elegir carpeta…» sirve
+  para una copia en otro lado. Trae título, autor, derechos y las diapositivas
+  como las separó EasyWorship, sin cambiar nada de su base. Se probó con una
+  biblioteca real de EasyWorship 6.1.
 - **Salir al aire sólo en la transmisión, sin ventana de salida.** La lista
   «Salida:» tiene una opción nueva, **📡 Sólo la transmisión (sin ventana)**. Con
   ella, «Poner en vivo» (y proyectar una canción, un versículo, Black, Clear o
