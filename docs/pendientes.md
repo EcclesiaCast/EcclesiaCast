@@ -428,12 +428,15 @@ no escribirle antes de esa fecha.
       > https://github.com/EcclesiaCast/EcclesiaCast) to project song lyrics and
       > Bible verses in church services and to feed a livestream (OBS). We'd
       > like to let churches use YouVersion Bibles inside it, especially
-      > Spanish versions such as RVR1960, NVI and NTV. Three questions:
+      > Spanish versions such as RVR1960, NVI and NTV. Five questions:
       > (1) Do the Platform terms allow a desktop app to show verses on a
       > projector or livestream? (2) May the verse text be cached on the
       > computer, since services often run without reliable internet? (3) Is
       > there a way for a free, non-profit app like ours to be approved as a
-      > partner, and what attribution do you require? Thank you very much.
+      > partner, and what attribution do you require? (4) Since the program is
+      > open source and installed on many computers, can one key be distributed
+      > with it, or must each church register its own? (5) What is the request
+      > rate limit per key? Thank you very much.
 - [ ] **Importar canciones de EasyWorship** (28/10/2026). Muchas iglesias
       vienen de ahí. EasyWorship 6 y 7 guardan las canciones en bases SQLite
       (`Songs.db` y `SongWords.db`, con la letra en RTF) dentro de su carpeta
