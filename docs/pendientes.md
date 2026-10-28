@@ -225,23 +225,6 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       el momento en que vuelve a empezar, a los 20 segundos). Mirá también que no
       tironeen en la PC del proyector. Quitá uno de la biblioteca, cerrá y abrí:
       no vuelve. Instalando sin la casilla, la pestaña no aparece.
-- [ ] **Etiqueta de los versículos en la transmisión** (28/10/2026; hay pruebas
-      de lo que se guarda, no se vio dibujada). **Transmisión → Estilos de la
-      transmisión…**, capa Biblia (y las otras): bajo «Mostrar la etiqueta» hay un
-      deslizador **Etiqueta** (50 a 300 %, 100 es el tamaño de siempre), tres
-      botones **Izquierda / Centro / Derecha** y **Arriba / Abajo de la letra**.
-      Mirá en la vista previa que «Juan 3:16 RVR 1960» cambie de tamaño y de
-      lugar con cada placa (Pestaña, Vidrio, Sólida, Línea…), que abajo de la
-      letra la pestaña quede pegada a la placa, y que en OBS se vea igual.
-- [ ] **Líneas por diapositiva en las canciones** (28/10/2026; hay pruebas de
-      cómo se parte, no se vio en el programa). Con una canción abierta, arriba
-      de la grilla aparece **Líneas por diapositiva: Todas / 1 / 2 / 3 / 4**.
-      Probalo con «Ardiendo en fuego»: con 2, el párrafo de cinco líneas queda en
-      tres diapositivas (2 + 2 + 1). Mirá que la canción, abierta en el editor,
-      siga con el párrafo entero; que cambiar el valor con una canción en vivo la
-      vuelva a poner; que al cambiar de canción siga el mismo valor; que se
-      recuerde al cerrar y abrir; y que en la transmisión y el escenario salgan
-      las mismas partes. La etiqueta (Coro, Verso 1) se repite en cada parte.
 - [ ] **Traer de otro programa (ProPresenter y EasyWorship)** (28/10/2026). En el
       **➕** de Canciones hay una sola entrada, **Traer de otro programa…** (y la
       misma en Archivo). La ventana tiene arriba dos botones, **ProPresenter** y
