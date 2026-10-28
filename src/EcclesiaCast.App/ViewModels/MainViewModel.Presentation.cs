@@ -306,7 +306,7 @@ public sealed partial class MainViewModel
         ApplyBackgroundCore(page);
         _livePageId = page.Id;
         UpdateOnAir();
-        _settings.Set(OutputDisplayKey, SelectedDisplay!.Info.DeviceName);
+        RememberOutputDisplay();
 
         LiveTitle = GridTitle;
         LiveSlideIndex = index;

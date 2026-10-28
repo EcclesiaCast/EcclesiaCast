@@ -170,7 +170,7 @@
 
             <MenuItem Header="_Archivo">
                 <MenuItem Header="Buscar canciones en internet…" Command="{Binding SearchSongsOnlineCommand}"/>
-                <MenuItem Header="Traer canciones de ProPresenter…" Command="{Binding ImportFromProPresenterCommand}"/>
+                <MenuItem Header="Traer canciones de otro programa…" Command="{Binding ImportFromOtherProgramCommand}"/>
                 <MenuItem Header="Importar canciones (.txt, .pro)…" Command="{Binding ImportSongsCommand}"/>
                 <MenuItem Header="Importar una Biblia (JSON o Zefania XML)…" Command="{Binding ImportBibleCommand}"/>
                 <MenuItem Header="Cómo preparar una Biblia para importar…" Command="{Binding ShowBibleFormatHelpCommand}"
@@ -434,7 +434,7 @@
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="Salida:" Foreground="{StaticResource MutedBrush}"
                                FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                    <ComboBox Width="220"
+                    <ComboBox Width="260"
                               ItemsSource="{Binding Displays}"
                               SelectedItem="{Binding SelectedDisplay}"
                               DisplayMemberPath="Label"
@@ -454,12 +454,22 @@
                                 <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
                                 <Setter Property="BorderThickness" Value="0"/>
                                 <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsBroadcastOnly}" Value="True">
+                                        <Setter Property="Content" Value="📡  Salir al aire en la transmisión"/>
+                                    </DataTrigger>
                                     <DataTrigger Binding="{Binding IsProjecting}" Value="True">
                                         <Setter Property="Content" Value="Apagar salida"/>
                                         <Setter Property="controls:ShortcutHint.Text" Value="Esc"/>
                                         <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
                                         <Setter Property="BorderThickness" Value="1"/>
                                     </DataTrigger>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding IsBroadcastOnly}" Value="True"/>
+                                            <Condition Binding="{Binding IsProjecting}" Value="True"/>
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Content" Value="Apagar la transmisión"/>
+                                    </MultiDataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </Button.Style>
@@ -1291,6 +1301,21 @@
                     <!-- Qué hay en la grilla y, si es otra cosa, qué está en pantalla -->
                     <DockPanel Grid.Row="0" Margin="12,8,12,8" LastChildFill="False"
                                Visibility="{Binding HasGridTitle, Converter={StaticResource BoolToVis}}">
+                        <!-- Sólo con una canción en la grilla: cuántas líneas lleva cada diapositiva -->
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0"
+                                    Visibility="{Binding IsSongOpen, Converter={StaticResource BoolToVis}}"
+                                    ToolTip="Cuántas líneas como máximo muestra cada diapositiva. Un párrafo largo se parte en varias; la canción guardada no cambia.">
+                            <TextBlock Text="Líneas por diapositiva:" FontSize="11" Foreground="{StaticResource MutedBrush}"
+                                       VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <ComboBox Width="68" FontSize="11" SelectedIndex="{Binding SongMaxLines}"
+                                      AutomationProperties.Name="Líneas por diapositiva">
+                                <ComboBoxItem Content="Todas"/>
+                                <ComboBoxItem Content="1"/>
+                                <ComboBoxItem Content="2"/>
+                                <ComboBoxItem Content="3"/>
+                                <ComboBoxItem Content="4"/>
+                            </ComboBox>
+                        </StackPanel>
                         <!-- Sólo con una presentación en la grilla -->
                         <Button DockPanel.Dock="Right" Content="➕ Playlist" FontSize="11" Padding="8,3" Margin="10,0,0,0"
                                 Style="{StaticResource DarkButton}"
@@ -2460,10 +2485,19 @@
         <!-- Un error (por ejemplo una imagen de Google que no se pudo bajar) la hace
              parpadear en rojo unos segundos: ver FlashStatusBar -->
         <Border x:Name="StatusBorder" Grid.Row="3" Background="Transparent" CornerRadius="4" Margin="8,2,8,4">
-            <TextBlock x:Name="StatusLine"
-                       Text="{Binding StatusText}"
-                       FontSize="12" Foreground="{StaticResource MutedBrush}"
-                       Margin="6,6,6,8" TextWrapping="Wrap"/>
+            <DockPanel>
+                <!-- Sin ventana de salida: lo único que está en vivo es la transmisión -->
+                <Border DockPanel.Dock="Left" Background="{StaticResource LiveBrush}" CornerRadius="3"
+                        Margin="6,6,4,6" Padding="8,2" VerticalAlignment="Center"
+                        Visibility="{Binding IsBroadcastOnlyLive, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="📡 EN VIVO SÓLO EN LA TRANSMISIÓN · sin ventana de salida"
+                               FontSize="12" FontWeight="SemiBold" Foreground="White"/>
+                </Border>
+                <TextBlock x:Name="StatusLine"
+                           Text="{Binding StatusText}"
+                           FontSize="12" Foreground="{StaticResource MutedBrush}"
+                           Margin="6,6,6,8" TextWrapping="Wrap"/>
+            </DockPanel>
         </Border>
     </Grid>
 </Window>

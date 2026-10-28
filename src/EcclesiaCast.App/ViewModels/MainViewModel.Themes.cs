@@ -45,10 +45,15 @@ public sealed partial class MainViewModel
             StageDisplays.Add(new DisplayOption(d, label));
         }
 
-        // Prefer the remembered display, then the first secondary one.
+        // The last entry opens no window at all: the words go only to the pages
+        // for OBS. The stage never lands on it, so it stays out of that list.
+        Displays.Add(new DisplayOption(BroadcastOnlyOutput.For(all), BroadcastOnlyOutput.Label));
+
+        // Prefer the remembered display, then the first secondary one; the
+        // stream-only entry is only ever picked by hand.
         SelectedDisplay =
             Displays.FirstOrDefault(o => o.Info.DeviceName == saved)
-            ?? Displays.FirstOrDefault(o => !o.Info.IsPrimary)
+            ?? Displays.FirstOrDefault(o => !o.BroadcastOnly && !o.Info.IsPrimary)
             ?? Displays.FirstOrDefault();
 
         // The stage goes anywhere but the congregation's screen.

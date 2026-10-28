@@ -3,11 +3,11 @@ using EcclesiaCast.App.Views;
 
 namespace EcclesiaCast.App.Services;
 
-public sealed class ProPresenterImportDialogService(SongSaver songSaver) : IProPresenterImportDialog
+public sealed class SongImportDialogService(SongSaver songSaver) : ISongImportDialog
 {
     public string? Show()
     {
-        var window = new ProPresenterImportWindow(songSaver)
+        var window = new SongImportWindow(songSaver)
         {
             Owner = Application.Current.MainWindow,
         };

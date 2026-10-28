@@ -193,6 +193,27 @@
                         </Grid>
                         <CheckBox x:Name="LabelCheck" Content="Mostrar la etiqueta (CORO / la cita)" Margin="0,10,0,0"
                                   Checked="Control_Changed" Unchecked="Control_Changed"/>
+                        <Grid Margin="0,8,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="40"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Etiqueta"
+                                       ToolTip="Tamaño de la etiqueta (CORO / la cita). 100 % es el tamaño de siempre"/>
+                            <Slider x:Name="LabelSizeSlider" Grid.Column="1" Minimum="50" Maximum="300" SmallChange="5" LargeChange="25"
+                                    IsSnapToTickEnabled="True" TickFrequency="5" ValueChanged="Slider_Changed"/>
+                            <TextBlock x:Name="LabelSizeText" Grid.Column="2" Style="{StaticResource FieldLabel}" TextAlignment="Right"/>
+                        </Grid>
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                            <RadioButton x:Name="LabLeft" Content="Izquierda" Tag="Left" GroupName="LabAlign" Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                            <RadioButton x:Name="LabCenter" Content="Centro" Tag="Center" GroupName="LabAlign" Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                            <RadioButton x:Name="LabRight" Content="Derecha" Tag="Right" GroupName="LabAlign" Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton x:Name="LabAbove" Content="Arriba de la letra" Tag="Above" GroupName="LabVert" Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                            <RadioButton x:Name="LabBelow" Content="Abajo de la letra" Tag="Below" GroupName="LabVert" Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                        </StackPanel>
 
                         <TextBlock Style="{StaticResource Section}" Text="Fondo fijo"/>
                         <StackPanel Orientation="Horizontal">

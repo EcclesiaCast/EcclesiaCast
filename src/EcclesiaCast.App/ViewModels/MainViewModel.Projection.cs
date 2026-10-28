@@ -272,8 +272,8 @@ public sealed partial class MainViewModel
         _presentation.GoLive(item.Slide);
         SyncHighlightBox();
         LiveTitle = GridTitle;
-        _projection.EnsureVisible(SelectedDisplay.Info);
-        _settings.Set(OutputDisplayKey, SelectedDisplay.Info.DeviceName);
+        ShowOutputWindow();
+        RememberOutputDisplay();
         IsProjecting = true;
 
         // A song reaching the screen may draw its own background. Done after
@@ -345,8 +345,8 @@ public sealed partial class MainViewModel
         _textLiveTitle = "Texto rápido";
         _presentation.GoLive(QuickSlide(QuickText.Trim()));
         SyncHighlightBox();
-        _projection.EnsureVisible(SelectedDisplay.Info);
-        _settings.Set(OutputDisplayKey, SelectedDisplay.Info.DeviceName);
+        ShowOutputWindow();
+        RememberOutputDisplay();
         IsProjecting = true;
 
         LiveSlideIndex = -1;
@@ -399,7 +399,7 @@ public sealed partial class MainViewModel
             return;
 
         _presentation.ShowOverlay(OverlayText.Trim());
-        _projection.EnsureVisible(SelectedDisplay.Info);
+        ShowOutputWindow();
         IsProjecting = true;
         StatusText = "Aviso al pie visible sobre la salida.";
     }
@@ -413,6 +413,59 @@ public sealed partial class MainViewModel
 
     // ── Estados de salida ────────────────────────────────────────
 
+    /// <summary>
+    /// Keeps the screen for the next time the program opens. «Only the stream»
+    /// is never kept: left on by mistake, a service with the projector would
+    /// start with no window to show it.
+    /// </summary>
+    private void RememberOutputDisplay()
+    {
+        if (SelectedDisplay is { BroadcastOnly: false } display)
+            _settings.Set(OutputDisplayKey, display.Info.DeviceName);
+    }
+
+    /// <summary>
+    /// Opens the output window on the selected screen. With «only the stream»
+    /// there is no window: going live then only means the pages for OBS, the
+    /// phone and the stage carry the words, and a window left open from before
+    /// comes down so it stops covering the program.
+    /// </summary>
+    private void ShowOutputWindow()
+    {
+        if (SelectedDisplay is null)
+            return;
+
+        if (SelectedDisplay.BroadcastOnly)
+        {
+            if (_projection.IsOutputVisible)
+                _projection.HideOutput();
+            return;
+        }
+
+        _projection.EnsureVisible(SelectedDisplay.Info);
+    }
+
+    /// <summary>
+    /// Changing the choice while live: to «only the stream» the window comes
+    /// down and the stream goes on; back to a screen, the window opens there.
+    /// </summary>
+    partial void OnSelectedDisplayChanged(DisplayOption? oldValue, DisplayOption? newValue)
+    {
+        if (!IsProjecting || newValue is null)
+            return;
+
+        if (newValue.BroadcastOnly)
+        {
+            ShowOutputWindow();
+            StatusText = "En vivo sólo en la transmisión: no hay ventana de salida.";
+        }
+        else if (oldValue?.BroadcastOnly == true)
+        {
+            ShowOutputWindow();
+            StatusText = $"Salida en vivo en {newValue.Label}.";
+        }
+    }
+
     /// <summary>Turns the output window on (if a display is selected).</summary>
     private bool EnsureOutputOn()
     {
@@ -422,7 +475,7 @@ public sealed partial class MainViewModel
             return false;
         }
 
-        _projection.EnsureVisible(SelectedDisplay.Info);
+        ShowOutputWindow();
         IsProjecting = true;
         return true;
     }
@@ -434,11 +487,13 @@ public sealed partial class MainViewModel
         {
             _projection.HideOutput();
             IsProjecting = false;
-            StatusText = "Salida apagada.";
+            StatusText = IsBroadcastOnly ? "Transmisión apagada." : "Salida apagada.";
         }
         else if (EnsureOutputOn())
         {
-            StatusText = "Salida en vivo.";
+            StatusText = IsBroadcastOnly
+                ? "En vivo sólo en la transmisión (OBS): no se abrió ninguna ventana de salida."
+                : "Salida en vivo.";
         }
     }
 
@@ -469,7 +524,7 @@ public sealed partial class MainViewModel
     {
         _projection.HideOutput();
         IsProjecting = false;
-        StatusText = "Salida apagada.";
+        StatusText = IsBroadcastOnly ? "Transmisión apagada." : "Salida apagada.";
     }
 
     private void UpdateStateFlags()

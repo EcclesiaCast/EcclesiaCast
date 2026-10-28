@@ -22,16 +22,18 @@ EcclesiaCast**.
 En la pestaña **Canciones**:
 
 - **➕** es el único botón para agregar canciones y ofrece cuatro caminos:
-  **Crear desde cero**, **Buscar en internet…**, **Traer de ProPresenter…** e
+  **Crear desde cero**, **Buscar en internet…**, **Traer de otro programa…** e
   **Importar archivo (.txt, .pro)…**. Crear desde cero abre una canción en
   blanco: pegá la letra, y **cada párrafo** (bloque separado por
   una línea en blanco) es una diapositiva. Opcionalmente, una línea `[Coro]` o
   `[Verso 1]` no se proyecta, solo le pone nombre a los párrafos que siguen.
-- **➕ → Traer de ProPresenter…** trae **todas** las canciones de ProPresenter de una vez: busca sola
-  dónde está instalado (también en la carpeta de OneDrive), te muestra sus
-  bibliotecas con cuántas canciones tiene cada una y las importa. Las que ya
-  estén en la biblioteca se saltean. Si tus canciones están en otro lado (un
-  disco externo, una copia de otra máquina), usá **Elegir carpeta…**.
+- **➕ → Traer de otro programa…** trae **todas** las canciones de ProPresenter o de
+  EasyWorship de una vez. Arriba elegís el programa (cada opción dice cuántas
+  canciones encontró); la ventana busca sola dónde está instalado (ProPresenter
+  también en la carpeta de OneDrive), te muestra sus bibliotecas con cuántas
+  canciones tiene cada una y las importa. Si una canción ya está, pregunta qué
+  hacer. Si están en otro lado (un disco externo, una copia de otra máquina), usá
+  **Elegir carpeta…**: en EasyWorship es la que tiene `Songs.db` y `SongWords.db`.
 - **➕ → Buscar en internet…** (también en **Archivo**) trae una canción
   nueva sin copiar y pegar: escribí el **nombre**, el **artista** o **una frase
   de la letra** y apretá Enter. Busca en musica.com y, si no está ahí, en

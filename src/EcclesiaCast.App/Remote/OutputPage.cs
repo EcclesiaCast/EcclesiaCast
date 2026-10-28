@@ -98,7 +98,7 @@ public static class OutputPage
             #stage.p-bottom { justify-content: flex-end; }
             #stage.k-line { align-items: flex-start; }
 
-            #swrap { position: relative; width: max-content; opacity: 0; }
+            #swrap { position: relative; width: max-content; opacity: 0; display: flex; flex-direction: column; }
             #plate {
               position: relative; box-sizing: border-box;
               padding: .4em .85em; text-align: center; line-height: 1.18;
@@ -172,6 +172,16 @@ public static class OutputPage
                            0 -.05em 0 #000, 0 .05em 0 #000, -.05em 0 0 #000, .05em 0 0 #000;
             }
             #stage.k-none #label { text-shadow: -.05em -.05em 0 #000, .05em -.05em 0 #000, -.05em .05em 0 #000, .05em .05em 0 #000; }
+
+            /* Where the label sits (Estilos → Etiqueta): left, centre or right
+               of the plate, over it or under it. It comes last so it wins over
+               the margins each plate gives the label. */
+            #stage.l-left #label { margin-left: 0; margin-right: auto; }
+            #stage.l-center #label { margin-left: auto; margin-right: auto; }
+            #stage.l-right #label { margin-left: auto; margin-right: 0; }
+            #stage.v-below #label { order: 2; margin-top: .18em; margin-bottom: 0; }
+            #stage.v-below.k-tab #label { margin-top: -1px; border-radius: 0 0 .5em .5em; }
+            #stage.v-below.k-glass #label { margin-top: .45em; }
           </style>
         </head>
         <body>
@@ -364,7 +374,8 @@ public static class OutputPage
               void swrap.offsetWidth;
 
               var m = st.marginPercent || 0;
-              stage.className = 'p-' + pos + ' k-' + kind;
+              stage.className = 'p-' + pos + ' k-' + kind + ' l-' + (st.labelAlign || 'center') + (st.labelBelow ? ' v-below' : '');
+              label.style.fontSize = (0.36 * (st.labelSize || 100) / 100).toFixed(3) + 'em';
               stage.style.padding = m + 'vh ' + m + 'vw ' + (s.overlay && pos === 'bottom' ? Math.max(m, 14) : m) + 'vh';
               stage.style.setProperty('--accent', st.accentColor);
               stage.style.setProperty('--onaccent', onColor(st.accentColor));

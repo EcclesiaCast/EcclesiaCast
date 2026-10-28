@@ -420,9 +420,9 @@ public partial class MainWindow : Window
         menu.Items.Add(new Separator());
         menu.Items.Add(new MenuItem
         {
-            Header = "Traer de ProPresenter…",
-            Command = vm.ImportFromProPresenterCommand,
-            ToolTip = "Busca solo dónde está instalado ProPresenter y trae sus bibliotecas enteras",
+            Header = "Traer de otro programa…",
+            Command = vm.ImportFromOtherProgramCommand,
+            ToolTip = "ProPresenter o EasyWorship: busca solo dónde están instaladas sus bibliotecas y las trae enteras",
         });
         menu.Items.Add(new MenuItem
         {

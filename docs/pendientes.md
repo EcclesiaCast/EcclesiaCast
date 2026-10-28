@@ -225,6 +225,17 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       el momento en que vuelve a empezar, a los 20 segundos). Mirá también que no
       tironeen en la PC del proyector. Quitá uno de la biblioteca, cerrá y abrí:
       no vuelve. Instalando sin la casilla, la pestaña no aparece.
+- [ ] **Traer de otro programa (ProPresenter y EasyWorship)** (28/10/2026). En el
+      **➕** de Canciones hay una sola entrada, **Traer de otro programa…** (y la
+      misma en Archivo). La ventana tiene arriba dos botones, **ProPresenter** y
+      **EasyWorship**, cada uno con la cantidad de canciones que encontró; abre
+      con el que tiene canciones. Probá los dos: ProPresenter tiene que listar sus
+      9 bibliotecas y el aviso de OneDrive como antes; EasyWorship, «Easyworship ·
+      Default · 2 canción(es)» (EasyWorship 8 guarda sus datos en una carpeta
+      llamada v6.1: es la versión del formato, no del programa). Importá una de
+      cada una (si repetís, pregunta qué hacer) y probá «Elegir carpeta…» con cada
+      programa. Falta una biblioteca grande de EasyWorship y, si hay, la de otra
+      versión (6 o 7).
 
 ## 2. Después de publicar la v1.0.0
 
@@ -335,24 +346,62 @@ no escribirle antes de esa fecha.
 
 ## 3. Para hacer después de la 1.0
 
-- [ ] **Proyectar sólo para la transmisión, sin pantalla** (28/10/2026, lo
-      primero). Le pasó a Alexis el fin de semana del 24-25/10: se rompió el
-      proyector, quería que la transmisión mostrara la Biblia y las letras, pero
-      con una sola pantalla «Poner en vivo» abrió la salida encima del programa
-      y tapó todo. Hace falta una forma de salir al aire **sólo para OBS**: por
-      ejemplo, en la lista de pantallas una opción «Sólo transmisión (sin
-      pantalla)», o que con una sola pantalla «Poner en vivo» pregunte. Así no
-      se abre ninguna ventana de salida, pero el programa funciona como si
-      estuviera proyectando: las páginas de `/salida` muestran lo que está al
-      aire, el LIVE del programa también, y Black, Clear y Logo andan igual. El
-      escenario y el celular siguen como siempre. Avisar claro en la barra de
-      abajo que se está «en vivo sólo en la transmisión».
-- [ ] **Importar canciones de EasyWorship** (28/10/2026). Muchas iglesias
-      vienen de ahí. EasyWorship 6 y 7 guardan las canciones en bases SQLite
-      (`Songs.db` y `SongWords.db`, con la letra en RTF) dentro de su carpeta
-      de datos; la 2009 usa bases Paradox. Empezar por la 6/7. OpenLP tiene un
-      importador para mirar cómo lo resuelve. Si Alexis tiene una base de
-      EasyWorship de alguien, sirve para probar.
+- [ ] **Escribirle a YouVersion para ver cómo integrar su plataforma**
+      (28/10/2026). Lo averiguado: YouVersion tiene una **Plataforma para
+      desarrolladores** (https://platform.youversion.com, documentación en
+      https://developers.youversion.com) con una API y kits de desarrollo
+      gratis; se entra con una cuenta, se registra la aplicación y dan una
+      clave. Dicen que ofrece más de 1.400 versiones de la Biblia, con
+      licencias de las editoriales ya resueltas («Fast-track Licensing»), pero
+      cada versión tiene sus reglas de atribución y de uso. **Términos leídos
+      el 28/10/2026** (`platform.youversion.com/terms`, versión del 17/8/2026):
+      - Es gratis, pero hay que registrarse, aceptar los términos (mayor de 18
+        años; persona o entidad) y usar una **clave que no se puede compartir con
+        nadie**. Un programa libre en GitHub **no puede llevar una clave
+        adentro**: cada iglesia tendría que sacar la suya, o habría que pasar por
+        un servidor propio. Es el problema más grande.
+      - Hay que **dejar prendido el reporte de uso** que traen sus herramientas
+        (mandan datos de uso a YouVersion), o sea que necesita internet.
+      - Para las Biblias con derechos, YouVersion **pasa datos del desarrollador
+        a las editoriales** para que verifiquen que cumple su licencia.
+      - Dejan **distribuir la aplicación** a los usuarios. No dicen nada, en los
+        términos generales, de proyectar en pantalla ni de guardar el texto sin
+        internet: eso lo fijan los «términos de cada herramienta» (se ven al
+        registrarse) y las reglas de cada editorial. **Preguntarlo.**
+      - No dejan usar sus cosas para hacer un servicio que **compita** con
+        YouVersion, ni usar sus marcas. Pueden cortar el acceso con 30 días de
+        aviso, o al instante si creen que se incumplió.
+      - Los derechos de los textos bíblicos **no los dan ellos**: salen de las
+        editoriales («Fast-track Licensing» las tramita).
+      Versiones en la Aplicación de la Biblia (`bible.com`; **no es lo mismo que
+      lo que la Plataforma deja usar con una clave**, eso se ve registrándose):
+      **español 30** (RVR1960, RVR09, RVR95, RVC, RVA2015, NVI, NVIs, NBV,
+      NTV, TLA, TLAI, DHH94 y otras, LBLA, NBLA, PDT, TCB, VBL), **inglés 88**
+      (KJV, NIV, ESV, NKJV, NLT, NASB, AMP, MSG, CSB, NET y muchas más) y
+      **portugués 17** (ARA, ARC, A21, NAA, NVI, NVT, NTLH, NBV-P, TB y otras).
+      Conclusión provisoria: serviría, a lo sumo, como una fuente **opcional
+      con internet**, no como reemplazo de las Biblias del programa.
+      Contacto: la página tiene «Support»
+      (`platform.youversion.com/support`) y «Partners» (`/partners`); los
+      términos dan **`platform-support@youversion.com`** (avisos y consultas de
+      la plataforma) y **`help@youversion.com`** (comentarios y soporte); el
+      `press@youversion.com` es de prensa.
+      No escribirles hasta que Alexis lo apruebe.
+      Borrador (en inglés, porque es a ellos):
+      > Hello, I'm Alexis, a volunteer in a church in Uruguay. I'm building
+      > EcclesiaCast, a free and open-source program (WPF/.NET 8, on GitHub:
+      > https://github.com/EcclesiaCast/EcclesiaCast) to project song lyrics and
+      > Bible verses in church services and to feed a livestream (OBS). We'd
+      > like to let churches use YouVersion Bibles inside it, especially
+      > Spanish versions such as RVR1960, NVI and NTV. Five questions:
+      > (1) Do the Platform terms allow a desktop app to show verses on a
+      > projector or livestream? (2) May the verse text be cached on the
+      > computer, since services often run without reliable internet? (3) Is
+      > there a way for a free, non-profit app like ours to be approved as a
+      > partner, and what attribution do you require? (4) Since the program is
+      > open source and installed on many computers, can one key be distributed
+      > with it, or must each church register its own? (5) What is the request
+      > rate limit per key? Thank you very much.
 - [ ] **Botón «Donar» con PayPal** (28/10/2026), en la página web y en el
       programa (Ayuda → «Colaborar con EcclesiaCast» y en «Acerca de»; reemplaza
       la idea «Acerca de: una forma de colaborar»). Cuando se haga, darle a
@@ -444,6 +493,12 @@ no escribirle antes de esa fecha.
 
 ## 5. Decisiones tomadas
 
+
+Descartado (28/10/2026): agregar letras.com a la búsqueda de canciones. Le niega
+el acceso a todo lo que no sea un navegador (403) y sus condiciones prohíben
+eludir medidas de seguridad. La búsqueda sigue con musica.com primero y LRCLIB de
+respaldo. Si algún día se quiere, la salida limpia es pedirles permiso por
+escrito (Vignoli Comunicação Ltda.).
 Descartado (15/10/2026): bajar una presentación de Google Slides pegando su
 enlace. Quien lo necesite descarga el PDF y lo agrega (los PDF y PowerPoint ya
 se importan), o abre Canva o Google Slides en el panel **🌐 Web** con la sesión

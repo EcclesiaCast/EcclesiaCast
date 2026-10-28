@@ -1213,7 +1213,7 @@ public sealed partial class MainViewModel
 
         if (SelectedDisplay is not null)
         {
-            _projection.EnsureVisible(SelectedDisplay.Info);
+            ShowOutputWindow();
             IsProjecting = true;
         }
         StatusText = item.Behavior == MediaBehavior.Foreground

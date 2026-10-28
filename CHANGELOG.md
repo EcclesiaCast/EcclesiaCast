@@ -7,6 +7,36 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Etiqueta de los versículos en la transmisión: tamaño y lugar.** En
+  **Transmisión → Estilos de la transmisión…**, cada capa tiene un deslizador
+  **Etiqueta** (de 50 a 300 %, 100 es el tamaño de siempre) y dónde va:
+  izquierda, centro o derecha, arriba o abajo de la letra. Sirve para
+  «Juan 3:16 RVR 1960» y para «CORO».
+- **Líneas por diapositiva en las canciones.** Con una canción abierta aparece,
+  arriba de la grilla, **Líneas por diapositiva: Todas / 1 / 2 / 3 / 4**. Un
+  párrafo más largo se parte en diapositivas de ese máximo (cinco líneas con 2
+  quedan 2 + 2 + 1) sin cambiar la canción guardada: el editor sigue mostrando el
+  párrafo entero. Se recuerda al cerrar el programa.
+- **Traer canciones de otro programa: ProPresenter y EasyWorship en una sola
+  ventana.** En el menú del **➕** de Canciones (y en Archivo), **Traer de otro
+  programa…** abre una ventana donde elegís arriba ProPresenter o EasyWorship;
+  cada opción dice cuántas canciones encontró. Busca solo dónde están instalados
+  (EasyWorship 6, 7 y 8), muestra sus bibliotecas con la cantidad, deja marcar cuáles
+  traer y pregunta lo de siempre si una canción ya está. «Elegir carpeta…» sirve
+  para una copia en otro lado. De EasyWorship trae título, autor, derechos y las
+  diapositivas como las separó, sin tocar su base. Se probó con una biblioteca
+  real de EasyWorship 8 (que guarda sus datos en una carpeta llamada «v6.1»: es la versión del formato, no del programa).
+- **Salir al aire sólo en la transmisión, sin ventana de salida.** La lista
+  «Salida:» tiene una opción nueva, **📡 Sólo la transmisión (sin ventana)**. Con
+  ella, «Poner en vivo» (y proyectar una canción, un versículo, Black, Clear o
+  Logo) no abre ninguna ventana en ninguna pantalla: las páginas `/salida` para
+  OBS, el celular y el escenario andan igual que cuando proyectás. Sirve cuando el
+  proyector no está o cuando la ventana taparía el programa. La barra de abajo
+  muestra «📡 EN VIVO SÓLO EN LA TRANSMISIÓN · sin ventana de salida» en rojo y el
+  botón dice «Apagar la transmisión». Si cambiás a esa opción con la ventana ya
+  abierta, la ventana baja y la transmisión sigue. No se recuerda al cerrar el
+  programa: la próxima vez vuelve a la pantalla de siempre. Un video de fondo o una
+  página web sólo se mueven en la ventana de salida.
 - **Menú «Transmisión» y estilos propios para OBS.** Hay un menú nuevo entre
   «Proyección» y «Ayuda». **Salida para OBS o vMix…** reúne las direcciones de la
   transmisión (la general y la de la Biblia, las canciones y los anuncios), que
