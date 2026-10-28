@@ -7,6 +7,17 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Salir al aire sólo en la transmisión, sin ventana de salida.** La lista
+  «Salida:» tiene una opción nueva, **📡 Sólo la transmisión (sin ventana)**. Con
+  ella, «Poner en vivo» (y proyectar una canción, un versículo, Black, Clear o
+  Logo) no abre ninguna ventana en ninguna pantalla: las páginas `/salida` para
+  OBS, el celular y el escenario andan igual que cuando proyectás. Sirve cuando el
+  proyector no está o cuando la ventana taparía el programa. La barra de abajo
+  muestra «📡 EN VIVO SÓLO EN LA TRANSMISIÓN · sin ventana de salida» en rojo y el
+  botón dice «Apagar la transmisión». Si cambiás a esa opción con la ventana ya
+  abierta, la ventana baja y la transmisión sigue. No se recuerda al cerrar el
+  programa: la próxima vez vuelve a la pantalla de siempre. Un video de fondo o una
+  página web sólo se mueven en la ventana de salida.
 - **Menú «Transmisión» y estilos propios para OBS.** Hay un menú nuevo entre
   «Proyección» y «Ayuda». **Salida para OBS o vMix…** reúne las direcciones de la
   transmisión (la general y la de la Biblia, las canciones y los anuncios), que
