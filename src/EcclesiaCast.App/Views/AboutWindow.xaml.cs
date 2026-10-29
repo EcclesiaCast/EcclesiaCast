@@ -16,6 +16,11 @@ public partial class AboutWindow : Window
     {
         InitializeComponent();
         VersionText.Text = $"versión {version}";
+        if (Services.AppInfo.HasDonateUrl)
+        {
+            DonateLink.NavigateUri = new Uri(Services.AppInfo.DonateUrl);
+            DonateLine.Visibility = Visibility.Visible;
+        }
         if (firstRun)
             CloseButton.Content = "Aceptar";
     }

@@ -75,6 +75,17 @@ public static class OutputPage
 
             .oculto { display: none !important; }
 
+            /* ── Sin formato (?formato=no) ───────────────────────────────────
+               Only the words, white and unadorned, in three paragraphs the
+               operator styles from the Browser Source's «CSS personalizado»
+               (#raw, #rlabel, #rmain, #rsecondary). */
+            #raw { display: none; }
+            body.crudo > *:not(#raw):not(script) { display: none !important; }
+            body.crudo #raw { display: block; position: absolute; inset: 0; padding: 4vh 6vw; box-sizing: border-box; color: #fff; font-size: 5vh; }
+            #raw p { margin: 0 0 .3em; white-space: pre-wrap; }
+            #rlabel { font-size: .5em; opacity: .85; }
+            #rsecondary { font-size: .8em; opacity: .92; }
+
             /* ── Own design of a layer (Transmisión → Estilos…) ──────────────
                With a style the page draws #plate instead of #canvas: the words
                sit top, centre or bottom with a safety margin, over the plate
@@ -207,6 +218,11 @@ public static class OutputPage
             <div id="countdownClock"></div>
           </div>
           <div id="overlay" class="oculto"></div>
+          <div id="raw">
+            <p id="rlabel" class="oculto"></p>
+            <p id="rmain"></p>
+            <p id="rsecondary" class="oculto"></p>
+          </div>
 
           <script>
             var params = new URLSearchParams(location.search);
@@ -218,6 +234,9 @@ public static class OutputPage
             // does the choosing; the page only says which one it is.
             var canal = (location.pathname.replace(/\/+$/, '').split('/')[2] || '').toLowerCase();
             var sound = params.get('sonido') === '1';
+            // «&formato=no»: the text alone, to be styled from OBS itself.
+            var raw = params.get('formato') === 'no';
+            if (raw) document.body.classList.add('crudo');
 
             var canvas = document.getElementById('canvas');
             var mediaBox = document.getElementById('mediaBox');
@@ -277,6 +296,7 @@ public static class OutputPage
             // preview). With a style the layer has its own design; without one
             // it is drawn as the projector draws it.
             function paint(s) {
+              if (raw) { paintRaw(s); return; }
               paintMedia(s.media);
               document.body.classList.toggle('estilo', !!s.style);
               paintBackground(s);
@@ -289,6 +309,19 @@ public static class OutputPage
 
               show(overlay, !!s.overlay);
               overlay.textContent = s.overlay || '';
+            }
+
+            // The words as plain paragraphs: the reference (or CORO) first, then
+            // the text, then the second version. Nothing from the theme.
+            function paintRaw(s) {
+              var tag = s.label || s.caption || '';
+              var text = s.showText ? (s.mainText || '') : '';
+              var second = text ? (s.secondaryText || '') : '';
+              document.getElementById('rmain').textContent = text;
+              document.getElementById('rsecondary').textContent = second;
+              document.getElementById('rlabel').textContent = text ? tag : '';
+              show(document.getElementById('rsecondary'), !!second);
+              show(document.getElementById('rlabel'), !!(text && tag));
             }
 
             var stage = document.getElementById('stage');
