@@ -451,9 +451,12 @@ no escribirle antes de esa fecha.
       (Archivo → Agregar paquete de fondos). **Hecho el 29/10/2026:** el
       paquete está armado, 9 fondos nuevos (luces y nieblas de otros colores) en
       `dist\EcclesiaCast-fondos-extra.zip` (22 MB; se vuelve a dibujar con
-      `dotnet run … -- <carpeta> 20 --paquete` en el generador). **Falta:**
-      subirlo como archivo de un *release* de GitHub (decidido: ahí se aloja;
-      Alexis tiene que aprobarlo) y el botón que lo baje solo.
+      `dotnet run … -- <carpeta> 20 --paquete` en el generador). **Subido el
+      29/10/2026** como release `fondos-extra-1` (pre-lanzamiento, sin versión)
+      y **Archivo → Bajar más fondos de internet…** lo baja, comprueba su
+      SHA-256 (`AppInfo.BackgroundPackSha256`) y lo agrega; probado en una
+      copia de prueba, dos veces seguidas (la segunda dice «Ya tenías todos»).
+      Un paquete nuevo = release nuevo + dirección y huella nuevas en `AppInfo`.
 
 - [ ] **Biblias: cómo distribuirlas, al menos en Uruguay.** Lo averiguado el
       7/10/2026: las versiones con derechos (RVR1960, NVI, NTV, TLA, y

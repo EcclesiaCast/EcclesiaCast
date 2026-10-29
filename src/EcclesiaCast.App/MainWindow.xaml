@@ -180,6 +180,7 @@
                 <MenuItem Header="Importar paquete de Biblias…" Command="{Binding ImportBiblePackageCommand}"/>
                 <MenuItem Header="Agregar imágenes, videos, PDF o PowerPoint…" Command="{Binding ImportMediaCommand}"/>
                 <MenuItem Header="Agregar paquete de fondos (.zip)…" Command="{Binding ImportBackgroundPackCommand}"/>
+                <MenuItem Header="Bajar más fondos de internet…" Command="{Binding DownloadBackgroundPackCommand}"/>
                 <Separator/>
                 <MenuItem Header="Guardar una copia de la biblioteca…" Command="{Binding SaveBackupCommand}"/>
                 <MenuItem Header="Restaurar desde una copia…" Command="{Binding RestoreBackupCommand}"/>
