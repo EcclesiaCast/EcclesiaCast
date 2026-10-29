@@ -363,7 +363,15 @@ no escribirle antes de esa fecha.
 
 ## 3. Para hacer después de la 1.0
 
-- [ ] **Escribirle a YouVersion para ver cómo integrar su plataforma**
+- [ ] **YouVersion: mensaje mandado el 29/10/2026, esperando respuesta.** Lo
+      mandó Alexis a `platform-support@youversion.com` (en inglés, firmado
+      «miembro de una iglesia en Uruguay»). Preguntó cuatro cosas: (1) si los
+      términos dejan mostrar versículos en un proyector o transmisión desde una
+      app de escritorio, (2) si se puede guardar el texto en la computadora,
+      (3) si se puede repartir una clave con el programa o cada iglesia saca la
+      suya, y (4) el límite de pedidos por clave. **No** preguntó por ser
+      socio. Cuando conteste, anotar acá la respuesta y decidir si sirve como
+      fuente opcional con internet.
       (28/10/2026). Lo averiguado: YouVersion tiene una **Plataforma para
       desarrolladores** (https://platform.youversion.com, documentación en
       https://developers.youversion.com) con una API y kits de desarrollo
@@ -403,22 +411,6 @@ no escribirle antes de esa fecha.
       términos dan **`platform-support@youversion.com`** (avisos y consultas de
       la plataforma) y **`help@youversion.com`** (comentarios y soporte); el
       `press@youversion.com` es de prensa.
-      No escribirles hasta que Alexis lo apruebe.
-      Borrador (en inglés, porque es a ellos):
-      > Hello, I'm Alexis, a volunteer in a church in Uruguay. I'm building
-      > EcclesiaCast, a free and open-source program (WPF/.NET 8, on GitHub:
-      > https://github.com/EcclesiaCast/EcclesiaCast) to project song lyrics and
-      > Bible verses in church services and to feed a livestream (OBS). We'd
-      > like to let churches use YouVersion Bibles inside it, especially
-      > Spanish versions such as RVR1960, NVI and NTV. Five questions:
-      > (1) Do the Platform terms allow a desktop app to show verses on a
-      > projector or livestream? (2) May the verse text be cached on the
-      > computer, since services often run without reliable internet? (3) Is
-      > there a way for a free, non-profit app like ours to be approved as a
-      > partner, and what attribution do you require? (4) Since the program is
-      > open source and installed on many computers, can one key be distributed
-      > with it, or must each church register its own? (5) What is the request
-      > rate limit per key? Thank you very much.
 - [ ] **Botón «Donar» con PayPal** (28/10/2026). **Hecho el lado del programa:**
       Ayuda → «Colaborar con EcclesiaCast…» y una línea en «Acerca de», que
       **no aparecen mientras `AppInfo.DonateUrl`
