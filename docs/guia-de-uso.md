@@ -443,6 +443,23 @@ poner encima de la cámara. No hace falta placa capturadora ni otra computadora.
 - Si tu programa no maneja transparencia, agregale `&fondo=negro` al final de
   la dirección.
 
+#### Sólo el texto, para darle estilo desde OBS
+
+Agregale `&formato=no` al final de la dirección (por ejemplo
+`.../salida/biblia?pin=1234&formato=no`) y la página manda **sólo las palabras**:
+la cita (o «CORO»), el texto y la segunda versión, en blanco, sin tema ni placa
+ni fondo. El estilo lo ponés vos en el Browser Source de OBS, en **CSS
+personalizado**. Por ejemplo, para letra amarilla, grande y a la izquierda:
+
+```css
+body { background: transparent; }
+#raw { color: #ffd54a; font-size: 64px; text-align: left; }
+#rlabel { font-size: 28px; }
+```
+
+Los tres párrafos se llaman `#rlabel` (la cita), `#rmain` (el texto) y
+`#rsecondary` (la segunda versión). Sirve también con OBS en otra computadora.
+
 #### Cada cosa en su propia capa
 
 La dirección de arriba muestra **todo junto**. Si querés ponerlas en capas

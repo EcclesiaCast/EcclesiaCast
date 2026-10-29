@@ -10,6 +10,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 - **Lugar para colaborar.** Ayuda → «Colaborar con EcclesiaCast…» y una línea
   en «Acerca de» abren la página donde se puede ayudar a que el programa siga.
   Quedan ocultos hasta que se cargue el enlace, así no hay un botón vacío.
+- **Sólo el texto para OBS.** Agregando `&formato=no` a la dirección de
+  `/salida` (o de cualquiera de las capas) la página manda únicamente la cita,
+  el texto y la segunda versión, sin tema, placa ni fondo, para darles estilo
+  desde el **CSS personalizado** del Browser Source de OBS. La guía trae un
+  ejemplo.
 - **Etiqueta de los versículos en la transmisión: tamaño y lugar.** En
   **Transmisión → Estilos de la transmisión…**, cada capa tiene un deslizador
   **Etiqueta** (de 50 a 300 %, 100 es el tamaño de siempre) y dónde va:
