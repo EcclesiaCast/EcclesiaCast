@@ -429,6 +429,20 @@ public partial class MainWindow
         }
     }
 
+    private void Donate_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            System.Diagnostics.Process.Start(
+                new System.Diagnostics.ProcessStartInfo(EcclesiaCast.App.Services.AppInfo.DonateUrl) { UseShellExecute = true });
+        }
+        catch
+        {
+            MessageBox.Show($"No se pudo abrir el navegador. La página está en:\n\n{EcclesiaCast.App.Services.AppInfo.DonateUrl}",
+                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+    }
+
     private void About_Click(object sender, RoutedEventArgs e) =>
         new Views.AboutWindow(Services.AppInfo.Version) { Owner = this }.ShowDialog();
 

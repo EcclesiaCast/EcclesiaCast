@@ -30,6 +30,8 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        if (EcclesiaCast.App.Services.AppInfo.HasDonateUrl)
+            DonateMenuItem.Visibility = Visibility.Visible;
 
         DataContextChanged += (_, _) =>
         {

@@ -409,11 +409,15 @@ no escribirle antes de esa fecha.
       > open source and installed on many computers, can one key be distributed
       > with it, or must each church register its own? (5) What is the request
       > rate limit per key? Thank you very much.
-- [ ] **Botón «Donar» con PayPal** (28/10/2026), en la página web y en el
-      programa (Ayuda → «Colaborar con EcclesiaCast» y en «Acerca de»; reemplaza
-      la idea «Acerca de: una forma de colaborar»). Cuando se haga, darle a
-      Alexis el paso a paso para crear el enlace de PayPal (la cuenta la crea
-      él) y confirmar antes que desde Uruguay se puede retirar lo que llegue.
+- [ ] **Botón «Donar» con PayPal** (28/10/2026). **Hecho el lado del programa:**
+      Ayuda → «Colaborar con EcclesiaCast…» y una línea en «Acerca de», que
+      **no aparecen mientras `AppInfo.DonateUrl`
+      ([AppInfo.cs](../src/EcclesiaCast.App/Services/AppInfo.cs)) esté vacío**, así
+      nunca hay un botón que no lleva a ningún lado. **Falta:** que Alexis cree
+      el enlace de PayPal (paso a paso a pedido; confirmar antes que desde
+      Uruguay se puede retirar lo que llegue), pegarlo ahí, y poner el botón en
+      la página web (`sitio/`). Reemplaza la idea «Acerca de: una forma de
+      colaborar».
 - [ ] **Saber si alguien usa el programa** (28/10/2026, falta decidir cómo).
       Lo respetuoso: al abrir por primera vez, preguntar «¿Nos dejás contar que
       usás EcclesiaCast?» y, si dice que sí, mandar una vez por día sólo un número

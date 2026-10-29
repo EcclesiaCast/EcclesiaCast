@@ -7,6 +7,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Lugar para colaborar.** Ayuda → «Colaborar con EcclesiaCast…» y una línea
+  en «Acerca de» abren la página donde se puede ayudar a que el programa siga.
+  Quedan ocultos hasta que se cargue el enlace, así no hay un botón vacío.
 - **Sólo el texto para OBS.** Agregando `&formato=no` a la dirección de
   `/salida` (o de cualquiera de las capas) la página manda únicamente la cita,
   el texto y la segunda versión, sin tema, placa ni fondo, para darles estilo
