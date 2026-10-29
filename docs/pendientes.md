@@ -448,10 +448,15 @@ no escribirle antes de esa fecha.
       juntos. Fotos o videos de Pexels o Pixabay **no**: sus licencias no dejan
       repartirlos dentro de otro programa.
       **Hecho el 28/10/2026:** el programa ya abre un paquete .zip de fondos
-      (Archivo → Agregar paquete de fondos). **Falta:** armar el paquete con más
-      fondos propios (con el generador de `installer\fondos`), subirlo como
-      archivo de un *release* de GitHub (decidido: ahí se aloja) y el botón que
-      lo baje solo; subir un release es algo que Alexis tiene que aprobar.
+      (Archivo → Agregar paquete de fondos). **Hecho el 29/10/2026:** el
+      paquete está armado, 9 fondos nuevos (luces y nieblas de otros colores) en
+      `dist\EcclesiaCast-fondos-extra.zip` (22 MB; se vuelve a dibujar con
+      `dotnet run … -- <carpeta> 20 --paquete` en el generador). **Subido el
+      29/10/2026** como release `fondos-extra-1` (pre-lanzamiento, sin versión)
+      y **Archivo → Bajar más fondos de internet…** lo baja, comprueba su
+      SHA-256 (`AppInfo.BackgroundPackSha256`) y lo agrega; probado en una
+      copia de prueba, dos veces seguidas (la segunda dice «Ya tenías todos»).
+      Un paquete nuevo = release nuevo + dirección y huella nuevas en `AppInfo`.
 
 - [ ] **Biblias: cómo distribuirlas, al menos en Uruguay.** Lo averiguado el
       7/10/2026: las versiones con derechos (RVR1960, NVI, NTV, TLA, y

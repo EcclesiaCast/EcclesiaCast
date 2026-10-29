@@ -18,5 +18,15 @@ public static class AppInfo
     /// </summary>
     public const string DonateUrl = "";
 
+    /// <summary>
+    /// The pack of extra backgrounds, an asset of a GitHub release that is not a
+    /// version of the program, and its SHA-256: only that exact file is accepted.
+    /// A new pack means a new release, a new address and a new hash here.
+    /// </summary>
+    public const string BackgroundPackUrl =
+        "https://github.com/EcclesiaCast/EcclesiaCast/releases/download/fondos-extra-1/EcclesiaCast-fondos-extra.zip";
+
+    public const string BackgroundPackSha256 = "f9895baadfec4179972ba5b3b452c5331a1b4d9f7e484b3c97d366afad159236";
+
     public static bool HasDonateUrl => DonateUrl.StartsWith("https://", StringComparison.Ordinal);
 }

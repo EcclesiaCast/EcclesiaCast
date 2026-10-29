@@ -31,6 +31,35 @@ var videos = new (string Name, Func<float, Img> Frame)[]
     ("Tres cruces", Designs.ThreeCrosses),
 };
 
+// Fondos extra: no vienen con el instalador. Se arman con «--paquete» como
+// tercer argumento y se reparten como un .zip aparte (Archivo > Agregar paquete
+// de fondos). Mismas recetas, otros colores.
+var extras = new (string Name, Func<float, Img> Frame)[]
+{
+    ("Luces rojas", t => Designs.Bokeh(Col.Hex("33090F"), Col.Hex("0D0204"),
+        [Col.Hex("FF5A5A"), Col.Hex("E02D4A"), Col.Hex("FF9A8A"), Col.Hex("B81E3C")], 52, t)),
+    ("Luces rosas", t => Designs.Bokeh(Col.Hex("311028"), Col.Hex("0C040A"),
+        [Col.Hex("FF8CC8"), Col.Hex("F25AA6"), Col.Hex("FFC2E0"), Col.Hex("C65AF2")], 63, t)),
+    ("Luces violeta", t => Designs.Bokeh(Col.Hex("1D0F3A"), Col.Hex("07030F"),
+        [Col.Hex("B38CFF"), Col.Hex("8456F2"), Col.Hex("D9BFFF"), Col.Hex("6A6AFF")], 74, t)),
+    ("Luces verdes", t => Designs.Bokeh(Col.Hex("0A2A1C"), Col.Hex("020C07"),
+        [Col.Hex("6BFFB0"), Col.Hex("2DD68A"), Col.Hex("B6FFD9"), Col.Hex("49C7C0")], 85, t)),
+    ("Luces turquesa", t => Designs.Bokeh(Col.Hex("08292E"), Col.Hex("020B0D"),
+        [Col.Hex("5AF0E6"), Col.Hex("2DB8D6"), Col.Hex("A8FFF5"), Col.Hex("5AA8FF")], 96, t)),
+    ("Luces blancas", t => Designs.Bokeh(Col.Hex("1B2434"), Col.Hex("05070B"),
+        [Col.Hex("FFFFFF"), Col.Hex("DCE8FF"), Col.Hex("FFF3D9"), Col.Hex("BFD4FF")], 107, t)),
+    ("Niebla violeta", t => Designs.Mist(t, "0E0A1A", "34264F", "A590C8")),
+    ("Niebla verde", t => Designs.Mist(t, "07120E", "1F3F34", "7FB8A0")),
+    ("Niebla dorada", t => Designs.Mist(t, "140D07", "4A361F", "C8A878")),
+};
+
+if (only == "--paquete")
+{
+    foreach (var (name, frame) in extras)
+        Video.Render(Path.Combine(outDir, name + ".mp4"), seconds, frame);
+    return;
+}
+
 foreach (var (name, frame) in videos)
 {
     if (only is null || string.Equals(only, name, StringComparison.OrdinalIgnoreCase))
@@ -287,7 +316,9 @@ static class Designs
         return img;
     }
 
-    public static Img Mist(float t)
+    public static Img Mist(float t) => Mist(t, "080D16", "23384A", "7F9BB0");
+
+    public static Img Mist(float t, string dark, string mid, string light)
     {
         var img = new Img(W, H);
         var slow = Orbit(t, 0.3f);
@@ -300,8 +331,8 @@ static class Designs
             float dx = (u - 0.5f) * Aspect, dy = v - 0.45f;
             float glow = MathF.Exp(-(dx * dx + dy * dy) / 0.35f);
 
-            var col = Col.Lerp(Col.Hex("080D16"), Col.Hex("23384A"), glow);
-            return Col.Lerp(col, Col.Hex("7F9BB0"), M.Smooth(0.4f, 0.8f, f) * (0.2f + 0.25f * glow));
+            var col = Col.Lerp(Col.Hex(dark), Col.Hex(mid), glow);
+            return Col.Lerp(col, Col.Hex(light), M.Smooth(0.4f, 0.8f, f) * (0.2f + 0.25f * glow));
         });
         img.Blur(3);
         img.Vignette(0.45f);

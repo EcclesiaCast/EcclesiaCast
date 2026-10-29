@@ -1,5 +1,7 @@
 using CommunityToolkit.Mvvm.Input;
 using System.IO;
+using System.Net.Http;
+using System.Windows;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Media;
 using Serilog;
@@ -122,33 +124,139 @@ public sealed partial class MainViewModel
                 return;
             }
 
-            foreach (var file in files)
-            {
-                var type = MediaFiles.Classify(file) == MediaFileKind.Image ? MediaType.Image : MediaType.Video;
-                _media.Add(new MediaItem
-                {
-                    Name = Path.GetFileNameWithoutExtension(file),
-                    Path = file,
-                    Type = type,
-                    ThumbnailPath = MediaThumbnails.Create(file, type, videoEngine: null),
-                    Category = BackgroundPack.Tab,
-                    Behavior = MediaBehavior.Background,
-                    Scaling = MediaScaling.Fill,
-                    EndBehavior = VideoEndBehavior.Loop,
-                    Muted = true,
-                });
-            }
-
-            LoadMedia();
-            Log.Information("Paquete de fondos agregado: {Count}", files.Count);
-            StatusText = files.Count == 1
-                ? $"Se agregó un fondo en la pestaña «{BackgroundPack.Tab}»."
-                : $"Se agregaron {files.Count} fondos en la pestaña «{BackgroundPack.Tab}».";
+            AddPackBackgrounds(files);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException)
         {
             Log.Warning(ex, "No se pudo agregar el paquete de fondos");
             StatusText = "No se pudo abrir el paquete: tiene que ser un .zip de fondos.";
         }
+    }
+
+    /// <summary>Brings unzipped pack files into the library's «Fondos agregados» tab.</summary>
+    private void AddPackBackgrounds(IReadOnlyList<string> files)
+    {
+        foreach (var file in files)
+        {
+            var type = MediaFiles.Classify(file) == MediaFileKind.Image ? MediaType.Image : MediaType.Video;
+            _media.Add(new MediaItem
+            {
+                Name = Path.GetFileNameWithoutExtension(file),
+                Path = file,
+                Type = type,
+                ThumbnailPath = MediaThumbnails.Create(file, type, videoEngine: null),
+                Category = BackgroundPack.Tab,
+                Behavior = MediaBehavior.Background,
+                Scaling = MediaScaling.Fill,
+                EndBehavior = VideoEndBehavior.Loop,
+                Muted = true,
+            });
+        }
+
+        LoadMedia();
+        Log.Information("Paquete de fondos agregado: {Count}", files.Count);
+        StatusText = files.Count == 1
+            ? $"Se agregó un fondo en la pestaña «{BackgroundPack.Tab}»."
+            : $"Se agregaron {files.Count} fondos en la pestaña «{BackgroundPack.Tab}».";
+    }
+
+    private bool _downloadingBackgroundPack;
+
+    /// <summary>
+    /// «Archivo → Bajar más fondos de internet…»: downloads the pack of extra
+    /// backgrounds from GitHub (about 22 MB), checks that it is exactly the file
+    /// the program knows, and adds what the library does not have yet.
+    /// </summary>
+    [RelayCommand]
+    private async Task DownloadBackgroundPack()
+    {
+        if (_downloadingBackgroundPack)
+            return;
+
+        var answer = MessageBox.Show(
+            "Se van a bajar 9 fondos en video (unos 22 MB) desde GitHub y a agregar a la pestaña «"
+            + BackgroundPack.Tab + "». ¿Seguimos?",
+            "Bajar más fondos", MessageBoxButton.YesNo, MessageBoxImage.Question);
+        if (answer != MessageBoxResult.Yes)
+            return;
+
+        _downloadingBackgroundPack = true;
+        var work = Path.Combine(Path.GetTempPath(), "ecclesiacast-fondos-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            Directory.CreateDirectory(work);
+            var zip = Path.Combine(work, "paquete.zip");
+            await DownloadBackgroundPackFile(zip);
+
+            StatusText = "Abriendo el paquete de fondos…";
+            var added = await Task.Run(() =>
+            {
+                // Unzipped apart: the ones the library already has are left out,
+                // so bajando dos veces no quedan copias «(2)».
+                var unpacked = BackgroundPack.Extract(zip, Path.Combine(work, "fondos"));
+                Directory.CreateDirectory(PackBackgroundsFolder);
+                var moved = new List<string>();
+                foreach (var file in unpacked)
+                {
+                    var target = Path.Combine(PackBackgroundsFolder, Path.GetFileName(file));
+                    if (File.Exists(target))
+                        continue;
+                    File.Move(file, target);
+                    moved.Add(target);
+                }
+
+                return moved;
+            });
+
+            if (added.Count == 0)
+                StatusText = "Ya tenías todos los fondos de ese paquete.";
+            else
+                AddPackBackgrounds(added);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException
+                                       or HttpRequestException or TaskCanceledException)
+        {
+            Log.Warning(ex, "No se pudo bajar el paquete de fondos");
+            StatusText = "No se pudo bajar el paquete de fondos. Revisá la conexión y probá de nuevo.";
+        }
+        finally
+        {
+            _downloadingBackgroundPack = false;
+            try { Directory.Delete(work, recursive: true); } catch (IOException) { /* se limpia solo */ }
+        }
+    }
+
+    private async Task DownloadBackgroundPackFile(string destination)
+    {
+        using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(10) };
+        client.DefaultRequestHeaders.UserAgent.ParseAdd($"EcclesiaCast/{AppInfo.Version}");
+        using var response = await client.GetAsync(AppInfo.BackgroundPackUrl, HttpCompletionOption.ResponseHeadersRead);
+        response.EnsureSuccessStatusCode();
+
+        var total = response.Content.Headers.ContentLength;
+        await using (var source = await response.Content.ReadAsStreamAsync())
+        await using (var target = File.Create(destination))
+        {
+            var buffer = new byte[81920];
+            long read = 0;
+            var lastPercent = -1;
+            int count;
+            while ((count = await source.ReadAsync(buffer)) > 0)
+            {
+                await target.WriteAsync(buffer.AsMemory(0, count));
+                read += count;
+                var percent = total is > 0 ? (int)(read * 100 / total.Value) : 0;
+                if (percent != lastPercent)
+                {
+                    lastPercent = percent;
+                    StatusText = $"Bajando los fondos… {percent}%";
+                }
+            }
+        }
+
+        await using var check = File.OpenRead(destination);
+        var hash = Convert.ToHexString(await System.Security.Cryptography.SHA256.HashDataAsync(check));
+        if (!hash.Equals(AppInfo.BackgroundPackSha256, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidDataException("El paquete bajado no es el esperado.");
     }
 }

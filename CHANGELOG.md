@@ -7,6 +7,10 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Bajar más fondos de internet.** **Archivo → Bajar más fondos de internet…**
+  baja de GitHub un paquete de 9 fondos en video (unos 22 MB, de dominio
+  público), comprueba que sea exactamente ese archivo y los deja en «Fondos
+  agregados». Si ya los tenías, avisa y no los repite.
 - **Agregar paquete de fondos.** **Archivo → Agregar paquete de fondos (.zip)…**
   abre un .zip con videos o imágenes y los deja en la pestaña «Fondos agregados»,
   en bucle y sin sonido. Sirve para sumar fondos sin agrandar el instalador.
