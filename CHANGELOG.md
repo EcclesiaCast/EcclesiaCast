@@ -7,6 +7,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Agregar paquete de fondos.** **Archivo → Agregar paquete de fondos (.zip)…**
+  abre un .zip con videos o imágenes y los deja en la pestaña «Fondos agregados»,
+  en bucle y sin sonido. Sirve para sumar fondos sin agrandar el instalador.
 - **Lugar para colaborar.** Ayuda → «Colaborar con EcclesiaCast…» y una línea
   en «Acerca de» abren la página donde se puede ayudar a que el programa siga.
   Quedan ocultos hasta que se cargue el enlace, así no hay un botón vacío.

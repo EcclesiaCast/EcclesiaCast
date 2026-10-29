@@ -236,6 +236,13 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       cada una (si repetís, pregunta qué hacer) y probá «Elegir carpeta…» con cada
       programa. Falta una biblioteca grande de EasyWorship y, si hay, la de otra
       versión (6 o 7).
+- [ ] **Agregar paquete de fondos** (28/10/2026; hay pruebas de cómo se abre el
+      .zip, no se vio en el programa). **Archivo → Agregar paquete de fondos
+      (.zip)…**: elegí un .zip con videos .mp4 y alguna imagen. Tienen que
+      aparecer en una pestaña nueva, **Fondos agregados**, andar en bucle y sin
+      sonido, y quedar al cerrar y abrir. Un .zip con otra cosa o un archivo que
+      no es .zip tiene que avisar sin romper nada. Falta la parte de **bajar**
+      el paquete desde internet: ver el punto de «Más fondos» en §3.
 - [ ] **Sólo el texto para OBS** (28/10/2026; hay prueba de que la página trae
       los párrafos, no se vio en OBS). Copiá la dirección de la Biblia
       (**Transmisión → Salida para OBS**) y agregale `&formato=no`. En el Browser
@@ -440,6 +447,11 @@ no escribirle antes de esa fecha.
       el catálogo de Biblias libres de abajo, así que conviene hacer los dos
       juntos. Fotos o videos de Pexels o Pixabay **no**: sus licencias no dejan
       repartirlos dentro de otro programa.
+      **Hecho el 28/10/2026:** el programa ya abre un paquete .zip de fondos
+      (Archivo → Agregar paquete de fondos). **Falta:** armar el paquete con más
+      fondos propios (con el generador de `installer\fondos`), subirlo como
+      archivo de un *release* de GitHub (decidido: ahí se aloja) y el botón que
+      lo baje solo; subir un release es algo que Alexis tiene que aprobar.
 
 - [ ] **Biblias: cómo distribuirlas, al menos en Uruguay.** Lo averiguado el
       7/10/2026: las versiones con derechos (RVR1960, NVI, NTV, TLA, y
