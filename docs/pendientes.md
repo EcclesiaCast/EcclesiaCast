@@ -273,7 +273,10 @@ nuevo (con otro paquete o con otra versión), después de `dotnet publish`:
 - [ ] **Una prueba que a veces falla en GitHub.** Al publicar la 1.0.1,
       `ReleaseFeedTests.A_server_error_is_a_failure` tardó 17 segundos en la
       máquina de GitHub y dio «sin conexión» en vez de «error del servidor»;
-      volviendo a correrla pasó. Acá nunca falló. Si se repite, mirar el
+      volviendo a correrla pasó. **Volvió a fallar el 28/10/2026** en el
+      chequeo de GitHub del pedido #5 (21 s; pasó al repetirlo): es la que más
+      puede frenar una publicación, porque `release.yml` corre las pruebas
+      antes de armar el instalador. Acá nunca falló. Si se repite, mirar el
       servidor de prueba (`LocalHttpServer`) con una respuesta 500 sin cuerpo.
 - Para las próximas versiones: el flujo de publicación toma las notas de la
   sección `## [<versión>]` del `CHANGELOG.md` (por ejemplo `## [1.0.1] - fecha`)

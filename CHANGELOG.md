@@ -5,6 +5,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+## [1.1.0] - 2026-10-29
+
 ### Agregado
 
 - **Bajar más fondos de internet.** **Archivo → Bajar más fondos de internet…**
