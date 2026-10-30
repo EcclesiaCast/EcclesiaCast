@@ -278,6 +278,8 @@ nuevo (con otro paquete o con otra versión), después de `dotnet publish`:
       puede frenar una publicación, porque `release.yml` corre las pruebas
       antes de armar el instalador. Acá nunca falló. Si se repite, mirar el
       servidor de prueba (`LocalHttpServer`) con una respuesta 500 sin cuerpo.
+      **Arreglado el 30/10/2026** (pedido #13): esas pruebas ahora esperan hasta
+      120 s en vez de 15.
 - Para las próximas versiones: el flujo de publicación toma las notas de la
   sección `## [<versión>]` del `CHANGELOG.md` (por ejemplo `## [1.0.1] - fecha`)
   y, si no la hay, de `## [Sin publicar]`.
@@ -329,10 +331,10 @@ nuevo (con otro paquete o con otra versión), después de `dotnet publish`:
       [sitio-web-encargo.md](sitio-web-encargo.md). **Estado (15/10/2026):
       publicada en <https://ecclesiacast.github.io/EcclesiaCast/>, con logo
       nuevo, capturas y un video de 40 segundos; el flujo `pages` la vuelve a
-      publicar con cada cambio en `sitio/` y después de cada versión.** Falta también la captura de «Ejecutar
-      de todas formas» del aviso de Windows (hoy la página explica ese paso sin
-      imagen); es sólo para la página, no tiene que ver con la firma (para la
-      firma lo que falta es visibilidad). Después: un video de
+      publicar con cada cambio en `sitio/` y después de cada versión.** **Las capturas reales del aviso de
+      Windows («Ejecutar de todas formas») ya están en la página (30/10/2026).**
+      Es sólo para la página, no tiene que ver con la firma (para la firma lo
+      que falta es visibilidad). Después: un video de
       demostración, contarlo en comunidades de iglesias y que otras iglesias lo
       usen y lo marquen con estrella. Volver a pedir la firma a SignPath cuando
       haya señales.
@@ -364,7 +366,8 @@ no escribirle antes de esa fecha.
 ## 3. Para hacer después de la 1.0
 
 - [ ] **Escribirle a YouVersion para ver cómo integrar su plataforma**
-      (28/10/2026). Lo averiguado: YouVersion tiene una **Plataforma para
+      (28/10/2026; **Alexis ya les mandó el mail, esperando respuesta**). Lo
+      averiguado: YouVersion tiene una **Plataforma para
       desarrolladores** (https://platform.youversion.com, documentación en
       https://developers.youversion.com) con una API y kits de desarrollo
       gratis; se entra con una cuenta, se registra la aplicación y dan una
@@ -440,13 +443,16 @@ no escribirle antes de esa fecha.
       `src/EcclesiaCast.Core/Feedback/`; textos en la política de privacidad.
       **Falta:** que Alexis borre la fila de prueba de la planilla, vea la
       ventana en el programa real y mire cuántos comentarios llegan.
-- [ ] **Que lo encuentren en Google, por partes** (28/10/2026). 1) Registrar
-      la página en Google Search Console y Bing Webmaster y mandar el sitemap
-      (con la cuenta de Alexis). 2) Un video en YouTube. 3) Páginas cortas para
+- [ ] **Que lo encuentren en Google, por partes** (28/10/2026). 1) ~~Registrar
+      la página en Google Search Console y Bing Webmaster y mandar el sitemap~~
+      (hecho el 30/10/2026: Bing leyó el sitemap; Google decía «No se ha podido
+      leer», es la demora normal de un sitio nuevo: volver a mirar en uno o dos
+      días). 2) Un video en YouTube. 3) Páginas cortas para
       lo que la gente busca («programa gratis para proyectar letras en la
       iglesia», «alternativa gratis a ProPresenter / EasyWorship», «letra en
-      OBS»). 4) Contarlo en grupos de iglesias. 5) Ver si conviene un dominio
-      propio (unos 10–12 dólares por año).
+      OBS»). 4) Contarlo en grupos de iglesias. 5) ~~Ver si conviene un
+      dominio propio~~ (decidido el 30/10/2026: se queda la dirección de
+      GitHub).
 
 - [x] **Más fondos y un botón «Agregar fondos»** (21/10/2026; hecho en la 1.1.0). Ya vienen 10
       fondos en video dentro del instalador (`installer\fondos`, dibujados por
@@ -485,6 +491,22 @@ no escribirle antes de esa fecha.
         camino legal sigue siendo el permiso de cada editorial.
       - Una carpeta privada `biblias` junto al instalador, para las PCs de la
         iglesia.
+      - **API.Bible** (American Bible Society, mirado el 30/10/2026; Alexis dijo
+        «por ahora no hagamos nada»). Catálogo de 412 versiones, 13 en español.
+        **No trae RVR1960, TLA, DHH ni PDT.** Libres: Nueva Biblia Viva (Biblica
+        Open; a Alexis no le gusta), RVR 1909, Versión Biblia Libre, Palabra de
+        Dios para ti y Biblia en español sencillo (las tres del medio ya las
+        tenemos). Licencia estándar: NTV, LBLA, NBLA. NVI: sólo licencia única,
+        con acuerdo directo con Biblica. Plan gratis: sin fines comerciales,
+        todas las libres + hasta 3 con derechos a elección, 5.000 consultas por
+        mes por cuenta. Piden: renovar el texto guardado cada 30 días, no más
+        de 500 versículos seguidos, poner la sigla de la versión. Cada iglesia
+        tendría que crear su cuenta y pegar su clave (una clave nuestra
+        compartida se gastaría y quedaría pública en el código). Duda: el botón
+        «Colaborar» de PayPal frente a «sin fines comerciales» (su guía acepta
+        enlaces chicos de donación; confirmarlo con ellos). Si se hace, sería
+        una opción para quien quiera, no el camino principal. Retomar junto
+        con las respuestas por RVR1960 (5/11/2026).
 
 ## 4. Para versiones futuras
 
