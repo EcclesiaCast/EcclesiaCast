@@ -5,6 +5,14 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+## [1.1.2] - 2026-10-30
+
+### Agregado
+
+- **Colaborar.** **Ayuda → Colaborar** y el enlace de **Acerca de** ahora
+  llevan a la página de PayPal del proyecto, para quien quiera ayudar a que
+  siga adelante. Es opcional: el programa sigue siendo gratis y completo.
+
 ## [1.1.1] - 2026-10-30
 
 ### Agregado
