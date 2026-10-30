@@ -294,6 +294,8 @@
                           ToolTip="Una vez por día, a los pocos segundos de abrir el programa, mira en GitHub si hay una versión nueva. No manda nada tuyo. Nunca interrumpe mientras se proyecta."/>
                 <Separator/>
                 <MenuItem x:Name="DonateMenuItem" Header="Colaborar con EcclesiaCast…" Click="Donate_Click" Visibility="Collapsed"/>
+                <MenuItem Header="Enviar comentarios…" Click="Feedback_Click"
+                          ToolTip="Contanos qué anduvo bien, qué falló o qué te faltó. No se manda nada hasta que apretás «Enviar»."/>
                 <MenuItem Header="Acerca de EcclesiaCast" Click="About_Click"/>
             </MenuItem>
         </Menu>

@@ -132,6 +132,7 @@ public sealed class BackupDialogService(string dbPath) : IBackupDialog
             }
         }
 
+        FeedbackCoordinator.Quiet = true;
         Application.Current.Shutdown();
     }
 }

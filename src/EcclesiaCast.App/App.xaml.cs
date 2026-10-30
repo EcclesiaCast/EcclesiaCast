@@ -5,6 +5,7 @@ using EcclesiaCast.App.Services;
 using EcclesiaCast.App.ViewModels;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Displays;
+using EcclesiaCast.Core.Feedback;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Data.Persistence;
 using LibVLCSharp.Shared;
@@ -18,6 +19,7 @@ public partial class App : Application
 {
     private ServiceProvider? _services;
     private UiWatchdog? _watchdog;
+    private CrashMarker? _crashMarker;
 
     /// <summary>Set once the "Acerca de" of the very first start has been shown.</summary>
     private const string AboutSeenKey = "app.about.seen";
@@ -168,6 +170,14 @@ public partial class App : Application
         BroadcastStyleSettings.Load(settings);
         mainWindow.AttachLayoutPersistence(settings);
 
+        // How much the program is used, and whether the last run ended badly:
+        // both only ever leave the computer inside a comment the person sends.
+        FeedbackCoordinator.Start(settings, appDataDir);
+        var crashMarker = new CrashMarker(appDataDir);
+        var lastRunCrashed = crashMarker.Begin();
+        _crashMarker = crashMarker;
+        SessionEnding += (_, _) => crashMarker.End();
+
         // The splash was the first window opened, so WPF took it for the main
         // one: hand the title over before closing it, or the program would exit.
         MainWindow = mainWindow;
@@ -181,6 +191,12 @@ public partial class App : Application
 
             // A Bible package chosen on the installer's page opens its import window (once).
             _ = _services.GetRequiredService<MainViewModel>().OfferInstalledBiblePackageAsync();
+
+            // Not on the very first start (the person has not used it yet), and
+            // not past the day the temporary notices stop.
+            if (lastRunCrashed && DateTime.Now <= FeedbackForm.AutoPromptUntil
+                && settings.Get(FeedbackPolicy.NeverKey) != "1" && (FeedbackCoordinator.Opens > 1))
+                FeedbackCoordinator.AskAfterCrash(mainWindow);
         };
         mainWindow.Show();
 
@@ -195,6 +211,8 @@ public partial class App : Application
     protected override void OnExit(ExitEventArgs e)
     {
         Log.Information("EcclesiaCast exiting");
+        FeedbackCoordinator.RecordEnd();
+        _crashMarker?.End();
         _watchdog?.Stop();
         AudioEndpointWatcher.Stop();
         LightVideoCache.Shutdown();
