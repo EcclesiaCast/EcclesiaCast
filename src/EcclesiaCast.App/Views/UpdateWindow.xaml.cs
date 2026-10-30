@@ -151,6 +151,7 @@ public partial class UpdateWindow : Window
             _installer.Launch(path);
 
             // The installer is running and needs the program's files.
+            Services.FeedbackCoordinator.Quiet = true;
             Application.Current.Shutdown();
         }
         catch (OperationCanceledException)

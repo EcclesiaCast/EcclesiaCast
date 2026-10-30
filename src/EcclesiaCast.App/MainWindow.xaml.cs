@@ -158,6 +158,9 @@ public partial class MainWindow : Window
         }
 
         Closing += (_, _) => SaveLayout();
+
+        // After the layout is saved, so a long answer cannot lose it.
+        Closing += (_, _) => Services.FeedbackCoordinator.AskOnClosing(this);
     }
 
     private double? ReadDouble(string key) =>

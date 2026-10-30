@@ -443,6 +443,9 @@ public partial class MainWindow
         }
     }
 
+    private void Feedback_Click(object sender, RoutedEventArgs e) =>
+        Services.FeedbackCoordinator.ShowFromMenu(this);
+
     private void About_Click(object sender, RoutedEventArgs e) =>
         new Views.AboutWindow(Services.AppInfo.Version) { Owner = this }.ShowDialog();
 
