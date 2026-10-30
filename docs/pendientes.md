@@ -407,6 +407,27 @@ no escribirle antes de esa fecha.
       la plataforma) y **`help@youversion.com`** (comentarios y soporte); el
       `press@youversion.com` es de prensa.
       No escribirles hasta que Alexis lo apruebe.
+      **Más averiguado el 30/10/2026** (documentación en `developers.youversion.com`,
+      versión en texto en `/llms.txt`): el texto se pide pasaje por pasaje
+      (`GET /v1/bibles/{id}/passages/JHN.3.16`) con la clave en el encabezado
+      `X-YVP-App-Key`; hay que mostrar siempre el aviso de derechos de la
+      versión (`copyright`) y usar sus fuentes y CSS (no se pueden alojar). Cada
+      Biblia sólo se puede leer si la organización **aceptó la licencia de esa
+      editorial** en el portal (si no, 403). La Plataforma tiene **25
+      editoriales y 1.478 Biblias**: Biblica (68), The Lockman Foundation (5),
+      Bible League International (1), eBible.org (26), Free Bible Ministry (5),
+      Latinamerican Textual Bible Foundation (1), Wycliffe (1.035) y otras.
+      **No aparecen** Tyndale (NTV), American Bible Society ni Sociedades
+      Bíblicas Unidas (RVR1960, TLA, DHH), aunque la aplicación bible.com sí las
+      tiene: probablemente la Plataforma no las trae. Sin clave no se pudo ver
+      el listado en español. Los límites de guardar sin internet y de proyectar
+      los fija cada licencia (no publicado); el límite de consultas tampoco es
+      público (un desarrollador contó un 429 a las ~117 consultas sin
+      autenticar). No se encontró ningún programa de proyección para iglesias
+      integrado a la Plataforma. Preguntas para YouVersion: ¿se puede proyectar?,
+      ¿se puede guardar sin internet?, ¿una sola clave dentro de un programa
+      libre o una por iglesia?, ¿qué límite de consultas?, ¿cuáles versiones en
+      español estarían disponibles?, ¿cómo se pide que una editorial se sume?
       Borrador (en inglés, porque es a ellos):
       > Hello, I'm Alexis, a volunteer in a church in Uruguay. I'm building
       > EcclesiaCast, a free and open-source program (WPF/.NET 8, on GitHub:
