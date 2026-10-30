@@ -21,6 +21,7 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Logo de EcclesiaCast y una canción proyectada con el programa">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="fuentes/anton.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="stylesheet" href="estilos.css">
 <script>document.documentElement.classList.add('js')</script>
 </head>
@@ -53,7 +54,7 @@
 <section class="portada" aria-labelledby="titulo">
   <div class="portada-dentro">
     <div class="portada-texto">
-      <h1 id="titulo">Las canciones y la Biblia, en un solo programa. Gratis.</h1>
+      <h1 id="titulo"><span class="linea"><span>Las canciones y la Biblia,</span></span> <span class="linea hueca"><span>en un solo programa.</span></span> <span class="linea dorada"><span>Gratis.</span></span></h1>
       <p class="entrada">EcclesiaCast es un programa para proyectar en la iglesia: la letra de las canciones, la Biblia en una o dos versiones a la vez, fondos con video y avisos. Es para Windows, está en castellano y es libre: no se paga nunca.</p>
       <div class="descarga">
         <a class="boton boton-grande" href="https://github.com/EcclesiaCast/EcclesiaCast/releases/download/v1.0.0/EcclesiaCast-1.0.0-setup.exe" data-release="url">
@@ -113,6 +114,15 @@
   </div>
 </section>
 
+<section class="cifras" aria-label="EcclesiaCast en números">
+  <div class="cifras-dentro">
+    <div class="cifra revelar"><p class="cifra-num"><span data-contar="4">4</span></p><p>Biblias libres para elegir al instalar</p></div>
+    <div class="cifra revelar"><p class="cifra-num"><span data-contar="2">2</span></p><p>versiones de la Biblia a la vez en pantalla</p></div>
+    <div class="cifra revelar"><p class="cifra-num"><span data-contar="3">3</span></p><p>salidas: el proyector, los músicos y la transmisión</p></div>
+    <div class="cifra revelar"><p class="cifra-num">$<span data-contar="0">0</span></p><p>para siempre, sin versión «premium»</p></div>
+  </div>
+</section>
+
 <section class="video seccion" aria-labelledby="video-titulo">
   <div class="angosto">
     <h2 id="video-titulo">Miralo en acción</h2>
@@ -136,6 +146,7 @@
       <img src="img/operador.webp" width="1600" height="950" loading="lazy" alt="La ventana del programa con la canción «Santo, santo, santo» separada en diapositivas, la playlist a la izquierda y la vista en vivo a la derecha">
     </figure>
     <div class="funcion-texto">
+      <p class="etiqueta"><span>S.01</span> Canciones</p>
       <h3>Canciones</h3>
       <p>Pegá la letra y cada párrafo es una diapositiva. Buscá por título, artista o una frase de la letra. Si venís de ProPresenter, EcclesiaCast trae todas tus canciones de una vez. También podés buscar una letra en internet y traerla ya separada.</p>
     </div>
@@ -146,6 +157,7 @@
       <img src="img/biblia-operador.webp" width="1600" height="950" loading="lazy" alt="La pestaña Biblia con Juan 3 abierto, la cita Juan 3:16 escrita en el buscador y el versículo en dos versiones en la vista en vivo">
     </figure>
     <div class="funcion-texto">
+      <p class="etiqueta"><span>S.02</span> Biblia</p>
       <h3>La Biblia, en una o dos versiones</h3>
       <p>Escribí <code>Juan 3:16</code> o <code>sal 23</code> y listo. Con Ctrl+clic sumás una segunda versión, que se proyecta debajo de la primera. Las flechas recorren la Biblia entera, de capítulo en capítulo y de libro en libro.</p>
     </div>
@@ -156,6 +168,7 @@
       <img src="img/propiedades.webp" width="1009" height="888" loading="lazy" alt="La ventana Propiedades de un video de fondo: comportamiento, escala, encuadre, recorte, desenfoque y volumen">
     </figure>
     <div class="funcion-texto">
+      <p class="etiqueta"><span>S.03</span> Fondos</p>
       <h3>Fondos con imágenes y video</h3>
       <p>Poné un video en bucle detrás de la letra: cambiar de verso no lo reinicia. Desenfocalo para que la letra se lea mejor. También proyecta PDF y presentaciones de PowerPoint, página por página.</p>
     </div>
@@ -166,6 +179,7 @@
       <img src="img/diseno.webp" width="1400" height="829" loading="lazy" alt="El diseño de una canción: la diapositiva en el centro y a la derecha la tipografía, el tamaño, el color y la alineación">
     </figure>
     <div class="funcion-texto">
+      <p class="etiqueta"><span>S.04</span> Estilo</p>
       <h3>Tu estilo</h3>
       <p>Elegí la letra, el tamaño, los colores, la sombra y el contorno. Si un versículo no entra, se achica solo. Cada canción puede tener su propio diseño.</p>
     </div>
@@ -176,6 +190,7 @@
       <img src="img/playlist.webp" width="345" height="600" loading="lazy" alt="La lista de canciones y debajo la playlist «Domingo 19/10» con dos himnos">
     </figure>
     <div class="funcion-texto">
+      <p class="etiqueta"><span>S.05</span> Playlist</p>
       <h3>La playlist del culto</h3>
       <p>Armá el orden del servicio con canciones, pasajes y medios, y manejalo entero con las flechas del teclado. ¿El domingo se parece al anterior? Duplicá la playlist y cambiá lo que haga falta.</p>
     </div>
@@ -186,6 +201,7 @@
       <img src="img/escenario.webp" width="1280" height="720" loading="lazy" alt="La pantalla de los músicos: el verso en vivo en letras grandes y la diapositiva siguiente más chica">
     </figure>
     <div class="funcion-texto">
+      <p class="etiqueta"><span>S.06</span> Músicos</p>
       <h3>Pantalla para los músicos</h3>
       <p>Un tercer monitor de cara a la plataforma: la letra en grande, la que sigue, la hora, el cronómetro y notas que sólo ven ellos. Aunque la congregación tenga la pantalla en negro, los músicos siguen viendo la letra.</p>
     </div>
@@ -196,6 +212,7 @@
       <img src="img/celular.webp" width="469" height="1015" loading="lazy" alt="La página del celular: el verso en vivo, el que sigue, las flechas, los botones Clear, Black, Logo y Salida, y las diapositivas">
     </figure>
     <div class="funcion-texto">
+      <p class="etiqueta"><span>S.07</span> Celular</p>
       <h3>Manejalo desde el celular</h3>
       <p>Escaneá un código QR, poné el PIN y pasá las diapositivas desde el celular, con la misma wifi de la iglesia. No hace falta instalar nada en el teléfono.</p>
     </div>
@@ -206,14 +223,23 @@
       <img src="img/transmision.webp" width="559" height="350" loading="lazy" alt="El recuadro «Para la transmisión (OBS o vMix)» con la dirección para copiar">
     </figure>
     <div class="funcion-texto">
+      <p class="etiqueta"><span>S.08</span> Transmisión <span class="chip">Nuevo</span></p>
       <h3>Para la transmisión</h3>
       <p>Copiá una dirección y pegala en OBS o vMix: la letra aparece sola, con fondo transparente, lista para ir encima de la cámara. Sin placa capturadora ni otra computadora.</p>
     </div>
   </article>
 
-  <div class="angosto tambien revelar">
-    <p><strong>También:</strong> cuenta regresiva antes de empezar · aviso al pie («el auto ABC 123 está mal estacionado») · resaltar palabras en vivo · buscador único con Ctrl+K · copia de seguridad de toda la biblioteca · se actualiza solo.</p>
-    <p><a class="enlace-flecha" href="https://github.com/EcclesiaCast/EcclesiaCast/blob/main/docs/guia-de-uso.md">Leé la guía de uso completa →</a></p>
+  <div class="demas">
+    <div class="angosto"><h2 class="demas-titulo">Y todo lo demás</h2></div>
+    <div class="demas-grilla">
+      <article class="mini revelar"><div class="mini-visual"><span class="mini-reloj">04:59</span></div><h3>Cuenta regresiva</h3><p>Un reloj en pantalla antes de empezar el servicio.</p></article>
+      <article class="mini revelar"><div class="mini-visual"><span class="mini-aviso">El auto ABC 123 está mal estacionado</span></div><h3>Aviso al pie</h3><p>Un mensaje corto sin interrumpir la letra.</p></article>
+      <article class="mini revelar"><div class="mini-visual"><span class="mini-letra">Santo, <mark>santo</mark>, santo</span></div><h3>Resaltar palabras</h3><p>Marcá en vivo la palabra que querés destacar.</p></article>
+      <article class="mini revelar"><div class="mini-visual"><span><kbd>Ctrl</kbd> + <kbd>K</kbd></span></div><h3>Buscador único</h3><p>Canciones, pasajes y medios en una sola búsqueda.</p></article>
+      <article class="mini revelar"><div class="mini-visual"><span class="mini-chip">Toda tu biblioteca</span></div><h3>Copia de seguridad</h3><p>Guardá todo y llevalo a otra computadora.</p></article>
+      <article class="mini revelar"><div class="mini-visual"><span class="mini-chip mini-ok">Actualizado ✓</span></div><h3>Se actualiza solo</h3><p>Avisa cuando hay una versión nueva y la instala.</p></article>
+    </div>
+    <p class="demas-guia revelar"><a class="enlace-flecha" href="https://github.com/EcclesiaCast/EcclesiaCast/blob/main/docs/guia-de-uso.md">Leé la guía de uso completa →</a></p>
   </div>
 </section>
 
