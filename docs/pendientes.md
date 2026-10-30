@@ -428,12 +428,15 @@ no escribirle antes de esa fecha.
       Uruguay se puede retirar lo que llegue), pegarlo ahí, y poner el botón en
       la página web (`sitio/`). Reemplaza la idea «Acerca de: una forma de
       colaborar».
-- [ ] **Saber si alguien usa el programa** (28/10/2026, falta decidir cómo).
-      Lo respetuoso: al abrir por primera vez, preguntar «¿Nos dejás contar que
-      usás EcclesiaCast?» y, si dice que sí, mandar una vez por día sólo un número
-      al azar, la versión y el país, nada personal. Hay que anotarlo en
-      [privacidad.md](privacidad.md) y en la web. Sin preguntar, lo único que
-      hay son las descargas de GitHub.
+- [x] **Saber si alguien usa el programa** (30/10/2026, hecho en la 1.1.1).
+      En vez de un contador automático, el programa tiene **Ayuda → Enviar
+      comentarios…**, un aviso al cerrar (una vez por versión, con «No volver a
+      mostrar», se apaga solo el 30/06/2027) y otro al abrir tras un cierre de
+      golpe. Lo que se manda va a un Google Form (respuestas en la planilla de
+      Alexis) y el resumen de uso es opcional y se ve antes de enviar. Código en
+      `src/EcclesiaCast.Core/Feedback/`; textos en la política de privacidad.
+      **Falta:** que Alexis borre la fila de prueba de la planilla, vea la
+      ventana en el programa real y mire cuántos comentarios llegan.
 - [ ] **Que lo encuentren en Google, por partes** (28/10/2026). 1) Registrar
       la página en Google Search Console y Bing Webmaster y mandar el sitemap
       (con la cuenta de Alexis). 2) Un video en YouTube. 3) Páginas cortas para
