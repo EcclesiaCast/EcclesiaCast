@@ -5,6 +5,24 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+## [1.1.1] - 2026-10-30
+
+### Agregado
+
+- **Enviar comentarios.** **Ayuda → Enviar comentarios…** abre una ventana para
+  contarnos qué anduvo bien, qué falló o qué te faltó. Se puede tildar
+  «Adjuntar el resumen de uso» (versión, cuántas veces se abrió, minutos de uso
+  y últimos errores; nada de tu biblioteca) y ver el texto exacto antes de
+  enviar. No se manda nada hasta apretar «Enviar»; cerrar la ventana o tocar
+  «Ahora no» no manda nada.
+- **Aviso al cerrar el programa.** Después de un rato de uso, una vez por
+  versión, pregunta si querés enviar un comentario. Tiene el check «No volver a
+  mostrar este aviso al cerrar». Es temporal: se apaga solo el 30/06/2027. No
+  aparece al actualizar ni al restaurar una copia.
+- **Aviso tras un cierre de golpe.** Si la última vez el programa no terminó por
+  su cuenta, al abrir ofrece contarnos qué pasó, con el resumen de uso ya
+  tildado.
+
 ## [1.1.0] - 2026-10-29
 
 ### Agregado
