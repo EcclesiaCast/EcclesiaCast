@@ -419,7 +419,10 @@ no escribirle antes de esa fecha.
       > open source and installed on many computers, can one key be distributed
       > with it, or must each church register its own? (5) What is the request
       > rate limit per key? Thank you very much.
-- [ ] **Botón «Donar» con PayPal** (28/10/2026). **Hecho el lado del programa:**
+- [x] **Botón «Donar» con PayPal** (28/10/2026). **Hecho el 30/10/2026:** el enlace es
+      <https://paypal.me/ecclesiacast> (cargado en `AppInfo.DonateUrl` y en la
+      web; sale con la próxima versión) y Alexis ya vinculó su tarjeta para retirar.
+      **Antes, el lado del programa:**
       Ayuda → «Colaborar con EcclesiaCast…» y una línea en «Acerca de», que
       **no aparecen mientras `AppInfo.DonateUrl`
       ([AppInfo.cs](../src/EcclesiaCast.App/Services/AppInfo.cs)) esté vacío**, así
@@ -445,7 +448,7 @@ no escribirle antes de esa fecha.
       OBS»). 4) Contarlo en grupos de iglesias. 5) Ver si conviene un dominio
       propio (unos 10–12 dólares por año).
 
-- [ ] **Más fondos y un botón «Agregar fondos»** (21/10/2026). Ya vienen 10
+- [x] **Más fondos y un botón «Agregar fondos»** (21/10/2026; hecho en la 1.1.0). Ya vienen 10
       fondos en video dentro del instalador (`installer\fondos`, dibujados por
       el generador de esa carpeta; pesan de 2 a 6 MB cada uno). Si se quieren
       más sin engordar el instalador, irían en un paquete aparte que se baja

@@ -16,7 +16,7 @@ public static class AppInfo
     /// creates it: while it is empty the «Colaborar» entries stay hidden, so
     /// there is never a button that leads nowhere.
     /// </summary>
-    public const string DonateUrl = "";
+    public const string DonateUrl = "https://paypal.me/ecclesiacast";
 
     /// <summary>
     /// The pack of extra backgrounds, an asset of a GitHub release that is not a
