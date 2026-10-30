@@ -22,8 +22,10 @@ public class ReleaseFeedTests : IDisposable
     private ReleaseFeed Feed(LocalHttpServer server, TimeSpan? timeout = null)
     {
         var client = ReleaseFeed.CreateClient("1.0.0-beta.7");
-        if (timeout is not null)
-            client.Timeout = timeout.Value;
+        // The real client gives up after 15 s; on a loaded build machine the local
+        // server can take that long to be scheduled, which turned a plain 500 into
+        // «sin conexión». Tests that need a short timeout still pass their own.
+        client.Timeout = timeout ?? TimeSpan.FromSeconds(120);
         _disposables.Add(client);
         return new ReleaseFeed(client, server.BaseUrl + "/releases");
     }
