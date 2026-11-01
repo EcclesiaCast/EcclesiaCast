@@ -170,6 +170,43 @@ public class MediaTabRuleTests
         Assert.Equal(MediaBehavior.Foreground, resolved.Behavior);
         Assert.Equal(VideoEndBehavior.Logo, resolved.EndBehavior);
     }
+
+    [Fact]
+    public void A_slideshow_rule_is_written_and_read_back_the_same()
+    {
+        foreach (var rule in new[]
+        {
+            new MediaTabRule(MediaTabMode.PerItem, false, false, MediaSlideshow.Sequential, 7),
+            new MediaTabRule(MediaTabMode.Foreground, true, true, MediaSlideshow.Random, 30),
+        })
+        {
+            Assert.Equal(rule, MediaTabRule.Parse(rule.ToSetting()));
+        }
+
+        Assert.Equal("item+show+secs10", new MediaTabRule(MediaTabMode.PerItem, false, false, MediaSlideshow.Sequential).ToSetting());
+        Assert.Equal("item", MediaTabRule.Default.ToSetting());
+    }
+
+    [Fact]
+    public void A_slideshow_gives_a_picture_with_no_seconds_the_seconds_of_the_tab_and_stops_a_looping_video()
+    {
+        var rule = new MediaTabRule(MediaTabMode.PerItem, false, false, MediaSlideshow.Random, 12);
+        var picture = new MediaItem { Id = 2, Type = MediaType.Image };
+        var ownTime = new MediaItem { Id = 3, Type = MediaType.Image, ShowSeconds = 5 };
+
+        Assert.Equal(12, rule.Resolve(picture).ShowSeconds);
+        Assert.Equal(0, picture.ShowSeconds);
+        Assert.Equal(5, rule.Resolve(ownTime).ShowSeconds);
+        Assert.Equal(VideoEndBehavior.Stop, rule.Resolve(Video()).EndBehavior);
+    }
+
+    [Fact]
+    public void Seconds_nobody_can_use_are_kept_to_something_sensible()
+    {
+        Assert.Equal(MediaTabRule.DefaultSlideSeconds, MediaTabRule.Parse("item+show").SlideSeconds);
+        Assert.Equal(1, MediaTabRule.Parse("item+show+secs0").SlideSeconds);
+        Assert.Equal(MediaTabRule.MaxSlideSeconds, MediaTabRule.Parse("item+show+secs999999").SlideSeconds);
+    }
 }
 
 public class MediaTabNamesTests

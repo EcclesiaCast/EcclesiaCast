@@ -26,7 +26,28 @@ public partial class MediaTabRuleWindow : Window
 
         LogoCheck.IsChecked = current.LogoAtEnd;
         MuteCheck.IsChecked = current.Muted;
+        SecondsBox.Text = current.SlideSeconds.ToString();
+        switch (current.Slideshow)
+        {
+            case MediaSlideshow.Sequential: ShowSequentialRadio.IsChecked = true; break;
+            case MediaSlideshow.Random: ShowRandomRadio.IsChecked = true; break;
+            default: ShowOffRadio.IsChecked = true; break;
+        }
+
         Mode_Changed(this, new RoutedEventArgs());
+        Show_Changed(this, new RoutedEventArgs());
+    }
+
+    /// <summary>The seconds only matter while the tab passes its media by itself.</summary>
+    private void Show_Changed(object sender, RoutedEventArgs e)
+    {
+        if (SecondsPanel is null)
+            return;
+
+        SecondsPanel.IsEnabled = ShowOffRadio.IsChecked != true;
+        PresentationCheck.IsEnabled = ShowOffRadio.IsChecked == true;
+        if (!PresentationCheck.IsEnabled)
+            PresentationCheck.IsChecked = false;
     }
 
     /// <summary>The rule the operator chose; valid once the window closed with Guardar.</summary>
@@ -52,10 +73,19 @@ public partial class MediaTabRuleWindow : Window
             : BackgroundRadio.IsChecked == true ? MediaTabMode.Background
             : MediaTabMode.PerItem;
 
+        var slideshow = ShowRandomRadio.IsChecked == true ? MediaSlideshow.Random
+            : ShowSequentialRadio.IsChecked == true ? MediaSlideshow.Sequential
+            : MediaSlideshow.Off;
+        var seconds = int.TryParse(SecondsBox.Text.Trim(), out var typed)
+            ? MediaTabRule.ClampSeconds(typed)
+            : MediaTabRule.DefaultSlideSeconds;
+
         Rule = new MediaTabRule(
             mode,
             mode == MediaTabMode.Foreground && LogoCheck.IsChecked == true,
-            MuteCheck.IsChecked == true);
+            MuteCheck.IsChecked == true,
+            slideshow,
+            seconds);
         Presentation = PresentationCheck.IsChecked == true;
         DialogResult = true;
     }
