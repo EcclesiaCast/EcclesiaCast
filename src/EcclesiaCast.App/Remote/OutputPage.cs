@@ -498,7 +498,8 @@ public static class OutputPage
               }
 
               // The gradient: the third of the screen on the side of the position.
-              if (kind === 'gradient') {
+              // An own box replaces it, as it does the box of any other plate.
+              if (kind === 'gradient' && !own) {
                 var c = rgba(st.plateColor, op), c0 = rgba(st.plateColor, 0);
                 sgrad.style.top = pos === 'top' ? '0' : pos === 'center' ? '32%' : 'auto';
                 sgrad.style.bottom = pos === 'bottom' ? '0' : 'auto';
