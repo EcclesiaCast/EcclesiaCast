@@ -1165,7 +1165,8 @@
                                      Background="Transparent" BorderThickness="0"
                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                      PreviewKeyDown="PlaylistList_PreviewKeyDown"
-                                     ToolTip="Clic: ver sin proyectar · doble clic: proyectar · Supr: quitar">
+                                     PreviewMouseMove="PlaylistList_PreviewMouseMove"
+                                     ToolTip="Clic: ver sin proyectar · doble clic: proyectar · arrastrar: cambiar el orden · Supr: quitar">
                                 <ListBox.InputBindings>
                                     <KeyBinding Key="Enter"
                                                 Command="{Binding ProjectPlaylistItemCommand}"

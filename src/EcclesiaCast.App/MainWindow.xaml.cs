@@ -508,15 +508,41 @@ public partial class MainWindow : Window
             || sender is not FrameworkElement { DataContext: Core.Playlists.PlaylistItem item })
             return;
 
+        _playlistDragItem = item;
+        _playlistDragStart = e.GetPosition(this);
+
         if (e.ClickCount == 1)
         {
             vm.OpenPlaylistItemCommand.Execute(item);
         }
         else if (e.ClickCount == 2)
         {
+            _playlistDragStart = null;
             vm.ProjectPlaylistItemCommand.Execute(item);
             e.Handled = true;
         }
+    }
+
+    private Point? _playlistDragStart;
+    private Core.Playlists.PlaylistItem? _playlistDragItem;
+
+    /// <summary>A press on a row that travels a few pixels drags it to another place in the playlist.</summary>
+    private void PlaylistList_PreviewMouseMove(object sender, MouseEventArgs e)
+    {
+        if (e.LeftButton != MouseButtonState.Pressed
+            || _playlistDragStart is not Point start
+            || _playlistDragItem is not { } item)
+            return;
+
+        var moved = e.GetPosition(this) - start;
+        if (Math.Abs(moved.X) < SystemParameters.MinimumHorizontalDragDistance * 2
+            && Math.Abs(moved.Y) < SystemParameters.MinimumVerticalDragDistance * 2)
+            return;
+
+        _playlistDragStart = null;
+        DragDrop.DoDragDrop(PlaylistList, new DataObject(typeof(Core.Playlists.PlaylistItem), item), DragDropEffects.Move);
+        _playlistDragItem = null;
+        PlaylistDropLine.Visibility = Visibility.Collapsed;
     }
 
     /// <summary>Double click on a found verse projects it (see the playlist for why it is taken here).</summary>
@@ -1076,13 +1102,14 @@ public partial class MainWindow : Window
     private void PlaylistBody_DragOver(object sender, DragEventArgs e)
     {
         e.Handled = true;
-        if (!e.Data.GetDataPresent(typeof(Song)) && DraggedMedia(e) is null)
+        var reordering = e.Data.GetDataPresent(typeof(Core.Playlists.PlaylistItem));
+        if (!reordering && !e.Data.GetDataPresent(typeof(Song)) && DraggedMedia(e) is null)
         {
             e.Effects = DragDropEffects.None;
             return;
         }
 
-        e.Effects = DragDropEffects.Copy;
+        e.Effects = reordering ? DragDropEffects.Move : DragDropEffects.Copy;
         var (_, lineY) = PlaylistDropPoint(e);
         PlaylistDropLine.Margin = new Thickness(10, Math.Max(0, lineY - 1.5), 10, 0);
         PlaylistDropLine.Visibility = Visibility.Visible;
@@ -1106,7 +1133,9 @@ public partial class MainWindow : Window
             return;
 
         var (index, _) = PlaylistDropPoint(e);
-        if (e.Data.GetData(typeof(Song)) is Song song)
+        if (e.Data.GetData(typeof(Core.Playlists.PlaylistItem)) is Core.Playlists.PlaylistItem moving)
+            vm.MovePlaylistItemBefore(moving, index);
+        else if (e.Data.GetData(typeof(Song)) is Song song)
             vm.InsertSongInPlaylist(song, index);
         else if (DraggedMediaList(e) is { Count: > 0 } media)
             vm.InsertMediaInPlaylist(media, index);

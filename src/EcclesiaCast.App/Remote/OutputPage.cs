@@ -154,9 +154,14 @@ public static class OutputPage
               -webkit-backdrop-filter: blur(1.8vh); backdrop-filter: blur(1.8vh); text-shadow: none;
             }
 
-            /* Sólida: no plate, one strong even shadow to read over any camera. */
+            /* Sólida: no plate, one strong even shadow to read over any camera.
+               The shadow takes the colour and the opacity of the plate (--pc is
+               the colour as «r,g,b», --k the opacity from 0 to 1), so the
+               Opacidad slider changes it too. */
             #stage.k-solid #plate, #stage.k-line #plate {
-              text-shadow: 0 .04em .06em rgba(0,0,0,.95), 0 0 .2em rgba(0,0,0,.85), 0 0 .5em rgba(0,0,0,.6);
+              text-shadow: 0 .04em .06em rgba(var(--pc),calc(var(--k) * 1.1)),
+                           0 0 .2em rgba(var(--pc),calc(var(--k) * 1)),
+                           0 0 .5em rgba(var(--pc),calc(var(--k) * .7));
             }
 
             /* Degradé: no box, the colour fades in from the edge (#sgrad). */
@@ -168,7 +173,10 @@ public static class OutputPage
             }
 
             /* Filete: soft shadow and a thin accent line that fades out sideways. */
-            #stage.k-fillet #plate { text-shadow: 0 .04em .12em rgba(0,0,0,.8), 0 0 .5em rgba(0,0,0,.45); padding-bottom: .5em; }
+            #stage.k-fillet #plate {
+              text-shadow: 0 .04em .12em rgba(var(--pc),calc(var(--k) * .95)), 0 0 .5em rgba(var(--pc),calc(var(--k) * .55));
+              padding-bottom: .5em;
+            }
             #stage.k-fillet #plate::after {
               content: ''; position: absolute; left: -4%; right: -4%; bottom: 0; height: max(2px, .04em);
               background: linear-gradient(90deg, transparent, var(--accent) 18%, var(--accent) 82%, transparent);
@@ -193,6 +201,16 @@ public static class OutputPage
             #stage.v-below #label { order: 2; margin-top: .18em; margin-bottom: 0; }
             #stage.v-below.k-tab #label { margin-top: -1px; border-radius: 0 0 .5em .5em; }
             #stage.v-below.k-glass #label { margin-top: .45em; }
+
+            /* The operator's own box (Estilos → Configuración extra del recuadro).
+               When it is set it wins over the box each plate draws; the plate
+               still gives the text shadow, the label and the line. */
+            #stage.box-own #plate {
+              background: var(--boxbg); border: var(--boxborder); border-radius: var(--boxradius);
+              box-shadow: none; padding: var(--boxpady) var(--boxpadx);
+              -webkit-backdrop-filter: var(--boxblur); backdrop-filter: var(--boxblur);
+            }
+            #stage.box-own.k-fillet #plate { padding-bottom: calc(var(--boxpady) + .1em); }
           </style>
         </head>
         <body>
@@ -333,7 +351,16 @@ public static class OutputPage
             var sgrad = document.getElementById('sgrad');
             var sbg = document.getElementById('sbg');
             var bgKey = '';
-            var plateKey = '';
+            var contentKey = '';
+            var styleKey = '';
+
+            // «r,g,b» of a colour, for the shadows that take the plate's colour.
+            function rgbOf(hex) {
+              var h = String(hex || '').replace('#', '');
+              if (h.length !== 6 || isNaN(parseInt(h, 16))) h = '000000';
+              var n = parseInt(h, 16);
+              return (n >> 16 & 255) + ',' + (n >> 8 & 255) + ',' + (n & 255);
+            }
 
             function rgba(hex, a) {
               var h = String(hex || '').replace('#', '');
@@ -390,9 +417,14 @@ public static class OutputPage
               var base = st.fontSize / 1080 * 100;
 
               // Nothing changed: leave it alone, or the fade would replay at every poll.
-              var key = JSON.stringify([st, text, s.secondaryText, tag, s.mainMarks, s.secondaryMarks, !!s.overlay]);
-              if (key === plateKey) return;
-              plateKey = key;
+              // A new text fades; a change of design alone (the style editor
+              // is open) is applied on the spot, with no fade at all.
+              var cKey = JSON.stringify([text, s.secondaryText, tag, s.mainMarks, s.secondaryMarks]);
+              var sKey = JSON.stringify([st, !!s.overlay]);
+              if (cKey === contentKey && sKey === styleKey) return;
+              var textChanged = cKey !== contentKey;
+              contentKey = cKey;
+              styleKey = sKey;
 
               if (!text) {
                 swrap.style.transition = 'opacity .2s';
@@ -401,20 +433,49 @@ public static class OutputPage
                 return;
               }
 
-              // A short fade between one text and the next instead of a jump.
-              swrap.style.transition = 'none';
-              swrap.style.opacity = '0';
-              void swrap.offsetWidth;
+              if (textChanged) {
+                // One text to the next is a cross-fade: the old one stays as a
+                // copy that fades out while the new one fades in, so there is
+                // never a moment with nothing on the screen.
+                if (swrap.style.opacity === '1' && smain.textContent) {
+                  var ghost = stage.cloneNode(true);
+                  ghost.style.transition = 'opacity .2s';
+                  stage.parentNode.insertBefore(ghost, stage.nextSibling);
+                  void ghost.offsetWidth;
+                  ghost.style.opacity = '0';
+                  setTimeout(function () { ghost.remove(); }, 300);
+                }
+                swrap.style.transition = 'none';
+                swrap.style.opacity = '0';
+                void swrap.offsetWidth;
+              }
 
+              var own = !!st.box && st.box !== 'auto';
               var m = st.marginPercent || 0;
-              stage.className = 'p-' + pos + ' k-' + kind + ' l-' + (st.labelAlign || 'center') + (st.labelBelow ? ' v-below' : '');
+              stage.className = 'p-' + pos + ' k-' + kind + ' l-' + (st.labelAlign || 'center') + (st.labelBelow ? ' v-below' : '') + (own ? ' box-own' : '');
               label.style.fontSize = (0.36 * (st.labelSize || 100) / 100).toFixed(3) + 'em';
               stage.style.padding = m + 'vh ' + m + 'vw ' + (s.overlay && pos === 'bottom' ? Math.max(m, 14) : m) + 'vh';
               stage.style.setProperty('--accent', st.accentColor);
               stage.style.setProperty('--onaccent', onColor(st.accentColor));
               stage.style.setProperty('--plate', rgba(st.plateColor, op));
-              stage.style.setProperty('--plateglass', rgba(st.plateColor, Math.min(op, 1) * 0.55));
-              stage.style.setProperty('--halo', rgba(st.plateColor, Math.max(op, 0.6) * 0.95));
+              stage.style.setProperty('--plateglass', rgba(st.plateColor, op * 0.65));
+              stage.style.setProperty('--halo', rgba(st.plateColor, op * 0.95));
+              stage.style.setProperty('--pc', rgbOf(st.plateColor));
+              stage.style.setProperty('--k', op);
+              if (own) {
+                var angle = st.boxAngle == null ? 90 : st.boxAngle;
+                var fill = st.box === 'color' ? rgba(st.plateColor, op)
+                  : st.box === 'gradient' ? 'linear-gradient(' + angle + 'deg,' + rgba(st.plateColor, op) + ',' + rgba(st.plateColor, 0) + ')'
+                  : 'none';
+                var bwid = (st.boxBorderWidth || 0) / 100;
+                var pad = (st.boxPadding == null ? 100 : st.boxPadding) / 100;
+                stage.style.setProperty('--boxbg', fill);
+                stage.style.setProperty('--boxborder', bwid > 0 ? bwid + 'em solid ' + st.boxBorderColor : 'none');
+                stage.style.setProperty('--boxradius', ((st.boxRadius == null ? 30 : st.boxRadius) / 100) + 'em');
+                stage.style.setProperty('--boxblur', st.boxBlur > 0 ? 'blur(' + (st.boxBlur / 10) + 'vh)' : 'none');
+                stage.style.setProperty('--boxpady', (0.45 * pad) + 'em');
+                stage.style.setProperty('--boxpadx', (0.9 * pad) + 'em');
+              }
               stage.style.color = st.textColor;
               stage.style.fontFamily = "'" + (st.fontFamily || 'Segoe UI') + "', 'Segoe UI', sans-serif";
               stage.style.fontWeight = st.bold ? '700' : '400';
@@ -450,9 +511,11 @@ public static class OutputPage
                 sgrad.style.opacity = '0';
               }
 
-              void swrap.offsetWidth;
-              swrap.style.transition = 'opacity .2s';
-              swrap.style.opacity = '1';
+              if (textChanged) {
+                void swrap.offsetWidth;
+                swrap.style.transition = 'opacity .2s';
+                swrap.style.opacity = '1';
+              }
             }
 
             function paintLegacy(s) {

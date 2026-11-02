@@ -162,7 +162,8 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="40"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Style="{StaticResource FieldLabel}" Text="Opacidad"/>
+                            <TextBlock Style="{StaticResource FieldLabel}" Text="Opacidad"
+                                       ToolTip="Cuánto se ve la placa (o su sombra, su halo o su degradé). Con «Ninguna» no hay nada que atenuar"/>
                             <Slider x:Name="OpacitySlider" Grid.Column="1" Minimum="0" Maximum="100" SmallChange="1" LargeChange="10"
                                     IsSnapToTickEnabled="True" TickFrequency="1" ValueChanged="Slider_Changed"/>
                             <TextBlock x:Name="OpacityText" Grid.Column="2" Style="{StaticResource FieldLabel}" TextAlignment="Right"/>
@@ -213,6 +214,86 @@
                         <StackPanel Orientation="Horizontal">
                             <RadioButton x:Name="LabAbove" Content="Arriba de la letra" Tag="Above" GroupName="LabVert" Style="{StaticResource Choice}" Checked="Control_Changed"/>
                             <RadioButton x:Name="LabBelow" Content="Abajo de la letra" Tag="Below" GroupName="LabVert" Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                        </StackPanel>
+
+                        <!-- Escondido hasta que se toca: la libertad total del recuadro -->
+                        <TextBlock x:Name="BoxToggle" Style="{StaticResource Section}" Text="▸  Configuración extra del recuadro"
+                                   Cursor="Hand" Background="Transparent"
+                                   MouseLeftButtonUp="BoxToggle_MouseLeftButtonUp"
+                                   ToolTip="Fondo, degradé, borde, esquinas y desenfoque del recuadro, con todo lo que quieras"/>
+                        <StackPanel x:Name="BoxPanel" Visibility="Collapsed">
+                            <TextBlock Style="{StaticResource FieldLabel}" TextWrapping="Wrap" Margin="0,0,0,6"
+                                       Text="«Según la placa» deja el recuadro como lo dibuja la placa elegida. Cualquier otra opción lo reemplaza por el tuyo, con el color y la opacidad de «Colores»."/>
+                            <WrapPanel>
+                                <RadioButton x:Name="BoxAuto" Content="Según la placa" Tag="Auto" GroupName="Box" Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                                <RadioButton x:Name="BoxNone" Content="Sin recuadro" Tag="None" GroupName="Box" Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                                <RadioButton x:Name="BoxColor" Content="Color liso" Tag="Color" GroupName="Box" Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                                <RadioButton x:Name="BoxGradient" Content="Degradé a transparente" Tag="Gradient" GroupName="Box" Style="{StaticResource Choice}" Checked="Control_Changed"/>
+                            </WrapPanel>
+                            <StackPanel x:Name="BoxOptions">
+                                <Grid x:Name="BoxAngleRow" Margin="0,4,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="110"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="40"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Style="{StaticResource FieldLabel}" Text="Dirección"
+                                               ToolTip="Hacia dónde se desvanece el degradé: 0° hacia arriba, 90° hacia la derecha, 180° hacia abajo, 270° hacia la izquierda"/>
+                                    <Slider x:Name="BoxAngleSlider" Grid.Column="1" Minimum="0" Maximum="345" SmallChange="15" LargeChange="45"
+                                            IsSnapToTickEnabled="True" TickFrequency="15" ValueChanged="Slider_Changed"/>
+                                    <TextBlock x:Name="BoxAngleText" Grid.Column="2" Style="{StaticResource FieldLabel}" TextAlignment="Right"/>
+                                </Grid>
+                                <Grid Margin="0,8,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="110"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="40"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Style="{StaticResource FieldLabel}" Text="Grosor del borde"/>
+                                    <Slider x:Name="BoxBorderSlider" Grid.Column="1" Minimum="0" Maximum="20" SmallChange="1" LargeChange="2"
+                                            IsSnapToTickEnabled="True" TickFrequency="1" ValueChanged="Slider_Changed"/>
+                                    <TextBlock x:Name="BoxBorderText" Grid.Column="2" Style="{StaticResource FieldLabel}" TextAlignment="Right"/>
+                                </Grid>
+                                <StackPanel x:Name="BoxBorderColorRow" Orientation="Horizontal" Margin="0,6,0,0">
+                                    <TextBlock Style="{StaticResource FieldLabel}" Text="Color del borde" Width="110"/>
+                                    <Button x:Name="BoxBorderColorButton" Style="{StaticResource Swatch}" Click="PickColor_Click" Tag="BoxBorder"/>
+                                </StackPanel>
+                                <Grid Margin="0,8,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="110"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="40"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Style="{StaticResource FieldLabel}" Text="Esquinas"/>
+                                    <Slider x:Name="BoxRadiusSlider" Grid.Column="1" Minimum="0" Maximum="80" SmallChange="1" LargeChange="10"
+                                            IsSnapToTickEnabled="True" TickFrequency="1" ValueChanged="Slider_Changed"/>
+                                    <TextBlock x:Name="BoxRadiusText" Grid.Column="2" Style="{StaticResource FieldLabel}" TextAlignment="Right"/>
+                                </Grid>
+                                <Grid Margin="0,8,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="110"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="40"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Style="{StaticResource FieldLabel}" Text="Espacio adentro"
+                                               ToolTip="Aire entre el borde del recuadro y la letra. 100 % es el de siempre"/>
+                                    <Slider x:Name="BoxPaddingSlider" Grid.Column="1" Minimum="0" Maximum="250" SmallChange="5" LargeChange="25"
+                                            IsSnapToTickEnabled="True" TickFrequency="5" ValueChanged="Slider_Changed"/>
+                                    <TextBlock x:Name="BoxPaddingText" Grid.Column="2" Style="{StaticResource FieldLabel}" TextAlignment="Right"/>
+                                </Grid>
+                                <Grid Margin="0,8,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="110"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="40"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Style="{StaticResource FieldLabel}" Text="Desenfoque"
+                                               ToolTip="Desenfoca lo que hay detrás del recuadro (la cámara). Se nota con una opacidad baja"/>
+                                    <Slider x:Name="BoxBlurSlider" Grid.Column="1" Minimum="0" Maximum="40" SmallChange="1" LargeChange="5"
+                                            IsSnapToTickEnabled="True" TickFrequency="1" ValueChanged="Slider_Changed"/>
+                                    <TextBlock x:Name="BoxBlurText" Grid.Column="2" Style="{StaticResource FieldLabel}" TextAlignment="Right"/>
+                                </Grid>
+                            </StackPanel>
                         </StackPanel>
 
                         <TextBlock Style="{StaticResource Section}" Text="Fondo fijo"/>

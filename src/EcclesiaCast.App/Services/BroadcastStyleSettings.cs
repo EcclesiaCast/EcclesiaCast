@@ -19,6 +19,19 @@ public static class BroadcastStyleSettings
     /// <summary>Reads the saved designs; the factory ones when nothing was saved.</summary>
     public static void Load(ISettingsStore settings) => Current = BroadcastStyles.Load(settings);
 
+    /// <summary>
+    /// Puts designs on the stream without saving them, so the operator sees
+    /// them in OBS while editing. Giving back the saved ones undoes it.
+    /// </summary>
+    public static void Preview(BroadcastStyles styles)
+    {
+        if (styles == Current)
+            return;
+
+        Current = styles;
+        Changed?.Invoke(null, EventArgs.Empty);
+    }
+
     /// <summary>Applies and saves the design of one layer; OBS picks it up on its next poll.</summary>
     public static void Set(OutputChannel channel, BroadcastStyle style, ISettingsStore settings)
     {

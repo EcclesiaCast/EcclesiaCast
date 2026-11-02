@@ -39,6 +39,8 @@ public partial class BroadcastStyleWindow : Window
         + "linear-gradient(135deg, #3a1c6b 0%, #1a1747 45%, #0c1230 100%)';";
 
     private readonly ISettingsStore _settings;
+    /// <summary>What was saved when the window opened. The stream shows the draft while editing, and goes back to this on Cancelar.</summary>
+    private readonly BroadcastStyles _saved = BroadcastStyleSettings.Current;
     private BroadcastStyles _draft = BroadcastStyleSettings.Current;
     private OutputChannel _channel = OutputChannel.Bible;
 
@@ -76,7 +78,13 @@ public partial class BroadcastStyleWindow : Window
         }
 
         Loaded += async (_, _) => await StartPreviewAsync();
-        Closed += (_, _) => _web?.Dispose();
+        Closed += (_, _) =>
+        {
+            _web?.Dispose();
+            // Closed without saving: the stream goes back to what was saved.
+            if (DialogResult != true)
+                BroadcastStyleSettings.Preview(_saved);
+        };
 
         Fill();
         _ready = true;
@@ -113,6 +121,17 @@ public partial class BroadcastStyleWindow : Window
         Pick(s.LabelAlign.ToString(), LabLeft, LabCenter, LabRight);
         Pick(s.LabelBelow ? "Below" : "Above", LabAbove, LabBelow);
 
+        Pick(s.Box.ToString(), BoxAuto, BoxNone, BoxColor, BoxGradient);
+        BoxAngleSlider.Value = s.BoxAngle;
+        BoxBorderSlider.Value = s.BoxBorderWidth;
+        BoxRadiusSlider.Value = s.BoxRadius;
+        BoxPaddingSlider.Value = s.BoxPadding;
+        BoxBlurSlider.Value = s.BoxBlur;
+
+        // A layer that already has its own box opens the extra settings.
+        if (s.Box != BroadcastBox.Auto)
+            SetBoxPanel(true);
+
         _loading = false;
         Refresh();
     }
@@ -147,7 +166,22 @@ public partial class BroadcastStyleWindow : Window
         LabelSize = (int)LabelSizeSlider.Value,
         LabelAlign = Chosen(Current.LabelAlign, LabLeft, LabCenter, LabRight),
         LabelBelow = LabBelow.IsChecked == true,
+        Box = Chosen(Current.Box, BoxAuto, BoxNone, BoxColor, BoxGradient),
+        BoxAngle = (int)BoxAngleSlider.Value,
+        BoxBorderWidth = (int)BoxBorderSlider.Value,
+        BoxRadius = (int)BoxRadiusSlider.Value,
+        BoxPadding = (int)BoxPaddingSlider.Value,
+        BoxBlur = (int)BoxBlurSlider.Value,
     };
+
+    private void BoxToggle_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e) =>
+        SetBoxPanel(BoxPanel.Visibility != Visibility.Visible);
+
+    private void SetBoxPanel(bool open)
+    {
+        BoxPanel.Visibility = open ? Visibility.Visible : Visibility.Collapsed;
+        BoxToggle.Text = (open ? "▾" : "▸") + "  Configuración extra del recuadro";
+    }
 
     private void Control_Changed(object sender, RoutedEventArgs e)
     {
@@ -190,6 +224,15 @@ public partial class BroadcastStyleWindow : Window
         WidthText.Text = s.WidthPercent + " %";
         MarginText.Text = s.MarginPercent + " %";
         LabelSizeText.Text = s.LabelSize + " %";
+        BoxAngleText.Text = s.BoxAngle + "°";
+        BoxBorderText.Text = s.BoxBorderWidth.ToString();
+        BoxRadiusText.Text = s.BoxRadius.ToString();
+        BoxPaddingText.Text = s.BoxPadding + " %";
+        BoxBlurText.Text = s.BoxBlur.ToString();
+        BoxOptions.Visibility = s.Box == BroadcastBox.Auto ? Visibility.Collapsed : Visibility.Visible;
+        BoxAngleRow.Visibility = s.Box == BroadcastBox.Gradient ? Visibility.Visible : Visibility.Collapsed;
+        BoxBorderColorRow.Visibility = s.BoxBorderWidth > 0 ? Visibility.Visible : Visibility.Collapsed;
+        SetSwatch(BoxBorderColorButton, s.BoxBorderColor);
 
         Controls.IsEnabled = !s.FollowProjector;
         Controls.Opacity = s.FollowProjector ? 0.4 : 1;
@@ -207,6 +250,9 @@ public partial class BroadcastStyleWindow : Window
             button.IsChecked = button.Tag is BroadcastPreset preset && preset.Matches(s);
 
         PushPreview();
+
+        // The stream shows it too while editing (nothing is saved until Guardar).
+        BroadcastStyleSettings.Preview(_draft);
     }
 
     private static void SetSwatch(Button button, string hex)
@@ -242,6 +288,7 @@ public partial class BroadcastStyleWindow : Window
             "Text" => s.TextColor,
             "Accent" => s.AccentColor,
             "Plate" => s.PlateColor,
+            "BoxBorder" => s.BoxBorderColor,
             _ => s.BackgroundColor,
         };
 
@@ -254,6 +301,7 @@ public partial class BroadcastStyleWindow : Window
             "Text" => s with { TextColor = picked },
             "Accent" => s with { AccentColor = picked },
             "Plate" => s with { PlateColor = picked },
+            "BoxBorder" => s with { BoxBorderColor = picked },
             _ => s with { BackgroundColor = picked },
         }).Clamp());
         Refresh();
@@ -299,7 +347,8 @@ public partial class BroadcastStyleWindow : Window
     {
         foreach (var channel in new[] { OutputChannel.Bible, OutputChannel.Songs, OutputChannel.Announcements })
         {
-            if (_draft.For(channel) != BroadcastStyleSettings.Current.For(channel))
+            // The stream already shows the draft, so it is compared with what was saved.
+            if (_draft.For(channel) != _saved.For(channel))
                 BroadcastStyleSettings.Set(channel, _draft.For(channel), _settings);
         }
 

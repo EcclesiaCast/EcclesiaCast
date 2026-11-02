@@ -122,10 +122,21 @@ public sealed partial class MainViewModel
         // screen) the rebuild would bring a dismissed slide back by itself.
         var wasOnAir = IsGridOnAir;
 
+        // In a song, the slide is found again by the place of its section and
+        // which piece of it it was: a long section is cut into several slides
+        // with the same label, and the label alone lands on the first one.
+        var liveSpot = SongSlideSpot(live);
+        var previewedSpot = PreviewSlideIndex >= 0 && PreviewSlideIndex < Slides.Count
+            ? SongSlideSpot(Slides[PreviewSlideIndex])
+            : null;
+        var previewedLabel = previewedSpot is null ? null : Slides[PreviewSlideIndex].Label;
+
         rebuild();
 
         if (previewed is not null && FindVerseSlide(previewed.Chapter, previewed.FirstVerse) is var marked and >= 0)
             SetPreviewIndex(marked);
+        else if (previewedSpot is { } spot && SongSlideAt(spot, previewedLabel) is var seen and >= 0)
+            SetPreviewIndex(seen);
 
         if (live is null || !wasOnAir)
             return;
@@ -142,10 +153,65 @@ public sealed partial class MainViewModel
         }
         else
         {
-            index = Slides.ToList().FindIndex(s => s.Label == live.Label);
+            index = liveSpot is { } spot ? SongSlideAt(spot, live.Label) : -1;
+            if (index < 0)
+                index = Slides.ToList().FindIndex(s => s.Label == live.Label);
         }
 
         if (index >= 0)
             GoLiveSlide(index);
+    }
+
+    /// <summary>Where a song slide sits: the place of its section among the song's and the piece of that section it is.</summary>
+    private (int Section, int Piece)? SongSlideSpot(SlideItemViewModel? slide)
+    {
+        if (slide is null || slide.SectionId == 0)
+            return null;
+
+        var section = -1;
+        var firstOfSection = 0;
+        var lastId = 0;
+        for (var i = 0; i <= slide.Index && i < Slides.Count; i++)
+        {
+            if (Slides[i].SectionId == lastId)
+                continue;
+            lastId = Slides[i].SectionId;
+            section++;
+            firstOfSection = i;
+        }
+
+        return (section, slide.Index - firstOfSection);
+    }
+
+    /// <summary>
+    /// The slide at a place found by <see cref="SongSlideSpot"/>, or -1 when
+    /// the song no longer has it or it is another section (one was added or
+    /// removed): then the caller falls back to the label.
+    /// </summary>
+    private int SongSlideAt((int Section, int Piece) spot, string? label)
+    {
+        var section = -1;
+        var lastId = 0;
+        for (var i = 0; i < Slides.Count; i++)
+        {
+            if (Slides[i].SectionId == 0)
+                return -1;
+            if (Slides[i].SectionId != lastId)
+            {
+                lastId = Slides[i].SectionId;
+                section++;
+            }
+
+            if (section != spot.Section)
+                continue;
+
+            var last = i;
+            while (last + 1 < Slides.Count && Slides[last + 1].SectionId == lastId)
+                last++;
+            var index = Math.Min(i + spot.Piece, last);
+            return Slides[index].Label == label ? index : -1;
+        }
+
+        return -1;
     }
 }

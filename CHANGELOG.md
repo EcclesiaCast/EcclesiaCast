@@ -5,6 +5,42 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+### Agregado
+
+- **Plantillas listas para el proyector.** En **Temas**, arriba del editor hay
+  siete looks (Clásico, Claro, Sobre video, Tercio inferior, Elegante, Alto
+  contraste, A la izquierda) que sirven para la letra y para la Biblia: un clic
+  cambia tipografía, colores, sombra, fondo y lugar del texto, y después se
+  retoca. No se guarda hasta «Guardar».
+- **Configuración extra del recuadro** en **Transmisión → Estilos de la
+  transmisión…** (escondida: se abre con un clic). Permite un recuadro propio:
+  sin recuadro, color liso o degradé a transparente (con la dirección que
+  quieras), borde con su grosor y color, esquinas, espacio adentro y desenfoque.
+- **Cambiar el orden de la playlist arrastrando** un renglón a otro lugar
+  («Subir» y «Bajar» del clic derecho siguen).
+- **Lo que editás en los estilos de la transmisión se ve en OBS mientras lo
+  editás**, sin esperar a «Guardar». Con «Cancelar» la transmisión vuelve a
+  como estaba.
+
+### Cambiado
+
+- **Las notas de una actualización suman todas las versiones** que te
+  perdiste (la más nueva primero), no sólo la última.
+- La **Opacidad** ahora cambia también la sombra de las placas Sólida, Filete y
+  Línea, el halo (antes no bajaba de 60 %) y el vidrio.
+- La página del celular dice «En pantalla» para el estado de la salida.
+
+### Corregido
+
+- **Pestañeo en la transmisión al cambiar de Biblia** (o de texto): ahora el
+  texto viejo se desvanece mientras entra el nuevo, sin un instante vacío. Un
+  cambio de diseño solo se aplica al instante, sin fundido.
+- **Editar una canción (como texto, edición rápida o diseño) ya no vuelve a la
+  primera diapositiva**: queda en la que estabas, aunque la sección esté
+  partida en varias, y la playlist conserva su lugar.
+- Al subir o bajar un renglón de la playlist, las flechas del teclado siguen
+  desde el mismo renglón.
+
 ## [1.1.2] - 2026-10-30
 
 ### Agregado
