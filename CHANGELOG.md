@@ -5,7 +5,16 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+## [1.1.3] - 2026-11-05
+
 ### Agregado
+
+- **Presentación con una pestaña de medios.** Clic derecho en la pestaña →
+  **Configurar…** → «Pasar los medios solos»: en orden, de forma continua, o al
+  azar sin repetir hasta que salgan todos. Hacés clic en un medio y sigue solo:
+  cada video hasta que termina y cada imagen los segundos que elijas (o los
+  suyos, si los tiene en Propiedades). Se corta al elegir otra cosa o al sacar
+  el fondo.
 
 - **Plantillas listas para el proyector.** En **Temas**, arriba del editor hay
   siete looks (Clásico, Claro, Sobre video, Tercio inferior, Elegante, Alto
