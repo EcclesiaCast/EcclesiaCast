@@ -264,6 +264,13 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       vacío. 5) Una canción con secciones partidas: «Editar como texto plano»
       y «Edición rápida» tienen que dejarte en la misma diapositiva. 6) Al
       actualizar saltando versiones, la ventana muestra las notas de todas.
+      **Salió en la 1.1.3 (5/11/2026).**
+- [ ] **Presentación con una pestaña de medios** (salió en la 1.1.3; hay
+      pruebas de la regla, no se vio andar). Clic derecho en una pestaña de
+      Medios → Configurar… → «Pasar los medios solos»: probá «En orden» y «Al
+      azar» con imágenes y videos mezclados. Cada video tiene que llegar al
+      final antes de pasar, y cada imagen durar los segundos elegidos (o los
+      suyos de Propiedades). Elegir otra cosa o sacar el fondo la corta.
 
 ## 2. Después de publicar la v1.0.0
 
@@ -375,12 +382,21 @@ que haya un sí por escrito, no se incluyen ni se ofrecen para bajar.
 
 Si para el 5/11/2026 no contestaron: llamar a la Sociedad Bíblica del Uruguay
 (2411 0034) y escribir a Proyecto Evanggelio por Facebook o Instagram. A Biblica
-no escribirle antes de esa fecha.
+no escribirle antes de esa fecha. **5/11/2026: no contestó nadie** (aparte de
+las respuestas automáticas de la tabla); toca dar estos pasos.
 
 ## 3. Para hacer después de la 1.0
 
-- [ ] **Escribirle a YouVersion para ver cómo integrar su plataforma**
-      (28/10/2026; **Alexis ya les mandó el mail, esperando respuesta**). Lo
+- [ ] **YouVersion: en pausa** (5/11/2026, Alexis: «queda en el freezer por
+      ahora»). La integración está programada y guardada en la rama
+      `claude/youversion-integracion`, sin fusionar: necesita que cada iglesia
+      saque su clave, y RVR1960, NTV, TLA, DHH y TCB no están en su API. No
+      tocarla hasta que Alexis la retome.
+      Lo de antes: **escribirle a YouVersion para ver cómo integrar su plataforma**
+      (28/10/2026). Contestaron el 1/11/2026: se puede proyectar y transmitir,
+      se puede guardar el texto respetando `Cache-Control`, cada iglesia
+      registra su propia clave, y el límite es de 200 consultas por hora en la
+      beta (10.000 en vivo). La respuesta completa está anotada en esa rama. Lo
       averiguado: YouVersion tiene una **Plataforma para
       desarrolladores** (https://platform.youversion.com, documentación en
       https://developers.youversion.com) con una API y kits de desarrollo
