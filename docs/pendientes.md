@@ -251,6 +251,20 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       ejemplo de la guía («Sólo el texto, para darle estilo desde OBS») y mirá que
       cambie el color y el tamaño.
 
+- [ ] **Lo de la tanda del 1/11/2026** (hay compilación y pruebas; nada se abrió
+      en el programa). 1) Playlist: arrastrá un renglón a otro lugar y mirá la
+      línea que marca dónde cae; con «Subir/Bajar» y las flechas del teclado
+      sigue desde el mismo renglón. 2) **Temas → Plantillas listas**: probá las
+      siete con una canción y con la Biblia; que la caja de texto se mueva sola
+      con «Tercio inferior». 3) **Transmisión → Estilos**: abrí «Configuración
+      extra del recuadro», probá degradé, borde y desenfoque, y mirá que OBS
+      cambie mientras tocás; «Cancelar» tiene que devolver lo de antes. La
+      opacidad tiene que notarse en Sólida, Filete, Línea y Halo. 4) Cambiá de
+      Biblia con un versículo en pantalla: en OBS no tiene que haber un instante
+      vacío. 5) Una canción con secciones partidas: «Editar como texto plano»
+      y «Edición rápida» tienen que dejarte en la misma diapositiva. 6) Al
+      actualizar saltando versiones, la ventana muestra las notas de todas.
+
 ## 2. Después de publicar la v1.0.0
 
 **La 1.0.0 salió el 21/10/2026** como versión estable, sin firma:
@@ -553,7 +567,7 @@ no escribirle antes de esa fecha.
 ## 5. Decisiones tomadas
 
 
-Descartado (28/10/2026): agregar letras.com a la búsqueda de canciones. Le niega
+Descartado (28/10/2026, vuelto a mirar el 1/11/2026 sin novedades: no hay API pública ni condiciones que lo permitan): agregar letras.com a la búsqueda de canciones. Le niega
 el acceso a todo lo que no sea un navegador (403) y sus condiciones prohíben
 eludir medidas de seguridad. La búsqueda sigue con musica.com primero y LRCLIB de
 respaldo. Si algún día se quiere, la salida limpia es pedirles permiso por

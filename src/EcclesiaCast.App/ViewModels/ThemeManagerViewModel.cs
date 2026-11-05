@@ -414,6 +414,24 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
             .Where(song => song.ThemeId == theme.Id || (isDefault && song.ThemeId is null));
     }
 
+    /// <summary>Raised when a look moves the text box, so the window redraws its handles.</summary>
+    public event EventHandler? BoxReplaced;
+
+    /// <summary>The ready-made looks the editor offers (Plantillas listas).</summary>
+    public IReadOnlyList<ThemePreset> Presets => ThemePresets.All;
+
+    /// <summary>Puts a ready-made look on the theme being edited. Nothing is saved until «Guardar».</summary>
+    [RelayCommand]
+    private void ApplyPreset(ThemePreset? preset)
+    {
+        if (preset is null || SelectedTheme is null)
+            return;
+
+        LoadEditorFrom(preset.ApplyTo(BuildTheme(SelectedTheme.Id)));
+        BoxReplaced?.Invoke(this, EventArgs.Empty);
+        StatusText = $"Plantilla «{preset.Name}» puesta. Guardá para conservarla.";
+    }
+
     [RelayCommand]
     private void NewTheme()
     {

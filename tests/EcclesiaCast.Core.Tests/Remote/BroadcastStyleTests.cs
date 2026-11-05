@@ -192,6 +192,53 @@ public class BroadcastStyleTests
     }
 
     [Fact]
+    public void The_box_of_a_layer_is_left_to_the_plate_unless_the_operator_sets_one()
+    {
+        Assert.Equal(BroadcastBox.Auto, BroadcastStyle.Default(OutputChannel.Songs).Box);
+    }
+
+    [Fact]
+    public void An_own_box_survives_the_round_trip_and_its_numbers_are_held_in_range()
+    {
+        var own = new BroadcastStyle
+        {
+            Box = BroadcastBox.Gradient, BoxAngle = 270, BoxBorderWidth = 6, BoxBorderColor = "#112233",
+            BoxRadius = 55, BoxBlur = 12, BoxPadding = 140,
+        };
+
+        Assert.Equal(own, BroadcastStyle.Parse(own.ToSetting(), OutputChannel.Bible));
+
+        var wild = (own with { BoxAngle = -90, BoxBorderWidth = 99, BoxRadius = -4, BoxBlur = 900, BoxPadding = 9000, BoxBorderColor = "rojo" }).Clamp();
+        Assert.Equal(270, wild.BoxAngle);
+        Assert.Equal(BroadcastStyle.MaxBoxBorderWidth, wild.BoxBorderWidth);
+        Assert.Equal(0, wild.BoxRadius);
+        Assert.Equal(BroadcastStyle.MaxBoxBlur, wild.BoxBlur);
+        Assert.Equal(BroadcastStyle.MaxBoxPadding, wild.BoxPadding);
+        Assert.Equal("#FFFFFF", wild.BoxBorderColor);
+    }
+
+    [Fact]
+    public void An_old_setting_without_a_box_reads_as_the_plates_own_box()
+    {
+        var parsed = BroadcastStyle.Parse("{\"plate\":\"glass\",\"fontSize\":60}", OutputChannel.Bible);
+
+        Assert.Equal(BroadcastBox.Auto, parsed.Box);
+        Assert.Equal(BroadcastPlate.Glass, parsed.Plate);
+    }
+
+    [Fact]
+    public void A_ready_made_look_takes_the_own_box_away()
+    {
+        var own = BroadcastStyle.Default(OutputChannel.Bible) with { Box = BroadcastBox.Color, BoxBorderWidth = 5 };
+        var preset = BroadcastPresets.All[0];
+
+        var applied = preset.ApplyTo(own);
+
+        Assert.Equal(BroadcastBox.Auto, applied.Box);
+        Assert.Equal(0, applied.BoxBorderWidth);
+    }
+
+    [Fact]
     public void The_page_with_everything_uses_the_announcements_style_and_With_replaces_one_layer()
     {
         var styles = BroadcastStyles.Default;

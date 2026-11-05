@@ -19,7 +19,7 @@ public sealed record BroadcastPreset(
     int WidthPercent)
 {
     /// <summary>The style with this look put on it.</summary>
-    public BroadcastStyle ApplyTo(BroadcastStyle style) => (style with
+    public BroadcastStyle ApplyTo(BroadcastStyle style) => (style.WithoutBox() with
     {
         FollowProjector = false,
         Plate = Plate,

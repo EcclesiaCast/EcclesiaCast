@@ -35,6 +35,7 @@ public partial class ThemeManagerWindow : Window
         // Reposition the box whenever the loaded theme's box changes.
         viewModel.PropertyChanged += OnViewModelChanged;
         viewModel.CloseRequested += (_, _) => { DialogResult = true; };
+        viewModel.BoxReplaced += (_, _) => PlaceBox();
         Loaded += (_, _) => PlaceBox();
     }
 

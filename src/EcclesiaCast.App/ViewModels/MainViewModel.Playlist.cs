@@ -510,11 +510,8 @@ public sealed partial class MainViewModel
         if (item is null)
             return;
         var index = PlaylistItems.IndexOf(item);
-        if (index <= 0)
-            return;
-        PlaylistItems.Move(index, index - 1);
-        SavePlaylist();
-        SelectedPlaylistItem = PlaylistItems.FirstOrDefault(i => i.Caption == item.Caption && i.Order == index - 1);
+        if (index > 0)
+            MovePlaylistItem(item, index - 1);
     }
 
     [RelayCommand]
@@ -523,10 +520,45 @@ public sealed partial class MainViewModel
         if (item is null)
             return;
         var index = PlaylistItems.IndexOf(item);
-        if (index < 0 || index >= PlaylistItems.Count - 1)
+        if (index >= 0 && index < PlaylistItems.Count - 1)
+            MovePlaylistItem(item, index + 1);
+    }
+
+    /// <summary>
+    /// A playlist row dragged to another place. <paramref name="insertBefore"/>
+    /// is the position of the row it was dropped above (the count when it goes
+    /// last), counted with the dragged row still in the list.
+    /// </summary>
+    public void MovePlaylistItemBefore(PlaylistItem item, int insertBefore)
+    {
+        var from = PlaylistItems.IndexOf(item);
+        if (from < 0)
             return;
-        PlaylistItems.Move(index, index + 1);
+
+        var to = Math.Clamp(insertBefore, 0, PlaylistItems.Count);
+        if (to > from)
+            to--;
+        if (to != from)
+            MovePlaylistItem(item, to);
+    }
+
+    private void MovePlaylistItem(PlaylistItem item, int to)
+    {
+        var from = PlaylistItems.IndexOf(item);
+
+        // The arrows walk the playlist from the item in use: it has to stay
+        // the same item after the move, not the same position.
+        if (from == _currentPlaylistIndex)
+            _currentPlaylistIndex = to;
+        else if (from < _currentPlaylistIndex && to >= _currentPlaylistIndex)
+            _currentPlaylistIndex--;
+        else if (from > _currentPlaylistIndex && to <= _currentPlaylistIndex)
+            _currentPlaylistIndex++;
+
+        PlaylistItems.Move(from, to);
+        // Saving rebuilds the list, so the moved row is looked up again.
         SavePlaylist();
+        SelectedPlaylistItem = to < PlaylistItems.Count ? PlaylistItems[to] : null;
     }
 
     /// <summary>

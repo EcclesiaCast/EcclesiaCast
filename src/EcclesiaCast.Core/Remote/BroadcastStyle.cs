@@ -18,6 +18,13 @@ public enum BroadcastPlate { None, Tab, Glass, Solid, Gradient, Halo, Fillet, Li
 public enum BroadcastBackground { None, Color, File }
 
 /// <summary>
+/// The box behind the words. <c>Auto</c> leaves it to the plate (the look the
+/// layer has always had); any other value is the operator's own box, drawn with
+/// the plate colour and opacity whatever the plate is.
+/// </summary>
+public enum BroadcastBox { Auto, None, Color, Gradient }
+
+/// <summary>
 /// How one layer of the stream (the Bible, the songs or the announcements)
 /// looks: its own design, made for the camera, not copied from the projector.
 /// Immutable; <see cref="Clamp"/> keeps every number inside its limits, and
@@ -78,6 +85,44 @@ public sealed record BroadcastStyle
     /// <summary>Path of the picture or video, for <see cref="BroadcastBackground.File"/>.</summary>
     public string BackgroundFile { get; init; } = string.Empty;
 
+    /// <summary>The operator's own box (see <see cref="BroadcastBox"/>); the fields below only count when it is not Auto.</summary>
+    public BroadcastBox Box { get; init; } = BroadcastBox.Auto;
+
+    /// <summary>Direction of the gradient box in degrees: 0 fades upward, 90 to the right, 180 downward, 270 to the left.</summary>
+    public int BoxAngle { get; init; } = 90;
+
+    /// <summary>Thickness of the border of the box, in hundredths of the font size (0 is none).</summary>
+    public int BoxBorderWidth { get; init; }
+
+    public string BoxBorderColor { get; init; } = "#FFFFFF";
+
+    /// <summary>Roundness of the corners, in hundredths of the font size.</summary>
+    public int BoxRadius { get; init; } = 30;
+
+    /// <summary>How much of the camera behind the box is blurred, 0 to 40.</summary>
+    public int BoxBlur { get; init; }
+
+    /// <summary>Space between the box and the words as a percentage of the usual one (100).</summary>
+    public int BoxPadding { get; init; } = 100;
+
+    public const int MaxBoxBorderWidth = 20;
+    public const int MaxBoxRadius = 80;
+    public const int MaxBoxBlur = 40;
+    public const int MinBoxPadding = 0;
+    public const int MaxBoxPadding = 250;
+
+    /// <summary>The same style without the operator's own box: back to what the plate draws.</summary>
+    public BroadcastStyle WithoutBox() => this with
+    {
+        Box = BroadcastBox.Auto,
+        BoxAngle = 90,
+        BoxBorderWidth = 0,
+        BoxBorderColor = "#FFFFFF",
+        BoxRadius = 30,
+        BoxBlur = 0,
+        BoxPadding = 100,
+    };
+
     public const int MinFontSize = 20;
     public const int MaxFontSize = 120;
     public const int MinWidthPercent = 30;
@@ -108,6 +153,13 @@ public sealed record BroadcastStyle
         Background = Enum.IsDefined(Background) ? Background : BroadcastBackground.None,
         LabelAlign = Enum.IsDefined(LabelAlign) ? LabelAlign : BroadcastLabelAlign.Center,
         LabelSize = Math.Clamp(LabelSize, MinLabelSize, MaxLabelSize),
+        Box = Enum.IsDefined(Box) ? Box : BroadcastBox.Auto,
+        BoxAngle = ((BoxAngle % 360) + 360) % 360,
+        BoxBorderWidth = Math.Clamp(BoxBorderWidth, 0, MaxBoxBorderWidth),
+        BoxBorderColor = Color(BoxBorderColor, "#FFFFFF"),
+        BoxRadius = Math.Clamp(BoxRadius, 0, MaxBoxRadius),
+        BoxBlur = Math.Clamp(BoxBlur, 0, MaxBoxBlur),
+        BoxPadding = Math.Clamp(BoxPadding, MinBoxPadding, MaxBoxPadding),
         AccentColor = Color(AccentColor, DefaultAccentColor),
         PlateColor = Color(PlateColor, DefaultPlateColor),
         TextColor = Color(TextColor, "#FFFFFF"),
@@ -157,6 +209,13 @@ public sealed record BroadcastStyle
         "position" => Enum.TryParse<BroadcastPosition>(Text(value), true, out var p) ? style with { Position = p } : style,
         "plate" => Enum.TryParse<BroadcastPlate>(Text(value), true, out var pl) ? style with { Plate = pl } : style,
         "background" => Enum.TryParse<BroadcastBackground>(Text(value), true, out var b) ? style with { Background = b } : style,
+        "box" => Enum.TryParse<BroadcastBox>(Text(value), true, out var bx) ? style with { Box = bx } : style,
+        "boxbordercolor" => style with { BoxBorderColor = Text(value) ?? style.BoxBorderColor },
+        "boxangle" => value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var ba) ? style with { BoxAngle = ba } : style,
+        "boxborderwidth" => value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var bw) ? style with { BoxBorderWidth = bw } : style,
+        "boxradius" => value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var br) ? style with { BoxRadius = br } : style,
+        "boxblur" => value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var bb) ? style with { BoxBlur = bb } : style,
+        "boxpadding" => value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var bp) ? style with { BoxPadding = bp } : style,
         "accentcolor" => style with { AccentColor = Text(value) ?? style.AccentColor },
         "platecolor" => style with { PlateColor = Text(value) ?? style.PlateColor },
         "textcolor" => style with { TextColor = Text(value) ?? style.TextColor },

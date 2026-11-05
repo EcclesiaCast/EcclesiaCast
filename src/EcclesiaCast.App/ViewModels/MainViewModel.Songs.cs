@@ -133,6 +133,29 @@ public sealed partial class MainViewModel
         PreviewSlide = Slides.FirstOrDefault()?.Slide;
     }
 
+    /// <summary>
+    /// Shows a song again after it was saved, staying where the operator was:
+    /// the live slide stays live, the marked one stays marked and the playlist
+    /// keeps its place, instead of everything going back to the first slide.
+    /// </summary>
+    private void ReloadSongKeepingPlace(int songId)
+    {
+        var wasOpening = _openingPlaylistItem;
+        _openingPlaylistItem = true;
+        try
+        {
+            RebuildSlidesPreservingLive(() =>
+            {
+                LoadSongs();
+                SelectedSong = Songs.FirstOrDefault(s => s.Id == songId);
+            });
+        }
+        finally
+        {
+            _openingPlaylistItem = wasOpening;
+        }
+    }
+
     private SongSection? SectionOf(SlideItemViewModel? item) =>
         item is null || SelectedSong is null || item.SectionId == 0
             ? null
@@ -160,11 +183,7 @@ public sealed partial class MainViewModel
 
         NoteAction($"Guardar la canción «{SelectedSong.Title}»");
         var saved = _songs.Save(SelectedSong);
-        RebuildSlidesPreservingLive(() =>
-        {
-            LoadSongs();
-            SelectedSong = Songs.FirstOrDefault(s => s.Id == saved.Id);
-        });
+        ReloadSongKeepingPlace(saved.Id);
         StatusText = "Diseño de la canción guardado.";
     }
 
@@ -197,11 +216,7 @@ public sealed partial class MainViewModel
         section.Text = edited;
         NoteAction($"Guardar la canción «{SelectedSong!.Title}»");
         var saved = _songs.Save(SelectedSong!);
-        RebuildSlidesPreservingLive(() =>
-        {
-            LoadSongs();
-            SelectedSong = Songs.FirstOrDefault(s => s.Id == saved.Id);
-        });
+        ReloadSongKeepingPlace(saved.Id);
         StatusText = "Texto de la diapositiva corregido.";
     }
 
@@ -405,8 +420,7 @@ public sealed partial class MainViewModel
 
         NoteAction($"Guardar la canción «{edited.Title}»");
         var saved = _songs.Save(edited);
-        LoadSongs();
-        SelectedSong = Songs.FirstOrDefault(s => s.Id == saved.Id);
+        ReloadSongKeepingPlace(saved.Id);
         StatusText = $"Canción \"{saved.Title}\" actualizada.";
     }
 

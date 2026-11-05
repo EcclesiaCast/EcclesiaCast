@@ -178,6 +178,37 @@ public class UpdatePickerTests
     }
 
     [Fact]
+    public void The_notes_add_up_every_version_since_the_installed_one_newest_first()
+    {
+        var releases = new[]
+        {
+            Release("v1.0.2", body: "- Tercero."),
+            Release("v1.0.1", body: "- Segundo."),
+            Release("v1.0.0", body: "- Ya instalado."),
+        };
+
+        var offer = UpdatePicker.Choose(V("1.0.0"), releases);
+
+        Assert.Equal(V("1.0.2"), offer!.Version);
+        Assert.Equal("Versión 1.0.2\n\n• Tercero.\n\nVersión 1.0.1\n\n• Segundo.", offer.Notes);
+    }
+
+    [Fact]
+    public void A_skipped_version_still_counts_in_the_notes_of_the_next_one()
+    {
+        var releases = new[]
+        {
+            Release("v1.0.2", body: "- Tercero."),
+            Release("v1.0.1", body: "- Segundo."),
+        };
+
+        var offer = UpdatePicker.Choose(V("1.0.0"), releases, skipped: V("1.0.1"));
+
+        Assert.Equal(V("1.0.2"), offer!.Version);
+        Assert.Contains("Segundo.", offer.Notes);
+    }
+
+    [Fact]
     public void A_manual_search_with_no_skipped_version_offers_everything_newer()
     {
         Assert.NotNull(UpdatePicker.Choose(V("1.0.0"), [Release("v1.0.1")], skipped: null));
