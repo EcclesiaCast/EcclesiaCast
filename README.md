@@ -2,7 +2,10 @@
 
 Software libre y nativo de Windows para proyección en iglesias: letras de canciones, Biblia multiversión, fondos de imagen y video, y formato de texto totalmente personalizable.
 
+🌐 **Página del programa: [ecclesiacast.github.io/EcclesiaCast](https://ecclesiacast.github.io/EcclesiaCast/)** — qué hace, capturas, video y descarga.
+
 > ✅ **Versión 1.0.** Instalador para Windows en la
+> [página del programa](https://ecclesiacast.github.io/EcclesiaCast/) o en la
 > [página de releases](https://github.com/EcclesiaCast/EcclesiaCast/releases).
 > Está en uso en una iglesia real. Si algo falla,
 > [contanos](https://github.com/EcclesiaCast/EcclesiaCast/issues).
