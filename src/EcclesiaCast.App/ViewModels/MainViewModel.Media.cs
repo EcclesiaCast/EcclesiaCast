@@ -274,6 +274,50 @@ public sealed partial class MainViewModel
         }
     }
 
+    /// <summary>Draws the next media of a tab set to «al azar»; see <see cref="ShuffleBag"/>.</summary>
+    private readonly ShuffleBag _slideshowBag = new();
+
+    /// <summary>
+    /// The media a slideshow tab goes on with after <paramref name="current"/>:
+    /// the following one in the tab's order, or one drawn at random without
+    /// repeating until all have come up. Only pictures and videos take part (a
+    /// web page or a window would hang the show). Null when the tab is not a
+    /// slideshow or has nothing to show.
+    /// </summary>
+    private MediaItem? NextInSlideshow(MediaItem current)
+    {
+        var rule = TabRule(current.Category);
+        if (!rule.IsSlideshow || IsPresentationTab(current.Category))
+            return null;
+
+        var pool = _allMedia
+            .Where(m => string.Equals(m.Category, current.Category, StringComparison.OrdinalIgnoreCase))
+            .Where(m => m.Type is MediaType.Image or MediaType.Video)
+            .ToList();
+        if (pool.Count == 0)
+            return null;
+
+        if (rule.Slideshow == MediaSlideshow.Random)
+        {
+            var id = _slideshowBag.Take(pool.Select(m => m.Id).ToList(), Random.Shared);
+            return pool.FirstOrDefault(m => m.Id == id);
+        }
+
+        var index = pool.FindIndex(m => m.Id == current.Id);
+        return pool[(index + 1) % pool.Count];
+    }
+
+    /// <summary>Goes on with the slideshow of the tab of <paramref name="finished"/>; false when it is not one.</summary>
+    private bool GoToNextInSlideshow(MediaItem finished)
+    {
+        if (NextInSlideshow(finished) is not { } next)
+            return false;
+
+        ApplyBackground(next);
+        StatusText = $"Presentación de «{finished.Category}» → {next.Name}.";
+        return true;
+    }
+
     /// <summary>The item after this one in its tab, wrapping around at the end.</summary>
     private MediaItem? NextInTab(MediaItem current)
     {
@@ -600,6 +644,14 @@ public sealed partial class MainViewModel
                 StatusText = $"«{tab}» es una presentación: un clic en una de sus tarjetas la abre en el cuadro central.";
                 return;
             }
+        }
+
+        _slideshowBag.Reset();
+        if (rule.IsSlideshow)
+        {
+            StatusText = $"«{tab}» es una presentación {(rule.Slideshow == MediaSlideshow.Random ? "al azar" : "continua")}: "
+                + $"clic en un medio para empezar; las imágenes duran {rule.SlideSeconds} s (o lo que digan sus Propiedades).";
+            return;
         }
 
         StatusText = rule.Mode switch
@@ -1265,6 +1317,9 @@ public sealed partial class MainViewModel
         if (item.EndBehavior == VideoEndBehavior.NextMedia && GoToNextMedia(item))
             return;
 
+        if (GoToNextInSlideshow(item))
+            return;
+
         if (item.EndBehavior == VideoEndBehavior.Logo)
         {
             _presentation.SetBackground(null);
@@ -1317,6 +1372,10 @@ public sealed partial class MainViewModel
 
         // A media that names what follows it goes there before anything else.
         if (background.EndBehavior == VideoEndBehavior.NextMedia && GoToNextMedia(background))
+            return;
+
+        // A slideshow tab goes on with its next picture or video, in order or at random.
+        if (GoToNextInSlideshow(background))
             return;
 
         // The tab plays through: hand over to the next item in it.

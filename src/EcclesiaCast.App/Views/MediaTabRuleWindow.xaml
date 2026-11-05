@@ -50,6 +50,21 @@
         <TextBlock Style="{StaticResource Hint}"
                    Text="Los videos de esta pestaña se proyectan sin sonido, aunque en sus Propiedades lo tengan prendido. Se nota en la pestaña con un 🔇."/>
 
+        <TextBlock Text="Pasar los medios solos" Margin="0,18,0,0" FontSize="13" Foreground="White"/>
+        <RadioButton x:Name="ShowOffRadio" Content="No, uno por clic" GroupName="show"
+                     Margin="22,6,0,0" Checked="Show_Changed"/>
+        <RadioButton x:Name="ShowSequentialRadio" Content="En orden, de forma continua" GroupName="show"
+                     Margin="22,4,0,0" Checked="Show_Changed"/>
+        <RadioButton x:Name="ShowRandomRadio" Content="Al azar, sin repetir hasta que salgan todos" GroupName="show"
+                     Margin="22,4,0,0" Checked="Show_Changed"/>
+        <StackPanel x:Name="SecondsPanel" Orientation="Horizontal" Margin="22,8,0,0">
+            <TextBlock Text="Cada imagen dura" FontSize="12" Foreground="White" VerticalAlignment="Center"/>
+            <TextBox x:Name="SecondsBox" Width="52" Margin="8,0" Padding="4,2" HorizontalContentAlignment="Center"/>
+            <TextBlock Text="segundos" FontSize="12" Foreground="White" VerticalAlignment="Center"/>
+        </StackPanel>
+        <TextBlock Style="{StaticResource Hint}"
+                   Text="Hacé clic en un medio para empezar: los videos siguen hasta que terminan y las imágenes pasan solas. Si una imagen tiene sus propios segundos en Propiedades, usa esos. Termina al elegir otra cosa o al sacar el fondo."/>
+
         <CheckBox x:Name="PresentationCheck" Content="📑 Usar como presentación" Margin="0,16,0,0"
                   Foreground="White" FontSize="13"/>
         <TextBlock Style="{StaticResource Hint}" Margin="22,2,0,0"

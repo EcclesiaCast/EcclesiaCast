@@ -15,6 +15,19 @@ public enum MediaTabMode
     Foreground,
 }
 
+/// <summary>How a tab used as a slideshow goes from one media to the next.</summary>
+public enum MediaSlideshow
+{
+    /// <summary>The tab is not a slideshow.</summary>
+    Off,
+
+    /// <summary>One after another in the order of the tab, starting over at the end.</summary>
+    Sequential,
+
+    /// <summary>In a random order, without repeating until all have come up.</summary>
+    Random,
+}
+
 /// <summary>
 /// The rule of one tab: «everything here is a foreground», for a tab of
 /// announcements, or «everything here is a background», for a tab of loops.
@@ -22,13 +35,50 @@ public enum MediaTabMode
 /// rewrites the library: take it off and each media goes back to what its own
 /// properties say. <paramref name="Muted"/> silences every media of the tab
 /// the same way (the tab is for announcements read by someone, say).
+/// <paramref name="Slideshow"/> makes the tab play on by itself, in order or at
+/// random: each video until it ends, each image for <paramref name="SlideSeconds"/>
+/// unless its own Propiedades say otherwise.
 /// </summary>
-public sealed record MediaTabRule(MediaTabMode Mode, bool LogoAtEnd, bool Muted = false)
+public sealed record MediaTabRule(
+    MediaTabMode Mode,
+    bool LogoAtEnd,
+    bool Muted = false,
+    MediaSlideshow Slideshow = MediaSlideshow.Off,
+    int SlideSeconds = MediaTabRule.DefaultSlideSeconds)
 {
+    public const int DefaultSlideSeconds = 10;
+
+    public const int MaxSlideSeconds = 3600;
+
     public static MediaTabRule Default { get; } = new(MediaTabMode.PerItem, false);
+
+    /// <summary>True when the tab goes from one media to the next by itself.</summary>
+    public bool IsSlideshow => Slideshow != MediaSlideshow.Off;
 
     /// <summary>The media as it should play in this tab: the same object when the rule changes nothing.</summary>
     public MediaItem Resolve(MediaItem item)
+    {
+        var resolved = ResolveLayer(item);
+        if (!IsSlideshow)
+            return resolved;
+
+        // A slideshow has to move on: a looping video would never end, and a
+        // picture with no seconds would never leave.
+        var seconds = item.Type == MediaType.Image && item.ShowSeconds <= 0 ? SlideSeconds : item.ShowSeconds;
+        var end = item.Type == MediaType.Video && resolved.EndBehavior == VideoEndBehavior.Loop
+            ? VideoEndBehavior.Stop
+            : resolved.EndBehavior;
+        if (seconds == resolved.ShowSeconds && end == resolved.EndBehavior)
+            return resolved;
+
+        if (ReferenceEquals(resolved, item))
+            resolved = item.Clone();
+        resolved.ShowSeconds = seconds;
+        resolved.EndBehavior = end;
+        return resolved;
+    }
+
+    private MediaItem ResolveLayer(MediaItem item)
     {
         var behavior = Mode switch
         {
@@ -68,7 +118,11 @@ public sealed record MediaTabRule(MediaTabMode Mode, bool LogoAtEnd, bool Muted 
         };
         if (Mode == MediaTabMode.Foreground && LogoAtEnd)
             mode += "+logo";
-        return Muted ? mode + "+mute" : mode;
+        if (Muted)
+            mode += "+mute";
+        if (IsSlideshow)
+            mode += (Slideshow == MediaSlideshow.Random ? "+random" : "+show") + $"+secs{SlideSeconds}";
+        return mode;
     }
 
     /// <summary>
@@ -90,11 +144,25 @@ public sealed record MediaTabRule(MediaTabMode Mode, bool LogoAtEnd, bool Muted 
             return Default;
 
         var extras = parts.Skip(1).Select(p => p.Trim()).ToHashSet();
+        var slideshow = extras.Contains("random") ? MediaSlideshow.Random
+            : extras.Contains("show") ? MediaSlideshow.Sequential
+            : MediaSlideshow.Off;
+
+        var seconds = DefaultSlideSeconds;
+        var secs = extras.FirstOrDefault(e => e.StartsWith("secs", StringComparison.Ordinal));
+        if (secs is not null && int.TryParse(secs.AsSpan(4), out var parsed))
+            seconds = ClampSeconds(parsed);
+
         return new MediaTabRule(
             mode.Value,
             mode == MediaTabMode.Foreground && extras.Contains("logo"),
-            extras.Contains("mute"));
+            extras.Contains("mute"),
+            slideshow,
+            seconds);
     }
+
+    /// <summary>Seconds a picture stays in a slideshow, kept to something that makes sense.</summary>
+    public static int ClampSeconds(int seconds) => Math.Clamp(seconds, 1, MaxSlideSeconds);
 }
 
 /// <summary>
