@@ -15,7 +15,7 @@ namespace EcclesiaCast.Data.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.32");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.33");
 
             modelBuilder.Entity("EcclesiaCast.Core.Audio.AudioTrack", b =>
                 {
@@ -456,6 +456,16 @@ namespace EcclesiaCast.Data.Migrations
 
                     b.Property<int>("Kind")
                         .HasColumnType("INTEGER");
+
+                    b.Property<int>("LineBand")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LineBandColor")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<double>("LineBandOpacity")
+                        .HasColumnType("REAL");
 
                     b.Property<double>("MarginHorizontal")
                         .HasColumnType("REAL");

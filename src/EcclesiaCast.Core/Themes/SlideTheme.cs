@@ -42,6 +42,19 @@ public enum TextCase
     Lower,
 }
 
+/// <summary>Bands of colour behind the lines of the text (see <see cref="SlideTheme.LineBand"/>).</summary>
+public enum LineBand
+{
+    /// <summary>No bands.</summary>
+    None,
+
+    /// <summary>Each band as wide as its line, with a little room at the sides.</summary>
+    Text,
+
+    /// <summary>Each band from one edge of the screen to the other.</summary>
+    FullWidth,
+}
+
 /// <summary>
 /// How one slide gives way to the next. Churches differ on this: some want
 /// the words to appear without ceremony, others want a soft fade so the
@@ -105,6 +118,20 @@ public sealed class SlideTheme
     public string OutlineColor { get; set; } = "#000000";
 
     public string TextColor { get; set; } = "#FFFFFF";
+
+    // ── Franjas detrás de cada renglón ───────────────────────────
+
+    /// <summary>
+    /// A band of colour behind every line of the text (the «caption» look of
+    /// a video): none, as wide as each line, or from edge to edge of the screen.
+    /// </summary>
+    public LineBand LineBand { get; set; }
+
+    /// <summary>The colour of the bands: usually black (with white letters) or white (with black ones).</summary>
+    public string LineBandColor { get; set; } = "#000000";
+
+    /// <summary>How solid the bands are, 0–1: below 1 the background shows through them.</summary>
+    public double LineBandOpacity { get; set; } = 1;
     public HAlign AlignH { get; set; } = HAlign.Center;
     public VAlign AlignV { get; set; } = VAlign.Center;
 

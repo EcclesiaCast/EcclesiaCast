@@ -122,6 +122,9 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     [ObservableProperty] private double _shadowBlur = 18;
     [ObservableProperty] private double _outlineWidth;
     [ObservableProperty] private string _outlineColor = "#000000";
+    [ObservableProperty] private int _lineBandIndex;                   // 0 sin franjas · 1 al ancho del texto · 2 de borde a borde
+    [ObservableProperty] private string _lineBandColor = "#000000";
+    [ObservableProperty] private double _lineBandOpacityPercent = 100;
     [ObservableProperty] private string _textColor = "#FFFFFF";
     [ObservableProperty] private int _alignHIndex = 1;                 // 0 Izq · 1 Centro · 2 Der
     [ObservableProperty] private int _alignVIndex = 1;                 // 0 Arriba · 1 Centro · 2 Abajo
@@ -209,6 +212,9 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         ShadowBlur = theme.ShadowBlur;
         OutlineWidth = theme.OutlineWidth;
         OutlineColor = theme.OutlineColor;
+        LineBandIndex = (int)theme.LineBand;
+        LineBandColor = theme.LineBandColor;
+        LineBandOpacityPercent = theme.LineBandOpacity * 100;
         TextColor = theme.TextColor;
         AlignHIndex = (int)theme.AlignH;
         AlignVIndex = (int)theme.AlignV;
@@ -260,6 +266,9 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         ShadowBlur = Math.Clamp(ShadowBlur, 0, 80),
         OutlineWidth = Math.Clamp(OutlineWidth, 0, 40),
         OutlineColor = string.IsNullOrWhiteSpace(OutlineColor) ? "#000000" : OutlineColor.Trim(),
+        LineBand = (LineBand)Math.Clamp(LineBandIndex, 0, 2),
+        LineBandColor = string.IsNullOrWhiteSpace(LineBandColor) ? "#000000" : LineBandColor.Trim(),
+        LineBandOpacity = Math.Clamp(LineBandOpacityPercent / 100, 0, 1),
         TextColor = TextColor,
         AlignH = (HAlign)Math.Clamp(AlignHIndex, 0, 2),
         AlignV = (VAlign)Math.Clamp(AlignVIndex, 0, 2),
@@ -537,6 +546,29 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
             TransparentBackground = false;
             BackgroundColor = picked;
         }
+    }
+
+    [RelayCommand]
+    private void PickLineBandColor()
+    {
+        var picked = ColorPickerHelper.Pick(LineBandColor);
+        if (picked is not null)
+            LineBandColor = picked;
+    }
+
+    /// <summary>
+    /// «Negras» o «Blancas»: the band and a letter that reads on it. Without
+    /// bands yet, they come on as wide as the text.
+    /// </summary>
+    [RelayCommand]
+    private void SetLineBandShade(string? shade)
+    {
+        var white = shade == "white";
+        if (LineBandIndex == 0)
+            LineBandIndex = 1;
+        LineBandColor = white ? "#FFFFFF" : "#000000";
+        TextColor = white ? "#111111" : "#FFFFFF";
+        LineBandOpacityPercent = 100;
     }
 
     [RelayCommand]
