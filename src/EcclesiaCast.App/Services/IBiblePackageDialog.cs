@@ -11,4 +11,7 @@ public interface IBiblePackageDialog
 
     /// <summary>The versions of a package to bring in, or null if cancelled.</summary>
     IReadOnlyList<BiblePackageEntry>? ChooseToImport(string packageFileName, IReadOnlyList<BiblePackageChoice> choices);
+
+    /// <summary>The Bibles of the download list to bring, or null if cancelled. <paramref name="installed"/> marks the ones already in the library.</summary>
+    IReadOnlyList<BibleCatalogItem>? ChooseToDownload(IReadOnlyList<BibleCatalogItem> items, IReadOnlyList<bool> installed);
 }

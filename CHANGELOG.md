@@ -5,6 +5,16 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+## [1.2.1] - 2026-11-08
+
+### Agregado
+
+- **Bajar Biblias desde el programa.** En la pestaña Biblia, **📥 Biblias →
+  «Bajar Biblias de internet…»** muestra las Biblias disponibles por idioma
+  (español, inglés, portugués y francés para empezar): marcás las que querés y
+  se baja sólo eso. Cada archivo se comprueba antes de agregarlo. El mismo
+  botón importa un paquete `.ecbiblias` o una Biblia suelta.
+
 ## [1.2.0] - 2026-11-08
 
 ### Agregado

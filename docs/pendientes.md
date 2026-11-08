@@ -286,6 +286,14 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       1.2.0; si sigue sin sonar, que mande el registro del día
       (`%APPDATA%\EcclesiaCast\logs\ecclesiacast-AAAAMMDD.log`): ahora dice si el
       video está silenciado, si no trae pista de audio o qué error dio VLC.
+- [ ] **Lo de la 1.2.1** (8/11/2026). Claude probó «Bajar Biblias de
+      internet…» con el programa abierto contra una lista servida en esta PC,
+      y la lista real de Cloudflare R2 con el código del programa, sin abrirlo:
+      las 8 bajan completas y con su huella. Falta que lo mires vos: en la 1.2.1
+      instalada, Biblia → **📥 Biblias** → «Bajar Biblias de internet…», marcá
+      una (por ejemplo King James), Descargar, y fijate que aparezca en las
+      versiones. Al abrir la lista de nuevo tiene que decir «ya está en la
+      biblioteca».
 
 ## 2. Después de publicar la v1.0.0
 
@@ -386,10 +394,22 @@ nuevo (con otro paquete o con otra versión), después de `dotnet publish`:
 Alexis pidió permiso para ofrecer estas versiones dentro del programa. Hasta
 que haya un sí por escrito, no se incluyen ni se ofrecen para bajar.
 
-**8/11/2026: contestaron todas que no** (Alexis). Así que las versiones con
-derechos no se suben a ningún lado, ni a GitHub ni a otro sitio: cada iglesia
-importa la suya (Archivo → Cómo preparar una Biblia para importar), y el
-instalador con Biblias sigue siendo sólo para las PCs de la iglesia.
+**8/11/2026, a la mañana:** Alexis contó que contestaron todas que no. **El
+mismo día, más tarde,** dijo que le permitieron ofrecerlas **para bajar desde el
+programa, sólo para quien las use**, y que los correos están en una PC de la
+iglesia. Hecho: Biblia → **📥 Biblias** → «Bajar Biblias de internet…» lee una
+lista (`catalogo.json`) en Cloudflare R2 y baja sólo lo que se marca (ver
+[installer/biblias-para-bajar/README.md](../installer/biblias-para-bajar/README.md)).
+La lista empieza con 8 Biblias libres (español, inglés, portugués y francés),
+listas en el Escritorio, carpeta «Biblias para subir a R2».
+
+- [x] **Cuenta de Cloudflare R2** (8/11/2026): bucket `ecclesiacast-biblias`
+      con acceso público en `https://pub-ec2cd8b767e842a2970aa9564a3ea4fb.r2.dev`,
+      ya en `AppInfo.BibleCatalogUrl`. Las 8 Biblias y la lista se bajaron de ahí
+      con la misma huella SHA-256 que los archivos del Escritorio.
+- [ ] **Las con derechos (NTV, NVI, RV1960, TLA)** entran a la lista sólo con el
+      correo de cada editorial anotado acá (quién, qué versiones, qué
+      condiciones). Claude no las sube sin haber visto el permiso.
 
 | Versión | A quién | Cómo | Respuesta |
 |---|---|---|---|

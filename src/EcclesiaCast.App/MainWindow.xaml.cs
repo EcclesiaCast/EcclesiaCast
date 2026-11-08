@@ -291,6 +291,18 @@ public partial class MainWindow : Window
 
     // ── Música ───────────────────────────────────────────────────
 
+    /// <summary>The «📥 Biblias» button opens its menu under it on a normal click.</summary>
+    private void AddBiblesMenu_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not FrameworkElement { ContextMenu: { } menu } button)
+            return;
+
+        menu.PlacementTarget = button;
+        menu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+        menu.DataContext = button.DataContext;
+        menu.IsOpen = true;
+    }
+
     /// <summary>Sends the media key named in the button's Tag, as the keyboard would.</summary>
     private void MusicKey_Click(object sender, RoutedEventArgs e)
     {

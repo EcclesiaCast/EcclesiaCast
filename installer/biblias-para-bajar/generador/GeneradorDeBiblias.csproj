@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Prepara las Biblias para bajar desde el programa (Cloudflare R2):
+       un .ecbiblias por versión y la lista catalogo.json. No es parte del
+       programa: ver README.md de la carpeta de arriba. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\EcclesiaCast.Core\EcclesiaCast.Core.csproj" />
+  </ItemGroup>
+
+</Project>
