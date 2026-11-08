@@ -125,8 +125,15 @@ public partial class VlcVideoSurface : UserControl
 
         // Its own volume, never the shared one (see PlayerSound): the silent
         // copy that fills the edges used to mute the video itself.
+        // Every change of slide puts the same background on again: the
+        // equalizer is only touched when the volume really changed.
         PlayerSound.KeepSessionFull(player);
-        PlayerSound.SetVolume(player, media.Volume);
+        var volume = Math.Clamp(media.Volume, 0, 100);
+        if (volume != _appliedVolume)
+        {
+            PlayerSound.SetVolume(player, volume);
+            _appliedVolume = volume;
+        }
 
         // Re-applying the same background must not restart it — the operator
         // may have paused it on purpose, and changing slides re-applies it.
@@ -264,6 +271,9 @@ public partial class VlcVideoSurface : UserControl
     /// <summary>The name of the video playing now, for the log.</summary>
     private string? _playingName;
 
+    /// <summary>The volume the equalizer of this player was last set to; -1 before the first.</summary>
+    private int _appliedVolume = -1;
+
     private static bool IsSilent(MediaItem media) => media.Muted || media.Volume <= 0;
 
     /// <summary>
@@ -327,7 +337,9 @@ public partial class VlcVideoSurface : UserControl
         ThreadPool.QueueUserWorkItem(_ =>
         {
             Thread.Sleep(1500);
-            if (Volatile.Read(ref _generation) != generation || _openedSilent || _trackOff)
+            // A player that was closed meanwhile must not be asked anything.
+            if (Volatile.Read(ref _generation) != generation || _openedSilent || _trackOff
+                || !ReferenceEquals(_player, player))
                 return;
             try
             {
@@ -746,6 +758,7 @@ public partial class VlcVideoSurface : UserControl
                 Dispatcher.BeginInvoke(() => Ended?.Invoke(this, EventArgs.Empty));
 
             _player = player;
+            _appliedVolume = -1;
             return player;
         }
         catch (Exception ex)
