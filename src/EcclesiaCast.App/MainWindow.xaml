@@ -154,7 +154,11 @@
         </ContextMenu>
     </Window.Resources>
 
+    <!-- Afuera, sólo la ventana y el recorrido de bienvenida encima: el
+         recorrido dibuja una copia borrosa de WindowContent, así que no puede
+         estar adentro de ella. -->
     <Grid>
+    <Grid x:Name="WindowContent">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -288,6 +292,8 @@
             </MenuItem>
 
             <MenuItem Header="A_yuda">
+                <MenuItem Header="Recorrido del programa" Click="WelcomeTour_Click"
+                          ToolTip="Muestra de nuevo, parte por parte, dónde está cada cosa de la ventana."/>
                 <MenuItem Header="Guía de uso (en internet)" Click="Guide_Click"/>
                 <Separator/>
                 <MenuItem Header="Buscar actualizaciones…" Command="{Binding CheckForUpdatesCommand}"/>
@@ -327,7 +333,7 @@
                            FontSize="17" FontWeight="SemiBold" Foreground="White"
                            VerticalAlignment="Center"/>
 
-                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal"
+                <StackPanel x:Name="ScreenButtons" DockPanel.Dock="Left" Orientation="Horizontal"
                             VerticalAlignment="Center" Margin="24,0,0,0">
                     <Button Content="Black" controls:ShortcutHint.Text="F1" Command="{Binding ToggleBlackCommand}"
                             ToolTip="Pantalla en negro (tecla F1): tapa todo (letra y fondo) sin apagar la salida.">
@@ -438,7 +444,7 @@
                             ToolTip="Buscar en canciones, versículos y medios a la vez (Ctrl+K)"/>
                 </StackPanel>
 
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                <StackPanel x:Name="OutputControls" DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="Salida:" Foreground="{StaticResource MutedBrush}"
                                FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
                     <ComboBox Width="260"
@@ -2537,5 +2543,9 @@
                            Margin="6,6,6,8" TextWrapping="Wrap"/>
             </DockPanel>
         </Border>
+    </Grid>
+
+    <!-- ══ Recorrido de bienvenida ══ (la primera vez, y desde Ayuda) -->
+    <controls:WelcomeTourOverlay x:Name="Tour" Visibility="Collapsed"/>
     </Grid>
 </Window>

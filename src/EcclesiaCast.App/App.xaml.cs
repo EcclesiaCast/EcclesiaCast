@@ -187,16 +187,34 @@ public partial class App : Application
         // The splash was the first window opened, so WPF took it for the main
         // one: hand the title over before closing it, or the program would exit.
         MainWindow = mainWindow;
-        mainWindow.ContentRendered += (_, _) =>
+        mainWindow.ContentRendered += async (_, _) =>
         {
             splash.Close();
 
             // Once, the first time the program ever opens.
-            if (OneTimeNotice.ShouldShow(settings, AboutSeenKey))
+            var firstRun = OneTimeNotice.ShouldShow(settings, AboutSeenKey);
+            if (firstRun)
                 new Views.AboutWindow(Services.AppInfo.Version, firstRun: true) { Owner = mainWindow }.ShowDialog();
 
             // A Bible package chosen on the installer's page opens its import window (once).
-            _ = _services.GetRequiredService<MainViewModel>().OfferInstalledBiblePackageAsync();
+            var biblePackage = _services.GetRequiredService<MainViewModel>().OfferInstalledBiblePackageAsync();
+
+            // The first time, after those two, the tour of the window. Someone
+            // updating from an older version already saw the About window, so
+            // it does not open by itself for them (it is in Ayuda).
+            if (firstRun)
+            {
+                try
+                {
+                    await biblePackage;
+                    mainWindow.StartWelcomeTour();
+                }
+                catch (Exception ex)
+                {
+                    // A tour that cannot be drawn must not stand in the way.
+                    Log.Warning(ex, "The welcome tour could not start");
+                }
+            }
 
             // Not on the very first start (the person has not used it yet), and
             // not past the day the temporary notices stop.

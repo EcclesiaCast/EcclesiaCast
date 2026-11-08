@@ -14,6 +14,10 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   (español, inglés, portugués y francés para empezar): marcás las que querés y
   se baja sólo eso. El mismo botón importa un paquete `.ecbiblias` o una
   Biblia suelta.
+- **Recorrido de bienvenida.** La primera vez que se abre el programa, un
+  recorrido corto muestra parte por parte dónde está cada cosa: canciones,
+  Biblia, playlist, diapositivas, medios, herramientas, LIVE y cómo salir en
+  vivo. Se vuelve a ver desde **Ayuda → «Recorrido del programa»**.
 
 ## [1.2.0] - 2026-11-08
 
