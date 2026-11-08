@@ -66,6 +66,7 @@ public class LineBandLayoutTests
                 Assert.True(look.TransparentBackground);
                 // The letter is the opposite of its band, or it does not read.
                 Assert.NotEqual(look.LineBandColor, look.TextColor);
+                Assert.Equal(look.TextColor, look.SecondaryColor);
             }
             else
             {

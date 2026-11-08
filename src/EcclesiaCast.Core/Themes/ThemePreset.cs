@@ -160,7 +160,9 @@ public static class ThemePresets
         look.LineBand = kind;
         look.LineBandColor = band;
         look.LineBandOpacity = 1;
-        // The caption has no band of its own: it keeps a shadow to be read.
+        // The second Bible version sits on bands too: it takes the letter's
+        // colour, or a white band would carry white words.
+        look.SecondaryColor = text;
         return look;
     }
 }
