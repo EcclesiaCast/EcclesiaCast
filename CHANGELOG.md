@@ -5,6 +5,34 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+## [1.2.0] - 2026-11-08
+
+### Agregado
+
+- **Franjas detrás de cada renglón.** En **Temas**, «Franjas detrás de cada
+  renglón»: negras con letra blanca o blancas con letra negra (o del color que
+  quieras), al ancho del texto o de borde a borde de la pantalla.
+- **Ocho plantillas nuevas** en **Temas**: Franjas negras, Franjas blancas,
+  Franja negra de borde a borde, Franja blanca de borde a borde, Franjas
+  abajo, Moderno, Cálido y Pizarra. Sirven para la letra y para la Biblia.
+- **Botón de sonido del video en pantalla.** En la barra «Fondo en pantalla»,
+  **🔇 Sin sonido** / **🔊 Con sonido** muestra si el video suena y lo cambia
+  con un clic (queda guardado en sus Propiedades).
+
+### Cambiado
+
+- **Las notas de una actualización son una lista corta**, un renglón por
+  cambio; «Ver los detalles» muestra todo.
+- **Un video largo con sonido entra con sonido** (un testimonio, un anuncio).
+  Los cortos, que suelen ser fondos, siguen entrando sin sonido.
+
+### Corregido
+
+- **Videos que no sonaban.** El video que rellena los bordes y el logo en
+  video silenciaban también al video principal, y el volumen de la lista de
+  música cambiaba el de los videos. Ahora cada uno tiene su propio sonido.
+  Además, el registro anota por qué un video no suena.
+
 ## [1.1.3] - 2026-11-05
 
 ### Agregado

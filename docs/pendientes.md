@@ -271,6 +271,22 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       azar» con imágenes y videos mezclados. Cada video tiene que llegar al
       final antes de pasar, y cada imagen durar los segundos elegidos (o los
       suyos de Propiedades). Elegir otra cosa o sacar el fondo la corta.
+- [ ] **Lo de la 1.2.0** (8/11/2026; hay compilación, pruebas y dibujos a
+      imagen de las plantillas, no se abrió el programa). 1) **Temas →
+      Plantillas listas**: probá las cinco de franjas con una canción y con la
+      Biblia, sobre un video; después «Franjas detrás de cada renglón» a mano
+      (negras, blancas, de borde a borde, otra opacidad). Las franjas tienen que
+      entrar y salir junto con la letra al pasar de diapositiva. 2) **Sonido**:
+      un video con sonido y, en sus Propiedades, un relleno de bordes con video
+      (o un logo que sea video): **tiene que sonar** (antes el relleno lo
+      callaba). Probá el botón 🔇/🔊 de «Fondo en pantalla», y la música de la
+      lista a otro volumen mientras suena un video. 3) Agregá un video largo
+      con sonido: entra con sonido; uno corto, sin. 4) Ayuda → «Buscar
+      actualizaciones…» desde una versión vieja: lista corta y «Ver los
+      detalles». **Al amigo con el video mudo:** que instale la 1.2.0; si sigue
+      sin sonar, que mande el registro del día
+      (`%APPDATA%\EcclesiaCast\logs\ecclesiacast-AAAAMMDD.log`): ahora dice si el
+      video está silenciado, si no trae pista de audio o qué error dio VLC.
 
 ## 2. Después de publicar la v1.0.0
 
@@ -370,6 +386,11 @@ nuevo (con otro paquete o con otra versión), después de `dotnet publish`:
 
 Alexis pidió permiso para ofrecer estas versiones dentro del programa. Hasta
 que haya un sí por escrito, no se incluyen ni se ofrecen para bajar.
+
+**8/11/2026: contestaron todas que no** (Alexis). Así que las versiones con
+derechos no se suben a ningún lado, ni a GitHub ni a otro sitio: cada iglesia
+importa la suya (Archivo → Cómo preparar una Biblia para importar), y el
+instalador con Biblias sigue siendo sólo para las PCs de la iglesia.
 
 | Versión | A quién | Cómo | Respuesta |
 |---|---|---|---|
