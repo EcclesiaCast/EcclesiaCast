@@ -178,6 +178,8 @@
                 <MenuItem Header="Exportar paquete de Biblias…" Command="{Binding ExportBiblePackageCommand}"
                           ToolTip="Guarda varias versiones en un solo archivo (.ecbiblias) para llevarlas a otra computadora tuya."/>
                 <MenuItem Header="Importar paquete de Biblias…" Command="{Binding ImportBiblePackageCommand}"/>
+                <MenuItem Header="Bajar Biblias de internet…" Command="{Binding DownloadBiblePackCommand}"
+                          ToolTip="Baja el paquete de Biblias sólo a esta computadora y elegís cuáles agregar."/>
                 <MenuItem Header="Agregar imágenes, videos, PDF o PowerPoint…" Command="{Binding ImportMediaCommand}"/>
                 <MenuItem Header="Agregar paquete de fondos (.zip)…" Command="{Binding ImportBackgroundPackCommand}"/>
                 <MenuItem Header="Bajar más fondos de internet…" Command="{Binding DownloadBackgroundPackCommand}"/>
@@ -696,11 +698,23 @@
                                                 Command="{Binding OpenAddPassageCommand}"
                                                 AutomationProperties.Name="Agregar a la playlist"
                                                 ToolTip="Abre una cajita para agregar un pasaje a la playlist: ya trae el tramo escrito en el buscador, o el versículo que está en pantalla, o el capítulo; se puede escribir otro («juan 8 del 5 al 10»). También: clic derecho sobre un versículo."/>
-                                        <Button Content="📥" FontSize="11" Padding="7,4"
+                                        <!-- Agregar Biblias: bajarlas, un paquete o un archivo suelto -->
+                                        <Button Content="📥 Biblias" FontSize="11" Padding="7,4"
                                                 Style="{StaticResource DarkButton}"
-                                                Command="{Binding ImportBibleCommand}"
-                                                AutomationProperties.Name="Importar Biblia"
-                                                ToolTip="Importar Biblia (JSON o Zefania XML). Una versión instalada se exporta con el clic derecho sobre ella."/>
+                                                Click="AddBiblesMenu_Click"
+                                                AutomationProperties.Name="Agregar Biblias"
+                                                ToolTip="Agregar Biblias: bajarlas de internet, abrir un paquete (.ecbiblias) o importar una Biblia. Una versión instalada se exporta con el clic derecho sobre ella.">
+                                            <Button.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Bajar Biblias de internet…" Command="{Binding DownloadBiblePackCommand}"
+                                                              ToolTip="Baja el paquete de Biblias sólo a esta computadora y elegís cuáles agregar."/>
+                                                    <MenuItem Header="Importar paquete de Biblias (.ecbiblias)…" Command="{Binding ImportBiblePackageCommand}"/>
+                                                    <MenuItem Header="Importar una Biblia (JSON o Zefania XML)…" Command="{Binding ImportBibleCommand}"/>
+                                                    <Separator/>
+                                                    <MenuItem Header="Cómo preparar una Biblia para importar…" Command="{Binding ShowBibleFormatHelpCommand}"/>
+                                                </ContextMenu>
+                                            </Button.ContextMenu>
+                                        </Button>
                                     </StackPanel>
                                     <ToggleButton x:Name="VersionsExpander" DockPanel.Dock="Left"
                                                   IsChecked="{Binding IsBibleVersionsExpanded}"

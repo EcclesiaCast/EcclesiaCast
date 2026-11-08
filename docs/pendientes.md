@@ -386,10 +386,17 @@ nuevo (con otro paquete o con otra versión), después de `dotnet publish`:
 Alexis pidió permiso para ofrecer estas versiones dentro del programa. Hasta
 que haya un sí por escrito, no se incluyen ni se ofrecen para bajar.
 
-**8/11/2026: contestaron todas que no** (Alexis). Así que las versiones con
-derechos no se suben a ningún lado, ni a GitHub ni a otro sitio: cada iglesia
-importa la suya (Archivo → Cómo preparar una Biblia para importar), y el
-instalador con Biblias sigue siendo sólo para las PCs de la iglesia.
+**8/11/2026, a la mañana:** Alexis contó que contestaron todas que no. **El
+mismo día, más tarde,** dijo que le permitieron ofrecerlas **para bajar desde el
+programa, sólo para quien las use**, y que los correos están en una PC de la
+iglesia. Hecho: Biblia → **📥 Biblias** → «Bajar Biblias de internet…» baja
+`EcclesiaCast-biblias.ecbiblias` (NTV, NVI, RV1960, TLA; SHA-256
+`3781681b…6951`, el `Biblias.ecbiblias` del Escritorio del 7/11) de la dirección
+de `AppInfo.BiblePackUrl` (release `biblias-1`), y si no está dice que todavía
+no están para bajar. **Falta subir el archivo**, y antes guardar acá el correo
+de cada editorial (quién, qué versiones, qué condiciones): Claude no lo sube
+sin haber visto el permiso. Otro archivo u otra dirección = cambiar la
+dirección y la huella en `AppInfo`.
 
 | Versión | A quién | Cómo | Respuesta |
 |---|---|---|---|
