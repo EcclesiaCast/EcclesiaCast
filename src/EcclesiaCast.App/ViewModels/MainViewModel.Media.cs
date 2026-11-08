@@ -1247,7 +1247,7 @@ public sealed partial class MainViewModel
             var sounded = new List<string>();
             foreach (var path in paths)
             {
-                var probe = await Task.Run(() => VideoSoundProbe.ProbeAsync(engine, path));
+                var probe = await Task.Run(() => VideoSoundProbe.Probe(engine, path));
                 if (probe is { HasSound: true } p && p.Duration >= SoundedVideoMinimum)
                     sounded.Add(path);
             }
