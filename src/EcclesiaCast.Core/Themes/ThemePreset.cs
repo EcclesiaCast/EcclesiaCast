@@ -63,6 +63,50 @@ public static class ThemePresets
                 look.CaptionPosition = CaptionPosition.BottomLeft;
                 return look;
             }),
+
+        new("Franjas negras", "Cada renglón sobre una franja negra, como un subtítulo: se lee sobre cualquier video o foto",
+            t => Bands(t, LineBand.Text, "#000000", "#FFFFFF")),
+
+        new("Franjas blancas", "Letra negra sobre una franja blanca por renglón, encima del video o la foto",
+            t => Bands(t, LineBand.Text, "#FFFFFF", "#111111")),
+
+        new("Franja negra de borde a borde", "Cada renglón sobre una franja negra que cruza toda la pantalla",
+            t => Bands(t, LineBand.FullWidth, "#000000", "#FFFFFF")),
+
+        new("Franja blanca de borde a borde", "Letra negra sobre franjas blancas que cruzan toda la pantalla",
+            t => Bands(t, LineBand.FullWidth, "#FFFFFF", "#111111")),
+
+        new("Franjas abajo", "Franjas negras en el tercio de abajo, para dejar ver el resto del video",
+            t =>
+            {
+                var look = Bands(t, LineBand.Text, "#000000", "#FFFFFF");
+                look.MaxFontSize = 60;
+                look.MinFontSize = 28;
+                look.AlignV = VAlign.Bottom;
+                look.BoxX = 160;
+                look.BoxY = 700;
+                look.BoxWidth = 1600;
+                look.BoxHeight = 300;
+                look.CaptionPosition = CaptionPosition.TopRight;
+                return look;
+            }),
+
+        new("Moderno", "Mayúsculas rectas y espaciosas sobre azul profundo",
+            t =>
+            {
+                var look = Look(t, "Bahnschrift SemiBold", 86, bold: false, "#FFFFFF", "#0E1A2B",
+                    outline: 0, shadow: 0.6, caption: "#8FB3D9");
+                look.TextCase = TextCase.Upper;
+                return look;
+            }),
+
+        new("Cálido", "Serifa crema sobre marrón oscuro, con la cita dorada",
+            t => Look(t, "Cambria", 86, bold: false, "#FFF4E0", "#2A1A12",
+                outline: 0, shadow: 0.55, caption: "#E3B778")),
+
+        new("Pizarra", "Letra clara y redonda sobre gris pizarra, sin sombra",
+            t => Look(t, "Calibri", 90, bold: true, "#F2F2F2", "#2B3138",
+                outline: 0, shadow: 0, caption: "#A9B4C0")),
     ];
 
     /// <summary>Puts the common parts of a look on a theme that is already a copy.</summary>
@@ -98,6 +142,27 @@ public static class ThemePresets
         t.CaptionFontFamily = null;
         t.CaptionColor = caption;
         t.SecondaryColor = caption;
+        t.LineBand = LineBand.None;
+        t.LineBandColor = "#000000";
+        t.LineBandOpacity = 1;
         return t;
+    }
+
+    /// <summary>
+    /// A look of bands behind each line: no shadow and no outline (the band
+    /// already makes the words readable), over a transparent background so the
+    /// video or the photo shows around the bands.
+    /// </summary>
+    private static SlideTheme Bands(SlideTheme t, LineBand kind, string band, string text)
+    {
+        var look = Look(t, "Segoe UI", 76, bold: true, text, "#000000",
+            outline: 0, shadow: 0, transparent: true, caption: "#FFFFFF");
+        look.LineBand = kind;
+        look.LineBandColor = band;
+        look.LineBandOpacity = 1;
+        // The second Bible version sits on bands too: it takes the letter's
+        // colour, or a white band would carry white words.
+        look.SecondaryColor = text;
+        return look;
     }
 }

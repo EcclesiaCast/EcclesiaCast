@@ -16,6 +16,9 @@
                     <!-- Cada texto va dentro de un Grid porque WPF admite un solo
                          efecto por elemento: el contenedor lleva la sombra y el
                          TextBlock el contorno (halo), así se pueden usar juntos. -->
+                    <!-- Las franjas van detrás del texto y fuera de su sombra -->
+                    <Grid x:Name="MainTextHost" HorizontalAlignment="Center">
+                    <Canvas x:Name="MainBands" IsHitTestVisible="False"/>
                     <Grid x:Name="MainTextShadow" HorizontalAlignment="Center">
                         <TextBlock x:Name="MainText"
                                    FontFamily="Segoe UI"
@@ -23,7 +26,10 @@
                                    Foreground="White"
                                    TextWrapping="Wrap" TextAlignment="Center"/>
                     </Grid>
+                    </Grid>
                     <!-- Segunda versión bíblica, cuando hay dos seleccionadas -->
+                    <Grid x:Name="SecondaryTextHost" HorizontalAlignment="Center">
+                    <Canvas x:Name="SecondaryBands" IsHitTestVisible="False"/>
                     <Grid x:Name="SecondaryTextShadow" HorizontalAlignment="Center" Margin="0,50,0,0">
                         <TextBlock x:Name="SecondaryText"
                                    FontFamily="Segoe UI"
@@ -31,6 +37,7 @@
                                    Foreground="#C9D4E8"
                                    TextWrapping="Wrap" TextAlignment="Center"
                                    Visibility="Collapsed"/>
+                    </Grid>
                     </Grid>
                 </StackPanel>
             </Grid>

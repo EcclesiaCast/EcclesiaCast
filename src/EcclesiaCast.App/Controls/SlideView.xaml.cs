@@ -388,6 +388,7 @@ public partial class SlideView : UserControl
         CaptionText.VerticalAlignment = SlideTextFit.IsCaptionOnTop(theme.CaptionPosition)
             ? VerticalAlignment.Top
             : VerticalAlignment.Bottom;
+        UpdateBands();
     }
 
     /// <summary>The drop shadow behind the text, at the configured strength.</summary>
@@ -546,6 +547,11 @@ public partial class SlideView : UserControl
         CaptionText.Visibility = theme.ShowCaption && hasCaption
             ? Visibility.Visible
             : Visibility.Collapsed;
+
+        // The bands need the lines where they finally fall.
+        if (theme.LineBand != LineBand.None)
+            MainText.UpdateLayout();
+        UpdateBands();
     }
 
     private string? Transform(string? text) => SlideTextFit.ApplyCase(text, EffectiveCase);

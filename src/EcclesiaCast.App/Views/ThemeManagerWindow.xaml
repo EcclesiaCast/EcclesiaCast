@@ -281,6 +281,40 @@
                             <TextBox Style="{StaticResource Field}" Text="{Binding OutlineColor, UpdateSourceTrigger=PropertyChanged}"/>
                         </DockPanel>
 
+                        <TextBlock Text="Franjas detrás de cada renglón" Style="{StaticResource FieldLabel}"
+                                   ToolTip="Una franja de color detrás de cada renglón, como un subtítulo: la letra se lee sobre cualquier video o foto"/>
+                        <ComboBox SelectedIndex="{Binding LineBandIndex}" FontSize="12">
+                            <ComboBoxItem Content="Sin franjas"/>
+                            <ComboBoxItem Content="Al ancho del texto"/>
+                            <ComboBoxItem Content="De borde a borde de la pantalla"/>
+                        </ComboBox>
+                        <UniformGrid Columns="2" Margin="0,6,0,0">
+                            <Button Content="▬ Negras, letra blanca" FontSize="11" Padding="6,4" Margin="0,0,3,0"
+                                    Style="{StaticResource DarkButton}"
+                                    Command="{Binding SetLineBandShadeCommand}" CommandParameter="black"/>
+                            <Button Content="▭ Blancas, letra negra" FontSize="11" Padding="6,4" Margin="3,0,0,0"
+                                    Style="{StaticResource DarkButton}"
+                                    Command="{Binding SetLineBandShadeCommand}" CommandParameter="white"/>
+                        </UniformGrid>
+                        <DockPanel Margin="0,6,0,0"
+                                   IsEnabled="{Binding LineBandIndex, Converter={StaticResource NonZeroToBool}}">
+                            <TextBlock DockPanel.Dock="Left" Text="Color" FontSize="11" Width="70" VerticalAlignment="Center"
+                                       Foreground="{StaticResource MutedBrush}"/>
+                            <Button DockPanel.Dock="Right" Content="Paleta…" FontSize="11" Padding="8,3" Margin="6,0,0,0"
+                                    Style="{StaticResource DarkButton}" Command="{Binding PickLineBandColorCommand}"/>
+                            <TextBox Style="{StaticResource Field}" Text="{Binding LineBandColor, UpdateSourceTrigger=PropertyChanged}"/>
+                        </DockPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0"
+                                    IsEnabled="{Binding LineBandIndex, Converter={StaticResource NonZeroToBool}}">
+                            <TextBlock Text="Opacidad" FontSize="11" Width="70" VerticalAlignment="Center"
+                                       Foreground="{StaticResource MutedBrush}"/>
+                            <controls:NumericField Minimum="10" Maximum="100" Step="5" Decimals="0"
+                                                   Value="{Binding LineBandOpacityPercent}"
+                                                   ToolTip="100 = franja llena · menos = se ve el fondo a través"/>
+                            <TextBlock Text="%" FontSize="11" VerticalAlignment="Center" Margin="6,0,0,0"
+                                       Foreground="{StaticResource FaintBrush}"/>
+                        </StackPanel>
+
                         <TextBlock Text="Color del texto" Style="{StaticResource FieldLabel}"/>
                         <DockPanel>
                             <Button DockPanel.Dock="Right" Content="Paleta…" FontSize="11" Padding="8,3" Margin="6,0,0,0"

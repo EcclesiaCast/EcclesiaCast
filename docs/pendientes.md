@@ -271,6 +271,21 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       azar» con imágenes y videos mezclados. Cada video tiene que llegar al
       final antes de pasar, y cada imagen durar los segundos elegidos (o los
       suyos de Propiedades). Elegir otra cosa o sacar el fondo la corta.
+- [ ] **Lo de la 1.2.0.** **Lo probó Claude el 8/11/2026** con el programa
+      abierto (una copia con una copia de la biblioteca) y salió bien: las
+      franjas en Temas (plantillas, a mano, opacidad) y en la salida real sobre
+      un video, también al pasar de versículo; un video con sonido y un relleno
+      de bordes con video **suena** (medido con el medidor de Windows); el botón
+      🔇/🔊 lo calla y le devuelve el sonido; un video largo con sonido entra
+      con sonido; la ventana de actualización muestra la lista corta y «Ver los
+      detalles». En la prueba apareció y se arregló un cierre del programa al
+      agregar un video. Falta que lo mires vos: las franjas con una **canción**
+      (en el programa se probó la Biblia; con canción, sólo en dibujos a imagen), la lista de **Música** a otro volumen mientras
+      suena un video (probado en un banco, no en el programa) y todo con el
+      proyector de la iglesia. **Al amigo con el video mudo:** que instale la
+      1.2.0; si sigue sin sonar, que mande el registro del día
+      (`%APPDATA%\EcclesiaCast\logs\ecclesiacast-AAAAMMDD.log`): ahora dice si el
+      video está silenciado, si no trae pista de audio o qué error dio VLC.
 
 ## 2. Después de publicar la v1.0.0
 
@@ -370,6 +385,11 @@ nuevo (con otro paquete o con otra versión), después de `dotnet publish`:
 
 Alexis pidió permiso para ofrecer estas versiones dentro del programa. Hasta
 que haya un sí por escrito, no se incluyen ni se ofrecen para bajar.
+
+**8/11/2026: contestaron todas que no** (Alexis). Así que las versiones con
+derechos no se suben a ningún lado, ni a GitHub ni a otro sitio: cada iglesia
+importa la suya (Archivo → Cómo preparar una Biblia para importar), y el
+instalador con Biblias sigue siendo sólo para las PCs de la iglesia.
 
 | Versión | A quién | Cómo | Respuesta |
 |---|---|---|---|

@@ -2280,6 +2280,24 @@
                                     ToolTip="Volver el fondo nítido"/>
                         </StackPanel>
 
+                        <!-- Sonido del video en pantalla: los videos entran sin sonido -->
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center"
+                                    Margin="14,0,0,0"
+                                    Visibility="{Binding IsBackgroundVideo, Converter={StaticResource BoolToVis}}">
+                            <Button Content="🔇 Sin sonido" FontSize="11" Padding="8,3"
+                                    Style="{StaticResource DarkButton}"
+                                    Command="{Binding ToggleBackgroundSoundCommand}"
+                                    Visibility="{Binding IsBackgroundMuted, Converter={StaticResource BoolToVis}}"
+                                    AutomationProperties.Name="Dar sonido al video"
+                                    ToolTip="Este video se proyecta sin sonido. Clic: que suene (queda guardado en sus Propiedades)."/>
+                            <Button Content="🔊 Con sonido" FontSize="11" Padding="8,3"
+                                    Style="{StaticResource DarkButton}"
+                                    Command="{Binding ToggleBackgroundSoundCommand}"
+                                    Visibility="{Binding IsBackgroundMuted, Converter={StaticResource InverseBoolToVis}}"
+                                    AutomationProperties.Name="Silenciar el video"
+                                    ToolTip="Este video suena. Clic: silenciarlo (queda guardado en sus Propiedades)."/>
+                        </StackPanel>
+
                         <TextBlock Text="FONDO EN PANTALLA" FontSize="10" FontWeight="SemiBold"
                                    Foreground="{StaticResource FaintBrush}" VerticalAlignment="Center"/>
                     </DockPanel>

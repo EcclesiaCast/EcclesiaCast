@@ -29,11 +29,36 @@ public partial class UpdateWindow : Window
         _isProjecting = isProjecting;
 
         VersionsText.Text = $"Tenés la {installedVersion} · La nueva es la {offer.Version}";
-        NotesText.Text = string.IsNullOrWhiteSpace(offer.Notes)
-            ? "Esta versión no trae una lista de cambios."
-            : offer.Notes;
+        ShowNotes(details: false);
         ShowOffer();
     }
+
+    private bool _details;
+
+    /// <summary>
+    /// The short list (one line per change) or every change explained. The
+    /// short one comes first: the full notes of a few versions were a wall
+    /// of text nobody read.
+    /// </summary>
+    private void ShowNotes(bool details)
+    {
+        var hasBrief = !string.IsNullOrWhiteSpace(_offer.Brief);
+        _details = details || !hasBrief;
+        var text = _details ? _offer.Notes : _offer.Brief;
+        NotesText.Text = string.IsNullOrWhiteSpace(text)
+            ? "Esta versión no trae una lista de cambios."
+            : text;
+        NotesScroll.ScrollToTop();
+
+        // Nothing to switch to when there is only one of them.
+        DetailsToggle.Visibility = hasBrief && !string.IsNullOrWhiteSpace(_offer.Notes) && _offer.Notes != _offer.Brief
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+        DetailsToggle.Text = _details ? "Ver la lista corta" : "Ver los detalles";
+    }
+
+    private void DetailsToggle_Click(object sender, System.Windows.Input.MouseButtonEventArgs e) =>
+        ShowNotes(!_details);
 
     /// <summary>Raised when the operator chooses «Saltar esta versión».</summary>
     public event EventHandler? SkipRequested;

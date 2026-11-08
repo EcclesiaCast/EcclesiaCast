@@ -3,12 +3,14 @@ namespace EcclesiaCast.Core.Updates;
 /// <summary>A newer version the operator can install.</summary>
 /// <param name="Version">The version, as people read it (1.0.0, no leading v).</param>
 /// <param name="Notes">What it brings, already turned into plain text.</param>
+/// <param name="Brief">The same, one short line per change (see <see cref="ReleaseNotesText.Brief"/>).</param>
 public sealed record UpdateOffer(
     AppVersion Version,
     string Tag,
     bool IsPreRelease,
     string Notes,
-    ReleaseAsset Installer);
+    ReleaseAsset Installer,
+    string Brief = "");
 
 /// <summary>
 /// Decides which release, if any, is worth offering. It looks only at the
@@ -29,7 +31,7 @@ public static class UpdatePicker
         AppVersion installed, IEnumerable<ReleaseInfo> releases, AppVersion? skipped = null)
     {
         UpdateOffer? best = null;
-        var newer = new List<(AppVersion Version, string Notes)>();
+        var newer = new List<(AppVersion Version, string Notes, string Brief)>();
 
         foreach (var release in releases)
         {
@@ -49,12 +51,13 @@ public static class UpdatePicker
                 continue;
 
             var notes = ReleaseNotesText.FromRelease(release.Body);
+            var brief = ReleaseNotesText.BriefFromRelease(release.Body);
 
             // A version the operator skipped is not offered again, but what it
             // brought is still new to them: its notes go into the next offer.
             if (skipped is not null && version == skipped)
             {
-                newer.Add((version, notes));
+                newer.Add((version, notes, brief));
                 continue;
             }
 
@@ -62,12 +65,18 @@ public static class UpdatePicker
             if (installer is null)
                 continue;
 
-            newer.Add((version, notes));
+            newer.Add((version, notes, brief));
             if (best is null || version > best.Version)
-                best = new UpdateOffer(version, release.Tag, isPreRelease, notes, installer);
+                best = new UpdateOffer(version, release.Tag, isPreRelease, notes, installer, brief);
         }
 
-        return best is null ? null : best with { Notes = AccumulatedNotes(best, newer) };
+        return best is null
+            ? null
+            : best with
+            {
+                Notes = AccumulatedNotes(best, newer.Select(n => (n.Version, n.Notes)).ToList(), best.Notes),
+                Brief = AccumulatedNotes(best, newer.Select(n => (n.Version, n.Brief)).ToList(), best.Brief),
+            };
     }
 
     /// <summary>
@@ -75,7 +84,7 @@ public static class UpdatePicker
     /// brings, newest first, so skipping a few versions loses nothing. With a
     /// single version it is just that version's notes.
     /// </summary>
-    private static string AccumulatedNotes(UpdateOffer offer, List<(AppVersion Version, string Notes)> newer)
+    private static string AccumulatedNotes(UpdateOffer offer, List<(AppVersion Version, string Notes)> newer, string own)
     {
         var included = newer
             .Where(n => n.Version <= offer.Version && n.Notes.Length > 0)
@@ -83,7 +92,7 @@ public static class UpdatePicker
             .ToList();
 
         if (included.Count <= 1)
-            return included.Count == 1 ? included[0].Notes : offer.Notes;
+            return included.Count == 1 ? included[0].Notes : own;
 
         return string.Join(
             "\n\n",
