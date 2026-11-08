@@ -7,10 +7,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
-- **Agregar Biblias desde la pestaña Biblia.** El botón **📥 Biblias** junta
-  todo: bajar Biblias de internet (sólo a la computadora que las pide),
-  importar un paquete `.ecbiblias`, importar una Biblia suelta y cómo
-  prepararla. «Bajar Biblias de internet…» también está en el menú Archivo.
+- **Bajar Biblias desde el programa.** En la pestaña Biblia, **📥 Biblias →
+  «Bajar Biblias de internet…»** muestra las Biblias disponibles por idioma
+  (español, inglés, portugués y francés para empezar): marcás las que querés y
+  se baja sólo eso. Cada archivo se comprueba antes de agregarlo. El mismo
+  botón importa un paquete `.ecbiblias` o una Biblia suelta.
 
 ## [1.2.0] - 2026-11-08
 

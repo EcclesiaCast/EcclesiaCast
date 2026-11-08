@@ -389,14 +389,19 @@ que haya un sí por escrito, no se incluyen ni se ofrecen para bajar.
 **8/11/2026, a la mañana:** Alexis contó que contestaron todas que no. **El
 mismo día, más tarde,** dijo que le permitieron ofrecerlas **para bajar desde el
 programa, sólo para quien las use**, y que los correos están en una PC de la
-iglesia. Hecho: Biblia → **📥 Biblias** → «Bajar Biblias de internet…» baja
-`EcclesiaCast-biblias.ecbiblias` (NTV, NVI, RV1960, TLA; SHA-256
-`3781681b…6951`, el `Biblias.ecbiblias` del Escritorio del 7/11) de la dirección
-de `AppInfo.BiblePackUrl` (release `biblias-1`), y si no está dice que todavía
-no están para bajar. **Falta subir el archivo**, y antes guardar acá el correo
-de cada editorial (quién, qué versiones, qué condiciones): Claude no lo sube
-sin haber visto el permiso. Otro archivo u otra dirección = cambiar la
-dirección y la huella en `AppInfo`.
+iglesia. Hecho: Biblia → **📥 Biblias** → «Bajar Biblias de internet…» lee una
+lista (`catalogo.json`) en Cloudflare R2 y baja sólo lo que se marca (ver
+[installer/biblias-para-bajar/README.md](../installer/biblias-para-bajar/README.md)).
+La lista empieza con 8 Biblias libres (español, inglés, portugués y francés),
+listas en el Escritorio, carpeta «Biblias para subir a R2».
+
+- [ ] **Alexis: crear la cuenta de Cloudflare R2** y el bucket
+      `ecclesiacast-biblias` con acceso público (pasos en ese README), subir esa
+      carpeta y pasarle a Claude la dirección `https://pub-….r2.dev`, que va en
+      `AppInfo.BibleCatalogUrl`.
+- [ ] **Las con derechos (NTV, NVI, RV1960, TLA)** entran a la lista sólo con el
+      correo de cada editorial anotado acá (quién, qué versiones, qué
+      condiciones). Claude no las sube sin haber visto el permiso.
 
 | Versión | A quién | Cómo | Respuesta |
 |---|---|---|---|
