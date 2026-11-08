@@ -5,6 +5,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+## [1.2.1] - 2026-11-08
+
 ### Agregado
 
 - **Bajar Biblias desde el programa.** En la pestaña Biblia, **📥 Biblias →
