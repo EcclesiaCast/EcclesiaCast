@@ -293,7 +293,12 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       instalada, Biblia → **📥 Biblias** → «Bajar Biblias de internet…», marcá
       una (por ejemplo King James), Descargar, y fijate que aparezca en las
       versiones. Al abrir la lista de nuevo tiene que decir «ya está en la
-      biblioteca».
+      biblioteca». **El recorrido de bienvenida** se probó dibujado a imagen
+      sobre una captura de la ventana, no en el programa abierto: en la 1.3.0,
+      Ayuda → «Recorrido del programa», pasá todos los pasos (con el mouse y
+      con las flechas), y fijate que al cambiar el tamaño de la ventana el foco
+      siga en su lugar y que Esc lo cierre sin apagar la salida. En una PC
+      donde nunca se instaló, tiene que salir solo después de «Acerca de».
 
 ## 2. Después de publicar la v1.0.0
 

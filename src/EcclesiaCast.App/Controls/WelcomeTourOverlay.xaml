@@ -1,0 +1,45 @@
+<UserControl x:Class="EcclesiaCast.App.Controls.WelcomeTourOverlay"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Focusable="True" FocusVisualStyle="{x:Null}"
+             FontFamily="Segoe UI">
+    <!-- El fondo transparente atrapa los clics: mientras dura el recorrido no
+         se toca nada de abajo por accidente. -->
+    <Canvas x:Name="Stage" Background="Transparent" ClipToBounds="True">
+        <!-- Una copia borrosa de la ventana, con un agujero donde va el foco -->
+        <Rectangle x:Name="Blurred" IsHitTestVisible="False"/>
+        <!-- Lo oscuro, con el mismo agujero -->
+        <Path x:Name="Shade" Fill="#B8090B10" IsHitTestVisible="False"/>
+        <!-- El borde del foco -->
+        <Rectangle x:Name="Ring" Stroke="{StaticResource AccentSoftBrush}" StrokeThickness="2"
+                   RadiusX="10" RadiusY="10" IsHitTestVisible="False" Visibility="Collapsed"/>
+
+        <Border x:Name="Card" Width="360"
+                Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource AccentBrush}" BorderThickness="1"
+                CornerRadius="12" Padding="20,16,20,16">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="24" ShadowDepth="4" Opacity="0.55" Color="Black"/>
+            </Border.Effect>
+            <StackPanel>
+                <TextBlock x:Name="StepCount" FontSize="11" Foreground="{StaticResource MutedBrush}"
+                           Margin="0,0,0,4"/>
+                <TextBlock x:Name="TitleText" FontSize="18" FontWeight="SemiBold" Foreground="White"
+                           TextWrapping="Wrap"/>
+                <TextBlock x:Name="BodyText" FontSize="13.5" Foreground="#D6DAE3" TextWrapping="Wrap"
+                           LineHeight="20" Margin="0,8,0,0"/>
+                <DockPanel Margin="0,18,0,0" LastChildFill="False">
+                    <Button x:Name="SkipButton" DockPanel.Dock="Left" Content="Saltar el recorrido"
+                            Style="{StaticResource DarkButton}" Padding="10,6" FontSize="12"
+                            Foreground="{StaticResource MutedBrush}" Click="Skip_Click"/>
+                    <Button x:Name="NextButton" DockPanel.Dock="Right" Content="Siguiente"
+                            Style="{StaticResource AccentButton}" Padding="16,6" Margin="6,0,0,0"
+                            Click="Next_Click"/>
+                    <Button x:Name="BackButton" DockPanel.Dock="Right" Content="Atrás"
+                            Style="{StaticResource DarkButton}" Padding="12,6"
+                            Click="Back_Click"/>
+                </DockPanel>
+            </StackPanel>
+        </Border>
+    </Canvas>
+</UserControl>
