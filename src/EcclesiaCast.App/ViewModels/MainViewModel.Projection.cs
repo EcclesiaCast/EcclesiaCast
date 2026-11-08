@@ -536,6 +536,7 @@ public sealed partial class MainViewModel
         IsCountdownRunning = _presentation.Countdown is not null;
         IsStageNotesActive = _presentation.StageNotes is not null;
         HasBackground = _presentation.Background is not null;
+        UpdateBackgroundSoundFlags();
 
         // A page of a presentation stops being «on screen» the moment
         // anything else takes the background.

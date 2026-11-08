@@ -57,7 +57,7 @@ public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
         {
             _volume = Math.Clamp(value, 0, 100);
             if (_player is { } player)
-                player.Volume = _volume;
+                PlayerSound.SetVolume(player, _volume);
         }
     }
 
@@ -88,7 +88,8 @@ public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
         media.AddOption(":no-video");
         if (start > TimeSpan.Zero)
             media.AddOption($":start-time={start.TotalSeconds.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)}");
-        player.Volume = _volume;
+        PlayerSound.KeepSessionFull(player);
+        PlayerSound.SetVolume(player, _volume);
         _path = path;
         player.Play(media);
     }
@@ -173,7 +174,7 @@ public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
         if (_player is { } existing)
             return existing;
 
-        var player = new MediaPlayer(libVlc) { Volume = _volume };
+        var player = new MediaPlayer(libVlc);
 
         // VLC raises these on its own thread, where calling back into the
         // player would deadlock: they are handed to the UI thread first.

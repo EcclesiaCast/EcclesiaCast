@@ -123,8 +123,10 @@ public partial class VlcVideoSurface : UserControl
         if (player is null)
             return;
 
-        player.Mute = media.Muted;
-        player.Volume = Math.Clamp(media.Volume, 0, 100);
+        // Its own volume, never the shared one (see PlayerSound): the silent
+        // copy that fills the edges used to mute the video itself.
+        PlayerSound.KeepSessionFull(player);
+        PlayerSound.SetVolume(player, media.Volume);
 
         // Re-applying the same background must not restart it — the operator
         // may have paused it on purpose, and changing slides re-applies it.
@@ -138,6 +140,7 @@ public partial class VlcVideoSurface : UserControl
             // device looks at, or lifting the mute never reopens the sound.
             _playing = media;
             ApplyStretch();
+            UpdateSilence(engine, player, media);
             return;
         }
 
@@ -184,6 +187,15 @@ public partial class VlcVideoSurface : UserControl
         // que traía: el video de fondo se lee del disco de la misma PC.
         m.AddOption(":file-caching=500");
 
+        // A silenced video is opened without its sound: nothing is decoded and
+        // no other player's sound can be touched by it.
+        var silent = IsSilent(media);
+        if (silent)
+            m.AddOption(":no-audio");
+        _openedSilent = silent;
+        _trackOff = false;
+        _playingName = media.Name;
+
         // Trimming is handed to VLC rather than watched for in code: a
         // loop then restarts at the trimmed start, which is the whole
         // point of cutting a sting off the front of a stock loop.
@@ -217,6 +229,7 @@ public partial class VlcVideoSurface : UserControl
             try
             {
                 var ok = player.SetAudioOutput("mmdevice");
+                PlayerSound.KeepSessionFull(player);
                 Log.Information("Se reabre la salida de audio del video ({Result})", ok ? "ok" : "no se pudo");
             }
             catch (Exception ex)
@@ -229,11 +242,104 @@ public partial class VlcVideoSurface : UserControl
         if (resumeAt is not null)
             return;
 
+        var sound = silent ? "sin sonido" : $"con sonido al {Math.Clamp(media.Volume, 0, 100)} %";
         if (playable == media.Path)
-            Log.Information("Video de fondo: {Name} ({Path})", media.Name, media.Path);
+            Log.Information("Video de fondo: {Name} ({Path}), {Sound}", media.Name, media.Path, sound);
         else
-            Log.Information("Video de fondo: {Name} ({Path}) desde su copia liviana {Copy}",
-                media.Name, media.Path, playable);
+            Log.Information("Video de fondo: {Name} ({Path}) desde su copia liviana {Copy}, {Sound}",
+                media.Name, media.Path, playable, sound);
+    }
+
+    // ── Sonido propio del video ──────────────────────────────────
+
+    /// <summary>True when the video was opened without its sound (<c>:no-audio</c>).</summary>
+    private bool _openedSilent;
+
+    /// <summary>True when its sound track was switched off while it played.</summary>
+    private bool _trackOff;
+
+    /// <summary>The sound track that was playing before it was switched off.</summary>
+    private int _savedTrack = -1;
+
+    /// <summary>The name of the video playing now, for the log.</summary>
+    private string? _playingName;
+
+    private static bool IsSilent(MediaItem media) => media.Muted || media.Volume <= 0;
+
+    /// <summary>
+    /// The same video is put on again with its sound switched (its tab was
+    /// silenced, or its Propiedades changed). Silencing switches its sound track
+    /// off in place; giving it the sound back switches the track on again, or,
+    /// when it was opened without one, reopens it where it was, with its sound.
+    /// </summary>
+    private void UpdateSilence(LibVLC engine, MediaPlayer player, MediaItem media)
+    {
+        try
+        {
+            if (IsSilent(media))
+            {
+                if (!_openedSilent && !_trackOff)
+                {
+                    _savedTrack = player.AudioTrack;
+                    player.SetAudioTrack(-1);
+                    _trackOff = true;
+                    Log.Information("Se silencia el video {Name}", media.Name);
+                }
+                return;
+            }
+
+            if (_trackOff && _savedTrack >= 0 && player.SetAudioTrack(_savedTrack))
+            {
+                _trackOff = false;
+                Log.Information("Vuelve el sonido del video {Name}", media.Name);
+                return;
+            }
+
+            if (!_openedSilent && !_trackOff)
+                return;
+
+            // Paused, it gets its sound the next time it is put on.
+            if (!player.IsPlaying)
+                return;
+
+            var position = TimeSpan.FromMilliseconds(Math.Max(0, player.Time));
+            Log.Information("Se vuelve a abrir el video {Name} con sonido en {Position}", media.Name, position);
+            HoldLastFrame();
+            StartPlayback(engine, player, media, position);
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "No se pudo cambiar el sonido del video");
+        }
+    }
+
+    /// <summary>
+    /// Leaves a line in the log when a video that should sound has no sound VLC
+    /// can play: the first thing to look at when someone reports a mute video.
+    /// </summary>
+    private void CheckSoundTrack(MediaPlayer player)
+    {
+        if (_openedSilent || _trackOff)
+            return;
+
+        var generation = Volatile.Read(ref _generation);
+        var name = _playingName;
+        ThreadPool.QueueUserWorkItem(_ =>
+        {
+            Thread.Sleep(1500);
+            if (Volatile.Read(ref _generation) != generation || _openedSilent || _trackOff)
+                return;
+            try
+            {
+                // The count includes the «off» entry: 0 means no sound at all.
+                if (player.AudioTrackCount <= 0)
+                    Log.Warning("El video {Name} no trae sonido que se pueda reproducir (ninguna pista de audio)", name);
+                else
+                    Log.Information("El video {Name} suena por la pista {Track} de {Count}",
+                        name, player.AudioTrack, player.AudioTrackCount - 1);
+            }
+            catch { /* el reproductor ya se cerró */ }
+        });
     }
 
     // ── Cambio de dispositivo de audio de Windows ────────────────
@@ -618,7 +724,6 @@ public partial class VlcVideoSurface : UserControl
         {
             var player = new MediaPlayer(engine)
             {
-                Mute = true,
                 // The graphics card decodes and VLC copies each frame back for
                 // the callbacks. Measured on the church's HEVC 1920×1280 loops:
                 // about a quarter of the CPU of decoding in software, which is
@@ -636,6 +741,7 @@ public partial class VlcVideoSurface : UserControl
             player.SetVideoCallbacks(_lockCb, null, _displayCb);
 
             player.EncounteredError += (_, _) => Log.Error("VLC no pudo reproducir el video de fondo");
+            player.Playing += (_, _) => CheckSoundTrack(player);
             player.EndReached += (_, _) =>
                 Dispatcher.BeginInvoke(() => Ended?.Invoke(this, EventArgs.Empty));
 

@@ -107,7 +107,13 @@ public partial class App : Application
         try
         {
             LibVLCSharp.Shared.Core.Initialize();
-            libVlc = new LibVLC("--no-osd", "--quiet");
+            // --no-volume-save: VLC kept its volume and mute in a Windows
+            // audio session of its own that Windows remembers between runs, so
+            // a mute left there by an older version stayed on for good. Each
+            // player now sets its own level (PlayerSound) and the session
+            // opens at full every time.
+            libVlc = new LibVLC("--no-osd", "--quiet", "--no-volume-save");
+            VlcLog.Attach(libVlc);
         }
         catch (Exception ex)
         {

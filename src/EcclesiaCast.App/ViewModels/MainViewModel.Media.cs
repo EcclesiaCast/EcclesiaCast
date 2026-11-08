@@ -786,7 +786,10 @@ public sealed partial class MainViewModel
         LightVideoCache.Hold(newVideos.Select(v => v.Path));
         RefreshLightCopies();
         if (newVideos.Count > 0)
+        {
             _ = OfferLightCopiesAsync(newVideos);
+            _ = GiveSoundToLongVideosAsync(newVideos.Select(v => v.Path).ToList());
+        }
 
         if (documents.Count > 0)
             _ = ImportDocumentsAsync(documents);
@@ -1221,6 +1224,62 @@ public sealed partial class MainViewModel
     /// Every path that puts a media on the output, or puts it there again
     /// after a change, goes through this.
     /// </summary>
+    /// <summary>
+    /// A video longer than this, with sound, comes in with its sound on: it
+    /// is a testimony or an announcement, not a loop (loops are seconds long).
+    /// </summary>
+    private static readonly TimeSpan SoundedVideoMinimum = TimeSpan.FromSeconds(40);
+
+    /// <summary>
+    /// Videos come in silent, as backgrounds. One that carries sound and
+    /// lasts more than <see cref="SoundedVideoMinimum"/> gets its sound on,
+    /// unless its tab is one of backgrounds or is silenced: a church that
+    /// brought in a testimony video found it mute and did not know about
+    /// Propiedades.
+    /// </summary>
+    private async Task GiveSoundToLongVideosAsync(IReadOnlyList<string> paths)
+    {
+        try
+        {
+            if (App.VideoEngine is not { } engine)
+                return;
+
+            var sounded = new List<string>();
+            foreach (var path in paths)
+            {
+                var probe = await Task.Run(() => VideoSoundProbe.ProbeAsync(engine, path));
+                if (probe is { HasSound: true } p && p.Duration >= SoundedVideoMinimum)
+                    sounded.Add(path);
+            }
+            if (sounded.Count == 0)
+                return;
+
+            var names = new List<string>();
+            foreach (var item in _allMedia.Where(m => m.Type == MediaType.Video && m.Muted
+                         && sounded.Contains(m.Path, StringComparer.OrdinalIgnoreCase)).ToList())
+            {
+                var rule = string.IsNullOrWhiteSpace(item.Category) ? MediaTabRule.Default : TabRule(item.Category);
+                if (rule.Mode == MediaTabMode.Background || rule.Muted)
+                    continue;
+
+                item.Muted = false;
+                _media.Update(item);
+                names.Add(item.Name);
+            }
+            if (names.Count == 0)
+                return;
+
+            Serilog.Log.Information("Entran con sonido los videos largos con sonido: {Names}", string.Join(", ", names));
+            StatusText = names.Count == 1
+                ? $"«{names[0]}» trae sonido: se va a escuchar. Para silenciarlo, 🔊 en la barra del fondo o sus Propiedades."
+                : $"{names.Count} videos traen sonido y se van a escuchar. Para silenciar uno, 🔊 en la barra del fondo o sus Propiedades.";
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Warning(ex, "No se pudo ver si los videos nuevos traen sonido");
+        }
+    }
+
     private MediaItem Resolved(MediaItem item)
     {
         item = Playable(item);
