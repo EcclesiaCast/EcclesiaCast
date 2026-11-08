@@ -7,9 +7,10 @@ huella SHA-256 antes de agregarlo, así que un archivo cambiado o roto se
 rechaza.
 
 La lista y las Biblias están en **Cloudflare R2**, en un «bucket» llamado
-`ecclesiacast-biblias`. La dirección de la lista está en
-`AppInfo.BibleCatalogUrl`. Mientras esa dirección esté vacía, el programa
-avisa que todavía no hay Biblias para bajar.
+`ecclesiacast-biblias`, con la dirección pública
+`https://pub-ec2cd8b767e842a2970aa9564a3ea4fb.r2.dev/catalogo.json`, que está en
+`AppInfo.BibleCatalogUrl`. Si esa dirección quedara vacía, el programa avisa
+que todavía no hay Biblias para bajar.
 
 ## Preparar los archivos
 

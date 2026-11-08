@@ -32,11 +32,12 @@ public static class AppInfo
     /// The list of Bibles the program offers to download (Biblia → 📥 → «Bajar
     /// Biblias de internet…»; see <see cref="EcclesiaCast.Core.Bible.BibleCatalog"/>).
     /// The Bibles live next to it, in the Cloudflare R2 bucket
-    /// «ecclesiacast-biblias». Empty until that address exists: then the program
-    /// says there are no Bibles to download yet. ECCLESIACAST_BIBLE_CATALOG
-    /// points a test at another list (for example one served on this computer).
+    /// «ecclesiacast-biblias», served through its public r2.dev address. If it
+    /// is ever left empty, the program says there are no Bibles to download yet.
+    /// ECCLESIACAST_BIBLE_CATALOG points a test at another list (for example one
+    /// served on this computer).
     /// </summary>
-    public const string BibleCatalogUrl = "";
+    public const string BibleCatalogUrl = "https://pub-ec2cd8b767e842a2970aa9564a3ea4fb.r2.dev/catalogo.json";
 
     public static string CurrentBibleCatalogUrl =>
         Environment.GetEnvironmentVariable("ECCLESIACAST_BIBLE_CATALOG") is { Length: > 0 } test ? test : BibleCatalogUrl;
