@@ -29,6 +29,124 @@ public static partial class ReleaseNotesText
         return ToPlainText(marker >= 0 ? body[(marker + NotesMarker.Length)..] : body);
     }
 
+    /// <summary>
+    /// The short version of the notes, for the first look at the update
+    /// window: each change as its title alone (the bold words it starts with,
+    /// or its first sentence), under the headings. The full text was a wall of
+    /// paragraphs, more so when several versions were skipped.
+    /// </summary>
+    public static string BriefFromRelease(string? body)
+    {
+        if (string.IsNullOrWhiteSpace(body))
+            return string.Empty;
+
+        var marker = body.IndexOf(NotesMarker, StringComparison.Ordinal);
+        return Brief(marker >= 0 ? body[(marker + NotesMarker.Length)..] : body);
+    }
+
+    /// <summary>The longest a line of <see cref="Brief"/> gets before it is cut with «…».</summary>
+    public const int BriefLineLength = 110;
+
+    public static string Brief(string? markdown)
+    {
+        if (string.IsNullOrWhiteSpace(markdown))
+            return string.Empty;
+
+        var text = HtmlComment().Replace(markdown.Replace("\r\n", "\n").Replace('\r', '\n'), string.Empty);
+        var output = new List<string>();
+        var item = new StringBuilder();
+        var inItem = false;
+        var inFence = false;
+
+        void Flush()
+        {
+            if (inItem && item.Length > 0)
+            {
+                var line = ItemTitle(item.ToString());
+                if (line.Length > 0 && !line.StartsWith("Full Changelog", StringComparison.OrdinalIgnoreCase))
+                    output.Add("• " + line);
+            }
+            item.Clear();
+            inItem = false;
+        }
+
+        foreach (var raw in text.Split('\n'))
+        {
+            var line = raw.TrimEnd();
+
+            if (FenceStart().IsMatch(line))
+            {
+                Flush();
+                inFence = !inFence;
+                continue;
+            }
+            if (inFence)
+                continue;
+
+            if (line.Trim().Length == 0)
+            {
+                Flush();
+                continue;
+            }
+
+            var heading = Heading().Match(line);
+            if (heading.Success)
+            {
+                Flush();
+                if (output.Count > 0)
+                    output.Add(string.Empty);
+                output.Add(Inline(heading.Groups[1].Value.Trim()));
+                continue;
+            }
+
+            var bullet = Bullet().Match(line);
+            if (bullet.Success)
+            {
+                Flush();
+                // A nested point is a detail of the one above it.
+                if (bullet.Groups[1].Value.Length < 2)
+                {
+                    inItem = true;
+                    item.Append(bullet.Groups[2].Value.Trim());
+                }
+                continue;
+            }
+
+            // The rest of a point wrapped onto the next line; a paragraph that
+            // is not a point is left out.
+            if (inItem)
+                item.Append(' ').Append(line.Trim());
+        }
+
+        Flush();
+        return string.Join("\n", output).Trim('\n');
+    }
+
+    /// <summary>The bold words a point starts with, or else its first sentence.</summary>
+    private static string ItemTitle(string item)
+    {
+        var lead = BoldLead().Match(item);
+        var title = lead.Success
+            ? lead.Groups[1].Value.Trim()
+            : FirstSentence().Match(item) is { Success: true } sentence ? sentence.Value.Trim() : item.Trim();
+
+        title = Inline(title).Trim();
+        if (title.Length > BriefLineLength)
+        {
+            var cut = title.LastIndexOf(' ', BriefLineLength - 1);
+            if (cut < 40)
+                cut = BriefLineLength - 1;
+            title = title[..cut].TrimEnd(',', ';', ':', ' ') + "…";
+        }
+        return title;
+    }
+
+    [GeneratedRegex(@"^\*\*(?=\S)(.+?)(?<=\S)\*\*")]
+    private static partial Regex BoldLead();
+
+    [GeneratedRegex(@"^.+?[.!?](?=\s|$)")]
+    private static partial Regex FirstSentence();
+
     public static string ToPlainText(string? markdown)
     {
         if (string.IsNullOrWhiteSpace(markdown))

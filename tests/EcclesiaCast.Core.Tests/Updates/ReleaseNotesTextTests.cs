@@ -192,4 +192,61 @@ public class ReleaseNotesTextTests
             + "• En Propiedades, el cuadro de vista previa. Se ve la imagen entera.",
             text);
     }
+
+    [Fact]
+    public void The_brief_keeps_one_line_per_change()
+    {
+        const string markdown = """
+            Firma: sin firma digital.
+
+            <!-- notas -->
+
+            ### Agregado
+
+            - **Presentación con una pestaña de medios.** Clic derecho en la pestaña →
+              **Configurar…** → «Pasar los medios solos»: en orden.
+              - Un detalle que no va.
+
+            - La **Opacidad** ahora cambia también la sombra. Y algo más.
+
+            Un párrafo suelto que no va.
+
+            ### Corregido
+
+            - **Pestañeo en la transmisión.** Ahora no.
+            """;
+
+        var brief = ReleaseNotesText.BriefFromRelease(markdown);
+
+        Assert.Equal(
+            "Agregado\n• Presentación con una pestaña de medios.\n• La Opacidad ahora cambia también la sombra.\n\n"
+            + "Corregido\n• Pestañeo en la transmisión.",
+            brief);
+    }
+
+    [Fact]
+    public void A_long_first_sentence_is_cut()
+    {
+        var words = string.Join(' ', Enumerable.Repeat("palabra", 40));
+        var brief = ReleaseNotesText.Brief($"- {words}.");
+
+        Assert.StartsWith("• palabra", brief);
+        Assert.EndsWith("…", brief);
+        Assert.True(brief.Length <= ReleaseNotesText.BriefLineLength + 3);
+    }
+
+    [Fact]
+    public void The_offer_brings_the_brief_of_every_version_it_covers()
+    {
+        static ReleaseInfo Release(string tag, string title) => new(
+            tag, false, false, $"<!-- notas -->\n\n- **{title}.** Mucho texto que sobra.",
+            [new ReleaseAsset($"EcclesiaCast-{tag.TrimStart('v')}-setup.exe", $"https://example.org/{tag}.exe", 100, null)]);
+
+        var offer = UpdatePicker.Choose(AppVersion.TryParse("1.1.0")!,
+            [Release("v1.1.1", "Uno"), Release("v1.2.0", "Dos")]);
+
+        Assert.NotNull(offer);
+        Assert.Equal("Versión 1.2.0\n\n• Dos.\n\nVersión 1.1.1\n\n• Uno.", offer!.Brief);
+        Assert.Contains("Mucho texto", offer.Notes);
+    }
 }
