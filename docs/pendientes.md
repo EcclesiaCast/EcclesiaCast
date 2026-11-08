@@ -286,10 +286,10 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       1.2.0; si sigue sin sonar, que mande el registro del día
       (`%APPDATA%\EcclesiaCast\logs\ecclesiacast-AAAAMMDD.log`): ahora dice si el
       video está silenciado, si no trae pista de audio o qué error dio VLC.
-- [ ] **Lo de la 1.2.1** (8/11/2026). Claude probó «Bajar Biblias de
+- [ ] **Lo de la 1.3.0** (8/11/2026). Claude probó «Bajar Biblias de
       internet…» con el programa abierto contra una lista servida en esta PC,
       y la lista real de Cloudflare R2 con el código del programa, sin abrirlo:
-      las 8 bajan completas y con su huella. Falta que lo mires vos: en la 1.2.1
+      las 8 bajan completas y con su huella. Falta que lo mires vos: en la 1.3.0
       instalada, Biblia → **📥 Biblias** → «Bajar Biblias de internet…», marcá
       una (por ejemplo King James), Descargar, y fijate que aparezca en las
       versiones. Al abrir la lista de nuevo tiene que decir «ya está en la
