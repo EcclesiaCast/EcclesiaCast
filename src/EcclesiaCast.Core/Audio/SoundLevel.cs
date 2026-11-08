@@ -17,8 +17,16 @@ public static class SoundLevel
     /// <summary>The most each band of the equalizer takes away (dB).</summary>
     public const double BandFloor = -20;
 
+    /// <summary>
+    /// What the pre-amplifier has to give for the sound to come out as loud as
+    /// without an equalizer: LibVLC's equalizer takes about 12 dB away on its
+    /// own (its «Flat» preset carries +12). Measured on 8/11/2026: with the
+    /// pre-amplifier at 0, 80 % came out 18 dB down instead of 6.
+    /// </summary>
+    public const double PreampUnity = 12;
+
     /// <summary>The quietest level reached before 0 % (which is silence).</summary>
-    public const double Floor = PreampFloor + BandFloor;
+    public const double Floor = PreampFloor - PreampUnity + BandFloor;
 
     /// <summary>
     /// The level for a volume from 0 to 100, in dB under full: 100 is 0 dB.
@@ -47,8 +55,8 @@ public static class SoundLevel
             return null;
 
         var db = ToDecibels(volume);
-        var preamp = Math.Max(db, PreampFloor);
-        var bands = Math.Max(db - preamp, BandFloor);
+        var preamp = Math.Max(PreampUnity + db, PreampFloor);
+        var bands = Math.Max(PreampUnity + db - preamp, BandFloor);
         return (preamp, bands);
     }
 }
