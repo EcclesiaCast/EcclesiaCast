@@ -902,8 +902,18 @@ public sealed partial class MainViewModel
         if (metadata is null)
             return;
 
+        // One the library already has: asked first, and the new copy takes its place.
+        var entry = new BiblePackageEntry(string.Empty, metadata.Name, metadata.Abbreviation, metadata.Language);
+        var plan = ConfirmReplacing([entry], e => e, "importar");
+        if (plan is null || plan.Count == 0)
+            return;
+
         var saved = _bibles.Import(metadata.Name, metadata.Abbreviation, metadata.Language, parsed);
+        ReplaceOldCopies(plan[0].Replaces, saved.Id);
+        var activeReplaced = KeepActiveAfterReplacing([(plan[0].Replaces, saved.Id)]);
         LoadBibleVersions();
+        if (activeReplaced)
+            RefreshAfterVersionChange();
 
         // Leave the freshly imported version active for projection.
         var imported = BibleVersionOptions.FirstOrDefault(o => o.Info.Id == saved.Id);

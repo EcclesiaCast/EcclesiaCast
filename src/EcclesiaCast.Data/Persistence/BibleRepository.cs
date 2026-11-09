@@ -83,6 +83,29 @@ public sealed class BibleRepository(string dbPath) : IBibleRepository
         db.SaveChanges();
     }
 
+    public void ReplaceVersion(int oldVersionId, int newVersionId)
+    {
+        if (oldVersionId == newVersionId)
+            return;
+
+        using var db = new AppDbContext(dbPath);
+        var old = db.BibleVersions.Find(oldVersionId);
+        var replacement = db.BibleVersions.Find(newVersionId);
+        if (old is null || replacement is null)
+            return;
+
+        var oldSuffix = $"({old.Abbreviation})";
+        foreach (var item in db.PlaylistItems.Where(i => i.BibleVersionId == oldVersionId))
+        {
+            item.BibleVersionId = newVersionId;
+            if (old.Abbreviation != replacement.Abbreviation && item.Caption.EndsWith(oldSuffix, StringComparison.Ordinal))
+                item.Caption = item.Caption[..^oldSuffix.Length] + $"({replacement.Abbreviation})";
+        }
+
+        db.BibleVersions.Remove(old);
+        db.SaveChanges();
+    }
+
     public ParsedBible ReadVersion(int versionId)
     {
         using var db = new AppDbContext(dbPath);

@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Windows;
 using CommunityToolkit.Mvvm.Input;
 using EcclesiaCast.App.Services;
+using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Bible;
 using Serilog;
 
@@ -52,7 +53,8 @@ public sealed partial class MainViewModel
             var marks = BibleInstallPlanner.Offer(items.Select(i => i.AsEntry(i.Abbreviation)), installed)
                 .Select(c => c.AlreadyInstalled)
                 .ToList();
-            var chosen = _biblePackageDialog.ChooseToDownload(items, marks);
+            var picked = _biblePackageDialog.ChooseToDownload(items, marks);
+            var chosen = picked is null ? null : ConfirmReplacing(picked, i => i.AsEntry(i.Abbreviation), "bajar");
             if (chosen is null || chosen.Count == 0)
             {
                 StatusText = string.Empty;
@@ -63,15 +65,26 @@ public sealed partial class MainViewModel
             var hadVersions = BibleVersionOptions.Count > 0;
             var imported = new List<string>();
             var failed = new List<string>();
+            var replaced = new List<(IReadOnlyList<int> OldIds, int NewId)>();
             for (var n = 0; n < chosen.Count; n++)
             {
-                var item = chosen[n];
+                var (item, replaces) = chosen[n];
                 try
                 {
                     var file = Path.Combine(work, $"{n}{BiblePackage.Extension}");
                     await DownloadBible(client, item, file, n + 1, chosen.Count);
                     StatusText = $"Agregando {item.Abbreviation}…";
-                    imported.Add(await Task.Run(() => ImportDownloadedBible(file, item)));
+                    // The old copy goes only once the new one is downloaded,
+                    // checked and in: a failed download leaves it as it was.
+                    var saved = await Task.Run(() =>
+                    {
+                        var version = ImportDownloadedBible(file, item);
+                        ReplaceOldCopies(replaces, version.Id);
+                        return version;
+                    });
+                    if (replaces.Count > 0)
+                        replaced.Add((replaces, saved.Id));
+                    imported.Add(saved.Name);
                 }
                 catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException
                                                or FormatException or HttpRequestException or TaskCanceledException)
@@ -81,8 +94,9 @@ public sealed partial class MainViewModel
                 }
             }
 
+            var activeReplaced = KeepActiveAfterReplacing(replaced);
             LoadBibleVersions();
-            if (!hadVersions && imported.Count > 0)
+            if ((!hadVersions && imported.Count > 0) || activeReplaced)
                 RefreshAfterVersionChange();
 
             StatusText = imported.Count switch
@@ -168,8 +182,8 @@ public sealed partial class MainViewModel
             throw new InvalidDataException("La Biblia bajada no es la esperada.");
     }
 
-    /// <summary>Adds the version a downloaded file brings; returns the name it got in the library.</summary>
-    private string ImportDownloadedBible(string file, BibleCatalogItem item)
+    /// <summary>Adds the version a downloaded file brings, as it was saved in the library.</summary>
+    private BibleVersionInfo ImportDownloadedBible(string file, BibleCatalogItem item)
     {
         BiblePackageEntry entry;
         using (var stream = File.OpenRead(file))
@@ -183,6 +197,6 @@ public sealed partial class MainViewModel
             throw new InvalidDataException("El archivo no trae versículos.");
 
         // The list's names win: they are the ones the operator chose from.
-        return _bibles.Import(item.Name, item.Abbreviation, item.Language, bible).Name;
+        return _bibles.Import(item.Name, item.Abbreviation, item.Language, bible);
     }
 }

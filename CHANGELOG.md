@@ -5,6 +5,14 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+### Arreglado
+
+- **Ya no se puede tener dos veces la misma Biblia.** Si bajás o importás una
+  Biblia que ya está en tu biblioteca, el programa te avisa antes (una sola
+  pregunta para todas las repetidas). Si decís que sí, la nueva reemplaza a la
+  que tenías, y las listas que la usaban siguen andando con la nueva. Si decís
+  que no, se bajan sólo las que no tenías.
+
 ## [1.3.1] - 2026-11-09
 
 ### Agregado
