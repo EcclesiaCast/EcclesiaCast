@@ -5,6 +5,20 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+### Cambiado
+
+- **Cada canción puede tener su tema propio.** Clic derecho en una canción (o en
+  una diapositiva) → **«Tema de esta canción…»**, o el botón **🎨 Tema** arriba
+  de las diapositivas, que muestra si sigue al tema principal, si tiene tema
+  propio o si usa otro tema. Lo que cambies ahí (letra, fondo, franjas…) queda
+  como tema propio de esa canción, y editar el tema principal ya no la toca.
+  Desde ahí mismo se puede volver al tema principal o elegir otro tema.
+- **Editar el tema principal ya no cambia las canciones con tema propio.**
+  Para que todas lo tomen, en **Temas**, con el tema principal elegido, está el
+  botón **«Aplicar a todas las canciones…»**: avisa cuántas canciones cambian
+  y deja elegir si se borran también los diseños hechos diapositiva por
+  diapositiva. Ya no aparece la pregunta al guardar un tema.
+
 ### Arreglado
 
 - **Ya no se puede tener dos veces la misma Biblia.** Si bajás o importás una

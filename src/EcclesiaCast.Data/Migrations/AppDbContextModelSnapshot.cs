@@ -490,6 +490,9 @@ namespace EcclesiaCast.Data.Migrations
                     b.Property<double>("OutlineWidth")
                         .HasColumnType("REAL");
 
+                    b.Property<int?>("OwnerSongId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("SecondaryColor")
                         .IsRequired()
                         .HasColumnType("TEXT");

@@ -18,7 +18,15 @@ public interface ISongRepository
     /// <summary>Inserts (Id 0) or updates a song, replacing its sections.</summary>
     Song Save(Song song);
 
+    /// <summary>Deletes a song, and its own theme with it.</summary>
     void Delete(int id);
+
+    /// <summary>
+    /// Points a song at another theme (null: the main one) without touching
+    /// its lyrics. Like <see cref="Save"/>, an own theme the song leaves
+    /// behind is deleted: nothing else can use it.
+    /// </summary>
+    void SetTheme(int songId, int? themeId);
 
     /// <summary>
     /// Notes that a song went on the projector. Called every time a slide of

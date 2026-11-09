@@ -54,7 +54,7 @@
             <TextBlock Text="Tema de proyección" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,4"/>
             <ComboBox x:Name="ThemeCombo" FontSize="13"
                       DisplayMemberPath="Label"
-                      ToolTip="Cada canción puede tener su propio tema; '(Tema por defecto)' usa el global"/>
+                      ToolTip="'(Tema principal)' sigue al tema principal de las canciones. Para retocar el tema de esta canción: clic derecho en la canción → Tema de esta canción…"/>
         </StackPanel>
 
         <TextBlock Grid.Row="3" Text="Letra *" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,16,0,4"/>
