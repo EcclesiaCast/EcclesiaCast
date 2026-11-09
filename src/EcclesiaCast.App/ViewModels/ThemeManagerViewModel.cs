@@ -154,12 +154,137 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     [ObservableProperty] private string _secondaryColor = "#C9D4E8";
     [ObservableProperty] private bool _secondaryItalic = true;
 
-    public ThemeManagerViewModel(IThemeRepository themes, ISettingsStore settings, ISongRepository songs)
+    // ── Tema de una canción ──────────────────────────────────────
+
+    /// <summary>An entry of «Partir de» in a song's theme: a theme the song can take.</summary>
+    public sealed record SongThemeOption(int? Id, string Label, SlideTheme Theme);
+
+    private readonly SongThemes _songThemes;
+
+    /// <summary>The song whose theme is being edited; null when the window edits the shared themes.</summary>
+    private readonly Song? _song;
+
+    /// <summary>
+    /// The look as the editor first showed it, to tell whether the operator
+    /// changed anything. Built by the editor itself, so the small rounding of
+    /// its fields is not mistaken for a change.
+    /// </summary>
+    private SlideTheme? _baseline;
+
+    /// <summary>The theme the song's editor started from (null: the main one).</summary>
+    private int? _startedFrom;
+
+    /// <summary>True when the window edits one song's theme instead of the shared themes.</summary>
+    public bool IsSongMode => _song is not null;
+
+    public bool IsThemeMode => _song is null;
+
+    public string WindowTitle => _song is null ? "Temas de proyección" : $"Tema de la canción «{_song.Title}»";
+
+    /// <summary>The themes the song can start from: its own, the main one and the other shared ones.</summary>
+    public ObservableCollection<SongThemeOption> SongThemeOptions { get; } = [];
+
+    [ObservableProperty]
+    private SongThemeOption? _selectedSongThemeOption;
+
+    /// <summary>What saving will do to the song, said in words.</summary>
+    [ObservableProperty]
+    private string _songThemeNote = string.Empty;
+
+    /// <summary>The song does not follow the main theme now, so «Volver al tema principal» means something.</summary>
+    public bool CanReturnToMain { get; }
+
+    /// <summary>The theme on the editor is the main song theme: «Aplicar a todas las canciones» is offered.</summary>
+    [ObservableProperty]
+    private bool _isMainSongTheme;
+
+    public ThemeManagerViewModel(IThemeRepository themes, ISettingsStore settings, ISongRepository songs, Song? song = null)
     {
         _themes = themes;
         _settings = settings;
         _songs = songs;
-        LoadThemes(null);
+        _song = song;
+        _songThemes = new SongThemes(themes, songs);
+
+        if (song is null)
+        {
+            LoadThemes(null);
+            return;
+        }
+
+        CanReturnToMain = _songThemes.StateOf(song) != SongThemeState.FollowsMain;
+        LoadSongThemeOptions(song);
+    }
+
+    private void LoadSongThemeOptions(Song song)
+    {
+        var mainId = ThemeSeeder.GetDefaultId(_settings, ThemeSeeder.DefaultSongThemeKey);
+        var main = (mainId is int id ? _themes.Get(id) : null) ?? SlideTheme.Fallback;
+
+        if (_songThemes.OwnThemeOf(song) is { } own)
+            SongThemeOptions.Add(new SongThemeOption(own.Id, "Tema propio de esta canción", own));
+        SongThemeOptions.Add(new SongThemeOption(null, $"Tema principal ({main.Name})", main));
+
+        // The other shared song themes, and the one chosen for this song even
+        // when it is not a song theme.
+        foreach (var theme in _themes.GetAll())
+        {
+            if (theme.Id != main.Id && (theme.Kind == ThemeKind.Song || theme.Id == song.ThemeId))
+                SongThemeOptions.Add(new SongThemeOption(theme.Id, theme.Name, theme));
+        }
+
+        SelectedSongThemeOption =
+            SongThemeOptions.FirstOrDefault(o => o.Id is not null && o.Id == song.ThemeId)
+            ?? SongThemeOptions.First(o => o.Id is null);
+    }
+
+    partial void OnSelectedSongThemeOptionChanged(SongThemeOption? value)
+    {
+        if (value is null)
+            return;
+
+        // Picking another theme starts over from it.
+        _startedFrom = value.Id;
+        _baseline = null;
+        if (SelectedTheme == value.Theme)
+            LoadEditorFrom(value.Theme);
+        else
+            SelectedTheme = value.Theme;
+        _baseline = BuildTheme(0);
+        UpdateSongThemeNote();
+
+        // Once the window's fields have taken the values (a field may round
+        // or clamp one as it shows it), the look is taken again: what the
+        // fields did by themselves is not the operator's change.
+        Application.Current?.Dispatcher.BeginInvoke(
+            System.Windows.Threading.DispatcherPriority.ContextIdle,
+            () =>
+            {
+                if (SelectedSongThemeOption != value || _baseline is null)
+                    return;
+                _baseline = BuildTheme(0);
+                UpdateSongThemeNote();
+            });
+    }
+
+    private bool HasSongEdits => _baseline is not null && !SongThemes.SameLook(BuildTheme(0), _baseline);
+
+    private void UpdateSongThemeNote()
+    {
+        if (_song is null || _baseline is null || SelectedSongThemeOption is not { } option)
+            return;
+
+        SongThemeNote = HasSongEdits
+            ? "Con cambios: al guardar, este pasa a ser el tema propio de la canción. "
+              + "Cambiar el tema principal ya no la va a tocar."
+            : option.Id is null
+                ? "Sigue al tema principal: si cambiás el principal, cambia también acá. "
+                  + "Si cambiás algo acá, la canción pasa a tener su tema propio."
+                : option.Theme.OwnerSongId is not null
+                    ? "Tiene tema propio: cambiar el tema principal no la toca. "
+                      + "Para que lo vuelva a seguir, «Volver al tema principal»."
+                    : $"Usa el tema «{option.Theme.Name}» y sigue sus cambios. "
+                      + "Si cambiás algo acá, la canción pasa a tener su tema propio.";
     }
 
     protected override void OnPropertyChanged(PropertyChangedEventArgs e)
@@ -170,6 +295,7 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         if (!_loading
             && e.PropertyName is not (nameof(PreviewSlide) or nameof(SelectedTheme) or nameof(DefaultsText)
                 or nameof(IsBibleKind) or nameof(StatusText) or nameof(AnimatePreview)
+                or nameof(SongThemeNote) or nameof(SelectedSongThemeOption) or nameof(IsMainSongTheme)
                 // The transition plays its own example (PlayTransitionSample).
                 or nameof(TransitionIndex) or nameof(TransitionMs) or nameof(TransitionSeconds)))
             UpdatePreview();
@@ -182,7 +308,13 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     {
         if (value is not null)
             LoadEditorFrom(value);
+        UpdateIsMainSongTheme();
     }
+
+    private void UpdateIsMainSongTheme() =>
+        IsMainSongTheme = _song is null
+            && SelectedTheme is not null
+            && SelectedTheme.Id == ThemeSeeder.GetDefaultId(_settings, ThemeSeeder.DefaultSongThemeKey);
 
     private void LoadThemes(int? keepId)
     {
@@ -335,6 +467,7 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         }
 
         PreviewSlide = new SlideContent(text, caption, secondary, theme);
+        UpdateSongThemeNote();
     }
 
     private void UpdateDefaultsText()
@@ -351,76 +484,112 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     /// <summary>Raised when the operator saves — the window closes in response.</summary>
     public event EventHandler? CloseRequested;
 
+    /// <summary>
+    /// Saves the theme on the editor. For a song, what it saves depends on
+    /// what was done: any change becomes the song's own theme; otherwise the
+    /// song takes the theme it started from.
+    ///
+    /// Saving a shared theme reaches only the songs that follow it: a song
+    /// with its own theme stays as it is until «Aplicar a todas las canciones».
+    /// </summary>
     [RelayCommand]
     private void SaveTheme()
     {
         if (SelectedTheme is null)
             return;
 
-        var saved = _themes.Save(BuildTheme(SelectedTheme.Id));
+        if (_song is not null)
+        {
+            _songThemes.Save(_song, _startedFrom, HasSongEdits ? BuildTheme(0) : null);
+            ChangesMade = true;
+            CloseRequested?.Invoke(this, EventArgs.Empty);
+            return;
+        }
+
+        _themes.Save(BuildTheme(SelectedTheme.Id));
         ChangesMade = true;
-        OfferToReplaceOwnDesigns(saved);
+        CloseRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>The song drops its own (or chosen) theme and follows the main one again.</summary>
+    [RelayCommand]
+    private void ReturnToMainTheme()
+    {
+        if (_song is null)
+            return;
+
+        _songThemes.FollowMain(_song);
+        ChangesMade = true;
         CloseRequested?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>
-    /// A song designed by hand keeps its own typeface, size and colours, so a
-    /// theme change leaves it untouched — which is right, and also surprising
-    /// when the operator meant "make everything look like this". Rather than
-    /// pick one behaviour, ask, and only when there is actually something to
-    /// overwrite.
+    /// «Aplicar a todas las canciones»: saves the main theme as it is on the
+    /// editor and puts every song back on it, after saying how many songs
+    /// lose their own look. The one way an edit of the main theme reaches the
+    /// songs that left it.
     /// </summary>
-    private void OfferToReplaceOwnDesigns(SlideTheme theme)
+    [RelayCommand]
+    private void ApplyToAllSongs()
     {
-        if (theme.Kind != ThemeKind.Song)
+        if (_song is not null || SelectedTheme is null || !IsMainSongTheme)
             return;
 
-        var designed = SongsUsing(theme)
-            .Where(song => song.Sections.Any(s => !string.IsNullOrEmpty(s.StyleJson)))
-            .ToList();
-
-        if (designed.Count == 0)
-            return;
-
-        var names = string.Join("\n", designed.Take(6).Select(s => $"  • {s.Title}"));
-        if (designed.Count > 6)
-            names += $"\n  • …y {designed.Count - 6} más";
-
-        var answer = MessageBox.Show(
-            $"{designed.Count} canción(es) que usan «{theme.Name}» tienen diseño propio "
-            + "(tipografía, tamaño, colores o caja cambiados a mano):\n\n"
-            + names
-            + "\n\n¿Querés que también tomen este tema?\n\n"
-            + "Sí — pierden su diseño propio y siguen el tema.\n"
-            + "No — quedan como las dejaste.",
-            "EcclesiaCast", MessageBoxButton.YesNo, MessageBoxImage.Question,
-            MessageBoxResult.No);
-
-        if (answer != MessageBoxResult.Yes)
-            return;
-
-        foreach (var song in designed)
+        var survey = _songThemes.Survey();
+        var name = string.IsNullOrWhiteSpace(ThemeName) ? SelectedTheme.Name : ThemeName.Trim();
+        if (survey.Apart == 0 && survey.Designed == 0)
         {
-            foreach (var section in song.Sections)
-                section.StyleJson = null;
-            _songs.Save(song);
+            SaveSelectedKeepingOpen();
+            StatusText = "Todas las canciones ya siguen este tema.";
+            return;
         }
 
-        StatusText = $"{designed.Count} canción(es) vuelven a seguir el tema.";
+        var lines = new List<string>();
+        if (survey.Own > 0)
+            lines.Add($"• {survey.Own} canción(es) con tema propio lo pierden.");
+        if (survey.Chosen > 0)
+            lines.Add($"• {survey.Chosen} canción(es) con otro tema elegido pasan a este.");
+        if (survey.Designed > 0)
+            lines.Add($"• {survey.Designed} canción(es) tienen diapositivas diseñadas a mano "
+                + "(letra, color o caja cambiados en «Editar canción (diseño)»).");
+
+        var message =
+            $"Todas las canciones van a seguir el tema principal «{name}», con lo que tenés en el editor.\n\n"
+            + string.Join("\n", lines)
+            + "\n\nNo se puede deshacer.";
+
+        // Each answer says what it does; the last one always backs out.
+        var options = new List<(string Label, bool? ClearDesigns)>();
+        if (survey.Apart > 0)
+            options.Add((survey.Designed > 0
+                ? "Aplicar el tema (los diseños por diapositiva se quedan)"
+                : "Aplicar el tema a todas las canciones", false));
+        if (survey.Designed > 0)
+            options.Add(("Aplicar el tema y borrar también los diseños por diapositiva", true));
+        options.Add(("Cancelar", null));
+
+        var app = Application.Current;
+        var window = new Views.ChoiceWindow("Aplicar a todas las canciones", message, options.Select(o => o.Label).ToList())
+        {
+            Owner = app.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive) ?? app.MainWindow,
+        };
+        if (window.ShowDialog() != true || window.Chosen < 0 || options[window.Chosen].ClearDesigns is not bool clear)
+            return;
+
+        SaveSelectedKeepingOpen();
+        var changed = _songThemes.ApplyMainToAll(clear);
+        StatusText = $"Listo: {changed} canción(es) vuelven a seguir este tema.";
     }
 
-    /// <summary>
-    /// Songs a theme governs: the ones pointing at it, plus — when it is the
-    /// default for songs — every song that never chose one.
-    /// </summary>
-    private IEnumerable<Song> SongsUsing(SlideTheme theme)
+    /// <summary>Saves the theme on the editor without closing the window.</summary>
+    private void SaveSelectedKeepingOpen()
     {
-        var isDefault = ThemeSeeder.GetDefaultId(_settings, ThemeSeeder.DefaultSongThemeKey) == theme.Id;
+        if (SelectedTheme is null)
+            return;
 
-        return _songs.Search(string.Empty)
-            .Select(s => _songs.Get(s.Id))
-            .OfType<Song>()
-            .Where(song => song.ThemeId == theme.Id || (isDefault && song.ThemeId is null));
+        var saved = _themes.Save(BuildTheme(SelectedTheme.Id));
+        ChangesMade = true;
+        LoadThemes(saved.Id);
     }
 
     /// <summary>Raised when a look moves the text box, so the window redraws its handles.</summary>
@@ -495,6 +664,7 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         _settings.Set(ThemeSeeder.DefaultSongThemeKey, SelectedTheme.Id.ToString());
         ChangesMade = true;
         UpdateDefaultsText();
+        UpdateIsMainSongTheme();
     }
 
     [RelayCommand]
