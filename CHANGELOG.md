@@ -5,6 +5,14 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+## [1.3.1] - 2026-11-09
+
+### Agregado
+
+- **Elegir el idioma en «Bajar Biblias».** Arriba de la lista hay un selector
+  de idioma que abre en español (o «Todos los idiomas»). Lo que marcás queda
+  marcado aunque cambies de idioma, y el botón dice cuántas se van a bajar.
+
 ## [1.3.0] - 2026-11-08
 
 ### Agregado

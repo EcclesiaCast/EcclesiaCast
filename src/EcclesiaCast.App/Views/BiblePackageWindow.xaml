@@ -18,6 +18,7 @@
     <Grid Margin="18">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -26,7 +27,14 @@
         <TextBlock Grid.Row="0" x:Name="IntroText"
                    FontSize="13" Foreground="White" TextWrapping="Wrap" Margin="0,0,0,10"/>
 
-        <Border Grid.Row="1"
+        <StackPanel Grid.Row="1" x:Name="GroupPanel" Orientation="Horizontal"
+                    Margin="0,0,0,10" Visibility="Collapsed">
+            <TextBlock Text="Idioma:" Foreground="{StaticResource MutedBrush}"
+                       FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
+            <ComboBox x:Name="GroupPicker" Width="200" SelectionChanged="GroupPicker_SelectionChanged"/>
+        </StackPanel>
+
+        <Border Grid.Row="2"
                 Background="{StaticResource SurfaceBrush}"
                 BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
                 CornerRadius="4" MinHeight="90">
@@ -48,13 +56,13 @@
             </ScrollViewer>
         </Border>
 
-        <Border Grid.Row="2" x:Name="WarningBox" Visibility="Collapsed"
+        <Border Grid.Row="3" x:Name="WarningBox" Visibility="Collapsed"
                 Background="#2A2418" BorderBrush="#7A5A18" BorderThickness="1"
                 CornerRadius="6" Padding="12,10" Margin="0,12,0,0">
             <TextBlock x:Name="WarningText" FontSize="12" Foreground="#E8D9A8" TextWrapping="Wrap"/>
         </Border>
 
-        <DockPanel Grid.Row="3" Margin="0,16,0,0">
+        <DockPanel Grid.Row="4" Margin="0,16,0,0">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                 <Button Content="Cancelar" Style="{StaticResource DarkButton}" IsCancel="True" Padding="18,9"/>
                 <Button x:Name="AcceptButton" Style="{StaticResource AccentButton}"

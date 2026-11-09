@@ -299,6 +299,11 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       con las flechas), y fijate que al cambiar el tamaño de la ventana el foco
       siga en su lugar y que Esc lo cierre sin apagar la salida. En una PC
       donde nunca se instaló, tiene que salir solo después de «Acerca de».
+- [ ] **Lo de la 1.3.1** (9/11/2026). El selector de idioma de «Bajar
+      Biblias» se probó dibujado a imagen, no en el programa abierto. En la
+      1.3.1: tiene que abrir en Español; marcá una en español, pasá a Inglés y
+      marcá otra, y el botón tiene que decir «Descargar (2)» y bajar las dos.
+      «Todas» y «Ninguna» tocan sólo el idioma que se ve.
 
 ## 2. Después de publicar la v1.0.0
 
