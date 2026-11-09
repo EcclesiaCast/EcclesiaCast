@@ -7,6 +7,9 @@ namespace EcclesiaCast.App.Services;
 
 public sealed class BiblePackageDialogService : IBiblePackageDialog
 {
+    /// <summary>The language the program speaks: the Bibles to download open showing that one.</summary>
+    private const string AppLanguage = "es";
+
     public IReadOnlyList<int>? ChooseToExport(IReadOnlyList<BibleVersionInfo> versions)
     {
         var rows = versions
@@ -53,7 +56,8 @@ public sealed class BiblePackageDialogService : IBiblePackageDialog
     public IReadOnlyList<BibleCatalogItem>? ChooseToDownload(IReadOnlyList<BibleCatalogItem> items, IReadOnlyList<bool> installed)
     {
         // By language, Spanish first: the order of the rows is the order of the list.
-        var ordered = BibleCatalog.ByLanguage(items)
+        var byLanguage = BibleCatalog.ByLanguage(items);
+        var ordered = byLanguage
             .SelectMany(g => g.Items.Select(i => (Item: i, g.Language)))
             .ToList();
         var rows = ordered
@@ -65,7 +69,8 @@ public sealed class BiblePackageDialogService : IBiblePackageDialog
                     parts.Add(o.Item.License);
                 if (have)
                     parts.Add("ya está en la biblioteca");
-                return new BiblePackageWindow.Row($"{o.Item.Name}  ({o.Item.Abbreviation})", string.Join(" · ", parts), isChecked: false);
+                return new BiblePackageWindow.Row($"{o.Item.Name}  ({o.Item.Abbreviation})", string.Join(" · ", parts),
+                    isChecked: false, group: o.Language);
             })
             .ToList();
         var window = new BiblePackageWindow(
@@ -73,7 +78,9 @@ public sealed class BiblePackageDialogService : IBiblePackageDialog
             "Marcá las que querés bajar a esta computadora. Se baja sólo lo que marques.",
             null,
             "Descargar",
-            rows)
+            rows,
+            groups: byLanguage.Select(g => g.Language).ToList(),
+            group: BibleCatalog.LanguageName(AppLanguage))
         {
             Owner = Application.Current.MainWindow,
         };
