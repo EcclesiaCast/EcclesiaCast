@@ -304,6 +304,21 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       1.3.1: tiene que abrir en Español; marcá una en español, pasá a Inglés y
       marcá otra, y el botón tiene que decir «Descargar (2)» y bajar las dos.
       «Todas» y «Ninguna» tocan sólo el idioma que se ve.
+- [ ] **Lo de la 1.4.0** (9/11/2026), para probar en
+      `dist\EcclesiaCast-1.4.0-prueba1-setup.exe` antes de publicarla. Nada se
+      probó con el programa abierto, sólo con pruebas automáticas.
+      **Biblias repetidas:** Importar paquete o «Bajar Biblias…» con una que
+      ya tenés (por ejemplo la NTV, que está dos veces) → tiene que preguntar
+      una sola vez; Sí → queda una sola NTV y los pasajes de las listas que la
+      usaban siguen andando. Con varias marcadas, algunas nuevas: No → baja
+      sólo las nuevas.
+      **Tema de cada canción:** clic derecho en una canción → «Tema de esta
+      canción…» (o 🎨 Tema arriba de las diapositivas): cambiale la letra o el
+      fondo y fijate que quede como tema propio. Después editá el tema
+      principal: esa canción no tiene que cambiar y las demás sí. «Volver al
+      tema principal» la vuelve a ligar. En Temas, con el principal elegido,
+      «Aplicar a todas las canciones…» tiene que avisar cuántas cambian.
+      Las canciones que ya tenías tienen que verse igual que antes.
 
 ## 2. Después de publicar la v1.0.0
 
