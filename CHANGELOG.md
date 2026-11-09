@@ -5,6 +5,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+## [1.3.1] - 2026-11-09
+
 ### Agregado
 
 - **Elegir el idioma en «Bajar Biblias».** Arriba de la lista hay un selector
