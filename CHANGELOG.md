@@ -5,6 +5,34 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+### Cambiado
+
+- **Editor de temas rehecho.** La vista previa queda en el medio y más grande,
+  los campos van a la derecha repartidos en secciones (Letra, Sombra y franjas,
+  Fondo, Leyenda, Transición y Biblia) y las plantillas listas se ven como
+  dibujos en vez de botones con el nombre. La lista de temas muestra cómo se ve
+  cada uno y cuál está en uso para las canciones y para la Biblia.
+- **Probar el tema sin salir del editor:** «Probar sobre» pone detrás una foto
+  oscura o una clara para ver si la letra se lee, «Texto largo» muestra hasta
+  dónde se achica, y «Ver la caja» la esconde para mirar el tema limpio.
+- Los colores muestran el color al lado del código, la alineación y el lugar
+  de la leyenda se eligen tocando, y la tipografía cambia en la vista previa
+  apenas se elige (antes había que hacer clic en otro lado).
+
+### Corregido
+
+- **Los cambios de un tema ya no se pierden en silencio.** Al pasar a otro
+  tema, crear uno nuevo o cerrar con cambios sin guardar, el programa pregunta
+  si guardarlos. Abajo avisa «Cambios sin guardar» y hay un botón «Deshacer
+  cambios».
+- **El sonido vuelve solo cuando la salida se cae y regresa** (un cable HDMI
+  flojo, un proyector que renegocia la señal, un parlante que se apaga y se
+  prende). Antes sólo se reabría si Windows pasaba a otra salida; si era la
+  misma, lo que sonaba quedaba mudo hasta «Reiniciar el sonido».
+- La paleta de colores se abre encima de la ventana que la pidió.
+- Guardar un tema con una biblioteca grande ya no relee cada canción una por
+  una.
+
 ## [1.3.1] - 2026-11-09
 
 ### Agregado
