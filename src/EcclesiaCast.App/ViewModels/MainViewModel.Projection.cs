@@ -435,6 +435,10 @@ public sealed partial class MainViewModel
         if (SelectedDisplay is null)
             return;
 
+        // Something goes on the air (the screen or only the stream): the
+        // first time each day, the anonymous count of use hears about it.
+        UsageReporter.NoteProjected(_settings);
+
         if (SelectedDisplay.BroadcastOnly)
         {
             if (_projection.IsOutputVisible)

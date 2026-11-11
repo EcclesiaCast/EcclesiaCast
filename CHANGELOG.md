@@ -7,6 +7,12 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Cuenta anónima de uso.** La primera vez que se proyecta algo en el día,
+  el programa avisa que esta instalación se usó, con un número al azar, el
+  día y la versión: nada de la iglesia ni de lo que se proyecta, y no se
+  guarda la dirección IP. Sirve para saber cuántas iglesias lo usan cada fin
+  de semana. Se apaga en Ajustes → Actualizaciones, y al apagarlo el número
+  se borra.
 - **Seguir la canción por lo que se escucha (en prueba).** En **Proyección →
   «Seguir la canción por lo que se escucha (beta)…»** el programa escucha el
   micrófono o la entrada de línea y sigue la canción que está abierta. Tres

@@ -461,8 +461,14 @@ las respuestas automáticas de la tabla); toca dar estos pasos.
       sus videos se pueden usar gratis; pide mostrar «Videos de Pexels» y el
       nombre del autor. Una ventana como la de YouTube: buscar, ver la
       vista previa, bajar a la pestaña elegida. Mediano.
-- [ ] **Saber cuántas iglesias lo usan por fin de semana.** Dos caminos, a
-      decidir por Alexis:
+- [ ] **Saber cuántas iglesias lo usan por fin de semana.** Alexis eligió el
+      contador anónimo (11/11/2026). **Programado**: cuenta la primera
+      proyección de cada día (no la apertura), con un interruptor en Ajustes
+      → Actualizaciones; el servicio está en `servicios/contador/` con sus
+      pruebas. **Falta que Alexis lo publique en Cloudflare** siguiendo
+      `servicios/contador/LEEME.md` (cinco pasos en el panel), y fusionar el
+      cambio de la página de privacidad cuando salga la versión. Los dos
+      caminos que se plantearon:
       1. *Contador anónimo:* el programa ya pregunta una vez por día si hay
          versión nueva; esa consulta pasaría por un servicio propio (en
          Cloudflare, donde ya están las Biblias) que cuenta números al azar
