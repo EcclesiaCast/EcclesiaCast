@@ -14,7 +14,7 @@
         <KeyBinding Key="F2" Command="{Binding ToggleClearCommand}"/>
         <KeyBinding Key="F3" Command="{Binding ToggleLogoCommand}"/>
         <KeyBinding Key="F4" Command="{Binding ClearBackgroundCommand}"/>
-        <KeyBinding Key="Escape" Command="{Binding HideOutputCommand}"/>
+        <KeyBinding Key="Escape" Command="{Binding EscapeOutputCommand}"/>
         <!-- Una sola caja para buscar en canciones, versículos y medios -->
         <KeyBinding Key="K" Modifiers="Control" Command="{Binding SearchEverythingCommand}"/>
         <KeyBinding Key="F" Modifiers="Control" Command="{Binding SearchEverythingCommand}"/>
@@ -460,7 +460,7 @@
                             ToolTip="Actualizar pantallas"
                             Padding="9,6" Margin="6,0,14,0"/>
                     <Button Command="{Binding ToggleOutputCommand}"
-                            ToolTip="Prende o apaga la ventana de salida en la pantalla elegida. Con la salida prendida, la tecla Esc la apaga.">
+                            ToolTip="Prende o apaga la ventana de salida en la pantalla elegida. Con la salida prendida, apretar Esc dos veces también la apaga.">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
                                 <Setter Property="Content" Value="🔴  Poner en vivo"/>
@@ -472,7 +472,7 @@
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding IsProjecting}" Value="True">
                                         <Setter Property="Content" Value="Apagar salida"/>
-                                        <Setter Property="controls:ShortcutHint.Text" Value="Esc"/>
+                                        <Setter Property="controls:ShortcutHint.Text" Value="Esc ×2"/>
                                         <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
                                         <Setter Property="BorderThickness" Value="1"/>
                                     </DataTrigger>

@@ -19,6 +19,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   de la leyenda se eligen tocando, y la tipografía cambia en la vista previa
   apenas se elige (antes había que hacer clic en otro lado).
 
+- **Esc hay que apretarlo dos veces para apagar la salida.** Es la tecla que
+  todos aprietan para «cancelar»: el primer toque avisa en la barra de estado
+  y el segundo, dentro de 2 segundos, apaga. El botón «Apagar salida» sigue
+  apagando con un clic.
+
 ### Corregido
 
 - **Un error inesperado ya no frena al operador.** Antes salía un cartel que

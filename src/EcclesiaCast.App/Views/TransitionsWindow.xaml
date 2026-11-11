@@ -74,7 +74,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Style="{StaticResource RowLabel}" Text="Apagar la salida (Esc)"/>
+            <TextBlock Style="{StaticResource RowLabel}" Text="Apagar la salida (Esc dos veces)"/>
             <controls:NumericField x:Name="OutputField" Grid.Column="1" Minimum="0" Maximum="10" Step="0.1" Decimals="1"/>
             <TextBlock Grid.Column="2" Text="s" Margin="6,0,0,0" Style="{StaticResource RowLabel}"
                        Foreground="{StaticResource MutedBrush}"/>

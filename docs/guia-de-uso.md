@@ -7,7 +7,8 @@ secciones en orden.
 
 Arriba a la derecha, en **Salida**, elegí el monitor del proyector (EcclesiaCast
 prefiere solo el que no es el principal). El botón **🔴 Poner en vivo** enciende
-y apaga la proyección; **Esc** también la apaga.
+y apaga la proyección; **Esc dos veces** (la segunda dentro de 2 segundos)
+también la apaga.
 
 La pantalla elegida se recuerda para la próxima vez.
 
@@ -340,7 +341,7 @@ programa recuerda lo que elijas.
 | **F2** | *Clear* — oculta el texto, deja el fondo |
 | **F3** | *Logo* |
 | **F4** | Quita el fondo, dejando la letra |
-| **Esc** | Apaga la salida |
+| **Esc** dos veces | Apaga la salida (el primer toque sólo avisa) |
 | **Ctrl+Enter** | Proyecta el texto rápido |
 
 - **Logos**: la flecha **▾** al lado de *Logo (F3)* elige cuál se muestra —
