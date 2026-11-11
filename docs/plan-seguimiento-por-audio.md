@@ -206,6 +206,53 @@ transmisión, que suele ser mejor mezcla que la entrada de la PC: sirve para
 saber si la idea funciona, y después hay que repetir con una grabación hecha
 en la PC del culto.
 
+## 4.2 Resultado de la fase 0 (11/11/2026)
+
+Probado con el audio de los cultos del 25/10, 1/11 y 8/11 bajado de Facebook
+(la transmisión, con toda la banda), en la notebook del culto, sin placa de
+video dedicada.
+
+| Reconocedor | Qué entendió del canto | Cuánto tarda por cada 8 s de audio |
+|---|---|---|
+| Whisper «base» | Nada: escribe «[Música]» | 0,3 s |
+| Whisper «small» | Palabras sueltas y frases inventadas | 2 a 5 s |
+| Whisper «large-v3-turbo» entero | Casi toda la letra de las canciones claras | 11 s (no sirve en vivo) |
+| **«large-v3-turbo» compacto (q5) con contexto corto** | **Casi toda la letra de las canciones claras** | **2,9 s** |
+
+- **Lo que anda:** canciones a ritmo medio con la voz adelante. De «La
+  alegría» (8/11) entendió «la alegría del Señor para siempre es la fuerza
+  de mi vida», «mi refugio, la esperanza que da vida», renglón por renglón.
+- **Lo que no anda todavía:** canciones rápidas con la banda fuerte. De «En
+  el nombre de Jesús» (1/11) casi no sacó nada útil («viviré, no moriré»
+  salió como frases sin sentido). También se pierde en las entradas
+  instrumentales, que es esperable.
+- **Cuando habla alguien** lo entiende perfecto; por eso el piloto sólo
+  actúa si las palabras coinciden con la canción abierta.
+- **Darle la letra como pista empeora:** el reconocedor empieza a «escuchar»
+  la letra aunque no la estén cantando. Descartado.
+- **Inventa cosas sobre la música** («Música», «¡Suscríbete al canal!», un
+  renglón repetido): se filtran antes de llegar al piloto (`HeardText`).
+- **Demora total:** unos 3 segundos de reconocedor más lo que tarda en
+  juntarse la frase. Por eso «adelantarse» viene con 5 palabras de margen en
+  vez de 2, y se ajusta en la ventana.
+- De las 15 canciones de esos tres cultos sólo 3 estaban en la biblioteca de
+  esta PC, así que **no hay todavía una medición de aciertos sobre un culto
+  entero**: eso sale de usarlo en modo «sugerir» y leer el registro.
+
+**Decisión:** alcanza para salir en prueba, no para confiarle un culto.
+Arranca en «sólo sugerir».
+
+**Hecho — fases 1, 3 y 4 en versión de prueba** (`Services/Listening/`,
+`MainViewModel.Listening.cs`, `Views/ListeningWindow`): entrada de sonido
+con medidor, descarga del reconocedor (unos 550 MB, una vez), y los tres modos.
+Cada cosa que escucha y cada decisión quedan en el registro del día
+(`Seguir la canción: …`), que es lo que hay que mirar después de cada
+domingo para ajustar.
+
+**Falta:** medir con cultos reales en «sugerir»; aprender el orden y la
+duración de cada canción (fase 5); probar la placa de video integrada para
+bajar la demora; otros idiomas.
+
 ## 5. Riesgos
 
 | Riesgo | Qué hacemos |
