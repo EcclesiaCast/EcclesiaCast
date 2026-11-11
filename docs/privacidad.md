@@ -18,6 +18,14 @@ nueva), y sólo con los sitios de esta lista:
 | Al abrir el programa (una vez por día; se apaga en Ayuda) | [GitHub](https://github.com) | Nada tuyo: pregunta cuál es la última versión. Al actualizar, baja el instalador nuevo. |
 | Hacés clic en un enlace (la guía de uso, informar un error) | El sitio del enlace, en tu navegador | Lo mismo que si lo abrieras a mano. |
 | Instalás el programa y a la PC le falta WebView2 | [Microsoft](https://developer.microsoft.com/microsoft-edge/webview2/) | Nada tuyo: baja el componente de Microsoft que usa el programa para YouTube, para las páginas web y para buscar canciones. |
+| Prendés «Seguir la canción» por primera vez y bajás el reconocedor de voz | [Hugging Face](https://huggingface.co) | Nada tuyo: baja el reconocedor de voz ([Whisper](https://github.com/ggml-org/whisper.cpp), unos 550 MB), una sola vez. |
+
+**Seguir la canción** (en prueba) escucha la entrada de sonido que elijas
+para saber por dónde va el canto. El reconocedor de voz corre en tu PC: el
+sonido **no se graba, no se guarda y no se manda a ningún lado**. En el
+registro del programa quedan las palabras que entendió y qué diapositiva
+puso, para poder mejorarlo; ese registro no sale de tu PC salvo que vos lo
+mandes.
 
 **Proyectar otra ventana** (botón **🖥 Ventana**) tampoco sale a internet: usa
 la captura de ventanas del propio Windows y dibuja la imagen dentro del

@@ -5,6 +5,19 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+### Agregado
+
+- **Seguir la canción por lo que se escucha (en prueba).** En **Proyección →
+  «Seguir la canción por lo que se escucha (beta)…»** el programa escucha el
+  micrófono o la entrada de línea y sigue la canción que está abierta. Tres
+  formas: **sólo sugerir** (marca la diapositiva que sigue y vos apretás
+  Enter), **seguir** (la pone cuando escucha que la cantan) y **adelantarse**
+  (pasa a la siguiente cuando la actual está terminando). Las flechas siempre
+  mandan, nunca cambia de canción y no toca la Biblia. La primera vez baja un
+  reconocedor de voz de unos 550 MB que queda en la PC: lo que escucha no se
+  graba ni sale de ahí. Anda mejor con canciones lentas y voces claras; con
+  canciones rápidas y la banda fuerte todavía se pierde.
+
 ### Cambiado
 
 - **Editor de temas rehecho.** La vista previa queda en el medio y más grande,

@@ -244,6 +244,7 @@ public partial class App : Application
         // Stop listening on the network before the process goes away.
         _services?.GetService<MainViewModel>()?.StopRemote();
         _services?.GetService<MainViewModel>()?.StopAudio();
+        _services?.GetService<MainViewModel>()?.ShutDownListening();
         _services?.GetService<MainViewModel>()?.StopWindowCapture();
         Log.CloseAndFlush();
         _services?.Dispose();

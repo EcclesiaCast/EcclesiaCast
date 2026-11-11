@@ -797,6 +797,28 @@ public partial class MainWindow : Window
         new Views.TransitionsWindow(_settings) { Owner = this }.ShowDialog();
     }
 
+    private Views.ListeningWindow? _listeningWindow;
+
+    /// <summary>
+    /// «Seguir la canción (beta)»: its window stays beside this one (it is
+    /// not modal), so the operator sees what the program hears while working.
+    /// </summary>
+    private void Listening_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm)
+            return;
+
+        if (_listeningWindow is { IsLoaded: true })
+        {
+            _listeningWindow.Activate();
+            return;
+        }
+
+        _listeningWindow = new Views.ListeningWindow(vm) { Owner = this };
+        _listeningWindow.Closed += (_, _) => _listeningWindow = null;
+        _listeningWindow.Show();
+    }
+
     private void RestartSound_Click(object sender, RoutedEventArgs e)
     {
         AudioEndpointWatcher.RequestRestart();
