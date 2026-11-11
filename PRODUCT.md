@@ -41,7 +41,7 @@ Iglesia de Dios Misiones Mundiales, Montevideo, Uruguay).
   links) are never mentioned.
 - No copyrighted Bible text (RVR1960, NVI…) or modern song lyrics in images:
   only the free Bibles (RV1909, BLM, VBL) and public-domain hymns.
-- The site costs nothing: GitHub Pages, no paid domain, no external services,
+- The site lives at https://ecclesiacast.org (own domain since 10/11/2026) on GitHub Pages: no external services,
   fonts or analytics, no cookies, no forms.
 
 ## Brand Commitments

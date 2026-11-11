@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ecclesiacast.github.io/EcclesiaCast/sitemap.xml
+Sitemap: https://ecclesiacast.org/sitemap.xml

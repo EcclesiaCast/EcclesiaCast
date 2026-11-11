@@ -383,7 +383,7 @@ nuevo (con otro paquete o con otra versión), después de `dotnet publish`:
       se junta visibilidad). Una página en GitHub Pages que muestre el programa
       (gratis): el encargo completo está en
       [sitio-web-encargo.md](sitio-web-encargo.md). **Estado (15/10/2026):
-      publicada en <https://ecclesiacast.github.io/EcclesiaCast/>, con logo
+      publicada en <https://ecclesiacast.org/>, con logo
       nuevo, capturas y un video de 40 segundos; el flujo `pages` la vuelve a
       publicar con cada cambio en `sitio/` y después de cada versión.** **Las capturas reales del aviso de
       Windows («Ejecutar de todas formas») ya están en la página (30/10/2026).**
