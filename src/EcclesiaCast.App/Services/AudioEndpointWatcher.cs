@@ -123,9 +123,27 @@ public static class AudioEndpointWatcher
         public int OnDeviceStateChanged(string deviceId, int newState)
         {
             Interlocked.Increment(ref _generation);
-            Log.Information("Cambió el estado de un dispositivo de audio ({State})", newState);
+            var playback = IsPlayback(deviceId);
+            Log.Information("Cambió el estado de un dispositivo de audio ({State}, {Kind})",
+                newState, playback ? "salida" : "entrada");
+
+            // An output that comes back (a cable with a loose contact, a
+            // projector that renegotiates its HDMI) stays the default one, so
+            // Windows reports no change of default: without this, what was
+            // playing kept its dead output until the program was restarted.
+            if (playback && newState == DeviceStateActive)
+                NotifyOnUiThread();
             return 0;
         }
+
+        private const int DeviceStateActive = 1;
+
+        /// <summary>
+        /// Windows writes the direction in the id of the endpoint:
+        /// «{0.0.0.…» is an output, «{0.0.1.…» an input (a microphone).
+        /// </summary>
+        private static bool IsPlayback(string? deviceId) =>
+            deviceId is null || !deviceId.StartsWith("{0.0.1.", StringComparison.Ordinal);
 
         public int OnDeviceAdded(string deviceId) => 0;
 
