@@ -1,7 +1,9 @@
 # Qué probar en la 1.4.0 de prueba (11/11/2026)
 
-Instalador: `dist\EcclesiaCast-1.4.0-prueba.1-setup.exe` (158 MB). No está
-publicado en ningún lado.
+Instalador: `dist\EcclesiaCast-1.4.0-prueba.2-setup.exe` (158 MB). No está
+publicado en ningún lado. La prueba.2 arregla que «Seguir la canción» no
+abría ninguna entrada y que «Bajar Biblias» repetía una que ya estaba; se
+instala encima de la prueba.1.
 
 **Nada de esto se probó con el programa abierto.** Compila, pasan las 1.301
 pruebas y el reconocedor de voz se probó contra el audio de tres cultos, pero
