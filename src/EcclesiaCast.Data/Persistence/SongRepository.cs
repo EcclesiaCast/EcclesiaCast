@@ -10,7 +10,8 @@ public sealed class SongRepository(string dbPath) : ISongRepository
     public IReadOnlyList<Song> Search(string? query = null)
     {
         using var db = new AppDbContext(dbPath);
-        IQueryable<Song> songs = db.Songs.Include(s => s.Sections).AsNoTracking();
+        IQueryable<Song> songs = db.Songs.Include(s => s.Sections).AsNoTracking()
+            .Where(s => s.DeletedAt == null);
 
         if (TextMatching.ContainsPattern(query) is { } pattern)
         {
@@ -36,6 +37,7 @@ public sealed class SongRepository(string dbPath) : ISongRepository
     {
         using var db = new AppDbContext(dbPath);
         return db.Songs.AsNoTracking()
+            .Where(s => s.DeletedAt == null)
             .Select(s => new SongTitle(s.Id, s.Title, s.Artist))
             .ToList();
     }
@@ -44,7 +46,7 @@ public sealed class SongRepository(string dbPath) : ISongRepository
     {
         using var db = new AppDbContext(dbPath);
         var song = db.Songs.Include(s => s.Sections).AsNoTracking()
-            .FirstOrDefault(s => s.Id == id);
+            .FirstOrDefault(s => s.Id == id && s.DeletedAt == null);
         if (song is not null)
             song.Sections = [.. song.Sections.OrderBy(x => x.Order)];
         return song;
@@ -97,9 +99,48 @@ public sealed class SongRepository(string dbPath) : ISongRepository
     {
         using var db = new AppDbContext(dbPath);
         var song = db.Songs.Find(id);
+        if (song is null || song.DeletedAt is not null)
+            return;
+        song.DeletedAt = DateTime.UtcNow;
+        db.SaveChanges();
+    }
+
+    public IReadOnlyList<Song> GetDeleted()
+    {
+        using var db = new AppDbContext(dbPath);
+        return db.Songs.AsNoTracking()
+            .Where(s => s.DeletedAt != null)
+            .OrderByDescending(s => s.DeletedAt)
+            .ToList();
+    }
+
+    public void Restore(int id)
+    {
+        using var db = new AppDbContext(dbPath);
+        var song = db.Songs.Find(id);
         if (song is null)
             return;
+        song.DeletedAt = null;
+        db.SaveChanges();
+    }
+
+    public void Purge(int id)
+    {
+        using var db = new AppDbContext(dbPath);
+        var song = db.Songs.Find(id);
+        if (song is null || song.DeletedAt is null)
+            return;
         db.Songs.Remove(song);
+        db.SaveChanges();
+    }
+
+    public void PurgeOlderThan(DateTime limit)
+    {
+        using var db = new AppDbContext(dbPath);
+        var old = db.Songs.Where(s => s.DeletedAt != null && s.DeletedAt < limit).ToList();
+        if (old.Count == 0)
+            return;
+        db.Songs.RemoveRange(old);
         db.SaveChanges();
     }
 }

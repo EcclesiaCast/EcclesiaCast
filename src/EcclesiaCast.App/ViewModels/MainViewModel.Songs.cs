@@ -443,7 +443,8 @@ public sealed partial class MainViewModel
             return;
 
         var confirm = MessageBox.Show(
-            $"¿Eliminar \"{SelectedSong.Title}\" de la biblioteca?",
+            $"¿Eliminar \"{SelectedSong.Title}\" de la biblioteca?\n\n"
+            + "Va a la papelera y se guarda 30 días: la podés recuperar desde Edición → Papelera.",
             "EcclesiaCast",
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
@@ -453,7 +454,17 @@ public sealed partial class MainViewModel
         _songs.Delete(SelectedSong.Id);
         SelectedSong = null;
         LoadSongs();
-        StatusText = "Canción eliminada.";
+        StatusText = "Canción enviada a la papelera (se guarda 30 días).";
+    }
+
+    /// <summary>Edición → «Papelera…»: lo borrado en los últimos 30 días, para recuperarlo.</summary>
+    [RelayCommand]
+    private void OpenTrash()
+    {
+        new Views.TrashWindow(_songs, _themes) { Owner = Application.Current.MainWindow }.ShowDialog();
+        LoadSongs();
+        ThemeSeeder.EnsureDefaults(_themes, _settings);
+        StatusText = "Papelera cerrada.";
     }
 
     /// <summary>Brings the libraries of another program (ProPresenter, EasyWorship) over, on the window's own choice.</summary>

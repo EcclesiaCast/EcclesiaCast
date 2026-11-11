@@ -801,7 +801,8 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         }
 
         var confirm = MessageBox.Show(
-            $"¿Eliminar el tema \"{SelectedRow.Name}\"? Las canciones que lo usen vuelven al tema por defecto.",
+            $"¿Eliminar el tema \"{SelectedRow.Name}\"? Las canciones que lo usen vuelven al tema por defecto.\n\n"
+            + "Va a la papelera y se guarda 30 días (Edición → Papelera).",
             "EcclesiaCast", MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (confirm != MessageBoxResult.Yes)
             return;

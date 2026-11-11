@@ -32,6 +32,12 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 - Las pestañas «Texto» y «Caja» del diseñador de canciones se ven como las
   pastillas del editor de temas, en vez del aspecto blanco de Windows.
 
+- **Papelera para canciones y temas.** Borrar una canción o un tema ya no es
+  definitivo: va a la papelera (Edición → «Papelera…») y se guarda 30 días,
+  con la fecha en que se borró y los días que le quedan. Desde ahí se puede
+  restaurar, borrar del todo o vaciar. Pasados los 30 días se borra solo al
+  abrir el programa.
+
 ### Corregido
 
 - **Un error inesperado ya no frena al operador.** Antes salía un cartel que

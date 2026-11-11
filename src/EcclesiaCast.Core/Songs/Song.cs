@@ -19,5 +19,8 @@ public sealed class Song
     /// </summary>
     public DateTime? LastProjectedAt { get; set; }
 
+    /// <summary>When the song went to the trash (UTC); null while it is in the library.</summary>
+    public DateTime? DeletedAt { get; set; }
+
     public List<SongSection> Sections { get; set; } = [];
 }

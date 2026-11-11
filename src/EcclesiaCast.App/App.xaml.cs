@@ -123,6 +123,11 @@ public partial class App : Application
             db.Database.Migrate();
 
         // Temas iniciales (Canciones y Biblia) en la primera ejecución.
+        // What has been in the trash for more than 30 days goes for good.
+        var purgeLimit = EcclesiaCast.Core.Songs.TrashPolicy.PurgeLimit(DateTime.UtcNow);
+        new SongRepository(dbPath).PurgeOlderThan(purgeLimit);
+        new ThemeRepository(dbPath).PurgeOlderThan(purgeLimit);
+
         ThemeSeeder.EnsureDefaults(new ThemeRepository(dbPath), new SqliteSettingsStore(dbPath));
 
         // Motor de video (VLC) para los fondos en movimiento.

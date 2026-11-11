@@ -202,6 +202,7 @@
                 <Separator/>
                 <MenuItem Header="Temas…" Command="{Binding OpenThemesCommand}"/>
                 <MenuItem Header="Logos…" Command="{Binding OpenLogosCommand}"/>
+                <MenuItem Header="Papelera…" Command="{Binding OpenTrashCommand}"/>
                 <Separator/>
                 <MenuItem Header="Buscar en todo" InputGestureText="Ctrl+K" Command="{Binding SearchEverythingCommand}"/>
             </MenuItem>

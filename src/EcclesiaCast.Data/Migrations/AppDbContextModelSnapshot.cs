@@ -15,7 +15,7 @@ namespace EcclesiaCast.Data.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.33");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.34");
 
             modelBuilder.Entity("EcclesiaCast.Core.Audio.AudioTrack", b =>
                 {
@@ -347,6 +347,9 @@ namespace EcclesiaCast.Data.Migrations
                     b.Property<string>("Copyright")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime?>("LastProjectedAt")
                         .HasColumnType("TEXT");
 
@@ -443,6 +446,9 @@ namespace EcclesiaCast.Data.Migrations
 
                     b.Property<int>("CaptionPosition")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("FitToWidth")
                         .HasColumnType("INTEGER");
