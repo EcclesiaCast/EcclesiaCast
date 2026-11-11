@@ -21,6 +21,10 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Corregido
 
+- **Un error inesperado ya no frena al operador.** Antes salía un cartel que
+  había que cerrar para seguir pasando la letra; ahora el programa sigue y
+  avisa en la barra de estado (como mucho cada 30 segundos). Las caídas en
+  segundo plano también quedan anotadas en el registro.
 - **Los cambios de un tema ya no se pierden en silencio.** Al pasar a otro
   tema, crear uno nuevo o cerrar con cambios sin guardar, el programa pregunta
   si guardarlos. Abajo avisa «Cambios sin guardar» y hay un botón «Deshacer

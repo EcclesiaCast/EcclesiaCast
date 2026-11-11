@@ -20,6 +20,7 @@ public partial class App : Application
     private ServiceProvider? _services;
     private UiWatchdog? _watchdog;
     private CrashMarker? _crashMarker;
+    private readonly EcclesiaCast.Core.Diagnostics.ErrorNoticeGate _errorGate = new(TimeSpan.FromSeconds(30));
 
     /// <summary>Set once the "Acerca de" of the very first start has been shown.</summary>
     private const string AboutSeenKey = "app.about.seen";
@@ -63,10 +64,32 @@ public partial class App : Application
         DispatcherUnhandledException += (_, args) =>
         {
             Log.Error(args.Exception, "Unhandled exception");
-            MessageBox.Show(
-                $"Ocurrió un error inesperado:\n\n{args.Exception.Message}",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Error);
+            if (_services?.GetService<MainViewModel>() is { } vm && MainWindow is { IsLoaded: true })
+            {
+                // The operator keeps going: no dialog, a line in the status bar, at most every 30 s.
+                if (_errorGate.ShouldNotify(DateTimeOffset.Now))
+                    vm.StatusText = "Hubo un error; el programa sigue. Quedó anotado en el registro.";
+            }
+            else
+            {
+                // Start-up error: nobody is using the program yet, so a dialog is fine.
+                MessageBox.Show(
+                    $"Ocurrió un error inesperado:\n\n{args.Exception.Message}",
+                    "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
             args.Handled = true;
+        };
+
+        AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+        {
+            Log.Fatal(args.ExceptionObject as Exception, "Fatal unhandled exception (terminating: {Terminating})", args.IsTerminating);
+            Log.CloseAndFlush();
+        };
+
+        TaskScheduler.UnobservedTaskException += (_, args) =>
+        {
+            Log.Error(args.Exception, "Unobserved task exception");
+            args.SetObserved();
         };
 
         var dbPath = Path.Combine(appDataDir, "ecclesiacast.db");
