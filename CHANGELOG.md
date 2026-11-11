@@ -29,6 +29,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   una nueva». Si el buscador no encuentra nada, avisa «Ninguna canción con
   eso.» (La playlist vacía ya explicaba cómo agregar canciones.)
 
+- Las pestañas «Texto» y «Caja» del diseñador de canciones se ven como las
+  pastillas del editor de temas, en vez del aspecto blanco de Windows.
+
 ### Corregido
 
 - **Un error inesperado ya no frena al operador.** Antes salía un cartel que
