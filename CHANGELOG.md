@@ -32,8 +32,42 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   de la leyenda se eligen tocando, y la tipografía cambia en la vista previa
   apenas se elige (antes había que hacer clic en otro lado).
 
+- **Esc hay que apretarlo dos veces para apagar la salida.** Es la tecla que
+  todos aprietan para «cancelar»: el primer toque avisa en la barra de estado
+  y el segundo, dentro de 2 segundos, apaga. El botón «Apagar salida» sigue
+  apagando con un clic.
+
+- **La lista de canciones vacía dice qué hacer:** «Todavía no hay canciones»
+  con los botones «Buscar en internet», «Traer de otro programa» y «Escribir
+  una nueva». Si el buscador no encuentra nada, avisa «Ninguna canción con
+  eso.» (La playlist vacía ya explicaba cómo agregar canciones.)
+
+- Las pestañas «Texto» y «Caja» del diseñador de canciones se ven como las
+  pastillas del editor de temas, en vez del aspecto blanco de Windows.
+
+- **Papelera para canciones y temas.** Borrar una canción o un tema ya no es
+  definitivo: va a la papelera (Edición → «Papelera…») y se guarda 30 días,
+  con la fecha en que se borró y los días que le quedan. Desde ahí se puede
+  restaurar, borrar del todo o vaciar. Pasados los 30 días se borra solo al
+  abrir el programa.
+
+- **La paleta de colores es más fácil.** Arriba hay una paleta grande (diez
+  tonos en seis claridades y una fila de grises), abajo los «Usados hace
+  poco» (se acuerdan de un día para otro), y las barras se escondieron detrás
+  de «Ajuste fino», que ahora mueve Tono, Intensidad y Claridad en vez de
+  rojo, verde y azul. Enter acepta.
+
+- **Ventana de Ajustes.** Archivo → «Ajustes…» (o Ctrl+,) junta en un solo
+  lugar las pantallas, el sonido, las transiciones, el celular, el modo de
+  bajo rendimiento, las actualizaciones y el aspecto. Por ahora usa los mismos
+  ajustes que los menús, que siguen donde estaban.
+
 ### Corregido
 
+- **Un error inesperado ya no frena al operador.** Antes salía un cartel que
+  había que cerrar para seguir pasando la letra; ahora el programa sigue y
+  avisa en la barra de estado (como mucho cada 30 segundos). Las caídas en
+  segundo plano también quedan anotadas en el registro.
 - **Los cambios de un tema ya no se pierden en silencio.** Al pasar a otro
   tema, crear uno nuevo o cerrar con cambios sin guardar, el programa pregunta
   si guardarlos. Abajo avisa «Cambios sin guardar» y hay un botón «Deshacer

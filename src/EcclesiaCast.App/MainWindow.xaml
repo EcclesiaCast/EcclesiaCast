@@ -14,10 +14,9 @@
         <KeyBinding Key="F2" Command="{Binding ToggleClearCommand}"/>
         <KeyBinding Key="F3" Command="{Binding ToggleLogoCommand}"/>
         <KeyBinding Key="F4" Command="{Binding ClearBackgroundCommand}"/>
-        <KeyBinding Key="Escape" Command="{Binding HideOutputCommand}"/>
+        <KeyBinding Key="Escape" Command="{Binding EscapeOutputCommand}"/>
         <!-- Una sola caja para buscar en canciones, versículos y medios -->
-        <KeyBinding Key="K" Modifiers="Control" Command="{Binding SearchEverythingCommand}"/>
-        <KeyBinding Key="F" Modifiers="Control" Command="{Binding SearchEverythingCommand}"/>
+        <KeyBinding Key="K" Modifiers="Control" Command="{Binding SearchEverythingCommand}"/>        <KeyBinding Key="F" Modifiers="Control" Command="{Binding SearchEverythingCommand}"/>
     </Window.InputBindings>
 
     <Window.Resources>
@@ -191,6 +190,9 @@
                 <MenuItem Header="Guardar una copia de la biblioteca…" Command="{Binding SaveBackupCommand}"/>
                 <MenuItem Header="Restaurar desde una copia…" Command="{Binding RestoreBackupCommand}"/>
                 <Separator/>
+                <MenuItem Header="Ajustes…" InputGestureText="Ctrl+," Click="Settings_Click"
+                          ToolTip="Pantallas, sonido, transiciones, celular, rendimiento, actualizaciones y aspecto, todo en una ventana."/>
+                <Separator/>
                 <MenuItem Header="Salir" Click="Exit_Click"/>
             </MenuItem>
 
@@ -202,6 +204,7 @@
                 <Separator/>
                 <MenuItem Header="Temas…" Command="{Binding OpenThemesCommand}"/>
                 <MenuItem Header="Logos…" Command="{Binding OpenLogosCommand}"/>
+                <MenuItem Header="Papelera…" Command="{Binding OpenTrashCommand}"/>
                 <Separator/>
                 <MenuItem Header="Buscar en todo" InputGestureText="Ctrl+K" Command="{Binding SearchEverythingCommand}"/>
             </MenuItem>
@@ -462,7 +465,7 @@
                             ToolTip="Actualizar pantallas"
                             Padding="9,6" Margin="6,0,14,0"/>
                     <Button Command="{Binding ToggleOutputCommand}"
-                            ToolTip="Prende o apaga la ventana de salida en la pantalla elegida. Con la salida prendida, la tecla Esc la apaga.">
+                            ToolTip="Prende o apaga la ventana de salida en la pantalla elegida. Con la salida prendida, apretar Esc dos veces también la apaga.">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
                                 <Setter Property="Content" Value="🔴  Poner en vivo"/>
@@ -474,7 +477,7 @@
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding IsProjecting}" Value="True">
                                         <Setter Property="Content" Value="Apagar salida"/>
-                                        <Setter Property="controls:ShortcutHint.Text" Value="Esc"/>
+                                        <Setter Property="controls:ShortcutHint.Text" Value="Esc ×2"/>
                                         <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
                                         <Setter Property="BorderThickness" Value="1"/>
                                     </DataTrigger>
@@ -600,6 +603,7 @@
                                          FontSize="13"
                                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                                          ToolTip="Buscar por título, artista o letra"/>
+                                <Grid>
                                 <ListBox x:Name="SongsList" ItemsSource="{Binding Songs}"
                                          PreviewMouseLeftButtonDown="SongsList_PreviewMouseLeftButtonDown"
                                          PreviewMouseMove="SongsList_PreviewMouseMove"
@@ -692,6 +696,25 @@
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
                                 </ListBox>
+                                <!-- Lista vacía: dice qué hacer (biblioteca sin canciones) -->
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16"
+                                            Visibility="{Binding IsSongLibraryEmpty, Converter={StaticResource BoolToVis}}">
+                                    <TextBlock Text="Todavía no hay canciones." Style="{StaticResource PlaceholderText}"
+                                               Margin="0,0,0,8"/>
+                                    <Button Content="Buscar en internet" Padding="10,6" Style="{StaticResource DarkButton}"
+                                            Command="{Binding SearchSongsOnlineCommand}"/>
+                                    <Button Content="Traer de otro programa" Padding="10,6" Margin="0,6,0,0"
+                                            Style="{StaticResource DarkButton}"
+                                            Command="{Binding ImportFromOtherProgramCommand}"/>
+                                    <Button Content="Escribir una nueva" Padding="10,6" Margin="0,6,0,0"
+                                            Style="{StaticResource DarkButton}"
+                                            Command="{Binding NewSongCommand}"/>
+                                </StackPanel>
+                                <!-- El buscador no encontró nada -->
+                                <TextBlock Text="Ninguna canción con eso." IsHitTestVisible="False"
+                                           Style="{StaticResource PlaceholderText}"
+                                           Visibility="{Binding IsSongSearchEmpty, Converter={StaticResource BoolToVis}}"/>
+                                </Grid>
                             </DockPanel>
 
                             <!-- ── Pestaña Biblia ── -->

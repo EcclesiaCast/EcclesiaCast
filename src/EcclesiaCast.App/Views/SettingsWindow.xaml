@@ -1,0 +1,145 @@
+<Window x:Class="EcclesiaCast.App.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Ajustes"
+        Width="720" Height="480" MinWidth="600" MinHeight="380"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BgBrush}"
+        FontFamily="Segoe UI">
+    <Window.Resources>
+        <!-- Una pastilla por sección, en columna a la izquierda -->
+        <Style TargetType="RadioButton" x:Key="SectionItem" BasedOn="{StaticResource TabButton}">
+            <Setter Property="Margin" Value="0,0,0,4"/>
+            <Setter Property="GroupName" Value="SettingsSections"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+        <Style x:Key="SectionText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+        <Style x:Key="FieldTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Margin" Value="0,8,0,4"/>
+        </Style>
+    </Window.Resources>
+
+    <DockPanel Margin="18">
+        <!-- Las secciones. Para sumar una: una pastilla acá y un panel en SectionPanels. -->
+        <StackPanel DockPanel.Dock="Left" Width="170" Margin="0,0,18,0">
+            <RadioButton x:Name="ScreensPill" Content="Pantallas" IsChecked="True" Style="{StaticResource SectionItem}"/>
+            <RadioButton x:Name="SoundPill" Content="Sonido" Style="{StaticResource SectionItem}"/>
+            <RadioButton x:Name="ListeningPill" Content="Seguir la canción" Style="{StaticResource SectionItem}"/>
+            <RadioButton x:Name="TransitionsPill" Content="Transiciones" Style="{StaticResource SectionItem}"/>
+            <RadioButton x:Name="PhonePill" Content="Celular" Style="{StaticResource SectionItem}"/>
+            <RadioButton x:Name="PerformancePill" Content="Rendimiento" Style="{StaticResource SectionItem}"/>
+            <RadioButton x:Name="UpdatesPill" Content="Actualizaciones" Style="{StaticResource SectionItem}"/>
+            <RadioButton x:Name="LookPill" Content="Aspecto" Style="{StaticResource SectionItem}"/>
+        </StackPanel>
+
+        <Button DockPanel.Dock="Bottom" Content="Cerrar" HorizontalAlignment="Right" Padding="20,8" Margin="0,12,0,0"
+                Style="{StaticResource DarkButton}" IsCancel="True" IsDefault="True"/>
+
+        <Border Style="{StaticResource Panel}" Padding="20">
+            <Grid x:Name="SectionPanels">
+
+                <!-- Pantallas -->
+                <StackPanel Visibility="{Binding IsChecked, ElementName=ScreensPill, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="Pantallas" Style="{StaticResource SectionTitle}"/>
+                    <TextBlock Style="{StaticResource SectionText}"
+                               Text="Elegí dónde sale la imagen: el proyector o la pantalla para la congregación, y la pantalla del escenario."/>
+                    <TextBlock Text="Salida" Style="{StaticResource FieldTitle}"/>
+                    <ComboBox ItemsSource="{Binding Displays}" SelectedItem="{Binding SelectedDisplay}"
+                              DisplayMemberPath="Label" HorizontalAlignment="Left" Width="360"
+                              ToolTip="Monitor o proyector donde sale la imagen"/>
+                    <TextBlock Text="Pantalla del escenario" Style="{StaticResource FieldTitle}"/>
+                    <ComboBox ItemsSource="{Binding StageDisplays}" SelectedItem="{Binding SelectedStageDisplay}"
+                              DisplayMemberPath="Label" HorizontalAlignment="Left" Width="360"
+                              ToolTip="Monitor donde se ve el escenario (letra, reloj y mensajes para quienes están adelante)"/>
+                    <Button Content="Actualizar la lista de pantallas" Command="{Binding RefreshDisplaysCommand}"
+                            Style="{StaticResource DarkButton}" Padding="14,7" Margin="0,14,0,0" HorizontalAlignment="Left"
+                            ToolTip="Si conectaste un proyector con el programa abierto y no aparece"/>
+                </StackPanel>
+
+                <!-- Sonido -->
+                <StackPanel Visibility="{Binding IsChecked, ElementName=SoundPill, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="Sonido" Style="{StaticResource SectionTitle}"/>
+                    <TextBlock Style="{StaticResource SectionText}"
+                               Text="Si no suena nada después de cambiar la salida de audio de Windows (parlantes, auriculares, Bluetooth): vuelve a abrir el sonido de la música y de los videos, en el mismo lugar. Los videos de YouTube siguen solos la salida de Windows."/>
+                    <Button Content="Reiniciar el sonido" Click="RestartSound_Click"
+                            Style="{StaticResource DarkButton}" Padding="14,7" HorizontalAlignment="Left"/>
+                </StackPanel>
+
+                <!-- Seguir la canción (beta) -->
+                <StackPanel Visibility="{Binding IsChecked, ElementName=ListeningPill, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="Seguir la canción (beta)" Style="{StaticResource SectionTitle}"/>
+                    <TextBlock Style="{StaticResource SectionText}"
+                               Text="El programa escucha el micrófono o la entrada de línea y sugiere o pasa las diapositivas de la canción abierta. Está en prueba: anda mejor con canciones lentas y voces claras. Lo que escucha no se graba ni sale de esta PC."/>
+                    <Button Content="Abrir «Seguir la canción»…" Click="Listening_Click"
+                            Style="{StaticResource DarkButton}" Padding="14,7" HorizontalAlignment="Left"
+                            ToolTip="Ahí se elige de dónde escucha, qué hace con lo que escucha, y se prende y se apaga"/>
+                </StackPanel>
+
+                <!-- Transiciones -->
+                <StackPanel Visibility="{Binding IsChecked, ElementName=TransitionsPill, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="Transiciones" Style="{StaticResource SectionTitle}"/>
+                    <TextBlock Style="{StaticResource SectionText}"
+                               Text="Cuántos segundos tardan en aparecer y desaparecer el logo, los cambios de imagen o video, la pantalla negra y el apagado de la salida."/>
+                    <Button Content="Cambiar las transiciones…" Click="Transitions_Click"
+                            Style="{StaticResource DarkButton}" Padding="14,7" HorizontalAlignment="Left"/>
+                </StackPanel>
+
+                <!-- Celular -->
+                <StackPanel Visibility="{Binding IsChecked, ElementName=PhonePill, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="Celular" Style="{StaticResource SectionTitle}"/>
+                    <TextBlock Style="{StaticResource SectionText}"
+                               Text="Controlar la proyección desde un celular conectado a la misma red de la iglesia."/>
+                    <Button Content="Controlar desde el celular…" Command="{Binding OpenRemoteCommand}"
+                            Style="{StaticResource DarkButton}" Padding="14,7" HorizontalAlignment="Left"/>
+                </StackPanel>
+
+                <!-- Rendimiento -->
+                <StackPanel Visibility="{Binding IsChecked, ElementName=PerformancePill, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="Rendimiento" Style="{StaticResource SectionTitle}"/>
+                    <CheckBox Content="Modo PC de bajo rendimiento" Foreground="White"
+                              IsChecked="{Binding IsLowPerformance, Mode=TwoWay}"/>
+                    <TextBlock Style="{StaticResource SectionText}" Margin="22,4,0,0"
+                               Text="Para computadoras viejas o sin placa de video: las transiciones cortan, el panel LIVE muestra la imagen fija del video y las vistas previas se dibujan sin sombra ni contorno. Lo que ve la congregación conserva su diseño."/>
+                </StackPanel>
+
+                <!-- Actualizaciones -->
+                <StackPanel Visibility="{Binding IsChecked, ElementName=UpdatesPill, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="Actualizaciones" Style="{StaticResource SectionTitle}"/>
+                    <CheckBox Content="Buscar actualizaciones al abrir" Foreground="White"
+                              IsChecked="{Binding CheckForUpdatesOnStartup, Mode=TwoWay}"/>
+                    <TextBlock Style="{StaticResource SectionText}" Margin="22,4,0,0"
+                               Text="Una vez por día, a los pocos segundos de abrir el programa, mira en GitHub si hay una versión nueva. No manda nada tuyo. Nunca interrumpe mientras se proyecta."/>
+                    <Button Content="Buscar ahora" Command="{Binding CheckForUpdatesCommand}"
+                            Style="{StaticResource DarkButton}" Padding="14,7" HorizontalAlignment="Left"/>
+                </StackPanel>
+
+                <!-- Aspecto -->
+                <StackPanel Visibility="{Binding IsChecked, ElementName=LookPill, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="Aspecto" Style="{StaticResource SectionTitle}"/>
+                    <TextBlock Style="{StaticResource SectionText}"
+                               Text="Cambia sólo lo que se lee en la ventana: los atajos de teclado andan igual en los dos diseños."/>
+                    <RadioButton x:Name="LearningRadio" GroupName="UiMode" Foreground="White" Click="LearningRadio_Click"
+                                 Content="Diseño de aprendizaje (con atajos a la vista)"/>
+                    <RadioButton x:Name="AdvancedRadio" GroupName="UiMode" Foreground="White" Margin="0,6,0,0" Click="AdvancedRadio_Click"
+                                 Content="Diseño avanzado (menos texto, sin atajos)"/>
+                </StackPanel>
+
+            </Grid>
+        </Border>
+    </DockPanel>
+</Window>

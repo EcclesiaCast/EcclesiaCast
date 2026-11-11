@@ -87,6 +87,9 @@ public sealed class SlideTheme
     public string Name { get; set; } = string.Empty;
     public ThemeKind Kind { get; set; }
 
+    /// <summary>When the theme went to the trash (UTC); null while it is in use.</summary>
+    public DateTime? DeletedAt { get; set; }
+
     // ── Texto principal ──────────────────────────────────────────
     public string FontFamily { get; set; } = "Segoe UI";
 

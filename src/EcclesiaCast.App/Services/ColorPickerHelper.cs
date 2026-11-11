@@ -8,6 +8,9 @@ public static class ColorPickerHelper
     /// <summary>Sentinel returned when the operator picks "Transparent".</summary>
     public const string Transparent = ColorPickerWindow.Transparent;
 
+    /// <summary>Where the colors used lately are kept; assigned at start-up (App.xaml.cs).</summary>
+    public static EcclesiaCast.Core.Abstractions.ISettingsStore? Settings { get; set; }
+
     public static string? Pick(string? currentHex, bool allowTransparent = false)
     {
         var window = new ColorPickerWindow(currentHex, allowTransparent)
