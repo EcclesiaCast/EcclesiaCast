@@ -38,6 +38,12 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   restaurar, borrar del todo o vaciar. Pasados los 30 días se borra solo al
   abrir el programa.
 
+- **La paleta de colores es más fácil.** Arriba hay una paleta grande (diez
+  tonos en seis claridades y una fila de grises), abajo los «Usados hace
+  poco» (se acuerdan de un día para otro), y las barras se escondieron detrás
+  de «Ajuste fino», que ahora mueve Tono, Intensidad y Claridad en vez de
+  rojo, verde y azul. Enter acepta.
+
 ### Corregido
 
 - **Un error inesperado ya no frena al operador.** Antes salía un cartel que

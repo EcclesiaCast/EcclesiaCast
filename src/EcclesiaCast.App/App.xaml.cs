@@ -200,6 +200,7 @@ public partial class App : Application
             DataContext = _services.GetRequiredService<MainViewModel>()
         };
         var settings = _services.GetRequiredService<ISettingsStore>();
+        ColorPickerHelper.Settings = settings;
         TransitionSettings.Load(settings);
         BroadcastStyleSettings.Load(settings);
         mainWindow.AttachLayoutPersistence(settings);
