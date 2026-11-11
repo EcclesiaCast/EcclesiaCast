@@ -36,7 +36,20 @@ public partial class ThemeManagerWindow : Window
         viewModel.PropertyChanged += OnViewModelChanged;
         viewModel.CloseRequested += (_, _) => { DialogResult = true; };
         viewModel.BoxReplaced += (_, _) => PlaceBox();
-        Loaded += (_, _) => PlaceBox();
+        Loaded += (_, _) =>
+        {
+            PlaceBox();
+            // The fields have taken their values (and rounded what they had
+            // to): from here on, a difference is an edit of the operator's.
+            viewModel.SettleBaseline();
+        };
+
+        // Closing with changes asks first; «Cancelar» keeps the window open.
+        Closing += (_, e) =>
+        {
+            if (!viewModel.ResolveUnsaved())
+                e.Cancel = true;
+        };
     }
 
     private void CenterBoxH_Click(object sender, RoutedEventArgs e)
@@ -55,7 +68,7 @@ public partial class ThemeManagerWindow : Window
     {
         // Only reposition when a different theme loads — never while the
         // operator is editing the box (that caused the box to snap back).
-        if (e.PropertyName == nameof(ThemeManagerViewModel.SelectedTheme))
+        if (e.PropertyName == nameof(ThemeManagerViewModel.SelectedRow))
             PlaceBox();
     }
 

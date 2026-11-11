@@ -12,7 +12,12 @@ public static class ColorPickerHelper
     {
         var window = new ColorPickerWindow(currentHex, allowTransparent)
         {
-            Owner = System.Windows.Application.Current.MainWindow,
+            // Over the window that asked (the theme editor, a designer), not
+            // the main one: otherwise it opens centred somewhere else.
+            Owner = System.Windows.Application.Current.Windows
+                        .OfType<System.Windows.Window>()
+                        .FirstOrDefault(w => w.IsActive)
+                    ?? System.Windows.Application.Current.MainWindow,
         };
         return window.ShowDialog() == true ? window.ResultHex : null;
     }
