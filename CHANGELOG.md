@@ -44,6 +44,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   de «Ajuste fino», que ahora mueve Tono, Intensidad y Claridad en vez de
   rojo, verde y azul. Enter acepta.
 
+- **Ventana de Ajustes.** Archivo → «Ajustes…» (o Ctrl+,) junta en un solo
+  lugar las pantallas, el sonido, las transiciones, el celular, el modo de
+  bajo rendimiento, las actualizaciones y el aspecto. Por ahora usa los mismos
+  ajustes que los menús, que siguen donde estaban.
+
 ### Corregido
 
 - **Un error inesperado ya no frena al operador.** Antes salía un cartel que

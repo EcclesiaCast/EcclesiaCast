@@ -30,6 +30,8 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        InputBindings.Add(new KeyBinding(
+            new CommunityToolkit.Mvvm.Input.RelayCommand(OpenSettings), Key.OemComma, ModifierKeys.Control));
         if (EcclesiaCast.App.Services.AppInfo.HasDonateUrl)
             DonateMenuItem.Visibility = Visibility.Visible;
 
@@ -789,20 +791,44 @@ public partial class MainWindow : Window
     /// changed and nothing is heard even though the automatic reopening ran
     /// (or did not notice).
     /// </summary>
-    private void Transitions_Click(object sender, RoutedEventArgs e)
+    private void Transitions_Click(object sender, RoutedEventArgs e) => OpenTransitions(this);
+
+    /// <summary>Opens the transitions window over <paramref name="owner"/> (the menu and the Ajustes window share it).</summary>
+    internal void OpenTransitions(Window owner)
     {
         if (_settings is null)
             return;
 
-        new Views.TransitionsWindow(_settings) { Owner = this }.ShowDialog();
+        new Views.TransitionsWindow(_settings) { Owner = owner }.ShowDialog();
     }
 
-    private void RestartSound_Click(object sender, RoutedEventArgs e)
+    private void RestartSound_Click(object sender, RoutedEventArgs e) => RestartSound();
+
+    internal void RestartSound()
     {
         AudioEndpointWatcher.RequestRestart();
         if (DataContext is MainViewModel vm)
             vm.StatusText = "Sonido reiniciado: la música y los videos vuelven a abrir la salida de audio.";
     }
+
+    /// <summary>Ctrl+, and Archivo → «Ajustes…».</summary>
+    private void Settings_Click(object sender, RoutedEventArgs e) => OpenSettings();
+
+    private void OpenSettings()
+    {
+        if (_settingsWindow is { IsLoaded: true })
+        {
+            _settingsWindow.Activate();
+            return;
+        }
+
+        // Not modal: it is a place to look around while the service goes on.
+        _settingsWindow = new Views.SettingsWindow(this) { Owner = this, DataContext = DataContext };
+        _settingsWindow.Closed += (_, _) => _settingsWindow = null;
+        _settingsWindow.Show();
+    }
+
+    private Views.SettingsWindow? _settingsWindow;
 
     private void MediaMenu_Opened(object sender, RoutedEventArgs e)
     {

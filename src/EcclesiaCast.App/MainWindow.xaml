@@ -16,8 +16,7 @@
         <KeyBinding Key="F4" Command="{Binding ClearBackgroundCommand}"/>
         <KeyBinding Key="Escape" Command="{Binding EscapeOutputCommand}"/>
         <!-- Una sola caja para buscar en canciones, versículos y medios -->
-        <KeyBinding Key="K" Modifiers="Control" Command="{Binding SearchEverythingCommand}"/>
-        <KeyBinding Key="F" Modifiers="Control" Command="{Binding SearchEverythingCommand}"/>
+        <KeyBinding Key="K" Modifiers="Control" Command="{Binding SearchEverythingCommand}"/>        <KeyBinding Key="F" Modifiers="Control" Command="{Binding SearchEverythingCommand}"/>
     </Window.InputBindings>
 
     <Window.Resources>
@@ -190,6 +189,9 @@
                 <Separator/>
                 <MenuItem Header="Guardar una copia de la biblioteca…" Command="{Binding SaveBackupCommand}"/>
                 <MenuItem Header="Restaurar desde una copia…" Command="{Binding RestoreBackupCommand}"/>
+                <Separator/>
+                <MenuItem Header="Ajustes…" InputGestureText="Ctrl+," Click="Settings_Click"
+                          ToolTip="Pantallas, sonido, transiciones, celular, rendimiento, actualizaciones y aspecto, todo en una ventana."/>
                 <Separator/>
                 <MenuItem Header="Salir" Click="Exit_Click"/>
             </MenuItem>
