@@ -93,7 +93,19 @@ public sealed partial class MainViewModel
         foreach (var song in _songs.Search(SearchText))
             Songs.Add(song);
         SelectedSong = Songs.FirstOrDefault(s => s.Id == keepId) ?? SelectedSong;
+        var none = Songs.Count == 0;
+        var filtering = !string.IsNullOrWhiteSpace(SearchText);
+        IsSongLibraryEmpty = none && !filtering;
+        IsSongSearchEmpty = none && filtering;
     }
+
+    /// <summary>The library has no songs at all (not just the search): the list says what to do.</summary>
+    [ObservableProperty]
+    private bool _isSongLibraryEmpty;
+
+    /// <summary>The search box found nothing.</summary>
+    [ObservableProperty]
+    private bool _isSongSearchEmpty;
 
     private void BuildSongSlides()
     {

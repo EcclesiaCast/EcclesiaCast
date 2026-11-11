@@ -598,6 +598,7 @@
                                          FontSize="13"
                                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                                          ToolTip="Buscar por título, artista o letra"/>
+                                <Grid>
                                 <ListBox x:Name="SongsList" ItemsSource="{Binding Songs}"
                                          PreviewMouseLeftButtonDown="SongsList_PreviewMouseLeftButtonDown"
                                          PreviewMouseMove="SongsList_PreviewMouseMove"
@@ -690,6 +691,25 @@
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
                                 </ListBox>
+                                <!-- Lista vacía: dice qué hacer (biblioteca sin canciones) -->
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16"
+                                            Visibility="{Binding IsSongLibraryEmpty, Converter={StaticResource BoolToVis}}">
+                                    <TextBlock Text="Todavía no hay canciones." Style="{StaticResource PlaceholderText}"
+                                               Margin="0,0,0,8"/>
+                                    <Button Content="Buscar en internet" Padding="10,6" Style="{StaticResource DarkButton}"
+                                            Command="{Binding SearchSongsOnlineCommand}"/>
+                                    <Button Content="Traer de otro programa" Padding="10,6" Margin="0,6,0,0"
+                                            Style="{StaticResource DarkButton}"
+                                            Command="{Binding ImportFromOtherProgramCommand}"/>
+                                    <Button Content="Escribir una nueva" Padding="10,6" Margin="0,6,0,0"
+                                            Style="{StaticResource DarkButton}"
+                                            Command="{Binding NewSongCommand}"/>
+                                </StackPanel>
+                                <!-- El buscador no encontró nada -->
+                                <TextBlock Text="Ninguna canción con eso." IsHitTestVisible="False"
+                                           Style="{StaticResource PlaceholderText}"
+                                           Visibility="{Binding IsSongSearchEmpty, Converter={StaticResource BoolToVis}}"/>
+                                </Grid>
                             </DockPanel>
 
                             <!-- ── Pestaña Biblia ── -->

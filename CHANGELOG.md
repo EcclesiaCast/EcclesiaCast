@@ -24,6 +24,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   y el segundo, dentro de 2 segundos, apaga. El botón «Apagar salida» sigue
   apagando con un clic.
 
+- **La lista de canciones vacía dice qué hacer:** «Todavía no hay canciones»
+  con los botones «Buscar en internet», «Traer de otro programa» y «Escribir
+  una nueva». Si el buscador no encuentra nada, avisa «Ninguna canción con
+  eso.» (La playlist vacía ya explicaba cómo agregar canciones.)
+
 ### Corregido
 
 - **Un error inesperado ya no frena al operador.** Antes salía un cartel que
