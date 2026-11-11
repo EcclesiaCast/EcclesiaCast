@@ -76,6 +76,18 @@ public sealed class FollowPilot
         _quietUntil = now + _options.PauseAfterOperator;
     }
 
+    /// <summary>
+    /// For a recogniser that listens again to the last seconds each time
+    /// (Whisper): <paramref name="window"/> is everything it made out of them,
+    /// and takes the place of what was heard before instead of adding to it.
+    /// The caller starts its window after the last change of slide.
+    /// </summary>
+    public FollowDecision HearWindow(string? window, DateTimeOffset now)
+    {
+        _follower.Forget();
+        return Hear(window, now);
+    }
+
     /// <summary>Takes the words just recognised and says whether a slide should go up.</summary>
     public FollowDecision Hear(string? words, DateTimeOffset now)
     {
