@@ -64,6 +64,10 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Corregido
 
+- **«Seguir la canción» no podía abrir ninguna entrada de sonido** y decía
+  «Unable to cast…». Ya abre el micrófono o la entrada que elijas.
+- **«Bajar Biblias» ya no agrega dos veces la misma Biblia** si se vuelve a
+  tildar una que ya estaba: la saltea y lo avisa.
 - **Un error inesperado ya no frena al operador.** Antes salía un cartel que
   había que cerrar para seguir pasando la letra; ahora el programa sigue y
   avisa en la barra de estado (como mucho cada 30 segundos). Las caídas en

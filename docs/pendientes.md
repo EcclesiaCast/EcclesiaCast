@@ -437,6 +437,42 @@ las respuestas automáticas de la tabla); toca dar estos pasos.
 
 ## 3. Para hacer después de la 1.0
 
+### Pedidos de la prueba de la 1.4.0 (11/11/2026)
+
+- [x] **«Seguir la canción» no abría ninguna entrada** («Unable to cast
+      MMDeviceEnumeratorComObject»). Era un choque dentro del programa: el
+      vigía del sonido y el karaoke declaraban el mismo componente de
+      Windows. Arreglado (b23aece) y probado en un banco con el código real:
+      lista las entradas y escucha. Falta que lo pruebe Alexis.
+- [x] **Bajar Biblias dejaba bajar otra vez una que ya estaba.** Ahora las
+      saltea y lo dice. Falta que lo pruebe Alexis.
+- [ ] **Medios: ninguna pestaña silenciada de entrada.** El programa ya no
+      silencia ninguna por su cuenta; en la biblioteca de Alexis «Fondos»
+      quedó silenciada (regla guardada `item+mute`), seguramente por un clic
+      en «Silenciar la pestaña». Se quita con clic derecho en la pestaña →
+      «Quitar el silencio». Decidir si además hace falta un aviso más
+      visible de que una pestaña está silenciada.
+- [ ] **Carteles propios en vez de los de Windows.** Hoy hay 47 `MessageBox`
+      con el aspecto gris de Windows. Una ventana de aviso con el aspecto del
+      programa (oscura, botones propios, textos de los botones en castellano
+      y no «Sí / No / Cancelar»), y reemplazarlos de a poco. Mediano.
+- [ ] **Bajar fondos de Pexels desde el programa.** Pexels tiene una API
+      gratuita (hace falta pedir una clave; límite de 200 pedidos por hora) y
+      sus videos se pueden usar gratis; pide mostrar «Videos de Pexels» y el
+      nombre del autor. Una ventana como la de YouTube: buscar, ver la
+      vista previa, bajar a la pestaña elegida. Mediano.
+- [ ] **Saber cuántas iglesias lo usan por fin de semana.** Dos caminos, a
+      decidir por Alexis:
+      1. *Contador anónimo:* el programa ya pregunta una vez por día si hay
+         versión nueva; esa consulta pasaría por un servicio propio (en
+         Cloudflare, donde ya están las Biblias) que cuenta números al azar
+         de instalación por semana, sin nombres ni datos. Hay que decirlo en
+         la página de privacidad y dejar apagarlo. Chico.
+      2. *Cuentas:* cada iglesia se registra. Sirve también para la copia
+         en la nube que Alexis tiene en mente, pero es mucho más grande
+         (servidor, base, inicio de sesión, contraseñas, privacidad, costo).
+         Va junto con la copia en la nube, cuando se decida hacerla.
+
 - [ ] **YouVersion: en pausa** (5/11/2026, Alexis: «queda en el freezer por
       ahora»). La integración está programada y guardada en la rama
       `claude/youversion-integracion`, sin fusionar: necesita que cada iglesia
