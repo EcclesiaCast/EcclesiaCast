@@ -44,7 +44,7 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       notas, con los acentos bien; 2) **importá cada ejemplo** con «Importar una
       Biblia» (cada uno trae 5 versículos: Génesis 1:1-3 y Juan 3:16-17) y
       proyectá Juan 3:16; 3) **📋 Copiar instrucciones para una IA** y pegalas en
-      el Bloc de notas: se leen enteras y en castellano (idealmente probalas con
+      el Bloc de notas: se leen enteras y en español (idealmente probalas con
       una IA de verdad y una Biblia tuya en Word o texto, y contame si el
       programita que arma sirve); 4) «Importar una Biblia…» de esa ventana abre
       el selector de archivos; 5) con un archivo que no sirve (por ejemplo un
@@ -129,7 +129,7 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       sin cuadro negro y sin tirón. Mirá si a vos también te parece bien, con
       la salida en el proyector de verdad.
 - [ ] **Fecha del evento con calendario.** En Propiedades, la fecha ya no se
-      escribe: se elige en un calendario (en castellano, la semana empieza el
+      escribe: se elige en un calendario (en español, la semana empieza el
       lunes), y la ✕ la saca. Se comprobó en la PC que abre y que la nota de
       abajo dice el día en que pasa a «Eventos pasados». Falta ver que una
       fecha vieja (por ejemplo del mes pasado) mueva la imagen al guardar.
@@ -320,7 +320,7 @@ nuevo (con otro paquete o con otra versión), después de `dotnet publish`:
       [publicar-1.0.md](publicar-1.0.md), salvo la firma): instalarla **sobre**
       una beta y ver que conserva canciones, Biblias y medios; con una beta
       instalada, que Ayuda → «Buscar actualizaciones…» ofrezca la 1.0 con las
-      notas nuevas en castellano; y el instalador con tus Biblias en una PC de
+      notas nuevas en español; y el instalador con tus Biblias en una PC de
       la iglesia (que al abrir el programa ofrezca traerlas).
 - [ ] **Usar la 1.0 en la reunión del domingo** y anotar lo que falle o no
       guste.
@@ -454,7 +454,7 @@ las respuestas automáticas de la tabla); toca dar estos pasos.
       visible de que una pestaña está silenciada.
 - [ ] **Carteles propios en vez de los de Windows.** Hoy hay 47 `MessageBox`
       con el aspecto gris de Windows. Una ventana de aviso con el aspecto del
-      programa (oscura, botones propios, textos de los botones en castellano
+      programa (oscura, botones propios, textos de los botones en español
       y no «Sí / No / Cancelar»), y reemplazarlos de a poco. Mediano.
 - [ ] **Bajar fondos de Pexels desde el programa.** Pexels tiene una API
       gratuita (hace falta pedir una clave; límite de 200 pedidos por hora) y
@@ -690,7 +690,7 @@ del panel web**, sin API ni claves. Se descartó Tenor (Google cerró su API el
 30/6/2026), la API de Google (cerrada a clientes nuevos y sin imágenes como
 las de Google Imágenes) y Giphy (100 búsquedas por hora para todas las
 iglesias juntas con una clave compartida, o una clave por iglesia). Google
-entiende el castellano, así que tampoco hace falta traducir.
+entiende el español, así que tampoco hace falta traducir.
 
 Descartado: importar las Biblias de BibleShow. Sus archivos `.bib` son bases
 de Access protegidas con usuario y contraseña, y NTV, NVI y PDT son textos con

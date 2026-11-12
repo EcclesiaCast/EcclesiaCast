@@ -26,7 +26,7 @@ queda siempre a la vista.*
 >
 > EcclesiaCast es un programa para proyectar en la iglesia: la letra de las
 > canciones, la Biblia en una o dos versiones a la vez, fondos con video y
-> avisos. Es para Windows, está en castellano y es libre: no se paga nunca.
+> avisos. Es para Windows, está en español y es libre: no se paga nunca.
 >
 > **[ ⬇ Descargar para Windows ]**
 > Versión 1.0.0-beta.15 · 141 MB · Windows 10 y 11

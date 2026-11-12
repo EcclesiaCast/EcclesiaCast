@@ -8,7 +8,7 @@
 > cubre sitios web y apps de celular), la exigencia de protección contra copia en un
 > programa de código abierto, la responsabilidad personal de quien se registra y que
 > pueden cancelar el acceso sin motivo (hay que borrar todo en 72 horas). En
-> castellano sólo se vieron la NTV, la LBLA y la NBLA; la RVR1960, la NVI suelta, la
+> español sólo se vieron la NTV, la LBLA y la NBLA; la RVR1960, la NVI suelta, la
 > TLA, la PDT y la TCB no estaban. **No volver a investigarlo** salvo que cambien las
 > condiciones o Tyndale dé un permiso directo. Camino elegido: los permisos pedidos
 > por correo (ver docs/pendientes.md) y las Biblias libres del instalador. La
@@ -90,7 +90,7 @@ Lo que **no se pudo comprobar** está marcado.
   en el código de un navegador, y en un programa instalado cualquiera la sacaría).
   Se guardaría en la biblioteca de cada iglesia.
 
-## Qué Biblias en castellano podrían servir
+## Qué Biblias en español podrían servir
 
 **No se pudo ver el catálogo**: la tabla de api.bible sólo muestra las filas a
 quien inició sesión, y crear la cuenta es cosa del dueño del proyecto. Lo que se
@@ -104,7 +104,7 @@ sabe:
   la CEV y la GNT), así que es la candidata más probable. Los socios que
   nombran son Biblica (NVI), **Tyndale (NTV)**, HarperCollins, Lockman (LBLA/NBLH),
   Holman (NVI en España/EE.UU., Biblias Holman) y NavPress, pero la
-  documentación no dice qué versiones en castellano tiene cada uno.
+  documentación no dice qué versiones en español tiene cada uno.
 - **TLA y PDT:** sin datos. La TLA es de las Sociedades Bíblicas Unidas y la PDT
   de la Liga Bíblica; ninguna aparece en lo leído.
 - Algunas Biblias piden además un **acuerdo aparte con el dueño** («Unique
@@ -119,7 +119,7 @@ una iglesia que elija bien.
 ## Cómo sería en el programa (idea, sin programar todavía)
 
 1. Menú **Archivo → Biblias en línea…**: se pega la clave, el programa pide la
-   lista de Biblias en castellano de esa clave y se tildan las que se quieren.
+   lista de Biblias en español de esa clave y se tildan las que se quieren.
 2. Esas Biblias aparecen en la fila de versiones con una marca de «en línea».
    Elegir libro y capítulo pide el capítulo (una consulta); proyectar un versículo
    no gasta consultas, porque sale del capítulo ya pedido.
@@ -136,7 +136,7 @@ una iglesia que elija bien.
 
 **Riesgos:** sin internet no hay texto (la caché ayuda pero no alcanza); el
 límite de 5.000 consultas es el de cada iglesia; los términos pueden cambiar; y
-**falta confirmar con API.Bible** el tema del FUMS y qué versiones en castellano
+**falta confirmar con API.Bible** el tema del FUMS y qué versiones en español
 están disponibles. Esas dos preguntas se pueden hacer en su Discord (el enlace
 está en el panel de cada cuenta) o a support@api.bible.
 

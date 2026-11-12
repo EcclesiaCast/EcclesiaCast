@@ -72,7 +72,7 @@ publica la licencia de su versión.
 
 ## Qué no entra (y por qué)
 
-Se revisó el catálogo en castellano de eBible.org y se **descartaron**:
+Se revisó el catálogo en español de eBible.org y se **descartaron**:
 
 - **Reina Valera Gómez (sparvg)**: © Humberto Gómez Caballero; prohíbe
   reproducirla con fines de lucro y sólo permite repartirla sin cambiar el

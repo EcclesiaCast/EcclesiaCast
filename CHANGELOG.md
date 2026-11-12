@@ -369,7 +369,7 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   imágenes del panel web, y el clic derecho sobre la imagen grande (aunque
   Google la tape con un vínculo), agregan a los medios la imagen original.
 - **Imágenes y GIF de Google.** El botón **🖼 Imágenes** de la barra de medios
-  abre Google Imágenes en el panel web (en castellano, con todos sus filtros), y
+  abre Google Imágenes en el panel web (en español, con todos sus filtros), y
   el panel tiene una fila para escribir qué buscás, con **🖼 Imágenes**, **🎞 GIF**
   (sólo animados) y «Sólo licencia libre» (el filtro «Derechos de uso» de
   Google). Con clic derecho sobre una imagen (aunque sea una miniatura sin abrir)
@@ -578,7 +578,7 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 - **Actualizaciones automáticas.** Una vez por día, a los pocos segundos de
   abrir, EcclesiaCast mira en GitHub si hay una versión nueva y, si la hay,
-  abre un aviso con lo que trae, en castellano, y tres botones: **Actualizar
+  abre un aviso con lo que trae, en español, y tres botones: **Actualizar
   ahora**, **Más tarde** y **Saltar esta versión**. Actualizar baja el
   instalador (con barra de avance y **Cancelar**), comprueba que el archivo sea
   el publicado (tamaño, SHA-256 y, cuando el programa instalado esté firmado,
@@ -590,7 +590,7 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   contesta, no avisa de nada. En **Ayuda** están **Buscar actualizaciones…**
   (busca en el momento) y **Buscar actualizaciones al abrir** (se apaga ahí).
   Las notas de cada versión publicada pasan a ser esta lista de cambios, en
-  castellano, en lugar de los títulos de los commits.
+  español, en lugar de los títulos de los commits.
 
 - **Proyectar una página web.** El botón **🌐 Web** de la barra de medios abre
   una página en el cuadro central, en lugar de las diapositivas: la usás con el
@@ -847,7 +847,7 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 - **El error de una imagen de Google se nota.** Si no se pudo agregar, la barra
   de abajo parpadea en rojo y el mensaje se destaca unos segundos.
 - **La fecha del evento se elige en un calendario.** Ya no se escribe a mano:
-  un selector de fecha en castellano, con ✕ para sacarla.
+  un selector de fecha en español, con ✕ para sacarla.
 - **Se sacaron el brillo y el tinte de Propiedades.** Ya no se dibujan; un
   medio que los tenía se ve sin ellos.
 - **El tiempo de una imagen se ve en la barra de reproducción.** «Cuánto tiempo
@@ -1211,7 +1211,7 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   MB, con una barra de progreso la primera vez), lo actualiza cada tres días y, si YouTube lo rechaza, lo actualiza y
   vuelve a intentar. La sesión de YouTube de la iglesia se la pide al
   navegador del programa, en lugar de leer el archivo que Windows tiene
-  bloqueado. Si igual falla, el aviso lo explica en castellano y recuerda que
+  bloqueado. Si igual falla, el aviso lo explica en español y recuerda que
   el video se puede proyectar por internet.
 - **Playlist que mostraba siempre lo primero**: si en el buscador de
   canciones quedaba algo escrito, las canciones de la playlist que no
