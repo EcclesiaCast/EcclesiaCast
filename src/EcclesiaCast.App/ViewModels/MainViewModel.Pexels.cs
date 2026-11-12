@@ -60,6 +60,11 @@ public sealed partial class MainViewModel
         catch (HttpRequestException ex)
         {
             Log.Information(ex, "No se pudo buscar en Pexels");
+
+            // The address of the service does not exist yet (it is not
+            // published): that is not the operator's connection.
+            if (ex.InnerException is System.Net.Sockets.SocketException { SocketErrorCode: System.Net.Sockets.SocketError.HostNotFound })
+                throw new PexelsSearchException("La búsqueda de fondos todavía no está disponible.");
             throw new PexelsSearchException("No se pudo conectar con la búsqueda. Revisá la conexión a internet.");
         }
         catch (TaskCanceledException) when (!cancel.IsCancellationRequested)

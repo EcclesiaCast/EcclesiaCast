@@ -173,11 +173,10 @@ public sealed partial class MainViewModel
         if (_downloadingBackgroundPack)
             return;
 
-        var answer = MessageBox.Show(
-            "Se van a bajar 9 fondos en video (unos 22 MB) desde GitHub y a agregar a la pestaña «"
-            + BackgroundPack.Tab + "». ¿Seguimos?",
-            "Bajar más fondos", MessageBoxButton.YesNo, MessageBoxImage.Question);
-        if (answer != MessageBoxResult.Yes)
+        if (!Notice.Confirm(
+                "Se van a bajar 9 fondos en video (unos 22 MB) desde GitHub y a agregar a la pestaña «"
+                + BackgroundPack.Tab + "».",
+                "Bajar los fondos", "Ahora no", title: "Bajar más fondos"))
             return;
 
         _downloadingBackgroundPack = true;
