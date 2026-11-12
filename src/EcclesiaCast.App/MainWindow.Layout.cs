@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Input;
+using EcclesiaCast.App.Services;
 
 namespace EcclesiaCast.App;
 
@@ -424,8 +425,7 @@ public partial class MainWindow
         }
         catch
         {
-            MessageBox.Show($"No se pudo abrir el navegador. La guía está en:\n\n{GuideUrl}",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Information);
+            Notice.Show($"La guía está en:\n\n{GuideUrl}", "No se pudo abrir el navegador");
         }
     }
 
@@ -438,8 +438,7 @@ public partial class MainWindow
         }
         catch
         {
-            MessageBox.Show($"No se pudo abrir el navegador. La página está en:\n\n{EcclesiaCast.App.Services.AppInfo.DonateUrl}",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Information);
+            Notice.Show($"La página está en:\n\n{EcclesiaCast.App.Services.AppInfo.DonateUrl}", "No se pudo abrir el navegador");
         }
     }
 
