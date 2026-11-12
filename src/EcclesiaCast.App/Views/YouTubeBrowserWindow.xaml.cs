@@ -32,10 +32,10 @@ public partial class YouTubeBrowserWindow : Window
         catch (Exception ex)
         {
             Log.Error(ex, "No se pudo abrir el navegador de YouTube");
-            MessageBox.Show(
-                "No se pudo abrir el navegador embebido.\n\n" +
+            Notice.Show(
                 "Instalá el runtime de WebView2 (Microsoft Edge WebView2) y volvé a intentar.",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
+                "No se pudo abrir el navegador embebido",
+                NoticeKind.Warning);
             Close();
         }
     }
@@ -60,9 +60,7 @@ public partial class YouTubeBrowserWindow : Window
         var id = YouTubeUrl.TryParseVideoId(Browser.Source?.ToString());
         if (id is null)
         {
-            MessageBox.Show(
-                "Abrí primero el video que querés agregar (la página tiene que ser la del video).",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Information);
+            Notice.Show("Abrí primero el video que querés agregar (la página tiene que ser la del video).");
             return;
         }
 

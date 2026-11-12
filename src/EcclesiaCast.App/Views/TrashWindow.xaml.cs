@@ -74,10 +74,10 @@ public partial class TrashWindow : Window
         if (Selected is not { } entry)
             return;
 
-        var answer = MessageBox.Show(this,
+        var answer = EcclesiaCast.App.Services.Notice.Confirm(
             $"¿Borrar del todo «{entry.Title}»?\n\nEsto no se puede deshacer.",
-            "EcclesiaCast", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No);
-        if (answer != MessageBoxResult.Yes)
+            "Borrar del todo", destructive: true);
+        if (!answer)
             return;
 
         if (entry.IsSong)
@@ -90,10 +90,10 @@ public partial class TrashWindow : Window
     private void Empty_Click(object sender, RoutedEventArgs e)
     {
         var count = TrashList.Items.Count;
-        var answer = MessageBox.Show(this,
+        var answer = EcclesiaCast.App.Services.Notice.Confirm(
             $"¿Vaciar la papelera? Se borran del todo {count} elemento(s).\n\nEsto no se puede deshacer.",
-            "EcclesiaCast", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No);
-        if (answer != MessageBoxResult.Yes)
+            "Vaciar la papelera", destructive: true);
+        if (!answer)
             return;
 
         var far = DateTime.UtcNow.AddYears(100);

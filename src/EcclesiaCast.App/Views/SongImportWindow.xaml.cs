@@ -291,9 +291,7 @@ public partial class SongImportWindow : Window
             var single = ProPresenterLocator.ReadFolder(folder);
             if (single.SongCount == 0)
             {
-                MessageBox.Show(
-                    "En esa carpeta no hay archivos .pro de ProPresenter.",
-                    "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Information);
+                Notice.Show("En esa carpeta no hay archivos .pro de ProPresenter.");
                 return false;
             }
             libraries = [single];
@@ -313,9 +311,7 @@ public partial class SongImportWindow : Window
     {
         if (EasyWorshipDatabase.FindFiles(folder) is null)
         {
-            MessageBox.Show(
-                "En esa carpeta no están los archivos Songs.db y SongWords.db de EasyWorship.",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Information);
+            Notice.Show("En esa carpeta no están los archivos Songs.db y SongWords.db de EasyWorship.");
             return false;
         }
 
@@ -354,8 +350,7 @@ public partial class SongImportWindow : Window
         var chosen = Rows.Where(r => r.Selected).ToList();
         if (chosen.Count == 0)
         {
-            MessageBox.Show("Marcá al menos una biblioteca.", "EcclesiaCast",
-                MessageBoxButton.OK, MessageBoxImage.Information);
+            Notice.Show("Marcá al menos una biblioteca.");
             return;
         }
 
@@ -467,9 +462,7 @@ public partial class SongImportWindow : Window
                     ? "Todas ya estaban en tu biblioteca y las descartaste."
                     : "No se pudo leer ninguna. El detalle está en el registro de la aplicación.";
 
-            MessageBox.Show(
-                $"No se importó ninguna canción.\n\n{reason}",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
+            Notice.Show(reason, "No se importó ninguna canción", NoticeKind.Warning);
         }
 
         DialogResult = true;
