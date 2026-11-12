@@ -442,13 +442,11 @@ public sealed partial class MainViewModel
         if (SelectedSong is null)
             return;
 
-        var confirm = MessageBox.Show(
+        var confirm = Notice.Confirm(
             $"¿Eliminar \"{SelectedSong.Title}\" de la biblioteca?\n\n"
             + "Va a la papelera y se guarda 30 días: la podés recuperar desde Edición → Papelera.",
-            "EcclesiaCast",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Question);
-        if (confirm != MessageBoxResult.Yes)
+            "Mandar a la papelera");
+        if (!confirm)
             return;
 
         _songs.Delete(SelectedSong.Id);

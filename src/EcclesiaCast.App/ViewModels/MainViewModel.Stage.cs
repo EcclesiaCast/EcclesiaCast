@@ -167,11 +167,11 @@ public sealed partial class MainViewModel
 
         if (SelectedStageDisplay.Info.DeviceName == SelectedDisplay?.Info.DeviceName)
         {
-            MessageBox.Show(
-                "El escenario y la salida no pueden ir en la misma pantalla: la vista de los "
-                + "músicos taparía lo que ve la congregación.\n\n"
+            Notice.Show(
+                "La vista de los músicos taparía lo que ve la congregación.\n\n"
                 + "Elegí otro monitor para el escenario.",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
+                "El escenario y la salida no pueden ir en la misma pantalla",
+                NoticeKind.Warning);
             return;
         }
 
@@ -180,12 +180,11 @@ public sealed partial class MainViewModel
         // out, before it happens.
         if (IsOperatorDisplay(SelectedStageDisplay.Info))
         {
-            var answer = MessageBox.Show(
+            var answer = Notice.Confirm(
                 "El escenario va a ocupar esta misma pantalla y va a tapar el panel del operador.\n\n"
-                + "Para cerrarlo, hacé doble clic sobre él.\n\n"
-                + "¿Lo prendo igual?",
-                "EcclesiaCast", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No);
-            if (answer != MessageBoxResult.Yes)
+                + "Para cerrarlo, hacé doble clic sobre él.",
+                "Prender igual", "Cancelar", destructive: true);
+            if (!answer)
                 return;
         }
 
