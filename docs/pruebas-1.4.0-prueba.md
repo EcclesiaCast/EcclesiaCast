@@ -1,6 +1,6 @@
 # Qué probar en la 1.4.0 de prueba (11/11/2026)
 
-Instalador: `dist\EcclesiaCast-1.4.0-prueba.3-setup.exe` (158 MB). No está
+Instalador: `dist\EcclesiaCast-1.4.0-prueba.4-setup.exe` (158 MB). No está
 publicado en ningún lado. Se instala encima de las anteriores.
 
 - La prueba.2 arregla que «Seguir la canción» no abría ninguna entrada y que
@@ -10,8 +10,10 @@ publicado en ningún lado. Se instala encima de las anteriores.
   con su explicación. Hasta que publiques el servicio en Cloudflare
   (`servicios/api/LEEME.md`) no cuenta nada, y no tiene que dar ningún
   error ni aviso por eso.
+- La prueba.4 suma **los avisos con el aspecto del programa** y **los fondos
+  de Pexels** (ver las secciones 5 y 6, al final).
 
-**Nada de esto se probó con el programa abierto.** Compila, pasan las 1.301
+**Nada de esto se probó con el programa abierto.** Compila, pasan las 1.327
 pruebas y el reconocedor de voz se probó contra el audio de tres cultos, pero
 ninguna ventana nueva se usó con el mouse. Lo esperable es encontrar detalles.
 
@@ -103,6 +105,43 @@ prendé el parlante). Tiene que volver a sonar solo en un segundo.
   menú de siempre.
 - **Errores sin cartel.** No se puede provocar a mano; si alguna vez aparece
   abajo «Hubo un error; el programa sigue», avisame y miro el registro.
+
+## 5. Avisos con el aspecto del programa
+
+Todos los carteles grises de Windows ahora son una ventana oscura del
+programa, con botones que dicen lo que hacen. Para verlos sin romper nada:
+
+1. **Temas:** cambiá algo en un tema y cerrá con la X → «Guardar / No
+   guardar / Seguir editando». Probá las tres.
+2. **Temas:** creá un tema nuevo y eliminalo → aviso amarillo con «Mandar a
+   la papelera» en rojo. Después restauralo desde Edición → Papelera.
+3. **Papelera:** «Vaciar la papelera» pregunta antes.
+4. **Archivo → «Bajar más fondos de internet…»** → «Bajar los fondos / Ahora
+   no» (podés decir «Ahora no»).
+5. Qué mirar en cada uno: que se lea entero, que **Enter** elija el botón
+   azul o rojo, que **Esc** cancele, y que aparezca encima de la ventana
+   desde donde lo abriste (no detrás).
+
+## 6. Fondos de Pexels
+
+**Antes de publicar el servicio:** tocá **🎞 Fondos** en la barra de medios,
+buscá «cruz» → tiene que decir «La búsqueda de fondos todavía no está
+disponible», sin errores raros.
+
+**Después de publicarlo** (`servicios/api/LEEME.md`: sacás la clave gratis en
+pexels.com/api y hacés los cinco pasos en Cloudflare):
+
+1. 🎞 Fondos → buscá «cruz atardecer». Aparecen tarjetas con la imagen, la
+   duración y quién lo hizo.
+2. Cambiá a **Fotos** → busca fotos con la misma palabra.
+3. «Ver más resultados» trae más.
+4. Elegí dos o tres con un clic (se marcan en azul), elegí la pestaña abajo y
+   tocá **Bajar 3**. Mientras baja dice el porcentaje.
+5. Aparecen en esa pestaña de medios, con miniatura, y se proyectan como
+   cualquier fondo. **Mirá que el video ande en bucle y se vea nítido en el
+   proyector.**
+6. Buscá lo mismo otra vez: los que ya bajaste dicen «Ya está en tus medios».
+7. Abajo a la izquierda, «Fotos y videos de Pexels» abre la página de Pexels.
 
 ## Si algo falla
 
