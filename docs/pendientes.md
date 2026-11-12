@@ -456,11 +456,15 @@ las respuestas automáticas de la tabla); toca dar estos pasos.
       con el aspecto gris de Windows. Una ventana de aviso con el aspecto del
       programa (oscura, botones propios, textos de los botones en español
       y no «Sí / No / Cancelar»), y reemplazarlos de a poco. Mediano.
-- [ ] **Bajar fondos de Pexels desde el programa.** Pexels tiene una API
-      gratuita (hace falta pedir una clave; límite de 200 pedidos por hora) y
-      sus videos se pueden usar gratis; pide mostrar «Videos de Pexels» y el
-      nombre del autor. Una ventana como la de YouTube: buscar, ver la
-      vista previa, bajar a la pestaña elegida. Mediano.
+- [ ] **Bajar fondos de Pexels desde el programa.** **Programado** (12/11,
+      e626d8c): botón «🎞 Fondos» en Medios y Archivo → «Buscar fondos en
+      Pexels…». La clave de Pexels no puede ir en el programa (código
+      público): la búsqueda pasa por nuestro servicio `api.ecclesiacast.org`
+      (`servicios/api/`, el mismo del contador), que guarda la clave y
+      recuerda cada búsqueda un día. Probado con un servicio de prueba y la
+      ventana dibujada a imagen; **falta**: que Alexis saque la clave en
+      pexels.com/api y publique el servicio (`servicios/api/LEEME.md`), y
+      probar la descarga de verdad con el programa abierto.
 - [ ] **Saber cuántas iglesias lo usan por fin de semana.** Alexis eligió el
       contador anónimo (11/11/2026). **Programado**: cuenta la primera
       proyección de cada día (no la apertura), con un interruptor en Ajustes
