@@ -802,6 +802,25 @@ public partial class MainWindow : Window
         new Views.TransitionsWindow(_settings) { Owner = owner }.ShowDialog();
     }
 
+    private Views.PexelsWindow? _pexelsWindow;
+
+    /// <summary>«Buscar fondos en Pexels»: one window, beside this one, that keeps its results.</summary>
+    private void Pexels_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm)
+            return;
+
+        if (_pexelsWindow is { IsLoaded: true })
+        {
+            _pexelsWindow.Activate();
+            return;
+        }
+
+        _pexelsWindow = new Views.PexelsWindow(vm) { Owner = this };
+        _pexelsWindow.Closed += (_, _) => _pexelsWindow = null;
+        _pexelsWindow.Show();
+    }
+
     private Views.ListeningWindow? _listeningWindow;
 
     private void Listening_Click(object sender, RoutedEventArgs e) => OpenListening();

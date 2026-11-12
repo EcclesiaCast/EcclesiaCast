@@ -7,6 +7,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Buscar fondos en Pexels.** El botón **🎞 Fondos** de la barra de medios
+  (y Archivo → «Buscar fondos en Pexels…») busca videos y fotos de fondo que
+  se pueden usar gratis. Elegís los que quieras con un clic y se bajan a la
+  pestaña que digas, listos para usar. Los que ya tenés aparecen marcados.
+
 - **Cuenta anónima de uso.** La primera vez que se proyecta algo en el día,
   el programa avisa que esta instalación se usó, con un número al azar, el
   día y la versión: nada de la iglesia ni de lo que se proyecta, y no se
