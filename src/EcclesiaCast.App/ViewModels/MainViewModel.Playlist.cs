@@ -136,10 +136,10 @@ public sealed partial class MainViewModel
     {
         if (SelectedPlaylist is null)
             return;
-        var confirm = MessageBox.Show(
+        var confirm = Notice.Confirm(
             $"¿Eliminar la playlist \"{SelectedPlaylist.Name}\"?",
-            "EcclesiaCast", MessageBoxButton.YesNo, MessageBoxImage.Question);
-        if (confirm != MessageBoxResult.Yes)
+            "Eliminar", destructive: true);
+        if (!confirm)
             return;
         _playlists.Delete(SelectedPlaylist.Id);
         SelectedPlaylist = null;

@@ -73,9 +73,10 @@ public partial class App : Application
             else
             {
                 // Start-up error: nobody is using the program yet, so a dialog is fine.
-                MessageBox.Show(
-                    $"Ocurrió un error inesperado:\n\n{args.Exception.Message}",
-                    "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Error);
+                Notice.Show(
+                    args.Exception.Message,
+                    "Ocurrió un error inesperado",
+                    NoticeKind.Error);
             }
             args.Handled = true;
         };
@@ -102,21 +103,20 @@ public partial class App : Application
         if (restore.Restored)
         {
             Log.Information("Biblioteca restaurada desde una copia de seguridad");
-            MessageBox.Show(
-                "Se restauró la copia de seguridad.\n\n"
-                + "Por las dudas, la biblioteca que tenías antes quedó guardada en:\n\n"
+            Notice.Show(
+                "Por las dudas, la biblioteca que tenías antes quedó guardada en:\n\n"
                 + DatabaseBackup.ReplacedLibraryPath(dbPath),
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Information);
+                "Se restauró la copia de seguridad");
         }
         else if (restore.WasStaged)
         {
             Log.Error("No se pudo aplicar la restauración pendiente: {Error}", restore.Error);
-            MessageBox.Show(
-                "No se pudo restaurar la copia: algo está usando la biblioteca.\n\n"
-                + "Suele ser otra ventana de EcclesiaCast abierta. Cerralas todas y volvé a abrir el "
+            Notice.Show(
+                "Suele ser otra ventana de EcclesiaCast abierta. Cerralas todas y volvé a abrir el "
                 + "programa; la copia sigue esperando y se restaura sola.\n\n"
                 + $"Detalle: {restore.Error}",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
+                "No se pudo restaurar la copia: algo está usando la biblioteca",
+                NoticeKind.Warning);
         }
 
         using (var db = new AppDbContext(dbPath))

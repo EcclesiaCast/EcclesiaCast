@@ -73,6 +73,10 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   bajo rendimiento, las actualizaciones y el aspecto. Por ahora usa los mismos
   ajustes que los menús, que siguen donde estaban.
 
+- **Avisos y preguntas con diseño propio.** Los avisos y preguntas del
+  programa tienen su diseño (oscuros, con botones que dicen lo que hacen) en
+  vez de los carteles grises de Windows.
+
 ### Corregido
 
 - **«Seguir la canción» no podía abrir ninguna entrada de sonido** y decía

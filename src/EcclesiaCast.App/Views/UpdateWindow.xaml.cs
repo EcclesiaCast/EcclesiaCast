@@ -144,11 +144,9 @@ public partial class UpdateWindow : Window
     /// </summary>
     private bool ConfirmClosingProjection() =>
         !_isProjecting()
-        || MessageBox.Show(
-            this,
-            "Se va a cerrar la proyección para actualizar. ¿Seguimos?",
-            "Actualizar EcclesiaCast", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No)
-            == MessageBoxResult.Yes;
+        || EcclesiaCast.App.Services.Notice.Confirm(
+            "Se va a cerrar la proyección para actualizar.",
+            "Actualizar", "Ahora no", "Actualizar EcclesiaCast");
 
     private async Task UpdateAsync()
     {

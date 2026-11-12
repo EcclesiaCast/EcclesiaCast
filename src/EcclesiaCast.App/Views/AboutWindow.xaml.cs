@@ -5,7 +5,7 @@ namespace EcclesiaCast.App.Views;
 
 /// <summary>
 /// Who made the program and why, in the same dark style as the other small
-/// windows (a plain MessageBox looked like a system error next to them). The
+/// windows (a plain system message box looked like an error next to them). The
 /// very first time the program opens it is shown on its own, and then the
 /// button says «Aceptar» instead of «Cerrar»: nobody asked to see it, so it
 /// should ask for a go-ahead rather than look like something to dismiss.

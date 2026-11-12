@@ -121,9 +121,7 @@ public sealed partial class MainViewModel
         {
             Log.Error(ex, "Falló la exportación del paquete de Biblias a {Path}", path);
             StatusText = "No se pudo guardar el paquete de Biblias.";
-            MessageBox.Show(
-                $"No se pudo guardar el archivo:\n\n{ex.Message}",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Error);
+            Notice.Show(ex.Message, "No se pudo guardar el archivo", NoticeKind.Error);
             return;
         }
 
@@ -159,17 +157,13 @@ public sealed partial class MainViewModel
         catch (Exception ex) when (ex is IOException or FormatException or UnauthorizedAccessException)
         {
             Log.Warning(ex, "No se pudo leer el paquete de Biblias {Path}", path);
-            MessageBox.Show(
-                $"No se pudo leer el paquete:\n\n{ex.Message}",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Error);
+            Notice.Show(ex.Message, "No se pudo leer el paquete", NoticeKind.Error);
             return;
         }
 
         if (entries.Count == 0)
         {
-            MessageBox.Show(
-                "El paquete no trae ninguna Biblia.",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
+            Notice.Show("El paquete no trae ninguna Biblia.", kind: NoticeKind.Warning);
             return;
         }
 
@@ -220,9 +214,7 @@ public sealed partial class MainViewModel
         };
         if (failed.Count > 0)
         {
-            MessageBox.Show(
-                $"No se pudo leer: {string.Join(", ", failed)}.",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
+            Notice.Show($"No se pudo leer: {string.Join(", ", failed)}.", kind: NoticeKind.Warning);
         }
 
         Log.Information("Paquete de Biblias importado: {Imported} (fallaron {Failed})",

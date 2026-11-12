@@ -606,21 +606,11 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
 
     private static bool? AskWithDialog(string themeName)
     {
-        var answer = MessageBox.Show(
+        return Notice.Choose(
             $"Cambiaste el tema «{themeName}» y todavía no lo guardaste.\n\n"
-            + "¿Querés guardar los cambios?\n\n"
-            + "Sí — se guardan.\n"
-            + "No — el tema queda como estaba.\n"
-            + "Cancelar — seguís editándolo.",
-            "EcclesiaCast", MessageBoxButton.YesNoCancel, MessageBoxImage.Question,
-            MessageBoxResult.Yes);
-
-        return answer switch
-        {
-            MessageBoxResult.Yes => true,
-            MessageBoxResult.No => false,
-            _ => null,
-        };
+            + "Si no lo guardás, el tema queda como estaba.",
+            "Guardar", "No guardar", "Seguir editando",
+            "¿Guardar los cambios?");
     }
 
     /// <summary>Puts the fields back as the theme is saved.</summary>
@@ -658,17 +648,15 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         if (designed.Count > 6)
             names += $"\n  • …y {designed.Count - 6} más";
 
-        var answer = MessageBox.Show(
+        var answer = Notice.Confirm(
             $"{designed.Count} canción(es) que usan «{theme.Name}» tienen diseño propio "
             + "(tipografía, tamaño, colores o caja cambiados a mano):\n\n"
             + names
-            + "\n\n¿Querés que también tomen este tema?\n\n"
-            + "Sí — pierden su diseño propio y siguen el tema.\n"
-            + "No — quedan como las dejaste.",
-            "EcclesiaCast", MessageBoxButton.YesNo, MessageBoxImage.Question,
-            MessageBoxResult.No);
+            + "\n\nSi las pasás al tema, pierden su diseño propio y siguen el tema.",
+            "Pasarlas al tema", "Dejarlas como están",
+            "¿Querés que también tomen este tema?");
 
-        if (answer != MessageBoxResult.Yes)
+        if (!answer)
             return;
 
         foreach (var song in designed)
@@ -795,16 +783,15 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
 
         if (Rows.Count <= 1)
         {
-            MessageBox.Show("Tiene que quedar al menos un tema.", "EcclesiaCast",
-                MessageBoxButton.OK, MessageBoxImage.Information);
+            Notice.Show("Tiene que quedar al menos un tema.");
             return;
         }
 
-        var confirm = MessageBox.Show(
+        var confirm = Notice.Confirm(
             $"¿Eliminar el tema \"{SelectedRow.Name}\"? Las canciones que lo usen vuelven al tema por defecto.\n\n"
             + "Va a la papelera y se guarda 30 días (Edición → Papelera).",
-            "EcclesiaCast", MessageBoxButton.YesNo, MessageBoxImage.Question);
-        if (confirm != MessageBoxResult.Yes)
+            "Eliminar", destructive: true);
+        if (!confirm)
             return;
 
         _themes.Delete(SelectedRow.Theme.Id);

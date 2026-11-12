@@ -204,10 +204,10 @@ public partial class LogoManagerWindow : Window
         if (Current is not { } logo)
             return;
 
-        var confirm = MessageBox.Show(
+        var confirm = Notice.Confirm(
             $"¿Eliminar el logo \"{logo.Name}\"?",
-            "EcclesiaCast", MessageBoxButton.YesNo, MessageBoxImage.Question);
-        if (confirm != MessageBoxResult.Yes)
+            "Eliminar", destructive: true);
+        if (!confirm)
             return;
 
         MediaThumbnails.Delete(logo.PosterPath);
