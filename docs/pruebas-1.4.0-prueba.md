@@ -8,7 +8,7 @@ publicado en ningún lado. Se instala encima de las anteriores.
 - La prueba.3 suma la cuenta anónima de uso. **Mirá** Ajustes →
   Actualizaciones: está el interruptor «Contar en forma anónima que se usó»
   con su explicación. Hasta que publiques el servicio en Cloudflare
-  (`servicios/contador/LEEME.md`) no cuenta nada, y no tiene que dar ningún
+  (`servicios/api/LEEME.md`) no cuenta nada, y no tiene que dar ningún
   error ni aviso por eso.
 
 **Nada de esto se probó con el programa abierto.** Compila, pasan las 1.301

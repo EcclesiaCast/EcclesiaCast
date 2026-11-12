@@ -464,9 +464,9 @@ las respuestas automáticas de la tabla); toca dar estos pasos.
 - [ ] **Saber cuántas iglesias lo usan por fin de semana.** Alexis eligió el
       contador anónimo (11/11/2026). **Programado**: cuenta la primera
       proyección de cada día (no la apertura), con un interruptor en Ajustes
-      → Actualizaciones; el servicio está en `servicios/contador/` con sus
+      → Actualizaciones; el servicio está en `servicios/api/` con sus
       pruebas. **Falta que Alexis lo publique en Cloudflare** siguiendo
-      `servicios/contador/LEEME.md` (cinco pasos en el panel), y fusionar el
+      `servicios/api/LEEME.md` (cinco pasos en el panel), y fusionar el
       cambio de la página de privacidad cuando salga la versión. Los dos
       caminos que se plantearon:
       1. *Contador anónimo:* el programa ya pregunta una vez por día si hay

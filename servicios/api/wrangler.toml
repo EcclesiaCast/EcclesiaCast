@@ -1,0 +1,12 @@
+# Servicio de EcclesiaCast (contador y fondos de Pexels). Pasos en LEEME.md.
+name = "ecclesiacast-api"
+main = "worker.js"
+compatibility_date = "2026-11-01"
+
+routes = [{ pattern = "api.ecclesiacast.org", custom_domain = true }]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "ecclesiacast-api"
+# El id de la base D1 «ecclesiacast-api» (ver LEEME.md).
+database_id = "COMPLETAR"
