@@ -4,8 +4,8 @@
 //   POST /v1/uso      el programa avisa «esta instalación proyectó algo hoy»
 //   GET  /v1/resumen  cuántas instalaciones se usaron por semana y por fin
 //                     de semana (pide la clave RESUMEN_CLAVE)
-//   GET  /v1/fondos   busca videos o fotos de fondo en Pexels con la clave
-//                     de EcclesiaCast (PEXELS_CLAVE), que nunca sale de acá
+//   GET  /v1/fondos   busca videos o fotos de fondo en Pixabay con la clave
+//                     de EcclesiaCast (PIXABAY_KEY), que nunca sale de acá
 //
 // No se guarda la dirección IP ni ningún dato de la persona.
 
@@ -82,7 +82,7 @@ th{color:#F4B942;font-weight:600}td:first-child,th:first-child{text-align:left}h
 <table><tr><th>Versión</th><th>Instalaciones</th></tr>${versiones}</table></html>`;
 }
 
-// ── Fondos de Pexels ────────────────────────────────────────────────────
+// ── Fondos de Pixabay ────────────────────────────────────────────────────
 
 const POR_PAGINA = 24;
 
@@ -97,64 +97,75 @@ export function pedidoDeFondos(url) {
 
 /**
  * El archivo de video que conviene bajar: el más grande que no pase de
- * 1920 de ancho (un proyector no muestra más), en mp4.
+ * 1920 de ancho (un proyector no muestra más). Pixabay ofrece cuatro
+ * tamaños (large, medium, small, tiny); algunos vienen vacíos.
  */
-export function mejorArchivo(archivos) {
-  const mp4 = (archivos ?? []).filter((a) => a.file_type === "video/mp4" && a.width && a.link);
-  const caben = mp4.filter((a) => a.width <= 1920);
-  const elegidos = caben.length > 0 ? caben : mp4;
+export function mejorArchivo(tamanos) {
+  const todos = Object.values(tamanos ?? {}).filter((a) => a && a.url && a.width);
+  const caben = todos.filter((a) => a.width <= 1920);
+  const elegidos = caben.length > 0 ? caben : todos;
   elegidos.sort((a, b) => (caben.length > 0 ? b.width - a.width : a.width - b.width));
   const a = elegidos[0];
-  return a ? { url: a.link, ancho: a.width, alto: a.height } : null;
+  return a ? { url: a.url, ancho: a.width, alto: a.height, miniatura: a.thumbnail } : null;
 }
 
-/** Lo que devuelve Pexels, con sólo lo que el programa necesita. */
-export function resumirPexels(tipo, datos) {
-  const lista = tipo === "fotos" ? datos.photos ?? [] : datos.videos ?? [];
+const autorUrl = (x) => (x.user && x.user_id ? `https://pixabay.com/users/${encodeURIComponent(x.user)}-${x.user_id}/` : undefined);
+
+/** Lo que devuelve Pixabay, con sólo lo que el programa necesita. */
+export function resumirPixabay(tipo, datos, pagina = 1) {
+  const lista = datos.hits ?? [];
   const resultados = lista
-    .map((x) => tipo === "fotos"
-      ? {
-          id: x.id, tipo: "foto", ancho: x.width, alto: x.height, duracion: 0,
-          miniatura: x.src?.medium, autor: x.photographer, autorUrl: x.photographer_url, paginaUrl: x.url,
-          archivo: x.src?.large2x ? { url: x.src.large2x, ancho: Math.min(x.width, 1880), alto: 0 } : null,
-        }
-      : {
-          id: x.id, tipo: "video", ancho: x.width, alto: x.height, duracion: x.duration,
-          miniatura: x.image, autor: x.user?.name, autorUrl: x.user?.url, paginaUrl: x.url,
-          archivo: mejorArchivo(x.video_files),
-        })
+    .map((x) => {
+      if (tipo === "fotos") {
+        return {
+          id: x.id, tipo: "foto", ancho: x.imageWidth, alto: x.imageHeight, duracion: 0,
+          miniatura: x.webformatURL, autor: x.user, autorUrl: autorUrl(x), paginaUrl: x.pageURL,
+          archivo: x.largeImageURL ? { url: x.largeImageURL, ancho: Math.min(x.imageWidth, 1280), alto: 0 } : null,
+        };
+      }
+      const archivo = mejorArchivo(x.videos);
+      return {
+        id: x.id, tipo: "video", ancho: archivo?.ancho ?? 0, alto: archivo?.alto ?? 0, duracion: x.duration,
+        miniatura: archivo?.miniatura, autor: x.user, autorUrl: autorUrl(x), paginaUrl: x.pageURL,
+        archivo: archivo ? { url: archivo.url, ancho: archivo.ancho, alto: archivo.alto } : null,
+      };
+    })
     .filter((r) => r.archivo && r.miniatura);
-  return { resultados, hayMas: Boolean(datos.next_page) };
+  return { resultados, hayMas: pagina * POR_PAGINA < (datos.totalHits ?? 0) };
 }
 
 async function buscarFondos(url, env, ctx) {
   const pedido = pedidoDeFondos(url);
   if (!pedido) return Response.json({ error: "Escribí qué buscar (de 2 a 60 letras)." }, { status: 400 });
-  if (!env.PEXELS_CLAVE) return Response.json({ error: "Falta la clave de Pexels." }, { status: 503 });
+  if (!env.PIXABAY_KEY) return Response.json({ error: "Falta la clave de Pixabay." }, { status: 503 });
 
-  // La misma búsqueda se contesta de la memoria de Cloudflare por un día:
-  // así la clave no se pasa de los 200 pedidos por hora.
+  // Pixabay pide guardar cada respuesta 24 horas: la misma búsqueda se
+  // contesta de la memoria de Cloudflare por un día (y la clave no se pasa
+  // de los 100 pedidos por minuto).
   const clave = new Request(`https://api.ecclesiacast.org/cache/fondos?q=${encodeURIComponent(pedido.q)}&tipo=${pedido.tipo}&pagina=${pedido.pagina}`);
   const memoria = caches.default;
   const guardada = await memoria.match(clave);
   if (guardada) return guardada;
 
-  const base = pedido.tipo === "fotos" ? "https://api.pexels.com/v1/search" : "https://api.pexels.com/videos/search";
-  const pexels = new URL(base);
-  pexels.searchParams.set("query", pedido.q);
-  pexels.searchParams.set("orientation", "landscape");
-  pexels.searchParams.set("per_page", String(POR_PAGINA));
-  pexels.searchParams.set("page", String(pedido.pagina));
-  pexels.searchParams.set("locale", "es-ES");
-  if (pedido.tipo === "videos") pexels.searchParams.set("size", "medium");
+  const pixabay = new URL(pedido.tipo === "fotos" ? "https://pixabay.com/api/" : "https://pixabay.com/api/videos/");
+  pixabay.searchParams.set("key", env.PIXABAY_KEY);
+  pixabay.searchParams.set("q", pedido.q);
+  pixabay.searchParams.set("lang", "es");
+  pixabay.searchParams.set("safesearch", "true");
+  pixabay.searchParams.set("per_page", String(POR_PAGINA));
+  pixabay.searchParams.set("page", String(pedido.pagina));
+  if (pedido.tipo === "fotos") {
+    pixabay.searchParams.set("image_type", "photo");
+    pixabay.searchParams.set("orientation", "horizontal");
+  }
 
-  const respuesta = await fetch(pexels, { headers: { Authorization: env.PEXELS_CLAVE } });
+  const respuesta = await fetch(pixabay);
   if (respuesta.status === 429)
-    return Response.json({ error: "Hubo muchas búsquedas en la última hora. Probá en un rato." }, { status: 429 });
+    return Response.json({ error: "Hubo muchas búsquedas en el último minuto. Probá en un rato." }, { status: 429 });
   if (!respuesta.ok)
-    return Response.json({ error: "Pexels no respondió. Probá de nuevo." }, { status: 502 });
+    return Response.json({ error: "Pixabay no respondió. Probá de nuevo." }, { status: 502 });
 
-  const cuerpo = Response.json(resumirPexels(pedido.tipo, await respuesta.json()), {
+  const cuerpo = Response.json(resumirPixabay(pedido.tipo, await respuesta.json(), pedido.pagina), {
     headers: { "cache-control": "public, max-age=86400" },
   });
   ctx?.waitUntil?.(memoria.put(clave, cuerpo.clone()));

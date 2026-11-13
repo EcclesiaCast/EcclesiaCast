@@ -473,7 +473,11 @@ las respuestas automáticas de la tabla); toca dar estos pasos.
       currently paused»). Se cambia por **Pixabay** (videos e imágenes
       gratis, clave al instante con una cuenta, pide guardar cada búsqueda
       24 h y bajar los archivos en vez de enlazarlos: justo lo que hace el
-      servicio). Lo programa una sesión aparte con Sonnet.
+      servicio). **Hecho el 13/11**: el servicio (`worker.js`, secreto `PIXABAY_KEY`),
+      el lector del programa y todos los textos pasaron a Pixabay; la ventana
+      dice «Fotos y videos de Pixabay» con enlace. Compila y pasan las
+      pruebas. **Falta**: sacar la clave en pixabay.com/api/docs, publicar el
+      servicio y probar la descarga de verdad.
 - [ ] **Saber cuántas iglesias lo usan por fin de semana.** Alexis eligió el
       contador anónimo (11/11/2026). **Programado**: cuenta la primera
       proyección de cada día (no la apertura), con un interruptor en Ajustes
@@ -512,7 +516,7 @@ prueba). Lo que quedó:
       sin esperar respuesta y el botón no tenía qué hacer. Arreglado el 13/11.
 - [x] **Aviso de Biblias que ya estaban** (9): ahora en una ventana (ver
       arriba).
-- [ ] **Pexels no da claves** (11): se pasa a Pixabay (ver arriba).
+- [x] **Pexels no da claves** (11): se pasó a Pixabay (ver arriba).
 - [ ] **El menú Archivo tiene demasiadas cosas** (12). Hoy son 16 opciones.
       Propuesta: dejar en Archivo sólo las copias de la biblioteca, Ajustes
       y Salir, y pasar lo demás a tres menús nuevos al lado: **Canciones**

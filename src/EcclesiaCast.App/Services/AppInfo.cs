@@ -52,8 +52,8 @@ public static class AppInfo
         Environment.GetEnvironmentVariable("ECCLESIACAST_USAGE_URL") is { Length: > 0 } test ? test : UsageCountUrl;
 
     /// <summary>
-    /// The search of backgrounds on Pexels, through our own service (it keeps
-    /// the Pexels key, which can not live in public code).
+    /// The search of backgrounds on Pixabay, through our own service (it keeps
+    /// the Pixabay key, which can not live in public code).
     /// ECCLESIACAST_BACKGROUNDS_URL points a test at another address.
     /// </summary>
     public const string BackgroundSearchUrl = "https://api.ecclesiacast.org/v1/fondos";

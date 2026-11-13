@@ -10,14 +10,14 @@ using EcclesiaCast.Core.Media;
 namespace EcclesiaCast.App.Views;
 
 /// <summary>One result of the search, as a card that can be chosen.</summary>
-public sealed partial class PexelsCard : ObservableObject
+public sealed partial class PixabayCard : ObservableObject
 {
-    public PexelsCard(PexelsHit hit, bool alreadyHave)
+    public PixabayCard(PixabayHit hit, bool alreadyHave)
     {
         Hit = hit;
         AlreadyHave = alreadyHave;
 
-        // The picture is read from Pexels in the background; the card is
+        // The picture is read from Pixabay in the background; the card is
         // there at once and fills in when it arrives.
         var thumb = new BitmapImage();
         thumb.BeginInit();
@@ -28,7 +28,7 @@ public sealed partial class PexelsCard : ObservableObject
         Thumb = thumb;
     }
 
-    public PexelsHit Hit { get; }
+    public PixabayHit Hit { get; }
 
     public BitmapImage Thumb { get; }
 
@@ -36,7 +36,7 @@ public sealed partial class PexelsCard : ObservableObject
 
     public bool HasDuration => Hit.DurationText.Length > 0;
 
-    public string AuthorLine => string.IsNullOrWhiteSpace(Hit.Author) ? "Pexels" : $"de {Hit.Author}";
+    public string AuthorLine => string.IsNullOrWhiteSpace(Hit.Author) ? "Pixabay" : $"de {Hit.Author}";
 
     public string Tip => Hit.IsVideo
         ? $"Video de {Hit.Width}×{Hit.Height}, {Hit.DurationText}. Clic para elegirlo."
@@ -47,27 +47,27 @@ public sealed partial class PexelsCard : ObservableObject
 }
 
 /// <summary>
-/// «Buscar fondos en Pexels»: searches, shows what it found, and downloads
+/// «Buscar fondos en Pixabay»: searches, shows what it found, and downloads
 /// the chosen ones into a tab of the media bar. It stays open beside the
 /// program (it is not modal) while it downloads.
 /// </summary>
-public partial class PexelsWindow : Window
+public partial class PixabayWindow : Window
 {
     private readonly MainViewModel _vm;
-    private readonly ObservableCollection<PexelsCard> _cards = [];
+    private readonly ObservableCollection<PixabayCard> _cards = [];
     private CancellationTokenSource? _work;
     private string _query = string.Empty;
     private bool _photos;
     private int _page;
     private bool _busy;
 
-    public PexelsWindow(MainViewModel vm)
+    public PixabayWindow(MainViewModel vm)
     {
         InitializeComponent();
         _vm = vm;
         DataContext = vm;
         Results.ItemsSource = _cards;
-        CreditText.Text = PexelsBackgrounds.Credit;
+        CreditText.Text = PixabayBackgrounds.Credit;
         Loaded += (_, _) => QueryBox.Focus();
         Closed += (_, _) => _work?.Cancel();
     }
@@ -107,11 +107,11 @@ public partial class PexelsWindow : Window
         _work = new CancellationTokenSource();
         try
         {
-            var page = await _vm.SearchPexelsAsync(_query, _photos, _page + 1, _work.Token);
+            var page = await _vm.SearchPixabayAsync(_query, _photos, _page + 1, _work.Token);
             _page++;
             foreach (var hit in page.Hits)
             {
-                var card = new PexelsCard(hit, _vm.HasMediaFile(PexelsFile(hit)));
+                var card = new PixabayCard(hit, _vm.HasMediaFile(PixabayFile(hit)));
                 card.PropertyChanged += (_, _) => UpdateAddButton();
                 _cards.Add(card);
             }
@@ -121,7 +121,7 @@ public partial class PexelsWindow : Window
                 ? $"No encontré {(_photos ? "fotos" : "videos")} con «{_query}». Probá con otra palabra."
                 : string.Empty;
         }
-        catch (PexelsSearchException ex)
+        catch (PixabaySearchException ex)
         {
             StatusLine.Text = ex.Message;
         }
@@ -135,8 +135,8 @@ public partial class PexelsWindow : Window
         }
     }
 
-    private string PexelsFile(PexelsHit hit) =>
-        Path.Combine(App.DataDir, "fondos-pexels", PexelsBackgrounds.FileName(hit, _query));
+    private string PixabayFile(PixabayHit hit) =>
+        Path.Combine(App.DataDir, "fondos-pixabay", PixabayBackgrounds.FileName(hit, _query));
 
     private async void Add_Click(object sender, RoutedEventArgs e)
     {
@@ -149,7 +149,7 @@ public partial class PexelsWindow : Window
         try
         {
             var progress = new Progress<string>(text => StatusLine.Text = text);
-            var (added, failed) = await _vm.AddPexelsAsync(chosen, _query, progress, _work.Token);
+            var (added, failed) = await _vm.AddPixabayAsync(chosen, _query, progress, _work.Token);
             foreach (var card in _cards)
                 card.IsSelected = false;
 
@@ -196,7 +196,7 @@ public partial class PexelsWindow : Window
     }
 
     private void Credit_Click(object sender, RoutedEventArgs e) =>
-        Process.Start(new ProcessStartInfo(PexelsBackgrounds.Site) { UseShellExecute = true });
+        Process.Start(new ProcessStartInfo(PixabayBackgrounds.Site) { UseShellExecute = true });
 
     private void Close_Click(object sender, RoutedEventArgs e) => Close();
 }

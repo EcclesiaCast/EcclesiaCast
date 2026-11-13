@@ -6,13 +6,13 @@ using System.Text.Json.Serialization;
 namespace EcclesiaCast.Core.Media;
 
 /// <summary>The file of a result that the program downloads.</summary>
-public sealed record PexelsFile(
+public sealed record PixabayFile(
     [property: JsonPropertyName("url")] string Url,
     [property: JsonPropertyName("ancho")] int Width,
     [property: JsonPropertyName("alto")] int Height);
 
-/// <summary>A video or a photo found on Pexels, as our service hands it over.</summary>
-public sealed record PexelsHit(
+/// <summary>A video or a photo found on Pixabay, as our service hands it over.</summary>
+public sealed record PixabayHit(
     [property: JsonPropertyName("id")] long Id,
     [property: JsonPropertyName("tipo")] string Kind,
     [property: JsonPropertyName("ancho")] int Width,
@@ -22,7 +22,7 @@ public sealed record PexelsHit(
     [property: JsonPropertyName("autor")] string? Author,
     [property: JsonPropertyName("autorUrl")] string? AuthorUrl,
     [property: JsonPropertyName("paginaUrl")] string? PageUrl,
-    [property: JsonPropertyName("archivo")] PexelsFile? File)
+    [property: JsonPropertyName("archivo")] PixabayFile? File)
 {
     public bool IsVideo => Kind == "video";
 
@@ -32,33 +32,33 @@ public sealed record PexelsHit(
 }
 
 /// <summary>A page of results.</summary>
-public sealed record PexelsPage(
-    [property: JsonPropertyName("resultados")] IReadOnlyList<PexelsHit> Hits,
+public sealed record PixabayPage(
+    [property: JsonPropertyName("resultados")] IReadOnlyList<PixabayHit> Hits,
     [property: JsonPropertyName("hayMas")] bool HasMore);
 
 /// <summary>
-/// The rules for backgrounds from Pexels: what our service answers, which
+/// The rules for backgrounds from Pixabay: what our service answers, which
 /// addresses the program accepts to download from, and the file name each
 /// one gets in the library.
 /// </summary>
-public static class PexelsBackgrounds
+public static class PixabayBackgrounds
 {
-    /// <summary>What the search window shows under the results, as Pexels asks.</summary>
-    public const string Credit = "Fotos y videos de Pexels";
+    /// <summary>What the search window shows under the results, as Pixabay asks.</summary>
+    public const string Credit = "Fotos y videos de Pixabay";
 
-    public const string Site = "https://www.pexels.com";
+    public const string Site = "https://pixabay.com";
 
     /// <summary>
     /// Reads a page of results. Throws <see cref="FormatException"/> when the
     /// answer is not one. Results without a file or a thumbnail, or whose
-    /// file is not on Pexels, are left out.
+    /// file is not on Pixabay, are left out.
     /// </summary>
-    public static PexelsPage ParsePage(string json)
+    public static PixabayPage ParsePage(string json)
     {
-        PexelsPage? page;
+        PixabayPage? page;
         try
         {
-            page = JsonSerializer.Deserialize<PexelsPage>(json);
+            page = JsonSerializer.Deserialize<PixabayPage>(json);
         }
         catch (JsonException ex)
         {
@@ -69,7 +69,7 @@ public static class PexelsBackgrounds
             throw new FormatException("La respuesta de la búsqueda no se pudo leer.");
 
         var usable = page.Hits
-            .Where(h => h.File is { } f && IsPexelsAddress(f.Url) && IsPexelsAddress(h.Thumbnail))
+            .Where(h => h.File is { } f && IsPixabayAddress(f.Url) && IsPixabayAddress(h.Thumbnail))
             .ToList();
         return page with { Hits = usable };
     }
@@ -89,26 +89,26 @@ public static class PexelsBackgrounds
     }
 
     /// <summary>
-    /// Only files from Pexels are downloaded, over https: an answer that
+    /// Only files from Pixabay are downloaded, over https: an answer that
     /// pointed somewhere else would not be followed.
     /// </summary>
-    public static bool IsPexelsAddress(string? url) =>
+    public static bool IsPixabayAddress(string? url) =>
         Uri.TryCreate(url, UriKind.Absolute, out var uri)
         && uri.Scheme == Uri.UriSchemeHttps
-        && (uri.Host.Equals("pexels.com", StringComparison.OrdinalIgnoreCase)
-            || uri.Host.EndsWith(".pexels.com", StringComparison.OrdinalIgnoreCase));
+        && (uri.Host.Equals("pixabay.com", StringComparison.OrdinalIgnoreCase)
+            || uri.Host.EndsWith(".pixabay.com", StringComparison.OrdinalIgnoreCase));
 
     /// <summary>
     /// The file name in the library: what was searched, who made it and its
-    /// number on Pexels, so it reads well in the media bar and can be found on
-    /// Pexels again. «Cruz atardecer · Ana López · Pexels 12345.mp4».
+    /// number on Pixabay, so it reads well in the media bar and can be found on
+    /// Pixabay again. «Cruz atardecer · Ana López · Pixabay 12345.mp4».
     /// </summary>
-    public static string FileName(PexelsHit hit, string query)
+    public static string FileName(PixabayHit hit, string query)
     {
         var what = Clean(query);
         what = what.Length == 0 ? (hit.IsVideo ? "Video" : "Foto") : char.ToUpper(what[0], CultureInfo.CurrentCulture) + what[1..];
         var who = Clean(hit.Author ?? string.Empty);
-        var name = who.Length > 0 ? $"{what} · {who} · Pexels {hit.Id}" : $"{what} · Pexels {hit.Id}";
+        var name = who.Length > 0 ? $"{what} · {who} · Pixabay {hit.Id}" : $"{what} · Pixabay {hit.Id}";
         return name + (hit.IsVideo ? ".mp4" : ".jpg");
     }
 
