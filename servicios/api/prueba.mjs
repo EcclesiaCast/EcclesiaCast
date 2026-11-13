@@ -3,7 +3,7 @@
 import { DatabaseSync } from "node:sqlite";
 import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
-import contador, { validar, pedidoDeFondos, mejorArchivo, resumirPexels } from "./worker.js";
+import contador, { validar, pedidoDeFondos, mejorArchivo, resumirPixabay } from "./worker.js";
 
 const sqlite = new DatabaseSync(":memory:");
 sqlite.exec(readFileSync(new URL("./schema.sql", import.meta.url), "utf8"));
@@ -74,35 +74,43 @@ assert.match(html, /Sábado o domingo/);
 
 
 
-// ── Fondos de Pexels ──
+// ── Fondos de Pixabay ──
 const u = (q) => new URL("https://api.ecclesiacast.org/v1/fondos" + q);
 assert.deepEqual(pedidoDeFondos(u("?q=%20Cruz%20%20atardecer%20")), { q: "cruz atardecer", tipo: "videos", pagina: 1 });
 assert.equal(pedidoDeFondos(u("?q=a")), null);
 assert.equal(pedidoDeFondos(u("?q=cruz&pagina=0")), null);
 assert.equal(pedidoDeFondos(u("?q=cruz&tipo=fotos&pagina=3")).tipo, "fotos");
 
-// De los archivos de un video, el más grande que no pase de 1920 de ancho.
-assert.deepEqual(mejorArchivo([
-  { file_type: "video/mp4", width: 3840, height: 2160, link: "4k" },
-  { file_type: "video/mp4", width: 1920, height: 1080, link: "hd" },
-  { file_type: "video/mp4", width: 1280, height: 720, link: "720" },
-  { file_type: "video/webm", width: 1920, height: 1080, link: "webm" },
-]), { url: "hd", ancho: 1920, alto: 1080 });
+// De los tamaños de un video, el más grande que no pase de 1920 de ancho.
+assert.deepEqual(mejorArchivo({
+  large: { url: "4k", width: 3840, height: 2160, thumbnail: "t4" },
+  medium: { url: "hd", width: 1920, height: 1080, thumbnail: "th" },
+  small: { url: "720", width: 1280, height: 720, thumbnail: "t7" },
+  tiny: { url: "", width: 0, height: 0, thumbnail: "" },
+}), { url: "hd", ancho: 1920, alto: 1080, miniatura: "th" });
 // Si sólo hay más grandes, el más chico de esos.
-assert.equal(mejorArchivo([{ file_type: "video/mp4", width: 3840, height: 2160, link: "4k" },
-  { file_type: "video/mp4", width: 2560, height: 1440, link: "2k" }]).url, "2k");
-assert.equal(mejorArchivo([]), null);
+assert.equal(mejorArchivo({ large: { url: "4k", width: 3840, height: 2160 }, medium: { url: "2k", width: 2560, height: 1440 } }).url, "2k");
+assert.equal(mejorArchivo({}), null);
+assert.equal(mejorArchivo(undefined), null);
 
-const videos = resumirPexels("videos", { next_page: "x", videos: [
-  { id: 1, width: 1920, height: 1080, duration: 12, image: "m.jpg", url: "p", user: { name: "Ana", url: "a" },
-    video_files: [{ file_type: "video/mp4", width: 1920, height: 1080, link: "hd" }] },
-  { id: 2, width: 1920, height: 1080, duration: 5, image: "m2.jpg", url: "p2", user: { name: "Beto" }, video_files: [] },
-]});
+const videos = resumirPixabay("videos", { totalHits: 100, hits: [
+  { id: 1, duration: 12, pageURL: "p", user: "Ana", user_id: 7,
+    videos: { medium: { url: "hd", width: 1920, height: 1080, thumbnail: "m.jpg" } } },
+  { id: 2, duration: 5, pageURL: "p2", user: "Beto", user_id: 8, videos: { medium: { url: "", width: 0, height: 0 } } },
+]}, 1);
 assert.equal(videos.resultados.length, 1);
 assert.equal(videos.resultados[0].autor, "Ana");
+assert.equal(videos.resultados[0].autorUrl, "https://pixabay.com/users/Ana-7/");
 assert.equal(videos.hayMas, true);
 
-// Sin clave de Pexels, avisa en vez de romperse; y una búsqueda mala no llega a Pexels.
+const fotos = resumirPixabay("fotos", { totalHits: 10, hits: [
+  { id: 3, imageWidth: 5000, imageHeight: 3000, pageURL: "p", user: "Cy", user_id: 9,
+    webformatURL: "w.jpg", largeImageURL: "l.jpg" }] }, 1);
+assert.equal(fotos.resultados[0].archivo.url, "l.jpg");
+assert.equal(fotos.resultados[0].archivo.ancho, 1280);
+assert.equal(fotos.hayMas, false);
+
+// Sin clave de Pixabay, avisa en vez de romperse; y una búsqueda mala no llega a Pixabay.
 assert.equal((await contador.fetch(new Request("https://api.ecclesiacast.org/v1/fondos?q=cruz"), { DB })).status, 503);
 assert.equal((await contador.fetch(new Request("https://api.ecclesiacast.org/v1/fondos?q=x"), env)).status, 400);
 

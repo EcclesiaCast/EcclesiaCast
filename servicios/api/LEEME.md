@@ -7,24 +7,21 @@ trabajos:
   vez que se proyecta, con tres datos: un número al azar de la instalación,
   el día y la versión. **No se guarda la dirección IP** ni nada de la iglesia
   o de lo que se proyecta. Se apaga en Ajustes → Actualizaciones.
-- **Fondos de Pexels.** El programa busca videos y fotos de fondo en Pexels a
-  través de este servicio, que guarda la clave de Pexels: la clave no puede
+- **Fondos de Pixabay.** El programa busca videos y fotos de fondo en Pixabay a
+  través de este servicio, que guarda la clave de Pixabay: la clave no puede
   estar en el programa porque el código es público. Cada búsqueda se recuerda
-  un día, para no pasar el límite de Pexels (200 búsquedas por hora). Los
-  videos se bajan directo de Pexels, no pasan por acá.
+  un día (Pixabay lo pide, y así no se pasa de sus 100 búsquedas por minuto).
+  Los videos y fotos se bajan directo de Pixabay, no pasan por acá.
 
 Mientras el servicio no esté publicado, el programa no se queja: el uso no se
-cuenta y «Buscar fondos en Pexels» dice que no está disponible.
+cuenta y «Buscar fondos en Pixabay» dice que no está disponible.
 
-## Antes: la clave de Pexels
+## Antes: la clave de Pixabay
 
-1. Entrá a <https://www.pexels.com/api/> y creá una cuenta (o entrá con la
-   tuya).
-2. *Your API Key* → completá para qué es: «EcclesiaCast, programa libre para
-   proyectar en iglesias; busca videos y fotos de fondo» y la dirección
-   `https://ecclesiacast.org`.
-3. Copiá la clave que te dan. No la pegues en ningún lado más que en el paso
-   4 de abajo.
+1. Entrá a <https://pixabay.com> y creá una cuenta (o entrá con la tuya).
+2. Abrí <https://pixabay.com/api/docs/>: con la sesión iniciada, la clave
+   aparece en esa página (en los ejemplos, en «Parameters → key»).
+3. Copiá la clave. No la pegues en ningún lado más que en el paso 4 de abajo.
 
 ## Publicarlo (una sola vez, desde el panel de Cloudflare)
 
@@ -41,7 +38,7 @@ Hace falta que `ecclesiacast.org` esté en la misma cuenta de Cloudflare.
    `ecclesiacast-api`.
 4. **Las claves.** *Settings → Variables and Secrets → Add*, tipo *Secret*,
    dos veces:
-   - `PEXELS_CLAVE` = la clave de Pexels.
+   - `PIXABAY_KEY` = la clave de Pixabay.
    - `RESUMEN_CLAVE` = una contraseña larga que inventes, para mirar los
      números (guardala).
 5. **La dirección.** *Settings → Domains & Routes → Add → Custom domain*:
@@ -68,12 +65,12 @@ Y qué versiones se usaron en las últimas 4 semanas. Con `&formato=json`
 devuelve lo mismo en datos. Cada PC cuenta por separado: una iglesia con dos
 PCs suma dos.
 
-## Si se queda corto con Pexels
+## Si se queda corto con Pixabay
 
-Con muchas iglesias buscando, el límite de 200 búsquedas por hora puede no
-alcanzar. Pexels lo levanta gratis si se lo pedís desde su página de la API,
-mostrando que el programa los nombra (la ventana de búsqueda dice «Fotos y
-videos de Pexels» y el autor de cada uno).
+Con muchas iglesias buscando, el límite de 100 búsquedas por minuto puede no
+alcanzar. Pixabay lo levanta gratis si se lo pedís (hay que mostrar de dónde
+salen: la ventana de búsqueda dice «Fotos y videos de Pixabay» con un enlace
+a pixabay.com).
 
 ## Costo
 
@@ -83,4 +80,4 @@ y 100.000 escrituras por día para D1.
 ## Probar sin Cloudflare
 
 `node servicios/api/prueba.mjs` prueba el contador contra el SQLite que trae
-Node y la parte de Pexels sin salir a internet. No instala nada.
+Node y la parte de Pixabay sin salir a internet. No instala nada.

@@ -14,7 +14,7 @@ los sitios de esta lista:
 | Cuándo | Con quién | Qué se manda |
 |---|---|---|
 | Buscás una canción en internet | [musica.com](https://www.musica.com) (su buscador completo usa Google) y [lrclib.net](https://lrclib.net) | Lo que escribiste para buscar. |
-| Buscás y bajás fondos de Pexels («🎞 Fondos» en Medios) | Nosotros (`api.ecclesiacast.org`), que le pregunta a [Pexels](https://www.pexels.com/es-es/privacy-policy/); los videos y fotos se bajan de Pexels | Lo que escribiste para buscar. Nada tuyo: la búsqueda la hace nuestro servicio con su propia clave. |
+| Buscás y bajás fondos de Pixabay («🎞 Fondos» en Medios) | Nosotros (`api.ecclesiacast.org`), que le pregunta a [Pixabay](https://pixabay.com/service/privacy/); los videos y fotos se bajan de Pixabay | Lo que escribiste para buscar. Nada tuyo: la búsqueda la hace nuestro servicio con su propia clave. |
 | Agregás, mirás o descargás un video de YouTube | [YouTube](https://www.youtube.com) | El enlace del video. Si iniciaste sesión en YouTube dentro del programa, se usa esa sesión; sus datos se guardan sólo en tu PC. |
 | Abrís una página web en el programa | La página que abrís (y Google, si escribís algo que no es una dirección) | Lo mismo que si la abrieras en un navegador. Si iniciás sesión en esa página (Google, Canva…), la sesión se guarda sólo en tu PC, la misma que usa YouTube. |
 | Descargás de YouTube por primera vez, y después cada tres días al descargar | [GitHub](https://github.com) | Nada tuyo: baja o actualiza el descargador ([yt-dlp](https://github.com/yt-dlp/yt-dlp) y [deno](https://github.com/denoland/deno)). |

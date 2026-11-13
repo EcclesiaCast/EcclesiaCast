@@ -7,8 +7,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
-- **Buscar fondos en Pexels.** El botón **🎞 Fondos** de la barra de medios
-  (y el menú Fondos → «Buscar fondos en Pexels…») busca videos y fotos de fondo que
+- **Buscar fondos en Pixabay.** El botón **🎞 Fondos** de la barra de medios
+  (y el menú Fondos → «Buscar fondos en Pixabay…») busca videos y fotos de fondo que
   se pueden usar gratis. Elegís los que quieras con un clic y se bajan a la
   pestaña que digas, listos para usar. Los que ya tenés aparecen marcados.
 

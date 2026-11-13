@@ -221,7 +221,7 @@
                 <MenuItem Header="Agregar paquete de fondos (.zip)…" Command="{Binding ImportBackgroundPackCommand}"/>
                 <Separator/>
                 <MenuItem Header="Bajar más fondos de internet…" Command="{Binding DownloadBackgroundPackCommand}"/>
-                <MenuItem Header="Buscar fondos en Pexels…" Click="Pexels_Click"
+                <MenuItem Header="Buscar fondos en Pixabay…" Click="Pixabay_Click"
                           ToolTip="Videos y fotos de fondo que se pueden usar gratis, para bajar a una pestaña de medios"/>
             </MenuItem>
 
@@ -2285,9 +2285,9 @@
                                 ToolTip="Buscar imágenes y GIF en Google Imágenes y agregarlos a la pestaña actual con clic derecho → Agregar a medios"/>
                         <Button Content="🎞 Fondos" FontSize="11" Padding="8,4" Margin="6,0,0,0"
                                 Style="{StaticResource DarkButton}"
-                                Click="Pexels_Click"
-                                AutomationProperties.Name="Buscar fondos en Pexels"
-                                ToolTip="Buscar videos y fotos de fondo en Pexels, que se pueden usar gratis, y bajarlos a una pestaña"/>
+                                Click="Pixabay_Click"
+                                AutomationProperties.Name="Buscar fondos en Pixabay"
+                                ToolTip="Buscar videos y fotos de fondo en Pixabay, que se pueden usar gratis, y bajarlos a una pestaña"/>
                         <Button Content="🖥 Ventana" FontSize="11" Padding="8,4" Margin="6,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding OpenWindowPickerCommand}"

@@ -802,23 +802,23 @@ public partial class MainWindow : Window
         new Views.TransitionsWindow(_settings) { Owner = owner }.ShowDialog();
     }
 
-    private Views.PexelsWindow? _pexelsWindow;
+    private Views.PixabayWindow? _pixabayWindow;
 
-    /// <summary>«Buscar fondos en Pexels»: one window, beside this one, that keeps its results.</summary>
-    private void Pexels_Click(object sender, RoutedEventArgs e)
+    /// <summary>«Buscar fondos en Pixabay»: one window, beside this one, that keeps its results.</summary>
+    private void Pixabay_Click(object sender, RoutedEventArgs e)
     {
         if (DataContext is not MainViewModel vm)
             return;
 
-        if (_pexelsWindow is { IsLoaded: true })
+        if (_pixabayWindow is { IsLoaded: true })
         {
-            _pexelsWindow.Activate();
+            _pixabayWindow.Activate();
             return;
         }
 
-        _pexelsWindow = new Views.PexelsWindow(vm) { Owner = this };
-        _pexelsWindow.Closed += (_, _) => _pexelsWindow = null;
-        _pexelsWindow.Show();
+        _pixabayWindow = new Views.PixabayWindow(vm) { Owner = this };
+        _pixabayWindow.Closed += (_, _) => _pixabayWindow = null;
+        _pixabayWindow.Show();
     }
 
     private Views.ListeningWindow? _listeningWindow;
