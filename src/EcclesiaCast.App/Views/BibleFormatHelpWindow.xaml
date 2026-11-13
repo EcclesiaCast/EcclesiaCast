@@ -13,7 +13,7 @@
         <StackPanel Margin="22,18,22,20">
             <TextBlock TextWrapping="Wrap" Foreground="White" FontSize="13">
                 <Run Text="EcclesiaCast lee Biblias en dos formatos de archivo."/>
-                <Run Text=" Si la tuya ya está en uno de los dos, usá «Archivo → Importar una Biblia»."
+                <Run Text=" Si la tuya ya está en uno de los dos, usá «Biblias → Importar una Biblia»."
                      Foreground="{StaticResource MutedBrush}"/>
             </TextBlock>
 

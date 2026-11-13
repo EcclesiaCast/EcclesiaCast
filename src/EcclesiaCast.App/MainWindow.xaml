@@ -171,24 +171,10 @@
              para lo que se usa en medio del servicio. -->
         <Menu Grid.Row="0" Padding="6,2" FontSize="12">
 
+            <!-- Archivo quedó sólo con la biblioteca entera, Ajustes y Salir; lo
+                 de canciones, Biblias y fondos tiene su propio menú (pedido de
+                 Alexis, 13/11/2026: «hay muchas opciones»). -->
             <MenuItem Header="_Archivo">
-                <MenuItem Header="Buscar canciones en internet…" Command="{Binding SearchSongsOnlineCommand}"/>
-                <MenuItem Header="Traer canciones de otro programa…" Command="{Binding ImportFromOtherProgramCommand}"/>
-                <MenuItem Header="Importar canciones (.txt, .pro)…" Command="{Binding ImportSongsCommand}"/>
-                <MenuItem Header="Importar una Biblia (JSON o Zefania XML)…" Command="{Binding ImportBibleCommand}"/>
-                <MenuItem Header="Cómo preparar una Biblia para importar…" Command="{Binding ShowBibleFormatHelpCommand}"
-                          ToolTip="Los dos formatos que se leen, un ejemplo de cada uno y unas instrucciones para pedirle a una IA que convierta tu archivo."/>
-                <MenuItem Header="Exportar paquete de Biblias…" Command="{Binding ExportBiblePackageCommand}"
-                          ToolTip="Guarda varias versiones en un solo archivo (.ecbiblias) para llevarlas a otra computadora tuya."/>
-                <MenuItem Header="Importar paquete de Biblias…" Command="{Binding ImportBiblePackageCommand}"/>
-                <MenuItem Header="Bajar Biblias de internet…" Command="{Binding DownloadBiblePackCommand}"
-                          ToolTip="Baja el paquete de Biblias sólo a esta computadora y elegís cuáles agregar."/>
-                <MenuItem Header="Agregar imágenes, videos, PDF o PowerPoint…" Command="{Binding ImportMediaCommand}"/>
-                <MenuItem Header="Agregar paquete de fondos (.zip)…" Command="{Binding ImportBackgroundPackCommand}"/>
-                <MenuItem Header="Bajar más fondos de internet…" Command="{Binding DownloadBackgroundPackCommand}"/>
-                <MenuItem Header="Buscar fondos en Pexels…" Click="Pexels_Click"
-                          ToolTip="Videos y fotos de fondo que se pueden usar gratis, para bajar a una pestaña de medios"/>
-                <Separator/>
                 <MenuItem Header="Guardar una copia de la biblioteca…" Command="{Binding SaveBackupCommand}"/>
                 <MenuItem Header="Restaurar desde una copia…" Command="{Binding RestoreBackupCommand}"/>
                 <Separator/>
@@ -209,6 +195,34 @@
                 <MenuItem Header="Papelera…" Command="{Binding OpenTrashCommand}"/>
                 <Separator/>
                 <MenuItem Header="Buscar en todo" InputGestureText="Ctrl+K" Command="{Binding SearchEverythingCommand}"/>
+            </MenuItem>
+
+            <MenuItem Header="_Canciones">
+                <MenuItem Header="Buscar canciones en internet…" Command="{Binding SearchSongsOnlineCommand}"/>
+                <MenuItem Header="Traer canciones de otro programa…" Command="{Binding ImportFromOtherProgramCommand}"/>
+                <MenuItem Header="Importar canciones (.txt, .pro)…" Command="{Binding ImportSongsCommand}"/>
+            </MenuItem>
+
+            <MenuItem Header="_Biblias">
+                <MenuItem Header="Bajar Biblias de internet…" Command="{Binding DownloadBiblePackCommand}"
+                          ToolTip="Baja el paquete de Biblias sólo a esta computadora y elegís cuáles agregar."/>
+                <Separator/>
+                <MenuItem Header="Importar una Biblia (JSON o Zefania XML)…" Command="{Binding ImportBibleCommand}"/>
+                <MenuItem Header="Cómo preparar una Biblia para importar…" Command="{Binding ShowBibleFormatHelpCommand}"
+                          ToolTip="Los dos formatos que se leen, un ejemplo de cada uno y unas instrucciones para pedirle a una IA que convierta tu archivo."/>
+                <Separator/>
+                <MenuItem Header="Exportar paquete de Biblias…" Command="{Binding ExportBiblePackageCommand}"
+                          ToolTip="Guarda varias versiones en un solo archivo (.ecbiblias) para llevarlas a otra computadora tuya."/>
+                <MenuItem Header="Importar paquete de Biblias…" Command="{Binding ImportBiblePackageCommand}"/>
+            </MenuItem>
+
+            <MenuItem Header="_Fondos">
+                <MenuItem Header="Agregar imágenes, videos, PDF o PowerPoint…" Command="{Binding ImportMediaCommand}"/>
+                <MenuItem Header="Agregar paquete de fondos (.zip)…" Command="{Binding ImportBackgroundPackCommand}"/>
+                <Separator/>
+                <MenuItem Header="Bajar más fondos de internet…" Command="{Binding DownloadBackgroundPackCommand}"/>
+                <MenuItem Header="Buscar fondos en Pexels…" Click="Pexels_Click"
+                          ToolTip="Videos y fotos de fondo que se pueden usar gratis, para bajar a una pestaña de medios"/>
             </MenuItem>
 
             <MenuItem Header="_Ver" SubmenuOpened="ViewMenu_SubmenuOpened">

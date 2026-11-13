@@ -845,7 +845,7 @@ public sealed partial class MainViewModel
 
     /// <summary>Added to the messages of an import that did not work: where the formats are explained.</summary>
     private const string HelpHint =
-        "\n\nEn «Archivo → Cómo preparar una Biblia para importar…» hay un ejemplo de cada formato.";
+        "\n\nEn «Biblias → Cómo preparar una Biblia para importar…» hay un ejemplo de cada formato.";
 
     /// <summary>
     /// «Cómo preparar una Biblia para importar…»: the two formats, an example of

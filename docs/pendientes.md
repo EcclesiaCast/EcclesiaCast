@@ -513,14 +513,14 @@ prueba). Lo que quedó:
 - [x] **Aviso de Biblias que ya estaban** (9): ahora en una ventana (ver
       arriba).
 - [ ] **Pexels no da claves** (11): se pasa a Pixabay (ver arriba).
-- [ ] **El menú Archivo tiene demasiadas cosas** (12). Hoy son 16 opciones.
+- [x] **El menú Archivo tiene demasiadas cosas** (12). Hoy son 16 opciones.
       Propuesta: dejar en Archivo sólo las copias de la biblioteca, Ajustes
       y Salir, y pasar lo demás a tres menús nuevos al lado: **Canciones**
       (buscar en internet, traer de otro programa, importar), **Biblias**
       (bajar de internet, importar una Biblia, cómo prepararla, exportar e
       importar paquete) y **Fondos** (agregar archivos, paquete .zip, bajar
       más fondos, buscar en Pixabay). Otra forma: los mismos tres grupos
-      como submenús dentro de Archivo. Esperando que Alexis elija.
+      como submenús dentro de Archivo. **Alexis eligió los tres menús (13/11); hecho.** Falta que lo vea.
 
 - [ ] **YouVersion: en pausa** (5/11/2026, Alexis: «queda en el freezer por
       ahora»). La integración está programada y guardada en la rama

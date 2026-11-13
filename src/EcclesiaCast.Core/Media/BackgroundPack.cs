@@ -4,7 +4,7 @@ namespace EcclesiaCast.Core.Media;
 
 /// <summary>
 /// A pack of backgrounds: a .zip with looping videos (and pictures) that the
-/// operator adds from «Archivo → Agregar paquete de fondos…». It is how more
+/// operator adds from «Fondos → Agregar paquete de fondos…». It is how more
 /// backgrounds can come in without making the installer bigger.
 /// </summary>
 public static class BackgroundPack

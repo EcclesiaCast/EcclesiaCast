@@ -8,7 +8,7 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 ### Agregado
 
 - **Buscar fondos en Pexels.** El botón **🎞 Fondos** de la barra de medios
-  (y Archivo → «Buscar fondos en Pexels…») busca videos y fotos de fondo que
+  (y el menú Fondos → «Buscar fondos en Pexels…») busca videos y fotos de fondo que
   se pueden usar gratis. Elegís los que quieras con un clic y se bajan a la
   pestaña que digas, listos para usar. Los que ya tenés aparecen marcados.
 
@@ -30,6 +30,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   canciones rápidas y la banda fuerte todavía se pierde.
 
 ### Cambiado
+
+- **El menú Archivo quedó más corto.** Tenía 16 opciones; ahora lo de las
+  canciones, las Biblias y los fondos está en tres menús nuevos al lado:
+  **Canciones**, **Biblias** y **Fondos**. En Archivo quedan las copias de la
+  biblioteca, Ajustes y Salir.
 
 - **Editor de temas rehecho.** La vista previa queda en el medio y más grande,
   los campos van a la derecha repartidos en secciones (Letra, Sombra y franjas,

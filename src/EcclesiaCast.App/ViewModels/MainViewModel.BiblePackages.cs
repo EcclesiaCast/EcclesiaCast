@@ -126,8 +126,8 @@ public sealed partial class MainViewModel
         }
 
         StatusText = chosen.Count == 1
-            ? "Paquete guardado con 1 Biblia. Se abre con «Importar paquete de Biblias» en el menú Archivo."
-            : $"Paquete guardado con {chosen.Count} Biblias. Se abre con «Importar paquete de Biblias» en el menú Archivo.";
+            ? "Paquete guardado con 1 Biblia. Se abre con «Importar paquete de Biblias» en el menú Biblias."
+            : $"Paquete guardado con {chosen.Count} Biblias. Se abre con «Importar paquete de Biblias» en el menú Biblias.";
         Log.Information("Paquete de Biblias exportado: {Count} versiones a {Path}", chosen.Count, path);
     }
 

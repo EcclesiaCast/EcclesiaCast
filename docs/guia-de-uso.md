@@ -35,7 +35,7 @@ En la pestaña **Canciones**:
   canciones tiene cada una y las importa. Si una canción ya está, pregunta qué
   hacer. Si están en otro lado (un disco externo, una copia de otra máquina), usá
   **Elegir carpeta…**: en EasyWorship es la que tiene `Songs.db` y `SongWords.db`.
-- **➕ → Buscar en internet…** (también en **Archivo**) trae una canción
+- **➕ → Buscar en internet…** (también en el menú **Canciones**) trae una canción
   nueva sin copiar y pegar: escribí el **nombre**, el **artista** o **una frase
   de la letra** y apretá Enter. Busca en musica.com y, si no está ahí, en
   lrclib.net. Al elegir un resultado ves la letra ya separada en diapositivas
@@ -57,13 +57,13 @@ desde la primera. Las flechas **←→** navegan en vivo.
 
 En la pestaña **Biblia**:
 
-- **📥** importa una Biblia en **JSON** o **Zefania XML**. Si la tuya está en otro formato (Word, PDF, texto), **Archivo → Cómo preparar una Biblia para importar…** trae un ejemplo de cada formato y unas instrucciones para pedirle a una IA que la convierta.
+- **📥** importa una Biblia en **JSON** o **Zefania XML**. Si la tuya está en otro formato (Word, PDF, texto), **Biblias → Cómo preparar una Biblia para importar…** trae un ejemplo de cada formato y unas instrucciones para pedirle a una IA que la convierta.
 - El instalador te deja elegir qué **Biblias libres** instalar (Reina-Valera
   1909, Biblia libre para el mundo y Versión Biblia Libre); aparecen solas la
   primera vez que abrís el programa. Las que tienen derechos (RVR1960, NVI…)
   no vienen con el instalador: para llevarlas a otra computadora tuya, en
-  **Archivo → Exportar paquete de Biblias…** marcás las versiones y se guarda
-  un archivo `.ecbiblias`; en la otra, **Archivo → Importar paquete de
+  **Biblias → Exportar paquete de Biblias…** marcás las versiones y se guarda
+  un archivo `.ecbiblias`; en la otra, **Biblias → Importar paquete de
   Biblias…** (o la página «Paquete de Biblias propio» del instalador) las
   trae. Usá los paquetes sólo en tus propias computadoras.
 - Las versiones van en una fila de botones con su abreviatura. Un **clic**
