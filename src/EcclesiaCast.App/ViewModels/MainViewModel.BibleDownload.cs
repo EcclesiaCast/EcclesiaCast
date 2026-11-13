@@ -108,6 +108,11 @@ public sealed partial class MainViewModel
                 StatusText += $" {string.Join(", ", skipped)} ya estaba: no se bajó de nuevo.";
             if (failed.Count > 0)
                 StatusText += $" No se pudo bajar: {string.Join(", ", failed)} (revisá la conexión y probá de nuevo).";
+            // Lo que no salió como se esperaba se avisa en una ventana: el texto
+            // del pie del programa no lo lee nadie.
+            if (skipped.Count > 0 || failed.Count > 0)
+                Notice.Show(StatusText, "Bajar Biblias",
+                    failed.Count > 0 ? NoticeKind.Warning : NoticeKind.Info);
             Log.Information("Biblias bajadas: {Imported} (fallaron {Failed})",
                 string.Join(", ", imported), string.Join(", ", failed));
         }

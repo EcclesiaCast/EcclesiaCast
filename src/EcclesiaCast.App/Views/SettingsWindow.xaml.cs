@@ -20,6 +20,9 @@ public partial class SettingsWindow : Window
         AdvancedRadio.IsChecked = main.IsAdvancedUi;
     }
 
+    // La ventana se abre sin ShowDialog: IsCancel sola no la cierra.
+    private void Close_Click(object sender, RoutedEventArgs e) => Close();
+
     private void RestartSound_Click(object sender, RoutedEventArgs e) => _main.RestartSound();
 
     private void Listening_Click(object sender, RoutedEventArgs e)

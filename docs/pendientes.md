@@ -443,16 +443,20 @@ las respuestas automáticas de la tabla); toca dar estos pasos.
       MMDeviceEnumeratorComObject»). Era un choque dentro del programa: el
       vigía del sonido y el karaoke declaraban el mismo componente de
       Windows. Arreglado (b23aece) y probado en un banco con el código real:
-      lista las entradas y escucha. Falta que lo pruebe Alexis.
+      lista las entradas y escucha. Probado por Alexis el 13/11: ya abre la
+      entrada (sigue lo de la lentitud, más abajo).
 - [x] **Bajar Biblias dejaba bajar otra vez una que ya estaba.** Ahora las
-      saltea y lo dice. Falta que lo pruebe Alexis.
+      saltea. Probado el 13/11: no la baja, pero el aviso iba al pie del
+      programa y nadie lo lee. **Desde el 13/11 lo dice en una ventana**
+      (también si alguna no se pudo bajar). Falta que lo vea Alexis.
 - [ ] **Medios: ninguna pestaña silenciada de entrada.** El programa ya no
       silencia ninguna por su cuenta; en la biblioteca de Alexis «Fondos»
       quedó silenciada (regla guardada `item+mute`), seguramente por un clic
       en «Silenciar la pestaña». Se quita con clic derecho en la pestaña →
       «Quitar el silencio». Decidir si además hace falta un aviso más
       visible de que una pestaña está silenciada.
-- [ ] **Carteles propios en vez de los de Windows.** Hoy hay 47 `MessageBox`
+- [x] **Carteles propios en vez de los de Windows.** Hechos (los 47) y
+      probados por Alexis el 13/11: le gusta que quede todo centralizado. Hoy hay 47 `MessageBox`
       con el aspecto gris de Windows. Una ventana de aviso con el aspecto del
       programa (oscura, botones propios, textos de los botones en español
       y no «Sí / No / Cancelar»), y reemplazarlos de a poco. Mediano.
@@ -465,6 +469,11 @@ las respuestas automáticas de la tabla); toca dar estos pasos.
       ventana dibujada a imagen; **falta**: que Alexis saque la clave en
       pexels.com/api y publique el servicio (`servicios/api/LEEME.md`), y
       probar la descarga de verdad con el programa abierto.
+      **13/11: Pexels dejó de dar claves nuevas** («New API key issuance is
+      currently paused»). Se cambia por **Pixabay** (videos e imágenes
+      gratis, clave al instante con una cuenta, pide guardar cada búsqueda
+      24 h y bajar los archivos en vez de enlazarlos: justo lo que hace el
+      servicio). Lo programa una sesión aparte con Sonnet.
 - [ ] **Saber cuántas iglesias lo usan por fin de semana.** Alexis eligió el
       contador anónimo (11/11/2026). **Programado**: cuenta la primera
       proyección de cada día (no la apertura), con un interruptor en Ajustes
@@ -482,6 +491,36 @@ las respuestas automáticas de la tabla); toca dar estos pasos.
          en la nube que Alexis tiene en mente, pero es mucho más grande
          (servidor, base, inicio de sesión, contraseñas, privacidad, costo).
          Va junto con la copia en la nube, cuando se decida hacerla.
+
+### Prueba del instalador prueba.4 (13/11/2026)
+
+Alexis probó la lista de `docs/pruebas-1.4.0-prueba.md`. Bien: el aviso
+pregunta (2), 3, 4, 5, 7, 8 y la búsqueda de fondos (10, con el servicio de
+prueba). Lo que quedó:
+
+- [ ] **Seguir la canción anda lento** (1). Con lo que suena en la PC
+      reconoce bien la letra, pero tarda: el registro del 12/11 muestra que
+      cada pedazo de 8 s tarda unos 2,7 s en pasarse a texto y se escucha
+      cada 3 s, así que va unos 6 s atrás; además salta mal a veces (de la 1
+      a la 6, de la 10 a la 14) porque decide con pocas palabras. Con el
+      micrófono no entendió nada. **Se rehace en una sesión aparte** (rama
+      propia) con el modelo más fuerte: usar la placa de video, pedazos más
+      cortos, un reconocedor que sólo busque las palabras de la canción y la
+      forma de la canción (estrofa, coro) para no saltar. Puede pedir la PC
+      para probar.
+- [x] **El botón «Cerrar» de Ajustes no cerraba** (6). La ventana se abre
+      sin esperar respuesta y el botón no tenía qué hacer. Arreglado el 13/11.
+- [x] **Aviso de Biblias que ya estaban** (9): ahora en una ventana (ver
+      arriba).
+- [ ] **Pexels no da claves** (11): se pasa a Pixabay (ver arriba).
+- [ ] **El menú Archivo tiene demasiadas cosas** (12). Hoy son 16 opciones.
+      Propuesta: dejar en Archivo sólo las copias de la biblioteca, Ajustes
+      y Salir, y pasar lo demás a tres menús nuevos al lado: **Canciones**
+      (buscar en internet, traer de otro programa, importar), **Biblias**
+      (bajar de internet, importar una Biblia, cómo prepararla, exportar e
+      importar paquete) y **Fondos** (agregar archivos, paquete .zip, bajar
+      más fondos, buscar en Pixabay). Otra forma: los mismos tres grupos
+      como submenús dentro de Archivo. Esperando que Alexis elija.
 
 - [ ] **YouVersion: en pausa** (5/11/2026, Alexis: «queda en el freezer por
       ahora»). La integración está programada y guardada en la rama

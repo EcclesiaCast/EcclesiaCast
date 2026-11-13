@@ -48,7 +48,7 @@
         </StackPanel>
 
         <Button DockPanel.Dock="Bottom" Content="Cerrar" HorizontalAlignment="Right" Padding="20,8" Margin="0,12,0,0"
-                Style="{StaticResource DarkButton}" IsCancel="True" IsDefault="True"/>
+                Style="{StaticResource DarkButton}" IsCancel="True" IsDefault="True" Click="Close_Click"/>
 
         <Border Style="{StaticResource Panel}" Padding="20">
             <Grid x:Name="SectionPanels">
