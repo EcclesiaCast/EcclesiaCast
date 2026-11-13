@@ -253,6 +253,87 @@ domingo para ajustar.
 duración de cada canción (fase 5); probar la placa de video integrada para
 bajar la demora; otros idiomas.
 
+## 4.3 Segunda vuelta: más rápido y con la forma de la canción (13/11/2026)
+
+Alexis probó la beta el 12/11 con lo que suena en la PC: la letra se entendía,
+pero iba unos 6 segundos atrás, saltaba mal (de la 1 a la 6, de la 10 a la 14)
+y con el micrófono de la notebook no escuchaba nada.
+
+**Cómo se midió.** Se grabó lo que suena en la PC (16 kHz, como lo escucha el
+programa) con «Bautizados en Fuego» (20 diapositivas, 5 min 20 s, en vivo, con
+una parte hablada en el medio) y «Más Fuerte que Nunca» (6 diapositivas). A
+mano se anotó en qué segundo se empieza a cantar cada diapositiva (con un
+margen de unos 2 segundos). Un banco aparte (sin abrir el programa) hace de
+cuenta que escucha en vivo: cada pasada tarda lo que de verdad tarda el
+reconocedor y la siguiente empieza cuando termina. «Retraso» es cuánto después
+de empezar a cantarse la diapositiva aparece en pantalla (negativo = antes).
+«Equivocado» es poner una que no es ni la que se canta ni la que sigue.
+
+| | Cambios acertados | Retraso (mediana) | Peor | Equivocados |
+|---|---|---|---|---|
+| **Bautizados · seguir** — antes | 6 de 18 | +11,0 s | +13,9 s | 3 |
+| después, con placa de video | 16 de 18 | +4,4 s | +8,1 s | 1 |
+| después, sólo procesador | 15 de 18 | +6,4 s | +11,4 s | 1 |
+| **Bautizados · adelantarse** — antes (5 palabras) | 14 de 18 | +1,6 s | +12,6 s | 1 |
+| después, con placa de video (2 palabras) | 17 de 18 | −1,7 s | +7,6 s | 1 |
+| después, sólo procesador (2 palabras) | 16 de 18 | 0,0 s | +8,2 s | 0 |
+| **Más Fuerte · seguir** — antes | 2 de 5 | +13,6 s | +13,6 s | 4 |
+| después, con placa de video | 5 de 5 | +3,6 s | +7,6 s | 0 |
+| después, sólo procesador | 4 de 5 | +8,9 s | +16,5 s | 1 |
+| **Más Fuerte · adelantarse** — antes (5 palabras) | 5 de 5 | +2,1 s | +26,2 s | 2 |
+| después, con placa de video (2 palabras) | 5 de 5 | −2,4 s | +1,6 s | 0 |
+| después, sólo procesador (2 palabras) | 5 de 5 | −0,3 s | +1,2 s | 0 |
+
+En «seguir» siempre hay 2 o 3 segundos que no se pueden sacar: hay que oír
+las primeras palabras de la diapositiva para saber que empezó. Por eso el modo
+que sirve para el culto es «adelantarse». Los cambios que faltan en
+«Bautizados» son las diapositivas de «Fuego, fuego» gritado, que el
+reconocedor no entiende.
+
+**Ojo:** las reglas se ajustaron mirando estas mismas dos canciones, así que
+con otras los números van a ser algo peores. Falta medir con canciones que no
+se usaron para ajustar, y con el sonido de la consola en un culto.
+
+**Qué cambió.**
+
+1. **Placa de video.** El reconocedor corre en la placa (Vulkan: sirve para
+   AMD, Intel y Nvidia) y cae al procesador si no puede. En la notebook
+   (Radeon 860M integrada) una pasada de 6 s de sonido bajó de 2,7 s a 0,45 s.
+   La primera pasada prepara la placa y tarda unos 10 s: se hace al encender,
+   no en la primera frase. El instalador crece unos 58 MB.
+2. **Pasadas cortas y seguidas.** Ventana de 6 s (antes 8) y una pasada por
+   segundo (antes cada 3). Además se le corta el paso cuando entra en bucle
+   repitiendo una frase, que era lo que causaba las pasadas de 5 a 10 s.
+3. **La forma de la canción** (`LyricFollower`, `FollowPilot`). Lo escuchado
+   se compara con la canción entera en orden, así que una frase que va del
+   final de una diapositiva al principio de la otra se reconoce igual. El
+   piloto lleva la cuenta de por dónde va el canto y sabe que avanza a ritmo
+   de voz: entre copias de la misma letra (un coro repetido, dos diapositivas
+   iguales seguidas) elige la que el canto pudo haber alcanzado. Ir a la
+   siguiente es lo esperado; saltar a otra parte pide palabras claras y
+   escucharlo dos pasadas seguidas; salir de una diapositiva que nadie cantó
+   todavía (alguien hablando antes de empezar) también pide más. Las palabras
+   cortas («de», «la», «y») valen la mitad. Ya no se tira lo escuchado después
+   de cada cambio, que dejaba al programa sordo unos segundos.
+4. **Adelantarse cuenta lo que tardó el reconocedor** (a 1,5 palabras por
+   segundo), así que el margen viene en 2 palabras en vez de 5.
+5. **Micrófono.** Lo del 12/11 no era el reconocedor: el programa descartaba
+   por «silencio» todo lo que no llegara al 1 % del volumen, y el micrófono
+   de la notebook no llegaba. Ahora el corte está en 0,2 %, el sonido bajo se
+   sube antes de reconocerlo (hasta 40 veces) y el nivel de cada pasada queda
+   en el registro. Probado bajando 10 veces la grabación: se entiende igual.
+   **No está probado con un micrófono de verdad** captando un parlante.
+
+**No se probó:** sherpa-onnx ni Vosk (reconocedores que
+transmiten palabra por palabra). Con la placa de video Whisper ya responde en
+medio segundo y es el único que entendió canto con banda en la fase 0; no
+valía la pena sumar otro motor y otro modelo para bajar.
+
+**Banco:** queda fuera del repositorio (tiene rutas de esta PC), con el audio
+y las referencias, en la carpeta de notas de la sesión. Comandos: `rec`
+(graba lo que suena), `probe`, `cost`, `sim` y `replay` (repite una
+simulación con el piloto de ahora sin volver a reconocer).
+
 ## 5. Riesgos
 
 | Riesgo | Qué hacemos |

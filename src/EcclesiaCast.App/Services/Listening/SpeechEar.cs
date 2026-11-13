@@ -3,6 +3,7 @@ using System.Text;
 using Serilog;
 using Whisper.net;
 using Whisper.net.Ggml;
+using Whisper.net.LibraryLoader;
 
 namespace EcclesiaCast.App.Services.Listening;
 
@@ -22,14 +23,25 @@ public sealed class SpeechEar : IDisposable
     /// <summary>About how much is downloaded, for the operator to know before starting.</summary>
     public const string ModelSizeText = "unos 550 MB";
 
-    /// <summary>
-    /// Whisper works on half-minute blocks. For the few seconds listened to
-    /// each time, a quarter of that is plenty and makes it four times faster.
-    /// </summary>
-    private const int ShortAudioContext = 448;
+    /// <summary>More pieces of words than this in a few seconds is the recogniser looping, not singing.</summary>
+    private const int MaxTokens = 64;
 
+    private readonly int _audioContext;
     private WhisperFactory? _factory;
     private WhisperProcessor? _processor;
+
+    /// <param name="window">How much sound is handed over each time.</param>
+    public SpeechEar(TimeSpan window) => _audioContext = ContextFor(window);
+
+    /// <summary>
+    /// Whisper works on half-minute blocks and looks at 50 steps a second.
+    /// For the few seconds listened to each time only that much is looked at,
+    /// with a little room: the shorter, the faster.
+    /// </summary>
+    public static int ContextFor(TimeSpan window) => (int)Math.Ceiling((window.TotalSeconds * 50 + 64) / 64) * 64;
+
+    /// <summary>True when the video card does the work: about five times faster than the processor on the church notebook.</summary>
+    public bool OnVideoCard { get; private set; }
 
     public static string ModelPath => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -68,17 +80,29 @@ public sealed class SpeechEar : IDisposable
         if (_processor is not null)
             return;
 
+        // The video card first (any brand, through Vulkan); the processor when
+        // this PC has no Vulkan. Has to be said before the first load.
+        RuntimeOptions.RuntimeLibraryOrder = [RuntimeLibrary.Vulkan, RuntimeLibrary.Cpu];
+
         // Half the cores, so the video and the window keep theirs.
         var threads = Math.Clamp(Environment.ProcessorCount / 2, 2, 8);
+        var clock = System.Diagnostics.Stopwatch.StartNew();
         _factory = WhisperFactory.FromPath(ModelPath);
+        OnVideoCard = RuntimeOptions.LoadedLibrary == RuntimeLibrary.Vulkan;
         _processor = _factory.CreateBuilder()
             .WithLanguage("es")
             .WithThreads(threads)
             .WithNoContext()
             .WithSingleSegment()
-            .WithAudioContextSize(ShortAudioContext)
+            .WithAudioContextSize(_audioContext)
+            .WithMaxTokensPerSegment(MaxTokens)
             .Build();
-        Log.Information("Reconocedor de voz cargado ({Threads} hilos)", threads);
+
+        // The first pass on a video card prepares it and takes seconds: better
+        // now than on the first line sung.
+        Transcribe(new float[SoundInput.Rate], CancellationToken.None);
+        Log.Information("Reconocedor de voz cargado en {Engine} ({Threads} hilos, listo en {Seconds:0.0} s)",
+            OnVideoCard ? "la placa de video" : "el procesador", threads, clock.Elapsed.TotalSeconds);
     }
 
     /// <summary>What was said or sung in a few seconds of sound, as the recogniser wrote it.</summary>

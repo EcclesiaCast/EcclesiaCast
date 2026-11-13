@@ -18,7 +18,9 @@ public sealed partial class MainViewModel
 {
     private const string ListenDeviceKey = "listen.device";
     private const string ListenModeKey = "listen.mode";
-    private const string ListenLeadKey = "listen.lead";
+    // A new name since the pilot counts what the recogniser takes by itself: the
+    // margin saved for the slow one (5 words) would now be far too early.
+    private const string ListenLeadKey = "listen.lead2";
 
     /// <summary>How the program acts on what it hears: 0 only marks the slide, 1 follows, 2 moves on ahead.</summary>
     public const int ListenSuggest = 0, ListenFollow = 1, ListenAnticipate = 2;
@@ -28,6 +30,7 @@ public sealed partial class MainViewModel
     private string _pilotSong = string.Empty;
     private DispatcherTimer? _listenMeter;
     private CancellationTokenSource? _modelDownload;
+    private bool _listenOnCard;
 
     public ObservableCollection<SoundInputDevice> ListenDevices { get; } = [];
 
@@ -39,7 +42,7 @@ public sealed partial class MainViewModel
 
     /// <summary>In «adelantarse»: how many words before the end of the slide the next one goes up.</summary>
     [ObservableProperty]
-    private double _listenLeadWords = 5;
+    private double _listenLeadWords = 2;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ListenButtonText))]
@@ -182,6 +185,12 @@ public sealed partial class MainViewModel
                 _listener = new SongListener(System.Windows.Application.Current.Dispatcher);
                 _listener.Heard += OnHeard;
                 _listener.Failed += reason => StopListening(reason);
+                _listener.Ready += onCard =>
+                {
+                    _listenOnCard = onCard;
+                    if (IsListening)
+                        ListenStatus = "Escuchando.";
+                };
             }
 
             _pilot = null;
@@ -230,8 +239,12 @@ public sealed partial class MainViewModel
         if (!IsListening)
             return;
 
-        ListenHeard = heard.Text.Length == 0 ? "(no distingo palabras)" : heard.Text;
-        var slow = heard.Cost > 4.5 ? " · esta PC va justa: el reconocedor tarda" : string.Empty;
+        ListenHeard = heard.Text.Length > 0 ? heard.Text
+            : heard.Level < SongListener.Silence ? "(no llega sonido por esta entrada: revisá que no esté silenciada en Windows)"
+            : "(no distingo palabras)";
+        var slow = heard.Cost > 2.5
+            ? _listenOnCard ? " · esta PC va justa: el reconocedor tarda" : " · va lento: esta PC no tiene placa de video que lo ayude"
+            : string.Empty;
 
         // Only a song with one of its slides on screen is followed: the pilot
         // never puts up the first one, changes of song or touches the Bible.
@@ -250,12 +263,12 @@ public sealed partial class MainViewModel
         if (pilot.LiveSlide != live)
         {
             pilot.OperatorMoved(live, now);
-            _listener?.MarkChange();
             Log.Information("Seguir la canción: el operador puso la diapositiva {Slide}", live + 1);
         }
 
-        var decision = pilot.HearWindow(heard.Text, now);
-        Log.Debug("Seguir la canción: «{Text}» ({Cost:0.0} s) → {Position}", heard.Text, heard.Cost, decision.Position);
+        var decision = pilot.HearWindow(heard.Text, now, TimeSpan.FromSeconds(heard.Cost));
+        Log.Debug("Seguir la canción: «{Text}» ({Cost:0.0} s, nivel {Level:0.000}) → {Position}",
+            heard.Text, heard.Cost, heard.Level, decision.Position);
 
         var where = decision.Position is { } at && at.Confidence >= 0.3
             ? $"Voy por la diapositiva {at.Slide + 1}"
@@ -267,7 +280,6 @@ public sealed partial class MainViewModel
             return;
         }
 
-        _listener?.MarkChange();
         if (ListenModeIndex == ListenSuggest)
         {
             SetPreviewIndex(target);
@@ -298,7 +310,6 @@ public sealed partial class MainViewModel
             Mode = ListenModeIndex == ListenFollow ? FollowMode.Follow : FollowMode.Anticipate,
             LeadWords = (int)Math.Round(ListenLeadWords),
         });
-        _listener?.MarkChange();
         return _pilot;
     }
 

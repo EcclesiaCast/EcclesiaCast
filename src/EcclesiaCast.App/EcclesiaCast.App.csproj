@@ -44,6 +44,15 @@
     <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.23.1" />
     <PackageReference Include="Whisper.net" Version="1.9.1" />
     <PackageReference Include="Whisper.net.Runtime" Version="1.9.1" />
+    <PackageReference Include="Whisper.net.Runtime.Vulkan" Version="1.9.1" />
   </ItemGroup>
+
+  <!-- The speech recogniser for video cards (Vulkan) also brings its Linux
+       files, 58 MB the installer does not need. -->
+  <Target Name="LeaveOutLinuxSpeechFiles" BeforeTargets="AssignTargetPaths">
+    <ItemGroup>
+      <None Remove="@(None)" Condition="$([System.String]::Copy(&apos;%(None.TargetPath)&apos;).StartsWith(&apos;runtimes/vulkan/linux&apos;))" />
+    </ItemGroup>
+  </Target>
 
 </Project>
