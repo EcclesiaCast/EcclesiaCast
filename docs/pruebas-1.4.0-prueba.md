@@ -1,7 +1,20 @@
-# Qué probar en la 1.4.0 de prueba (11/11/2026)
+# Qué probar en la 1.4.0 de prueba (11/11/2026, al día el 14/11)
 
-Instalador: `dist\EcclesiaCast-1.4.0-prueba.4-setup.exe` (158 MB). No está
+Instalador: `dist\EcclesiaCast-1.4.0-prueba.5-setup.exe` (171 MB). No está
 publicado en ningún lado. Se instala encima de las anteriores.
+
+**Lo nuevo de la prueba.5 (para el domingo 15/11):**
+
+- **«Seguir la canción» rehecho** (sección 1): usa la placa de video,
+  escucha una vez por segundo y sigue el orden de la canción. Con las dos
+  canciones del 13/11 pasó de acertar 6 de 18 cambios a 16 de 18, y de ir
+  11 s atrás a unos 4 s. **Es lo principal para probar en el culto.**
+- **Menú Archivo dividido:** ahora hay menús **Canciones**, **Biblias** y
+  **Fondos**. Mirá que cada opción abra lo mismo que antes.
+- **Ajustes → «Cerrar»** ya cierra la ventana.
+- **Bajar Biblias:** si elegís una que ya tenés, lo dice en una ventana.
+- **Fondos de Pixabay** en vez de Pexels (sección 6). Hasta que publiques el
+  servicio dice «todavía no está disponible».
 
 - La prueba.2 arregla que «Seguir la canción» no abría ninguna entrada y que
   «Bajar Biblias» repetía una que ya estaba.
@@ -59,9 +72,17 @@ Qué esperar, para no llevarse una sorpresa:
 
 - Anda con canciones a ritmo medio y la voz adelante. Con canciones rápidas y
   la banda fuerte se pierde, y ahí va a decir «No ubico la letra todavía».
-- Tarda unos 3 segundos en entender cada tramo.
-- Usa bastante procesador mientras escucha. **Mirá si el video de fondo se
-  traba**; si se traba, es un dato importante.
+- Con la placa de video entiende cada tramo en medio segundo y va unos 4
+  segundos atrás de lo que se canta en «Seguir». En **Adelantarse** (ahora
+  viene en 2 palabras) llegó justo a tiempo o un poco antes: **probá ese
+  modo primero**.
+- Para saltar a otra parte de la canción lo tiene que escuchar dos veces
+  seguidas: si alguien repite un coro fuera de orden, tarda un poco más.
+- Ahora trabaja la placa de video mientras escucha. **Mirá si el video de
+  fondo se traba**; si se traba, es un dato importante.
+- **Con el micrófono:** sube el volumen solo si llega bajito, y avisa si por
+  esa entrada no llega nada. Probalo también con el micrófono de la
+  notebook, aunque sea cerca del parlante.
 - Sólo actúa con una canción que ya tiene una diapositiva en pantalla. Nunca
   pone la primera, nunca cambia de canción y no toca la Biblia.
 
@@ -116,20 +137,21 @@ programa, con botones que dicen lo que hacen. Para verlos sin romper nada:
 2. **Temas:** creá un tema nuevo y eliminalo → aviso amarillo con «Mandar a
    la papelera» en rojo. Después restauralo desde Edición → Papelera.
 3. **Papelera:** «Vaciar la papelera» pregunta antes.
-4. **Archivo → «Bajar más fondos de internet…»** → «Bajar los fondos / Ahora
+4. **Fondos → «Bajar más fondos de internet…»** → «Bajar los fondos / Ahora
    no» (podés decir «Ahora no»).
 5. Qué mirar en cada uno: que se lea entero, que **Enter** elija el botón
    azul o rojo, que **Esc** cancele, y que aparezca encima de la ventana
    desde donde lo abriste (no detrás).
 
-## 6. Fondos de Pexels
+## 6. Fondos de Pixabay
 
-**Antes de publicar el servicio:** tocá **🎞 Fondos** en la barra de medios,
-buscá «cruz» → tiene que decir «La búsqueda de fondos todavía no está
-disponible», sin errores raros.
+**Antes de publicar el servicio:** tocá **🎞 Fondos** en la barra de medios
+(o menú Fondos → «Buscar fondos en Pixabay…»), buscá «cruz» → tiene que
+decir «La búsqueda de fondos todavía no está disponible», sin errores raros.
 
-**Después de publicarlo** (`servicios/api/LEEME.md`: sacás la clave gratis en
-pexels.com/api y hacés los cinco pasos en Cloudflare):
+**Después de publicarlo** (`servicios/api/LEEME.md`: creás una cuenta gratis
+en pixabay.com, copiás la clave de pixabay.com/api/docs y hacés los pasos en
+Cloudflare):
 
 1. 🎞 Fondos → buscá «cruz atardecer». Aparecen tarjetas con la imagen, la
    duración y quién lo hizo.
@@ -141,7 +163,7 @@ pexels.com/api y hacés los cinco pasos en Cloudflare):
    cualquier fondo. **Mirá que el video ande en bucle y se vea nítido en el
    proyector.**
 6. Buscá lo mismo otra vez: los que ya bajaste dicen «Ya está en tus medios».
-7. Abajo a la izquierda, «Fotos y videos de Pexels» abre la página de Pexels.
+7. Abajo a la izquierda, «Fotos y videos de Pixabay» abre la página de Pixabay.
 
 ## Si algo falla
 
