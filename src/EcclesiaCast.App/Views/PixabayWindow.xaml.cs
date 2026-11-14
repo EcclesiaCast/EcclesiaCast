@@ -57,6 +57,10 @@ public partial class PixabayWindow : Window
     private readonly ObservableCollection<PixabayCard> _cards = [];
     private CancellationTokenSource? _work;
     private string _query = string.Empty;
+    // Lo que sale en el medio cuando no hay resultados (sin resultados, o la
+    // búsqueda todavía no está disponible): abajo, chiquito, no se ve.
+    private string? _centerMessage;
+    private readonly string _welcomeText;
     private bool _photos;
     private int _page;
     private bool _busy;
@@ -64,6 +68,7 @@ public partial class PixabayWindow : Window
     public PixabayWindow(MainViewModel vm)
     {
         InitializeComponent();
+        _welcomeText = EmptyText.Text;
         _vm = vm;
         DataContext = vm;
         Results.ItemsSource = _cards;
@@ -103,6 +108,7 @@ public partial class PixabayWindow : Window
             Scroller.ScrollToTop();
         }
 
+        _centerMessage = null;
         SetBusy(true, "Buscando…");
         _work = new CancellationTokenSource();
         try
@@ -117,13 +123,21 @@ public partial class PixabayWindow : Window
             }
 
             MoreButton.Visibility = page.HasMore ? Visibility.Visible : Visibility.Collapsed;
-            StatusLine.Text = _cards.Count == 0
-                ? $"No encontré {(_photos ? "fotos" : "videos")} con «{_query}». Probá con otra palabra."
-                : string.Empty;
+            StatusLine.Text = string.Empty;
+            if (_cards.Count == 0)
+                _centerMessage = $"No encontré {(_photos ? "fotos" : "videos")} con «{_query}». Probá con otra palabra.";
         }
         catch (PixabaySearchException ex)
         {
-            StatusLine.Text = ex.Message;
+            if (_cards.Count == 0)
+            {
+                StatusLine.Text = string.Empty;
+                _centerMessage = ex.Message;
+            }
+            else
+            {
+                StatusLine.Text = ex.Message;
+            }
         }
         catch (OperationCanceledException)
         {
@@ -176,9 +190,10 @@ public partial class PixabayWindow : Window
         _busy = busy;
         if (status is not null)
             StatusLine.Text = status;
-        EmptyText.Visibility = _cards.Count == 0 && !busy && string.IsNullOrEmpty(_query)
-            ? Visibility.Visible
-            : Visibility.Collapsed;
+        var message = _cards.Count > 0 || busy ? null
+            : _centerMessage ?? (string.IsNullOrEmpty(_query) ? _welcomeText : null);
+        EmptyText.Text = message ?? string.Empty;
+        EmptyText.Visibility = message is null ? Visibility.Collapsed : Visibility.Visible;
         MoreButton.IsEnabled = !busy;
         UpdateAddButton();
     }

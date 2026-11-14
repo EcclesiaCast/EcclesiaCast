@@ -542,9 +542,9 @@ Con una copia de la biblioteca (la real no cambió) y la grabación del 13/11:
       («No llegó sonido por esta entrada…») salió bien. Puede ser la tecla
       de silenciar micrófono o que Windows no lo deja a programas abiertos
       desde Claude: Alexis lo mira el domingo con el instalado.
-- [ ] **Detalle:** en Buscar fondos, «La búsqueda de fondos todavía no está
+- [x] **Detalle:** en Buscar fondos, «La búsqueda de fondos todavía no está
       disponible» sale chiquito abajo y el centro queda vacío: mostrarlo en
-      el medio.
+      el medio. **Hecho el 14/11** (también «No encontré…»), en la prueba.5.
 
 - [ ] **YouVersion: en pausa** (5/11/2026, Alexis: «queda en el freezer por
       ahora»). La integración está programada y guardada en la rama
