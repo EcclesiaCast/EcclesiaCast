@@ -168,14 +168,14 @@ public class FollowPilotTests
     }
 
     [Fact]
-    public void A_jump_back_in_the_song_is_followed_when_it_is_clear()
+    public void A_jump_back_in_the_song_is_followed_when_it_is_heard_twice()
     {
         var pilot = new FollowPilot(Hymn, liveSlide: 3);
 
-        var decision = pilot.Hear("santo santo santo te adoro reverente", At(0));
-
-        // Slide 1 is being sung, and it is not near its end: go there.
-        Assert.Equal(1, decision.GoTo);
+        // Heard once it could be a slip of the ear; heard again, slide 1 is
+        // being sung, and it is not near its end: go there.
+        Assert.Null(pilot.Hear("santo santo santo te adoro reverente", At(0)).GoTo);
+        Assert.Equal(1, pilot.Hear("santo santo te adoro reverente", At(1)).GoTo);
     }
 
     [Fact]
@@ -217,5 +217,87 @@ public class FollowPilotTests
         var pilot = new FollowPilot(Hymn, liveSlide: 3);
 
         Assert.Null(pilot.Hear("ante el trono y el cristalino mar", At(0)).GoTo);
+    }
+
+    // ── La forma de la canción ───────────────────────────────────
+
+    // Estrofa, coro, estrofa, coro: el coro está dos veces, como se canta.
+    private static readonly string[] WithChorus =
+    [
+        "Santo, santo, santo, Señor omnipotente,\nsiempre el labio mío loores te dará.",
+        "Gloria, gloria al que vive para siempre,\ntoda la tierra canta su bondad.",
+        "Santo, santo, santo, en numeroso coro\nsantos escogidos te adoran sin cesar,",
+        "Gloria, gloria al que vive para siempre,\ntoda la tierra canta su bondad.",
+    ];
+
+    [Fact]
+    public void A_line_that_runs_from_one_slide_into_the_next_is_still_found()
+    {
+        var at = new FollowPilot(Hymn, options: new FollowOptions { Mode = FollowMode.Follow })
+            .HearWindow("mío loores te dará santo santo santo te adoro reverente", At(0));
+
+        Assert.Equal(1, at.GoTo);
+        Assert.True(at.Position!.Value.Confidence > 0.8);
+    }
+
+    [Fact]
+    public void A_chorus_that_comes_twice_is_the_one_that_comes_next()
+    {
+        var follow = new FollowOptions { Mode = FollowMode.Follow };
+
+        var first = new FollowPilot(WithChorus, liveSlide: 0, follow);
+        Assert.Equal(1, first.HearWindow("gloria gloria al que vive para siempre", At(0)).GoTo);
+
+        var second = new FollowPilot(WithChorus, liveSlide: 2, follow);
+        Assert.Equal(3, second.HearWindow("gloria gloria al que vive para siempre", At(0)).GoTo);
+    }
+
+    [Fact]
+    public void A_far_jump_heard_only_once_moves_nothing()
+    {
+        var pilot = new FollowPilot(Hymn, liveSlide: 3, new FollowOptions { Mode = FollowMode.Follow });
+
+        Assert.Null(pilot.HearWindow("santo santo santo te adoro reverente", At(0)).GoTo);
+
+        // Then the song goes on where it was: the jump is forgotten.
+        Assert.Null(pilot.HearWindow("rinden ante el trono", At(1)).GoTo);
+        Assert.Null(pilot.HearWindow("santo santo santo te adoro reverente", At(10)).GoTo);
+        Assert.Equal(3, pilot.LiveSlide);
+    }
+
+    [Fact]
+    public void A_few_small_words_are_not_enough_to_jump_far()
+    {
+        var pilot = new FollowPilot(Hymn, liveSlide: 0, new FollowOptions { Mode = FollowMode.Follow });
+
+        // «y el» is in the last slide, and so are a hundred other lines.
+        Assert.Null(pilot.HearWindow("y el mar", At(0)).GoTo);
+        Assert.Null(pilot.HearWindow("y el mar", At(1)).GoTo);
+    }
+
+    [Fact]
+    public void A_window_that_still_holds_the_slide_just_left_does_not_go_back()
+    {
+        var pilot = new FollowPilot(Hymn);
+        Assert.Equal(1, pilot.HearWindow("siempre el labio mío loores te", At(0)).GoTo);
+
+        // The recogniser hears the same seconds again, with one word more.
+        Assert.Null(pilot.HearWindow("siempre el labio mío loores te dará", At(2)).GoTo);
+        Assert.Null(pilot.HearWindow("labio mío loores te dará santo santo", At(4)).GoTo);
+        Assert.Equal(1, pilot.LiveSlide);
+    }
+
+    [Fact]
+    public void A_slow_recogniser_makes_the_pilot_move_on_sooner()
+    {
+        var options = new FollowOptions { LeadWords = 1 };
+
+        // Four words left: not yet, when the answer is fresh.
+        var fresh = new FollowPilot(Hymn, options: options);
+        Assert.Null(fresh.HearWindow("señor omnipotente siempre el labio", At(0)).GoTo);
+
+        // Two seconds late, those four words have been sung by now.
+        var late = new FollowPilot(Hymn, options: options);
+        Assert.Equal(1, late.HearWindow("señor omnipotente siempre el labio", At(0), TimeSpan.FromSeconds(2)).GoTo);
     }
 }

@@ -36,6 +36,17 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   **Canciones**, **Biblias** y **Fondos**. En Archivo quedan las copias de la
   biblioteca, Ajustes y Salir.
 
+- **«Seguir la canción» va mucho más al ritmo y se equivoca menos (sigue en
+  prueba).** Ahora escucha más o menos una vez por segundo en vez de cada
+  tres, y usa la placa de video de la PC para entender lo que oye (si la PC
+  no tiene una que sirva, sigue funcionando como antes, más lento). Lleva la
+  cuenta de por dónde va la canción: lo normal es pasar a la diapositiva
+  siguiente, un coro que se repite es el que toca según el orden, y para
+  saltar a otra parte tiene que escucharlo dos veces seguidas. Ya no cambia
+  por alguien que habla antes de empezar ni por dos o tres palabras sueltas.
+  En «adelantarse» el margen viene en 2 palabras (antes 5). Con un micrófono
+  que llega bajito sube el volumen por su cuenta antes de escuchar, y avisa
+  si por esa entrada no llega nada.
 - **Editor de temas rehecho.** La vista previa queda en el medio y más grande,
   los campos van a la derecha repartidos en secciones (Letra, Sombra y franjas,
   Fondo, Leyenda, Transición y Biblia) y las plantillas listas se ven como

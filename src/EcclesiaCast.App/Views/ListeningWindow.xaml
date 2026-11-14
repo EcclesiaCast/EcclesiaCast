@@ -90,7 +90,7 @@
             <TextBlock Text="Pasar cuando falten" Foreground="White" FontSize="12" VerticalAlignment="Center"/>
             <controls:NumericField Minimum="0" Maximum="12" Step="1" Margin="8,0"
                                    Value="{Binding ListenLeadWords}"
-                                   ToolTip="Para sugerir y adelantarse. Más palabras = pasa antes. El programa tarda unos segundos en entender lo que oye, por eso conviene darle margen."/>
+                                   ToolTip="Para sugerir y adelantarse. Más palabras = pasa antes. Con 2 la diapositiva suele llegar justo antes de que la canten; si llega tarde, subilo."/>
             <TextBlock Text="palabras de la diapositiva" Foreground="White" FontSize="12" VerticalAlignment="Center"/>
         </StackPanel>
 
