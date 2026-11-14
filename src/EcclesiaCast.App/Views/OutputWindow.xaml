@@ -10,7 +10,8 @@
         Focusable="False"
         Topmost="True"
         Cursor="None"
-        Background="Black">
+        Background="Black"
+        MouseDoubleClick="Output_MouseDoubleClick">
     <Grid>
         <!-- Relleno: se ve donde el fondo no llega (zoom hacia afuera, un
              tamaño fijo más chico, o barras por la proporción) -->
@@ -46,5 +47,15 @@
              antes de cerrar la ventana (Proyección → Transiciones…) -->
         <Rectangle x:Name="ShutterLayer" Fill="Black" Opacity="0" Visibility="Collapsed"
                    IsHitTestVisible="False"/>
+
+        <!-- Cómo volver. Sólo cuando la salida tapa el panel del operador (una
+             sola pantalla), una vez por sesión, y se desvanece sola. -->
+        <Border x:Name="WayBackHint" Visibility="Collapsed" IsHitTestVisible="False"
+                VerticalAlignment="Top" HorizontalAlignment="Center"
+                Background="#CC2F63C9" CornerRadius="0,0,10,10"
+                Padding="26,12">
+            <TextBlock Text="Para volver al programa: tecla Esc o doble clic en esta pantalla"
+                       FontFamily="Segoe UI" FontSize="20" Foreground="White"/>
+        </Border>
     </Grid>
 </Window>

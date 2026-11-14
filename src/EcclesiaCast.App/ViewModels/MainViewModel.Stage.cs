@@ -178,7 +178,7 @@ public sealed partial class MainViewModel
         // With only two screens the stage can only land on the operator's own,
         // covering the panel it was started from. Say so, and say how to get
         // out, before it happens.
-        if (IsOperatorDisplay(SelectedStageDisplay.Info))
+        if (OperatorScreen.Holds(SelectedStageDisplay.Info))
         {
             var answer = MessageBox.Show(
                 "El escenario va a ocupar esta misma pantalla y va a tapar el panel del operador.\n\n"
@@ -192,21 +192,6 @@ public sealed partial class MainViewModel
         _stage.ShowOn(SelectedStageDisplay.Info, ActiveStageLayout);
         _settings.Set(StageDisplayKey, SelectedStageDisplay.Info.DeviceName);
         StatusText = $"Escenario en {SelectedStageDisplay.Label}.";
-    }
-
-    /// <summary>True when that display is the one holding the operator window.</summary>
-    private static bool IsOperatorDisplay(DisplayInfo display)
-    {
-        var window = Application.Current?.MainWindow;
-        if (window is null)
-            return false;
-
-        var handle = new System.Windows.Interop.WindowInteropHelper(window).Handle;
-        if (handle == IntPtr.Zero)
-            return false;
-
-        var screen = System.Windows.Forms.Screen.FromHandle(handle);
-        return string.Equals(screen.DeviceName, display.DeviceName, StringComparison.Ordinal);
     }
 
     [RelayCommand]
