@@ -611,6 +611,36 @@ las respuestas automáticas de la tabla); toca dar estos pasos.
 
 ## 4. Para versiones futuras
 
+- **Versión para Mac** (la piden en Instagram; Alexis quiere hacerla,
+  14/11/2026). Es el trabajo más grande que queda:
+  - **Qué se aprovecha:** `EcclesiaCast.Core` y `EcclesiaCast.Data` (unas
+    24.000 líneas: canciones, Biblias, playlists, base SQLite, control remoto)
+    ya son .NET común y funcionan en Mac sin cambios.
+  - **Qué hay que rehacer:** la interfaz entera (`EcclesiaCast.App`, unas
+    42.000 líneas y 43 ventanas y controles) está hecha con WPF, que sólo
+    existe en Windows. El camino es pasarla a **Avalonia**, que se escribe casi
+    igual que WPF y funciona en Windows, Mac y Linux. Hacer una sola versión en
+    Avalonia para los dos sistemas, no mantener dos interfaces.
+  - **Piezas sólo de Windows que necesitan reemplazo:** el video (LibVLC tiene
+    versión para Mac y para Avalonia), WebView2 (páginas web, YouTube,
+    musica.com: en Mac no existe), y capturar ventanas, teclas multimedia,
+    miniaturas de archivos, barra de título oscura, ahorro de energía y la
+    lista de pantallas (`Services/` del programa).
+  - **Orden propuesto:** primero un prototipo en Avalonia que muestre una
+    canción y un versículo en la pantalla del proyector y pase un video de
+    fondo, probado en una Mac de verdad. Si eso funciona bien, pasar el resto
+    por partes, cuidando que la versión de Windows no empeore.
+  - **Cómo probarlo:** GitHub tiene Macs en la nube (gratis para repositorios
+    públicos) para compilar, correr las pruebas y sacar capturas de cada
+    pantalla; sirve para todo menos el proyector. Para la prueba de verdad
+    hace falta una Mac física con proyector o TV: prestada, o de alguno de los
+    que la piden en Instagram como probador. Armar Mac con chip Apple
+    (arm64) y Mac con Intel (x64).
+  - **Instalación en Mac:** sin firma de Apple (cuenta de desarrollador de
+    Apple, paga por año) la Mac bloquea el programa y hay que habilitarlo a
+    mano en Ajustes del Sistema → Privacidad y seguridad → «Abrir igual».
+    Explicarlo en la página con capturas, como el «Ejecutar de todas formas»
+    de Windows.
 - **Ideas tomadas de G-Presenter** (gpresenter.com, mirado el 28/10/2026;
   Alexis dijo que sí a las seis, para más adelante):
   1. **Cámara o capturadora como diapositiva**, o de fondo detrás de la letra
