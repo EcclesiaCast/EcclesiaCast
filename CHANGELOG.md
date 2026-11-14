@@ -5,6 +5,15 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+### Corregido
+
+- **Con una sola pantalla ya no quedás atrapado en la salida.** Si la salida
+  ocupa la misma pantalla que el programa (una notebook, o un proyector que
+  duplica la pantalla), la primera vez que se prende muestra unos segundos
+  arriba «Para volver al programa: tecla Esc o doble clic en esta pantalla».
+  Y ahora el doble clic sobre la salida la apaga, como ya pasaba con el
+  escenario. Con el proyector en una pantalla aparte no cambia nada.
+
 ## [1.3.1] - 2026-11-09
 
 ### Agregado

@@ -407,6 +407,8 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 IsProjecting = _projection.IsOutputVisible;
         };
         _projection.VideoEnded += (_, _) => OnProjectedVideoEnded();
+        // A double click on an output that covers the panel: same as Esc.
+        _projection.TurnOffRequested += (_, _) => HideOutput();
         _stage.VisibilityChanged += (_, _) => IsStageVisible = _stage.IsVisible;
         LoadStageLayouts();
         LoadSongMaxLines();

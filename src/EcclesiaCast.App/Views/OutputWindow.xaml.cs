@@ -100,9 +100,18 @@ public partial class OutputWindow : Window
     /// <summary>Raised when the small copy of the video for the operator's preview changes.</summary>
     public event EventHandler<System.Windows.Media.ImageSource?>? VideoFrameChanged;
 
+    /// <summary>
+    /// Raised when the operator double-clicks the output to switch it off.
+    /// Only while it covers the operator panel: on a projector of its own a
+    /// stray double click must never take the words off the screen.
+    /// </summary>
+    public event EventHandler? TurnOffRequested;
+
     /// <summary>Shows this window fullscreen on the given display.</summary>
     public void ShowOn(DisplayInfo display)
     {
+        var wasHidden = !IsVisible || IsFadingOut;
+
         // Something was projected while the screen was still fading to black
         // to switch off: it stays on.
         CancelFadeOut();
@@ -110,6 +119,50 @@ public partial class OutputWindow : Window
         _display = display;
         Show();
         MoveToDisplay();
+
+        if (wasHidden && !s_wayBackShown && OperatorScreen.Holds(display))
+        {
+            s_wayBackShown = true;
+            ShowWayBackHint();
+        }
+    }
+
+    // ── Cómo volver al panel con una sola pantalla ───────────────
+
+    /// <summary>
+    /// Once per run: congregations that project with a single screen (a
+    /// notebook, or a projector duplicating it) may see it too, so it is not
+    /// repeated every time the output comes on.
+    /// </summary>
+    private static bool s_wayBackShown;
+
+    /// <summary>
+    /// With a single screen the output covers the operator panel, and someone
+    /// new has no way to know that Esc brings it back: the first beta tester
+    /// with a notebook was left stuck with a verse on screen. Flashes the way
+    /// out for a few seconds, as the stage window does.
+    /// </summary>
+    private void ShowWayBackHint()
+    {
+        WayBackHint.BeginAnimation(OpacityProperty, null);
+        WayBackHint.Visibility = Visibility.Visible;
+        WayBackHint.Opacity = 1;
+
+        var fade = new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(700))
+        {
+            BeginTime = TimeSpan.FromSeconds(6),
+        };
+        fade.Completed += (_, _) => WayBackHint.Visibility = Visibility.Collapsed;
+        WayBackHint.BeginAnimation(OpacityProperty, fade);
+    }
+
+    private void Output_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (_display is null || !OperatorScreen.Holds(_display))
+            return;
+
+        e.Handled = true;
+        TurnOffRequested?.Invoke(this, EventArgs.Empty);
     }
 
     // ── Apagar la salida con fundido ─────────────────────────────
