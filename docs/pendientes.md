@@ -526,6 +526,26 @@ prueba). Lo que quedó:
       más fondos, buscar en Pixabay). Otra forma: los mismos tres grupos
       como submenús dentro de Archivo. **Alexis eligió los tres menús (13/11); hecho.** Falta que lo vea.
 
+### Prueba de Claude con la prueba.5 abierta (14/11/2026)
+
+Con una copia de la biblioteca (la real no cambió) y la grabación del 13/11:
+
+- Menús Canciones / Biblias / Fondos / Archivo, «Cerrar» de Ajustes, aviso
+  de Biblias ya instaladas, aviso de «Bajar más fondos» (Esc cancela) y
+  Pixabay sin servicio: **todo bien**.
+- **Seguir la canción, Adelantarse, sonido de la PC, «Bautizados en Fuego»:**
+  16 de 18 cambios bien; casi todos entre 4 s antes y 5 s después de que se
+  canta, dos tarde (8 y 13 s). Cada pasada 0,5–0,9 s en la placa de video.
+  Las dos últimas no las puso porque en la grabación cantan otra cosa ahí.
+  Cuando empezó otra canción no se movió.
+- [ ] **Micrófono de la notebook: nivel 0,000**, ni ruido. El aviso nuevo
+      («No llegó sonido por esta entrada…») salió bien. Puede ser la tecla
+      de silenciar micrófono o que Windows no lo deja a programas abiertos
+      desde Claude: Alexis lo mira el domingo con el instalado.
+- [ ] **Detalle:** en Buscar fondos, «La búsqueda de fondos todavía no está
+      disponible» sale chiquito abajo y el centro queda vacío: mostrarlo en
+      el medio.
+
 - [ ] **YouVersion: en pausa** (5/11/2026, Alexis: «queda en el freezer por
       ahora»). La integración está programada y guardada en la rama
       `claude/youversion-integracion`, sin fusionar: necesita que cada iglesia
