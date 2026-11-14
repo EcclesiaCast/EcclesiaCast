@@ -384,6 +384,8 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _youTube = youTube;
         _logos = logos;
         _logoManager = logoManager;
+        MediaLookup.Find = FindMedia;
+        MediaLookup.All = () => _allMedia.ToList();
         _songImport = songImport;
         _webSongSearch = webSongSearch;
         _stage = stage;

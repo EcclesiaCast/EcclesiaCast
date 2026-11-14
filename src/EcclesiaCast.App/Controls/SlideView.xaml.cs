@@ -742,6 +742,8 @@ public partial class SlideView : UserControl
             LogoImage.Visibility = Visibility.Collapsed;
             LogoImage.Source = null;
             _lastLogoImagePath = null;
+            MediaFraming.Apply(LogoImage, null, RootCanvas.Width, RootCanvas.Height);
+            RenderLogoFill(null);
             LogoText.Text = "EcclesiaCast";
             LogoText.FontFamily = new FontFamily("Segoe UI");
             LogoText.FontSize = 120;
@@ -770,13 +772,6 @@ public partial class SlideView : UserControl
             LogoText.Foreground = BrushFromHex(logo.TextColor, "#FFFFFF");
         }
 
-        LogoImage.Stretch = logo.Scaling switch
-        {
-            MediaScaling.Fill => Stretch.UniformToFill,
-            MediaScaling.Stretch => Stretch.Fill,
-            _ => Stretch.Uniform,
-        };
-
         // An image logo shows its file; a video logo shows its poster, but only
         // in the previews (live, the real video is playing behind this layer).
         var path = logo.Kind switch
@@ -786,34 +781,76 @@ public partial class SlideView : UserControl
             _ => null,
         };
 
-        if (path == _lastLogoImagePath)
-            return;
-        _lastLogoImagePath = path;
-
-        if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
+        if (path != _lastLogoImagePath)
         {
-            try
-            {
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.UriSource = new Uri(path);
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.DecodePixelWidth = 1920;
-                bitmap.EndInit();
-                if (bitmap.CanFreeze)
-                    bitmap.Freeze();
-                LogoImage.Source = bitmap;
-                LogoImage.Visibility = Visibility.Visible;
-                return;
-            }
-            catch
-            {
-                // Ilegible: queda el color de fondo del logo.
-            }
+            _lastLogoImagePath = path;
+            LogoImage.Source = LoadLogoBitmap(path);
+            LogoImage.Visibility = LogoImage.Source is null ? Visibility.Collapsed : Visibility.Visible;
         }
 
-        LogoImage.Source = null;
-        LogoImage.Visibility = Visibility.Collapsed;
+        // Framed exactly like a background: zoom, shift, fixed size and fill.
+        var framing = LogoImage.Source is null ? null : logo.AsFramedMedia();
+        MediaFraming.Apply(LogoImage, framing, RootCanvas.Width, RootCanvas.Height);
+        RenderLogoFill(framing);
+    }
+
+    private string? _lastLogoFillKey;
+
+    /// <summary>
+    /// What fills the screen around a logo that does not cover it: the colour
+    /// of the layer, or on top of it a blurred copy of the logo or an image of
+    /// the media library. A video logo live has its own fill in the output.
+    /// </summary>
+    private void RenderLogoFill(MediaItem? framing)
+    {
+        var fill = framing is null || !MediaFraming.NeedsFill(framing) ? null
+            : framing.FillsWithSelf ? framing
+            : framing.FillMediaId is int id and > 0 ? MediaLookup.Find(id) : null;
+
+        // Only a still can be drawn here; a video fill shows its thumbnail.
+        var fillPath = fill is null ? null
+            : ReferenceEquals(fill, framing) ? framing.Path
+            : fill.Type == MediaType.Image ? fill.Path : fill.ThumbnailPath;
+        var key = fillPath is null ? null : $"{(ReferenceEquals(fill, framing) ? "self" : "lib")}|{fillPath}";
+        if (key == _lastLogoFillKey)
+            return;
+        _lastLogoFillKey = key;
+
+        if (fillPath is null)
+        {
+            LogoFillImage.Source = null;
+            LogoFillImage.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        LogoFillImage.Source = ReferenceEquals(fill, framing)
+            ? MediaFraming.BlurredFill(LogoImage.Source as BitmapSource) ?? LogoImage.Source
+            : LoadLogoBitmap(fillPath);
+        LogoFillImage.Visibility = LogoFillImage.Source is null ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    private static BitmapImage? LoadLogoBitmap(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+            return null;
+
+        try
+        {
+            var bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.UriSource = new Uri(path);
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.DecodePixelWidth = 1920;
+            bitmap.EndInit();
+            if (bitmap.CanFreeze)
+                bitmap.Freeze();
+            return bitmap;
+        }
+        catch
+        {
+            // Ilegible: queda el color de fondo del logo.
+            return null;
+        }
     }
 
     // ── Estados ──────────────────────────────────────────────────

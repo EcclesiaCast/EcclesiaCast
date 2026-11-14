@@ -56,6 +56,53 @@ public sealed class Logo
     /// <summary>Blur used when this logo is put behind the lyrics as a background, 0–100.</summary>
     public double BackgroundBlur { get; set; } = 40;
 
+    // ── Encuadre: the same framing a media item has ──────────────
+
+    /// <summary>Manual zoom over the framing, 1 = as the scaling mode left it.</summary>
+    public double Zoom { get; set; } = 1;
+
+    /// <summary>Horizontal shift, as a fraction of the screen width.</summary>
+    public double OffsetX { get; set; }
+
+    /// <summary>Vertical shift, as a fraction of the screen height.</summary>
+    public double OffsetY { get; set; }
+
+    /// <summary>Fixed size on the 1920×1080 canvas; null uses the whole screen.</summary>
+    public int? FrameWidth { get; set; }
+
+    public int? FrameHeight { get; set; }
+
+    /// <summary>
+    /// What fills the screen around the picture instead of
+    /// <see cref="BackgroundColor"/>: <see cref="MediaItem.FillWithSelfId"/>
+    /// for a blurred copy of the logo itself, or an image of the media library.
+    /// </summary>
+    public int? FillMediaId { get; set; }
+
+    /// <summary>
+    /// The logo as a media item carrying its framing, so the same code that
+    /// frames the backgrounds frames the logo. The id is negative: it never
+    /// collides with a row of the media library.
+    /// </summary>
+    public MediaItem AsFramedMedia() => new()
+    {
+        Id = -1000 - Id,
+        Name = Name,
+        Path = Path ?? string.Empty,
+        Type = Kind == LogoKind.Video ? MediaType.Video : MediaType.Image,
+        ThumbnailPath = Kind == LogoKind.Video ? PosterPath : Path,
+        Scaling = Scaling,
+        Zoom = Zoom,
+        OffsetX = OffsetX,
+        OffsetY = OffsetY,
+        FrameWidth = FrameWidth,
+        FrameHeight = FrameHeight,
+        FillColor = BackgroundColor,
+        FillMediaId = FillMediaId,
+        Muted = Muted,
+        EndBehavior = VideoEndBehavior.Loop,
+    };
+
     /// <summary>True when it can act as a background layer (it has a file).</summary>
     public bool CanBeBackground => Kind is LogoKind.Image or LogoKind.Video
         && !string.IsNullOrWhiteSpace(Path);

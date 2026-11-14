@@ -348,8 +348,13 @@ programa recuerda lo que elijas.
   podés tener uno para la reunión general, otro para jóvenes, otro para
   mujeres. Cada logo puede ser una **imagen**, un **video en bucle** o un
   **texto libre** con su tipografía y colores; se arman en *Administrar
-  logos…*. El botón **🖼▦** de al lado pone el logo **de fondo**, detrás de la
-  letra, con el desenfoque que le hayas puesto.
+  logos…*. Una imagen o un video que no es 16:9 (un logo cuadrado, por
+  ejemplo) se acomoda igual que un fondo: entero, rellenando o estirado, con
+  zoom, corrido, a un tamaño fijo, y con los bordes del color de fondo, de la
+  misma imagen desenfocada o de otra imagen de la biblioteca. En la vista
+  previa se arrastra para correrlo y la ruedita hace zoom. El botón **🖼▦** de
+  al lado pone el logo **de fondo**, detrás de la letra, con el desenfoque que
+  le hayas puesto.
 
 - **Texto rápido**: escribí un anuncio y proyectalo al momento.
 - **Aviso al pie**: un mensaje que aparece sobre todo lo demás (ideal para

@@ -25,6 +25,12 @@
         <controls:YouTubeSurface x:Name="YouTube" Visibility="Collapsed"/>
 
         <!-- Video del logo: encima del fondo, debajo del texto y del aviso al pie -->
+        <!-- Su relleno (color o imagen) aparece y se va junto con el video -->
+        <Grid Visibility="{Binding Visibility, ElementName=LogoVideo}"
+              Opacity="{Binding Opacity, ElementName=LogoVideo}" IsHitTestVisible="False">
+            <Rectangle x:Name="LogoVideoFillColor"/>
+            <Image x:Name="LogoVideoFillImage" Stretch="UniformToFill"/>
+        </Grid>
         <controls:VlcVideoSurface x:Name="LogoVideo" Visibility="Collapsed"/>
 
         <!-- Fondo de imagen + texto + estados, compuesto encima -->

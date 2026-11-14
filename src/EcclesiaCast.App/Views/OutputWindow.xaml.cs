@@ -258,8 +258,17 @@ public partial class OutputWindow : Window
         {
             var wasShown = LogoVideo.Visibility == Visibility.Visible;
             var from = wasShown ? LogoVideo.Opacity : 0;
-            LogoVideo.Show(AsLoopingVideo(logo!));
+            var framed = AsLoopingVideo(logo!);
+            LogoVideo.Show(framed);
             LogoVideo.Visibility = Visibility.Visible;
+
+            // Around a video that does not cover the screen: the logo's colour,
+            // or an image of the library (a video has no blurred copy of itself).
+            var needsFill = MediaFraming.NeedsFill(framed);
+            LogoVideoFillColor.Fill = needsFill ? MediaFraming.FillBrush(framed) : System.Windows.Media.Brushes.Transparent;
+            var fill = needsFill && framed.FillMediaId is int fillId and > 0 ? MediaLookup.Find(fillId) : null;
+            var fillPath = fill is null ? null : fill.Type == MediaType.Image ? fill.Path : fill.ThumbnailPath;
+            LogoVideoFillImage.Source = fillPath is null ? null : LoadFillBitmap(fillPath);
 
             // Fades in only when it was not already up (a change of logo while
             // the logo is on screen must not blink).
@@ -303,17 +312,7 @@ public partial class OutputWindow : Window
     private int _logoVideoVersion;
 
     /// <summary>Wraps a video logo as a media item so the VLC surface can play it.</summary>
-    private static MediaItem AsLoopingVideo(Logo logo) => new()
-    {
-        // Negative ids never collide with the media library's own rows.
-        Id = -1000 - logo.Id,
-        Name = logo.Name,
-        Path = logo.Path!,
-        Type = MediaType.Video,
-        Scaling = logo.Scaling,
-        Muted = logo.Muted,
-        EndBehavior = VideoEndBehavior.Loop,
-    };
+    private static MediaItem AsLoopingVideo(Logo logo) => logo.AsFramedMedia();
 
     private void UpdateVideo()
     {

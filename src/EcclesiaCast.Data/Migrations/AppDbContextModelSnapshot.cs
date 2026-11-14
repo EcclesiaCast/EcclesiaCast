@@ -128,12 +128,21 @@ namespace EcclesiaCast.Data.Migrations
                     b.Property<bool>("Bold")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("FillMediaId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("FontFamily")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<double>("FontSize")
                         .HasColumnType("REAL");
+
+                    b.Property<int?>("FrameHeight")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("FrameWidth")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Kind")
                         .HasColumnType("INTEGER");
@@ -144,6 +153,12 @@ namespace EcclesiaCast.Data.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<double>("OffsetX")
+                        .HasColumnType("REAL");
+
+                    b.Property<double>("OffsetY")
+                        .HasColumnType("REAL");
 
                     b.Property<int>("Order")
                         .HasColumnType("INTEGER");
@@ -164,6 +179,9 @@ namespace EcclesiaCast.Data.Migrations
                     b.Property<string>("TextColor")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<double>("Zoom")
+                        .HasColumnType("REAL");
 
                     b.HasKey("Id");
 

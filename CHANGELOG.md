@@ -7,6 +7,14 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Encuadre del logo, como el de los fondos.** En Logos, una imagen o un
+  video que no tiene la forma de la pantalla (un logo cuadrado, por ejemplo)
+  ahora tiene lo mismo que Propiedades de un medio: zoom, correrlo, tamaño
+  fijo en pantalla y con qué se rellenan los bordes: el color de fondo, **la
+  misma imagen desenfocada** (así no se ven bordes) u otra imagen de la
+  biblioteca. En la vista previa se arrastra para correrlo y la ruedita hace
+  zoom.
+
 - **Buscar fondos en Pixabay.** El botón **🎞 Fondos** de la barra de medios
   (y el menú Fondos → «Buscar fondos en Pixabay…») busca videos y fotos de fondo que
   se pueden usar gratis. Elegís los que quieras con un clic y se bajan a la
