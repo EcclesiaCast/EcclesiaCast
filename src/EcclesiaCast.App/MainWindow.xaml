@@ -481,7 +481,7 @@
                             ToolTip="Actualizar pantallas"
                             Padding="9,6" Margin="6,0,14,0"/>
                     <Button Command="{Binding ToggleOutputCommand}"
-                            ToolTip="Prende o apaga la ventana de salida en la pantalla elegida. Con la salida prendida, apretar Esc dos veces también la apaga.">
+                            ToolTip="Prende o apaga la ventana de salida en la pantalla elegida. Con la salida prendida, Esc también la apaga.">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
                                 <Setter Property="Content" Value="🔴  Poner en vivo"/>

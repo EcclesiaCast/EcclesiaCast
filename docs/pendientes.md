@@ -718,6 +718,40 @@ Con una copia de la biblioteca (la real no cambió) y la grabación del 13/11:
         una opción para quien quiera, no el camino principal. Retomar junto
         con las respuestas por RVR1960 (5/11/2026).
 
+### Prueba de la prueba.5 en la iglesia (15/11/2026)
+
+Alexis probó la lista entera y casi todo dio bien. Registro de la PC de la
+iglesia (11:22–12:53): ningún error ni cierre.
+
+- [x] **Seguir la canción volvía atrás lo que puso el operador** (12:43: puso
+      la 8 y a los 4 s volvió a la 6 porque seguían con «Gracias mi Señor
+      Jesús»). Ahora no vuelve detrás de la diapositiva que puso el operador
+      hasta oír que se canta.
+- [x] **La cuenta de uso probó 104 veces** sin internet: ahora espera una hora.
+- [x] **Esc vuelve a apagar con un solo toque** (lo pidió Alexis).
+- [x] **Editar el diseño de la transmisión lo cambiaba en vivo:** ahora
+      espera a «Guardar».
+- Datos de Seguir la canción: IN 2 de la Behringer no traía sonido (nivel 0);
+  con IN 1 entendió bien. En automático pasó solo unas 20 diapositivas, con
+  unas 5 correcciones a mano. Tres retrocesos por coros repetidos.
+- [ ] **Logo de video que no se reproducía** («Reunión general», PDV Logo
+      MOV.mp4). El registro muestra que VLC lo abrió 5 veces (12:22–12:25),
+      sin error. Falta saber si se mostró como logo (F3) o de fondo, y si se
+      veía quieto o negro.
+- [ ] **Imagen bajada del buscador que quedó fija de fondo** y no se podía
+      sacar. No quedó nada en el registro: falta saber de qué buscador
+      (Google Imágenes o Pixabay) y cómo se intentó sacar.
+- [ ] **Degradé de fondo en todos los temas de la transmisión** (lo pidió
+      para «Noticiero»). Ya existe Recuadro → «Degradé a transparente» para
+      cualquier placa: ver si es eso o el degradé desde el borde de «Clásica».
+- [ ] **Logo de video: rellenar los bordes con un cuadro fijo del video**
+      (pedido). Hoy sólo color o una imagen de la biblioteca.
+- [ ] **Se cortó la salida de sonido de la PC** y hubo que desconectar y
+      conectar. Fue a las 12:53 (el registro muestra el cambio de salida de
+      Windows después). Mirar si «Seguir la canción» con la Behringer (que es
+      entrada y salida a la vez) tiene algo que ver.
+- No se pudo probar: si el video de fondo se traba mientras escucha.
+
 ## 4. Para versiones futuras
 
 - **Ideas tomadas de G-Presenter** (gpresenter.com, mirado el 28/10/2026;

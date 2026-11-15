@@ -203,6 +203,36 @@ public class FollowPilotTests
     }
 
     [Fact]
+    public void The_pilot_never_takes_back_a_slide_the_operator_put_up_ahead()
+    {
+        // 15/11: the operator went on to the next slide while the band was
+        // still repeating the line before, and the pilot took it back.
+        var pilot = new FollowPilot(Hymn);
+        pilot.OperatorMoved(2, At(0));
+
+        const string before = "señor omnipotente siempre el labio mío loores te dará";
+        Assert.Null(pilot.HearWindow(before, At(4)).GoTo);
+        Assert.Null(pilot.HearWindow(before, At(5)).GoTo);
+        Assert.Null(pilot.HearWindow(before, At(6)).GoTo);
+        Assert.Equal(2, pilot.LiveSlide);
+
+        // Once the singing reaches the operator's slide, it follows as always.
+        Assert.Null(pilot.HearWindow("santo santo santo en numeroso coro", At(8)).GoTo);
+        Assert.Equal(3, pilot.HearWindow("en numeroso coro santos escogidos te adoran sin cesar", At(10)).GoTo);
+    }
+
+    [Fact]
+    public void A_suggestion_does_not_hold_the_pilot_back()
+    {
+        var held = new FollowPilot(Hymn);
+        held.OperatorMoved(2, At(0), byHand: false);
+
+        const string before = "señor omnipotente siempre el labio mío loores te dará";
+        held.HearWindow(before, At(4));
+        Assert.True(held.HearWindow(before, At(5)).GoTo < 2);
+    }
+
+    [Fact]
     public void Talking_between_songs_moves_nothing()
     {
         var pilot = new FollowPilot(Hymn, liveSlide: 1);

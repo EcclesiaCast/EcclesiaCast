@@ -285,7 +285,7 @@ public sealed partial class MainViewModel
             SetPreviewIndex(target);
 
             // Nothing went up: the song is still where the operator has it.
-            pilot.OperatorMoved(live, now);
+            pilot.OperatorMoved(live, now, byHand: false);
             ListenStatus = $"Sugiero la diapositiva {target + 1} (Enter la pone)." + slow;
             Log.Information("Seguir la canción: sugiere la diapositiva {Slide} (en vivo: {Live})", target + 1, live + 1);
             return;

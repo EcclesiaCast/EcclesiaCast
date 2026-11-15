@@ -7,7 +7,7 @@ secciones en orden.
 
 Arriba a la derecha, en **Salida**, elegí el monitor del proyector (EcclesiaCast
 prefiere solo el que no es el principal). El botón **🔴 Poner en vivo** enciende
-y apaga la proyección; **Esc dos veces** (la segunda dentro de 2 segundos)
+y apaga la proyección; **Esc**
 también la apaga.
 
 La pantalla elegida se recuerda para la próxima vez.

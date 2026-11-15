@@ -67,11 +67,6 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   de la leyenda se eligen tocando, y la tipografía cambia en la vista previa
   apenas se elige (antes había que hacer clic en otro lado).
 
-- **Esc hay que apretarlo dos veces para apagar la salida.** Es la tecla que
-  todos aprietan para «cancelar»: el primer toque avisa en la barra de estado
-  y el segundo, dentro de 2 segundos, apaga. El botón «Apagar salida» sigue
-  apagando con un clic.
-
 - **La lista de canciones vacía dice qué hacer:** «Todavía no hay canciones»
   con los botones «Buscar en internet», «Traer de otro programa» y «Escribir
   una nueva». Si el buscador no encuentra nada, avisa «Ninguna canción con
@@ -102,6 +97,14 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   vez de los carteles grises de Windows.
 
 ### Corregido
+
+- **«Seguir la canción» ya no deshace lo que pone el operador.** Si pasás a
+  una diapositiva más adelante mientras todavía cantan la anterior, el
+  programa espera a que se cante esa antes de moverse, en vez de volver atrás.
+- **La cuenta de uso ya no reintenta con cada diapositiva** cuando no hay
+  internet o el servicio no contesta: vuelve a probar una hora después.
+- **Los cambios en el diseño de la transmisión se ven en OBS recién al tocar
+  «Guardar»,** no mientras se editan.
 
 - **«Seguir la canción» no podía abrir ninguna entrada de sonido** y decía
   «Unable to cast…». Ya abre el micrófono o la entrada que elijas.

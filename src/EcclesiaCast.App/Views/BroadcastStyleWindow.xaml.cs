@@ -249,10 +249,9 @@ public partial class BroadcastStyleWindow : Window
         foreach (var button in PresetPanel.Children.OfType<RadioButton>())
             button.IsChecked = button.Tag is BroadcastPreset preset && preset.Matches(s);
 
+        // Only the preview of this window changes: the stream keeps the saved
+        // design until Guardar (15/11: editing during a service changed it live).
         PushPreview();
-
-        // The stream shows it too while editing (nothing is saved until Guardar).
-        BroadcastStyleSettings.Preview(_draft);
     }
 
     private static void SetSwatch(Button button, string hex)

@@ -17,11 +17,16 @@ public static class UsageReporter
     private static readonly HttpClient Client = CreateClient();
     private static int _sending;
 
+    // After a failed try, the next one waits: without internet every slide
+    // tried again (15/11: 104 tries in one morning).
+    private static readonly TimeSpan RetryAfter = TimeSpan.FromHours(1);
+    private static DateTimeOffset _nextTry = DateTimeOffset.MinValue;
+
     /// <summary>Called whenever something goes on the air. Does nothing after the first time each day.</summary>
     public static void NoteProjected(ISettingsStore settings)
     {
         var now = DateTimeOffset.Now;
-        if (!UsageCount.ShouldSend(settings, now, UpdateChecker.IsDevelopmentBuild))
+        if (now < _nextTry || !UsageCount.ShouldSend(settings, now, UpdateChecker.IsDevelopmentBuild))
             return;
 
         // One send at a time: the next slide comes a second later.
@@ -47,12 +52,14 @@ public static class UsageReporter
                 }
                 else
                 {
+                    _nextTry = DateTimeOffset.Now + RetryAfter;
                     Log.Information("El contador de uso respondió {Status}", (int)response.StatusCode);
                 }
             }
             catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
             {
-                Log.Information("No se pudo contar el uso del día ({Reason})", ex.Message);
+                _nextTry = DateTimeOffset.Now + RetryAfter;
+                Log.Information("No se pudo contar el uso del día ({Reason}); vuelve a probar en una hora", ex.Message);
             }
             finally
             {

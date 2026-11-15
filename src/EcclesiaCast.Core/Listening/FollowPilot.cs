@@ -87,6 +87,10 @@ public sealed class FollowPilot
     // Whether the slide on screen has been heard sung at all.
     private bool _heardLive;
 
+    // The operator put this slide up by hand: the pilot does not take the
+    // song back behind it until the singing has been heard there or further on.
+    private int? _holdFrom;
+
     // A jump far away heard once, waiting to be heard again.
     private int? _pendingJump;
     private DateTimeOffset _pendingSince;
@@ -105,9 +109,16 @@ public sealed class FollowPilot
     /// <summary>
     /// The operator put a slide up by hand (arrow, click, the phone): that
     /// is where the song is now, and the pilot waits before touching anything.
+    /// Until the singing reaches that slide it never takes the song back
+    /// behind it: the operator went there on purpose, and the band may still
+    /// be finishing the line before (15/11: the operator put the next slide
+    /// up and the pilot took it back four seconds later).
+    /// <paramref name="byHand"/> is false when nothing really moved (only a
+    /// suggestion was shown).
     /// </summary>
-    public void OperatorMoved(int slide, DateTimeOffset now)
+    public void OperatorMoved(int slide, DateTimeOffset now, bool byHand = true)
     {
+        _holdFrom = byHand ? slide : null;
         LiveSlide = slide;
         _follower.Forget();
         _pendingJump = null;
@@ -152,7 +163,13 @@ public sealed class FollowPilot
             || at.Confidence < _options.MinConfidence)
             return new FollowDecision(null, at);
 
+        // The singing got to where the operator put it: the hold is over.
+        if (_holdFrom is { } hold && at.Slide >= hold && at.InSlide >= 2)
+            _holdFrom = null;
+
         var target = Target(at, now, heardAt, lag);
+        if (target is { } back && _holdFrom is { } held && back < held)
+            return new FollowDecision(null, at);
         if (target is not { } slide || slide == LiveSlide)
             return new FollowDecision(null, at);
 

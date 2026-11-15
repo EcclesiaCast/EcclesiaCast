@@ -359,7 +359,7 @@ public sealed partial class MainViewModel
         LiveTitle = "Texto rápido";
         Projection.NextSlide = null;
 
-        StatusText = "Texto rápido en vivo. F1 Black · F2 Clear · F3 Logo · Esc dos veces apaga la salida.";
+        StatusText = "Texto rápido en vivo. F1 Black · F2 Clear · F3 Logo · Esc apaga la salida.";
     }
 
     // ── Notas para la plataforma ─────────────────────────────────
@@ -523,26 +523,15 @@ public sealed partial class MainViewModel
         EnsureOutputOn();
     }
 
-    private readonly DoublePressGate _escapeGate = new(TimeSpan.FromSeconds(2));
-
     /// <summary>
-    /// The Esc key: it is what everybody presses to "cancel", so with the
-    /// output on the first press only warns and a second one within two seconds
-    /// switches it off. The button and the menu still switch it off in one click.
+    /// The Esc key switches the output off at once. (For a while it asked for
+    /// two presses; the 15/11 test asked to go back to one.)
     /// </summary>
     [RelayCommand]
     private void EscapeOutput()
     {
-        if (!IsProjecting)
-        {
-            _escapeGate.Reset();
-            return;
-        }
-
-        if (_escapeGate.Press(DateTimeOffset.Now))
+        if (IsProjecting)
             HideOutput();
-        else
-            StatusText = "Esc otra vez para apagar la salida.";
     }
 
     [RelayCommand]
