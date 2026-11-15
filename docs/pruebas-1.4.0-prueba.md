@@ -15,6 +15,8 @@ publicado en ningún lado. Se instala encima de las anteriores.
 - **Bajar Biblias:** si elegís una que ya tenés, lo dice en una ventana.
 - **Fondos de Pixabay** en vez de Pexels (sección 6). Hasta que publiques el
   servicio dice «todavía no está disponible».
+- **Encuadre del logo** (sección 7): zoom, correr, tamaño fijo y con qué se
+  rellenan los bordes, igual que en los fondos.
 
 - La prueba.2 arregla que «Seguir la canción» no abría ninguna entrada y que
   «Bajar Biblias» repetía una que ya estaba.
@@ -34,7 +36,8 @@ ninguna ventana nueva se usó con el mouse. Lo esperable es encontrar detalles.
 
 1. **Hacé una copia de la biblioteca:** Archivo → «Guardar una copia de la
    biblioteca…». Esta versión le agrega a la base lo necesario para la
-   papelera; si algo sale mal, con la copia se vuelve atrás.
+   papelera y el encuadre de los logos; si algo sale mal, con la copia se
+   vuelve atrás.
 2. Cerrá el programa e instalá encima. Windows va a mostrar el aviso de
    siempre («Más información» → «Ejecutar de todas formas»).
 
@@ -164,6 +167,22 @@ Cloudflare):
    proyector.**
 6. Buscá lo mismo otra vez: los que ya bajaste dicen «Ya está en tus medios».
 7. Abajo a la izquierda, «Fotos y videos de Pixabay» abre la página de Pixabay.
+
+## 7. Encuadre del logo
+
+1. Proyección → Logos…, elegí un logo de imagen (mejor uno cuadrado).
+2. Tiene que aparecer el recuadro **Encuadre**. En «Los bordes se rellenan
+   con» elegí **«La misma imagen, desenfocada»**: los costados se llenan con
+   el logo borroso.
+3. En la vista previa de arriba: **arrastrá** para correrlo, la **ruedita**
+   hace zoom, las **flechas** lo corren de a poquito. «Reencuadrar» lo vuelve
+   a dejar como estaba.
+4. Probá **Tamaño fijo en pantalla** con «Cuadrado».
+5. Mostrá el logo en el proyector: **se tiene que ver igual que en la vista
+   previa.**
+6. Si tenés un logo de **video**, mirá que las barras de los costados salgan
+   del color de fondo del logo (antes podía verse el video de fondo pausado).
+7. Tus otros logos tienen que verse como antes.
 
 ## Si algo falla
 
