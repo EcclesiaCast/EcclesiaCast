@@ -163,14 +163,16 @@ public partial class LogoManagerWindow : Window
 
     /// <summary>
     /// The choices for the borders: the colour alone, the logo itself blurred
-    /// (only a picture: a video would need a second player) or an image of
-    /// the media library.
+    /// (for a video, a still of it: a moving copy would need a second player)
+    /// or an image of the media library.
     /// </summary>
     private void LoadFillOptions(LogoKind kind, int? selectedId)
     {
         var options = new List<MediaItem> { new() { Id = 0, Name = "El color de fondo" } };
         if (kind == LogoKind.Image)
             options.Add(new MediaItem { Id = MediaItem.FillWithSelfId, Name = "La misma imagen, desenfocada" });
+        else if (kind == LogoKind.Video)
+            options.Add(new MediaItem { Id = MediaItem.FillWithSelfId, Name = "Una imagen fija del video, desenfocada" });
         options.AddRange(MediaLookup.All()
             .Where(m => m.Type == MediaType.Image)
             .OrderBy(m => m.Name));

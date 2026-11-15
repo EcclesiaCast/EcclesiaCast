@@ -85,6 +85,12 @@ public sealed record BroadcastStyle
     /// <summary>Path of the picture or video, for <see cref="BroadcastBackground.File"/>.</summary>
     public string BackgroundFile { get; init; } = string.Empty;
 
+    /// <summary>
+    /// The dark gradient from the edge of the screen that the «Degradé» plate
+    /// draws, added behind any other plate (15/11: asked for the «Noticiero» look).
+    /// </summary>
+    public bool EdgeGradient { get; init; }
+
     /// <summary>The operator's own box (see <see cref="BroadcastBox"/>); the fields below only count when it is not Auto.</summary>
     public BroadcastBox Box { get; init; } = BroadcastBox.Auto;
 
@@ -206,6 +212,7 @@ public sealed record BroadcastStyle
     private static BroadcastStyle Apply(BroadcastStyle style, string name, JsonElement value) => name switch
     {
         "followprojector" => IsBool(value) ? style with { FollowProjector = value.GetBoolean() } : style,
+        "edgegradient" => IsBool(value) ? style with { EdgeGradient = value.GetBoolean() } : style,
         "position" => Enum.TryParse<BroadcastPosition>(Text(value), true, out var p) ? style with { Position = p } : style,
         "plate" => Enum.TryParse<BroadcastPlate>(Text(value), true, out var pl) ? style with { Plate = pl } : style,
         "background" => Enum.TryParse<BroadcastBackground>(Text(value), true, out var b) ? style with { Background = b } : style,

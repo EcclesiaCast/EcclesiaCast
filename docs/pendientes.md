@@ -734,22 +734,20 @@ iglesia (11:22–12:53): ningún error ni cierre.
 - Datos de Seguir la canción: IN 2 de la Behringer no traía sonido (nivel 0);
   con IN 1 entendió bien. En automático pasó solo unas 20 diapositivas, con
   unas 5 correcciones a mano. Tres retrocesos por coros repetidos.
-- [ ] **Logo de video que no se reproducía** («Reunión general», PDV Logo
-      MOV.mp4). El registro muestra que VLC lo abrió 5 veces (12:22–12:25),
-      sin error. Falta saber si se mostró como logo (F3) o de fondo, y si se
-      veía quieto o negro.
-- [ ] **Imagen bajada del buscador que quedó fija de fondo** y no se podía
-      sacar. No quedó nada en el registro: falta saber de qué buscador
-      (Google Imágenes o Pixabay) y cómo se intentó sacar.
-- [ ] **Degradé de fondo en todos los temas de la transmisión** (lo pidió
-      para «Noticiero»). Ya existe Recuadro → «Degradé a transparente» para
-      cualquier placa: ver si es eso o el degradé desde el borde de «Clásica».
-- [ ] **Logo de video: rellenar los bordes con un cuadro fijo del video**
-      (pedido). Hoy sólo color o una imagen de la biblioteca.
-- [ ] **Se cortó la salida de sonido de la PC** y hubo que desconectar y
-      conectar. Fue a las 12:53 (el registro muestra el cambio de salida de
-      Windows después). Mirar si «Seguir la canción» con la Behringer (que es
-      entrada y salida a la vez) tiene algo que ver.
+- [x] **Logo de video negro con F3.** El video se reproducía detrás de la
+      vista proyectada, y el color del tema (o una imagen de fondo) lo tapaba:
+      sólo se veía con un video de fondo. Ahora sus cuadros se dibujan en la
+      capa del logo. Probado con el banco de render (cuadro falso); **falta
+      verlo con un video de verdad en el proyector.**
+- [x] **Imagen de Google que quedaba encima del logo:** era lo mismo (el
+      logo era el de video). Para sacar un fondo: «Sin fondo» (F4).
+- [x] **Degradé desde el borde (el de «Clásica») en cualquier diseño de la
+      transmisión:** casilla nueva debajo de las placas.
+- [x] **Logo de video: bordes con una imagen fija del video,** desenfocada.
+- [ ] **Se cortó la salida de sonido de la PC** al terminar (hubo que
+      desconectar y conectar, 12:53). El programa llevaba 10 minutos sin
+      escuchar ni reproducir nada, y «Seguir la canción» no toca el volumen
+      ni la salida. Sin indicios de que sea del programa: avisar si se repite.
 - No se pudo probar: si el video de fondo se traba mientras escucha.
 
 ## 4. Para versiones futuras

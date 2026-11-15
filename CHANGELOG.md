@@ -7,6 +7,13 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Degradé desde el borde en cualquier diseño de la transmisión.** En el
+  diseño de la transmisión, debajo de las placas, la casilla «Degradé oscuro
+  desde el borde, detrás de la placa» suma el degradé de «Clásica» a
+  cualquier otra (por ejemplo a «Noticiero»).
+- **Bordes de un logo de video con una imagen fija del mismo video,**
+  desenfocada: en Logos → Encuadre → «Los bordes se rellenan con».
+
 - **Encuadre del logo, como el de los fondos.** En Logos, una imagen o un
   video que no tiene la forma de la pantalla (un logo cuadrado, por ejemplo)
   ahora tiene lo mismo que Propiedades de un medio: zoom, correrlo, tamaño
@@ -98,6 +105,10 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Corregido
 
+- **Un logo de video se veía negro** si no había un video de fondo, y una
+  imagen de fondo quedaba encima de él. Ahora el video del logo se dibuja en
+  la capa del logo, como una imagen: tapa cualquier fondo, aparece y se va
+  con el mismo fundido y usa el encuadre y el color de fondo.
 - **«Seguir la canción» ya no deshace lo que pone el operador.** Si pasás a
   una diapositiva más adelante mientras todavía cantan la anterior, el
   programa espera a que se cante esa antes de moverse, en vez de volver atrás.

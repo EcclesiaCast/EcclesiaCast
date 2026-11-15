@@ -83,6 +83,18 @@ public partial class ProjectedView : UserControl
             new PropertyMetadata(null, (d, e) =>
                 ((ProjectedView)d).SlideView.Logo = (EcclesiaCast.Core.Logos.Logo?)e.NewValue));
 
+    /// <summary>The moving picture of a video logo, on the real output (see <see cref="SlideView.LogoVideoFrame"/>).</summary>
+    public static readonly DependencyProperty LogoVideoFrameProperty =
+        DependencyProperty.Register(nameof(LogoVideoFrame), typeof(ImageSource), typeof(ProjectedView),
+            new PropertyMetadata(null, (d, e) =>
+                ((ProjectedView)d).SlideView.LogoVideoFrame = (ImageSource?)e.NewValue));
+
+    public ImageSource? LogoVideoFrame
+    {
+        get => (ImageSource?)GetValue(LogoVideoFrameProperty);
+        set => SetValue(LogoVideoFrameProperty, value);
+    }
+
     /// <summary>Blur applied to the background image layer, 0–100.</summary>
     public static readonly DependencyProperty BackgroundBlurProperty =
         DependencyProperty.Register(nameof(BackgroundBlur), typeof(double), typeof(ProjectedView),
