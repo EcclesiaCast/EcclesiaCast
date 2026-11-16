@@ -639,7 +639,7 @@ public partial class MainWindow : Window
         MediaCardState.SetIsLive(card, vm.LiveMediaId == media.Id);
         if (media.FillMediaId is int fillId
             && card.Template.FindName("preview", card) is FramedMediaPreview preview)
-            preview.FillMedia = media.FillsWithSelf ? media : vm.FindMedia(fillId);
+            preview.FillMedia = media.FillsWithSelf || media.FillsWithOwnVideo ? media : vm.FindMedia(fillId);
     }
 
     /// <summary>

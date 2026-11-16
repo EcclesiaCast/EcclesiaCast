@@ -740,7 +740,7 @@ public sealed partial class MainViewModel
 
             // Videos the shell can't decode get their poster from VLC afterwards,
             // in the background, so a batch import doesn't freeze the window.
-            _media.Add(new MediaItem
+            var item = new MediaItem
             {
                 Name = Path.GetFileNameWithoutExtension(path),
                 Path = path,
@@ -753,10 +753,13 @@ public sealed partial class MainViewModel
 
                 // A picture goes in whole («Ajustar»), and the bars the screen shape
                 // leaves are filled with a blurred copy of itself, so it looks like
-                // one picture. A video keeps what it always had.
+                // one picture. A video gets what Ajustes → Videos says (by
+                // default the same: whole, with itself blurred in the bars).
                 Scaling = type == MediaType.Image ? MediaScaling.Fit : default,
                 FillMediaId = type == MediaType.Image ? MediaItem.FillWithSelfId : null,
-            });
+            };
+            ApplyNewVideoFit(item);
+            _media.Add(item);
             added++;
             if (type == MediaType.Video)
                 newVideos.Add((path, Path.GetFileNameWithoutExtension(path)));
@@ -829,7 +832,7 @@ public sealed partial class MainViewModel
                     continue;
                 }
 
-                _media.Add(new MediaItem
+                var gifVideo = new MediaItem
                 {
                     Name = name,
                     Path = video,
@@ -840,7 +843,10 @@ public sealed partial class MainViewModel
                     // A GIF has no sound and never ends: it loops, silent.
                     Muted = true,
                     EndBehavior = VideoEndBehavior.Loop,
-                });
+                };
+                // GIFs come in every shape: fitted as Ajustes → Videos says.
+                ApplyNewVideoFit(gifVideo);
+                _media.Add(gifVideo);
                 converted++;
             }
         }

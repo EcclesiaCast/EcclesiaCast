@@ -301,13 +301,7 @@ public static class MediaFraming
     }
 
     /// <summary>True when the picture leaves part of the output uncovered.</summary>
-    public static bool NeedsFill(MediaItem? media) =>
-        media is not null
-        && (media.HasFrame
-            || media.Zoom is > 0 and < 1
-            || media.Scaling == MediaScaling.Fit
-            || media.OffsetX != 0
-            || media.OffsetY != 0);
+    public static bool NeedsFill(MediaItem? media) => VideoBackdrop.NeedsFill(media);
 
     public static Brush FillBrush(MediaItem? media)
     {

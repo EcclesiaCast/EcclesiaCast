@@ -96,10 +96,10 @@
                 <ComboBoxItem Content="Primer plano (pantalla completa, tapa el texto)"/>
             </ComboBox>
 
-            <TextBlock Text="Escala (si no es 16:9)" Style="{StaticResource L}"/>
+            <TextBlock Text="Escala (si no tiene la forma de la pantalla)" Style="{StaticResource L}"/>
             <ComboBox x:Name="ScalingBox" SelectionChanged="Field_SelectionChanged">
                 <ComboBoxItem Content="Rellenar (recorta lo que sobra)"/>
-                <ComboBoxItem Content="Ajustar (todo, con barras)"/>
+                <ComboBoxItem Content="Ajustar (entero, con bordes)"/>
                 <ComboBoxItem Content="Estirar (deforma)"/>
             </ComboBox>
 
@@ -166,7 +166,7 @@
                                 Padding="10,3" Margin="8,0,0,0" Click="PickFillColor_Click"/>
                         <ComboBox x:Name="FillMediaBox" SelectionChanged="Field_SelectionChanged" Width="180" Margin="8,0,0,0" FontSize="11"
                                   DisplayMemberPath="Name"
-                                  ToolTip="O, en lugar del color: la misma imagen desenfocada (así parece una sola imagen, sin bordes), o una imagen o video de la biblioteca detrás"/>
+                                  ToolTip="O, en lugar del color: la misma imagen o el mismo video, desenfocado (así parece uno solo, sin bordes), o una imagen o video de la biblioteca detrás"/>
                     </StackPanel>
                 </StackPanel>
             </Border>

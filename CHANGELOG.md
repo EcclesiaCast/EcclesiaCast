@@ -7,6 +7,18 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Los videos de otra forma entran enteros, con los bordes desenfocados.** Un
+  video vertical, cuadrado o 4:3 (o cualquier video en un proyector de
+  1024×768) ya no sale recortado: se ve entero y lo que queda libre se rellena
+  con el mismo video, agrandado y desenfocado, así parece uno solo, sin franjas
+  negras. Si el video ya tiene la forma de la pantalla no cambia nada. Vale
+  para los videos que se agregan desde ahora (también los GIF animados y los
+  YouTube descargados); los que ya están en la biblioteca siguen como estaban.
+  En **Ajustes → Videos** se elige otra cosa para los nuevos: con un color de
+  fondo, rellenar (recorta) o estirar. En Propiedades de cada video, «Los
+  bordes se rellenan con» ahora ofrece «el mismo video, desenfocado». No abre
+  un segundo reproductor: usa los mismos cuadros que ya se dibujan. La página
+  de salida para OBS y vMix también lo dibuja.
 - **Botones para marcar el coro y las estrofas** en el editor de canciones:
   «Coro», «Estrofa», «Puente» y «Final», arriba de la letra. Con el cursor en
   un párrafo, ponen la línea [Coro] o [Estrofa 1] arriba (la estrofa se

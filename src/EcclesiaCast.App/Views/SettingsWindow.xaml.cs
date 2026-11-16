@@ -35,6 +35,13 @@ public partial class SettingsWindow : Window
 
     private void Transitions_Click(object sender, RoutedEventArgs e) => _main.OpenTransitions(this);
 
+    private void NewVideoColor_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is ViewModels.MainViewModel vm
+            && Services.ColorPickerHelper.Pick(vm.NewVideoFitColor) is { } picked)
+            vm.NewVideoFitColor = picked;
+    }
+
     private void LearningRadio_Click(object sender, RoutedEventArgs e) => _main.SetUiMode(advanced: false);
 
     private void AdvancedRadio_Click(object sender, RoutedEventArgs e) => _main.SetUiMode(advanced: true);

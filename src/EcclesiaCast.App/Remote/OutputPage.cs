@@ -43,6 +43,15 @@ public static class OutputPage
               background: transparent;
             }
 
+            /* «Ajustar» with the same picture or video, enlarged and blurred, in
+               the bars. A video's copy is a tiny canvas the browser stretches:
+               that stretching is most of the blur, and it costs next to nothing. */
+            #mediaBackdrop {
+              position: absolute; inset: 0; width: 100%; height: 100%;
+              object-fit: cover; filter: brightness(.8); overflow: hidden;
+            }
+            img#mediaBackdrop { filter: blur(40px) brightness(.8); transform: scale(1.1); }
+
             #main, #secondary { margin: 0; white-space: pre-wrap; line-height: 1.15; }
             /* The marker pen, the same yellow as on the projector. */
             mark { background: #E8C34A; color: #000; text-shadow: none; }
@@ -290,15 +299,17 @@ public static class OutputPage
             // muted: the projector already plays its sound, and a second copy of
             // it in the stream would be an echo (add «&sonido=1» to hear it).
             function paintMedia(media) {
-              var key = media ? media.kind + ':' + media.id + ':' + media.fit + ':' + media.loop : '';
+              var key = media ? media.kind + ':' + media.id + ':' + media.fit + ':' + media.loop + ':' + !!media.backdrop : '';
               if (key === mediaKey) return;
               mediaKey = key;
               mediaBox.textContent = '';
               if (!media) return;
 
+              var src = '/api/media?pin=' + encodeURIComponent(pin) + '&id=' + media.id;
               var el = document.createElement(media.kind === 'video' ? 'video' : 'img');
               el.id = 'media';
-              el.src = '/api/media?pin=' + encodeURIComponent(pin) + '&id=' + media.id;
+              el.src = src;
+              if (media.backdrop) paintBackdrop(media, el, src);
               el.style.objectFit = media.fit || 'cover';
               if (media.kind === 'video') {
                 el.autoplay = true;
@@ -308,6 +319,40 @@ public static class OutputPage
                 el.addEventListener('canplay', function () { el.play().catch(function () {}); });
               }
               mediaBox.appendChild(el);
+            }
+
+            // The bars of a fitted picture or video, filled with itself, blurred.
+            // A picture: the same file again, blurred once by the browser. A
+            // video: each of its frames drawn into a canvas of 128 pixels, with
+            // no second copy of the video playing.
+            function paintBackdrop(media, el, src) {
+              if (media.kind !== 'video') {
+                var img = document.createElement('img');
+                img.id = 'mediaBackdrop';
+                img.src = src;
+                mediaBox.appendChild(img);
+                return;
+              }
+
+              var canvas = document.createElement('canvas');
+              canvas.id = 'mediaBackdrop';
+              mediaBox.appendChild(canvas);
+              var ctx = canvas.getContext('2d');
+              function frame() {
+                if (!el.isConnected) return;
+                var w = el.videoWidth, h = el.videoHeight;
+                if (w > 0 && h > 0 && el.readyState >= 2) {
+                  var step = Math.max(1, Math.min(w, h) / 72);
+                  var cw = Math.round(w / step), ch = Math.round(h / step);
+                  if (canvas.width !== cw || canvas.height !== ch) { canvas.width = cw; canvas.height = ch; }
+                  // Drawn a little bigger than the canvas: the faded edge a blur
+                  // leaves falls outside it.
+                  ctx.filter = 'blur(2px)';
+                  ctx.drawImage(el, -6, -6, cw + 12, ch + 12);
+                }
+                requestAnimationFrame(frame);
+              }
+              requestAnimationFrame(frame);
             }
 
             // Draws what the computer sent (also called by the style editor's

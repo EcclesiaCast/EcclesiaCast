@@ -44,10 +44,13 @@ public partial class MediaInspectorWindow : Window
         // background with itself would be a mirror facing a mirror.
         var options = new List<MediaItem> { new() { Id = 0, Name = "(sólo el color)" } };
 
-        // A picture can fill its own bars with a soft copy of itself, which makes
-        // it look like one image with no border. A video would need a second player.
+        // A picture or a video can fill its own bars with a soft copy of itself,
+        // which makes it look like one picture with no border. The video's copy
+        // is made from the frames it already decodes: no second player.
         if (item.Type == MediaType.Image)
             options.Add(new MediaItem { Id = MediaItem.FillWithSelfId, Name = "(la misma imagen, desenfocada)" });
+        else if (item.Type == MediaType.Video)
+            options.Add(new MediaItem { Id = MediaItem.FillWithSelfId, Name = "(el mismo video, desenfocado)" });
 
         options.AddRange(library
             .Where(m => m.Id != item.Id && m.Type != MediaType.YouTube)
@@ -210,7 +213,7 @@ public partial class MediaInspectorWindow : Window
 
         var chosenFill = FillMediaBox.SelectedItem as MediaItem;
         shown.FillMediaId = chosenFill is { Id: not 0 } ? chosenFill.Id : null;
-        Preview.FillMedia = chosenFill is { Id: > 0 } fill ? fill : shown.FillsWithSelf ? shown : null;
+        Preview.FillMedia = chosenFill is { Id: > 0 } fill ? fill : shown.FillsWithSelf || shown.FillsWithOwnVideo ? shown : null;
         Preview.Blur = BlurField.Value;
         Preview.Media = shown;
     }

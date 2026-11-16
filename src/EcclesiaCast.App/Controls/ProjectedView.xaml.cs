@@ -786,13 +786,15 @@ public partial class ProjectedView : UserControl
         // A video used as fill can only play in the output window, which owns
         // the VLC surfaces; here its poster stands in, exactly like the
         // background video's poster does in the previews.
-        var fillPath = needsFill && media is { FillsWithSelf: true }
-            ? media.Path
+        // A video that fills its bars with itself: in a preview, its poster.
+        var ownFill = needsFill && media is { FillsWithSelf: true } or { FillsWithOwnVideo: true };
+        var fillPath = ownFill
+            ? media!.Type == MediaType.Image ? media.Path : media.ThumbnailPath
             : fill?.Type == MediaType.Image ? fill.Path : fill?.ThumbnailPath;
 
         // An image that fills its own bars shows itself, already blurred; any
         // other fill is the picture as it is.
-        var selfFill = needsFill && media is { FillsWithSelf: true } && fillPath is not null;
+        var selfFill = ownFill && fillPath is not null;
         var fillKey = selfFill ? "blur:" + fillPath : fillPath;
 
         if (fillKey != _lastFillImagePath)

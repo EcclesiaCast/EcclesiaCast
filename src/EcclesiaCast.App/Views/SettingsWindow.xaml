@@ -41,6 +41,7 @@
             <RadioButton x:Name="SoundPill" Content="Sonido" Style="{StaticResource SectionItem}"/>
             <RadioButton x:Name="ListeningPill" Content="Seguir la canción" Style="{StaticResource SectionItem}"/>
             <RadioButton x:Name="TransitionsPill" Content="Transiciones" Style="{StaticResource SectionItem}"/>
+            <RadioButton x:Name="VideosPill" Content="Videos" Style="{StaticResource SectionItem}"/>
             <RadioButton x:Name="PhonePill" Content="Celular" Style="{StaticResource SectionItem}"/>
             <RadioButton x:Name="PerformancePill" Content="Rendimiento" Style="{StaticResource SectionItem}"/>
             <RadioButton x:Name="UpdatesPill" Content="Actualizaciones" Style="{StaticResource SectionItem}"/>
@@ -97,6 +98,25 @@
                                Text="Cuántos segundos tardan en aparecer y desaparecer el logo, los cambios de imagen o video, la pantalla negra y el apagado de la salida."/>
                     <Button Content="Cambiar las transiciones…" Click="Transitions_Click"
                             Style="{StaticResource DarkButton}" Padding="14,7" HorizontalAlignment="Left"/>
+                </StackPanel>
+
+                <!-- Videos -->
+                <StackPanel Visibility="{Binding IsChecked, ElementName=VideosPill, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="Videos" Style="{StaticResource SectionTitle}"/>
+                    <TextBlock Style="{StaticResource SectionText}"
+                               Text="Cómo entra en la pantalla un video que no tiene su misma forma (vertical, cuadrado, 4:3). Vale para los videos que agregues desde ahora: los que ya están no cambian. Cada video se puede cambiar en sus Propiedades."/>
+                    <TextBlock Text="Videos nuevos" Style="{StaticResource FieldTitle}"/>
+                    <ComboBox ItemsSource="{Binding NewVideoFitChoices}" SelectedIndex="{Binding NewVideoFitIndex, Mode=TwoWay}"
+                              HorizontalAlignment="Left" Width="360"
+                              ToolTip="Los bordes desenfocados son una copia del mismo video, agrandada y borrosa: así no quedan franjas negras"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0"
+                                Visibility="{Binding IsNewVideoFitColor, Converter={StaticResource BoolToVis}}">
+                        <Border x:Name="NewVideoColorSwatch" Width="28" Height="24" CornerRadius="3"
+                                BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
+                                Background="{Binding NewVideoFitColor}"/>
+                        <Button Content="Color de fondo…" Click="NewVideoColor_Click"
+                                Style="{StaticResource DarkButton}" Padding="12,5" Margin="8,0,0,0"/>
+                    </StackPanel>
                 </StackPanel>
 
                 <!-- Celular -->

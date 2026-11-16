@@ -305,7 +305,8 @@ public sealed partial class MainViewModel
                 MediaScaling.Stretch => "fill",
                 _ => "cover",
             },
-            Loop: media.Type == MediaType.Video && media.EndBehavior == VideoEndBehavior.Loop);
+            Loop: media.Type == MediaType.Video && media.EndBehavior == VideoEndBehavior.Loop,
+            Backdrop: media.Scaling == MediaScaling.Fit && (media.FillsWithSelf || media.FillsWithOwnVideo));
     }
 
     /// <summary>

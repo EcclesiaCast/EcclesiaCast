@@ -170,6 +170,13 @@ public sealed class MediaItem
     /// <summary>True when the bars are filled with a blurred copy of this very image.</summary>
     public bool FillsWithSelf => FillMediaId == FillWithSelfId && Type == MediaType.Image;
 
+    /// <summary>
+    /// True when the bars of a video are filled with the same video, enlarged
+    /// and blurred. On the projector it is drawn from the frames the video
+    /// already decodes (no second player); the previews use its poster.
+    /// </summary>
+    public bool FillsWithOwnVideo => FillMediaId == FillWithSelfId && Type == MediaType.Video;
+
     // ── Vencimiento ──────────────────────────────────────────────
 
     /// <summary>

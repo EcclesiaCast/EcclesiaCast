@@ -127,5 +127,7 @@ public sealed record RemoteOutput(
 /// The picture or video that is alone on the screen, for the announcements page
 /// of the stream. <paramref name="Fit"/> is a CSS «object-fit» (the projector's
 /// Rellenar, Ajustar and Estirar); the page asks for the file by <paramref name="Id"/>.
+/// <paramref name="Backdrop"/>: the bars «Ajustar» leaves are filled with the
+/// same picture or video, enlarged and blurred, as on the projector.
 /// </summary>
-public sealed record RemoteOutputMedia(int Id, string Kind, string Fit, bool Loop);
+public sealed record RemoteOutputMedia(int Id, string Kind, string Fit, bool Loop, bool Backdrop = false);

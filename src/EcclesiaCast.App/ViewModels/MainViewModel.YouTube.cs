@@ -174,7 +174,7 @@ public sealed partial class MainViewModel
         }
 
         var name = Path.GetFileNameWithoutExtension(path);
-        _media.Add(new MediaItem
+        var downloaded = new MediaItem
         {
             Name = name,
             Path = path,
@@ -186,7 +186,10 @@ public sealed partial class MainViewModel
             EndBehavior = item.EndBehavior,
             Muted = item.Muted,
             Volume = item.Volume,
-        });
+        };
+        // Now a file like any other: fitted as Ajustes → Videos says (a Short is vertical).
+        ApplyNewVideoFit(downloaded);
+        _media.Add(downloaded);
 
         if (removeOnlineEntry)
             _media.Delete(item.Id);

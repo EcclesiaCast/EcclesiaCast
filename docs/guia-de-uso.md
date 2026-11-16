@@ -114,7 +114,12 @@ En la barra **MEDIOS**, abajo:
 - **Clic derecho → Propiedades** abre el Inspector:
   - **Comportamiento**: *Fondo* (detrás del texto) o *Primer plano* (pantalla
     completa, tapa el texto — para anuncios o videos institucionales).
-  - **Escala**: *Rellenar* (recorta), *Ajustar* (con barras) o *Estirar*.
+  - **Escala**: *Rellenar* (recorta), *Ajustar* (entero, con bordes) o
+    *Estirar*. Un video nuevo entra como diga **Archivo → Ajustes… → Videos**:
+    de fábrica, *Ajustar* con **el mismo video, desenfocado** en los bordes,
+    así un video vertical, cuadrado o 4:3 (o cualquiera en un proyector de
+    1024×768) se ve entero y sin franjas negras. Cambiar ese ajuste no toca
+    los videos que ya están en la biblioteca.
   - **Qué sigue después**: en un video, repetir en bucle, nada, el logo u
     **otro medio de la biblioteca**. En una imagen en primer plano, cuántos
     segundos se ve y qué pasa pasados esos segundos (nada: sale de la
@@ -132,9 +137,10 @@ En la barra **MEDIOS**, abajo:
   - **Recorte del video**: desde qué segundo arranca y hasta cuál llega. Sirve
     para saltear la cortina o el logo del principio; el bucle respeta el
     recorte y vuelve al segundo que marcaste, no al cero.
-  - **Los bordes se rellenan con**: un color, o **otra imagen o video** de la
-    biblioteca detrás. El truco de siempre es poner una copia desenfocada del
-    mismo video como relleno.
+  - **Los bordes se rellenan con**: un color, **la misma imagen o el mismo
+    video, desenfocado** (parece uno solo, sin bordes), u **otra imagen o
+    video** de la biblioteca detrás. El video desenfocado sale de los mismos
+    cuadros que ya se están dibujando: no abre un segundo reproductor.
 - **Sin fondo (F4)**, arriba, lo quita **sin sacar la letra**.
 - Con un video en pantalla aparece la **barra de reproducción**: volver al
   principio, ±10 segundos, reproducir/pausar y una barra para moverte. Al lado
@@ -484,7 +490,9 @@ un **Browser Source** distinto cada una:
 - Cada página muestra lo suyo sólo cuando eso está al aire en el proyector, y
   queda vacía (transparente) el resto del tiempo.
 - Las imágenes y los videos se ajustan como en el proyector (Rellenar, Ajustar o
-  Estirar). El zoom y el corrimiento de Propiedades **no** se aplican.
+  Estirar), y si los bordes llevan la misma imagen o el mismo video
+  desenfocado, también. El zoom y el corrimiento de Propiedades **no** se
+  aplican.
 - El video **va sin sonido** en la transmisión, porque el sonido ya sale por la
   computadora del proyector. Si lo querés ahí, agregá `&sonido=1` al final.
 - Un video en la transmisión empieza cuando aparece, no necesariamente al mismo

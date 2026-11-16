@@ -8,6 +8,13 @@
          imagen entera y deja que lo que no entra sobresalga; el borde de la
          pantalla es el único recorte. -->
     <Grid>
+        <!-- «El mismo video, desenfocado»: una copia chiquita de cada cuadro,
+             ya desenfocada, estirada sobre toda la pantalla detrás del video
+             ajustado. Sale del mismo cuadro decodificado: no hay otro
+             reproductor. El estirado suave (Linear) termina de desenfocarla. -->
+        <Image x:Name="Backdrop" Stretch="UniformToFill" Visibility="Collapsed" IsHitTestVisible="False"
+               RenderOptions.BitmapScalingMode="Linear"/>
+
         <Image x:Name="Surface" Stretch="UniformToFill"/>
 
         <!-- El último cuadro del video anterior, congelado, mientras llega el
