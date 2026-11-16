@@ -612,7 +612,11 @@ las respuestas automáticas de la tabla); toca dar estos pasos.
 ## 4. Para versiones futuras
 
 - **Versión para Mac** (la piden en Instagram; Alexis quiere hacerla,
-  14/11/2026). Es el trabajo más grande que queda:
+  14/11/2026). **El plan completo está en [plan-mac.md](plan-mac.md)**
+  (15/11/2026), con las decisiones de Alexis en su sección 19 y los encargos
+  en `plan-mac-1.md` a `plan-mac-8.md`. Estado: plan escrito; falta lanzar la
+  tanda 1 (prototipo). Lo de abajo es la nota inicial; donde no coincida,
+  vale el plan. Es el trabajo más grande que queda:
   - **Qué se aprovecha:** `EcclesiaCast.Core` y `EcclesiaCast.Data` (unas
     24.000 líneas: canciones, Biblias, playlists, base SQLite, control remoto)
     ya son .NET común y funcionan en Mac sin cambios.
