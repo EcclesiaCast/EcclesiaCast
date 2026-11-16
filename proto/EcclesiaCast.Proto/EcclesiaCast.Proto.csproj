@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Throwaway prototype (Mac plan, batch 1): proves Avalonia + LibVLC on a
+       real Apple-chip Mac before the program itself is touched. It is not in
+       EcclesiaCast.slnx on purpose: that solution builds with .NET 8. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>EcclesiaCast.Proto</RootNamespace>
+    <AssemblyName>EcclesiaCast.Proto</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <InvariantGlobalization>false</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\EcclesiaCast.Core\EcclesiaCast.Core.csproj" />
+    <ProjectReference Include="..\..\src\EcclesiaCast.Data\EcclesiaCast.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.1.6" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.6" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.6" />
+    <PackageReference Include="LibVLCSharp" Version="3.10.2" />
+    <PackageReference Include="QRCoder" Version="1.8.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+  </ItemGroup>
+
+  <!-- LibVLC itself: the official VideoLAN packages. The Mac one (3.1.3.2)
+       carries both osx-x64 and osx-arm64 (libvlc 3.0.24); a publish for
+       osx-arm64 takes only the Apple-chip tree, under libvlc/osx-arm64/lib. -->
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+    <PackageReference Include="VideoLAN.LibVLC.Mac" Version="3.1.3.2" />
+  </ItemGroup>
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.24" />
+  </ItemGroup>
+
+  <!-- Selawik (SIL OFL 1.1, Microsoft): stands in for Segoe UI, which a Mac
+       does not have. -->
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\Fonts\*.ttf" />
+    <None Include="Assets\Fonts\OFL.txt" />
+  </ItemGroup>
+
+  <!-- The Bible the first start imports. On the Mac the bundle step moves this
+       folder to Contents/Resources/bibles. -->
+  <ItemGroup>
+    <None Include="..\..\installer\bibles\RV1909.ecbiblias" Link="bibles\RV1909.ecbiblias">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
