@@ -2,10 +2,34 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://ecclesiacast.org/</loc>
-    <lastmod>2026-11-10</lastmod>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ecclesiacast.org/ayuda.html</loc>
+    <lastmod>2026-11-16</lastmod>
+  </url>
+  <url>
+    <loc>https://ecclesiacast.org/cargar-canciones.html</loc>
+    <lastmod>2026-11-16</lastmod>
+  </url>
+  <url>
+    <loc>https://ecclesiacast.org/biblias.html</loc>
+    <lastmod>2026-11-16</lastmod>
+  </url>
+  <url>
+    <loc>https://ecclesiacast.org/control-desde-el-celular.html</loc>
+    <lastmod>2026-11-16</lastmod>
+  </url>
+  <url>
+    <loc>https://ecclesiacast.org/videos-y-powerpoint.html</loc>
+    <lastmod>2026-11-16</lastmod>
+  </url>
+  <url>
+    <loc>https://ecclesiacast.org/pantallas-extra.html</loc>
+    <lastmod>2026-11-16</lastmod>
   </url>
   <url>
     <loc>https://ecclesiacast.org/privacidad.html</loc>
-    <lastmod>2026-11-10</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
 </urlset>
