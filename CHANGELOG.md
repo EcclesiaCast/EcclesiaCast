@@ -125,12 +125,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   imagen de fondo quedaba encima de él. Ahora el video del logo se dibuja en
   la capa del logo, como una imagen: tapa cualquier fondo, aparece y se va
   con el mismo fundido y usa el encuadre y el color de fondo.
-- **La cuenta de uso ya no reintenta con cada diapositiva** cuando no hay
-  internet o el servicio no contesta: vuelve a probar una hora después.
 - **Los cambios en el diseño de la transmisión se ven en OBS recién al tocar
   «Guardar»,** no mientras se editan.
-- **«Bajar Biblias» ya no agrega dos veces la misma Biblia** si se vuelve a
-  tildar una que ya estaba: la saltea y lo avisa.
 - **Un error inesperado ya no frena al operador.** Antes salía un cartel que
   había que cerrar para seguir pasando la letra; ahora el programa sigue y
   avisa en la barra de estado (como mucho cada 30 segundos). Las caídas en
