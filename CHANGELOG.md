@@ -14,6 +14,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   Y ahora el doble clic sobre la salida la apaga, como ya pasaba con el
   escenario. Con el proyector en una pantalla aparte no cambia nada.
 
+Por dentro: un prototipo aparte (carpeta `proto/`) para probar en una Mac si
+EcclesiaCast puede andar ahí. No cambia nada del programa.
+
 ## [1.3.1] - 2026-11-09
 
 ### Agregado
