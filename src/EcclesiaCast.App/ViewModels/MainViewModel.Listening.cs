@@ -4,6 +4,7 @@ using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EcclesiaCast.App.Services.Listening;
+using EcclesiaCast.Core.Diagnostics;
 using EcclesiaCast.Core.Listening;
 using Serilog;
 
@@ -31,6 +32,16 @@ public sealed partial class MainViewModel
     private DispatcherTimer? _listenMeter;
     private CancellationTokenSource? _modelDownload;
     private bool _listenOnCard;
+
+    /// <summary>
+    /// «Seguir la canción» is still in trial and hidden from everyone except
+    /// where the file «seguir-la-cancion.txt» sits in the data folder. Looked
+    /// at once, when the program starts: it takes closing and opening the
+    /// program to turn it on or off. Everything that shows or starts the
+    /// function depends on this.
+    /// </summary>
+    public bool IsListeningAvailable { get; } =
+        HiddenFeatures.IsEnabled(App.DataDir, HiddenFeatures.FollowTheSong);
 
     public ObservableCollection<SoundInputDevice> ListenDevices { get; } = [];
 
@@ -99,6 +110,9 @@ public sealed partial class MainViewModel
     [RelayCommand]
     private void RefreshListenDevices()
     {
+        if (!IsListeningAvailable)
+            return;
+
         var saved = _settings.Get(ListenDeviceKey) ?? string.Empty;
         var keep = SelectedListenDevice;
 
@@ -123,6 +137,9 @@ public sealed partial class MainViewModel
     [RelayCommand]
     private async Task DownloadListenModel()
     {
+        if (!IsListeningAvailable)
+            return;
+
         if (IsDownloadingListenModel)
         {
             _modelDownload?.Cancel();
@@ -164,6 +181,10 @@ public sealed partial class MainViewModel
 
     private void StartListening()
     {
+        // Hidden function: no microphone, no recogniser, no download.
+        if (!IsListeningAvailable)
+            return;
+
         if (!SpeechEar.HasModel)
         {
             ListenStatus = "Primero hay que bajar el reconocedor de voz.";

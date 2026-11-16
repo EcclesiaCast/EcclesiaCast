@@ -831,6 +831,9 @@ public partial class MainWindow : Window
     /// </summary>
     internal void OpenListening()
     {
+        if (DataContext is not ViewModels.MainViewModel { IsListeningAvailable: true })
+            return;
+
         if (DataContext is not MainViewModel vm)
             return;
 

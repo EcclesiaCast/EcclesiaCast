@@ -39,7 +39,8 @@
         <StackPanel DockPanel.Dock="Left" Width="170" Margin="0,0,18,0">
             <RadioButton x:Name="ScreensPill" Content="Pantallas" IsChecked="True" Style="{StaticResource SectionItem}"/>
             <RadioButton x:Name="SoundPill" Content="Sonido" Style="{StaticResource SectionItem}"/>
-            <RadioButton x:Name="ListeningPill" Content="Seguir la canción" Style="{StaticResource SectionItem}"/>
+            <RadioButton x:Name="ListeningPill" Content="Seguir la canción" Style="{StaticResource SectionItem}"
+                         Visibility="{Binding IsListeningAvailable, Converter={StaticResource BoolToVis}}"/>
             <RadioButton x:Name="TransitionsPill" Content="Transiciones" Style="{StaticResource SectionItem}"/>
             <RadioButton x:Name="VideosPill" Content="Videos" Style="{StaticResource SectionItem}"/>
             <RadioButton x:Name="PhonePill" Content="Celular" Style="{StaticResource SectionItem}"/>
@@ -82,7 +83,21 @@
                 </StackPanel>
 
                 <!-- Seguir la canción (beta) -->
-                <StackPanel Visibility="{Binding IsChecked, ElementName=ListeningPill, Converter={StaticResource BoolToVis}}">
+                <StackPanel>
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsListeningAvailable}" Value="True"/>
+                                        <Condition Binding="{Binding IsChecked, ElementName=ListeningPill}" Value="True"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
                     <TextBlock Text="Seguir la canción (beta)" Style="{StaticResource SectionTitle}"/>
                     <TextBlock Style="{StaticResource SectionText}"
                                Text="El programa escucha el micrófono o la entrada de línea y sugiere o pasa las diapositivas de la canción abierta. Está en prueba: anda mejor con canciones lentas y voces claras. Lo que escucha no se graba ni sale de esta PC."/>

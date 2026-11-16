@@ -300,6 +300,7 @@
                           ToolTip="Cuántos segundos tardan en aparecer y desaparecer el logo, los cambios de imagen o video, la pantalla negra y el apagado de la salida."/>
                 <MenuItem Header="Controlar desde el celular…" Command="{Binding OpenRemoteCommand}"/>
                 <MenuItem Header="Seguir la canción por lo que se escucha (beta)…" Click="Listening_Click"
+                          Visibility="{Binding IsListeningAvailable, Converter={StaticResource BoolToVis}}"
                           ToolTip="El programa escucha el micrófono o la entrada de línea y sugiere o pasa las diapositivas de la canción abierta. Está en prueba."/>
                 <Separator/>
                 <MenuItem Header="Actualizar la lista de pantallas" Command="{Binding RefreshDisplaysCommand}"/>
@@ -2584,11 +2585,25 @@
                                FontSize="12" FontWeight="SemiBold" Foreground="White"/>
                 </Border>
                 <!-- Seguir la canción (beta): mientras escucha, se ve acá qué está haciendo -->
-                <Button DockPanel.Dock="Right" Style="{StaticResource DarkButton}"
+                <Button DockPanel.Dock="Right"
                         Margin="4,4,6,4" Padding="8,2" VerticalAlignment="Center"
                         Click="Listening_Click"
-                        ToolTip="Seguir la canción por lo que se escucha (beta). Clic para abrir sus opciones."
-                        Visibility="{Binding IsListening, Converter={StaticResource BoolToVis}}">
+                        ToolTip="Seguir la canción por lo que se escucha (beta). Clic para abrir sus opciones.">
+                    <Button.Style>
+                        <!-- Sólo se ve si la función está disponible (archivo señal) y escuchando -->
+                        <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsListeningAvailable}" Value="True"/>
+                                        <Condition Binding="{Binding IsListening}" Value="True"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
                     <StackPanel Orientation="Horizontal">
                         <Ellipse Width="8" Height="8" Fill="#6FBF8F" Margin="0,0,6,0" VerticalAlignment="Center"/>
                         <TextBlock Text="{Binding ListenStatus}" FontSize="12" MaxWidth="460"
