@@ -26,6 +26,9 @@ al repositorio) y actualizar los números de la tabla y de la carta.
 - [ ] Actualizar los números de la carta (están marcados con la fecha).
 - [ ] Revisar que los enlaces abran: el reel, la web y el repositorio.
 - [ ] Poner el enlace del reel donde dice `[ENLACE DEL REEL]`.
+- [ ] Confirmar la frase «Ya hay iglesias que lo usan cada domingo»: es lo que
+      se ve por los mensajes, pero el número no está medido (lo va a medir la
+      cuenta de uso de la 1.4). Si sabés cuántas, ponelo; si no, dejala así.
 - [ ] Si para entonces ya salió la 1.4.0, cambiar «1.3.1» y sus descargas.
 
 ## La carta, en español (para que la leas)
@@ -64,8 +67,7 @@ usando copias pirata o PowerPoint. Funciona sin internet.
 **Por qué nos importa la firma.** Nuestros usuarios son voluntarios de
 iglesia, no técnicos. Cuando Windows les muestra «Editor desconocido» y el
 aviso de SmartScreen, muchos no se animan a instalar, y con razón: es lo que
-les enseñamos a hacer con un programa que no conocen. La mayoría de los
-mensajes que recibimos después del video son sobre ese aviso. Con la firma,
+les enseñamos a hacer con un programa que no conocen. Con la firma,
 además, el programa podría comprobar que cada actualización viene de nosotros
 antes de instalarla.
 
@@ -126,8 +128,7 @@ PowerPoint. It works without an internet connection.
 **Why signing matters to us.** Our users are church volunteers, not technical
 people. When Windows shows "Unknown publisher" and the SmartScreen warning,
 many of them do not dare to install, and rightly so: that is what we teach
-them to do with software they do not know. Most of the messages we received
-after the video are about that warning. With a signature, the program could
+them to do with software they do not know. With a signature, the program could
 also check that each update comes from us before installing it.
 
 **What is still small.** The repository has few stars and a single developer.
