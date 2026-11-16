@@ -361,3 +361,46 @@ simulación con el piloto de ahora sin volver a reconocer).
 - Vosk, modelos y vocabulario propio: <https://alphacephei.com/vosk/models> ·
   <https://alphacephei.com/vosk/lm>
 - Whisper para .NET: <https://github.com/sandrohanea/whisper.net>
+
+## Cambios hechos (no anunciados: la función sale escondida)
+
+Estas entradas estaban en el CHANGELOG, en «Sin publicar». Como «Seguir la
+canción» sale escondida en la 1.4.0 (sólo aparece donde existe el archivo
+`seguir-la-cancion.txt` en la carpeta de datos), no se anuncian al público.
+Se guardan acá, tal cual estaban, para pasarlas al CHANGELOG el día que la
+función se muestre a todos.
+
+### Agregado
+
+- **Seguir la canción por lo que se escucha (en prueba).** En **Proyección →
+  «Seguir la canción por lo que se escucha (beta)…»** el programa escucha el
+  micrófono o la entrada de línea y sigue la canción que está abierta. Tres
+  formas: **sólo sugerir** (marca la diapositiva que sigue y vos apretás
+  Enter), **seguir** (la pone cuando escucha que la cantan) y **adelantarse**
+  (pasa a la siguiente cuando la actual está terminando). Las flechas siempre
+  mandan, nunca cambia de canción y no toca la Biblia. La primera vez baja un
+  reconocedor de voz de unos 550 MB que queda en la PC: lo que escucha no se
+  graba ni sale de ahí. Anda mejor con canciones lentas y voces claras; con
+  canciones rápidas y la banda fuerte todavía se pierde.
+
+### Cambiado
+
+- **«Seguir la canción» va mucho más al ritmo y se equivoca menos (sigue en
+  prueba).** Ahora escucha más o menos una vez por segundo en vez de cada
+  tres, y usa la placa de video de la PC para entender lo que oye (si la PC
+  no tiene una que sirva, sigue funcionando como antes, más lento). Lleva la
+  cuenta de por dónde va la canción: lo normal es pasar a la diapositiva
+  siguiente, un coro que se repite es el que toca según el orden, y para
+  saltar a otra parte tiene que escucharlo dos veces seguidas. Ya no cambia
+  por alguien que habla antes de empezar ni por dos o tres palabras sueltas.
+  En «adelantarse» el margen viene en 2 palabras (antes 5). Con un micrófono
+  que llega bajito sube el volumen por su cuenta antes de escuchar, y avisa
+  si por esa entrada no llega nada.
+
+### Corregido
+
+- **«Seguir la canción» ya no deshace lo que pone el operador.** Si pasás a
+  una diapositiva más adelante mientras todavía cantan la anterior, el
+  programa espera a que se cante esa antes de moverse, en vez de volver atrás.
+- **«Seguir la canción» no podía abrir ninguna entrada de sonido** y decía
+  «Unable to cast…». Ya abre el micrófono o la entrada que elijas.
