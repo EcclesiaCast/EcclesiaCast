@@ -165,7 +165,7 @@
                     <CheckBox Content="Contar en forma anónima que se usó" Foreground="White" Margin="0,24,0,0"
                               IsChecked="{Binding IsUsageCountEnabled, Mode=TwoWay}"/>
                     <TextBlock Style="{StaticResource SectionText}" Margin="22,4,0,0"
-                               Text="La primera vez que proyectás algo en el día, el programa avisa «una instalación se usó hoy», con un número al azar y la versión. Nada más: ni el nombre de la iglesia, ni canciones, ni lo que escribís. Sirve para saber cuántas iglesias lo usan y seguir mejorándolo. Si lo apagás, el número se borra."/>
+                               Text="La primera vez que proyectás algo en el día, el programa avisa «una instalación se usó hoy», con un número al azar y la versión. Del lugar se anota sólo el país. Nada más: ni el nombre de la iglesia, ni la ciudad, ni canciones, ni lo que escribís. Sirve para saber cuántas iglesias lo usan y seguir mejorándolo. Si lo apagás, el número se borra."/>
                 </StackPanel>
 
                 <!-- Aspecto -->

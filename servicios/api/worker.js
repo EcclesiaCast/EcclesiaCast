@@ -7,7 +7,8 @@
 //   GET  /v1/fondos   busca videos o fotos de fondo en Pixabay con la clave
 //                     de EcclesiaCast (PIXABAY_KEY), que nunca sale de acá
 //
-// No se guarda la dirección IP ni ningún dato de la persona.
+// No se guarda la dirección IP ni ningún dato de la persona. Del lugar sólo
+// queda el país, que Cloudflare informa con cada pedido.
 
 // ── Contador de uso ─────────────────────────────────────────────────────
 
@@ -29,6 +30,16 @@ export function validar(cuerpo, ahora = new Date()) {
   if (Number.isNaN(fecha) || Math.abs(fecha - ahora.getTime()) > 2 * 86400000) return null;
 
   return { dia, instalacion, version };
+}
+
+/**
+ * El país desde donde llegó el aviso, como lo informa Cloudflare (dos letras,
+ * «UY»). Es lo único del lugar que se guarda: la dirección IP no. Vacío si
+ * Cloudflare no lo sabe («XX») o si llega por la red Tor («T1»).
+ */
+export function paisDe(pedido) {
+  const pais = String(pedido?.cf?.country ?? "").toUpperCase();
+  return /^[A-Z]{2}$/.test(pais) && pais !== "XX" ? pais : "";
 }
 
 const RESUMEN_SQL = `
@@ -53,11 +64,34 @@ const VERSIONES_SQL = `
    GROUP BY version
    ORDER BY instalaciones DESC`;
 
+// Una instalación cuenta en el último país desde donde avisó.
+const PAISES_SQL = `
+  SELECT pais,
+         COUNT(*)                                                   AS instalaciones,
+         SUM(CASE WHEN ultimo >= date('now', '-28 days') THEN 1 ELSE 0 END) AS ultimas_4_semanas
+    FROM (SELECT instalacion, pais, MAX(dia) AS ultimo FROM uso GROUP BY instalacion)
+   GROUP BY pais
+   ORDER BY instalaciones DESC, pais`;
+
+const nombres = new Intl.DisplayNames(["es"], { type: "region" });
+
+/** «Uruguay» para «UY»; «Sin dato» cuando no se supo el país. */
+export function nombreDePais(pais) {
+  if (!pais) return "Sin dato";
+  try {
+    return nombres.of(pais) ?? pais;
+  } catch {
+    return pais;
+  }
+}
+
 export async function resumen(db) {
   const semanas = (await db.prepare(RESUMEN_SQL).all()).results;
   const nuevas = new Map((await db.prepare(NUEVAS_SQL).all()).results.map((f) => [f.semana, f.nuevas]));
   const versiones = (await db.prepare(VERSIONES_SQL).all()).results;
+  const paises = (await db.prepare(PAISES_SQL).all()).results;
   return {
+    paises: paises.map((p) => ({ ...p, nombre: nombreDePais(p.pais) })),
     semanas: semanas.map((s) => ({ ...s, nuevas: nuevas.get(s.semana) ?? 0 })),
     versiones_ultimas_4_semanas: versiones,
   };
@@ -70,6 +104,9 @@ function paginaResumen(datos) {
   const versiones = datos.versiones_ultimas_4_semanas
     .map((v) => `<tr><td>${v.version}</td><td>${v.instalaciones}</td></tr>`)
     .join("");
+  const paises = datos.paises
+    .map((p) => `<tr><td>${p.nombre}</td><td>${p.ultimas_4_semanas}</td><td>${p.instalaciones}</td></tr>`)
+    .join("");
   return `<!doctype html><html lang="es"><meta charset="utf-8"><title>EcclesiaCast · uso</title>
 <style>body{font-family:system-ui,sans-serif;background:#08142A;color:#EAF0F8;padding:24px}
 table{border-collapse:collapse;margin:12px 0 28px}td,th{padding:8px 14px;border-bottom:1px solid #22355A;text-align:right}
@@ -78,6 +115,9 @@ th{color:#F4B942;font-weight:600}td:first-child,th:first-child{text-align:left}h
 <p>Cada número es una instalación distinta (una PC). Una iglesia con dos PCs cuenta dos.</p>
 <h2>Por semana (empieza el lunes)</h2>
 <table><tr><th>Semana</th><th>Sábado o domingo</th><th>Toda la semana</th><th>Nuevas</th></tr>${filas}</table>
+<h2>Por país</h2>
+<p>Cada instalación cuenta en el último país desde donde avisó.</p>
+<table><tr><th>País</th><th>Últimas 4 semanas</th><th>Desde el principio</th></tr>${paises}</table>
 <h2>Versiones (últimas 4 semanas)</h2>
 <table><tr><th>Versión</th><th>Instalaciones</th></tr>${versiones}</table></html>`;
 }
@@ -187,8 +227,8 @@ export default {
       }
       const fila = validar(cuerpo);
       if (!fila) return new Response(null, { status: 400 });
-      await env.DB.prepare("INSERT OR IGNORE INTO uso (dia, instalacion, version) VALUES (?1, ?2, ?3)")
-        .bind(fila.dia, fila.instalacion, fila.version)
+      await env.DB.prepare("INSERT OR IGNORE INTO uso (dia, instalacion, version, pais) VALUES (?1, ?2, ?3, ?4)")
+        .bind(fila.dia, fila.instalacion, fila.version, paisDe(pedido))
         .run();
       return new Response(null, { status: 204 });
     }

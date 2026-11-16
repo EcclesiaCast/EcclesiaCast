@@ -3,7 +3,7 @@
 import { DatabaseSync } from "node:sqlite";
 import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
-import contador, { validar, pedidoDeFondos, mejorArchivo, resumirPixabay } from "./worker.js";
+import contador, { validar, paisDe, nombreDePais, pedidoDeFondos, mejorArchivo, resumirPixabay } from "./worker.js";
 
 const sqlite = new DatabaseSync(":memory:");
 sqlite.exec(readFileSync(new URL("./schema.sql", import.meta.url), "utf8"));
@@ -25,15 +25,26 @@ const env = { DB, RESUMEN_CLAVE: "secreto" };
 const hoy = new Date().toISOString().slice(0, 10);
 const uno = "0123456789abcdef0123456789abcdef";
 const otro = "fedcba9876543210fedcba9876543210";
-const avisar = (cuerpo) => contador.fetch(new Request("https://api.ecclesiacast.org/v1/uso",
-  { method: "POST", body: JSON.stringify(cuerpo), headers: { "content-type": "application/json" } }), env);
+// Cloudflare le agrega «cf» a cada pedido, con el país.
+const avisar = (cuerpo, pais) => contador.fetch(Object.assign(new Request("https://api.ecclesiacast.org/v1/uso",
+  { method: "POST", body: JSON.stringify(cuerpo), headers: { "content-type": "application/json" } }),
+  pais ? { cf: { country: pais } } : {}), env);
 
 // Lo que manda el programa se cuenta, una vez por día.
 assert.equal((await avisar({ instalacion: uno, dia: hoy, version: "1.4.0" })).status, 204);
 assert.equal((await avisar({ instalacion: uno, dia: hoy, version: "1.4.0" })).status, 204);
-assert.equal((await avisar({ instalacion: otro, dia: hoy, version: "1.4.0-prueba.2+d5929187" })).status, 204);
+assert.equal((await avisar({ instalacion: otro, dia: hoy, version: "1.4.0-prueba.2+d5929187" }, "UY")).status, 204);
 assert.equal(sqlite.prepare("SELECT COUNT(*) AS n FROM uso").get().n, 2);
 assert.equal(sqlite.prepare("SELECT version FROM uso WHERE instalacion = ?").get(otro).version, "1.4.0-prueba.2");
+
+// Del lugar se guarda sólo el país; sin dato queda vacío.
+assert.equal(sqlite.prepare("SELECT pais FROM uso WHERE instalacion = ?").get(otro).pais, "UY");
+assert.equal(sqlite.prepare("SELECT pais FROM uso WHERE instalacion = ?").get(uno).pais, "");
+assert.equal(paisDe({ cf: { country: "ar" } }), "AR");
+for (const raro of [{}, { cf: {} }, { cf: { country: "XX" } }, { cf: { country: "T1" } }, { cf: { country: "Uruguay" } }, undefined])
+  assert.equal(paisDe(raro), "", JSON.stringify(raro));
+assert.equal(nombreDePais("UY"), "Uruguay");
+assert.equal(nombreDePais(""), "Sin dato");
 
 // Lo que no cuadra no entra.
 for (const malo of [
@@ -63,14 +74,20 @@ const filas = [
   ["2026-11-22", otro],                                             // domingo siguiente
 ];
 for (const [dia, inst] of filas)
-  sqlite.prepare("INSERT INTO uso VALUES (?, ?, '1.4.0')").run(dia, inst);
+  sqlite.prepare("INSERT INTO uso (dia, instalacion, version, pais) VALUES (?, ?, '1.4.0', ?)").run(dia, inst, inst === uno ? "UY" : "MX");
 const datos = await (await ver("?clave=secreto&formato=json")).json();
 assert.deepEqual(datos.semanas, [
   { semana: "2026-11-16", en_la_semana: 2, en_el_fin_de_semana: 1, nuevas: 0 },
   { semana: "2026-11-09", en_la_semana: 2, en_el_fin_de_semana: 2, nuevas: 2 },
 ]);
+// Por país: cada instalación cuenta una vez. Las fechas de la prueba son
+// fijas, así que «últimas 4 semanas» depende del día en que se corre.
+assert.deepEqual(datos.paises.map((p) => [p.pais, p.nombre, p.instalaciones]),
+  [["MX", "México", 1], ["UY", "Uruguay", 1]]);
 const html = await (await ver("?clave=secreto")).text();
 assert.match(html, /Sábado o domingo/);
+assert.match(html, /Por país/);
+assert.match(html, /Uruguay/);
 
 
 

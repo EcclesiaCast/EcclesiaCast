@@ -5,8 +5,9 @@ trabajos:
 
 - **Contador anónimo de uso.** El programa avisa una vez por día, la primera
   vez que se proyecta, con tres datos: un número al azar de la instalación,
-  el día y la versión. **No se guarda la dirección IP** ni nada de la iglesia
-  o de lo que se proyecta. Se apaga en Ajustes → Actualizaciones.
+  el día y la versión. Del lugar se guarda **sólo el país**, que Cloudflare
+  informa con cada aviso. **No se guarda la dirección IP** ni nada de la
+  iglesia o de lo que se proyecta. Se apaga en Ajustes → Actualizaciones.
 - **Fondos de Pixabay.** El programa busca videos y fotos de fondo en Pixabay a
   través de este servicio, que guarda la clave de Pixabay: la clave no puede
   estar en el programa porque el código es público. Cada búsqueda se recuerda
@@ -60,6 +61,10 @@ Para probarlo, en el navegador:
   Es el número que más se parece a «iglesias que lo usaron en el culto».
 - **Toda la semana:** las que proyectaron algún día.
 - **Nuevas:** las que proyectaron por primera vez esa semana.
+
+También **por país**: cuántas instalaciones avisaron desde cada uno, en las
+últimas 4 semanas y desde el principio (cada una cuenta en el último país
+desde donde avisó).
 
 Y qué versiones se usaron en las últimas 4 semanas. Con `&formato=json`
 devuelve lo mismo en datos. Cada PC cuenta por separado: una iglesia con dos
