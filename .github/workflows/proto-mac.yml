@@ -1,0 +1,107 @@
+name: proto-mac
+
+# Throwaway prototype for the Mac version (docs/plan-mac-1.md). Runs only by
+# hand or on pushes to proto/** branches; the program's own build is build.yml.
+on:
+  workflow_dispatch:
+  push:
+    branches: ['proto/**']
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - name: Build
+        run: dotnet build proto/Proto.slnx --configuration Release
+      - name: Test
+        run: dotnet test proto/Proto.slnx --configuration Release --no-build --verbosity normal
+      - name: Upload the slide pictures
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: diapositiva-windows
+          path: proto/EcclesiaCast.Proto.Tests/bin/Release/net10.0/render/*.png
+          if-no-files-found: warn
+
+  mac:
+    # macos-15 runs on an Apple chip, like the Mac the prototype is for.
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - name: Machine
+        run: |
+          sw_vers
+          uname -m
+      - name: Build
+        run: dotnet build proto/Proto.slnx --configuration Release
+      - name: Test
+        run: dotnet test proto/Proto.slnx --configuration Release --no-build --verbosity normal
+      - name: Upload the slide pictures
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: diapositiva-mac
+          path: proto/EcclesiaCast.Proto.Tests/bin/Release/net10.0/render/*.png
+          if-no-files-found: warn
+
+      - name: Publish for Apple chips
+        run: >
+          dotnet publish proto/EcclesiaCast.Proto/EcclesiaCast.Proto.csproj
+          --configuration Release --runtime osx-arm64 --self-contained
+          --output "$RUNNER_TEMP/publish"
+
+      - name: Make, sign and zip the app
+        run: |
+          chmod +x proto/mac/bundle.sh
+          proto/mac/bundle.sh "$RUNNER_TEMP/publish" "$RUNNER_TEMP/out"
+
+      # The zip is already made with ditto (it keeps the execute permission
+      # and the signatures); the artifact only carries it.
+      - name: Upload the app
+        uses: actions/upload-artifact@v7
+        with:
+          name: EcclesiaCast-Proto-mac
+          path: ${{ runner.temp }}/out/EcclesiaCast-Proto-mac.zip
+          compression-level: 0
+          if-no-files-found: error
+
+      # What Alexis will get: unzip the zip the same way the Mac does and
+      # check the signature there.
+      - name: Check the zipped app
+        run: |
+          mkdir -p "$RUNNER_TEMP/check"
+          ditto -x -k "$RUNNER_TEMP/out/EcclesiaCast-Proto-mac.zip" "$RUNNER_TEMP/check"
+          APP="$RUNNER_TEMP/check/EcclesiaCast Proto.app"
+          codesign --verify --deep --strict --verbose=2 "$APP"
+          ls -l "$APP/Contents/MacOS/EcclesiaCast.Proto"
+          spctl --assess --type execute --verbose "$APP" || echo "Gatekeeper no lo acepta sin «Abrir igualmente» (esperado: no tiene firma de Apple)"
+
+      # GitHub's Macs have a desktop session: open the unzipped app for 20
+      # seconds and read its log. Shows, before the real Mac, whether the
+      # library is created, the Bible imported and LibVLC loaded. It does not
+      # fail the run (a runner without a screen would be a false alarm).
+      - name: Start the app for a moment
+        continue-on-error: true
+        run: |
+          APP="$RUNNER_TEMP/check/EcclesiaCast Proto.app"
+          "$APP/Contents/MacOS/EcclesiaCast.Proto" &
+          PID=$!
+          sleep 20
+          kill "$PID" 2>/dev/null || true
+          sleep 2
+          LOGS="$HOME/Library/Application Support/EcclesiaCast-proto/logs"
+          ls -la "$LOGS"
+          cat "$LOGS"/*.log
+          grep -q "LibVLC .* listo" "$LOGS"/*.log
+          grep -q "Biblia importada" "$LOGS"/*.log
+          ! grep -E "\[(ERR|FTL)\]" "$LOGS"/*.log
