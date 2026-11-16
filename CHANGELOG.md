@@ -7,6 +7,10 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Botones para marcar el coro y las estrofas** en el editor de canciones:
+  «Coro», «Estrofa», «Puente» y «Final», arriba de la letra. Con el cursor en
+  un párrafo, ponen la línea [Coro] o [Estrofa 1] arriba (la estrofa se
+  numera sola). Las canciones ya cargadas no cambian.
 - **Degradé desde el borde en cualquier diseño de la transmisión.** En el
   diseño de la transmisión, debajo de las placas, la casilla «Degradé oscuro
   desde el borde, detrás de la placa» suma el degradé de «Clásica» a

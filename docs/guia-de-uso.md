@@ -27,7 +27,9 @@ En la pestaña **Canciones**:
   **Importar archivo (.txt, .pro)…**. Crear desde cero abre una canción en
   blanco: pegá la letra, y **cada párrafo** (bloque separado por
   una línea en blanco) es una diapositiva. Opcionalmente, una línea `[Coro]` o
-  `[Verso 1]` no se proyecta, solo le pone nombre a los párrafos que siguen.
+  `[Estrofa 1]` no se proyecta, solo le pone nombre a los párrafos que siguen:
+  los botones **Coro**, **Estrofa**, **Puente** y **Final**, arriba de la letra,
+  la escriben por vos sobre el párrafo donde está el cursor.
 - **➕ → Traer de otro programa…** trae **todas** las canciones de ProPresenter o de
   EasyWorship de una vez. Arriba elegís el programa (cada opción dice cuántas
   canciones encontró); la ventana busca sola dónde está instalado (ProPresenter
