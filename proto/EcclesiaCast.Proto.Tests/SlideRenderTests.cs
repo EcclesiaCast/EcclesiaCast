@@ -77,8 +77,20 @@ public sealed class SlideRenderTests
         var text = slide.GetVisualDescendants().OfType<TextBlock>().First(t => t.Text == John316);
         Assert.True(text.Bounds.Height <= 1080 - 2 * theme.MarginVertical, $"No entra: {text.Bounds.Height}");
         var frame = window.CaptureRenderedFrame();
-        frame?.Save(Path.Combine(AppContext.BaseDirectory, "render", "versiculo.png"), PngBitmapEncoderOptions.Default);
+        if (frame is not null)
+            SavePicture(frame, "versiculo.png");
         window.Close();
+    }
+
+    /// <summary>
+    /// Saves a picture under render/ next to the tests, creating the folder:
+    /// any test may be the first one to run.
+    /// </summary>
+    private static void SavePicture(Bitmap frame, string fileName)
+    {
+        var folder = Path.Combine(AppContext.BaseDirectory, "render");
+        Directory.CreateDirectory(folder);
+        frame.Save(Path.Combine(folder, fileName), PngBitmapEncoderOptions.Default);
     }
 
     private static SlideTheme Theme(double outline, bool shadow) => new()
@@ -114,9 +126,7 @@ public sealed class SlideRenderTests
         var frame = window.CaptureRenderedFrame() ?? throw new InvalidOperationException("No se dibujó nada");
         window.Close();
 
-        var folder = Path.Combine(AppContext.BaseDirectory, "render");
-        Directory.CreateDirectory(folder);
-        frame.Save(Path.Combine(folder, fileName), PngBitmapEncoderOptions.Default);
+        SavePicture(frame, fileName);
 
         // Back to a WriteableBitmap to read its pixels.
         using var stream = new MemoryStream();
