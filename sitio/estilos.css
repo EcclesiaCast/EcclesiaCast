@@ -560,3 +560,15 @@ details p { color: var(--suave); padding-right: 2rem; }
 }
 @keyframes respira { from { opacity: .6; transform: translateX(-50%) scale(.9); } to { opacity: 1; transform: translateX(-50%) scale(1.1); } }
 @media (prefers-reduced-motion: reduce) { .cierre::before { animation: none; } .barra { transition: none; } }
+
+/* Guías: ejemplos de texto, listas y el aviso del final */
+.texto pre {
+  background: color-mix(in srgb, var(--linea) 55%, transparent);
+  border-radius: 10px; padding: 1rem 1.1rem; overflow-x: auto;
+  font-family: "Cascadia Mono", Consolas, ui-monospace, monospace;
+  font-size: .95rem; line-height: 1.6; color: var(--texto);
+}
+.texto pre code { background: none; padding: 0; font-size: inherit; }
+.texto ol, .texto ul { padding-left: 1.3rem; }
+.texto li { margin: .4rem 0; }
+.texto .llamada { margin-top: 2.5rem; padding-top: 1.2rem; border-top: 1px solid var(--linea); }

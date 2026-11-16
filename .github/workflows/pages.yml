@@ -12,6 +12,7 @@ on:
       - "sitio/**"
       - ".github/workflows/pages.yml"
       - ".github/scripts/datos-del-sitio.py"
+      - ".github/scripts/sitemap.sh"
   workflow_run:
     workflows: [release]
     types: [completed]
@@ -34,11 +35,15 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: main
+          fetch-depth: 0
 
       - name: Put the newest installer into the download buttons
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 .github/scripts/datos-del-sitio.py
+
+      - name: Put the date of each page into the sitemap
+        run: bash .github/scripts/sitemap.sh
 
       - uses: actions/configure-pages@v6
 
