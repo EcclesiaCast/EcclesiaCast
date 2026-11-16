@@ -49,17 +49,6 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   guarda la dirección IP. Sirve para saber cuántas iglesias lo usan cada fin
   de semana. Se apaga en Ajustes → Actualizaciones, y al apagarlo el número
   se borra.
-- **Seguir la canción por lo que se escucha (en prueba).** En **Proyección →
-  «Seguir la canción por lo que se escucha (beta)…»** el programa escucha el
-  micrófono o la entrada de línea y sigue la canción que está abierta. Tres
-  formas: **sólo sugerir** (marca la diapositiva que sigue y vos apretás
-  Enter), **seguir** (la pone cuando escucha que la cantan) y **adelantarse**
-  (pasa a la siguiente cuando la actual está terminando). Las flechas siempre
-  mandan, nunca cambia de canción y no toca la Biblia. La primera vez baja un
-  reconocedor de voz de unos 550 MB que queda en la PC: lo que escucha no se
-  graba ni sale de ahí. Anda mejor con canciones lentas y voces claras; con
-  canciones rápidas y la banda fuerte todavía se pierde.
-
 ### Cambiado
 
 - **El menú Archivo quedó más corto.** Tenía 16 opciones; ahora lo de las
@@ -67,17 +56,6 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   **Canciones**, **Biblias** y **Fondos**. En Archivo quedan las copias de la
   biblioteca, Ajustes y Salir.
 
-- **«Seguir la canción» va mucho más al ritmo y se equivoca menos (sigue en
-  prueba).** Ahora escucha más o menos una vez por segundo en vez de cada
-  tres, y usa la placa de video de la PC para entender lo que oye (si la PC
-  no tiene una que sirva, sigue funcionando como antes, más lento). Lleva la
-  cuenta de por dónde va la canción: lo normal es pasar a la diapositiva
-  siguiente, un coro que se repite es el que toca según el orden, y para
-  saltar a otra parte tiene que escucharlo dos veces seguidas. Ya no cambia
-  por alguien que habla antes de empezar ni por dos o tres palabras sueltas.
-  En «adelantarse» el margen viene en 2 palabras (antes 5). Con un micrófono
-  que llega bajito sube el volumen por su cuenta antes de escuchar, y avisa
-  si por esa entrada no llega nada.
 - **Editor de temas rehecho.** La vista previa queda en el medio y más grande,
   los campos van a la derecha repartidos en secciones (Letra, Sombra y franjas,
   Fondo, Leyenda, Transición y Biblia) y las plantillas listas se ven como
@@ -131,16 +109,10 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   imagen de fondo quedaba encima de él. Ahora el video del logo se dibuja en
   la capa del logo, como una imagen: tapa cualquier fondo, aparece y se va
   con el mismo fundido y usa el encuadre y el color de fondo.
-- **«Seguir la canción» ya no deshace lo que pone el operador.** Si pasás a
-  una diapositiva más adelante mientras todavía cantan la anterior, el
-  programa espera a que se cante esa antes de moverse, en vez de volver atrás.
 - **La cuenta de uso ya no reintenta con cada diapositiva** cuando no hay
   internet o el servicio no contesta: vuelve a probar una hora después.
 - **Los cambios en el diseño de la transmisión se ven en OBS recién al tocar
   «Guardar»,** no mientras se editan.
-
-- **«Seguir la canción» no podía abrir ninguna entrada de sonido** y decía
-  «Unable to cast…». Ya abre el micrófono o la entrada que elijas.
 - **«Bajar Biblias» ya no agrega dos veces la misma Biblia** si se vuelve a
   tildar una que ya estaba: la saltea y lo avisa.
 - **Un error inesperado ya no frena al operador.** Antes salía un cartel que
