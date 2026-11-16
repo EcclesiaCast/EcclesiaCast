@@ -437,6 +437,11 @@ las respuestas automáticas de la tabla); toca dar estos pasos.
 
 ## 3. Para hacer después de la 1.0
 
+> **«Seguir la canción» sale escondida en la 1.4.0.** Para verla: crear un
+> archivo vacío `seguir-la-cancion.txt` en `%APPDATA%\EcclesiaCast` y volver a
+> abrir el programa. Sus entradas del CHANGELOG están guardadas al final de
+> [plan-seguimiento-por-audio.md](plan-seguimiento-por-audio.md).
+
 ### Pedidos de la prueba de la 1.4.0 (11/11/2026)
 
 - [x] **«Seguir la canción» no abría ninguna entrada** («Unable to cast
