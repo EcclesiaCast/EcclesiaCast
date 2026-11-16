@@ -10,7 +10,7 @@ Leelo entero antes de tocar nada. Valen las **reglas de trabajo** de
 - No ejecutar python: no está instalado y llamarlo abre la Microsoft Store.
 - Rama `beta6`, sin push. Un commit por punto, en inglés, con
   `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`.
-- Castellano rioplatense para todo lo que se ve.
+- Español rioplatense para todo lo que se ve.
 - CHANGELOG [Sin publicar] y `docs/pendientes.md` al día.
 - Los archivos tienen fin de línea CRLF: sed y perl los rompen, así que usá la
   herramienta Edit.
@@ -20,7 +20,7 @@ Leelo entero antes de tocar nada. Valen las **reglas de trabajo** de
 
 Que el programa avise solo cuando hay una versión nueva y se actualice con un
 botón, sin que nadie tenga que entrar a GitHub. Lo decidido:
-- Avisa en castellano qué trae la versión nueva.
+- Avisa en español qué trae la versión nueva.
 - Tres botones: **«Actualizar ahora»**, **«Más tarde»** y **«Saltar esta
   versión»**.
 - **Nunca interrumpe mientras se está proyectando.**
@@ -130,7 +130,7 @@ Todo lo que se pueda decidir sin internet ni ventanas va en
    botón «⬆ Versión nueva»), preguntá antes: «Se va a cerrar la proyección
    para actualizar. ¿Seguimos?».
 
-## 4. Las notas de cada versión en castellano
+## 4. Las notas de cada versión en español
 
 Hoy `.github/workflows/release.yml` publica el *release* con
 `generate_release_notes: true` (títulos de commits en inglés) más el renglón
@@ -192,7 +192,7 @@ de la política de firma.
   -p:Version=1.0.0-beta.7 --output publish`; y después
   `"%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe" /DAppVersion=1.0.0-beta.7
   installer\EcclesiaCast.iss`.
-- Informe final en castellano, para Alexis:
+- Informe final en español, para Alexis:
   - qué quedó hecho (con commits);
   - cómo lo probaste;
   - qué no pudiste probar;

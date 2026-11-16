@@ -435,6 +435,10 @@ public sealed partial class MainViewModel
         if (SelectedDisplay is null)
             return;
 
+        // Something goes on the air (the screen or only the stream): the
+        // first time each day, the anonymous count of use hears about it.
+        UsageReporter.NoteProjected(_settings);
+
         if (SelectedDisplay.BroadcastOnly)
         {
             if (_projection.IsOutputVisible)
@@ -517,6 +521,17 @@ public sealed partial class MainViewModel
     {
         _presentation.ToggleLogo();
         EnsureOutputOn();
+    }
+
+    /// <summary>
+    /// The Esc key switches the output off at once. (For a while it asked for
+    /// two presses; the 15/11 test asked to go back to one.)
+    /// </summary>
+    [RelayCommand]
+    private void EscapeOutput()
+    {
+        if (IsProjecting)
+            HideOutput();
     }
 
     [RelayCommand]

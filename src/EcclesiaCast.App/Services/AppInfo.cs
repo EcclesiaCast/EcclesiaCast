@@ -42,5 +42,24 @@ public static class AppInfo
     public static string CurrentBibleCatalogUrl =>
         Environment.GetEnvironmentVariable("ECCLESIACAST_BIBLE_CATALOG") is { Length: > 0 } test ? test : BibleCatalogUrl;
 
+    /// <summary>
+    /// The anonymous count of use (servicios/api in the repository, on
+    /// Cloudflare). ECCLESIACAST_USAGE_URL points a test at another address.
+    /// </summary>
+    public const string UsageCountUrl = "https://api.ecclesiacast.org/v1/uso";
+
+    public static string CurrentUsageCountUrl =>
+        Environment.GetEnvironmentVariable("ECCLESIACAST_USAGE_URL") is { Length: > 0 } test ? test : UsageCountUrl;
+
+    /// <summary>
+    /// The search of backgrounds on Pixabay, through our own service (it keeps
+    /// the Pixabay key, which can not live in public code).
+    /// ECCLESIACAST_BACKGROUNDS_URL points a test at another address.
+    /// </summary>
+    public const string BackgroundSearchUrl = "https://api.ecclesiacast.org/v1/fondos";
+
+    public static string CurrentBackgroundSearchUrl =>
+        Environment.GetEnvironmentVariable("ECCLESIACAST_BACKGROUNDS_URL") is { Length: > 0 } test ? test : BackgroundSearchUrl;
+
     public static bool HasDonateUrl => DonateUrl.StartsWith("https://", StringComparison.Ordinal);
 }

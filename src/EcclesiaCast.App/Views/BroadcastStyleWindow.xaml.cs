@@ -103,6 +103,7 @@ public partial class BroadcastStyleWindow : Window
         FollowCheck.IsChecked = s.FollowProjector;
         Pick(s.Position.ToString(), PosTop, PosCenter, PosBottom);
         Pick(s.Plate.ToString(), PlNone, PlTab, PlGlass, PlSolid, PlGradient, PlHalo, PlFillet, PlLine);
+        EdgeGradientCheck.IsChecked = s.EdgeGradient;
         Pick(s.Background.ToString(), BgNone, BgColor, BgFile);
 
         if (!FontCombo.Items.Contains(s.FontFamily))
@@ -154,6 +155,7 @@ public partial class BroadcastStyleWindow : Window
         FollowProjector = FollowCheck.IsChecked == true,
         Position = Chosen(Current.Position, PosTop, PosCenter, PosBottom),
         Plate = Chosen(Current.Plate, PlNone, PlTab, PlGlass, PlSolid, PlGradient, PlHalo, PlFillet, PlLine),
+        EdgeGradient = EdgeGradientCheck.IsChecked == true,
         Background = Chosen(Current.Background, BgNone, BgColor, BgFile),
         FontFamily = FontCombo.SelectedItem as string ?? Current.FontFamily,
         FontSize = SizeSlider.Value,
@@ -249,10 +251,9 @@ public partial class BroadcastStyleWindow : Window
         foreach (var button in PresetPanel.Children.OfType<RadioButton>())
             button.IsChecked = button.Tag is BroadcastPreset preset && preset.Matches(s);
 
+        // Only the preview of this window changes: the stream keeps the saved
+        // design until Guardar (15/11: editing during a service changed it live).
         PushPreview();
-
-        // The stream shows it too while editing (nothing is saved until Guardar).
-        BroadcastStyleSettings.Preview(_draft);
     }
 
     private static void SetSwatch(Button button, string hex)

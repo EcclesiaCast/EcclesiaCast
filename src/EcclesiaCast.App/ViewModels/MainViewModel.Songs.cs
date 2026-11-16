@@ -93,7 +93,19 @@ public sealed partial class MainViewModel
         foreach (var song in _songs.Search(SearchText))
             Songs.Add(song);
         SelectedSong = Songs.FirstOrDefault(s => s.Id == keepId) ?? SelectedSong;
+        var none = Songs.Count == 0;
+        var filtering = !string.IsNullOrWhiteSpace(SearchText);
+        IsSongLibraryEmpty = none && !filtering;
+        IsSongSearchEmpty = none && filtering;
     }
+
+    /// <summary>The library has no songs at all (not just the search): the list says what to do.</summary>
+    [ObservableProperty]
+    private bool _isSongLibraryEmpty;
+
+    /// <summary>The search box found nothing.</summary>
+    [ObservableProperty]
+    private bool _isSongSearchEmpty;
 
     private void BuildSongSlides()
     {
@@ -430,18 +442,27 @@ public sealed partial class MainViewModel
         if (SelectedSong is null)
             return;
 
-        var confirm = MessageBox.Show(
-            $"¿Eliminar \"{SelectedSong.Title}\" de la biblioteca?",
-            "EcclesiaCast",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Question);
-        if (confirm != MessageBoxResult.Yes)
+        var confirm = Notice.Confirm(
+            $"¿Eliminar \"{SelectedSong.Title}\" de la biblioteca?\n\n"
+            + "Va a la papelera y se guarda 30 días: la podés recuperar desde Edición → Papelera.",
+            "Mandar a la papelera");
+        if (!confirm)
             return;
 
         _songs.Delete(SelectedSong.Id);
         SelectedSong = null;
         LoadSongs();
-        StatusText = "Canción eliminada.";
+        StatusText = "Canción enviada a la papelera (se guarda 30 días).";
+    }
+
+    /// <summary>Edición → «Papelera…»: lo borrado en los últimos 30 días, para recuperarlo.</summary>
+    [RelayCommand]
+    private void OpenTrash()
+    {
+        new Views.TrashWindow(_songs, _themes) { Owner = Application.Current.MainWindow }.ShowDialog();
+        LoadSongs();
+        ThemeSeeder.EnsureDefaults(_themes, _settings);
+        StatusText = "Papelera cerrada.";
     }
 
     /// <summary>Brings the libraries of another program (ProPresenter, EasyWorship) over, on the window's own choice.</summary>

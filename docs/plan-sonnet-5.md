@@ -7,7 +7,7 @@ ninguna ventana visible (para lo visual, dibujar a PNG desde un programa de
 consola STA en tu carpeta temporal), no escribir nunca en la biblioteca real
 (`\\localhost\C$\Users\alexi\AppData\Roaming\EcclesiaCast`), rama `beta6`, sin
 push, un commit por punto en inglés con `Co-Authored-By: Claude Sonnet 5.5
-<noreply@anthropic.com>`, castellano rioplatense para lo que se ve, CHANGELOG
+<noreply@anthropic.com>`, español rioplatense para lo que se ve, CHANGELOG
 [Sin publicar] y `docs/pendientes.md` al día.
 
 ## El problema
@@ -86,6 +86,6 @@ Rearmá el instalador de la beta.7 como en `.github/workflows/release.yml`
 `"%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe" /DAppVersion=1.0.0-beta.7
 installer\EcclesiaCast.iss`). Sumá a `docs/pendientes.md`, sección 1 «Para
 probar», cómo probarlo (una página vertical en «Rellenar», alejar el zoom y
-correrla hasta abajo). Informe final en castellano, para Alexis: qué quedó
+correrla hasta abajo). Informe final en español, para Alexis: qué quedó
 hecho (con commits), cómo lo probaste, qué no pudiste probar y qué decidiste
 vos.

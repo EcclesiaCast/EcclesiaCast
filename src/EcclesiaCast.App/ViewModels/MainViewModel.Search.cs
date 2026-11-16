@@ -262,17 +262,12 @@ public sealed partial class MainViewModel
     /// of the app can tell it apart from a real library item and never tries
     /// to write it back to the media table.
     /// </summary>
-    private static MediaItem LogoBackground(Logo logo) => new()
+    private static MediaItem LogoBackground(Logo logo)
     {
-        Id = -1000 - logo.Id,
-        Name = logo.Name,
-        Path = logo.Path!,
-        Type = logo.Kind == LogoKind.Video ? MediaType.Video : MediaType.Image,
-        ThumbnailPath = logo.Kind == LogoKind.Video ? logo.PosterPath : logo.Path,
-        Scaling = logo.Scaling,
-        Behavior = MediaBehavior.Background,
-        EndBehavior = VideoEndBehavior.Loop,
-        Muted = true,
-        Blur = logo.BackgroundBlur,
-    };
+        var media = logo.AsFramedMedia();
+        media.Behavior = MediaBehavior.Background;
+        media.Muted = true;
+        media.Blur = logo.BackgroundBlur;
+        return media;
+    }
 }

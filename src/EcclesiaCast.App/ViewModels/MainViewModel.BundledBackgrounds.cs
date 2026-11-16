@@ -99,7 +99,7 @@ public sealed partial class MainViewModel
     private static string PackBackgroundsFolder => Path.Combine(App.DataDir, "fondos-agregados");
 
     /// <summary>
-    /// «Archivo → Agregar paquete de fondos…»: unzips a pack of backgrounds
+    /// «Fondos → Agregar paquete de fondos…»: unzips a pack of backgrounds
     /// into the library's own folder and brings each one into the «Fondos
     /// agregados» tab, looping and silent, like the sample ones.
     /// </summary>
@@ -163,7 +163,7 @@ public sealed partial class MainViewModel
     private bool _downloadingBackgroundPack;
 
     /// <summary>
-    /// «Archivo → Bajar más fondos de internet…»: downloads the pack of extra
+    /// «Fondos → Bajar más fondos de internet…»: downloads the pack of extra
     /// backgrounds from GitHub (about 22 MB), checks that it is exactly the file
     /// the program knows, and adds what the library does not have yet.
     /// </summary>
@@ -173,11 +173,10 @@ public sealed partial class MainViewModel
         if (_downloadingBackgroundPack)
             return;
 
-        var answer = MessageBox.Show(
-            "Se van a bajar 9 fondos en video (unos 22 MB) desde GitHub y a agregar a la pestaña «"
-            + BackgroundPack.Tab + "». ¿Seguimos?",
-            "Bajar más fondos", MessageBoxButton.YesNo, MessageBoxImage.Question);
-        if (answer != MessageBoxResult.Yes)
+        if (!Notice.Confirm(
+                "Se van a bajar 9 fondos en video (unos 22 MB) desde GitHub y a agregar a la pestaña «"
+                + BackgroundPack.Tab + "».",
+                "Bajar los fondos", "Ahora no", title: "Bajar más fondos"))
             return;
 
         _downloadingBackgroundPack = true;

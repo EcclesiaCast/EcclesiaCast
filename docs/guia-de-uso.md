@@ -7,7 +7,8 @@ secciones en orden.
 
 Arriba a la derecha, en **Salida**, elegí el monitor del proyector (EcclesiaCast
 prefiere solo el que no es el principal). El botón **🔴 Poner en vivo** enciende
-y apaga la proyección; **Esc** también la apaga.
+y apaga la proyección; **Esc**
+también la apaga.
 
 La pantalla elegida se recuerda para la próxima vez.
 
@@ -26,7 +27,9 @@ En la pestaña **Canciones**:
   **Importar archivo (.txt, .pro)…**. Crear desde cero abre una canción en
   blanco: pegá la letra, y **cada párrafo** (bloque separado por
   una línea en blanco) es una diapositiva. Opcionalmente, una línea `[Coro]` o
-  `[Verso 1]` no se proyecta, solo le pone nombre a los párrafos que siguen.
+  `[Estrofa 1]` no se proyecta, solo le pone nombre a los párrafos que siguen:
+  los botones **Coro**, **Estrofa**, **Puente** y **Final**, arriba de la letra,
+  la escriben por vos sobre el párrafo donde está el cursor.
 - **➕ → Traer de otro programa…** trae **todas** las canciones de ProPresenter o de
   EasyWorship de una vez. Arriba elegís el programa (cada opción dice cuántas
   canciones encontró); la ventana busca sola dónde está instalado (ProPresenter
@@ -34,7 +37,7 @@ En la pestaña **Canciones**:
   canciones tiene cada una y las importa. Si una canción ya está, pregunta qué
   hacer. Si están en otro lado (un disco externo, una copia de otra máquina), usá
   **Elegir carpeta…**: en EasyWorship es la que tiene `Songs.db` y `SongWords.db`.
-- **➕ → Buscar en internet…** (también en **Archivo**) trae una canción
+- **➕ → Buscar en internet…** (también en el menú **Canciones**) trae una canción
   nueva sin copiar y pegar: escribí el **nombre**, el **artista** o **una frase
   de la letra** y apretá Enter. Busca en musica.com y, si no está ahí, en
   lrclib.net. Al elegir un resultado ves la letra ya separada en diapositivas
@@ -56,13 +59,13 @@ desde la primera. Las flechas **←→** navegan en vivo.
 
 En la pestaña **Biblia**:
 
-- **📥** importa una Biblia en **JSON** o **Zefania XML**. Si la tuya está en otro formato (Word, PDF, texto), **Archivo → Cómo preparar una Biblia para importar…** trae un ejemplo de cada formato y unas instrucciones para pedirle a una IA que la convierta.
+- **📥** importa una Biblia en **JSON** o **Zefania XML**. Si la tuya está en otro formato (Word, PDF, texto), **Biblias → Cómo preparar una Biblia para importar…** trae un ejemplo de cada formato y unas instrucciones para pedirle a una IA que la convierta.
 - El instalador te deja elegir qué **Biblias libres** instalar (Reina-Valera
   1909, Biblia libre para el mundo y Versión Biblia Libre); aparecen solas la
   primera vez que abrís el programa. Las que tienen derechos (RVR1960, NVI…)
   no vienen con el instalador: para llevarlas a otra computadora tuya, en
-  **Archivo → Exportar paquete de Biblias…** marcás las versiones y se guarda
-  un archivo `.ecbiblias`; en la otra, **Archivo → Importar paquete de
+  **Biblias → Exportar paquete de Biblias…** marcás las versiones y se guarda
+  un archivo `.ecbiblias`; en la otra, **Biblias → Importar paquete de
   Biblias…** (o la página «Paquete de Biblias propio» del instalador) las
   trae. Usá los paquetes sólo en tus propias computadoras.
 - Las versiones van en una fila de botones con su abreviatura. Un **clic**
@@ -340,15 +343,20 @@ programa recuerda lo que elijas.
 | **F2** | *Clear* — oculta el texto, deja el fondo |
 | **F3** | *Logo* |
 | **F4** | Quita el fondo, dejando la letra |
-| **Esc** | Apaga la salida |
+| **Esc** dos veces | Apaga la salida (el primer toque sólo avisa) |
 | **Ctrl+Enter** | Proyecta el texto rápido |
 
 - **Logos**: la flecha **▾** al lado de *Logo (F3)* elige cuál se muestra —
   podés tener uno para la reunión general, otro para jóvenes, otro para
   mujeres. Cada logo puede ser una **imagen**, un **video en bucle** o un
   **texto libre** con su tipografía y colores; se arman en *Administrar
-  logos…*. El botón **🖼▦** de al lado pone el logo **de fondo**, detrás de la
-  letra, con el desenfoque que le hayas puesto.
+  logos…*. Una imagen o un video que no es 16:9 (un logo cuadrado, por
+  ejemplo) se acomoda igual que un fondo: entero, rellenando o estirado, con
+  zoom, corrido, a un tamaño fijo, y con los bordes del color de fondo, de la
+  misma imagen desenfocada o de otra imagen de la biblioteca. En la vista
+  previa se arrastra para correrlo y la ruedita hace zoom. El botón **🖼▦** de
+  al lado pone el logo **de fondo**, detrás de la letra, con el desenfoque que
+  le hayas puesto.
 
 - **Texto rápido**: escribí un anuncio y proyectalo al momento.
 - **Aviso al pie**: un mensaje que aparece sobre todo lo demás (ideal para

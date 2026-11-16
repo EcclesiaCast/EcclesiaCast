@@ -6,7 +6,7 @@ Leelo entero antes de tocar nada. Valen las **reglas de trabajo** de
 ninguna ventana visible, no escribir nunca en la biblioteca real
 (`\\localhost\C$\Users\alexi\AppData\Roaming\EcclesiaCast`; para datos reales,
 copiar sólo `ecclesiacast.db` a una carpeta temporal), rama `beta6`, sin push,
-un commit por punto en inglés, castellano rioplatense para lo que se ve,
+un commit por punto en inglés, español rioplatense para lo que se ve,
 CHANGELOG y pendientes al día.
 
 ## Lo que se encontró (8/10/2026, en la biblioteca de Alexis)
@@ -84,5 +84,5 @@ Rearmá el instalador de la beta.7 como en `.github/workflows/release.yml`
 `"%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe" /DAppVersion=1.0.0-beta.7 installer\EcclesiaCast.iss`;
 borrá `publish` antes). Sumá a `docs/pendientes.md`, sección 1 «Para probar»,
 cómo probarlo (por ejemplo Juan 8:11 y Marcos 16:8 en NTV, y corregir un
-versículo). Informe final en castellano, para Alexis: qué quedó hecho (con
+versículo). Informe final en español, para Alexis: qué quedó hecho (con
 commits), cómo lo probaste, qué no pudiste probar y qué decidiste vos.

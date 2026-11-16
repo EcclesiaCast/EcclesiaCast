@@ -33,18 +33,16 @@ public sealed class BackupDialogService(string dbPath) : IBackupDialog
             var size = new FileInfo(dialog.FileName).Length / (1024d * 1024d);
 
             Log.Information("Copia de seguridad guardada en {Path}", dialog.FileName);
-            MessageBox.Show(
-                $"Listo. La copia quedó en:\n\n{dialog.FileName}\n\n({size:0.0} MB)\n\n"
+            Notice.Show(
+                $"La copia quedó en:\n\n{dialog.FileName}\n\n({size:0.0} MB)\n\n"
                 + "Guardala fuera de esta computadora — en un pendrive o en la nube —, "
                 + "porque si se rompe el disco se va con él.",
-                "Copia guardada", MessageBoxButton.OK, MessageBoxImage.Information);
+                "Copia guardada");
         }
         catch (Exception ex)
         {
             Log.Error(ex, "No se pudo guardar la copia en {Path}", dialog.FileName);
-            MessageBox.Show(
-                $"No se pudo guardar la copia:\n\n{ex.Message}",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Error);
+            Notice.Show(ex.Message, "No se pudo guardar la copia", NoticeKind.Error);
         }
     }
 
@@ -62,23 +60,23 @@ public sealed class BackupDialogService(string dbPath) : IBackupDialog
         var summary = DatabaseBackup.Inspect(dialog.FileName);
         if (summary is null)
         {
-            MessageBox.Show(
-                "Ese archivo no es una copia de EcclesiaCast.\n\n"
-                + "Buscá el que termina en «.ecbackup», o el archivo «ecclesiacast.db».",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
+            Notice.Show(
+                "Buscá el que termina en «.ecbackup», o el archivo «ecclesiacast.db».",
+                "Ese archivo no es una copia de EcclesiaCast",
+                NoticeKind.Warning);
             return;
         }
 
         if (DatabaseBackup.IsFromANewerVersion(dialog.FileName, dbPath))
         {
-            MessageBox.Show(
+            Notice.Show(
                 "Esa copia la hizo una versión de EcclesiaCast más nueva que la que tenés instalada.\n\n"
                 + "Actualizá el programa y volvé a intentarlo.",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
+                kind: NoticeKind.Warning);
             return;
         }
 
-        var answer = MessageBox.Show(
+        var restoreIt = Notice.Confirm(
             $"La copia tiene:\n\n"
             + $"    • {summary.Songs} canciones\n"
             + $"    • {summary.BibleVersions} versiones de la Biblia\n"
@@ -86,10 +84,10 @@ public sealed class BackupDialogService(string dbPath) : IBackupDialog
             + $"    • {summary.Playlists} playlists\n\n"
             + "Al restaurarla, TODO lo que tenés ahora (canciones, Biblias, temas, medios y playlists) "
             + "se reemplaza por lo que hay en la copia.\n\n"
-            + "EcclesiaCast se va a cerrar y volver a abrir solo. ¿Seguimos?",
-            "Restaurar la copia", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No);
+            + "EcclesiaCast se va a cerrar y volver a abrir solo.",
+            "Restaurar", "Ahora no", "Restaurar la copia", destructive: true);
 
-        if (answer != MessageBoxResult.Yes)
+        if (!restoreIt)
             return;
 
         try
@@ -99,9 +97,7 @@ public sealed class BackupDialogService(string dbPath) : IBackupDialog
         catch (Exception ex)
         {
             Log.Error(ex, "No se pudo preparar la restauración desde {Path}", dialog.FileName);
-            MessageBox.Show(
-                $"No se pudo leer la copia:\n\n{ex.Message}",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Error);
+            Notice.Show(ex.Message, "No se pudo leer la copia", NoticeKind.Error);
             return;
         }
 
@@ -125,10 +121,9 @@ public sealed class BackupDialogService(string dbPath) : IBackupDialog
             catch (Exception ex)
             {
                 Log.Error(ex, "No se pudo relanzar EcclesiaCast; queda por cuenta del operador");
-                MessageBox.Show(
-                    "La copia quedó lista para restaurarse, pero no pude volver a abrir EcclesiaCast solo.\n\n"
-                    + "Abrilo de nuevo a mano y la restauración se completa sola.",
-                    "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Information);
+                Notice.Show(
+                    "Abrilo de nuevo a mano y la restauración se completa sola.",
+                    "La copia quedó lista, pero no pude volver a abrir EcclesiaCast solo");
             }
         }
 

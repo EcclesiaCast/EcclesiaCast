@@ -83,6 +83,22 @@ public partial class SlideView : UserControl
             new PropertyMetadata(false, (d, _) => ((SlideView)d).RenderLogo()));
 
     /// <summary>
+    /// On the real output, the bitmap a video logo is being played into. It
+    /// is drawn in the logo layer like an image logo, so it sits over whatever
+    /// background is up (15/11: played behind this view, a theme colour or an
+    /// image background covered it and the logo showed black).
+    /// </summary>
+    public static readonly DependencyProperty LogoVideoFrameProperty =
+        DependencyProperty.Register(nameof(LogoVideoFrame), typeof(ImageSource), typeof(SlideView),
+            new PropertyMetadata(null, (d, _) => ((SlideView)d).RenderLogo()));
+
+    public ImageSource? LogoVideoFrame
+    {
+        get => (ImageSource?)GetValue(LogoVideoFrameProperty);
+        set => SetValue(LogoVideoFrameProperty, value);
+    }
+
+    /// <summary>
     /// The "we start in 5:00" screen. Null while there is no countdown, which
     /// is most of the time.
     /// </summary>
@@ -728,9 +744,10 @@ public partial class SlideView : UserControl
     private string? _lastLogoImagePath;
 
     /// <summary>
-    /// Paints the Logo state: a colour, plus an image (or the frame of a video
+    /// Paints the Logo state: a colour, plus an image (or the poster of a video
     /// logo in the previews) or free text. In the live output a video logo
-    /// leaves this layer transparent, since the moving picture plays behind.
+    /// shows its moving picture here (<see cref="LogoVideoFrame"/>), and its
+    /// poster until the first frame arrives.
     /// </summary>
     private void RenderLogo()
     {
@@ -742,6 +759,8 @@ public partial class SlideView : UserControl
             LogoImage.Visibility = Visibility.Collapsed;
             LogoImage.Source = null;
             _lastLogoImagePath = null;
+            MediaFraming.Apply(LogoImage, null, RootCanvas.Width, RootCanvas.Height);
+            RenderLogoFill(null);
             LogoText.Text = "EcclesiaCast";
             LogoText.FontFamily = new FontFamily("Segoe UI");
             LogoText.FontSize = 120;
@@ -751,13 +770,7 @@ public partial class SlideView : UserControl
             return;
         }
 
-        var isLiveVideo = logo.Kind == LogoKind.Video && IsLiveOutput;
-
-        // The video surface behind paints the whole screen, so anything drawn
-        // here (even the background colour) would cover it.
-        LogoLayer.Background = isLiveVideo
-            ? Brushes.Transparent
-            : BrushFromHex(logo.BackgroundColor, "#10141E");
+        LogoLayer.Background = BrushFromHex(logo.BackgroundColor, "#10141E");
 
         LogoText.Visibility = logo.Kind == LogoKind.Text ? Visibility.Visible : Visibility.Collapsed;
         if (logo.Kind == LogoKind.Text)
@@ -770,50 +783,101 @@ public partial class SlideView : UserControl
             LogoText.Foreground = BrushFromHex(logo.TextColor, "#FFFFFF");
         }
 
-        LogoImage.Stretch = logo.Scaling switch
-        {
-            MediaScaling.Fill => Stretch.UniformToFill,
-            MediaScaling.Stretch => Stretch.Fill,
-            _ => Stretch.Uniform,
-        };
-
-        // An image logo shows its file; a video logo shows its poster, but only
-        // in the previews (live, the real video is playing behind this layer).
+        // An image logo shows its file; a video logo shows its poster, and on
+        // the real output the video itself once it has a frame.
         var path = logo.Kind switch
         {
             LogoKind.Image => logo.Path,
-            LogoKind.Video when !IsLiveOutput => logo.PosterPath,
+            LogoKind.Video => logo.PosterPath,
             _ => null,
         };
 
-        if (path == _lastLogoImagePath)
-            return;
-        _lastLogoImagePath = path;
-
-        if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
+        if (logo.Kind == LogoKind.Video && IsLiveOutput && LogoVideoFrame is { } frame)
         {
-            try
+            if (!ReferenceEquals(LogoImage.Source, frame))
             {
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.UriSource = new Uri(path);
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.DecodePixelWidth = 1920;
-                bitmap.EndInit();
-                if (bitmap.CanFreeze)
-                    bitmap.Freeze();
-                LogoImage.Source = bitmap;
+                // A path that never matches: the poster is loaded again when the video goes.
+                _lastLogoImagePath = "\u0001video";
+                LogoImage.Source = frame;
                 LogoImage.Visibility = Visibility.Visible;
-                return;
-            }
-            catch
-            {
-                // Ilegible: queda el color de fondo del logo.
             }
         }
+        else if (path != _lastLogoImagePath)
+        {
+            _lastLogoImagePath = path;
+            LogoImage.Source = LoadLogoBitmap(path);
+            LogoImage.Visibility = LogoImage.Source is null ? Visibility.Collapsed : Visibility.Visible;
+        }
 
-        LogoImage.Source = null;
-        LogoImage.Visibility = Visibility.Collapsed;
+        // Framed exactly like a background: zoom, shift, fixed size and fill.
+        var framing = LogoImage.Source is null ? null : logo.AsFramedMedia();
+        MediaFraming.Apply(LogoImage, framing, RootCanvas.Width, RootCanvas.Height);
+        RenderLogoFill(framing);
+    }
+
+    private string? _lastLogoFillKey;
+
+    /// <summary>
+    /// What fills the screen around a logo that does not cover it: the colour
+    /// of the layer, or on top of it a blurred copy of the logo or an image of
+    /// the media library. A video logo live has its own fill in the output.
+    /// </summary>
+    private void RenderLogoFill(MediaItem? framing)
+    {
+        // A video logo fills with a blurred still of itself: its poster.
+        var ownStill = framing is { Type: MediaType.Video, FillMediaId: MediaItem.FillWithSelfId }
+                       && !string.IsNullOrWhiteSpace(framing.ThumbnailPath);
+        var fill = framing is null || !MediaFraming.NeedsFill(framing) ? null
+            : framing.FillsWithSelf || ownStill ? framing
+            : framing.FillMediaId is int id and > 0 ? MediaLookup.Find(id) : null;
+
+        // Only a still can be drawn here; a video fill shows its thumbnail.
+        var fillPath = fill is null ? null
+            : ReferenceEquals(fill, framing) ? (ownStill ? framing.ThumbnailPath : framing.Path)
+            : fill.Type == MediaType.Image ? fill.Path : fill.ThumbnailPath;
+        var key = fillPath is null ? null : $"{(ReferenceEquals(fill, framing) ? "self" : "lib")}|{fillPath}";
+        if (key == _lastLogoFillKey)
+            return;
+        _lastLogoFillKey = key;
+
+        if (fillPath is null)
+        {
+            LogoFillImage.Source = null;
+            LogoFillImage.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        // The video's poster is loaded on its own: the logo image may be the moving picture.
+        var own = !ReferenceEquals(fill, framing) ? null
+            : ownStill ? LoadLogoBitmap(fillPath) : LogoImage.Source as BitmapSource;
+        LogoFillImage.Source = ReferenceEquals(fill, framing)
+            ? MediaFraming.BlurredFill(own) ?? own
+            : LoadLogoBitmap(fillPath);
+        LogoFillImage.Visibility = LogoFillImage.Source is null ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    private static BitmapImage? LoadLogoBitmap(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+            return null;
+
+        try
+        {
+            var bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.UriSource = new Uri(path);
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.DecodePixelWidth = 1920;
+            bitmap.EndInit();
+            if (bitmap.CanFreeze)
+                bitmap.Freeze();
+            return bitmap;
+        }
+        catch
+        {
+            // Ilegible: queda el color de fondo del logo.
+            return null;
+        }
     }
 
     // ── Estados ──────────────────────────────────────────────────

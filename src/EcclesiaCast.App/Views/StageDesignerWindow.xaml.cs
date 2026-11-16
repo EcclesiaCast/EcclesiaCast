@@ -147,13 +147,11 @@ public partial class StageDesignerWindow : Window
     {
         if (_layouts.Count <= 1)
         {
-            MessageBox.Show(this, "Tiene que quedar al menos un escenario.", "EcclesiaCast",
-                MessageBoxButton.OK, MessageBoxImage.Information);
+            Notice.Show("Tiene que quedar al menos un escenario.");
             return;
         }
 
-        if (MessageBox.Show(this, $"¿Eliminar el escenario «{_current.Name}»?", "EcclesiaCast",
-                MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) != MessageBoxResult.Yes)
+        if (!Notice.Confirm($"¿Eliminar el escenario «{_current.Name}»?", "Eliminar", destructive: true))
             return;
 
         var index = _layouts.IndexOf(_current);

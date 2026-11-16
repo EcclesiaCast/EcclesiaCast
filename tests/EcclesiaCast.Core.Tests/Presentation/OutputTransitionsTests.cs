@@ -33,7 +33,7 @@ public class OutputTransitionsTests
     }
 
     [Fact]
-    public void Se_escribe_con_punto_aunque_Windows_este_en_castellano()
+    public void Se_escribe_con_punto_aunque_Windows_este_en_espanol()
     {
         var previous = CultureInfo.CurrentCulture;
         try

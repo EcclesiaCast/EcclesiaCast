@@ -60,7 +60,9 @@
             </Grid>
 
             <!-- Capa de logo: color de fondo + imagen (o póster del video) + texto -->
-            <Grid x:Name="LogoLayer" Background="#10141E" Visibility="Collapsed">
+            <Grid x:Name="LogoLayer" Background="#10141E" Visibility="Collapsed" ClipToBounds="True">
+                <!-- Relleno alrededor del logo: la misma imagen desenfocada u otra de la biblioteca -->
+                <Image x:Name="LogoFillImage" Stretch="UniformToFill" Visibility="Collapsed"/>
                 <Image x:Name="LogoImage" Stretch="Uniform" Visibility="Collapsed"/>
                 <TextBlock x:Name="LogoText" Text="EcclesiaCast"
                            FontFamily="Segoe UI"

@@ -433,6 +433,16 @@ public partial class VlcVideoSurface : UserControl
     /// <summary>Raised on the UI thread when a video draws its first picture.</summary>
     public event EventHandler? FirstFrame;
 
+    /// <summary>
+    /// The bitmap the frames are written into, raised with the first frame
+    /// of every video put on. Whoever draws it elsewhere (the logo layer, for
+    /// a video logo) sees the video move without a second player.
+    /// </summary>
+    public event EventHandler<ImageSource>? FrameSourceChanged;
+
+    /// <summary>The playback whose first frame was last announced.</summary>
+    private int _announcedGeneration = -1;
+
     private readonly DispatcherTimer _holdTimer = new() { Interval = TimeSpan.FromSeconds(2) };
     private bool _holdTimerHooked;
     private int _holdVersion;
@@ -964,6 +974,12 @@ public partial class VlcVideoSurface : UserControl
 
                 // The new picture is drawn: the old one held in front of it
                 // can fade away now, and so can whatever else was kept for it.
+                if ((firstFrame || generation != _announcedGeneration) && _bitmap is { } made)
+                {
+                    _announcedGeneration = generation;
+                    FrameSourceChanged?.Invoke(this, made);
+                }
+
                 if (firstFrame)
                 {
                     ReleaseHold(HoldFade);

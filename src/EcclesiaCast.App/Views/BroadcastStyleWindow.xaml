@@ -118,6 +118,9 @@
                             <RadioButton x:Name="PlFillet" Content="Filete" Tag="Fillet" GroupName="Plate" Style="{StaticResource Choice}" Checked="Control_Changed"/>
                             <RadioButton x:Name="PlLine" Content="Línea" Tag="Line" GroupName="Plate" Style="{StaticResource Choice}" Checked="Control_Changed"/>
                         </UniformGrid>
+                        <CheckBox x:Name="EdgeGradientCheck" Content="Degradé oscuro desde el borde, detrás de la placa" Margin="0,10,0,0"
+                                  ToolTip="El mismo degradé de «Clásica», sumado a cualquier placa. Usa el color y la opacidad de la placa."
+                                  Checked="Control_Changed" Unchecked="Control_Changed"/>
 
                         <TextBlock Style="{StaticResource Section}" Text="3 · Letra"/>
                         <Grid>

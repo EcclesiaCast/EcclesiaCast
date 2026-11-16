@@ -223,5 +223,5 @@ public sealed class UpdateChecker(
     }
 
     private static void Message(string text) =>
-        MessageBox.Show(text, "Actualizaciones", MessageBoxButton.OK, MessageBoxImage.Information);
+        Notice.Show(text, "Actualizaciones");
 }

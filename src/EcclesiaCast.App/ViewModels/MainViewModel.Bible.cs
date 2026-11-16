@@ -845,7 +845,7 @@ public sealed partial class MainViewModel
 
     /// <summary>Added to the messages of an import that did not work: where the formats are explained.</summary>
     private const string HelpHint =
-        "\n\nEn «Archivo → Cómo preparar una Biblia para importar…» hay un ejemplo de cada formato.";
+        "\n\nEn «Biblias → Cómo preparar una Biblia para importar…» hay un ejemplo de cada formato.";
 
     /// <summary>
     /// «Cómo preparar una Biblia para importar…»: the two formats, an example of
@@ -882,18 +882,16 @@ public sealed partial class MainViewModel
         catch (Exception ex)
         {
             Log.Error(ex, "Falló el análisis de la Biblia {Path}", dialog.FileName);
-            MessageBox.Show(
-                $"No se pudo leer el archivo:\n\n{ex.Message}" + HelpHint,
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Error);
+            Notice.Show(ex.Message + HelpHint, "No se pudo leer el archivo", NoticeKind.Error);
             return;
         }
 
         if (parsed.VerseCount == 0)
         {
-            MessageBox.Show(
+            Notice.Show(
                 "El archivo no contiene versículos reconocibles."
                 + HelpHint,
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
+                kind: NoticeKind.Warning);
             return;
         }
 
@@ -964,10 +962,10 @@ public sealed partial class MainViewModel
         if (target is null)
             return;
 
-        var confirm = MessageBox.Show(
+        var confirm = Notice.Confirm(
             $"¿Eliminar la versión \"{target.Name}\" y sus {target.VerseCount} versículos?",
-            "EcclesiaCast", MessageBoxButton.YesNo, MessageBoxImage.Question);
-        if (confirm != MessageBoxResult.Yes)
+            "Eliminar", destructive: true);
+        if (!confirm)
             return;
 
         var wasActive = _checkedVersionIds.Contains(target.Id);
@@ -1012,9 +1010,7 @@ public sealed partial class MainViewModel
         catch (Exception ex)
         {
             Log.Error(ex, "Falló la exportación de la Biblia {Name}", target.Name);
-            MessageBox.Show(
-                $"No se pudo guardar el archivo:\n\n{ex.Message}",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Error);
+            Notice.Show(ex.Message, "No se pudo guardar el archivo", NoticeKind.Error);
             return;
         }
 

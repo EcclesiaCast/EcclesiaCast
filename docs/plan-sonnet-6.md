@@ -10,7 +10,7 @@ Leelo entero antes de tocar nada. Valen las **reglas de trabajo** de
 - No ejecutar python: no está instalado, y llamarlo abre la Microsoft Store.
 - Rama `beta6`, sin push. Un commit por punto, en inglés, con
   `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`.
-- Castellano rioplatense para todo lo que se ve.
+- Español rioplatense para todo lo que se ve.
 - CHANGELOG [Sin publicar] y `docs/pendientes.md` al día.
 
 **Excepción sólo para este plan:** para probar WebView2 podés abrir **tu propia
@@ -199,7 +199,7 @@ explicalo en el informe antes de seguir por otro camino.
   -p:Version=1.0.0-beta.7 --output publish`; y después
   `"%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe" /DAppVersion=1.0.0-beta.7
   installer\EcclesiaCast.iss`.
-- Informe final en castellano, para Alexis:
+- Informe final en español, para Alexis:
   - qué quedó hecho (con commits);
   - cómo lo probaste;
   - qué no pudiste probar;

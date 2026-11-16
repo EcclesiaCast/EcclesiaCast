@@ -63,9 +63,21 @@ public sealed partial class MainViewModel
             var hadVersions = BibleVersionOptions.Count > 0;
             var imported = new List<string>();
             var failed = new List<string>();
+            var skipped = new List<string>();
             for (var n = 0; n < chosen.Count; n++)
             {
                 var item = chosen[n];
+
+                // The list marks what is already there, but it can be ticked
+                // again: a second copy of the same Bible is never wanted.
+                // Checked against the library as it is now, so a Bible listed
+                // twice is not added twice either.
+                if (BibleInstallPlanner.Offer([item.AsEntry(item.Abbreviation)], _bibles.GetVersions())[0].AlreadyInstalled)
+                {
+                    skipped.Add(item.Abbreviation);
+                    continue;
+                }
+
                 try
                 {
                     var file = Path.Combine(work, $"{n}{BiblePackage.Extension}");
@@ -87,12 +99,20 @@ public sealed partial class MainViewModel
 
             StatusText = imported.Count switch
             {
+                0 when skipped.Count > 0 => $"Ya tenías {string.Join(", ", skipped)}: no se bajó de nuevo.",
                 0 => "No se agregó ninguna Biblia.",
                 1 => $"Se agregó la Biblia «{imported[0]}».",
                 _ => $"Se agregaron {imported.Count} Biblias: {string.Join(", ", imported)}.",
             };
+            if (imported.Count > 0 && skipped.Count > 0)
+                StatusText += $" {string.Join(", ", skipped)} ya estaba: no se bajó de nuevo.";
             if (failed.Count > 0)
                 StatusText += $" No se pudo bajar: {string.Join(", ", failed)} (revisá la conexión y probá de nuevo).";
+            // Lo que no salió como se esperaba se avisa en una ventana: el texto
+            // del pie del programa no lo lee nadie.
+            if (skipped.Count > 0 || failed.Count > 0)
+                Notice.Show(StatusText, "Bajar Biblias",
+                    failed.Count > 0 ? NoticeKind.Warning : NoticeKind.Info);
             Log.Information("Biblias bajadas: {Imported} (fallaron {Failed})",
                 string.Join(", ", imported), string.Join(", ", failed));
         }

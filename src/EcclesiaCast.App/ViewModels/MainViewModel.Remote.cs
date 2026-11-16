@@ -48,10 +48,10 @@ public sealed partial class MainViewModel
     {
         if (!StartRemote())
         {
-            MessageBox.Show(
-                "No se pudo abrir ningún puerto para la salida de OBS. "
-                + "Puede que otro programa los esté usando.",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
+            Notice.Show(
+                "Puede que otro programa los esté usando.",
+                "No se pudo abrir ningún puerto para la salida de OBS",
+                NoticeKind.Warning);
             return;
         }
 
@@ -107,10 +107,10 @@ public sealed partial class MainViewModel
     {
         if (!StartRemote())
         {
-            MessageBox.Show(
-                "No se pudo abrir ningún puerto para el control remoto. "
-                + "Puede que otro programa los esté usando.",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
+            Notice.Show(
+                "Puede que otro programa los esté usando.",
+                "No se pudo abrir ningún puerto para el control remoto",
+                NoticeKind.Warning);
             return;
         }
 

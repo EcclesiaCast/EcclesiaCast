@@ -55,11 +55,10 @@ public sealed partial class MainViewModel
         var capture = WindowCaptureService;
         if (!capture.IsSupported)
         {
-            MessageBox.Show(
-                "Esta versión de Windows no permite proyectar otra ventana.\n\n" +
+            Notice.Show(
                 "Hace falta Windows 10 versión 1903 (de mayo de 2019) o más nueva. " +
                 "Si tu Windows es más nuevo y ves este mensaje, actualizá los controladores de video.",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Information);
+                "Esta versión de Windows no permite proyectar otra ventana");
             StatusText = "Esta versión de Windows no permite proyectar otra ventana.";
             return;
         }

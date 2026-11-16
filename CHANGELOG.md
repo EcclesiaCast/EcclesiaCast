@@ -5,6 +5,108 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+### Agregado
+
+- **Botones para marcar el coro y las estrofas** en el editor de canciones:
+  «Coro», «Estrofa», «Puente» y «Final», arriba de la letra. Con el cursor en
+  un párrafo, ponen la línea [Coro] o [Estrofa 1] arriba (la estrofa se
+  numera sola). Las canciones ya cargadas no cambian.
+- **Degradé desde el borde en cualquier diseño de la transmisión.** En el
+  diseño de la transmisión, debajo de las placas, la casilla «Degradé oscuro
+  desde el borde, detrás de la placa» suma el degradé de «Clásica» a
+  cualquier otra (por ejemplo a «Noticiero»).
+- **Bordes de un logo de video con una imagen fija del mismo video,**
+  desenfocada: en Logos → Encuadre → «Los bordes se rellenan con».
+
+- **Encuadre del logo, como el de los fondos.** En Logos, una imagen o un
+  video que no tiene la forma de la pantalla (un logo cuadrado, por ejemplo)
+  ahora tiene lo mismo que Propiedades de un medio: zoom, correrlo, tamaño
+  fijo en pantalla y con qué se rellenan los bordes: el color de fondo, **la
+  misma imagen desenfocada** (así no se ven bordes) u otra imagen de la
+  biblioteca. En la vista previa se arrastra para correrlo y la ruedita hace
+  zoom.
+
+- **Buscar fondos en Pixabay.** El botón **🎞 Fondos** de la barra de medios
+  (y el menú Fondos → «Buscar fondos en Pixabay…») busca videos y fotos de fondo que
+  se pueden usar gratis. Elegís los que quieras con un clic y se bajan a la
+  pestaña que digas, listos para usar. Los que ya tenés aparecen marcados.
+
+- **Cuenta anónima de uso.** La primera vez que se proyecta algo en el día,
+  el programa avisa que esta instalación se usó, con un número al azar, el
+  día y la versión: nada de la iglesia ni de lo que se proyecta, y no se
+  guarda la dirección IP. Sirve para saber cuántas iglesias lo usan cada fin
+  de semana. Se apaga en Ajustes → Actualizaciones, y al apagarlo el número
+  se borra.
+- **Seguir la canción por lo que se escucha (en prueba).** En **Proyección →
+  «Seguir la canción por lo que se escucha (beta)…»** el programa escucha el
+  micrófono o la entrada de línea y sigue la canción que está abierta. Tres
+  formas: **sólo sugerir** (marca la diapositiva que sigue y vos apretás
+  Enter), **seguir** (la pone cuando escucha que la cantan) y **adelantarse**
+  (pasa a la siguiente cuando la actual está terminando). Las flechas siempre
+  mandan, nunca cambia de canción y no toca la Biblia. La primera vez baja un
+  reconocedor de voz de unos 550 MB que queda en la PC: lo que escucha no se
+  graba ni sale de ahí. Anda mejor con canciones lentas y voces claras; con
+  canciones rápidas y la banda fuerte todavía se pierde.
+
+### Cambiado
+
+- **El menú Archivo quedó más corto.** Tenía 16 opciones; ahora lo de las
+  canciones, las Biblias y los fondos está en tres menús nuevos al lado:
+  **Canciones**, **Biblias** y **Fondos**. En Archivo quedan las copias de la
+  biblioteca, Ajustes y Salir.
+
+- **«Seguir la canción» va mucho más al ritmo y se equivoca menos (sigue en
+  prueba).** Ahora escucha más o menos una vez por segundo en vez de cada
+  tres, y usa la placa de video de la PC para entender lo que oye (si la PC
+  no tiene una que sirva, sigue funcionando como antes, más lento). Lleva la
+  cuenta de por dónde va la canción: lo normal es pasar a la diapositiva
+  siguiente, un coro que se repite es el que toca según el orden, y para
+  saltar a otra parte tiene que escucharlo dos veces seguidas. Ya no cambia
+  por alguien que habla antes de empezar ni por dos o tres palabras sueltas.
+  En «adelantarse» el margen viene en 2 palabras (antes 5). Con un micrófono
+  que llega bajito sube el volumen por su cuenta antes de escuchar, y avisa
+  si por esa entrada no llega nada.
+- **Editor de temas rehecho.** La vista previa queda en el medio y más grande,
+  los campos van a la derecha repartidos en secciones (Letra, Sombra y franjas,
+  Fondo, Leyenda, Transición y Biblia) y las plantillas listas se ven como
+  dibujos en vez de botones con el nombre. La lista de temas muestra cómo se ve
+  cada uno y cuál está en uso para las canciones y para la Biblia.
+- **Probar el tema sin salir del editor:** «Probar sobre» pone detrás una foto
+  oscura o una clara para ver si la letra se lee, «Texto largo» muestra hasta
+  dónde se achica, y «Ver la caja» la esconde para mirar el tema limpio.
+- Los colores muestran el color al lado del código, la alineación y el lugar
+  de la leyenda se eligen tocando, y la tipografía cambia en la vista previa
+  apenas se elige (antes había que hacer clic en otro lado).
+
+- **La lista de canciones vacía dice qué hacer:** «Todavía no hay canciones»
+  con los botones «Buscar en internet», «Traer de otro programa» y «Escribir
+  una nueva». Si el buscador no encuentra nada, avisa «Ninguna canción con
+  eso.» (La playlist vacía ya explicaba cómo agregar canciones.)
+
+- Las pestañas «Texto» y «Caja» del diseñador de canciones se ven como las
+  pastillas del editor de temas, en vez del aspecto blanco de Windows.
+
+- **Papelera para canciones y temas.** Borrar una canción o un tema ya no es
+  definitivo: va a la papelera (Edición → «Papelera…») y se guarda 30 días,
+  con la fecha en que se borró y los días que le quedan. Desde ahí se puede
+  restaurar, borrar del todo o vaciar. Pasados los 30 días se borra solo al
+  abrir el programa.
+
+- **La paleta de colores es más fácil.** Arriba hay una paleta grande (diez
+  tonos en seis claridades y una fila de grises), abajo los «Usados hace
+  poco» (se acuerdan de un día para otro), y las barras se escondieron detrás
+  de «Ajuste fino», que ahora mueve Tono, Intensidad y Claridad en vez de
+  rojo, verde y azul. Enter acepta.
+
+- **Ventana de Ajustes.** Archivo → «Ajustes…» (o Ctrl+,) junta en un solo
+  lugar las pantallas, el sonido, las transiciones, el celular, el modo de
+  bajo rendimiento, las actualizaciones y el aspecto. Por ahora usa los mismos
+  ajustes que los menús, que siguen donde estaban.
+
+- **Avisos y preguntas con diseño propio.** Los avisos y preguntas del
+  programa tienen su diseño (oscuros, con botones que dicen lo que hacen) en
+  vez de los carteles grises de Windows.
+
 ### Corregido
 
 - **Con una sola pantalla ya no quedás atrapado en la salida.** Si la salida
@@ -13,6 +115,37 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   arriba «Para volver al programa: tecla Esc o doble clic en esta pantalla».
   Y ahora el doble clic sobre la salida la apaga, como ya pasaba con el
   escenario. Con el proyector en una pantalla aparte no cambia nada.
+- **Un logo de video se veía negro** si no había un video de fondo, y una
+  imagen de fondo quedaba encima de él. Ahora el video del logo se dibuja en
+  la capa del logo, como una imagen: tapa cualquier fondo, aparece y se va
+  con el mismo fundido y usa el encuadre y el color de fondo.
+- **«Seguir la canción» ya no deshace lo que pone el operador.** Si pasás a
+  una diapositiva más adelante mientras todavía cantan la anterior, el
+  programa espera a que se cante esa antes de moverse, en vez de volver atrás.
+- **La cuenta de uso ya no reintenta con cada diapositiva** cuando no hay
+  internet o el servicio no contesta: vuelve a probar una hora después.
+- **Los cambios en el diseño de la transmisión se ven en OBS recién al tocar
+  «Guardar»,** no mientras se editan.
+
+- **«Seguir la canción» no podía abrir ninguna entrada de sonido** y decía
+  «Unable to cast…». Ya abre el micrófono o la entrada que elijas.
+- **«Bajar Biblias» ya no agrega dos veces la misma Biblia** si se vuelve a
+  tildar una que ya estaba: la saltea y lo avisa.
+- **Un error inesperado ya no frena al operador.** Antes salía un cartel que
+  había que cerrar para seguir pasando la letra; ahora el programa sigue y
+  avisa en la barra de estado (como mucho cada 30 segundos). Las caídas en
+  segundo plano también quedan anotadas en el registro.
+- **Los cambios de un tema ya no se pierden en silencio.** Al pasar a otro
+  tema, crear uno nuevo o cerrar con cambios sin guardar, el programa pregunta
+  si guardarlos. Abajo avisa «Cambios sin guardar» y hay un botón «Deshacer
+  cambios».
+- **El sonido vuelve solo cuando la salida se cae y regresa** (un cable HDMI
+  flojo, un proyector que renegocia la señal, un parlante que se apaga y se
+  prende). Antes sólo se reabría si Windows pasaba a otra salida; si era la
+  misma, lo que sonaba quedaba mudo hasta «Reiniciar el sonido».
+- La paleta de colores se abre encima de la ventana que la pidió.
+- Guardar un tema con una biblioteca grande ya no relee cada canción una por
+  una.
 
 ## [1.3.1] - 2026-11-09
 
@@ -293,7 +426,7 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   imágenes del panel web, y el clic derecho sobre la imagen grande (aunque
   Google la tape con un vínculo), agregan a los medios la imagen original.
 - **Imágenes y GIF de Google.** El botón **🖼 Imágenes** de la barra de medios
-  abre Google Imágenes en el panel web (en castellano, con todos sus filtros), y
+  abre Google Imágenes en el panel web (en español, con todos sus filtros), y
   el panel tiene una fila para escribir qué buscás, con **🖼 Imágenes**, **🎞 GIF**
   (sólo animados) y «Sólo licencia libre» (el filtro «Derechos de uso» de
   Google). Con clic derecho sobre una imagen (aunque sea una miniatura sin abrir)
@@ -502,7 +635,7 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 
 - **Actualizaciones automáticas.** Una vez por día, a los pocos segundos de
   abrir, EcclesiaCast mira en GitHub si hay una versión nueva y, si la hay,
-  abre un aviso con lo que trae, en castellano, y tres botones: **Actualizar
+  abre un aviso con lo que trae, en español, y tres botones: **Actualizar
   ahora**, **Más tarde** y **Saltar esta versión**. Actualizar baja el
   instalador (con barra de avance y **Cancelar**), comprueba que el archivo sea
   el publicado (tamaño, SHA-256 y, cuando el programa instalado esté firmado,
@@ -514,7 +647,7 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   contesta, no avisa de nada. En **Ayuda** están **Buscar actualizaciones…**
   (busca en el momento) y **Buscar actualizaciones al abrir** (se apaga ahí).
   Las notas de cada versión publicada pasan a ser esta lista de cambios, en
-  castellano, en lugar de los títulos de los commits.
+  español, en lugar de los títulos de los commits.
 
 - **Proyectar una página web.** El botón **🌐 Web** de la barra de medios abre
   una página en el cuadro central, en lugar de las diapositivas: la usás con el
@@ -771,7 +904,7 @@ Lo que salió del primer servicio en vivo (27/9/2026).
 - **El error de una imagen de Google se nota.** Si no se pudo agregar, la barra
   de abajo parpadea en rojo y el mensaje se destaca unos segundos.
 - **La fecha del evento se elige en un calendario.** Ya no se escribe a mano:
-  un selector de fecha en castellano, con ✕ para sacarla.
+  un selector de fecha en español, con ✕ para sacarla.
 - **Se sacaron el brillo y el tinte de Propiedades.** Ya no se dibujan; un
   medio que los tenía se ve sin ellos.
 - **El tiempo de una imagen se ve en la barra de reproducción.** «Cuánto tiempo
@@ -1135,7 +1268,7 @@ Lo que salió del primer servicio en vivo (27/9/2026).
   MB, con una barra de progreso la primera vez), lo actualiza cada tres días y, si YouTube lo rechaza, lo actualiza y
   vuelve a intentar. La sesión de YouTube de la iglesia se la pide al
   navegador del programa, en lugar de leer el archivo que Windows tiene
-  bloqueado. Si igual falla, el aviso lo explica en castellano y recuerda que
+  bloqueado. Si igual falla, el aviso lo explica en español y recuerda que
   el video se puede proyectar por internet.
 - **Playlist que mostraba siempre lo primero**: si en el buscador de
   canciones quedaba algo escrito, las canciones de la playlist que no

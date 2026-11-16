@@ -44,7 +44,7 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       notas, con los acentos bien; 2) **importá cada ejemplo** con «Importar una
       Biblia» (cada uno trae 5 versículos: Génesis 1:1-3 y Juan 3:16-17) y
       proyectá Juan 3:16; 3) **📋 Copiar instrucciones para una IA** y pegalas en
-      el Bloc de notas: se leen enteras y en castellano (idealmente probalas con
+      el Bloc de notas: se leen enteras y en español (idealmente probalas con
       una IA de verdad y una Biblia tuya en Word o texto, y contame si el
       programita que arma sirve); 4) «Importar una Biblia…» de esa ventana abre
       el selector de archivos; 5) con un archivo que no sirve (por ejemplo un
@@ -129,7 +129,7 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
       sin cuadro negro y sin tirón. Mirá si a vos también te parece bien, con
       la salida en el proyector de verdad.
 - [ ] **Fecha del evento con calendario.** En Propiedades, la fecha ya no se
-      escribe: se elige en un calendario (en castellano, la semana empieza el
+      escribe: se elige en un calendario (en español, la semana empieza el
       lunes), y la ✕ la saca. Se comprobó en la PC que abre y que la nota de
       abajo dice el día en que pasa a «Eventos pasados». Falta ver que una
       fecha vieja (por ejemplo del mes pasado) mueva la imagen al guardar.
@@ -320,7 +320,7 @@ nuevo (con otro paquete o con otra versión), después de `dotnet publish`:
       [publicar-1.0.md](publicar-1.0.md), salvo la firma): instalarla **sobre**
       una beta y ver que conserva canciones, Biblias y medios; con una beta
       instalada, que Ayuda → «Buscar actualizaciones…» ofrezca la 1.0 con las
-      notas nuevas en castellano; y el instalador con tus Biblias en una PC de
+      notas nuevas en español; y el instalador con tus Biblias en una PC de
       la iglesia (que al abrir el programa ofrezca traerlas).
 - [ ] **Usar la 1.0 en la reunión del domingo** y anotar lo que falle o no
       guste.
@@ -383,7 +383,7 @@ nuevo (con otro paquete o con otra versión), después de `dotnet publish`:
       se junta visibilidad). Una página en GitHub Pages que muestre el programa
       (gratis): el encargo completo está en
       [sitio-web-encargo.md](sitio-web-encargo.md). **Estado (15/10/2026):
-      publicada en <https://ecclesiacast.github.io/EcclesiaCast/>, con logo
+      publicada en <https://ecclesiacast.org/>, con logo
       nuevo, capturas y un video de 40 segundos; el flujo `pages` la vuelve a
       publicar con cada cambio en `sitio/` y después de cada versión.** **Las capturas reales del aviso de
       Windows («Ejecutar de todas formas») ya están en la página (30/10/2026).**
@@ -436,6 +436,115 @@ no escribirle antes de esa fecha. **5/11/2026: no contestó nadie** (aparte de
 las respuestas automáticas de la tabla); toca dar estos pasos.
 
 ## 3. Para hacer después de la 1.0
+
+### Pedidos de la prueba de la 1.4.0 (11/11/2026)
+
+- [x] **«Seguir la canción» no abría ninguna entrada** («Unable to cast
+      MMDeviceEnumeratorComObject»). Era un choque dentro del programa: el
+      vigía del sonido y el karaoke declaraban el mismo componente de
+      Windows. Arreglado (b23aece) y probado en un banco con el código real:
+      lista las entradas y escucha. Probado por Alexis el 13/11: ya abre la
+      entrada (sigue lo de la lentitud, más abajo).
+- [x] **Bajar Biblias dejaba bajar otra vez una que ya estaba.** Ahora las
+      saltea. Probado el 13/11: no la baja, pero el aviso iba al pie del
+      programa y nadie lo lee. **Desde el 13/11 lo dice en una ventana**
+      (también si alguna no se pudo bajar). Falta que lo vea Alexis.
+- [ ] **Medios: ninguna pestaña silenciada de entrada.** El programa ya no
+      silencia ninguna por su cuenta; en la biblioteca de Alexis «Fondos»
+      quedó silenciada (regla guardada `item+mute`), seguramente por un clic
+      en «Silenciar la pestaña». Se quita con clic derecho en la pestaña →
+      «Quitar el silencio». Decidir si además hace falta un aviso más
+      visible de que una pestaña está silenciada.
+- [x] **Carteles propios en vez de los de Windows.** Hechos (los 47) y
+      probados por Alexis el 13/11: le gusta que quede todo centralizado. Hoy hay 47 `MessageBox`
+      con el aspecto gris de Windows. Una ventana de aviso con el aspecto del
+      programa (oscura, botones propios, textos de los botones en español
+      y no «Sí / No / Cancelar»), y reemplazarlos de a poco. Mediano.
+- [ ] **Bajar fondos de Pexels desde el programa.** **Programado** (12/11,
+      e626d8c): botón «🎞 Fondos» en Medios y Archivo → «Buscar fondos en
+      Pexels…». La clave de Pexels no puede ir en el programa (código
+      público): la búsqueda pasa por nuestro servicio `api.ecclesiacast.org`
+      (`servicios/api/`, el mismo del contador), que guarda la clave y
+      recuerda cada búsqueda un día. Probado con un servicio de prueba y la
+      ventana dibujada a imagen; **falta**: que Alexis saque la clave en
+      pexels.com/api y publique el servicio (`servicios/api/LEEME.md`), y
+      probar la descarga de verdad con el programa abierto.
+      **13/11: Pexels dejó de dar claves nuevas** («New API key issuance is
+      currently paused»). Se cambia por **Pixabay** (videos e imágenes
+      gratis, clave al instante con una cuenta, pide guardar cada búsqueda
+      24 h y bajar los archivos en vez de enlazarlos: justo lo que hace el
+      servicio). **Hecho el 13/11**: el servicio (`worker.js`, secreto `PIXABAY_KEY`),
+      el lector del programa y todos los textos pasaron a Pixabay; la ventana
+      dice «Fotos y videos de Pixabay» con enlace. Compila y pasan las
+      pruebas. **Falta**: sacar la clave en pixabay.com/api/docs, publicar el
+      servicio y probar la descarga de verdad.
+- [ ] **Saber cuántas iglesias lo usan por fin de semana.** Alexis eligió el
+      contador anónimo (11/11/2026). **Programado**: cuenta la primera
+      proyección de cada día (no la apertura), con un interruptor en Ajustes
+      → Actualizaciones; el servicio está en `servicios/api/` con sus
+      pruebas. **Falta que Alexis lo publique en Cloudflare** siguiendo
+      `servicios/api/LEEME.md` (cinco pasos en el panel), y fusionar el
+      cambio de la página de privacidad cuando salga la versión. Los dos
+      caminos que se plantearon:
+      1. *Contador anónimo:* el programa ya pregunta una vez por día si hay
+         versión nueva; esa consulta pasaría por un servicio propio (en
+         Cloudflare, donde ya están las Biblias) que cuenta números al azar
+         de instalación por semana, sin nombres ni datos. Hay que decirlo en
+         la página de privacidad y dejar apagarlo. Chico.
+      2. *Cuentas:* cada iglesia se registra. Sirve también para la copia
+         en la nube que Alexis tiene en mente, pero es mucho más grande
+         (servidor, base, inicio de sesión, contraseñas, privacidad, costo).
+         Va junto con la copia en la nube, cuando se decida hacerla.
+
+### Prueba del instalador prueba.4 (13/11/2026)
+
+Alexis probó la lista de `docs/pruebas-1.4.0-prueba.md`. Bien: el aviso
+pregunta (2), 3, 4, 5, 7, 8 y la búsqueda de fondos (10, con el servicio de
+prueba). Lo que quedó:
+
+- [ ] **Seguir la canción anda lento** (1). Con lo que suena en la PC
+      reconoce bien la letra, pero tarda: el registro del 12/11 muestra que
+      cada pedazo de 8 s tarda unos 2,7 s en pasarse a texto y se escucha
+      cada 3 s, así que va unos 6 s atrás; además salta mal a veces (de la 1
+      a la 6, de la 10 a la 14) porque decide con pocas palabras. Con el
+      micrófono no entendió nada. **Se rehace en una sesión aparte** (rama
+      propia) con el modelo más fuerte: usar la placa de video, pedazos más
+      cortos, un reconocedor que sólo busque las palabras de la canción y la
+      forma de la canción (estrofa, coro) para no saltar. Puede pedir la PC
+      para probar.
+- [x] **El botón «Cerrar» de Ajustes no cerraba** (6). La ventana se abre
+      sin esperar respuesta y el botón no tenía qué hacer. Arreglado el 13/11.
+- [x] **Aviso de Biblias que ya estaban** (9): ahora en una ventana (ver
+      arriba).
+- [x] **Pexels no da claves** (11): se pasó a Pixabay (ver arriba).
+- [x] **El menú Archivo tiene demasiadas cosas** (12). Hoy son 16 opciones.
+      Propuesta: dejar en Archivo sólo las copias de la biblioteca, Ajustes
+      y Salir, y pasar lo demás a tres menús nuevos al lado: **Canciones**
+      (buscar en internet, traer de otro programa, importar), **Biblias**
+      (bajar de internet, importar una Biblia, cómo prepararla, exportar e
+      importar paquete) y **Fondos** (agregar archivos, paquete .zip, bajar
+      más fondos, buscar en Pixabay). Otra forma: los mismos tres grupos
+      como submenús dentro de Archivo. **Alexis eligió los tres menús (13/11); hecho.** Falta que lo vea.
+
+### Prueba de Claude con la prueba.5 abierta (14/11/2026)
+
+Con una copia de la biblioteca (la real no cambió) y la grabación del 13/11:
+
+- Menús Canciones / Biblias / Fondos / Archivo, «Cerrar» de Ajustes, aviso
+  de Biblias ya instaladas, aviso de «Bajar más fondos» (Esc cancela) y
+  Pixabay sin servicio: **todo bien**.
+- **Seguir la canción, Adelantarse, sonido de la PC, «Bautizados en Fuego»:**
+  16 de 18 cambios bien; casi todos entre 4 s antes y 5 s después de que se
+  canta, dos tarde (8 y 13 s). Cada pasada 0,5–0,9 s en la placa de video.
+  Las dos últimas no las puso porque en la grabación cantan otra cosa ahí.
+  Cuando empezó otra canción no se movió.
+- [ ] **Micrófono de la notebook: nivel 0,000**, ni ruido. El aviso nuevo
+      («No llegó sonido por esta entrada…») salió bien. Puede ser la tecla
+      de silenciar micrófono o que Windows no lo deja a programas abiertos
+      desde Claude: Alexis lo mira el domingo con el instalado.
+- [x] **Detalle:** en Buscar fondos, «La búsqueda de fondos todavía no está
+      disponible» sale chiquito abajo y el centro queda vacío: mostrarlo en
+      el medio. **Hecho el 14/11** (también «No encontré…»), en la prueba.5.
 
 - [ ] **YouVersion: en pausa** (5/11/2026, Alexis: «queda en el freezer por
       ahora»). La integración está programada y guardada en la rama
@@ -609,6 +718,38 @@ las respuestas automáticas de la tabla); toca dar estos pasos.
         una opción para quien quiera, no el camino principal. Retomar junto
         con las respuestas por RVR1960 (5/11/2026).
 
+### Prueba de la prueba.5 en la iglesia (15/11/2026)
+
+Alexis probó la lista entera y casi todo dio bien. Registro de la PC de la
+iglesia (11:22–12:53): ningún error ni cierre.
+
+- [x] **Seguir la canción volvía atrás lo que puso el operador** (12:43: puso
+      la 8 y a los 4 s volvió a la 6 porque seguían con «Gracias mi Señor
+      Jesús»). Ahora no vuelve detrás de la diapositiva que puso el operador
+      hasta oír que se canta.
+- [x] **La cuenta de uso probó 104 veces** sin internet: ahora espera una hora.
+- [x] **Esc vuelve a apagar con un solo toque** (lo pidió Alexis).
+- [x] **Editar el diseño de la transmisión lo cambiaba en vivo:** ahora
+      espera a «Guardar».
+- Datos de Seguir la canción: IN 2 de la Behringer no traía sonido (nivel 0);
+  con IN 1 entendió bien. En automático pasó solo unas 20 diapositivas, con
+  unas 5 correcciones a mano. Tres retrocesos por coros repetidos.
+- [x] **Logo de video negro con F3.** El video se reproducía detrás de la
+      vista proyectada, y el color del tema (o una imagen de fondo) lo tapaba:
+      sólo se veía con un video de fondo. Ahora sus cuadros se dibujan en la
+      capa del logo. Probado con el banco de render (cuadro falso); **falta
+      verlo con un video de verdad en el proyector.**
+- [x] **Imagen de Google que quedaba encima del logo:** era lo mismo (el
+      logo era el de video). Para sacar un fondo: «Sin fondo» (F4).
+- [x] **Degradé desde el borde (el de «Clásica») en cualquier diseño de la
+      transmisión:** casilla nueva debajo de las placas.
+- [x] **Logo de video: bordes con una imagen fija del video,** desenfocada.
+- [ ] **Se cortó la salida de sonido de la PC** al terminar (hubo que
+      desconectar y conectar, 12:53). El programa llevaba 10 minutos sin
+      escuchar ni reproducir nada, y «Seguir la canción» no toca el volumen
+      ni la salida. Sin indicios de que sea del programa: avisar si se repite.
+- No se pudo probar: si el video de fondo se traba mientras escucha.
+
 ## 4. Para versiones futuras
 
 - **Versión para Mac** (la piden en Instagram; Alexis quiere hacerla,
@@ -678,7 +819,7 @@ del panel web**, sin API ni claves. Se descartó Tenor (Google cerró su API el
 30/6/2026), la API de Google (cerrada a clientes nuevos y sin imágenes como
 las de Google Imágenes) y Giphy (100 búsquedas por hora para todas las
 iglesias juntas con una clave compartida, o una clave por iglesia). Google
-entiende el castellano, así que tampoco hace falta traducir.
+entiende el español, así que tampoco hace falta traducir.
 
 Descartado: importar las Biblias de BibleShow. Sus archivos `.bib` son bases
 de Access protegidas con usuario y contraseña, y NTV, NVI y PDT son textos con

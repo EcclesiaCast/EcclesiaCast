@@ -25,7 +25,9 @@
         <!-- YouTube a pantalla completa (solo visible mientras se proyecta) -->
         <controls:YouTubeSurface x:Name="YouTube" Visibility="Collapsed"/>
 
-        <!-- Video del logo: encima del fondo, debajo del texto y del aviso al pie -->
+        <!-- Video del logo: nunca se ve acá. Sólo decodifica; sus cuadros se
+             dibujan en la capa del logo (ProjectedView.LogoVideoFrame), encima
+             de cualquier fondo. -->
         <controls:VlcVideoSurface x:Name="LogoVideo" Visibility="Collapsed"/>
 
         <!-- Fondo de imagen + texto + estados, compuesto encima -->

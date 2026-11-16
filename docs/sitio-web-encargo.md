@@ -16,7 +16,7 @@ No es un gasto: tiene que costar **0**.
 Encargados de proyección y pastores de iglesias chicas de habla hispana
 (Uruguay, Argentina y el resto de Latinoamérica). Gente que **no es técnica**,
 que hoy usa PowerPoint o programas pagos, y que desconfía de bajar un
-instalador sin firma. Todo en **castellano rioplatense** (el usuario de este
+instalador sin firma. Todo en **español rioplatense** (el usuario de este
 proyecto no maneja inglés), simple y sin jerga.
 
 ## Qué tiene que tener

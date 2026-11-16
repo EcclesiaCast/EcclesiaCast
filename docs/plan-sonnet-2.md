@@ -3,7 +3,7 @@
 Alexis instaló la beta.6, la probó y mandó esta lista. Leé el plan entero
 antes de tocar nada. Las **reglas de trabajo** son las mismas de
 [plan-sonnet.md](plan-sonnet.md), sección 2 (rama `beta6`, sin push, un commit
-por tema, castellano rioplatense para todo lo que se ve, comentarios en
+por tema, español rioplatense para todo lo que se ve, comentarios en
 inglés, pruebas en Core, CHANGELOG y pendientes al día). Lo que se suma:
 
 - **No abras la aplicación ni ninguna ventana** salvo que el encargo diga lo
@@ -44,7 +44,7 @@ la PC es de julio. Alexis no tiene que escribir comandos nunca.
   mismo entorno que `WebViewProfile`), escribilas a un `cookies.txt` temporal
   en formato Netscape, pasalo con `--cookies` y borralo al terminar. Si no hay
   ningún WebView2 creado, creá uno oculto con ese entorno sólo para eso.
-- Los mensajes de error, en castellano y sin instrucciones técnicas: si igual
+- Los mensajes de error, en español y sin instrucciones técnicas: si igual
   falla, decí qué pasó y que se puede proyectar por internet.
 
 ### 1.2 YouTube en medios
@@ -225,6 +225,6 @@ en la base.
   Por las licencias, Alexis lo decide más adelante.
 
 ## 5. Informe al terminar cada tanda
-En castellano, para Alexis: qué quedó hecho (con los commits), cómo lo
+En español, para Alexis: qué quedó hecho (con los commits), cómo lo
 probaste, qué no pudiste probar (eso también va a `docs/pendientes.md`,
 sección «Para probar»), qué decidiste vos y qué quedó pendiente.

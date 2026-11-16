@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Privacidad · EcclesiaCast</title>
-<meta name="description" content="EcclesiaCast no tiene cuentas, no junta estadísticas y no manda datos de uso a nadie. Qué se conecta a internet y cuándo.">
+<meta name="description" content="EcclesiaCast no tiene cuentas ni guarda nada tuyo fuera de tu PC. Sólo cuenta en forma anónima cuántas instalaciones se usan, y se puede apagar. Qué se conecta a internet y cuándo.">
 <link rel="canonical" href="https://ecclesiacast.org/privacidad.html">
 <meta name="theme-color" content="#0B1A33">
 <link rel="icon" href="img/logo.svg" type="image/svg+xml">
 <link rel="icon" href="img/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="img/icono-180.png">
 <meta property="og:title" content="Privacidad · EcclesiaCast">
-<meta property="og:description" content="EcclesiaCast no tiene cuentas, no junta estadísticas y no manda datos de uso a nadie.">
+<meta property="og:description" content="EcclesiaCast no tiene cuentas ni guarda nada tuyo fuera de tu PC. Sólo cuenta en forma anónima cuántas instalaciones se usan.">
 <meta property="og:image" content="https://ecclesiacast.org/img/tarjeta.png">
 <link rel="stylesheet" href="estilos.css">
 <script>document.documentElement.classList.add('js')</script>
@@ -34,9 +34,9 @@
   <a class="volver" href="./">← Volver al inicio</a>
   <h1>Política de privacidad</h1>
 
-  <p>EcclesiaCast <strong>no tiene cuentas, no junta estadísticas por su cuenta y no manda datos de uso a nadie sin que vos lo decidas</strong>. Todo lo tuyo (canciones, Biblias, medios, playlists, temas y ajustes) queda en tu PC, en <code>%APPDATA%\EcclesiaCast</code>, y el registro de errores también (<code>%APPDATA%\EcclesiaCast\logs</code>).</p>
+  <p>EcclesiaCast <strong>no tiene cuentas y no manda nada tuyo a nadie</strong>. Lo único que cuenta por su cuenta es <strong>cuántas instalaciones se usan</strong>, de forma anónima y con un interruptor para apagarlo (lo explicamos abajo). Todo lo tuyo (canciones, Biblias, medios, playlists, temas y ajustes) queda en tu PC, en <code>%APPDATA%\EcclesiaCast</code>, y el registro de errores también (<code>%APPDATA%\EcclesiaCast\logs</code>).</p>
 
-  <p>El programa se conecta a internet <strong>sólo cuando usás una función que lo necesita</strong> (y una vez por día, al abrirlo, para saber si hay una versión nueva), y sólo con los sitios de esta lista:</p>
+  <p>El programa se conecta a internet <strong>sólo cuando usás una función que lo necesita</strong> (y una vez por día: al abrirlo, para saber si hay una versión nueva, y la primera vez que proyectás, para la cuenta anónima), y sólo con los sitios de esta lista:</p>
 
   <div class="tabla">
     <table>
@@ -45,9 +45,11 @@
       </thead>
       <tbody>
         <tr><th scope="row">Buscás una canción en internet</th><td data-titulo="Con quién"><a href="https://www.musica.com">musica.com</a> (su buscador completo usa Google) y <a href="https://lrclib.net">lrclib.net</a></td><td data-titulo="Qué se manda">Lo que escribiste para buscar.</td></tr>
+        <tr><th scope="row">Buscás y bajás fondos de Pixabay («🎞 Fondos» en Medios)</th><td data-titulo="Con quién">Nosotros (<code>api.ecclesiacast.org</code>), que le pregunta a <a href="https://pixabay.com/service/privacy/">Pixabay</a>; los videos y fotos se bajan de Pixabay</td><td data-titulo="Qué se manda">Lo que escribiste para buscar. Nada tuyo: la búsqueda la hace nuestro servicio con su propia clave.</td></tr>
         <tr><th scope="row">Agregás, mirás o descargás un video de YouTube</th><td data-titulo="Con quién"><a href="https://www.youtube.com">YouTube</a></td><td data-titulo="Qué se manda">El enlace del video. Si iniciaste sesión en YouTube dentro del programa, se usa esa sesión; sus datos se guardan sólo en tu PC.</td></tr>
         <tr><th scope="row">Abrís una página web en el programa</th><td data-titulo="Con quién">La página que abrís (y Google, si escribís algo que no es una dirección)</td><td data-titulo="Qué se manda">Lo mismo que si la abrieras en un navegador. Si iniciás sesión en esa página (Google, Canva…), la sesión se guarda sólo en tu PC, la misma que usa YouTube.</td></tr>
         <tr><th scope="row">Descargás de YouTube por primera vez, y después cada tres días al descargar</th><td data-titulo="Con quién"><a href="https://github.com">GitHub</a></td><td data-titulo="Qué se manda">Nada tuyo: baja o actualiza el descargador (<a href="https://github.com/yt-dlp/yt-dlp">yt-dlp</a> y <a href="https://github.com/denoland/deno">deno</a>).</td></tr>
+        <tr><th scope="row">La primera vez que proyectás algo en el día (se apaga en Ajustes → Actualizaciones)</th><td data-titulo="Con quién">Nosotros (<code>api.ecclesiacast.org</code>, en <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare</a>)</td><td data-titulo="Qué se manda">Un número al azar de esta instalación, el día y la versión del programa. Sirve para saber cuántas iglesias lo usan cada fin de semana. No se guarda tu dirección IP, ni el nombre de la iglesia, ni nada de lo que proyectás. Si lo apagás, el número se borra de tu PC.</td></tr>
         <tr><th scope="row">Al abrir el programa (una vez por día; se apaga en Ayuda)</th><td data-titulo="Con quién"><a href="https://github.com">GitHub</a></td><td data-titulo="Qué se manda">Nada tuyo: pregunta cuál es la última versión. Al actualizar, baja el instalador nuevo.</td></tr>
         <tr><th scope="row">Tocás «Enviar» en la ventana de comentarios (Ayuda → Enviar comentarios, o el aviso al cerrar el programa o después de que se cerró de golpe)</th><td data-titulo="Con quién"><a href="https://policies.google.com/privacy">Google</a> (Formularios)</td><td data-titulo="Qué se manda">Sólo lo que escribiste, el tipo de comentario, tu iglesia y tu correo si los completaste. Si tildás «Adjuntar el resumen de uso», también ese texto: versión del programa y de Windows, un código al azar de esta instalación, cuántas veces se abrió y cuántos minutos se usó, y las últimas líneas de error del registro (sin tu nombre de usuario de Windows). Podés ver el texto exacto antes de enviar. Nada de tu biblioteca. No se manda nada si cerrás la ventana o tocás «Ahora no».</td></tr>
         <tr><th scope="row">Hacés clic en un enlace (la guía de uso, informar un error)</th><td data-titulo="Con quién">El sitio del enlace, en tu navegador</td><td data-titulo="Qué se manda">Lo mismo que si lo abrieras a mano.</td></tr>
@@ -65,8 +67,8 @@
   <h2>El aviso al cerrar es temporal</h2>
   <p>Hasta el 30 de junio de 2027 el programa pregunta, una vez por versión y sólo después de un rato de uso, si querés enviar un comentario. Podés tildar «No volver a mostrar este aviso al cerrar» y no vuelve a aparecer. «Enviar comentarios» queda siempre en el menú Ayuda.</p>
 
-  <h2 id="esta-pagina">Esta página web</h2>
-  <p>Esta página no usa cookies ni junta datos tuyos. Para saber cuánta gente la visita, y cuántos tocan «Descargar» o el link para donar, usa <a href="https://www.goatcounter.com">GoatCounter</a>, un contador libre que no usa cookies, no guarda tu dirección y no sigue a nadie de un sitio a otro: sólo ve qué página se abrió o qué botón se tocó, desde qué sitio se llegó, el país, el navegador y el tamaño de la pantalla (<a href="https://www.goatcounter.com/help/privacy">política de privacidad de GoatCounter</a>). La sirve GitHub Pages, que como cualquier servidor recibe la dirección de quien la visita (<a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement">política de privacidad de GitHub</a>).</p>
+  <h2>Esta página web</h2>
+  <p>Esta página tampoco junta nada: no usa cookies, no cuenta visitas y no carga nada de otros sitios. La sirve GitHub Pages, que como cualquier servidor recibe la dirección de quien la visita (<a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement">política de privacidad de GitHub</a>).</p>
 </main>
 
 <footer class="pie">
@@ -76,7 +78,6 @@
     <nav class="pie-enlaces" aria-label="Enlaces del pie">
       <a href="https://github.com/EcclesiaCast/EcclesiaCast">Código en GitHub</a>
       <a href="./">Inicio</a>
-      <a href="ayuda.html">Guías</a>
       <a href="mailto:alexissebastianperez@gmail.com">Escribirme</a>
       <a href="https://github.com/EcclesiaCast/EcclesiaCast/blob/main/LICENSE">Licencia GPL-3.0</a>
     </nav>
@@ -84,6 +85,5 @@
   </div>
 </footer>
 
-<script data-goatcounter="https://ecclesiacast.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>

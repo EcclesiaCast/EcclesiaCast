@@ -83,6 +83,11 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <!-- Las dos secciones del panel derecho (Texto, Caja): una pastilla por sección -->
+        <Style TargetType="RadioButton" x:Key="SectionPill" BasedOn="{StaticResource TabButton}">
+            <Setter Property="Margin" Value="0,0,4,4"/>
+            <Setter Property="GroupName" Value="DesignerSections"/>
+        </Style>
     </Window.Resources>
 
     <Grid Margin="14">
@@ -249,8 +254,14 @@
                                 ToolTip="Dibuja el cuadro elegido debajo de los demás, un lugar"/>
                     </StackPanel>
                 </StackPanel>
-                <TabControl DockPanel.Dock="Top" Background="Transparent" BorderThickness="0">
-                    <TabItem Header="Texto">
+                <WrapPanel DockPanel.Dock="Top" Margin="0,0,0,4">
+                    <RadioButton x:Name="TextSectionPill" Content="Texto" IsChecked="True"
+                                 Style="{StaticResource SectionPill}"/>
+                    <RadioButton x:Name="BoxSectionPill" Content="Caja" Style="{StaticResource SectionPill}"/>
+                </WrapPanel>
+                <!-- Los dos paneles siguen dentro de la ventana aunque uno esté oculto: el código usa sus controles por nombre -->
+                <Grid DockPanel.Dock="Top">
+                    <Grid Visibility="{Binding IsChecked, ElementName=TextSectionPill, Converter={StaticResource BoolToVis}}">
                         <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,4,6,0">
                             <StackPanel>
                                 <TextBlock Text="Tipografía" Style="{StaticResource FieldLabel}"/>
@@ -355,9 +366,9 @@
                                           ToolTip="Achica el texto hasta que cada renglón entre en una sola línea"/>
                             </StackPanel>
                         </ScrollViewer>
-                    </TabItem>
+                    </Grid>
 
-                    <TabItem Header="Caja">
+                    <Grid Visibility="{Binding IsChecked, ElementName=BoxSectionPill, Converter={StaticResource BoolToVis}}">
                         <StackPanel Margin="0,4,6,0">
                             <TextBlock Text="Tamaño de la caja (% de la pantalla)" Style="{StaticResource FieldLabel}"/>
                             <StackPanel Orientation="Horizontal">
@@ -421,8 +432,8 @@
                                 </StackPanel>
                             </UniformGrid>
                         </StackPanel>
-                    </TabItem>
-                </TabControl>
+                    </Grid>
+                </Grid>
             </DockPanel>
         </Border>
 

@@ -71,11 +71,11 @@ public static class BibleImportHelp
     /// one answer — asks for a small conversion program instead of the converted text.
     /// </summary>
     public static string InstructionsForAi() => """
-        Necesito convertir una Biblia a un formato que lee un programa de proyección para iglesias (EcclesiaCast). Hablame en castellano, simple, como si yo no supiera programar.
+        Necesito convertir una Biblia a un formato que lee un programa de proyección para iglesias (EcclesiaCast). Hablame en español, simple, como si yo no supiera programar.
 
         EL FORMATO QUE NECESITO (JSON):
         - Es un arreglo con los 66 libros, en el orden de siempre: de Génesis (el 1.º) a Apocalipsis (el 66.º). La posición en el arreglo ES el número del libro, así que tienen que estar los 66, aunque alguno quede vacío.
-        - Cada libro es un objeto con "name" (el nombre del libro, en castellano) y "chapters".
+        - Cada libro es un objeto con "name" (el nombre del libro, en español) y "chapters".
         - "chapters" es un arreglo de capítulos, en orden (el 1.º es el capítulo 1).
         - Cada capítulo es un arreglo de textos, uno por versículo, en orden (el 1.º es el versículo 1).
         - Cada versículo es sólo el texto, sin el número delante y sin llaves ni etiquetas. No resumas ni cambies ninguna palabra.

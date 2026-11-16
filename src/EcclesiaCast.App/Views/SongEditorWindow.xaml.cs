@@ -41,6 +41,22 @@ public partial class SongEditorWindow : Window
 
     public Song? Result { get; private set; }
 
+    /// <summary>
+    /// «Coro», «Estrofa»…: writes the tag line above the paragraph the cursor
+    /// is in. Done as a replacement of the selection so Ctrl+Z takes it back.
+    /// </summary>
+    private void Tag_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.Tag is not string kind)
+            return;
+
+        var change = LyricsTags.Insert(LyricsBox.Text, LyricsBox.CaretIndex, kind);
+        LyricsBox.Focus();
+        LyricsBox.Select(change.Start, change.Length);
+        LyricsBox.SelectedText = change.Text;
+        LyricsBox.Select(change.Caret, 0);
+    }
+
     private void Save_Click(object sender, RoutedEventArgs e)
     {
         var title = TitleBox.Text.Trim();

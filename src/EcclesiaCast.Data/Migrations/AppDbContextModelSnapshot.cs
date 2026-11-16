@@ -15,7 +15,7 @@ namespace EcclesiaCast.Data.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.33");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.34");
 
             modelBuilder.Entity("EcclesiaCast.Core.Audio.AudioTrack", b =>
                 {
@@ -128,12 +128,21 @@ namespace EcclesiaCast.Data.Migrations
                     b.Property<bool>("Bold")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("FillMediaId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("FontFamily")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<double>("FontSize")
                         .HasColumnType("REAL");
+
+                    b.Property<int?>("FrameHeight")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("FrameWidth")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Kind")
                         .HasColumnType("INTEGER");
@@ -144,6 +153,12 @@ namespace EcclesiaCast.Data.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<double>("OffsetX")
+                        .HasColumnType("REAL");
+
+                    b.Property<double>("OffsetY")
+                        .HasColumnType("REAL");
 
                     b.Property<int>("Order")
                         .HasColumnType("INTEGER");
@@ -164,6 +179,9 @@ namespace EcclesiaCast.Data.Migrations
                     b.Property<string>("TextColor")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<double>("Zoom")
+                        .HasColumnType("REAL");
 
                     b.HasKey("Id");
 
@@ -347,6 +365,9 @@ namespace EcclesiaCast.Data.Migrations
                     b.Property<string>("Copyright")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime?>("LastProjectedAt")
                         .HasColumnType("TEXT");
 
@@ -443,6 +464,9 @@ namespace EcclesiaCast.Data.Migrations
 
                     b.Property<int>("CaptionPosition")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("FitToWidth")
                         .HasColumnType("INTEGER");
