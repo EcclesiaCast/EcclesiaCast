@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:EcclesiaCast.App.Controls"
         xmlns:converters="clr-namespace:EcclesiaCast.App.Converters"
-        Title="Temas de proyección"
+        Title="{Binding WindowTitle}"
         Width="1240" Height="790"
         MinWidth="1100" MinHeight="680"
         WindowStartupLocation="CenterOwner"
@@ -197,8 +197,16 @@
         </Grid.RowDefinitions>
 
         <!-- ── Lista de temas ── -->
-        <Border Grid.Column="0" Grid.RowSpan="2" Style="{StaticResource Panel}">
+        <Border Grid.Column="0" Grid.RowSpan="2" Style="{StaticResource Panel}"
+                Visibility="{Binding IsThemeMode, Converter={StaticResource BoolToVis}}">
             <DockPanel>
+                <!-- Sólo con el tema principal de las canciones elegido: editarlo no toca
+                     las canciones con tema propio; este botón sí. -->
+                <Button DockPanel.Dock="Bottom" Content="Aplicar a todas las canciones…"
+                        Style="{StaticResource DarkButton}" FontSize="11" Padding="8,5" Margin="12,6,12,10"
+                        Command="{Binding ApplyToAllSongsCommand}"
+                        Visibility="{Binding IsMainSongTheme, Converter={StaticResource BoolToVis}}"
+                        ToolTip="Guarda este tema y hace que todas las canciones lo sigan, también las que tienen tema propio. Antes pregunta."/>
                 <DockPanel DockPanel.Dock="Top">
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
                                 VerticalAlignment="Center" Margin="0,8,10,6">
@@ -278,6 +286,29 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
             </DockPanel>
+        </Border>
+
+        <!-- ── Tema de una canción ── -->
+        <Border Grid.Column="0" Grid.RowSpan="2" Style="{StaticResource Panel}"
+                Visibility="{Binding IsSongMode, Converter={StaticResource BoolToVis}}">
+            <StackPanel>
+                <TextBlock Text="TEMA DE LA CANCIÓN" Style="{StaticResource PanelTitle}"/>
+                <StackPanel Margin="12,0,12,12">
+                    <TextBlock Text="Partir de" FontSize="11" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,3"/>
+                    <ComboBox ItemsSource="{Binding SongThemeOptions}"
+                              SelectedItem="{Binding SelectedSongThemeOption}"
+                              DisplayMemberPath="Label" FontSize="12"
+                              AutomationProperties.Name="Partir de"
+                              ToolTip="El tema que toma la canción. Si después cambiás algo, queda como tema propio de la canción."/>
+                    <TextBlock Text="{Binding SongThemeNote}" TextWrapping="Wrap" FontSize="12"
+                               Foreground="White" Margin="0,12,0,0"/>
+                    <Button Content="↺ Volver al tema principal" Style="{StaticResource DarkButton}"
+                            FontSize="11" Padding="8,5" Margin="0,14,0,0"
+                            Command="{Binding ReturnToMainThemeCommand}"
+                            Visibility="{Binding CanReturnToMain, Converter={StaticResource BoolToVis}}"
+                            ToolTip="La canción deja su tema y vuelve a seguir al principal"/>
+                </StackPanel>
+            </StackPanel>
         </Border>
 
         <!-- ── Vista previa y plantillas ── -->
@@ -419,6 +450,8 @@
         <Border Grid.Column="4" Grid.Row="0" Style="{StaticResource Panel}">
             <DockPanel Margin="14,4,8,10">
                 <StackPanel DockPanel.Dock="Top" Margin="0,0,6,0">
+                    <!-- El tema propio de una canción no lleva nombre ni tipo: es de esa canción. -->
+                    <StackPanel Visibility="{Binding IsThemeMode, Converter={StaticResource BoolToVis}}">
                     <TextBlock Text="Nombre del tema" Style="{StaticResource FieldLabel}"/>
                     <TextBox Style="{StaticResource Field}" Text="{Binding ThemeName, UpdateSourceTrigger=PropertyChanged}"/>
 
@@ -434,6 +467,7 @@
                     </DockPanel>
 
                     <Border Height="1" Background="{StaticResource LineBrush}" Margin="0,14,0,10"/>
+                    </StackPanel>
 
                     <WrapPanel>
                         <RadioButton Content="Letra" Style="{StaticResource SectionPill}"
@@ -805,7 +839,8 @@
 
         <!-- ── Acciones ── -->
         <DockPanel Grid.Column="2" Grid.ColumnSpan="3" Grid.Row="1" Margin="0,12,0,0">
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Left"
+                        Visibility="{Binding IsThemeMode, Converter={StaticResource BoolToVis}}">
                 <Button Content="Usar en canciones" Style="{StaticResource DarkButton}"
                         Command="{Binding SetDefaultForSongsCommand}"
                         ToolTip="Este tema pasa a ser el de todas las canciones que no tengan uno propio"/>

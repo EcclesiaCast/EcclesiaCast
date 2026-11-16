@@ -168,7 +168,11 @@ public sealed partial class MainViewModel
         }
 
         var choices = BibleInstallPlanner.Offer(entries, _bibles.GetVersions());
-        var chosen = _biblePackageDialog.ChooseToImport(Path.GetFileName(path), choices);
+        var picked = _biblePackageDialog.ChooseToImport(Path.GetFileName(path), choices);
+        if (picked is null || picked.Count == 0)
+            return;
+
+        var chosen = ConfirmReplacing(picked, e => e, "importar");
         if (chosen is null || chosen.Count == 0)
             return;
 
@@ -176,9 +180,10 @@ public sealed partial class MainViewModel
         StatusText = "Importando Biblias del paquete…";
         var imported = new List<string>();
         var failed = new List<string>();
+        var replaced = new List<(IReadOnlyList<int> OldIds, int NewId)>();
         await Task.Run(() =>
         {
-            foreach (var entry in chosen)
+            foreach (var (entry, replaces) in chosen)
             {
                 try
                 {
@@ -192,7 +197,12 @@ public sealed partial class MainViewModel
                         continue;
                     }
 
-                    imported.Add(_bibles.Import(entry.Name, entry.Abbreviation, entry.Language, bible).Name);
+                    // The old copy goes only once the new one is in.
+                    var saved = _bibles.Import(entry.Name, entry.Abbreviation, entry.Language, bible);
+                    ReplaceOldCopies(replaces, saved.Id);
+                    if (replaces.Count > 0)
+                        replaced.Add((replaces, saved.Id));
+                    imported.Add(saved.Name);
                 }
                 catch (Exception ex) when (ex is IOException or FormatException or UnauthorizedAccessException)
                 {
@@ -202,8 +212,9 @@ public sealed partial class MainViewModel
             }
         });
 
+        var activeReplaced = KeepActiveAfterReplacing(replaced);
         LoadBibleVersions();
-        if (!hadVersions && imported.Count > 0)
+        if ((!hadVersions && imported.Count > 0) || activeReplaced)
             RefreshAfterVersionChange();
 
         StatusText = imported.Count switch
@@ -219,6 +230,77 @@ public sealed partial class MainViewModel
 
         Log.Information("Paquete de Biblias importado: {Imported} (fallaron {Failed})",
             string.Join(", ", imported), string.Join(", ", failed));
+    }
+
+    /// <summary>
+    /// Of the chosen Bibles, the ones the library already has are asked about
+    /// once, all together. Yes: they come in and take the place of the ones
+    /// there. No: only the new ones come in. Null: nothing comes in. Each
+    /// chosen one comes back with the installed versions it replaces (none
+    /// for a new one).
+    /// </summary>
+    /// <param name="verb">«bajar» or «importar», for the question.</param>
+    private IReadOnlyList<(T Item, IReadOnlyList<int> Replaces)>? ConfirmReplacing<T>(
+        IReadOnlyList<T> chosen, Func<T, BiblePackageEntry> entryOf, string verb)
+    {
+        var installed = _bibles.GetVersions();
+        var plan = chosen
+            .Select(c => (Item: c, Replaces: (IReadOnlyList<int>)BibleInstallPlanner.Matching(entryOf(c), installed).Select(v => v.Id).ToList()))
+            .ToList();
+        var repeated = plan.Where(p => p.Replaces.Count > 0).ToList();
+        if (repeated.Count == 0)
+            return plan;
+
+        var othersToo = repeated.Count < plan.Count;
+        var answer = MessageBox.Show(
+            BibleInstallPlanner.ReplaceQuestion(repeated.Select(p => entryOf(p.Item).Abbreviation).ToList(), verb, othersToo),
+            "EcclesiaCast",
+            othersToo ? MessageBoxButton.YesNoCancel : MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
+
+        return answer switch
+        {
+            MessageBoxResult.Yes => plan,
+            MessageBoxResult.No when othersToo => plan.Where(p => p.Replaces.Count == 0).ToList(),
+            _ => null,
+        };
+    }
+
+    /// <summary>
+    /// The new copy takes the place of the old ones in the library and in the
+    /// playlists. Called off the window's thread; the versions on screen are
+    /// fixed afterwards with <see cref="KeepActiveAfterReplacing"/>.
+    /// </summary>
+    private void ReplaceOldCopies(IReadOnlyList<int> oldIds, int newId)
+    {
+        foreach (var oldId in oldIds)
+            _bibles.ReplaceVersion(oldId, newId);
+    }
+
+    /// <summary>
+    /// A replaced version that was ticked for projection leaves its new copy
+    /// ticked in its place. True when one of them was (the text on the grid
+    /// has to be read again).
+    /// </summary>
+    private bool KeepActiveAfterReplacing(IEnumerable<(IReadOnlyList<int> OldIds, int NewId)> replaced)
+    {
+        var any = false;
+        foreach (var (oldIds, newId) in replaced)
+        {
+            foreach (var oldId in oldIds)
+            {
+                var position = _checkedVersionIds.IndexOf(oldId);
+                if (position < 0)
+                    continue;
+                any = true;
+                if (_checkedVersionIds.Contains(newId))
+                    _checkedVersionIds.RemoveAt(position);
+                else
+                    _checkedVersionIds[position] = newId;
+            }
+        }
+
+        return any;
     }
 
     /// <summary>

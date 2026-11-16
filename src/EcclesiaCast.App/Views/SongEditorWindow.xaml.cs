@@ -16,8 +16,13 @@ public partial class SongEditorWindow : Window
     {
         InitializeComponent();
 
-        var choices = new List<ThemeChoice> { new(null, "(Tema por defecto)") };
+        var choices = new List<ThemeChoice> { new(null, "(Tema principal)") };
         choices.AddRange(themes.Select(t => new ThemeChoice(t.Id, t.Name)));
+
+        // The song's own theme is not among the shared ones: offered apart, so
+        // saving the lyrics does not take it away. Picking another one does.
+        if (existing?.ThemeId is int own && choices.All(c => c.Id != own))
+            choices.Insert(1, new ThemeChoice(own, "(Tema propio de esta canción)"));
         ThemeCombo.ItemsSource = choices;
         ThemeCombo.SelectedItem = choices.FirstOrDefault(c => c.Id == existing?.ThemeId) ?? choices[0];
 

@@ -650,6 +650,9 @@
                                                         <MenuItem Header="Editar como texto plano"
                                                                   Command="{Binding PlacementTarget.Tag.EditSongTextForCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                                   CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                        <MenuItem Header="Tema de esta canción…"
+                                                                  Command="{Binding PlacementTarget.Tag.EditSongThemeForCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                                         <Separator/>
                                                         <MenuItem Header="Agregar a la playlist"
                                                                   Command="{Binding PlacementTarget.Tag.AddSongToPlaylistCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
@@ -1383,6 +1386,14 @@
                                 <ComboBoxItem Content="4"/>
                             </ComboBox>
                         </StackPanel>
+                        <!-- Sólo con una canción en la grilla: qué tema usa (el principal, uno
+                             propio u otro elegido); clic abre el tema de esta canción. -->
+                        <Button DockPanel.Dock="Right" Content="{Binding SongThemeLabel}" FontSize="11" Padding="8,3" Margin="10,0,0,0"
+                                Style="{StaticResource DarkButton}"
+                                Command="{Binding EditSongThemeCommand}"
+                                Visibility="{Binding IsSongOpen, Converter={StaticResource BoolToVis}}"
+                                AutomationProperties.Name="Tema de esta canción"
+                                ToolTip="{Binding SongThemeHint}"/>
                         <!-- Sólo con una presentación en la grilla -->
                         <Button DockPanel.Dock="Right" Content="➕ Playlist" FontSize="11" Padding="8,3" Margin="10,0,0,0"
                                 Style="{StaticResource DarkButton}"
@@ -1460,6 +1471,8 @@
                                                         <MenuItem Header="Editar como texto plano (canción)"
                                                                   Command="{Binding PlacementTarget.Tag.EditSongAsTextCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                                   CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                        <MenuItem Header="Tema de esta canción…"
+                                                                  Command="{Binding PlacementTarget.Tag.EditSongThemeCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                                         <Separator/>
                                                         <MenuItem Header="Copiar"
                                                                   Command="{Binding PlacementTarget.Tag.CopySlideCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"

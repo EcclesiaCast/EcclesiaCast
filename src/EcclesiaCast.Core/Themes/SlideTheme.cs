@@ -90,6 +90,14 @@ public sealed class SlideTheme
     /// <summary>When the theme went to the trash (UTC); null while it is in use.</summary>
     public DateTime? DeletedAt { get; set; }
 
+    /// <summary>
+    /// The song this theme belongs to, when it is a song's own theme (one
+    /// edited from the song itself); null for the shared themes the theme
+    /// manager lists. An own theme follows nothing: editing the main theme
+    /// leaves it as it is.
+    /// </summary>
+    public int? OwnerSongId { get; set; }
+
     // ── Texto principal ──────────────────────────────────────────
     public string FontFamily { get; set; } = "Segoe UI";
 

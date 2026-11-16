@@ -67,7 +67,7 @@ public sealed class SongRepository(string dbPath) : ISongRepository
         existing.Title = song.Title;
         existing.Artist = song.Artist;
         existing.Copyright = song.Copyright;
-        existing.ThemeId = song.ThemeId;
+        ChangeTheme(db, existing, song.ThemeId);
 
         db.SongSections.RemoveRange(existing.Sections);
         existing.Sections = song.Sections
@@ -131,6 +131,7 @@ public sealed class SongRepository(string dbPath) : ISongRepository
         if (song is null || song.DeletedAt is null)
             return;
         db.Songs.Remove(song);
+        db.Themes.RemoveRange(db.Themes.Where(t => t.OwnerSongId == id));
         db.SaveChanges();
     }
 
@@ -140,7 +141,36 @@ public sealed class SongRepository(string dbPath) : ISongRepository
         var old = db.Songs.Where(s => s.DeletedAt != null && s.DeletedAt < limit).ToList();
         if (old.Count == 0)
             return;
+        var ids = old.Select(s => s.Id).ToList();
         db.Songs.RemoveRange(old);
+        db.Themes.RemoveRange(db.Themes.Where(t => t.OwnerSongId != null && ids.Contains(t.OwnerSongId.Value)));
         db.SaveChanges();
+    }
+
+    public void SetTheme(int songId, int? themeId)
+    {
+        using var db = new AppDbContext(dbPath);
+        var song = db.Songs.FirstOrDefault(s => s.Id == songId);
+        if (song is null)
+            return;
+
+        ChangeTheme(db, song, themeId);
+        db.SaveChanges();
+    }
+
+    /// <summary>
+    /// Sets the song's theme. When the song leaves its own theme, that theme
+    /// goes too, or it would sit in the database belonging to nobody.
+    /// </summary>
+    private static void ChangeTheme(AppDbContext db, Song song, int? themeId)
+    {
+        if (song.ThemeId == themeId)
+            return;
+
+        if (song.ThemeId is int old
+            && db.Themes.FirstOrDefault(t => t.Id == old && t.OwnerSongId == song.Id) is { } own)
+            db.Themes.Remove(own);
+
+        song.ThemeId = themeId;
     }
 }

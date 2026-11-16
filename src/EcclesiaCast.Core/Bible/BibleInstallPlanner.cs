@@ -77,8 +77,37 @@ public static class BibleInstallPlanner
     public static string Fingerprint(string fileName, long length, DateTime lastWriteUtc) =>
         $"{fileName.ToLowerInvariant()}|{length}|{lastWriteUtc.Ticks}";
 
+    /// <summary>
+    /// The installed versions that are the same one as <paramref name="entry"/>:
+    /// the ones a new copy of it takes the place of. More than one when the
+    /// library already had it twice.
+    /// </summary>
+    public static IReadOnlyList<BibleVersionInfo> Matching(BiblePackageEntry entry, IEnumerable<BibleVersionInfo> installed) =>
+        installed.Where(v => IsSame(entry, v)).ToList();
+
+    /// <summary>
+    /// The question asked once for every chosen Bible the library already has.
+    /// With <paramref name="othersToo"/> (there are also new ones), «No» brings
+    /// only the new ones, so the question says so.
+    /// </summary>
+    /// <param name="verb">«bajar» or «importar».</param>
+    public static string ReplaceQuestion(IReadOnlyList<string> names, string verb, bool othersToo)
+    {
+        var text = names.Count == 1
+            ? $"Ya tenés «{names[0]}» en tu biblioteca.\n\n¿La querés {verb} igual? Se borra la que tenés y queda la nueva en su lugar."
+            : $"Ya tenés estas Biblias en tu biblioteca: {string.Join(", ", names)}.\n\n¿Las querés {verb} igual? Se borran las que tenés y quedan las nuevas en su lugar.";
+        if (othersToo)
+            text += names.Count == 1
+                ? $"\n\nSí: se reemplaza.\nNo: se {(verb == "bajar" ? "bajan" : "importan")} sólo las que no tenés."
+                : $"\n\nSí: se reemplazan.\nNo: se {(verb == "bajar" ? "bajan" : "importan")} sólo las que no tenés.";
+        return text;
+    }
+
     private static bool IsInstalled(BiblePackageEntry entry, List<BibleVersionInfo> installed) =>
-        installed.Any(v => SameKey(v.Abbreviation, entry.Abbreviation) || SameKey(v.Name, entry.Name));
+        installed.Any(v => IsSame(entry, v));
+
+    private static bool IsSame(BiblePackageEntry entry, BibleVersionInfo version) =>
+        SameKey(version.Abbreviation, entry.Abbreviation) || SameKey(version.Name, entry.Name);
 
     private static string Normalize(string text) =>
         new(text.Where(char.IsLetterOrDigit).Select(char.ToLowerInvariant).ToArray());

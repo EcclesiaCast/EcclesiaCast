@@ -9,7 +9,10 @@ public sealed class ThemeRepository(string dbPath) : IThemeRepository
     public IReadOnlyList<SlideTheme> GetAll()
     {
         using var db = new AppDbContext(dbPath);
-        return db.Themes.AsNoTracking().Where(t => t.DeletedAt == null).OrderBy(t => t.Name).ToList();
+        return db.Themes.AsNoTracking()
+            .Where(t => t.DeletedAt == null && t.OwnerSongId == null)
+            .OrderBy(t => t.Name)
+            .ToList();
     }
 
     public SlideTheme? Get(int id)

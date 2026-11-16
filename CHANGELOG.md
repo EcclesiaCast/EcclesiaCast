@@ -62,6 +62,17 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Cambiado
 
+- **Cada canción puede tener su tema propio.** Clic derecho en una canción (o en
+  una diapositiva) → **«Tema de esta canción…»**, o el botón **🎨 Tema** arriba
+  de las diapositivas, que muestra si sigue al tema principal, si tiene tema
+  propio o si usa otro tema. Lo que cambies ahí (letra, fondo, franjas…) queda
+  como tema propio de esa canción, y editar el tema principal ya no la toca.
+  Desde ahí mismo se puede volver al tema principal o elegir otro tema.
+- **Editar el tema principal ya no cambia las canciones con tema propio.**
+  Para que todas lo tomen, en **Temas**, con el tema principal elegido, está el
+  botón **«Aplicar a todas las canciones…»**: avisa cuántas canciones cambian
+  y deja elegir si se borran también los diseños hechos diapositiva por
+  diapositiva. Ya no aparece la pregunta al guardar un tema.
 - **El menú Archivo quedó más corto.** Tenía 16 opciones; ahora lo de las
   canciones, las Biblias y los fondos está en tres menús nuevos al lado:
   **Canciones**, **Biblias** y **Fondos**. En Archivo quedan las copias de la
@@ -121,6 +132,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Corregido
 
+- **Ya no se puede tener dos veces la misma Biblia.** Si bajás o importás una
+  Biblia que ya está en tu biblioteca, el programa te avisa antes (una sola
+  pregunta para todas las repetidas). Si decís que sí, la nueva reemplaza a la
+  que tenías, y las listas que la usaban siguen andando con la nueva. Si decís
+  que no, se bajan sólo las que no tenías.
 - **Con una sola pantalla ya no quedás atrapado en la salida.** Si la salida
   ocupa la misma pantalla que el programa (una notebook, o un proyector que
   duplica la pantalla), la primera vez que se prende muestra unos segundos
