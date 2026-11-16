@@ -31,10 +31,10 @@
   <!-- LibVLC itself: the official VideoLAN packages. The Mac one (3.1.3.2)
        carries both osx-x64 and osx-arm64 (libvlc 3.0.24); a publish for
        osx-arm64 takes only the Apple-chip tree, under libvlc/osx-arm64/lib. -->
-  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('OSX')) Or $(RuntimeIdentifier.StartsWith('osx'))">
     <PackageReference Include="VideoLAN.LibVLC.Mac" Version="3.1.3.2" />
   </ItemGroup>
-  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows')) And !$(RuntimeIdentifier.StartsWith('osx'))">
     <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.24" />
   </ItemGroup>
 
