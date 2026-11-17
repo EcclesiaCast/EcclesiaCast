@@ -184,10 +184,11 @@ Cloudflare):
    del color de fondo del logo (antes podía verse el video de fondo pausado).
 7. Tus otros logos tienen que verse como antes.
 
-## 8. Vista en grilla de la Biblia (prueba.9)
+## 8. Vista en grilla de la Biblia (prueba.9 y prueba.10)
 
-Instalador: `dist\EcclesiaCast-1.4.0-prueba.9-setup.exe`. Es lo único nuevo
-respecto de la prueba.8. Si la grilla da problemas, se saca y la 1.4.0 sale
+Instalador: `dist\EcclesiaCast-1.4.0-prueba.10-setup.exe`. La prueba.10 es la
+prueba.9 más el paso 11 (la grilla con su propio ancho del panel). Respecto
+de la prueba.8, la grilla es lo único nuevo. Si la grilla da problemas, se saca y la 1.4.0 sale
 sin ella (está en commits propios).
 
 1. Pestaña **Biblia**: al lado del 🕘 hay un botón **«▦ Grilla»**. Tocalo.
