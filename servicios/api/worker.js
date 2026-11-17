@@ -29,7 +29,7 @@ export function validar(cuerpo, ahora = new Date()) {
   const fecha = Date.parse(dia + "T12:00:00Z");
   if (Number.isNaN(fecha) || Math.abs(fecha - ahora.getTime()) > 2 * 86400000) return null;
 
-  return { dia, instalacion, version };
+  return { dia, instalacion, version, iglesia: String(cuerpo.iglesia ?? "").replace(/\s+/g, " ").trim().slice(0, 60) };
 }
 
 /**
@@ -227,8 +227,8 @@ export default {
       }
       const fila = validar(cuerpo);
       if (!fila) return new Response(null, { status: 400 });
-      await env.DB.prepare("INSERT OR IGNORE INTO uso (dia, instalacion, version, pais) VALUES (?1, ?2, ?3, ?4)")
-        .bind(fila.dia, fila.instalacion, fila.version, paisDe(pedido))
+      await env.DB.prepare("INSERT INTO uso (dia, instalacion, version, pais, iglesia) VALUES (?1, ?2, ?3, ?4, ?5) ON CONFLICT (dia, instalacion) DO UPDATE SET iglesia = excluded.iglesia WHERE excluded.iglesia <> ''")
+        .bind(fila.dia, fila.instalacion, fila.version, paisDe(pedido), fila.iglesia)
         .run();
       return new Response(null, { status: 204 });
     }

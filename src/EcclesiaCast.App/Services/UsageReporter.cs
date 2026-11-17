@@ -43,6 +43,7 @@ public static class UsageReporter
                     instalacion = ping.Install,
                     dia = ping.Day,
                     version = ping.Version,
+                    iglesia = ping.Church,
                 });
 
                 if (response.IsSuccessStatusCode)

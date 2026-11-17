@@ -37,6 +37,13 @@ assert.equal((await avisar({ instalacion: otro, dia: hoy, version: "1.4.0-prueba
 assert.equal(sqlite.prepare("SELECT COUNT(*) AS n FROM uso").get().n, 2);
 assert.equal(sqlite.prepare("SELECT version FROM uso WHERE instalacion = ?").get(otro).version, "1.4.0-prueba.2");
 
+// El nombre de la iglesia es opcional: sin nombre queda vacío; si lo ponen después el mismo día, se actualiza.
+assert.equal(sqlite.prepare("SELECT iglesia FROM uso WHERE instalacion = ?").get(uno).iglesia, "");
+assert.equal((await avisar({ instalacion: uno, dia: hoy, version: "1.4.0", iglesia: "  Iglesia   del Centro " })).status, 204);
+assert.equal(sqlite.prepare("SELECT iglesia FROM uso WHERE instalacion = ?").get(uno).iglesia, "Iglesia del Centro");
+assert.equal((await avisar({ instalacion: uno, dia: hoy, version: "1.4.0" })).status, 204);
+assert.equal(sqlite.prepare("SELECT iglesia FROM uso WHERE instalacion = ?").get(uno).iglesia, "Iglesia del Centro");
+
 // Del lugar se guarda sólo el país; sin dato queda vacío.
 assert.equal(sqlite.prepare("SELECT pais FROM uso WHERE instalacion = ?").get(otro).pais, "UY");
 assert.equal(sqlite.prepare("SELECT pais FROM uso WHERE instalacion = ?").get(uno).pais, "");

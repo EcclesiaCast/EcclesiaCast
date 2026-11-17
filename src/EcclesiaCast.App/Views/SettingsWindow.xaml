@@ -165,7 +165,13 @@
                     <CheckBox Content="Contar en forma anónima que se usó" Foreground="White" Margin="0,24,0,0"
                               IsChecked="{Binding IsUsageCountEnabled, Mode=TwoWay}"/>
                     <TextBlock Style="{StaticResource SectionText}" Margin="22,4,0,0"
-                               Text="La primera vez que proyectás algo en el día, el programa avisa «una instalación se usó hoy», con un número al azar y la versión. Del lugar se anota sólo el país. Nada más: ni el nombre de la iglesia, ni la ciudad, ni canciones, ni lo que escribís. Sirve para saber cuántas iglesias lo usan y seguir mejorándolo. Si lo apagás, el número se borra."/>
+                               Text="La primera vez que proyectás algo en el día, el programa avisa «una instalación se usó hoy», con un número al azar y la versión. Del lugar se anota sólo el país. Nada más: ni la ciudad, ni canciones, ni lo que escribís. Sirve para saber cuántas iglesias lo usan y seguir mejorándolo. Si lo apagás, el número se borra."/>
+                    <TextBlock Style="{StaticResource SectionText}" Margin="22,10,0,0"
+                               Text="Si querés, podés escribir el nombre de tu iglesia. Es sólo informativo: sirve para saber quiénes usan el programa y seguir mejorándolo. No hace falta, y se puede borrar cuando quieras."/>
+                    <TextBox Margin="22,6,0,0" MaxLength="60" HorizontalAlignment="Left" Width="320"
+                             Text="{Binding UsageChurchName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             IsEnabled="{Binding IsUsageCountEnabled}"
+                             AutomationProperties.Name="Nombre de la iglesia (opcional)"/>
                 </StackPanel>
 
                 <!-- Aspecto -->

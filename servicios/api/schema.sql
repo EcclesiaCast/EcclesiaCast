@@ -6,5 +6,9 @@ CREATE TABLE IF NOT EXISTS uso (
   instalacion TEXT NOT NULL,  -- 32 caracteres al azar, uno por instalación
   version     TEXT NOT NULL,  -- versión del programa
   pais        TEXT NOT NULL DEFAULT '',  -- «UY»: lo informa Cloudflare; vacío si no se sabe
+  iglesia     TEXT NOT NULL DEFAULT '',  -- nombre que la iglesia quiso poner (opcional); vacío si no
   PRIMARY KEY (dia, instalacion)
 );
+
+-- Si la tabla ya existía (antes de la 1.4.0), agregale la columna una sola vez:
+--   ALTER TABLE uso ADD COLUMN iglesia TEXT NOT NULL DEFAULT '';

@@ -6,12 +6,13 @@ namespace EcclesiaCast.Core.Diagnostics;
 /// <summary>
 /// What is sent to count how many churches use the program: a number drawn
 /// at random once per installation, the day (as this PC sees it) and the
-/// version. No name, no church, no song, nothing typed.
+/// version, and the name of the church only if the person typed it in Ajustes
+/// (optional, informative). No song, nothing else typed.
 /// </summary>
 /// <param name="Install">The random number of this installation.</param>
 /// <param name="Day">The day something was projected, «2026-11-15».</param>
 /// <param name="Version">The program's version.</param>
-public sealed record UsagePing(string Install, string Day, string Version);
+public sealed record UsagePing(string Install, string Day, string Version, string Church = "");
 
 /// <summary>
 /// The anonymous count of use (Ajustes → Actualizaciones, on unless turned
@@ -24,6 +25,8 @@ public static class UsageCount
     public const string EnabledKey = "usage.count";
     public const string InstallKey = "usage.install";
     public const string LastSentKey = "usage.last-sent";
+    public const string ChurchKey = "usage.church";
+    public const int MaxChurchLength = 60;
 
     public static bool IsEnabled(ISettingsStore settings) => settings.Get(EnabledKey) != "0";
 
@@ -48,7 +51,27 @@ public static class UsageCount
             settings.Set(InstallKey, install);
         }
 
-        return new UsagePing(install!, Day(now), version);
+        return new UsagePing(install!, Day(now), version, ChurchName(settings));
+    }
+
+    /// <summary>The name of the church the person chose to tell, cleaned up; empty if none.</summary>
+    public static string ChurchName(ISettingsStore settings) => CleanChurch(settings.Get(ChurchKey));
+
+    public static string CleanChurch(string? value)
+    {
+        var text = string.Join(" ", (value ?? string.Empty).Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
+        return text.Length <= MaxChurchLength ? text : text[..MaxChurchLength].TrimEnd();
+    }
+
+    /// <summary>Saves the name and asks for today to be told again, so it arrives now and not tomorrow.</summary>
+    public static void SetChurchName(ISettingsStore settings, string? value)
+    {
+        var clean = CleanChurch(value);
+        if (clean == ChurchName(settings))
+            return;
+
+        settings.Set(ChurchKey, clean);
+        settings.Set(LastSentKey, string.Empty);
     }
 
     /// <summary>Remembers that today was told, so it is not told again. Only after it got there.</summary>
@@ -62,6 +85,7 @@ public static class UsageCount
     {
         settings.Set(InstallKey, string.Empty);
         settings.Set(LastSentKey, string.Empty);
+        settings.Set(ChurchKey, string.Empty);
     }
 
     /// <summary>32 hexadecimal characters, the only shape the service accepts.</summary>

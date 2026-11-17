@@ -250,6 +250,15 @@ public class BroadcastStyleTests
     }
 
     [Fact]
+    public void The_edge_gradient_has_an_intensity_that_is_kept_and_limited()
+    {
+        var read = BroadcastStyle.Parse(new BroadcastStyle { EdgeGradient = true, EdgeGradientIntensity = 40 }.ToSetting(), OutputChannel.Bible);
+        Assert.Equal(40, read.EdgeGradientIntensity);
+        Assert.Equal(100, BroadcastStyle.Parse("{}", OutputChannel.Bible).EdgeGradientIntensity);
+        Assert.Equal(100, BroadcastStyle.Parse("{\"edgeGradientIntensity\":500}", OutputChannel.Bible).EdgeGradientIntensity);
+    }
+
+    [Fact]
     public void The_edge_gradient_goes_with_any_plate_and_is_off_unless_asked_for()
     {
         var style = new BroadcastStyle { Plate = BroadcastPlate.Line, EdgeGradient = true };

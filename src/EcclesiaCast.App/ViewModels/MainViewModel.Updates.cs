@@ -53,6 +53,18 @@ public sealed partial class MainViewModel
             if (!value)
                 EcclesiaCast.Core.Diagnostics.UsageCount.Forget(_settings);
             OnPropertyChanged();
+            OnPropertyChanged(nameof(UsageChurchName));
+        }
+    }
+
+    /// <summary>The optional name of the church, told with the count of use (Ajustes → Actualizaciones).</summary>
+    public string UsageChurchName
+    {
+        get => EcclesiaCast.Core.Diagnostics.UsageCount.ChurchName(_settings);
+        set
+        {
+            EcclesiaCast.Core.Diagnostics.UsageCount.SetChurchName(_settings, value);
+            OnPropertyChanged();
         }
     }
 

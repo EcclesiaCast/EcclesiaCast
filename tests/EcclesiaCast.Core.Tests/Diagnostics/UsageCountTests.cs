@@ -26,6 +26,31 @@ public class UsageCountTests
     }
 
     [Fact]
+    public void The_church_name_is_optional_cleaned_and_told_again_when_it_changes()
+    {
+        var settings = new Settings();
+        Assert.Equal("", UsageCount.Ping(settings, Sunday, "1.4.0").Church);
+
+        UsageCount.MarkSent(settings, Sunday);
+        UsageCount.SetChurchName(settings, "  Iglesia   del Centro ");
+        Assert.Equal("Iglesia del Centro", UsageCount.Ping(settings, Sunday, "1.4.0").Church);
+        // A new name asks for today to be told again.
+        Assert.True(UsageCount.ShouldSend(settings, Sunday, isDevelopmentBuild: false));
+
+        UsageCount.SetChurchName(settings, new string('a', 200));
+        Assert.Equal(UsageCount.MaxChurchLength, UsageCount.ChurchName(settings).Length);
+    }
+
+    [Fact]
+    public void Turning_the_count_off_forgets_the_church_name()
+    {
+        var settings = new Settings();
+        UsageCount.SetChurchName(settings, "Iglesia");
+        UsageCount.Forget(settings);
+        Assert.Equal("", UsageCount.ChurchName(settings));
+    }
+
+    [Fact]
     public void A_development_build_never_counts()
     {
         Assert.False(UsageCount.ShouldSend(new Settings(), Sunday, isDevelopmentBuild: true));
