@@ -1913,6 +1913,7 @@
                                                     FillMedia="{Binding Projection.BackgroundFill}"
                                                     BackgroundBlur="{Binding Projection.BackgroundBlur}"
                                                     LiveVideoFrame="{Binding Projection.LiveFrame}"
+                                                    LogoVideoFrame="{Binding Projection.LiveLogoFrame}"
                                                     Logo="{Binding Projection.ActiveLogo}"/>
                         </Border>
                         </controls:AspectFitBox>

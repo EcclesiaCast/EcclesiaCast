@@ -32,6 +32,7 @@ public sealed class ProjectionWindowService(ProjectionViewModel projectionViewMo
             // is drawing, so the video moves there too instead of sitting on
             // a still poster — and nothing is decoded twice.
             _window.VideoFrameChanged += (_, frame) => projectionViewModel.LiveFrame = frame;
+            _window.LogoFrameChanged += (_, frame) => projectionViewModel.LiveLogoFrame = frame;
         }
 
         // Still fading to black to switch off counts as hidden: its video was

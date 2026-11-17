@@ -34,7 +34,10 @@ public partial class OutputWindow : Window
         LogoVideo.FrameSourceChanged += (_, frame) =>
         {
             if (_logoVideoId is not null)
+            {
                 Projected.LogoVideoFrame = frame;
+                LogoFrameChanged?.Invoke(this, frame);
+            }
         };
         // • Video to image: the video's last picture (kept by the surface) goes
         //   when the image has finished fading in over it.
@@ -106,6 +109,9 @@ public partial class OutputWindow : Window
 
     /// <summary>Raised when the small copy of the video for the operator's preview changes.</summary>
     public event EventHandler<System.Windows.Media.ImageSource?>? VideoFrameChanged;
+
+    /// <summary>The frames of a video logo, copied to the operator's Live panel.</summary>
+    public event EventHandler<System.Windows.Media.ImageSource?>? LogoFrameChanged;
 
     /// <summary>
     /// Raised when the operator double-clicks the output to switch it off.
@@ -321,6 +327,7 @@ public partial class OutputWindow : Window
             {
                 _logoVideoId = logo.Id;
                 Projected.LogoVideoFrame = null;
+                LogoFrameChanged?.Invoke(this, null);
             }
 
             LogoVideo.Show(AsLoopingVideo(logo));
@@ -336,6 +343,7 @@ public partial class OutputWindow : Window
             LogoVideo.Show(null);
             _logoVideoId = null;
             Projected.LogoVideoFrame = null;
+            LogoFrameChanged?.Invoke(this, null);
         }
 
         // The video keeps playing while the logo layer fades away.

@@ -792,7 +792,7 @@ public partial class SlideView : UserControl
             _ => null,
         };
 
-        if (logo.Kind == LogoKind.Video && IsLiveOutput && LogoVideoFrame is { } frame)
+        if (logo.Kind == LogoKind.Video && LogoVideoFrame is { } frame)
         {
             if (!ReferenceEquals(LogoImage.Source, frame))
             {
