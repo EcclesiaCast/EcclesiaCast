@@ -282,6 +282,15 @@ public sealed partial class MainViewModel
             tile.Format = value;
     }
 
+    /// <summary>The one button over the grid: abbreviation → abbreviation and name → name → abbreviation.</summary>
+    [RelayCommand]
+    private void CycleBibleGridFormat() => BibleGridFormat = BibleGridFormat switch
+    {
+        BibleGridFormat.Abbreviation => BibleGridFormat.Both,
+        BibleGridFormat.Both => BibleGridFormat.Names,
+        _ => BibleGridFormat.Abbreviation,
+    };
+
     private void LoadBibleGridFormat() =>
         BibleGridFormat = Enum.TryParse<BibleGridFormat>(_settings.Get(BibleGridFormatKey), out var format)
             && Enum.IsDefined(format) ? format : BibleGridFormat.Abbreviation;

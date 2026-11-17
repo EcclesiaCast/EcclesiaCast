@@ -301,8 +301,7 @@ abrió con el programa.
 1. **Ancho del panel otra vez independiente:** en grilla dejá el panel de un
    ancho y en lista (o Canciones) de otro. Cambiá de vista: cada una vuelve a su
    ancho, también al cerrar y abrir.
-2. **Tres formas de ficha:** arriba de la grilla, «Gn» (sólo la abreviatura,
-   como en la prueba.11), «Gn + nombre» (la de tu captura) y «Nombre». Las tres
+2. **Tres formas de ficha, un solo botón** (prueba.14): arriba de la grilla, «Fichas: Gn»; cada toque pasa a «Gn + nombre», «Nombre» y vuelve a «Gn». Las tres
    con «Ocultar capítulos» abierto y cerrado. Se acuerda la que elegiste.
 3. **Volumen «Salida»:** movelo con un video andando y con música: tiene que ir
    **suave**, como el de Windows (ahora es el volumen del programa en el

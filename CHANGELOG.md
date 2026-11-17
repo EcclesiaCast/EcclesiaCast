@@ -7,8 +7,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
-- **La grilla de la Biblia, más cómoda.** Arriba de las fichas se elige cómo se
-  ven: «Gn» (sólo la abreviatura, chicas), «Gn + nombre» o «Nombre». «Ocultar
+- **La grilla de la Biblia, más cómoda.** Un botón arriba de las fichas cambia cómo se
+  ven, un toque cada vez: «Gn» (sólo la abreviatura, chicas), «Gn + nombre» o «Nombre». «Ocultar
   capítulos» deja los libros más grandes. El programa recuerda las dos cosas, y
   al escribir una cita («1jn 3 1») la grilla se mueve hasta ese libro y lo deja
   marcado.

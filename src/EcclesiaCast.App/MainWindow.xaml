@@ -1190,17 +1190,25 @@
                                         </Grid.RowDefinitions>
                                         <!-- Cómo se ven las fichas, y capítulos abiertos o cerrados -->
                                         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="8,0,4,4">
-                                            <TextBlock Text="Fichas:" FontSize="11" VerticalAlignment="Center"
-                                                       Foreground="{StaticResource MutedBrush}" Margin="0,0,6,0"/>
-                                            <RadioButton Content="Gn" Style="{StaticResource TabButton}" Padding="8,3" FontSize="11"
-                                                         IsChecked="{Binding IsBibleGridAbbreviation, Mode=TwoWay}"
-                                                         ToolTip="Sólo la abreviatura: fichas chicas, entran todos los libros"/>
-                                            <RadioButton Content="Gn + nombre" Style="{StaticResource TabButton}" Padding="8,3" FontSize="11" Margin="2,0,0,0"
-                                                         IsChecked="{Binding IsBibleGridBoth, Mode=TwoWay}"
-                                                         ToolTip="La abreviatura grande y el nombre chico abajo"/>
-                                            <RadioButton Content="Nombre" Style="{StaticResource TabButton}" Padding="8,3" FontSize="11" Margin="2,0,0,0"
-                                                         IsChecked="{Binding IsBibleGridNames, Mode=TwoWay}"
-                                                         ToolTip="El nombre completo del libro"/>
+                                            <!-- Un solo botón: cada toque pasa a la forma siguiente de las fichas -->
+                                            <Button FontSize="11" Padding="8,3" MinWidth="96"
+                                                    Command="{Binding CycleBibleGridFormatCommand}"
+                                                    AutomationProperties.Name="Forma de las fichas"
+                                                    ToolTip="Cambia cómo se ven las fichas: sólo la abreviatura, abreviatura y nombre, o el nombre. Cada toque pasa a la siguiente.">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                                        <Setter Property="Content" Value="Fichas: Gn"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding BibleGridFormat}" Value="Both">
+                                                                <Setter Property="Content" Value="Fichas: Gn + nombre"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding BibleGridFormat}" Value="Names">
+                                                                <Setter Property="Content" Value="Fichas: Nombre"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
                                             <Button FontSize="11" Padding="8,3" Margin="10,0,0,0"
                                                     Command="{Binding ToggleBibleChaptersCommand}"
                                                     AutomationProperties.Name="Mostrar u ocultar capítulos y versículos"
