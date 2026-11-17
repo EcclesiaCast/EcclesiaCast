@@ -277,18 +277,28 @@ public static class MediaFraming
         const int Width = 480, Height = 270;
         const double Oversize = 1.4;
 
-        var frame = new Grid { Width = Width, Height = Height, ClipToBounds = true, Background = Brushes.Black };
-        frame.Children.Add(new Image
+        // Placed by hand in a canvas (no layout alignment to trust): the
+        // picture covers the oversized area and its middle is the middle of
+        // the frame, whatever its shape.
+        var targetW = Width * Oversize;
+        var targetH = Height * Oversize;
+        var scale = Math.Max(targetW / Math.Max(1, source.Width), targetH / Math.Max(1, source.Height));
+        var drawnW = source.Width * scale;
+        var drawnH = source.Height * scale;
+
+        var frame = new Canvas { Width = Width, Height = Height, ClipToBounds = true, Background = Brushes.Black };
+        var picture = new Image
         {
             Source = source,
-            Stretch = Stretch.UniformToFill,
-            Width = Width * Oversize,
-            Height = Height * Oversize,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center,
+            Stretch = Stretch.Fill,
+            Width = drawnW,
+            Height = drawnH,
             // 10 here is 40 on a 1920-wide screen.
             Effect = new BlurEffect { Radius = 10, KernelType = KernelType.Gaussian, RenderingBias = RenderingBias.Performance },
-        });
+        };
+        Canvas.SetLeft(picture, (Width - drawnW) / 2);
+        Canvas.SetTop(picture, (Height - drawnH) / 2);
+        frame.Children.Add(picture);
         frame.Measure(new Size(Width, Height));
         frame.Arrange(new Rect(0, 0, Width, Height));
         frame.UpdateLayout();
