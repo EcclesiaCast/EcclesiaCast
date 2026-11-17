@@ -19,6 +19,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   ancho del panel y, con una Biblia de menos libros (sólo el Nuevo
   Testamento, por ejemplo), sólo aparecen los que tiene. El programa
   recuerda qué vista elegiste; la lista de siempre queda como estaba.
+  La grilla tiene **su propio ancho del panel**: si la agrandás para ver más
+  fichas, las canciones y la Biblia en lista siguen con el ancho que tenían, y
+  al volver a la grilla el panel recupera el suyo. El programa recuerda los dos.
 
 - **Los videos de otra forma entran enteros, con los bordes desenfocados.** Un
   video vertical, cuadrado o 4:3 (o cualquier video en un proyector de

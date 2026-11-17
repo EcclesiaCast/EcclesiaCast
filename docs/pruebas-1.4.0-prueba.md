@@ -211,6 +211,11 @@ sin ella (está en commits propios).
    con `?` y el historial 🕘 tienen que funcionar en las dos vistas.
 10. Mirá que, al cambiar de Biblia con la grilla abierta, las fichas
     se actualicen.
+11. **Dos anchos por separado.** Con la grilla abierta, agrandá el panel de
+    la izquierda. Pasá a **Canciones**: el panel vuelve al ancho de antes.
+    Achicalo un poco y volvé a **Biblia**: recupera el ancho grande de la
+    grilla. Tocá «☰ Lista»: queda con el ancho de las canciones. Cerrá y
+    abrí el programa: cada vista tiene que conservar su ancho.
 
 Lo que **no** tiene a propósito: favoritos de versículos.
 

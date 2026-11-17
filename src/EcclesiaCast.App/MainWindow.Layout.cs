@@ -78,6 +78,50 @@ public partial class MainWindow
     // Sizes of the blocks themselves, whichever slot they sit in.
     private double _libraryWidth = 270;
     private double _rightWidth = 320;
+
+    /// <summary>
+    /// The library's width while the Bible shows its grid: the coloured tiles
+    /// want more room than the lists, and widening the column for them must
+    /// not leave the songs (or the Bible as a list) that wide too.
+    /// </summary>
+    private double _bibleGridWidth = DefaultBibleGridWidth;
+
+    /// <summary>Six book tiles a row, with the scroll bar.</summary>
+    private const double DefaultBibleGridWidth = 420;
+
+    /// <summary>Which of the two widths the library column holds right now.</summary>
+    private bool _libraryShowsGrid;
+
+    /// <summary>The library is showing the Bible as a grid (and not the songs, or the Bible as a list).</summary>
+    private bool LibraryWantsGrid =>
+        DataContext is ViewModels.MainViewModel { IsBibleTabActive: true, IsBibleGridView: true };
+
+    /// <summary>
+    /// Switches the library column to the width of what it shows now: the
+    /// width dragged so far is kept for the view being left.
+    /// </summary>
+    private void SyncLibraryWidth()
+    {
+        if (LibraryWantsGrid == _libraryShowsGrid)
+            return;
+
+        CaptureSizes();
+        _libraryShowsGrid = LibraryWantsGrid;
+        ApplyLayout();
+    }
+
+    /// <summary>The width the library has for what it shows: the list or the Bible grid.</summary>
+    private double LibraryWidth
+    {
+        get => _libraryShowsGrid ? _bibleGridWidth : _libraryWidth;
+        set
+        {
+            if (_libraryShowsGrid)
+                _bibleGridWidth = value;
+            else
+                _libraryWidth = value;
+        }
+    }
     private double _playlistHeight = 240;
     private double _mediaHeight = 170;
 
@@ -129,6 +173,7 @@ public partial class MainWindow
         _outputSplit = _settings?.Get(OutputSplitKey) == "1";
         foreach (var fold in Folds)
             fold.Set(_settings?.Get(fold.Key) == "1");
+        _libraryShowsGrid = LibraryWantsGrid;
         ApplyLayout();
     }
 
@@ -157,7 +202,7 @@ public partial class MainWindow
         // A folded block is as big as its header (or its rail): that is not
         // the size the operator chose, so it must not overwrite it.
         if (!_leftRail)
-            _libraryWidth = columns[_mirrored ? 4 : 0].ActualWidth is > 0 and var lw ? lw : _libraryWidth;
+            LibraryWidth = columns[_mirrored ? 4 : 0].ActualWidth is > 0 and var lw ? lw : LibraryWidth;
         _rightWidth = columns[_mirrored ? 0 : 4].ActualWidth is > 0 and var rw ? rw : _rightWidth;
 
         var mediaRow = MainArea.RowDefinitions[_mediaOnTop ? 0 : 2];
@@ -180,7 +225,7 @@ public partial class MainWindow
         var leftColumn = _mirrored ? 4 : 0;
         var rightColumn = _mirrored ? 0 : 4;
         var columns = MainArea.ColumnDefinitions;
-        columns[leftColumn].Width = new GridLength(_leftRail ? RailWidth : _libraryWidth);
+        columns[leftColumn].Width = new GridLength(_leftRail ? RailWidth : LibraryWidth);
         columns[leftColumn].MinWidth = _leftRail ? RailWidth : LibraryMinWidth;
         columns[rightColumn].Width = new GridLength(_rightWidth);
         columns[rightColumn].MinWidth = RightMinWidth;
@@ -455,6 +500,7 @@ public partial class MainWindow
         foreach (var fold in Folds)
             fold.Set(false);
         _libraryWidth = 270;
+        _bibleGridWidth = DefaultBibleGridWidth;
         _rightWidth = 320;
         _playlistHeight = 240;
         _mediaHeight = 170;
