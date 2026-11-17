@@ -454,8 +454,19 @@ las respuestas automáticas de la tabla); toca dar estos pasos.
 
 ### Pedidos de la prueba de la 1.4.0 prueba.11 (17/11/2026)
 
-- [ ] **Ningún video entra silenciado, y el sonido se ve y se controla en el
-      LIVE.** Alexis agregó a Medios → Anuncios
+- [ ] **Para próximas versiones (pedidos del 17/11/2026):**
+      1. **Máximo de caracteres por versículo:** poder poner el tope; si el
+         versículo lo pasa, se corta y sigue en la diapositiva que viene.
+      2. **Proyectar a una ventana** en lugar de a una pantalla (para quien
+         tiene una sola pantalla).
+      3. **Mandar la salida principal o la del escenario por wifi** a un
+         navegador (como la página que se usa con OBS, pero para ver la
+         pantalla entera, en un celular o una tele).
+      4. **Cuenta de uso:** hoy sólo se pide el nombre de la iglesia
+         (opcional). Alexis no quiere el correo.
+
+- [x] **Ningún video entra silenciado, y el sonido se ve y se controla en el
+      LIVE.** (Hecho el 17/11 en la prueba.12; falta que Alexis lo pruebe.) Alexis agregó a Medios → Anuncios
       `presentacion-v3-final.mp4` (9:16, 26 s, con audio AAC) y salió mudo; el
       registro dice «sin sonido». Causa: `GiveSoundToLongVideosAsync`
       (`MainViewModel.Media.cs`) deja mudos todos los videos nuevos salvo los

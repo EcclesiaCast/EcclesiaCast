@@ -7,6 +7,23 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **La grilla de la Biblia, más cómoda.** El botón «Ocultar capítulos» deja los
+  libros más grandes; «Aa Nombres» / «Gn Abreviaturas» elige cómo se ven las
+  fichas (el programa recuerda las dos cosas); y al escribir una cita («1jn 3
+  1») la grilla se mueve hasta ese libro y lo deja marcado.
+- **El programa recuerda qué Biblia estaba abierta** (y la segunda, si había)
+  al cerrarlo y volver a abrirlo.
+- **Volumen en el LIVE.** Debajo de los controles del video en pantalla, un
+  botón dice si el video suena o está silenciado, un control ajusta el volumen
+  de ese video, y otro el volumen de toda la salida (videos y música), sin
+  tocar el volumen de Windows.
+- **Intensidad del degradé desde el borde** en el diseño de la transmisión,
+  para que quede tan oscuro o tan suave como quieras.
+- **Nombre de la iglesia, opcional,** en Ajustes → Actualizaciones, junto a
+  la cuenta de uso. Es sólo informativo y se puede dejar vacío o borrar.
+- Las imágenes para rellenar los bordes (en Logos y en las Propiedades de un
+  medio) aparecen **agrupadas por pestaña**, para saber de dónde sale cada una.
+
 - **Vista en grilla para buscar en la Biblia.** Un botón nuevo en el panel de
   la Biblia, «▦ Grilla» (y «☰ Lista» para volver), muestra los 66 libros como
   fichas con la abreviatura grande (Gn, Ex, Jn, 1Co…) y el nombre chico,
@@ -123,6 +140,15 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Corregido
 
+- **Los videos ya no entran silenciados.** Entran con su sonido, duren lo que
+  duren; silenciarlos lo decidís vos (🔇 en el LIVE o en sus Propiedades). Los
+  videos que ya estaban en la biblioteca siguen como los dejaste.
+- **Las teclas F1 a F4 con la salida apagada** ahora prenden la salida
+  mostrando lo que dicen (Black, Clear, Logo, Sin fondo) y no vuelven a la
+  canción o al versículo de antes.
+- **El logo de video se ve moviéndose en el panel LIVE** (antes quedaba negro).
+- **El relleno desenfocado de un logo o de un video quedaba pegado arriba**:
+  ahora la imagen de relleno está centrada.
 - **Ya no se puede tener dos veces la misma Biblia.** Si bajás o importás una
   Biblia que ya está en tu biblioteca, el programa te avisa antes (una sola
   pregunta para todas las repetidas). Si decís que sí, la nueva reemplaza a la

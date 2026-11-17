@@ -214,6 +214,68 @@ sin ella (está en commits propios).
 
 Lo que **no** tiene a propósito: favoritos de versículos.
 
+## 9. Lo nuevo de la prueba.12 (17/11/2026)
+
+Instalador: `dist\EcclesiaCast-1.4.0-prueba.12-setup.exe`. Junta todo lo que
+pediste después de la prueba.11. **Nada se abrió con el programa**: compila y
+pasan las 1.440 pruebas, pero ninguna ventana se usó con el mouse.
+
+### Sonido de los videos (lo que falló)
+1. Agregá a Medios un video con audio, **corto** (por ejemplo
+   `presentacion-v3-final.mp4`, 26 s). Tiene que **sonar**, sin tocar nada.
+2. Pasá el video al LIVE. Debajo de la barra de avance hay una fila nueva:
+   **🔊 Con sonido** (clic: lo silencia y pasa a **🔇 Sin sonido**), un control
+   «Video» (volumen de ese video) y uno «Salida» (volumen de todo).
+3. Bajá «Salida» a la mitad con un video andando: tiene que bajar el
+   volumen de EcclesiaCast (también el de la lista de música), **no** el de Windows.
+4. «Video» al mínimo con el video en pantalla: se silencia; subirlo lo vuelve a dar.
+5. Cerrá y abrí el programa: «Salida» queda como la dejaste.
+6. Los videos que **ya tenías** como silenciados siguen así (no se tocan).
+
+### Teclas F con la salida apagada
+7. Poné un versículo o canción, **F3** (logo), **Esc** (apaga). Ahora **F3**: tiene
+   que prender la salida con el **logo** (antes traía el versículo).
+8. Lo mismo con **F1** (Black), **F2** (Clear), **F4** (Sin fondo; ahí tiene que
+   volver la letra) y con los botones del programa.
+9. Con la salida prendida, F1/F2/F3 siguen alternando como siempre.
+
+### Logo de video en el LIVE
+10. Elegí un logo de video, **F3**: en el panel LIVE tiene que **verse moviéndose**
+    (antes, negro). En el proyector, igual que antes.
+
+### Relleno centrado y combo por pestañas
+11. En Logos, con un logo cuadrado: «Los bordes se rellenan con» → «La misma
+    imagen, desenfocada»: la imagen desenfocada tiene que estar **centrada**
+    (no pegada arriba). Probalo con un video y con un fondo normal también.
+12. En esa lista, y en Propiedades de un medio, las imágenes salen **agrupadas
+    por pestaña** («Pestaña «Anuncios»», etc.), con las dos primeras opciones aparte.
+
+### Degradé de la transmisión
+13. Transmisión → Estilos de la transmisión…: debajo de «Degradé oscuro desde el
+    borde», la barra **Intensidad**. Probala con 100 %, 50 % y 10 %: se ve en
+    la vista previa y en OBS mientras la movés. Apagada la casilla, la barra
+    queda deshabilitada.
+
+### Grilla de la Biblia
+14. Arriba de las fichas hay dos botones: **Aa Nombres** (fichas con el nombre
+    completo; vuelve con «Gn Abreviaturas») y **▾ Ocultar capítulos**.
+15. Con los capítulos ocultos los libros se ven **más grandes** y entran todos.
+    Elegir un libro vuelve a abrir los capítulos.
+16. Escribí **`1jn 3 1`** + Enter: la grilla se **mueve hasta 1 Juan** y lo deja
+    marcado (probalo con Apocalipsis y con Génesis: arriba y abajo de todo).
+17. Elegí otra Biblia, cerrá el programa, abrilo: tiene que volver con **esa
+    Biblia** (y con la segunda, si usabas dos).
+18. Las dos formas de ficha, con la Biblia sin libros (Nuevo Testamento sólo):
+    no se corta nada y no sale barra horizontal.
+
+### Nombre de la iglesia (cuenta de uso)
+19. Ajustes → Actualizaciones: debajo de la cuenta anónima hay un campo para el
+    **nombre de la iglesia** (opcional, sólo informativo). Escribilo, salí del
+    campo, cerrá y abrí Ajustes: sigue ahí. Apagar la cuenta lo borra.
+    (Hasta publicar el servicio nuevo no cuenta nada, y no tiene que dar error.)
+    **Antes de publicar el servicio:** agregar la columna con el `ALTER TABLE` que
+    está al final de `servicios/api/schema.sql`.
+
 ## Si algo falla
 
 El registro del día está en
