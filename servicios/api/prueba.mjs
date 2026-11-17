@@ -44,6 +44,15 @@ assert.equal(sqlite.prepare("SELECT iglesia FROM uso WHERE instalacion = ?").get
 assert.equal((await avisar({ instalacion: uno, dia: hoy, version: "1.4.0" })).status, 204);
 assert.equal(sqlite.prepare("SELECT iglesia FROM uso WHERE instalacion = ?").get(uno).iglesia, "Iglesia del Centro");
 
+// El resumen lista los nombres, sin dejar que un nombre rompa la página.
+assert.equal((await avisar({ instalacion: otro, dia: hoy, version: "1.4.0", iglesia: "<b>Otra</b>" })).status, 204);
+{
+  const pagina = await (await contador.fetch(new Request("https://api.ecclesiacast.org/v1/resumen?clave=secreto"), env)).text();
+  assert.ok(pagina.includes("Iglesia del Centro"));
+  assert.ok(pagina.includes("&lt;b&gt;Otra&lt;/b&gt;"));
+  assert.ok(!pagina.includes("<b>Otra</b>"));
+}
+
 // Del lugar se guarda sólo el país; sin dato queda vacío.
 assert.equal(sqlite.prepare("SELECT pais FROM uso WHERE instalacion = ?").get(otro).pais, "UY");
 assert.equal(sqlite.prepare("SELECT pais FROM uso WHERE instalacion = ?").get(uno).pais, "");

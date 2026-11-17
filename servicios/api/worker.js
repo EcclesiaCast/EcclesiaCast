@@ -73,6 +73,20 @@ const PAISES_SQL = `
    GROUP BY pais
    ORDER BY instalaciones DESC, pais`;
 
+// Las iglesias que pusieron su nombre (opcional): el último nombre de cada instalación.
+const IGLESIAS_SQL = `
+  SELECT u.iglesia, u.pais, MAX(u.dia) AS ultimo
+    FROM uso u
+   WHERE u.iglesia <> ''
+     AND u.dia = (SELECT MAX(dia) FROM uso WHERE instalacion = u.instalacion AND iglesia <> '')
+   GROUP BY u.instalacion
+   ORDER BY ultimo DESC, u.iglesia`;
+
+/** Lo que escribió una iglesia, listo para ir dentro de la página sin romperla. */
+export function escapar(texto) {
+  return String(texto).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+}
+
 const nombres = new Intl.DisplayNames(["es"], { type: "region" });
 
 /** «Uruguay» para «UY»; «Sin dato» cuando no se supo el país. */
@@ -90,8 +104,10 @@ export async function resumen(db) {
   const nuevas = new Map((await db.prepare(NUEVAS_SQL).all()).results.map((f) => [f.semana, f.nuevas]));
   const versiones = (await db.prepare(VERSIONES_SQL).all()).results;
   const paises = (await db.prepare(PAISES_SQL).all()).results;
+  const iglesias = (await db.prepare(IGLESIAS_SQL).all()).results;
   return {
     paises: paises.map((p) => ({ ...p, nombre: nombreDePais(p.pais) })),
+    iglesias: iglesias.map((i) => ({ ...i, nombre_pais: nombreDePais(i.pais) })),
     semanas: semanas.map((s) => ({ ...s, nuevas: nuevas.get(s.semana) ?? 0 })),
     versiones_ultimas_4_semanas: versiones,
   };
@@ -107,6 +123,9 @@ function paginaResumen(datos) {
   const paises = datos.paises
     .map((p) => `<tr><td>${p.nombre}</td><td>${p.ultimas_4_semanas}</td><td>${p.instalaciones}</td></tr>`)
     .join("");
+  const iglesias = datos.iglesias.length
+    ? datos.iglesias.map((i) => `<tr><td>${escapar(i.iglesia)}</td><td>${i.nombre_pais}</td><td>${i.ultimo}</td></tr>`).join("")
+    : `<tr><td colspan="3">Todavía ninguna puso su nombre.</td></tr>`;
   return `<!doctype html><html lang="es"><meta charset="utf-8"><title>EcclesiaCast · uso</title>
 <style>body{font-family:system-ui,sans-serif;background:#08142A;color:#EAF0F8;padding:24px}
 table{border-collapse:collapse;margin:12px 0 28px}td,th{padding:8px 14px;border-bottom:1px solid #22355A;text-align:right}
@@ -119,7 +138,10 @@ th{color:#F4B942;font-weight:600}td:first-child,th:first-child{text-align:left}h
 <p>Cada instalación cuenta en el último país desde donde avisó.</p>
 <table><tr><th>País</th><th>Últimas 4 semanas</th><th>Desde el principio</th></tr>${paises}</table>
 <h2>Versiones (últimas 4 semanas)</h2>
-<table><tr><th>Versión</th><th>Instalaciones</th></tr>${versiones}</table></html>`;
+<table><tr><th>Versión</th><th>Instalaciones</th></tr>${versiones}</table>
+<h2>Iglesias que pusieron su nombre</h2>
+<p>Es opcional (Ajustes → Actualizaciones). Una iglesia con dos PCs puede aparecer dos veces.</p>
+<table><tr><th>Iglesia</th><th>País</th><th>Último uso</th></tr>${iglesias}</table></html>`;
 }
 
 // ── Fondos de Pixabay ────────────────────────────────────────────────────
