@@ -164,7 +164,7 @@ public sealed partial class MainViewModel
             if (info is not null)
             {
                 BibleBooksAvailable.Add(info);
-                BibleBookTiles.Add(new BibleBookTile(info) { NamesOnly = IsBibleGridNames });
+                BibleBookTiles.Add(new BibleBookTile(info) { Format = BibleGridFormat });
             }
         }
 
@@ -221,7 +221,7 @@ public sealed partial class MainViewModel
 
     // ── Vista en grilla ──────────────────────────────────────────
 
-    private const string BibleGridNamesKey = "bible.grid.names";
+    private const string BibleGridFormatKey = "bible.grid.format";
 
     /// <summary>A grid tile asks to be shown: the book picked (or typed) may be far down.</summary>
     public event EventHandler<BibleBookTile>? BibleBookTileFocusRequested;
@@ -231,26 +231,60 @@ public sealed partial class MainViewModel
     [NotifyPropertyChangedFor(nameof(BibleTileHeight), nameof(BibleTileWidth), nameof(BibleTileAbbrSize))]
     private bool _bibleChaptersOpen = true;
 
-    /// <summary>Books as full names (the first look of the grid) instead of abbreviations.</summary>
+    /// <summary>How the book tiles look: only the abbreviation, abbreviation and name, or the name.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(BibleTileHeight), nameof(BibleTileWidth), nameof(BibleTileAbbrSize))]
-    private bool _isBibleGridNames;
+    [NotifyPropertyChangedFor(nameof(BibleTileHeight), nameof(BibleTileWidth), nameof(BibleTileAbbrSize),
+        nameof(IsBibleGridAbbreviation), nameof(IsBibleGridBoth), nameof(IsBibleGridNames))]
+    private BibleGridFormat _bibleGridFormat = BibleGridFormat.Abbreviation;
 
-    public double BibleTileWidth => IsBibleGridNames ? (BibleChaptersOpen ? 92 : 112) : (BibleChaptersOpen ? 60 : 78);
-
-    public double BibleTileHeight => IsBibleGridNames ? (BibleChaptersOpen ? 34 : 42) : (BibleChaptersOpen ? 46 : 60);
-
-    public double BibleTileAbbrSize => BibleChaptersOpen ? 15 : 19;
-
-    partial void OnIsBibleGridNamesChanged(bool value)
+    public bool IsBibleGridAbbreviation
     {
-        _settings.Set(BibleGridNamesKey, value ? "1" : "0");
-        foreach (var tile in BibleBookTiles)
-            tile.NamesOnly = value;
+        get => BibleGridFormat == BibleGridFormat.Abbreviation;
+        set { if (value) BibleGridFormat = BibleGridFormat.Abbreviation; }
     }
 
-    [RelayCommand]
-    private void ToggleBibleGridNames() => IsBibleGridNames = !IsBibleGridNames;
+    public bool IsBibleGridBoth
+    {
+        get => BibleGridFormat == BibleGridFormat.Both;
+        set { if (value) BibleGridFormat = BibleGridFormat.Both; }
+    }
+
+    public bool IsBibleGridNames
+    {
+        get => BibleGridFormat == BibleGridFormat.Names;
+        set { if (value) BibleGridFormat = BibleGridFormat.Names; }
+    }
+
+    public double BibleTileWidth => BibleGridFormat switch
+    {
+        BibleGridFormat.Abbreviation => BibleChaptersOpen ? 42 : 54,
+        BibleGridFormat.Both => BibleChaptersOpen ? 60 : 78,
+        _ => BibleChaptersOpen ? 92 : 112,
+    };
+
+    public double BibleTileHeight => BibleGridFormat switch
+    {
+        BibleGridFormat.Abbreviation => BibleChaptersOpen ? 30 : 40,
+        BibleGridFormat.Both => BibleChaptersOpen ? 46 : 60,
+        _ => BibleChaptersOpen ? 34 : 42,
+    };
+
+    public double BibleTileAbbrSize => BibleGridFormat switch
+    {
+        BibleGridFormat.Abbreviation => BibleChaptersOpen ? 13 : 16,
+        _ => BibleChaptersOpen ? 15 : 19,
+    };
+
+    partial void OnBibleGridFormatChanged(BibleGridFormat value)
+    {
+        _settings.Set(BibleGridFormatKey, value.ToString());
+        foreach (var tile in BibleBookTiles)
+            tile.Format = value;
+    }
+
+    private void LoadBibleGridFormat() =>
+        BibleGridFormat = Enum.TryParse<BibleGridFormat>(_settings.Get(BibleGridFormatKey), out var format)
+            && Enum.IsDefined(format) ? format : BibleGridFormat.Abbreviation;
 
     [RelayCommand]
     private void ToggleBibleChapters() => BibleChaptersOpen = !BibleChaptersOpen;

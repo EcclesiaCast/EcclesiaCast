@@ -26,8 +26,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 - **Vista en grilla para buscar en la Biblia.** Un botón nuevo en el panel de
   la Biblia, «▦ Grilla» (y «☰ Lista» para volver), muestra los 66 libros como
-  fichas con la abreviatura grande (Gn, Ex, Jn, 1Co…) y el nombre chico,
-  con un color por grupo: Ley, Históricos, Poéticos, Profetas mayores y
+  fichas chicas con la abreviatura (Gn, Ex, Jn, 1Co…; el nombre completo sale
+  al dejar el mouse encima), todos a la vista sin bajar con la barra, y con
+  un color por grupo: Ley, Históricos, Poéticos, Profetas mayores y
   menores, Evangelios, Hechos, Cartas de Pablo, Cartas generales y
   Apocalipsis. Al tocar un libro aparecen sus capítulos y, al tocar un
   capítulo, sus versículos al lado; tocar un versículo lo proyecta, igual que
@@ -36,6 +37,12 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   ancho del panel y, con una Biblia de menos libros (sólo el Nuevo
   Testamento, por ejemplo), sólo aparecen los que tiene. El programa
   recuerda qué vista elegiste; la lista de siempre queda como estaba.
+  La grilla tiene **su propio ancho del panel**: si la agrandás para ver más
+  fichas, las canciones y la Biblia en lista siguen con el ancho que tenían, y
+  al volver a la grilla el panel recupera el suyo. El programa recuerda los dos.
+  Los capítulos y los versículos se reparten el alto con los libros. Al
+  entrar en la grilla, **la playlist se pliega sola** para dejarle lugar, y
+  se abre otra vez al volver a la lista o a las canciones.
 
 - **Los videos de otra forma entran enteros, con los bordes desenfocados.** Un
   video vertical, cuadrado o 4:3 (o cualquier video en un proyector de

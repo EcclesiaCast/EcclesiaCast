@@ -850,6 +850,16 @@ iglesia (11:22–12:53): ningún error ni cierre.
   4. **Agrandar o achicar la interfaz**, para notebooks de pantalla chica.
   5. **Exportar canciones a .txt** (hoy sólo se importan).
   6. **Otros idiomas** de la interfaz; el primero sería el portugués (Brasil).
+- **Una salida como ventana flotante** (pedido de Alexis, 17/11/2026). Hoy la
+  salida para la transmisión es una dirección (Transmisión → «Salida para OBS
+  o vMix…») que se pega en OBS. Sumar la opción de que una salida se abra
+  como **ventana flotante** en la PC: una ventana común, que se puede mover,
+  agrandar y poner en cualquier pantalla, sin ocupar la pantalla entera
+  como el proyector. Sirve, por ejemplo, para capturarla con OBS como ventana,
+  verla en un monitor chico o tenerla al lado del programa. Pensar al
+  hacerlo: qué salida muestra (la del proyector o una de la transmisión:
+  Biblia, canciones, anuncios), si la ventana queda siempre encima, y que
+  recuerde su lugar y su tamaño de un servicio al otro.
 - **NDI para OBS: no sirve para lo de arriba.** NDI manda una imagen (como una
   cámara), con la letra ya dibujada: en OBS no se le puede cambiar la letra ni
   el tamaño. Las salidas separadas ya están como páginas web (`/salida/biblia`,

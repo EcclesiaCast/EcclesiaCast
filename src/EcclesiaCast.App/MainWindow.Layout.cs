@@ -78,6 +78,83 @@ public partial class MainWindow
     // Sizes of the blocks themselves, whichever slot they sit in.
     private double _libraryWidth = 270;
     private double _rightWidth = 320;
+
+    /// <summary>
+    /// The library's width while the Bible shows its grid: the coloured tiles
+    /// want more room than the lists, and widening the column for them must
+    /// not leave the songs (or the Bible as a list) that wide too.
+    /// </summary>
+    private double _bibleGridWidth = DefaultBibleGridWidth;
+
+    /// <summary>Six book tiles a row, with the scroll bar.</summary>
+    private const double DefaultBibleGridWidth = 420;
+
+    /// <summary>Which of the two widths the library column holds right now.</summary>
+    private bool _libraryShowsGrid;
+
+    /// <summary>The library is showing the Bible as a grid (and not the songs, or the Bible as a list).</summary>
+    private bool LibraryWantsGrid =>
+        DataContext is ViewModels.MainViewModel { IsBibleTabActive: true, IsBibleGridView: true };
+
+    /// <summary>
+    /// Switches the library column to the width of what it shows now: the
+    /// width dragged so far is kept for the view being left.
+    /// </summary>
+    private void SyncLibraryWidth()
+    {
+        if (LibraryWantsGrid == _libraryShowsGrid)
+            return;
+
+        CaptureSizes();
+        _libraryShowsGrid = LibraryWantsGrid;
+        FoldPlaylistForGrid();
+        ApplyLayout();
+        SaveLayoutOptions();
+    }
+
+    /// <summary>
+    /// True while the playlist is folded only because the Bible grid needed
+    /// its height: leaving the grid opens it again. The operator folding or
+    /// opening it by hand in the meantime takes that over.
+    /// </summary>
+    private bool _playlistFoldedByGrid;
+
+    /// <summary>
+    /// The grid wants all the height it can get: entering it folds an open
+    /// playlist, and leaving it opens the playlist the grid had folded.
+    /// </summary>
+    private void FoldPlaylistForGrid()
+    {
+        if (_libraryShowsGrid)
+        {
+            if (!_playlistCollapsed)
+            {
+                _playlistCollapsed = true;
+                _playlistFoldedByGrid = true;
+            }
+        }
+        else if (_playlistFoldedByGrid)
+        {
+            _playlistCollapsed = false;
+            _playlistFoldedByGrid = false;
+        }
+    }
+
+    /// <summary>The playlist as the operator left it, without the fold the grid put on it.</summary>
+    private bool PlaylistCollapsedByOperator => _playlistCollapsed && !_playlistFoldedByGrid;
+
+    /// <summary>The width the library has for what it shows: the list or the Bible grid.</summary>
+    private double LibraryWidth
+    {
+        get => _libraryShowsGrid ? _bibleGridWidth : _libraryWidth;
+        set
+        {
+            if (_libraryShowsGrid)
+                _bibleGridWidth = value;
+            else
+                _libraryWidth = value;
+        }
+    }
     private double _playlistHeight = 240;
     private double _mediaHeight = 170;
 
@@ -117,7 +194,13 @@ public partial class MainWindow
     private void ToggleFold(string key)
     {
         var fold = FoldOf(key);
-        ChangeLayout(() => fold.Set(!fold.Get()));
+        ChangeLayout(() =>
+        {
+            fold.Set(!fold.Get());
+            // Folded or opened by hand: from now on it stays as the operator left it.
+            if (key == PlaylistCollapsedKey)
+                _playlistFoldedByGrid = false;
+        });
     }
 
     private void RestoreLayoutOptions()
@@ -129,6 +212,9 @@ public partial class MainWindow
         _outputSplit = _settings?.Get(OutputSplitKey) == "1";
         foreach (var fold in Folds)
             fold.Set(_settings?.Get(fold.Key) == "1");
+        _libraryShowsGrid = LibraryWantsGrid;
+        _playlistFoldedByGrid = false;
+        FoldPlaylistForGrid();
         ApplyLayout();
     }
 
@@ -143,7 +229,12 @@ public partial class MainWindow
         _settings.Set(LiveBottomKey, _liveAtBottom ? "1" : "0");
         _settings.Set(OutputSplitKey, _outputSplit ? "1" : "0");
         foreach (var fold in Folds)
-            _settings.Set(fold.Key, fold.Get() ? "1" : "0");
+        {
+            // The grid's own fold is not saved: the next session opens the
+            // playlist again when it leaves the grid.
+            var folded = fold.Key == PlaylistCollapsedKey ? PlaylistCollapsedByOperator : fold.Get();
+            _settings.Set(fold.Key, folded ? "1" : "0");
+        }
     }
 
     /// <summary>
@@ -157,7 +248,7 @@ public partial class MainWindow
         // A folded block is as big as its header (or its rail): that is not
         // the size the operator chose, so it must not overwrite it.
         if (!_leftRail)
-            _libraryWidth = columns[_mirrored ? 4 : 0].ActualWidth is > 0 and var lw ? lw : _libraryWidth;
+            LibraryWidth = columns[_mirrored ? 4 : 0].ActualWidth is > 0 and var lw ? lw : LibraryWidth;
         _rightWidth = columns[_mirrored ? 0 : 4].ActualWidth is > 0 and var rw ? rw : _rightWidth;
 
         var mediaRow = MainArea.RowDefinitions[_mediaOnTop ? 0 : 2];
@@ -180,7 +271,7 @@ public partial class MainWindow
         var leftColumn = _mirrored ? 4 : 0;
         var rightColumn = _mirrored ? 0 : 4;
         var columns = MainArea.ColumnDefinitions;
-        columns[leftColumn].Width = new GridLength(_leftRail ? RailWidth : _libraryWidth);
+        columns[leftColumn].Width = new GridLength(_leftRail ? RailWidth : LibraryWidth);
         columns[leftColumn].MinWidth = _leftRail ? RailWidth : LibraryMinWidth;
         columns[rightColumn].Width = new GridLength(_rightWidth);
         columns[rightColumn].MinWidth = RightMinWidth;
@@ -356,7 +447,11 @@ public partial class MainWindow
         });
 
     private void LeftRail_Playlist_Click(object sender, RoutedEventArgs e) =>
-        LeaveRail(() => _playlistCollapsed = false);
+        LeaveRail(() =>
+        {
+            _playlistCollapsed = false;
+            _playlistFoldedByGrid = false;
+        });
 
     /// <summary>
     /// Takes the panel off the rail and opens just the part whose icon was
@@ -454,7 +549,10 @@ public partial class MainWindow
         _mirrored = _playlistOnTop = _mediaOnTop = _liveAtBottom = _outputSplit = false;
         foreach (var fold in Folds)
             fold.Set(false);
+        _playlistFoldedByGrid = false;
+        FoldPlaylistForGrid();
         _libraryWidth = 270;
+        _bibleGridWidth = DefaultBibleGridWidth;
         _rightWidth = 320;
         _playlistHeight = 240;
         _mediaHeight = 170;

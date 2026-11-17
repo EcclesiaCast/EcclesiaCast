@@ -29,9 +29,9 @@ public sealed partial class BibleBookTile : ObservableObject
     [ObservableProperty]
     private bool _isSelected;
 
-    /// <summary>Names-only format of the grid: the full name, no abbreviation.</summary>
+    /// <summary>How the tile shows the book (see <see cref="BibleGridFormat"/>).</summary>
     [ObservableProperty]
-    private bool _namesOnly;
+    private BibleGridFormat _format;
 
     private static SolidColorBrush Freeze(SolidColorBrush brush)
     {
@@ -47,4 +47,17 @@ public sealed partial class VerseOption(int number) : ObservableObject
 
     [ObservableProperty]
     private bool _isSelected;
+}
+
+/// <summary>How the book tiles of the Bible grid look.</summary>
+public enum BibleGridFormat
+{
+    /// <summary>Only the abbreviation, small: all the books fit.</summary>
+    Abbreviation,
+
+    /// <summary>The abbreviation big and the name small under it.</summary>
+    Both,
+
+    /// <summary>The full name.</summary>
+    Names,
 }

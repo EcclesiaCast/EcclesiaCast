@@ -20,6 +20,7 @@ namespace EcclesiaCast.App;
 public partial class MainWindow : Window
 {
     private const string LayoutLibraryKey = "layout.library.width";
+    private const string LayoutBibleGridKey = "layout.biblegrid.width";
     private const string LayoutPreviewKey = "layout.preview.width";
     private const string LayoutPlaylistKey = "layout.playlist.height";
     private const string LayoutMediaKey = "layout.media.height";
@@ -55,6 +56,14 @@ public partial class MainWindow : Window
             {
                 if (args.PropertyName == nameof(MainViewModel.StatusAlert))
                     FlashStatusBar();
+            };
+
+            // The Bible grid has a library width of its own; the songs and the
+            // Bible as a list share the other one.
+            vm.PropertyChanged += (_, args) =>
+            {
+                if (args.PropertyName is nameof(MainViewModel.IsBibleTabActive) or nameof(MainViewModel.IsBibleGridView))
+                    SyncLibraryWidth();
             };
             WebPanelView.KeyboardFocusChanged += (_, _) => SyncShortcutsWithWebFocus();
             vm.PropertyChanged += (_, args) =>
@@ -146,6 +155,8 @@ public partial class MainWindow : Window
         // the right keeps the width it had on the left.
         if (ReadDouble(LayoutLibraryKey) is double library)
             _libraryWidth = library;
+        if (ReadDouble(LayoutBibleGridKey) is double bibleGrid)
+            _bibleGridWidth = bibleGrid;
         if (ReadDouble(LayoutPreviewKey) is double preview)
             _rightWidth = preview;
         if (ReadDouble(LayoutPlaylistKey) is double playlist)
@@ -182,6 +193,7 @@ public partial class MainWindow : Window
         {
             CaptureSizes();
             _settings.Set(LayoutLibraryKey, _libraryWidth.ToString("0"));
+            _settings.Set(LayoutBibleGridKey, _bibleGridWidth.ToString("0"));
             _settings.Set(LayoutPreviewKey, _rightWidth.ToString("0"));
             _settings.Set(LayoutPlaylistKey, _playlistHeight.ToString("0"));
             _settings.Set(LayoutMediaKey, _mediaHeight.ToString("0"));

@@ -184,15 +184,17 @@ Cloudflare):
    del color de fondo del logo (antes podía verse el video de fondo pausado).
 7. Tus otros logos tienen que verse como antes.
 
-## 8. Vista en grilla de la Biblia (prueba.9)
+## 8. Vista en grilla de la Biblia (prueba.9 a prueba.11)
 
-Instalador: `dist\EcclesiaCast-1.4.0-prueba.9-setup.exe`. Es lo único nuevo
-respecto de la prueba.8. Si la grilla da problemas, se saca y la 1.4.0 sale
+Instalador: `dist\EcclesiaCast-1.4.0-prueba.11-setup.exe`. La prueba.10 sumó
+el paso 11 (la grilla con su propio ancho del panel) y la prueba.11 los pasos
+12 y 13 (fichas chicas, alto repartido y la playlist que se pliega sola).
+Respecto de la prueba.8, la grilla es lo único nuevo. Si la grilla da problemas, se saca y la 1.4.0 sale
 sin ella (está en commits propios).
 
 1. Pestaña **Biblia**: al lado del 🕘 hay un botón **«▦ Grilla»**. Tocalo.
-2. Aparecen los **libros como fichas**, con la abreviatura grande y el nombre
-   chico. Cada grupo tiene su color (Ley, Históricos, Poéticos, Profetas,
+2. Aparecen los **libros como fichas** chicas, sólo con la abreviatura (el
+   nombre completo sale al dejar el mouse encima). Cada grupo tiene su color (Ley, Históricos, Poéticos, Profetas,
    Evangelios, Hechos, Cartas de Pablo, Cartas generales, Apocalipsis). El
    botón pasó a decir **«☰ Lista»**.
 3. Tocá **Juan**: la ficha queda marcada y abajo aparecen sus **capítulos** y,
@@ -211,6 +213,19 @@ sin ella (está en commits propios).
    con `?` y el historial 🕘 tienen que funcionar en las dos vistas.
 10. Mirá que, al cambiar de Biblia con la grilla abierta, las fichas
     se actualicen.
+11. **Dos anchos por separado.** Con la grilla abierta, agrandá el panel de
+    la izquierda. Pasá a **Canciones**: el panel vuelve al ancho de antes.
+    Achicalo un poco y volvé a **Biblia**: recupera el ancho grande de la
+    grilla. Tocá «☰ Lista»: queda con el ancho de las canciones. Cerrá y
+    abrí el programa: cada vista tiene que conservar su ancho.
+12. **Todo a la vista.** Con la grilla y el panel en su ancho de entrada, los
+    66 libros tienen que verse enteros, sin barra. Elegí **Jeremías**: los
+    capítulos y los versículos se reparten el alto con los libros, de a 6 por
+    fila, y se ven los 52 capítulos (con la ventana maximizada).
+13. **La playlist se pliega sola.** Con la playlist abierta, pasá a la
+    grilla: la playlist queda plegada en su título. Volvé a «☰ Lista» o a
+    **Canciones**: se abre otra vez. Si en la grilla la abrís a mano, queda
+    abierta; si la tenías plegada desde antes, sigue plegada al salir.
 
 Lo que **no** tiene a propósito: favoritos de versículos.
 
