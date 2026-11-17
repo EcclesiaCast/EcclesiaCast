@@ -532,6 +532,8 @@ public partial class OutputWindow : Window
         Video.PauseForHiddenOutput();
         LogoVideo.PauseForHiddenOutput();
         FillVideo.PauseForHiddenOutput();
+        // The LIVE panel shows the logo's poster, still, while the output is off.
+        LogoFrameChanged?.Invoke(this, null);
     }
 
     public void ResumeAfterHiddenOutput()
@@ -540,6 +542,8 @@ public partial class OutputWindow : Window
         Video.ResumeAfterHiddenOutput();
         LogoVideo.ResumeAfterHiddenOutput();
         FillVideo.ResumeAfterHiddenOutput();
+        if (_logoVideoId is not null)
+            LogoFrameChanged?.Invoke(this, Projected.LogoVideoFrame);
     }
 
     /// <summary>Blurs the background layer (video, YouTube or image), 0–100.</summary>
