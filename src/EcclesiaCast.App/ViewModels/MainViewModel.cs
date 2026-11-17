@@ -425,6 +425,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         RefreshDisplays();
         LoadSongs();
         IsBibleVersionsExpanded = _settings.Get(BibleVersionsExpandedKey) == "1";
+        IsBibleGridView = _settings.Get(BibleGridViewKey) == "1";
 
         // The Bibles the installer left, before anything reads the library:
         // the window is not up yet, so there is no one to keep waiting.

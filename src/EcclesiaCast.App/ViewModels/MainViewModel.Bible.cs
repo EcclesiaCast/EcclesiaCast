@@ -148,6 +148,7 @@ public sealed partial class MainViewModel
     {
         var keepNumber = SelectedBibleBook?.Number;
         BibleBooksAvailable.Clear();
+        BibleBookTiles.Clear();
         SelectedBibleBook = null;
 
         if (PrimaryVersion is null)
@@ -160,7 +161,10 @@ public sealed partial class MainViewModel
         {
             var info = BibleBookCatalog.FindByNumber(number);
             if (info is not null)
+            {
                 BibleBooksAvailable.Add(info);
+                BibleBookTiles.Add(new BibleBookTile(info));
+            }
         }
 
         if (keepNumber is int n)
@@ -172,7 +176,10 @@ public sealed partial class MainViewModel
     partial void OnSelectedBibleBookChanged(BibleBookInfo? value)
     {
         BibleChapters.Clear();
+        BibleVerses.Clear();
         ChaptersTitle = value?.Name ?? string.Empty;
+        foreach (var tile in BibleBookTiles)
+            tile.IsSelected = tile.Number == value?.Number;
 
         if (value is not null && PrimaryVersion is not null)
         {
@@ -185,6 +192,66 @@ public sealed partial class MainViewModel
 
     [RelayCommand]
     private void BackToBooks() => SelectedBibleBook = null;
+
+    // ── Vista en grilla ──────────────────────────────────────────
+
+    private const string BibleGridViewKey = "bible.view.grid";
+
+    /// <summary>The books of the primary version as coloured tiles (grid view).</summary>
+    public ObservableCollection<BibleBookTile> BibleBookTiles { get; } = [];
+
+    /// <summary>Verses of the chapter on screen, as numbered buttons (grid view).</summary>
+    public ObservableCollection<VerseOption> BibleVerses { get; } = [];
+
+    /// <summary>The Bible tab shows books, chapters and verses as grids instead of the list.</summary>
+    [ObservableProperty]
+    private bool _isBibleGridView;
+
+    /// <summary>The grid is what is on screen right now (and no text search is covering it).</summary>
+    [ObservableProperty]
+    private bool _showBibleGrid;
+
+    partial void OnIsBibleGridViewChanged(bool value)
+    {
+        _settings.Set(BibleGridViewKey, value ? "1" : "0");
+        UpdateBibleViewState();
+    }
+
+    [RelayCommand]
+    private void ToggleBibleView() => IsBibleGridView = !IsBibleGridView;
+
+    [RelayCommand]
+    private void SelectBibleBookTile(BibleBookTile? tile)
+    {
+        if (tile is null)
+            return;
+
+        // Browsing replaces whatever was typed, as with the chapter buttons.
+        if (!string.IsNullOrEmpty(BibleQuery))
+            BibleQuery = string.Empty;
+        SelectedBibleBook = tile.Info;
+    }
+
+    /// <summary>A verse button does what a click on that verse's slide does: it projects it.</summary>
+    [RelayCommand]
+    private void SelectVerse(VerseOption? option)
+    {
+        if (option is null || _currentPassage is null)
+            return;
+
+        var index = FindVerseSlide(_currentPassage.Chapter, option.Number);
+        if (index < 0)
+            return;
+
+        MarkVerseSelected(Slides[index].Verses);
+        GoLiveSlide(index);
+    }
+
+    private void MarkVerseSelected(VerseGroup? group)
+    {
+        foreach (var option in BibleVerses)
+            option.IsSelected = group is not null && group.Contains(option.Number);
+    }
 
     [RelayCommand]
     private void SelectChapter(ChapterOption? option)
@@ -208,8 +275,9 @@ public sealed partial class MainViewModel
     private void UpdateBibleViewState()
     {
         ShowBibleResults = BibleSearchResults.Count > 0;
-        ShowChaptersView = !ShowBibleResults && SelectedBibleBook is not null;
-        ShowBooksList = !ShowBibleResults && !ShowChaptersView;
+        ShowBibleGrid = IsBibleGridView && !ShowBibleResults;
+        ShowChaptersView = !ShowBibleResults && !IsBibleGridView && SelectedBibleBook is not null;
+        ShowBooksList = !ShowBibleResults && !IsBibleGridView && !ShowChaptersView;
     }
 
     partial void OnBibleQueryChanged(string value)
@@ -475,7 +543,12 @@ public sealed partial class MainViewModel
         }
 
         if (SelectedBibleBook?.Number == reference.BookNumber)
+        {
             MarkChapterSelected(reference.Chapter);
+            BibleVerses.Clear();
+            foreach (var number in verses.Where(v => v.Chapter == reference.Chapter).Select(v => v.Verse).Distinct().Order())
+                BibleVerses.Add(new VerseOption(number));
+        }
 
         PreviewSlide = Slides.FirstOrDefault(s => s.JumpTarget is null)?.Slide;
         BibleStatusText = $"{verses.Count} versículo(s). Clic en una diapositiva para proyectar.";
@@ -546,6 +619,7 @@ public sealed partial class MainViewModel
         PreviewSlideIndex = index;
         if (index >= 0 && index < Slides.Count)
             PreviewSlide = Slides[index].Slide;
+        MarkVerseSelected(index >= 0 && index < Slides.Count ? Slides[index].Verses : null);
     }
 
     /// <summary>Projects the verse a typed reference points to (Enter in the search box).</summary>

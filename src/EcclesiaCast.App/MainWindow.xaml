@@ -925,6 +925,22 @@
                                         Click="BibleHistoryButton_Click"
                                         AutomationProperties.Name="Historial de versículos"
                                         ToolTip="Historial de los versículos que proyectaste: clic carga y marca el versículo, doble clic lo proyecta. También: flecha ↓ en la caja vacía."/>
+                                <Button x:Name="BibleViewToggleButton" DockPanel.Dock="Right"
+                                        FontSize="11" Padding="8,6" Margin="6,0,0,0"
+                                        Command="{Binding ToggleBibleViewCommand}"
+                                        AutomationProperties.Name="Cambiar la vista de la Biblia"
+                                        ToolTip="Vista en grilla: los libros como fichas de colores, con los capítulos y versículos al lado. Vista en lista: la de siempre. Escribir una cita («jn 3 16») + Enter funciona en las dos.">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                            <Setter Property="Content" Value="▦ Grilla"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsBibleGridView}" Value="True">
+                                                    <Setter Property="Content" Value="☰ Lista"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
                                 <TextBox x:Name="BibleQueryBox"
                                          Padding="8,6"
                                          PreviewKeyDown="BibleQueryBox_PreviewKeyDown"
@@ -1114,6 +1130,159 @@
                                             </ItemsControl>
                                         </ScrollViewer>
                                     </DockPanel>
+
+                                    <!-- Vista en grilla: los libros como fichas de colores por grupo,
+                                         y al pie los capítulos y los versículos del libro elegido -->
+                                    <Grid x:Name="BibleGridHost"
+                                          Visibility="{Binding ShowBibleGrid, Converter={StaticResource BoolToVis}}">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto"
+                                                      HorizontalScrollBarVisibility="Disabled">
+                                            <ItemsControl ItemsSource="{Binding BibleBookTiles}" Margin="8,0,4,4">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <WrapPanel/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Button Width="60" Height="46" Margin="2"
+                                                                Command="{Binding DataContext.SelectBibleBookTileCommand, ElementName=BibleGridHost}"
+                                                                CommandParameter="{Binding}"
+                                                                AutomationProperties.Name="{Binding Name}"
+                                                                ToolTip="{Binding GroupName}">
+                                                            <Button.Template>
+                                                                <ControlTemplate TargetType="Button">
+                                                                    <Border x:Name="bd" Background="{Binding FillBrush}"
+                                                                            BorderBrush="{Binding AccentBrush}"
+                                                                            BorderThickness="1" CornerRadius="5">
+                                                                        <StackPanel VerticalAlignment="Center">
+                                                                            <TextBlock x:Name="abbr" Text="{Binding Abbreviation}"
+                                                                                       FontSize="15" FontWeight="Bold"
+                                                                                       Foreground="{Binding AccentBrush}"
+                                                                                       HorizontalAlignment="Center"/>
+                                                                            <TextBlock x:Name="full" Text="{Binding Name}"
+                                                                                       FontSize="8.5"
+                                                                                       Foreground="{StaticResource MutedBrush}"
+                                                                                       HorizontalAlignment="Center"
+                                                                                       TextTrimming="CharacterEllipsis"
+                                                                                       Margin="3,0"/>
+                                                                        </StackPanel>
+                                                                    </Border>
+                                                                    <ControlTemplate.Triggers>
+                                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                                            <Setter TargetName="bd" Property="BorderThickness" Value="2"/>
+                                                                        </Trigger>
+                                                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                            <Setter TargetName="bd" Property="Background" Value="{Binding AccentBrush}"/>
+                                                                            <Setter TargetName="abbr" Property="Foreground" Value="{StaticResource BgBrush}"/>
+                                                                            <Setter TargetName="full" Property="Foreground" Value="{StaticResource BgBrush}"/>
+                                                                        </DataTrigger>
+                                                                    </ControlTemplate.Triggers>
+                                                                </ControlTemplate>
+                                                            </Button.Template>
+                                                        </Button>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+
+                                        <!-- Capítulos y versículos, uno al lado del otro -->
+                                        <Grid Grid.Row="1" Height="170" Margin="8,4,8,0">
+                                            <Grid.Style>
+                                                <Style TargetType="Grid">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding SelectedBibleBook}" Value="{x:Null}">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Grid.Style>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="6"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <DockPanel Grid.Column="0">
+                                                <TextBlock DockPanel.Dock="Top" Text="{Binding ChaptersTitle}"
+                                                           FontSize="11" FontWeight="SemiBold" Foreground="White"
+                                                           Margin="2,0,0,3" TextTrimming="CharacterEllipsis"/>
+                                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                                    <ItemsControl ItemsSource="{Binding BibleChapters}">
+                                                        <ItemsControl.ItemsPanel>
+                                                            <ItemsPanelTemplate>
+                                                                <WrapPanel/>
+                                                            </ItemsPanelTemplate>
+                                                        </ItemsControl.ItemsPanel>
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Button Content="{Binding Number}"
+                                                                        Width="34" Height="28" Margin="1.5"
+                                                                        Padding="0" FontSize="12"
+                                                                        Command="{Binding DataContext.SelectChapterCommand, ElementName=BibleGridHost}"
+                                                                        CommandParameter="{Binding}">
+                                                                    <Button.Style>
+                                                                        <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                                                            <Style.Triggers>
+                                                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                                    <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                                                                    <Setter Property="BorderThickness" Value="0"/>
+                                                                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                                                                </DataTrigger>
+                                                                            </Style.Triggers>
+                                                                        </Style>
+                                                                    </Button.Style>
+                                                                </Button>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </ScrollViewer>
+                                            </DockPanel>
+
+                                            <DockPanel Grid.Column="2">
+                                                <TextBlock DockPanel.Dock="Top" Text="Versículos"
+                                                           FontSize="11" FontWeight="SemiBold" Foreground="White"
+                                                           Margin="2,0,0,3"/>
+                                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                                    <ItemsControl ItemsSource="{Binding BibleVerses}">
+                                                        <ItemsControl.ItemsPanel>
+                                                            <ItemsPanelTemplate>
+                                                                <WrapPanel/>
+                                                            </ItemsPanelTemplate>
+                                                        </ItemsControl.ItemsPanel>
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Button Content="{Binding Number}"
+                                                                        Width="34" Height="28" Margin="1.5"
+                                                                        Padding="0" FontSize="12"
+                                                                        Command="{Binding DataContext.SelectVerseCommand, ElementName=BibleGridHost}"
+                                                                        CommandParameter="{Binding}"
+                                                                        ToolTip="Proyecta este versículo">
+                                                                    <Button.Style>
+                                                                        <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                                                            <Style.Triggers>
+                                                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                                    <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                                                                    <Setter Property="BorderThickness" Value="0"/>
+                                                                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                                                                </DataTrigger>
+                                                                            </Style.Triggers>
+                                                                        </Style>
+                                                                    </Button.Style>
+                                                                </Button>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </ScrollViewer>
+                                            </DockPanel>
+                                        </Grid>
+                                    </Grid>
 
                                     <!-- Resultados de búsqueda por texto -->
                                     <ListBox x:Name="BibleResultsList"
