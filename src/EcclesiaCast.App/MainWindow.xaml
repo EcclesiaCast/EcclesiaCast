@@ -1135,11 +1135,28 @@
                                          y al pie los capítulos y los versículos del libro elegido -->
                                     <Grid x:Name="BibleGridHost"
                                           Visibility="{Binding ShowBibleGrid, Converter={StaticResource BoolToVis}}">
+                                        <!-- Los libros y, con un libro elegido, sus capítulos y versículos:
+                                             se reparten el alto en lugar de que el pie tenga uno fijo -->
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="*"/>
-                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition>
+                                                <RowDefinition.Style>
+                                                    <Style TargetType="RowDefinition">
+                                                        <Setter Property="Height" Value="*"/>
+                                                        <Setter Property="MinHeight" Value="120"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding SelectedBibleBook}" Value="{x:Null}">
+                                                                <Setter Property="Height" Value="0"/>
+                                                                <Setter Property="MinHeight" Value="0"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </RowDefinition.Style>
+                                            </RowDefinition>
                                         </Grid.RowDefinitions>
 
+                                        <!-- Fichas chicas, sólo con la abreviatura: así entran los 66
+                                             libros sin barra. El nombre va en el globo del mouse. -->
                                         <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto"
                                                       HorizontalScrollBarVisibility="Disabled">
                                             <ItemsControl ItemsSource="{Binding BibleBookTiles}" Margin="8,0,4,4">
@@ -1150,28 +1167,27 @@
                                                 </ItemsControl.ItemsPanel>
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
-                                                        <Button Width="60" Height="46" Margin="2"
+                                                        <Button Width="42" Height="30" Margin="1.5"
                                                                 Command="{Binding DataContext.SelectBibleBookTileCommand, ElementName=BibleGridHost}"
                                                                 CommandParameter="{Binding}"
-                                                                AutomationProperties.Name="{Binding Name}"
-                                                                ToolTip="{Binding GroupName}">
+                                                                AutomationProperties.Name="{Binding Name}">
+                                                            <Button.ToolTip>
+                                                                <TextBlock>
+                                                                    <Run Text="{Binding Name, Mode=OneWay}" FontWeight="SemiBold"/>
+                                                                    <Run Text=" · "/>
+                                                                    <Run Text="{Binding GroupName, Mode=OneWay}"/>
+                                                                </TextBlock>
+                                                            </Button.ToolTip>
                                                             <Button.Template>
                                                                 <ControlTemplate TargetType="Button">
                                                                     <Border x:Name="bd" Background="{Binding FillBrush}"
                                                                             BorderBrush="{Binding AccentBrush}"
-                                                                            BorderThickness="1" CornerRadius="5">
-                                                                        <StackPanel VerticalAlignment="Center">
-                                                                            <TextBlock x:Name="abbr" Text="{Binding Abbreviation}"
-                                                                                       FontSize="15" FontWeight="Bold"
-                                                                                       Foreground="{Binding AccentBrush}"
-                                                                                       HorizontalAlignment="Center"/>
-                                                                            <TextBlock x:Name="full" Text="{Binding Name}"
-                                                                                       FontSize="8.5"
-                                                                                       Foreground="{StaticResource MutedBrush}"
-                                                                                       HorizontalAlignment="Center"
-                                                                                       TextTrimming="CharacterEllipsis"
-                                                                                       Margin="3,0"/>
-                                                                        </StackPanel>
+                                                                            BorderThickness="1" CornerRadius="4">
+                                                                        <TextBlock x:Name="abbr" Text="{Binding Abbreviation}"
+                                                                                   FontSize="13" FontWeight="Bold"
+                                                                                   Foreground="{Binding AccentBrush}"
+                                                                                   HorizontalAlignment="Center"
+                                                                                   VerticalAlignment="Center"/>
                                                                     </Border>
                                                                     <ControlTemplate.Triggers>
                                                                         <Trigger Property="IsMouseOver" Value="True">
@@ -1180,7 +1196,6 @@
                                                                         <DataTrigger Binding="{Binding IsSelected}" Value="True">
                                                                             <Setter TargetName="bd" Property="Background" Value="{Binding AccentBrush}"/>
                                                                             <Setter TargetName="abbr" Property="Foreground" Value="{StaticResource BgBrush}"/>
-                                                                            <Setter TargetName="full" Property="Foreground" Value="{StaticResource BgBrush}"/>
                                                                         </DataTrigger>
                                                                     </ControlTemplate.Triggers>
                                                                 </ControlTemplate>
@@ -1192,7 +1207,7 @@
                                         </ScrollViewer>
 
                                         <!-- Capítulos y versículos, uno al lado del otro -->
-                                        <Grid Grid.Row="1" Height="170" Margin="8,4,8,0">
+                                        <Grid Grid.Row="1" Margin="8,4,8,0">
                                             <Grid.Style>
                                                 <Style TargetType="Grid">
                                                     <Setter Property="Visibility" Value="Visible"/>
@@ -1223,8 +1238,8 @@
                                                         <ItemsControl.ItemTemplate>
                                                             <DataTemplate>
                                                                 <Button Content="{Binding Number}"
-                                                                        Width="34" Height="28" Margin="1.5"
-                                                                        Padding="0" FontSize="12"
+                                                                        Width="31" Height="26" Margin="1"
+                                                                        Padding="0" FontSize="11"
                                                                         Command="{Binding DataContext.SelectChapterCommand, ElementName=BibleGridHost}"
                                                                         CommandParameter="{Binding}">
                                                                     <Button.Style>
@@ -1259,8 +1274,8 @@
                                                         <ItemsControl.ItemTemplate>
                                                             <DataTemplate>
                                                                 <Button Content="{Binding Number}"
-                                                                        Width="34" Height="28" Margin="1.5"
-                                                                        Padding="0" FontSize="12"
+                                                                        Width="31" Height="26" Margin="1"
+                                                                        Padding="0" FontSize="11"
                                                                         Command="{Binding DataContext.SelectVerseCommand, ElementName=BibleGridHost}"
                                                                         CommandParameter="{Binding}"
                                                                         ToolTip="Proyecta este versículo">
