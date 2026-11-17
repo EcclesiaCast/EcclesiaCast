@@ -65,7 +65,7 @@
         <p class="descarga-datos">Versión <span data-release="version">1.0.0</span> · <span data-release="size">142 MB</span> · Windows 10 y 11</p>
       </div>
       <p class="beta">Hoy se usa en la Iglesia Pan de Vida (Iglesia de Dios Misiones Mundiales), en Montevideo, Uruguay.</p>
-      <p class="beta"><a href="#instalar">¿Windows te dice que no es seguro? Te contamos por qué →</a></p>
+      <p class="beta"><a href="#instalar">¿Edge o Windows no te dejan instalarlo? Te mostramos cómo →</a></p>
     </div>
 
     <div class="proyeccion" aria-roledescription="carrusel" aria-label="Lo que se ve en la pantalla de la iglesia">
@@ -248,13 +248,21 @@
   <div class="angosto">
     <h2 id="instalar-titulo">Cómo instalarlo</h2>
     <div class="verdad revelar">
-      <p><strong>Antes, la verdad:</strong> el instalador <strong>todavía no está firmado digitalmente</strong>. La firma es un certificado que le dice a Windows quién hizo el programa; cuesta dinero y todavía no la tenemos. Sin ella, Windows muestra un aviso la primera vez: no dice que el programa haga daño, dice que todavía no sabe quién lo hizo.</p>
+      <p><strong>Antes, la verdad:</strong> el instalador <strong>todavía no está firmado digitalmente</strong>. La firma es un certificado que le dice a Windows quién hizo el programa; cuesta dinero y todavía no la tenemos. Sin ella, el navegador y Windows muestran un aviso la primera vez: no dicen que el programa haga daño, dicen que todavía no saben quién lo hizo.</p>
     </div>
 
     <ol class="pasos">
       <li class="revelar">
         <h3>Descargalo</h3>
         <p>Con el botón de esta página. Bajá siempre de acá o de <a href="https://github.com/EcclesiaCast/EcclesiaCast/releases">la página de versiones en GitHub</a>; de ningún otro lado.</p>
+      </li>
+      <li class="revelar" id="edge">
+        <h3>Si el navegador frena la descarga, tocá «Conservar»</h3>
+        <p>Edge puede avisar que el archivo «no se descarga habitualmente», porque todavía lo bajó poca gente. El archivo está bien:</p>
+        <figure class="aviso">
+          <img src="img/aviso-edge.png" width="362" height="138" loading="lazy" alt="Panel de descargas de Edge: «EcclesiaCast-setup.exe no se descarga habitualmente. Asegúrate de que confías en el archivo antes de abrirlo»">
+        </figure>
+        <p>Apretá <strong>Ctrl + J</strong> para ver las descargas, pasá el mouse sobre el archivo y tocá los tres puntitos <strong>(…)</strong> → <strong>«Conservar»</strong>. Si aparece otro aviso, tocá <strong>«Mostrar más»</strong> → <strong>«Conservar de todas formas»</strong>. En Chrome es parecido: en la descarga, <strong>«Conservar»</strong> o <strong>«Descargar de todas formas»</strong>.</p>
       </li>
       <li class="revelar">
         <h3>Abrí el archivo</h3>
@@ -399,6 +407,7 @@
 </footer>
 
 <script src="sitio.js" defer></script>
+<script src="descargar.js" defer></script>
 <script data-goatcounter="https://ecclesiacast.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>
