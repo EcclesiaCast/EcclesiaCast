@@ -272,7 +272,7 @@ pasan las 1.440 pruebas, pero ninguna ventana se usó con el mouse.
     queda deshabilitada.
 
 ### Grilla de la Biblia
-14. Arriba de las fichas hay dos botones: **Aa Nombres** (fichas con el nombre
+14. (Cambiado en la prueba.13, ver la sección 10.) Arriba de las fichas hay botones para la forma de las fichas (el nombre
     completo; vuelve con «Gn Abreviaturas») y **▾ Ocultar capítulos**.
 15. Con los capítulos ocultos los libros se ven **más grandes** y entran todos.
     Elegir un libro vuelve a abrir los capítulos.
@@ -290,6 +290,38 @@ pasan las 1.440 pruebas, pero ninguna ventana se usó con el mouse.
     (Hasta publicar el servicio nuevo no cuenta nada, y no tiene que dar error.)
     **Antes de publicar el servicio:** agregar la columna con el `ALTER TABLE` que
     está al final de `servicios/api/schema.sql`.
+
+## 10. Lo nuevo de la prueba.13 (17/11/2026)
+
+Instalador: `dist\EcclesiaCast-1.4.0-prueba.13-setup.exe`. Trae todo lo de la
+prueba.11 (el ancho propio de la grilla, la grilla chica, la playlist que se
+pliega) **y** lo de la prueba.12, más los arreglos de lo que probaste. Nada se
+abrió con el programa.
+
+1. **Ancho del panel otra vez independiente:** en grilla dejá el panel de un
+   ancho y en lista (o Canciones) de otro. Cambiá de vista: cada una vuelve a su
+   ancho, también al cerrar y abrir.
+2. **Tres formas de ficha:** arriba de la grilla, «Gn» (sólo la abreviatura,
+   como en la prueba.11), «Gn + nombre» (la de tu captura) y «Nombre». Las tres
+   con «Ocultar capítulos» abierto y cerrado. Se acuerda la que elegiste.
+3. **Volumen «Salida»:** movelo con un video andando y con música: tiene que ir
+   **suave**, como el de Windows (ahora es el volumen del programa en el
+   mezclador de Windows: lo vas a ver moverse ahí también).
+4. **Volumen «Video»:** también va mejor, pero cambia unas pocas veces por
+   segundo (es un ecualizador del video, no puede ser tan fino). Decime si igual
+   se entrecorta.
+5. **Logo de video, salida apagada:** con el logo puesto, Esc. En el LIVE el logo
+   tiene que quedar **quieto**. Al volver a prender, se vuelve a mover.
+6. **Gotero:** en cualquier paleta de colores, «💧 Gotero». La ventana se corre,
+   aparece una cruz con un cuadradito que muestra el color; clic lo toma, Esc
+   cancela. Probalo sobre el LIVE, sobre una imagen y en la otra pantalla.
+7. **Nombre de la iglesia:** el recuadro tiene que verse entero (si no entra,
+   la sección se desplaza con la ruedita). Escribí el nombre y tocá «Cerrar»
+   enseguida: tiene que quedar guardado igual.
+
+**Para ver los nombres que llegan:** volvé a pegar el `worker.js` de esta rama
+en Cloudflare (Workers → `ecclesiacast-api` → Edit code → Deploy). El resumen
+ahora tiene al final «Iglesias que pusieron su nombre».
 
 ## Si algo falla
 
