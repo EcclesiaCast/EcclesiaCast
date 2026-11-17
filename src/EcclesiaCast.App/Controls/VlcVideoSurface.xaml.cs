@@ -750,6 +750,12 @@ public partial class VlcVideoSurface : UserControl
             MediaFraming.SetBlur(Hold, radius);
     }
 
+    private void OnMasterChanged(object? sender, EventArgs e)
+    {
+        if (_player is { } player)
+            PlayerSound.KeepSessionFull(player);
+    }
+
     private MediaPlayer? EnsurePlayer(LibVLC engine)
     {
         if (_player is not null)
@@ -782,6 +788,7 @@ public partial class VlcVideoSurface : UserControl
 
             _player = player;
             _appliedVolume = -1;
+            PlayerSound.MasterChanged += OnMasterChanged;
             return player;
         }
         catch (Exception ex)
@@ -794,6 +801,7 @@ public partial class VlcVideoSurface : UserControl
     private void Dispose()
     {
         AudioEndpointWatcher.OutputChanged -= OnAudioOutputChanged;
+        PlayerSound.MasterChanged -= OnMasterChanged;
         _holdTimer.Stop();
         ClearHold();
 

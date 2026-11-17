@@ -26,8 +26,12 @@ public static class PlayerSound
         {
             if (player.Mute)
                 player.Mute = false;
-            if (player.Volume != 100)
-                player.Volume = 100;
+            // The shared session carries the general volume of the program
+            // (the «Salida» control): Windows moves it smoothly, with no
+            // restart of the sound, unlike an equalizer.
+            var master = Math.Clamp(Master, 0, 100);
+            if (player.Volume != master)
+                player.Volume = master;
         }
         catch (Exception ex)
         {
@@ -35,20 +39,35 @@ public static class PlayerSound
         }
     }
 
+    private static int _master = 100;
+
     /// <summary>
-    /// One volume for everything the program plays (0–100), applied on top of
-    /// each player's own. Set from the LIVE controls.
+    /// One volume for everything the program plays (0–100), set from the LIVE
+    /// controls. It is the volume of the program's Windows audio session, so
+    /// every player follows it at once and smoothly.
     /// </summary>
-    public static int Master { get; set; } = 100;
+    public static int Master
+    {
+        get => _master;
+        set
+        {
+            value = Math.Clamp(value, 0, 100);
+            if (value == _master)
+                return;
+            _master = value;
+            MasterChanged?.Invoke(null, EventArgs.Empty);
+        }
+    }
 
-    /// <summary>The player's own volume with the general one applied.</summary>
-    public static int Effective(int volume) =>
-        Math.Clamp(volume, 0, 100) * Math.Clamp(Master, 0, 100) / 100;
+    /// <summary>Raised when <see cref="Master"/> changes: each live player applies it.</summary>
+    public static event EventHandler? MasterChanged;
 
-    /// <summary>Turns this player alone down to <paramref name="volume"/> (0–100), after the general volume.</summary>
+    /// <summary>The player's own volume (0–100).</summary>
+    public static int Effective(int volume) => Math.Clamp(volume, 0, 100);
+
+    /// <summary>Turns this player alone down to <paramref name="volume"/> (0–100).</summary>
     public static void SetVolume(MediaPlayer player, int volume)
     {
-        volume = Effective(volume);
         try
         {
             if (SoundLevel.Split(volume) is not { } level)

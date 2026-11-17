@@ -203,9 +203,16 @@ public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
         {
             _listening = true;
             AudioEndpointWatcher.OutputChanged += OnOutputChanged;
+            PlayerSound.MasterChanged += OnMasterChanged;
         }
 
         return player;
+    }
+
+    private void OnMasterChanged(object? sender, EventArgs e)
+    {
+        if (_player is { } player)
+            PlayerSound.KeepSessionFull(player);
     }
 
     private static void OnUiThread(Action action)
@@ -219,6 +226,7 @@ public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
     public void Dispose()
     {
         AudioEndpointWatcher.OutputChanged -= OnOutputChanged;
+        PlayerSound.MasterChanged -= OnMasterChanged;
         _listening = false;
         var player = _player;
         _player = null;

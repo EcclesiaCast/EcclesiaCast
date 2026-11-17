@@ -24,19 +24,21 @@ public sealed partial class MainViewModel
 
     partial void OnOutputVolumeChanged(int value)
     {
-        value = Math.Clamp(value, 0, 100);
-        PlayerSound.Master = value;
+        // Applied at once to every player (it is the program's Windows audio
+        // session, which moves smoothly); only saving waits for the slider to rest.
+        PlayerSound.Master = Math.Clamp(value, 0, 100);
         if (_startingUp)
             return;
 
-        _settings.Set(OutputVolumeKey, value.ToString());
-
-        // Re-apply to what is already playing.
-        _audioPlayer.Volume = AudioVolume;
-        if (_presentation.Background is { Type: MediaType.Video, Id: > 0 } background
-            && _allMedia.FirstOrDefault(m => m.Id == background.Id) is { } original)
-            _presentation.RefreshBackground(Resolved(original).Clone(), ResolveFill(original));
+        _outputVolumeSave ??= NewRestTimer(TimeSpan.FromMilliseconds(500), () =>
+            _settings.Set(OutputVolumeKey, OutputVolume.ToString()));
+        Restart(_outputVolumeSave);
     }
+
+    private System.Windows.Threading.DispatcherTimer? _outputVolumeSave;
+    private System.Windows.Threading.DispatcherTimer? _backgroundVolumeApply;
+    private System.Windows.Threading.DispatcherTimer? _backgroundVolumeSave;
+    private MediaItem? _backgroundVolumeItem;
 
     partial void OnBackgroundVolumeChanged(int value)
     {
@@ -47,13 +49,57 @@ public sealed partial class MainViewModel
             || _allMedia.FirstOrDefault(m => m.Id == background.Id) is not { } original)
             return;
 
+        var wasSilent = original.Muted || original.Volume <= 0;
         original.Volume = Math.Clamp(value, 0, 100);
         // Raising the volume of a silenced video is asking for its sound.
         if (original.Volume > 0 && original.Muted)
             original.Muted = false;
-        _media.Update(original);
-        _presentation.RefreshBackground(Resolved(original).Clone(), ResolveFill(original));
+        _backgroundVolumeItem = original;
+
+        // A video's own volume is an equalizer of its player: changing it on
+        // every step of the slider made the sound stutter. It is applied a few
+        // times a second while the slider moves (at once when the video goes
+        // from silent to sounding or back), and saved when it rests.
+        var nowSilent = original.Muted || original.Volume <= 0;
+        _backgroundVolumeApply ??= NewRestTimer(TimeSpan.FromMilliseconds(150), ApplyBackgroundVolume);
+        if (wasSilent != nowSilent)
+            ApplyBackgroundVolume();
+        else if (!_backgroundVolumeApply.IsEnabled)
+            _backgroundVolumeApply.Start();
+
+        _backgroundVolumeSave ??= NewRestTimer(TimeSpan.FromMilliseconds(600), () =>
+        {
+            if (_backgroundVolumeItem is { } item)
+                _media.Update(item);
+        });
+        Restart(_backgroundVolumeSave);
+    }
+
+    private void ApplyBackgroundVolume()
+    {
+        _backgroundVolumeApply?.Stop();
+        if (_backgroundVolumeItem is not { } item || _presentation.Background?.Id != item.Id)
+            return;
+
+        _presentation.RefreshBackground(Resolved(item).Clone(), ResolveFill(item));
         UpdateBackgroundSoundFlags();
+    }
+
+    private static System.Windows.Threading.DispatcherTimer NewRestTimer(TimeSpan interval, Action action)
+    {
+        var timer = new System.Windows.Threading.DispatcherTimer { Interval = interval };
+        timer.Tick += (_, _) =>
+        {
+            timer.Stop();
+            action();
+        };
+        return timer;
+    }
+
+    private static void Restart(System.Windows.Threading.DispatcherTimer timer)
+    {
+        timer.Stop();
+        timer.Start();
     }
 
     private void LoadOutputVolume()
