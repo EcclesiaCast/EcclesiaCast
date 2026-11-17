@@ -21,6 +21,10 @@
         <DockPanel Grid.Row="0" Margin="0,0,0,14">
             <Border x:Name="Preview" DockPanel.Dock="Left" Width="56" Height="56" CornerRadius="6"
                     BorderBrush="{StaticResource LineBrush}" BorderThickness="1" Background="White"/>
+            <Button DockPanel.Dock="Right" Content="💧 Gotero" Style="{StaticResource DarkButton}"
+                    VerticalAlignment="Bottom" Padding="10,5" Margin="8,0,0,0" Click="Dropper_Click"
+                    AutomationProperties.Name="Tomar un color de la pantalla"
+                    ToolTip="Tomá un color de cualquier parte de la pantalla: clic donde está el color, Esc cancela"/>
             <StackPanel VerticalAlignment="Center" Margin="14,0,0,0">
                 <TextBlock Text="Código (hex)" FontSize="11" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,3"/>
                 <TextBox x:Name="HexBox" Background="{StaticResource SurfaceAltBrush}" Foreground="White"

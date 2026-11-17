@@ -161,6 +161,27 @@ public partial class ColorPickerWindow : Window
         }
     }
 
+    /// <summary>The dropper: this window gets out of the way and the colour is taken from the screen.</summary>
+    private void Dropper_Click(object sender, RoutedEventArgs e)
+    {
+        // Out of the way, off the screen: hiding a dialog would close it, and
+        // a window without transparency ignores Opacity.
+        var (left, top) = (Left, Top);
+        Left = -32000;
+        Top = -32000;
+        try
+        {
+            if (EcclesiaCast.App.Services.ScreenColorPicker.Pick() is { } color)
+                SetColor(color);
+        }
+        finally
+        {
+            Left = left;
+            Top = top;
+            Activate();
+        }
+    }
+
     private void Swatch_Click(object sender, RoutedEventArgs e)
     {
         if (sender is FrameworkElement { Tag: string hex })
