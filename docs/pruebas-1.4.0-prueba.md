@@ -208,7 +208,7 @@ sin ella (está en commits propios).
    reacomodan y nada se corta ni sale una barra horizontal.
 8. Cerrá el programa y abrilo: tiene que volver a la **vista que dejaste**.
 9. Volvé a **«☰ Lista»**: la lista de siempre, igual que antes. La búsqueda
-   con `?` y el historial 🕘 tienen que andar en las dos vistas.
+   con `?` y el historial 🕘 tienen que funcionar en las dos vistas.
 10. Mirá que, al cambiar de Biblia con la grilla abierta, las fichas
     se actualicen.
 
