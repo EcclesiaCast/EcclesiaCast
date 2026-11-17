@@ -29,6 +29,10 @@ public sealed partial class BibleBookTile : ObservableObject
     [ObservableProperty]
     private bool _isSelected;
 
+    /// <summary>Names-only format of the grid: the full name, no abbreviation.</summary>
+    [ObservableProperty]
+    private bool _namesOnly;
+
     private static SolidColorBrush Freeze(SolidColorBrush brush)
     {
         brush.Freeze();

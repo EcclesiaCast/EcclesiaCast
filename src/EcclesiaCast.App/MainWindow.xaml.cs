@@ -43,6 +43,11 @@ public partial class MainWindow : Window
             vm.IsOutputMerged = !_outputSplit;
             vm.MediaSelectionChanged += (_, _) => RefreshMediaSelectionVisuals();
 
+            // The grid of the Bible scrolls to the book picked or typed.
+            vm.BibleBookTileFocusRequested += (_, tile) => Dispatcher.BeginInvoke(
+                System.Windows.Threading.DispatcherPriority.Loaded,
+                () => (BibleTilesControl.ItemContainerGenerator.ContainerFromItem(tile) as FrameworkElement)?.BringIntoView());
+
             // The web panel: the view model decides when it is open or live;
             // this window shows or hides it and keeps the keyboard honest.
             vm.WebHost = WebPanelView;

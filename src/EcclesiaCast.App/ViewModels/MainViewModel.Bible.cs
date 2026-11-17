@@ -135,6 +135,7 @@ public sealed partial class MainViewModel
     /// </summary>
     private void RefreshAfterVersionChange()
     {
+        SaveCheckedVersions();
         UpdateVersionBadges();
         RebuildSlidesPreservingLive(() =>
         {
@@ -163,7 +164,7 @@ public sealed partial class MainViewModel
             if (info is not null)
             {
                 BibleBooksAvailable.Add(info);
-                BibleBookTiles.Add(new BibleBookTile(info));
+                BibleBookTiles.Add(new BibleBookTile(info) { NamesOnly = IsBibleGridNames });
             }
         }
 
@@ -180,6 +181,8 @@ public sealed partial class MainViewModel
         ChaptersTitle = value?.Name ?? string.Empty;
         foreach (var tile in BibleBookTiles)
             tile.IsSelected = tile.Number == value?.Number;
+        if (value is not null && BibleBookTiles.FirstOrDefault(t => t.Number == value.Number) is { } focus)
+            BibleBookTileFocusRequested?.Invoke(this, focus);
 
         if (value is not null && PrimaryVersion is not null)
         {
@@ -193,7 +196,64 @@ public sealed partial class MainViewModel
     [RelayCommand]
     private void BackToBooks() => SelectedBibleBook = null;
 
+    // ── Versiones que quedaron marcadas ───────────────────────────
+
+    private const string BibleVersionsKey = "bible.versions";
+
+    /// <summary>Remembers which Bibles were active (the first is the one read), for the next time the program opens.</summary>
+    private void SaveCheckedVersions()
+    {
+        if (_startingUp || _checkedVersionIds.Count == 0)
+            return;
+        _settings.Set(BibleVersionsKey, string.Join(",", _checkedVersionIds));
+    }
+
+    private void RestoreCheckedVersions()
+    {
+        var saved = (_settings.Get(BibleVersionsKey) ?? string.Empty)
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(s => int.TryParse(s, out var id) ? id : -1)
+            .Where(id => id > 0)
+            .Distinct()
+            .Take(2);
+        _checkedVersionIds.AddRange(saved);
+    }
+
     // ── Vista en grilla ──────────────────────────────────────────
+
+    private const string BibleGridNamesKey = "bible.grid.names";
+
+    /// <summary>A grid tile asks to be shown: the book picked (or typed) may be far down.</summary>
+    public event EventHandler<BibleBookTile>? BibleBookTileFocusRequested;
+
+    /// <summary>The chapters and verses under the grid are open; closed, the books get the room.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(BibleTileHeight), nameof(BibleTileWidth), nameof(BibleTileAbbrSize))]
+    private bool _bibleChaptersOpen = true;
+
+    /// <summary>Books as full names (the first look of the grid) instead of abbreviations.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(BibleTileHeight), nameof(BibleTileWidth), nameof(BibleTileAbbrSize))]
+    private bool _isBibleGridNames;
+
+    public double BibleTileWidth => IsBibleGridNames ? (BibleChaptersOpen ? 92 : 112) : (BibleChaptersOpen ? 60 : 78);
+
+    public double BibleTileHeight => IsBibleGridNames ? (BibleChaptersOpen ? 34 : 42) : (BibleChaptersOpen ? 46 : 60);
+
+    public double BibleTileAbbrSize => BibleChaptersOpen ? 15 : 19;
+
+    partial void OnIsBibleGridNamesChanged(bool value)
+    {
+        _settings.Set(BibleGridNamesKey, value ? "1" : "0");
+        foreach (var tile in BibleBookTiles)
+            tile.NamesOnly = value;
+    }
+
+    [RelayCommand]
+    private void ToggleBibleGridNames() => IsBibleGridNames = !IsBibleGridNames;
+
+    [RelayCommand]
+    private void ToggleBibleChapters() => BibleChaptersOpen = !BibleChaptersOpen;
 
     private const string BibleGridViewKey = "bible.view.grid";
 
@@ -226,6 +286,7 @@ public sealed partial class MainViewModel
         if (tile is null)
             return;
 
+        BibleChaptersOpen = true;
         // Browsing replaces whatever was typed, as with the chapter buttons.
         if (!string.IsNullOrEmpty(BibleQuery))
             BibleQuery = string.Empty;
@@ -881,6 +942,9 @@ public sealed partial class MainViewModel
 
     private void LoadBibleVersions()
     {
+        if (_checkedVersionIds.Count == 0)
+            RestoreCheckedVersions();
+
         _suppressVersionEvents = true;
 
         var keepSelectedId = SelectedBibleVersionOption?.Info.Id;

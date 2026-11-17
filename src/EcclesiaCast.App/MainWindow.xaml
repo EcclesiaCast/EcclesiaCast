@@ -1165,13 +1165,49 @@
                                     <Grid x:Name="BibleGridHost"
                                           Visibility="{Binding ShowBibleGrid, Converter={StaticResource BoolToVis}}">
                                         <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="*"/>
                                             <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
+                                        <!-- Cómo se ve la grilla: nombres o abreviaturas, y capítulos abiertos o cerrados -->
+                                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="8,0,4,4">
+                                            <Button FontSize="11" Padding="8,3"
+                                                    Command="{Binding ToggleBibleGridNamesCommand}"
+                                                    AutomationProperties.Name="Cambiar entre abreviaturas y nombres"
+                                                    ToolTip="Cambia las fichas: abreviaturas grandes (Gn, Jn…) o los nombres completos">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                                        <Setter Property="Content" Value="Aa Nombres"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsBibleGridNames}" Value="True">
+                                                                <Setter Property="Content" Value="Gn Abreviaturas"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                            <Button FontSize="11" Padding="8,3" Margin="6,0,0,0"
+                                                    Command="{Binding ToggleBibleChaptersCommand}"
+                                                    AutomationProperties.Name="Mostrar u ocultar capítulos y versículos"
+                                                    ToolTip="Oculta los capítulos y versículos para ver todos los libros más grandes">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                                        <Setter Property="Content" Value="▾ Ocultar capítulos"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding BibleChaptersOpen}" Value="False">
+                                                                <Setter Property="Content" Value="▴ Mostrar capítulos"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                        </StackPanel>
 
-                                        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto"
+
+
+                                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
                                                       HorizontalScrollBarVisibility="Disabled">
-                                            <ItemsControl ItemsSource="{Binding BibleBookTiles}" Margin="8,0,4,4">
+                                            <ItemsControl x:Name="BibleTilesControl" ItemsSource="{Binding BibleBookTiles}" Margin="8,0,4,4">
                                                 <ItemsControl.ItemsPanel>
                                                     <ItemsPanelTemplate>
                                                         <WrapPanel/>
@@ -1179,7 +1215,8 @@
                                                 </ItemsControl.ItemsPanel>
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
-                                                        <Button Width="60" Height="46" Margin="2"
+                                                        <Button Width="{Binding DataContext.BibleTileWidth, ElementName=BibleGridHost}"
+                                                                Height="{Binding DataContext.BibleTileHeight, ElementName=BibleGridHost}" Margin="2"
                                                                 Command="{Binding DataContext.SelectBibleBookTileCommand, ElementName=BibleGridHost}"
                                                                 CommandParameter="{Binding}"
                                                                 AutomationProperties.Name="{Binding Name}"
@@ -1191,7 +1228,7 @@
                                                                             BorderThickness="1" CornerRadius="5">
                                                                         <StackPanel VerticalAlignment="Center">
                                                                             <TextBlock x:Name="abbr" Text="{Binding Abbreviation}"
-                                                                                       FontSize="15" FontWeight="Bold"
+                                                                                       FontSize="{Binding DataContext.BibleTileAbbrSize, ElementName=BibleGridHost}" FontWeight="Bold"
                                                                                        Foreground="{Binding AccentBrush}"
                                                                                        HorizontalAlignment="Center"/>
                                                                             <TextBlock x:Name="full" Text="{Binding Name}"
@@ -1203,6 +1240,12 @@
                                                                         </StackPanel>
                                                                     </Border>
                                                                     <ControlTemplate.Triggers>
+                                                                        <DataTrigger Binding="{Binding NamesOnly}" Value="True">
+                                                                            <Setter TargetName="abbr" Property="Visibility" Value="Collapsed"/>
+                                                                            <Setter TargetName="full" Property="FontSize" Value="11"/>
+                                                                            <Setter TargetName="full" Property="FontWeight" Value="SemiBold"/>
+                                                                            <Setter TargetName="full" Property="Foreground" Value="{Binding AccentBrush}"/>
+                                                                        </DataTrigger>
                                                                         <Trigger Property="IsMouseOver" Value="True">
                                                                             <Setter TargetName="bd" Property="BorderThickness" Value="2"/>
                                                                         </Trigger>
@@ -1221,11 +1264,14 @@
                                         </ScrollViewer>
 
                                         <!-- Capítulos y versículos, uno al lado del otro -->
-                                        <Grid Grid.Row="1" Height="170" Margin="8,4,8,0">
+                                        <Grid Grid.Row="2" Height="170" Margin="8,4,8,0">
                                             <Grid.Style>
                                                 <Style TargetType="Grid">
                                                     <Setter Property="Visibility" Value="Visible"/>
                                                     <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding BibleChaptersOpen}" Value="False">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
                                                         <DataTrigger Binding="{Binding SelectedBibleBook}" Value="{x:Null}">
                                                             <Setter Property="Visibility" Value="Collapsed"/>
                                                         </DataTrigger>
