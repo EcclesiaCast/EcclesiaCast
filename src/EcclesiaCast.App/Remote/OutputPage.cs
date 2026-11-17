@@ -546,11 +546,12 @@ public static class OutputPage
               // An own box replaces it, as it does the box of any other plate.
               // Asked for on its own (edgeGradient), it goes behind any plate or box.
               if (st.edgeGradient || (kind === 'gradient' && !own)) {
-                var c = rgba(st.plateColor, op), c0 = rgba(st.plateColor, 0);
+                var gi = st.edgeGradientIntensity === undefined ? 1 : st.edgeGradientIntensity / 100;
+                var c = rgba(st.plateColor, op * gi), c0 = rgba(st.plateColor, 0);
                 sgrad.style.top = pos === 'top' ? '0' : pos === 'center' ? '32%' : 'auto';
                 sgrad.style.bottom = pos === 'bottom' ? '0' : 'auto';
                 sgrad.style.height = pos === 'center' ? '36%' : '38%';
-                sgrad.style.background = pos === 'top' ? 'linear-gradient(to bottom,' + c + ' 0%,' + rgba(st.plateColor, op * 0.55) + ' 55%,' + c0 + ' 100%)'
+                sgrad.style.background = pos === 'top' ? 'linear-gradient(to bottom,' + c + ' 0%,' + rgba(st.plateColor, op * gi * 0.55) + ' 55%,' + c0 + ' 100%)'
                   : pos === 'center' ? 'linear-gradient(to bottom,' + c0 + ' 0%,' + c + ' 50%,' + c0 + ' 100%)'
                   : 'linear-gradient(to top,' + c + ' 0%,' + rgba(st.plateColor, op * 0.55) + ' 55%,' + c0 + ' 100%)';
                 sgrad.style.opacity = '1';

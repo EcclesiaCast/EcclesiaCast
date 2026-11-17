@@ -104,6 +104,7 @@ public partial class BroadcastStyleWindow : Window
         Pick(s.Position.ToString(), PosTop, PosCenter, PosBottom);
         Pick(s.Plate.ToString(), PlNone, PlTab, PlGlass, PlSolid, PlGradient, PlHalo, PlFillet, PlLine);
         EdgeGradientCheck.IsChecked = s.EdgeGradient;
+        EdgeGradientSlider.Value = s.EdgeGradientIntensity;
         Pick(s.Background.ToString(), BgNone, BgColor, BgFile);
 
         if (!FontCombo.Items.Contains(s.FontFamily))
@@ -156,6 +157,7 @@ public partial class BroadcastStyleWindow : Window
         Position = Chosen(Current.Position, PosTop, PosCenter, PosBottom),
         Plate = Chosen(Current.Plate, PlNone, PlTab, PlGlass, PlSolid, PlGradient, PlHalo, PlFillet, PlLine),
         EdgeGradient = EdgeGradientCheck.IsChecked == true,
+        EdgeGradientIntensity = (int)EdgeGradientSlider.Value,
         Background = Chosen(Current.Background, BgNone, BgColor, BgFile),
         FontFamily = FontCombo.SelectedItem as string ?? Current.FontFamily,
         FontSize = SizeSlider.Value,
@@ -223,6 +225,8 @@ public partial class BroadcastStyleWindow : Window
         var s = Current;
         SizeText.Text = ((int)s.FontSize).ToString();
         OpacityText.Text = s.PlateOpacity + " %";
+        EdgeGradientText.Text = s.EdgeGradientIntensity + " %";
+        EdgeGradientSlider.IsEnabled = s.EdgeGradient;
         WidthText.Text = s.WidthPercent + " %";
         MarginText.Text = s.MarginPercent + " %";
         LabelSizeText.Text = s.LabelSize + " %";
