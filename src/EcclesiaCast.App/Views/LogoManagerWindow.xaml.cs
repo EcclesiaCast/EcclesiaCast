@@ -179,7 +179,7 @@ public partial class LogoManagerWindow : Window
 
         var wasLoading = _loading;
         _loading = true;
-        FillMediaBox.ItemsSource = options;
+        EcclesiaCast.App.Services.FillOptionsBox.Fill(FillMediaBox, options);
         FillMediaBox.SelectedItem = options.FirstOrDefault(m => m.Id == (selectedId ?? 0)) ?? options[0];
         _loading = wasLoading;
     }

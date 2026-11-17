@@ -55,7 +55,7 @@ public partial class MediaInspectorWindow : Window
         options.AddRange(library
             .Where(m => m.Id != item.Id && m.Type != MediaType.YouTube)
             .OrderBy(m => m.Name));
-        FillMediaBox.ItemsSource = options;
+        EcclesiaCast.App.Services.FillOptionsBox.Fill(FillMediaBox, options);
         FillMediaBox.SelectedItem = options.FirstOrDefault(m => m.Id == (item.FillMediaId ?? 0)) ?? options[0];
 
         NameBox.Text = item.Name;
