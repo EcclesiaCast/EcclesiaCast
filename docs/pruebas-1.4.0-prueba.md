@@ -184,6 +184,36 @@ Cloudflare):
    del color de fondo del logo (antes podía verse el video de fondo pausado).
 7. Tus otros logos tienen que verse como antes.
 
+## 8. Vista en grilla de la Biblia (prueba.9)
+
+Instalador: `dist\EcclesiaCast-1.4.0-prueba.9-setup.exe`. Es lo único nuevo
+respecto de la prueba.8. Si la grilla da problemas, se saca y la 1.4.0 sale
+sin ella (está en commits propios).
+
+1. Pestaña **Biblia**: al lado del 🕘 hay un botón **«▦ Grilla»**. Tocalo.
+2. Aparecen los **libros como fichas**, con la abreviatura grande y el nombre
+   chico. Cada grupo tiene su color (Ley, Históricos, Poéticos, Profetas,
+   Evangelios, Hechos, Cartas de Pablo, Cartas generales, Apocalipsis). El
+   botón pasó a decir **«☰ Lista»**.
+3. Tocá **Juan**: la ficha queda marcada y abajo aparecen sus **capítulos** y,
+   al lado, los **versículos**. Tocá el capítulo 3: se carga en el centro.
+4. Tocá el versículo **16**: **se proyecta** (igual que un clic en su
+   diapositiva).
+5. Con la grilla abierta, escribí **`jn 3 16`** y Enter, y después
+   **`Juan 3:16`**: tiene que saltar al versículo, marcar las fichas y
+   proyectarlo. Probá también un libro con número («1co 13»).
+6. Con una **Biblia sólo del Nuevo Testamento** (o cualquier otra con menos
+   libros) tienen que aparecer sólo los libros que tiene.
+7. **Cambiá el ancho del panel** (o achicá la ventana): las fichas se
+   reacomodan y nada se corta ni sale una barra horizontal.
+8. Cerrá el programa y abrilo: tiene que volver a la **vista que dejaste**.
+9. Volvé a **«☰ Lista»**: la lista de siempre, igual que antes. La búsqueda
+   con `?` y el historial 🕘 tienen que andar en las dos vistas.
+10. Mirá que, al cambiar de Biblia con la grilla abierta, las fichas
+    se actualicen.
+
+Lo que **no** tiene a propósito: favoritos de versículos.
+
 ## Si algo falla
 
 El registro del día está en
