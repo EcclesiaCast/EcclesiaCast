@@ -42,6 +42,8 @@ public sealed class PresentationService : IPresentationService
     public void ToggleLogo() =>
         SetState(State == OutputState.Logo ? OutputState.Content : OutputState.Logo);
 
+    public void ShowState(OutputState state) => SetState(state);
+
     public void ShowOverlay(string message)
     {
         OverlayMessage = message;

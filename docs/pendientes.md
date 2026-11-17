@@ -452,6 +452,31 @@ las respuestas automáticas de la tabla); toca dar estos pasos.
 
 ## 3. Para hacer después de la 1.0
 
+### Pedidos de la prueba de la 1.4.0 prueba.11 (17/11/2026)
+
+- [ ] **Ningún video entra silenciado, y el sonido se ve y se controla en el
+      LIVE.** Alexis agregó a Medios → Anuncios
+      `presentacion-v3-final.mp4` (9:16, 26 s, con audio AAC) y salió mudo; el
+      registro dice «sin sonido». Causa: `GiveSoundToLongVideosAsync`
+      (`MainViewModel.Media.cs`) deja mudos todos los videos nuevos salvo los
+      que traen sonido y duran 40 s o más (`SoundedVideoMinimum`). **Lo que
+      pide Alexis (decisión suya, 17/11):**
+      1. **Un video nunca entra silenciado**, dure lo que dure. Silenciar lo
+         elige la persona, nunca el programa. (Sacar la regla de «videos
+         cortos = fondos sin sonido»; revisar también GIF convertidos y
+         YouTube descargados, y qué pasa con los videos ya cargados en la
+         biblioteca.)
+      2. **Que se vea si un video está silenciado en los controles de
+         reproducción del LIVE** (hoy sólo está el 🔇/🔊 de la barra «Fondo en
+         pantalla»).
+      3. **Que se pueda controlar el volumen de lo que sale de EcclesiaCast**
+         desde ahí mismo (volumen del video en pantalla; evaluar también un
+         volumen general de la salida).
+      Alexis pasa más pruebas antes de hacer los cambios: se hacen todos
+      juntos. Hay que cambiar el CHANGELOG de la 1.2.0 («los cortos entran sin
+      sonido») y los textos de las pruebas.
+
+
 > **«Seguir la canción» sale escondida en la 1.4.0.** Para verla: crear un
 > archivo vacío `seguir-la-cancion.txt` en `%APPDATA%\EcclesiaCast` y volver a
 > abrir el programa. Sus entradas del CHANGELOG están guardadas al final de

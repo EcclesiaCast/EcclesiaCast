@@ -35,9 +35,20 @@ public static class PlayerSound
         }
     }
 
-    /// <summary>Turns this player alone down to <paramref name="volume"/> (0–100).</summary>
+    /// <summary>
+    /// One volume for everything the program plays (0–100), applied on top of
+    /// each player's own. Set from the LIVE controls.
+    /// </summary>
+    public static int Master { get; set; } = 100;
+
+    /// <summary>The player's own volume with the general one applied.</summary>
+    public static int Effective(int volume) =>
+        Math.Clamp(volume, 0, 100) * Math.Clamp(Master, 0, 100) / 100;
+
+    /// <summary>Turns this player alone down to <paramref name="volume"/> (0–100), after the general volume.</summary>
     public static void SetVolume(MediaPlayer player, int volume)
     {
+        volume = Effective(volume);
         try
         {
             if (SoundLevel.Split(volume) is not { } level)

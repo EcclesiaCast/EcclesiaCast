@@ -112,8 +112,11 @@ public sealed class MediaItem
     /// </summary>
     public int ShowSeconds { get; set; }
 
-    /// <summary>Mute the video's audio (backgrounds are muted by default).</summary>
-    public bool Muted { get; set; } = true;
+    /// <summary>
+    /// Mute the video's audio. A video is never silenced by the program: it
+    /// comes in with its sound and the person silences it if they want to.
+    /// </summary>
+    public bool Muted { get; set; }
 
     /// <summary>Playback volume 0–100 when not muted.</summary>
     public int Volume { get; set; } = 100;

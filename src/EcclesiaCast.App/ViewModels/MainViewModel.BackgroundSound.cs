@@ -26,6 +26,7 @@ public sealed partial class MainViewModel
         var background = _presentation.Background;
         IsBackgroundVideo = background?.Type is MediaType.Video or MediaType.YouTube;
         IsBackgroundMuted = IsBackgroundVideo && (background!.Muted || background.Volume <= 0);
+        SyncBackgroundVolume();
     }
 
     /// <summary>The 🔇 / 🔊 button of the bar of the background on screen.</summary>

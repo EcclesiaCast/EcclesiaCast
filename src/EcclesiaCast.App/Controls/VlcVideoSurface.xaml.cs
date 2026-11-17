@@ -133,10 +133,10 @@ public partial class VlcVideoSurface : UserControl
         // Every change of slide puts the same background on again: the
         // equalizer is only touched when the volume really changed.
         PlayerSound.KeepSessionFull(player);
-        var volume = Math.Clamp(media.Volume, 0, 100);
+        var volume = PlayerSound.Effective(media.Volume);
         if (volume != _appliedVolume)
         {
-            PlayerSound.SetVolume(player, volume);
+            PlayerSound.SetVolume(player, media.Volume);
             _appliedVolume = volume;
         }
 

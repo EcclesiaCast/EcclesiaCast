@@ -504,7 +504,9 @@ public sealed partial class MainViewModel
     [RelayCommand]
     private void ToggleClear()
     {
-        _presentation.ToggleClear();
+        // With the output off the key turns it on showing what it names; it
+        // must not «toggle back» from a state left over from before.
+        if (IsProjecting) _presentation.ToggleClear(); else _presentation.ShowState(OutputState.Clear);
         EnsureOutputOn();
     }
 
@@ -512,14 +514,14 @@ public sealed partial class MainViewModel
     private void ToggleBlack()
     {
         NoteAction("Pantalla negra (Black)");
-        _presentation.ToggleBlack();
+        if (IsProjecting) _presentation.ToggleBlack(); else _presentation.ShowState(OutputState.Black);
         EnsureOutputOn();
     }
 
     [RelayCommand]
     private void ToggleLogo()
     {
-        _presentation.ToggleLogo();
+        if (IsProjecting) _presentation.ToggleLogo(); else _presentation.ShowState(OutputState.Logo);
         EnsureOutputOn();
     }
 

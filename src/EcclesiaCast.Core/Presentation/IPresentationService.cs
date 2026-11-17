@@ -83,6 +83,12 @@ public interface IPresentationService
     /// <summary>Toggles between the logo and the current content.</summary>
     void ToggleLogo();
 
+    /// <summary>
+    /// Puts the output in <paramref name="state"/> without toggling: used when
+    /// the output was off, so the key that turns it on shows what it names.
+    /// </summary>
+    void ShowState(OutputState state);
+
     /// <summary>Shows an announcement at the bottom of the output.</summary>
     void ShowOverlay(string message);
 

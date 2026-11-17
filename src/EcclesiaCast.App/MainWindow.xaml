@@ -89,6 +89,35 @@
                         Value="{Binding PlaybackPositionSeconds}"
                         IsMoveToPointEnabled="True" Margin="0,6,0,0"
                         ToolTip="Arrastrá para moverte dentro del video"/>
+                <!-- Sonido: se ve si el video está silenciado, su volumen y el de toda la salida -->
+                <DockPanel Margin="0,6,0,0">
+                    <Button DockPanel.Dock="Left" Content="🔇 Sin sonido" FontSize="11" Padding="8,3"
+                            Style="{StaticResource DarkButton}"
+                            Command="{Binding ToggleBackgroundSoundCommand}"
+                            Visibility="{Binding IsBackgroundMuted, Converter={StaticResource BoolToVis}}"
+                            AutomationProperties.Name="Dar sonido al video"
+                            ToolTip="Este video está silenciado. Clic: que suene."/>
+                    <Button DockPanel.Dock="Left" Content="🔊 Con sonido" FontSize="11" Padding="8,3"
+                            Style="{StaticResource DarkButton}"
+                            Command="{Binding ToggleBackgroundSoundCommand}"
+                            Visibility="{Binding IsBackgroundMuted, Converter={StaticResource InverseBoolToVis}}"
+                            AutomationProperties.Name="Silenciar el video"
+                            ToolTip="Este video suena. Clic: silenciarlo."/>
+                    <TextBlock DockPanel.Dock="Left" Text="Video" FontSize="11" VerticalAlignment="Center"
+                               Foreground="{StaticResource MutedBrush}" Margin="8,0,4,0"/>
+                    <TextBlock DockPanel.Dock="Right" Text="{Binding OutputVolume, StringFormat={}{0} %}" FontSize="11"
+                               VerticalAlignment="Center" Width="34" TextAlignment="Right"
+                               Foreground="{StaticResource MutedBrush}"/>
+                    <Slider DockPanel.Dock="Right" Minimum="0" Maximum="100" Width="70"
+                            Value="{Binding OutputVolume}" IsMoveToPointEnabled="True"
+                            AutomationProperties.Name="Volumen de toda la salida"
+                            ToolTip="Volumen de todo lo que sale de EcclesiaCast (videos y música). No toca el volumen de Windows."/>
+                    <TextBlock DockPanel.Dock="Right" Text="Salida" FontSize="11" VerticalAlignment="Center"
+                               Foreground="{StaticResource MutedBrush}" Margin="8,0,4,0"/>
+                    <Slider Minimum="0" Maximum="100" Value="{Binding BackgroundVolume}" IsMoveToPointEnabled="True"
+                            AutomationProperties.Name="Volumen del video"
+                            ToolTip="Volumen de este video (queda guardado en sus Propiedades)."/>
+                </DockPanel>
             </StackPanel>
         </DataTemplate>
         <!-- Menú de clic derecho de las tarjetas de la barra de medios. Es uno solo,

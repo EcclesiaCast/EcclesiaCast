@@ -415,6 +415,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         LoadStageLayouts();
         LoadSongMaxLines();
         LoadLowPerformance();
+        LoadOutputVolume();
         LoadMeetingSections();
         Slides.CollectionChanged += (_, _) =>
         {
