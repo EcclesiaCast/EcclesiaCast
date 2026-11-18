@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EcclesiaCast.Presentation.Remote;
@@ -29,10 +28,7 @@ public sealed partial class MainViewModel
     // ── Reproducción del fondo (barra de transporte) ─────────────
 
     /// <summary>Polls the output while a video plays; the transport bar binds to the result.</summary>
-    private readonly System.Windows.Threading.DispatcherTimer _playbackTimer = new()
-    {
-        Interval = TimeSpan.FromMilliseconds(300),
-    };
+    private readonly IUiTimer _playbackTimer;
 
     /// <summary>True while the timer writes the position, so it isn't read back as a seek.</summary>
     private bool _updatingPlayback;
