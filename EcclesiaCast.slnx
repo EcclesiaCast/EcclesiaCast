@@ -8,5 +8,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/EcclesiaCast.Core.Tests/EcclesiaCast.Core.Tests.csproj" />
+    <Project Path="tests/EcclesiaCast.Presentation.Tests/EcclesiaCast.Presentation.Tests.csproj" />
   </Folder>
 </Solution>

@@ -18,9 +18,10 @@ jobs:
       - name: Test
         run: dotnet test --configuration Release --no-build --verbosity normal
 
-  # Core and Data are plain .NET, so their tests must also pass on a Mac with
-  # an Apple chip. The test project is targeted directly (not the solution)
-  # because the app itself is WPF and only builds on Windows.
+  # Core, Data and Presentation (the view models) are plain .NET, so their
+  # tests must also pass on a Mac with an Apple chip. The test projects are
+  # targeted directly (not the solution) because the app itself is WPF and
+  # only builds on Windows.
   test-mac:
     runs-on: macos-15
     steps:
@@ -30,3 +31,5 @@ jobs:
           dotnet-version: 10.0.x
       - name: Test
         run: dotnet test tests/EcclesiaCast.Core.Tests --configuration Release --verbosity normal
+      - name: Test view models
+        run: dotnet test tests/EcclesiaCast.Presentation.Tests --configuration Release --verbosity normal

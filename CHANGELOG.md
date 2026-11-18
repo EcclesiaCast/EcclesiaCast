@@ -15,6 +15,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 - Por dentro, sin cambios para quien usa el programa: los modelos de vista (la lógica de cada
   pantalla) ya no dependen de las ventanas de Windows; piden esas cosas por medio de avisos
   y servicios, para poder pasarlos a la parte común.
+- Por dentro, sin cambios para quien usa el programa: esos modelos de vista ya viven en la
+  parte común, y hay pruebas nuevas que arman el programa completo sin pantalla (abrir una
+  canción, proyectar, elegir un versículo, la cuenta regresiva) y corren también en una Mac.
 
 ## [1.4.0] - 2026-11-17
 
