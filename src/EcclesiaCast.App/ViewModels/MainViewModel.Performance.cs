@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EcclesiaCast.Presentation.Remote;
@@ -53,7 +52,7 @@ public sealed partial class MainViewModel
     {
         // The installer asks once and leaves its answer in the registry; it
         // only counts until the operator has chosen something here.
-        var initial = LowPerformance.InitialSetting(_settings.Get(LowPerformance.SettingKey), ReadInstallerChoice());
+        var initial = LowPerformance.InitialSetting(_settings.Get(LowPerformance.SettingKey), _installer.ReadLowPerformanceChoice());
         if (initial is not null)
             _settings.Set(LowPerformance.SettingKey, initial);
 
@@ -61,17 +60,4 @@ public sealed partial class MainViewModel
         _startingUp = false;
     }
 
-    private static string? ReadInstallerChoice()
-    {
-        try
-        {
-            using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(LowPerformance.InstallerRegistryKey);
-            return key?.GetValue(LowPerformance.InstallerValueName)?.ToString();
-        }
-        catch (Exception ex) when (ex is System.Security.SecurityException or UnauthorizedAccessException or IOException)
-        {
-            Log.Debug(ex, "No se pudo leer la respuesta del instalador");
-            return null;
-        }
-    }
 }
