@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EcclesiaCast.Presentation.Remote;
@@ -669,20 +668,22 @@ public sealed partial class MainViewModel
     [RelayCommand]
     private void ImportMedia()
     {
-        var dialog = new Microsoft.Win32.OpenFileDialog
-        {
-            Title = $"Agregar a «{SelectedMediaTab}»",
-            Filter = "Imágenes, videos y documentos"
-                   + "|*.jpg;*.jpeg;*.png;*.bmp;*.webp;*.gif;*.mp4;*.mov;*.m4v;*.avi;*.mkv;*.wmv;*.webm;*.pdf;*.pptx;*.ppt"
-                   + "|Imágenes|*.jpg;*.jpeg;*.png;*.bmp;*.webp;*.gif"
-                   + "|Videos|*.mp4;*.mov;*.m4v;*.avi;*.mkv;*.wmv;*.webm"
-                   + "|PDF y PowerPoint|*.pdf;*.pptx;*.ppt",
-            Multiselect = true,
-        };
-        if (dialog.ShowDialog() != true)
+        var files = _dialogs.OpenFiles(new OpenFileRequest($"Agregar a «{SelectedMediaTab}»",
+        [
+            new FileFilter("Imágenes, videos y documentos",
+            [
+                "*.jpg", "*.jpeg", "*.png", "*.bmp", "*.webp", "*.gif",
+                "*.mp4", "*.mov", "*.m4v", "*.avi", "*.mkv", "*.wmv", "*.webm",
+                "*.pdf", "*.pptx", "*.ppt",
+            ]),
+            new FileFilter("Imágenes", ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.webp", "*.gif"]),
+            new FileFilter("Videos", ["*.mp4", "*.mov", "*.m4v", "*.avi", "*.mkv", "*.wmv", "*.webm"]),
+            new FileFilter("PDF y PowerPoint", ["*.pdf", "*.pptx", "*.ppt"]),
+        ]));
+        if (files is null)
             return;
 
-        ImportMediaFiles(dialog.FileNames);
+        ImportMediaFiles(files);
     }
 
     /// <summary>
@@ -745,7 +746,7 @@ public sealed partial class MainViewModel
                 Name = Path.GetFileNameWithoutExtension(path),
                 Path = path,
                 Type = type.Value,
-                ThumbnailPath = MediaThumbnails.Create(path, type.Value, videoEngine: null),
+                ThumbnailPath = _thumbnails.Create(path, type.Value, videoEngine: null),
                 Category = SelectedMediaTab,
                 // Videos with audio default to a foreground announcement; silent
                 // ones and images to a background — the operator can change it.
@@ -821,7 +822,7 @@ public sealed partial class MainViewModel
                         Name = name,
                         Path = gif,
                         Type = MediaType.Image,
-                        ThumbnailPath = MediaThumbnails.Create(gif, MediaType.Image, videoEngine: null),
+                        ThumbnailPath = _thumbnails.Create(gif, MediaType.Image, videoEngine: null),
                         Category = tab,
                         Behavior = MediaBehavior.Background,
                         Scaling = MediaScaling.Fit,
@@ -934,19 +935,19 @@ public sealed partial class MainViewModel
     /// <summary>Runs the window that makes the copy; a cancelled copy is remembered as "no".</summary>
     private void MakeLightCopy(string path, string name)
     {
-        var window = new Views.LightCopyWindow(path, name) { Owner = Application.Current.MainWindow };
-        var done = window.ShowDialog() == true;
+        var result = _lightCopy.Run(path, name);
 
-        if (done)
+        if (result == LightCopyResult.Done)
         {
             StatusText = $"Copia liviana lista: «{name}». La biblioteca guarda el original y la copia.";
             return;
         }
 
-        if (window.Cancelled)
+        var cancelled = result == LightCopyResult.Cancelled;
+        if (cancelled)
             LightVideoCache.Decline(path);
 
-        StatusText = window.Cancelled
+        StatusText = cancelled
             ? $"Sin copia liviana de «{name}»: se proyecta el original. Clic derecho sobre el video → Hacer una copia liviana, si querés hacerla después."
             : $"No se pudo hacer la copia liviana de «{name}»: se proyecta el original.";
     }
@@ -1064,7 +1065,7 @@ public sealed partial class MainViewModel
                     Name = $"{name} · {page + 1}",
                     Path = result.Pages[page],
                     Type = MediaType.Image,
-                    ThumbnailPath = MediaThumbnails.Create(result.Pages[page], MediaType.Image, videoEngine: null),
+                    ThumbnailPath = _thumbnails.Create(result.Pages[page], MediaType.Image, videoEngine: null),
                     Category = tab,
                     Behavior = MediaBehavior.Foreground,
 
@@ -1129,7 +1130,7 @@ public sealed partial class MainViewModel
     {
         // Videos need the VLC engine to get a poster; images and document
         // pages do not, so a missing engine must not stop their posters.
-        var engine = App.VideoEngine;
+        var engine = _video.Instance;
 
         var rebuildAll = _settings.Get(VideoThumbnailsRebuiltKey) is null;
         var reshapeImages = _settings.Get(ImageThumbnailsShapedKey) is null;
@@ -1156,10 +1157,10 @@ public sealed partial class MainViewModel
                 foreach (var item in pending)
                 {
                     if (rebuildAll && item.Type == MediaType.Video)
-                        MediaThumbnails.Delete(item.ThumbnailPath);
+                        _thumbnails.Delete(item.ThumbnailPath);
 
                     var replaced = item.ThumbnailPath;
-                    var thumbnail = MediaThumbnails.Create(item.Path, item.Type, engine);
+                    var thumbnail = _thumbnails.Create(item.Path, item.Type, engine);
                     if (thumbnail is null)
                         continue;
 
@@ -1169,7 +1170,7 @@ public sealed partial class MainViewModel
 
                     // The old poster goes only once the new one is in place.
                     if (item.Type == MediaType.Image && reshapeImages && replaced != thumbnail)
-                        MediaThumbnails.Delete(replaced);
+                        _thumbnails.Delete(replaced);
                 }
                 return count;
             });
@@ -1189,7 +1190,7 @@ public sealed partial class MainViewModel
 
         // Sweep posters left behind by earlier rebuilds.
         var current = _media.GetAll().Select(m => m.ThumbnailPath).ToList();
-        await Task.Run(() => MediaThumbnails.DeleteOrphans(current));
+        await Task.Run(() => _thumbnails.DeleteOrphans(current));
     }
 
     /// <summary>

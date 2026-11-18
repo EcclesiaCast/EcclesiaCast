@@ -221,6 +221,7 @@ public partial class App : Application
         services.AddSingleton<IStageDesigner, StageDesignerService>();
         services.AddSingleton<IBackupDialog>(_ => new BackupDialogService(dbPath));
         services.AddSingleton<ICountdownDialog, CountdownDialogService>();
+        services.AddSingleton<ILightCopyDialog, LightCopyDialogService>();
         services.AddSingleton<IGlobalSearchDialog, GlobalSearchDialogService>();
         services.AddSingleton(sp => new UpdateChecker(
             sp.GetRequiredService<ISettingsStore>(),

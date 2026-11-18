@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EcclesiaCast.Presentation.Remote;
@@ -132,7 +131,7 @@ public sealed partial class MainViewModel
         // A brand-new poster, not the card's thumbnail: deleting the logo
         // deletes its poster, and the card still needs its own.
         var poster = isVideo
-            ? await Task.Run(() => MediaThumbnails.Create(item.Path, MediaType.Video, App.VideoEngine))
+            ? await Task.Run(() => _thumbnails.Create(item.Path, MediaType.Video, _video.Instance))
             : null;
 
         var created = _logos.Save(new Logo
