@@ -490,3 +490,6 @@ dist/
 
 # Campaign pieces are rendered by docs/campana/generar.ps1
 docs/campana/salida/
+
+# Resultados de los bancos de render (imagenes y medidas)
+artifacts/
