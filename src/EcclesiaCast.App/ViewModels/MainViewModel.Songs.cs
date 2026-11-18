@@ -198,6 +198,7 @@ public sealed partial class MainViewModel
             foreach (var piece in SlideSplitter.Split(section.Text, SongMaxLines))
             {
                 Slides.Add(new SlideItemViewModel(
+                    _images,
                     Slides.Count,
                     section.Label,
                     new SlideContent(piece, caption, Theme: theme, Override: section.GetOverride()),

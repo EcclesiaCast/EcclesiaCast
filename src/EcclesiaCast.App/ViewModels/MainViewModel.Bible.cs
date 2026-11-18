@@ -568,6 +568,7 @@ public sealed partial class MainViewModel
         if (GetPreviousChapter(reference) is var (prevBook, prevChapter, prevName))
         {
             Slides.Add(new SlideItemViewModel(
+                _images,
                 Slides.Count,
                 "ANTERIOR",
                 new SlideContent($"◀  {prevName} {prevChapter}", "Volver al capítulo anterior", Theme: theme),
@@ -623,6 +624,7 @@ public sealed partial class MainViewModel
                     slideLabel += $" ({part + 1}/{parts.Count})";
 
                 Slides.Add(new SlideItemViewModel(
+                    _images,
                     Slides.Count,
                     slideLabel,
                     new SlideContent(parts[part].Main, caption, parts[part].Secondary, theme))
@@ -637,6 +639,7 @@ public sealed partial class MainViewModel
         if (GetNextChapter(reference) is var (nextBook, nextChapter, nextName))
         {
             Slides.Add(new SlideItemViewModel(
+                _images,
                 Slides.Count,
                 "SIGUIENTE",
                 new SlideContent($"▶  {nextName} {nextChapter}", "Pasar al siguiente capítulo", Theme: theme),

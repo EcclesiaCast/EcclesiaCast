@@ -181,7 +181,7 @@ public sealed partial class MainViewModel
         for (var i = 0; i < pages.Count; i++)
         {
             Slides.Add(new SlideItemViewModel(
-                i, $"Página {i + 1}", new SlideContent($"Página {i + 1}"))
+                _images, i, $"Página {i + 1}", new SlideContent($"Página {i + 1}"))
             {
                 Page = pages[i],
             });

@@ -1,5 +1,4 @@
 using System.IO;
-using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using EcclesiaCast.Core.Bible;
 using EcclesiaCast.Core.Media;
@@ -9,7 +8,7 @@ namespace EcclesiaCast.App.ViewModels;
 
 /// <summary>One card in the slide grid.</summary>
 public sealed partial class SlideItemViewModel(
-    int index, string label, SlideContent slide,
+    IImageFactory images, int index, string label, SlideContent slide,
     BibleReference? jumpTarget = null, bool jumpToEnd = false, int sectionId = 0)
     : ObservableObject
 {
@@ -52,15 +51,16 @@ public sealed partial class SlideItemViewModel(
 
     public bool IsPage => Page is not null;
 
-    private System.Windows.Media.ImageSource? _pageImage;
+    private object? _pageImage;
     private bool _pageImageLoaded;
 
     /// <summary>
     /// The picture of the card: the page's small poster, never the 4K file.
     /// Without a poster the picture itself is read at the width of a card.
-    /// Read the first time the card is drawn.
+    /// Read the first time the card is drawn. It is the picture the screen
+    /// knows how to draw (see <see cref="IImageFactory"/>), kept as an object.
     /// </summary>
-    public System.Windows.Media.ImageSource? PageImage
+    public object? PageImage
     {
         get
         {
@@ -74,29 +74,14 @@ public sealed partial class SlideItemViewModel(
         }
     }
 
-    private static System.Windows.Media.ImageSource? LoadPageImage(MediaItem page)
+    private object? LoadPageImage(MediaItem page)
     {
         var poster = !string.IsNullOrWhiteSpace(page.ThumbnailPath) && File.Exists(page.ThumbnailPath);
         var path = poster ? page.ThumbnailPath : page.Type == MediaType.Image ? page.Path : null;
         if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
             return null;
 
-        try
-        {
-            var bitmap = new BitmapImage();
-            bitmap.BeginInit();
-            bitmap.UriSource = new Uri(path);
-            bitmap.CacheOption = BitmapCacheOption.OnLoad;
-            if (!poster)
-                bitmap.DecodePixelWidth = 220;
-            bitmap.EndInit();
-            bitmap.Freeze();
-            return bitmap;
-        }
-        catch
-        {
-            return null;
-        }
+        return images.FromFile(path, poster ? null : 220);
     }
 
     /// <summary>
