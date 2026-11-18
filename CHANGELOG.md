@@ -5,6 +5,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+## [1.4.0] - 2026-11-17
+
 ### Agregado
 
 - **La grilla de la Biblia, más cómoda.** Un botón arriba de las fichas cambia cómo se
