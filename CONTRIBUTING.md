@@ -23,7 +23,17 @@ No hace falta instalar VLC: las librerías de video vienen en un paquete NuGet.
 |---|---|
 | `EcclesiaCast.Core` | Dominio puro: canciones, Biblia, temas, medios, playlists y el `PresentationService`. **Sin dependencias de UI**, y es donde viven los tests. |
 | `EcclesiaCast.Data` | Persistencia con SQLite + EF Core, importadores y migraciones. |
-| `EcclesiaCast.App` | La interfaz WPF: ventana del operador, ventana de salida, editores. |
+| `EcclesiaCast.Presentation` | Lo que decide algo y no dibuja: servicios, el control remoto y las interfaces de plataforma (`Platform/`). .NET común, **sin WPF ni nada de Windows**: lo comparten la versión de Windows y la de Mac. |
+| `EcclesiaCast.Platform.Windows` | Lo que le habla a Windows y no dibuja: PowerPoint, las páginas de un PDF, las teclas multimedia, los dispositivos de sonido. Sin WPF ni Windows Forms. |
+| `EcclesiaCast.App` | La interfaz WPF: ventana del operador, ventana de salida, editores, y la versión de WPF de las interfaces de plataforma (`Platform/`). |
+
+Cada sistema llena las interfaces de plataforma al arrancar (`App.xaml.cs`):
+el hilo de la pantalla, los relojes, los avisos, los diálogos de archivos, las
+carpetas, las imágenes, las fuentes. `Presentation` sólo conoce las interfaces.
+
+**`Presentation` no conoce pantallas; si no compila sin WPF, no va ahí.** Lo
+que usa imágenes o ventanas de WPF se queda en `App`; lo que le habla a Windows
+sin dibujar va en `Platform.Windows`.
 
 Dos reglas que sostienen el diseño:
 
