@@ -18,6 +18,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 - Por dentro, sin cambios para quien usa el programa: esos modelos de vista ya viven en la
   parte común, y hay pruebas nuevas que arman el programa completo sin pantalla (abrir una
   canción, proyectar, elegir un versículo, la cuenta regresiva) y corren también en una Mac.
+- Por dentro, sin cambios para quien usa el programa: un juego fijo de 65 diapositivas de
+  prueba (canciones, Biblia, franjas, contorno, sombra, cuenta regresiva, logo, escenario) y un
+  programa que las dibuja sin mostrar nada, para comprobar que la versión de Mac corte la letra igual.
 
 ## [1.4.0] - 2026-11-17
 

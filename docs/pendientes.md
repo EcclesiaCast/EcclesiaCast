@@ -844,6 +844,15 @@ iglesia (11:22–12:53): ningún error ni cierre.
     mano en Ajustes del Sistema → Privacidad y seguridad → «Abrir igual».
     Explicarlo en la página con capturas, como el «Ejecutar de todas formas»
     de Windows.
+  - **Banco de render de WPF** (tanda 6): la «foto» de cómo dibuja hoy WPF la
+    letra proyectada, para comparar con Avalonia. Los 65 casos están en
+    `tests/casos-de-render/` (3 temas cada uno; `generar.cs` los escribe).
+    Se corre con `dotnet build tests/EcclesiaCast.RenderBench.Wpf` y después
+    el `.exe` que queda en su carpeta `bin` (no muestra nada y tarda unos 40
+    segundos). Deja las imágenes y las medidas en `artifacts/render/wpf/`
+    (carpeta que git ignora; el resultado está en `resultado.txt`). Las
+    medidas de referencia, ya guardadas, están en
+    `tests/casos-de-render/referencia-wpf/`.
 - **Ideas tomadas de G-Presenter** (gpresenter.com, mirado el 28/10/2026;
   Alexis dijo que sí a las seis, para más adelante):
   1. **Cámara o capturadora como diapositiva**, o de fondo detrás de la letra
