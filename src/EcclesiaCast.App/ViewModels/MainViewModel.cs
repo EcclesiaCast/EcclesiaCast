@@ -78,6 +78,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private readonly IGlobalSearchDialog _globalSearch;
     private readonly IUiDispatcher _dispatcher;
     private readonly IUiTimerFactory _timers;
+    private readonly IDialogs _dialogs;
 
     /// <summary>Copied slide (label + text + style) for paste/duplicate.</summary>
     private (string Label, string Text, string? StyleJson)? _clipboardSlide;
@@ -365,8 +366,11 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         ProjectionViewModel projectionViewModel,
         IUiDispatcher dispatcher,
         IFontCatalog fonts,
-        IUiTimerFactory timers)
+        IUiTimerFactory timers,
+        IDialogs dialogs)
     {
+        _dialogs = dialogs;
+        _audioTimer = timers.Create(TimeSpan.FromMilliseconds(250));
         _dispatcher = dispatcher;
         _timers = timers;
         _playbackTimer = timers.Create(TimeSpan.FromMilliseconds(300));

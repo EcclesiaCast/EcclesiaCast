@@ -22,10 +22,7 @@ public sealed partial class MainViewModel
     private readonly IAudioPlayer _audioPlayer;
 
     /// <summary>Asks the player how far along it is while a track is loaded.</summary>
-    private readonly System.Windows.Threading.DispatcherTimer _audioTimer = new()
-    {
-        Interval = TimeSpan.FromMilliseconds(250),
-    };
+    private readonly IUiTimer _audioTimer;
 
     private bool _updatingAudio;
 
@@ -129,16 +126,14 @@ public sealed partial class MainViewModel
     [RelayCommand]
     private void ImportAudio()
     {
-        var dialog = new Microsoft.Win32.OpenFileDialog
-        {
-            Title = "Agregar audios",
-            Filter = "Audios (mp3, wav, m4a, ogg, flac)|*.mp3;*.wav;*.m4a;*.ogg;*.flac",
-            Multiselect = true,
-        };
-        if (dialog.ShowDialog() != true)
+        var files = _dialogs.OpenFiles(new OpenFileRequest("Agregar audios",
+        [
+            new FileFilter("Audios (mp3, wav, m4a, ogg, flac)", ["*.mp3", "*.wav", "*.m4a", "*.ogg", "*.flac"]),
+        ]));
+        if (files is null)
             return;
 
-        AddAudioFiles(dialog.FileNames);
+        AddAudioFiles(files);
     }
 
     /// <summary>
