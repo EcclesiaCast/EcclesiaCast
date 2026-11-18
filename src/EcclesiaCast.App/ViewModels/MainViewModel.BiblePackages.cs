@@ -1,5 +1,4 @@
 using System.IO;
-using System.Windows;
 using CommunityToolkit.Mvvm.Input;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Bible;
@@ -247,18 +246,23 @@ public sealed partial class MainViewModel
             return plan;
 
         var othersToo = repeated.Count < plan.Count;
-        var answer = MessageBox.Show(
-            BibleInstallPlanner.ReplaceQuestion(repeated.Select(p => entryOf(p.Item).Abbreviation).ToList(), verb, othersToo),
-            "EcclesiaCast",
-            othersToo ? MessageBoxButton.YesNoCancel : MessageBoxButton.YesNo,
-            MessageBoxImage.Question);
+        var question = BibleInstallPlanner.ReplaceQuestion(
+            repeated.Select(p => entryOf(p.Item).Abbreviation).ToList(), verb, othersToo);
 
-        return answer switch
+        if (othersToo)
         {
-            MessageBoxResult.Yes => plan,
-            MessageBoxResult.No when othersToo => plan.Where(p => p.Replaces.Count == 0).ToList(),
-            _ => null,
-        };
+            // Yes / No / Cancel; closing the notice counts as Cancel.
+            return Notice.Choose(question, "Sí", "No", "Cancelar", "EcclesiaCast") switch
+            {
+                true => plan,
+                false => plan.Where(p => p.Replaces.Count == 0).ToList(),
+                null => null,
+            };
+        }
+
+        // Yes / No: anything but Yes brings nothing in. With the system box the
+        // window could not be closed any other way; here closing counts as No.
+        return Notice.Confirm(question, "Sí", "No", "EcclesiaCast") ? plan : null;
     }
 
     /// <summary>
