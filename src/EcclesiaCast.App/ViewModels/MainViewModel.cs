@@ -37,6 +37,7 @@ public sealed record DisplayOption(DisplayInfo Info, string Label)
 public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 {
     private const string OutputDisplayKey = "output.display";
+    private const string OutputChoiceKey = "output.choice";
     private const string StageNotesKey = "stage.notes.text";
     private const string QuickTextFontKey = "quicktext.font";
     private const string BibleHistoryKey = "bible.history";

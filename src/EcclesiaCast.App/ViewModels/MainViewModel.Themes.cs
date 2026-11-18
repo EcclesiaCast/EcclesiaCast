@@ -31,12 +31,14 @@ public sealed partial class MainViewModel
     [RelayCommand]
     private void RefreshDisplays()
     {
-        var saved = SelectedDisplay?.Info.DeviceName ?? _settings.Get(OutputDisplayKey);
+        var all = _displayProvider.GetDisplays();
+        var saved = SelectedDisplay?.Info.DeviceName
+            ?? FloatingOutput.Remembered(all, _settings.Get(OutputChoiceKey), _settings.Get(OutputDisplayKey));
         var savedStage = SelectedStageDisplay?.Info.DeviceName ?? _settings.Get(StageDisplayKey);
 
+        _refreshingDisplays = true;
         Displays.Clear();
         StageDisplays.Clear();
-        var all = _displayProvider.GetDisplays();
 
         // An ordinary window (to share by Discord, or with a single screen). With
         // one screen only it goes first: a full screen there covers the program.
@@ -67,6 +69,7 @@ public sealed partial class MainViewModel
             Displays.FirstOrDefault(o => o.Info.DeviceName == saved)
             ?? Displays.FirstOrDefault(o => o.Info.DeviceName == start)
             ?? Displays.FirstOrDefault();
+        _refreshingDisplays = false;
 
         // The stage goes anywhere but the congregation's screen.
         SelectedStageDisplay =

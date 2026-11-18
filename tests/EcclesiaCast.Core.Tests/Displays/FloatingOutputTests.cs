@@ -35,9 +35,35 @@ public class FloatingOutputTests
     }
 
     [Fact]
+    public void With_a_single_screen_what_an_older_version_kept_does_not_count()
+    {
+        // 1.4.0 kept «Pantalla 1» on a notebook only because it was the only option: the window goes first.
+        var remembered = FloatingOutput.Remembered([Notebook], chosen: null, keptBefore: Notebook.DeviceName);
+
+        Assert.Null(remembered);
+        Assert.Equal(FloatingOutput.DeviceName, FloatingOutput.StartingChoice([Notebook], remembered));
+    }
+
+    [Fact]
+    public void With_a_projector_what_an_older_version_kept_still_counts()
+    {
+        var remembered = FloatingOutput.Remembered([Notebook, Projector], chosen: null, keptBefore: Projector.DeviceName);
+
+        Assert.Equal(Projector.DeviceName, FloatingOutput.StartingChoice([Notebook, Projector], remembered));
+    }
+
+    [Fact]
+    public void What_is_chosen_from_now_on_is_remembered_with_one_screen_or_more()
+    {
+        // A projector set to «duplicate» (Windows sees one screen): «Pantalla 1» chosen once, kept after.
+        Assert.Equal(Notebook.DeviceName, FloatingOutput.Remembered([Notebook], Notebook.DeviceName, null));
+        Assert.Equal(FloatingOutput.DeviceName,
+            FloatingOutput.Remembered([Notebook, Projector], FloatingOutput.DeviceName, Projector.DeviceName));
+    }
+
+    [Fact]
     public void What_was_used_last_time_wins_while_it_is_still_there()
     {
-        // Someone on a single screen (a projector set to «duplicate») who already went live on it keeps it.
         Assert.Equal(Notebook.DeviceName, FloatingOutput.StartingChoice([Notebook], Notebook.DeviceName));
         Assert.Equal(FloatingOutput.DeviceName, FloatingOutput.StartingChoice([Notebook, Projector], FloatingOutput.DeviceName));
         // The projector that was used is unplugged: back to the window.

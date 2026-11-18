@@ -13,7 +13,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   agrandarla; tamaños rápidos (640×360, 1280×720, 1920×1080 o 640×480, 1024×768, 1440×1080) y
   «Siempre visible». Recuerda forma, tamaño y lugar. Cerrarla apaga la salida. Las vistas EN VIVO y
   VISTA PREVIA siguen la forma elegida. **Con una sola pantalla es la primera opción de la lista y
-  la que viene elegida** (quien ya había proyectado en su única pantalla la sigue teniendo).
+  la que viene elegida**, también para quien ya usaba el programa así. Desde ahora la salida que se
+  elige en la lista queda recordada (aunque no se ponga en vivo): si alguien elige «Pantalla 1»,
+  arranca ahí la próxima vez.
 - **Biblias en el XML de OpenSong.** Además de JSON y Zefania, se importan las Biblias en el
   XML que usan ProPresenter, Holyrics y FreeShow (y páginas como Beblia): `<bible><b n="Juan"><c n="3"><v n="16">`.
   La ventana «Cómo preparar una Biblia para importar» trae su ejemplo y las instrucciones para la IA lo nombran.

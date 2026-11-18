@@ -48,14 +48,22 @@ public static class FloatingOutput
     public static bool GoesFirst(IReadOnlyList<DisplayInfo> screens) => screens.Count <= 1;
 
     /// <summary>
+    /// The output remembered from last time. What was chosen from this version
+    /// on (<paramref name="chosen"/>) always counts. What an older version kept
+    /// (<paramref name="keptBefore"/>) counts only with more than one screen:
+    /// with a single one it was the only option there was, not a choice, so the
+    /// window takes its place the first time.
+    /// </summary>
+    public static string? Remembered(IReadOnlyList<DisplayInfo> screens, string? chosen, string? keptBefore) =>
+        !string.IsNullOrEmpty(chosen) ? chosen
+        : GoesFirst(screens) ? null
+        : keptBefore;
+
+    /// <summary>
     /// Which output to start on: the one remembered if it is still there; with a
     /// single screen and nothing remembered, the window; otherwise a screen that
     /// is not the main one (the projector), or the main one.
     /// </summary>
-    /// <remarks>
-    /// Someone who already went live on their only screen keeps it: that may be
-    /// a projector set to «duplicate», where the full screen is what they want.
-    /// </remarks>
     public static string StartingChoice(IReadOnlyList<DisplayInfo> screens, string? remembered)
     {
         if (remembered == DeviceName || screens.Any(s => s.DeviceName == remembered))

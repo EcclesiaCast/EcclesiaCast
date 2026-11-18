@@ -40,7 +40,8 @@ Falta probar a mano:
 - [ ] **Con una sola pantalla** (una notebook sin proyector, en una instalación nueva o en otra PC):
   «⧉ En una ventana» tiene que ser la primera de la lista «Salida:» y venir elegida. Ojo con una
   notebook con el proyector en «duplicar»: ahí Windows ve una sola pantalla, así que también arranca
-  en la ventana; para pantalla completa hay que elegir «Pantalla 1» (después lo recuerda).
+  en la ventana (también si ya la usaban con la 1.4.0); para pantalla completa hay que elegir
+  «Pantalla 1» en la lista una vez, y al cerrar y abrir el programa tiene que seguir ahí.
 - [ ] Si se toca la ventana flotante, el teclado queda en ella: las teclas del panel (flechas,
   Ctrl+Enter) no andan hasta volver a hacer clic en el panel. Ver si molesta.
 - [ ] **«➕ Agregar» en Canciones** con el panel angosto: que el título «CANCIONES» no quede tapado.
