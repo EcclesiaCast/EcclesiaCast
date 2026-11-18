@@ -39,4 +39,40 @@ public sealed class WindowsPlatformPaths : IPlatformPaths
                 "EcclesiaCast", "copias-livianas");
 
     public string BundledFolder => AppContext.BaseDirectory;
+
+    public string SoftouchFolder =>
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), "Softouch");
+
+    /// <summary>
+    /// Documents and the OneDrive mirror of it, in both the English and Spanish
+    /// spellings — with OneDrive on, the real folder usually lives there and not
+    /// in the local Documents.
+    /// </summary>
+    public IReadOnlyList<string> DocumentFolders
+    {
+        get
+        {
+            var folders = new List<string>
+            {
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Documents"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Documentos"),
+            };
+
+            foreach (var oneDrive in new[]
+                     {
+                         Environment.GetEnvironmentVariable("OneDrive"),
+                         Environment.GetEnvironmentVariable("OneDriveConsumer"),
+                         Environment.GetEnvironmentVariable("OneDriveCommercial"),
+                     })
+            {
+                if (string.IsNullOrWhiteSpace(oneDrive))
+                    continue;
+                folders.Add(Path.Combine(oneDrive, "Documents"));
+                folders.Add(Path.Combine(oneDrive, "Documentos"));
+            }
+
+            return folders;
+        }
+    }
 }

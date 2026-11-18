@@ -28,4 +28,13 @@ public interface IPlatformPaths
 
     /// <summary>What comes with the program (the bundled Bibles and backgrounds).</summary>
     string BundledFolder { get; }
+
+    /// <summary>Where EasyWorship keeps its libraries (the folder «Softouch»), to bring songs over from it.</summary>
+    string SoftouchFolder { get; }
+
+    /// <summary>
+    /// Where to look for ProPresenter: the documents folder and, with a cloud
+    /// drive on, its copy of it — a copy usually holds the real folder.
+    /// </summary>
+    IReadOnlyList<string> DocumentFolders { get; }
 }

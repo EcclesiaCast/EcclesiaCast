@@ -74,6 +74,11 @@ internal sealed class TempPaths(string root) : IPlatformPaths
     public string LightCopiesFolder { get; } = Path.Combine(root, "light");
 
     public string BundledFolder { get; } = Path.Combine(root, "bundled");
+
+    public string SoftouchFolder { get; } = Path.Combine(root, "Softouch");
+
+    /// <summary>Only one: «documents» inside the temporary folder.</summary>
+    public IReadOnlyList<string> DocumentFolders { get; } = [Path.Combine(root, "documents")];
 }
 
 /// <summary>A main screen and a second one, like a church with a projector.</summary>
