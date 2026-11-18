@@ -16,6 +16,10 @@
     <!-- Sólo para achicar el cuadro de video del panel LIVE sin copiarlo
          entero (VlcVideoSurface). -->
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- .NET 9 turns CET (a Windows stack protection) on by default. It stays off,
+         as it was with .NET 8, until VLC, Whisper and WebView2 are tried with CET
+         on: the Windows version must not get worse. -->
+    <CETCompat>false</CETCompat>
     <AssemblyTitle>EcclesiaCast</AssemblyTitle>
     <Product>EcclesiaCast</Product>
   </PropertyGroup>
