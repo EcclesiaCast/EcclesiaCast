@@ -22,7 +22,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   prueba (canciones, Biblia, franjas, contorno, sombra, cuenta regresiva, logo, escenario) y un
   programa que las dibuja sin mostrar nada, para comprobar que la versión de Mac corte la letra igual.
 - Por dentro, sin cambios para quien usa el programa: lo que deciden y guardan las ventanas
-  Papelera, Pixabay, Logos, Buscar letra en internet, Propiedades del medio e Importar canciones
+  Papelera, Pixabay, Logos, Buscar letra en internet, Propiedades del medio, Importar canciones,
+  Estilos de la transmisión, el diseñador del escenario, el diseñador de canciones y lo que la
+  ventana principal recuerda de un servicio a otro (tamaños, lugares, bloques plegados)
   pasó a la parte común (con pruebas), para que la versión de Mac no tenga que repetirlo.
 
 ## [1.4.0] - 2026-11-17
