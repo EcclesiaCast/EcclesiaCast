@@ -15,13 +15,13 @@ public partial class MainWindow
     internal bool IsAdvancedUi => AdvancedModeItem.IsChecked;
 
     private void RestoreUiMode() =>
-        ApplyUiMode(OperatorLayout.IsAdvanced(_settings?.Get(OperatorLayout.SettingKey)));
+        ApplyUiMode(_settings?.ReadAdvancedUi() == true);
 
     /// <summary>Changes the layout and remembers the choice for the next service.</summary>
     internal void SetUiMode(bool advanced)
     {
         ApplyUiMode(advanced);
-        _settings?.Set(OperatorLayout.SettingKey, OperatorLayout.ToSetting(advanced));
+        _settings?.WriteAdvancedUi(advanced);
     }
 
     /// <summary>

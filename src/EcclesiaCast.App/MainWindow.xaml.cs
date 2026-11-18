@@ -7,6 +7,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using EcclesiaCast.App.Controls;
 using EcclesiaCast.App.Services;
+using EcclesiaCast.Presentation.Services;
 using EcclesiaCast.Presentation.ViewModels;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Audio;
@@ -19,14 +20,11 @@ namespace EcclesiaCast.App;
 
 public partial class MainWindow : Window
 {
-    private const string LayoutLibraryKey = "layout.library.width";
-    private const string LayoutBibleGridKey = "layout.biblegrid.width";
-    private const string LayoutPreviewKey = "layout.preview.width";
-    private const string LayoutPlaylistKey = "layout.playlist.height";
-    private const string LayoutMediaKey = "layout.media.height";
-    private const string LayoutWindowKey = "layout.window";
+    /// <summary>What is remembered between services (null until <see cref="AttachLayoutPersistence"/>).</summary>
+    private MainWindowSettings? _settings;
 
-    private ISettingsStore? _settings;
+    /// <summary>Opens the transitions window over the window it is given.</summary>
+    private Action<Window>? _openTransitions;
 
     public MainWindow()
     {
@@ -147,31 +145,31 @@ public partial class MainWindow : Window
         WebPanelView.Visibility == Visibility.Visible && WebPanelView.IsHitTestVisible && WebPanelView.HasKeyboardInside;
 
     /// <summary>Restores the panel sizes saved from the last session.</summary>
-    public void AttachLayoutPersistence(ISettingsStore settings)
+    public void AttachLayoutPersistence(MainWindowSettings settings, Action<Window> openTransitions)
     {
         _settings = settings;
+        _openTransitions = openTransitions;
 
         // The sizes belong to the blocks, not to the slots: a library moved to
         // the right keeps the width it had on the left.
-        if (ReadDouble(LayoutLibraryKey) is double library)
+        if (settings.ReadSize(MainWindowSettings.LibraryWidthKey) is double library)
             _libraryWidth = library;
-        if (ReadDouble(LayoutBibleGridKey) is double bibleGrid)
+        if (settings.ReadSize(MainWindowSettings.BibleGridWidthKey) is double bibleGrid)
             _bibleGridWidth = bibleGrid;
-        if (ReadDouble(LayoutPreviewKey) is double preview)
+        if (settings.ReadSize(MainWindowSettings.PreviewWidthKey) is double preview)
             _rightWidth = preview;
-        if (ReadDouble(LayoutPlaylistKey) is double playlist)
+        if (settings.ReadSize(MainWindowSettings.PlaylistHeightKey) is double playlist)
             _playlistHeight = playlist;
-        if (ReadDouble(LayoutMediaKey) is double media)
+        if (settings.ReadSize(MainWindowSettings.MediaHeightKey) is double media)
             _mediaHeight = media;
         RestoreLayoutOptions();
         RestoreUiMode();
 
-        if (settings.Get(LayoutWindowKey)?.Split(';') is [var w, var h, var state]
-            && double.TryParse(w, out var width) && double.TryParse(h, out var height))
+        if (settings.ReadWindow() is { } bounds)
         {
-            Width = Math.Max(MinWidth, width);
-            Height = Math.Max(MinHeight, height);
-            if (state == "max")
+            Width = Math.Max(MinWidth, bounds.Width);
+            Height = Math.Max(MinHeight, bounds.Height);
+            if (bounds.Maximized)
                 WindowState = WindowState.Maximized;
         }
 
@@ -181,9 +179,6 @@ public partial class MainWindow : Window
         Closing += (_, _) => Services.FeedbackCoordinator.AskOnClosing(this);
     }
 
-    private double? ReadDouble(string key) =>
-        double.TryParse(_settings?.Get(key), out var value) && value > 0 ? value : null;
-
     private void SaveLayout()
     {
         if (_settings is null)
@@ -192,16 +187,15 @@ public partial class MainWindow : Window
         try
         {
             CaptureSizes();
-            _settings.Set(LayoutLibraryKey, _libraryWidth.ToString("0"));
-            _settings.Set(LayoutBibleGridKey, _bibleGridWidth.ToString("0"));
-            _settings.Set(LayoutPreviewKey, _rightWidth.ToString("0"));
-            _settings.Set(LayoutPlaylistKey, _playlistHeight.ToString("0"));
-            _settings.Set(LayoutMediaKey, _mediaHeight.ToString("0"));
+            _settings.WriteSize(MainWindowSettings.LibraryWidthKey, _libraryWidth);
+            _settings.WriteSize(MainWindowSettings.BibleGridWidthKey, _bibleGridWidth);
+            _settings.WriteSize(MainWindowSettings.PreviewWidthKey, _rightWidth);
+            _settings.WriteSize(MainWindowSettings.PlaylistHeightKey, _playlistHeight);
+            _settings.WriteSize(MainWindowSettings.MediaHeightKey, _mediaHeight);
 
-            var size = WindowState == WindowState.Maximized
-                ? $"{RestoreBounds.Width:0};{RestoreBounds.Height:0};max"
-                : $"{Width:0};{Height:0};normal";
-            _settings.Set(LayoutWindowKey, size);
+            _settings.WriteWindow(WindowState == WindowState.Maximized
+                ? new WindowBounds(RestoreBounds.Width, RestoreBounds.Height, Maximized: true)
+                : new WindowBounds(Width, Height, Maximized: false));
         }
         catch
         {
@@ -813,10 +807,7 @@ public partial class MainWindow : Window
     /// <summary>Opens the transitions window over <paramref name="owner"/> (the menu and the Ajustes window share it).</summary>
     internal void OpenTransitions(Window owner)
     {
-        if (_settings is null)
-            return;
-
-        new Views.TransitionsWindow(_settings) { Owner = owner }.ShowDialog();
+        _openTransitions?.Invoke(owner);
     }
 
     private Views.PixabayWindow? _pixabayWindow;

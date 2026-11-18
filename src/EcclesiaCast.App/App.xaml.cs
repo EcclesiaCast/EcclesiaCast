@@ -260,7 +260,9 @@ public partial class App : Application
         ColorPickerHelper.Settings = settings;
         TransitionSettings.Load(settings);
         BroadcastStyleSettings.Load(settings);
-        mainWindow.AttachLayoutPersistence(settings);
+        mainWindow.AttachLayoutPersistence(
+            new MainWindowSettings(settings),
+            owner => new Views.TransitionsWindow(settings) { Owner = owner }.ShowDialog());
 
         // How much the program is used, and whether the last run ended badly:
         // both only ever leave the computer inside a comment the person sends.

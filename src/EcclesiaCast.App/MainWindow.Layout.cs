@@ -3,6 +3,7 @@ using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Input;
 using EcclesiaCast.App.Services;
+using EcclesiaCast.Presentation.Services;
 
 namespace EcclesiaCast.App;
 
@@ -19,17 +20,17 @@ namespace EcclesiaCast.App;
 /// </summary>
 public partial class MainWindow
 {
-    private const string MirroredKey = "layout.mirrored";
-    private const string PlaylistTopKey = "layout.playlist.top";
-    private const string MediaTopKey = "layout.media.top";
-    private const string LiveBottomKey = "layout.live.bottom";
-    private const string OutputSplitKey = "layout.output.split";
-    private const string LibraryCollapsedKey = "layout.library.collapsed";
-    private const string PlaylistCollapsedKey = "layout.playlist.collapsed";
-    private const string MediaCollapsedKey = "layout.media.collapsed";
-    private const string ToolsCollapsedKey = "layout.tools.collapsed";
-    private const string LeftRailKey = "layout.left.rail";
-    private const string AudioListCollapsedKey = "layout.audiolist.collapsed";
+    private const string MirroredKey = MainWindowSettings.MirroredKey;
+    private const string PlaylistTopKey = MainWindowSettings.PlaylistTopKey;
+    private const string MediaTopKey = MainWindowSettings.MediaTopKey;
+    private const string LiveBottomKey = MainWindowSettings.LiveBottomKey;
+    private const string OutputSplitKey = MainWindowSettings.OutputSplitKey;
+    private const string LibraryCollapsedKey = MainWindowSettings.LibraryCollapsedKey;
+    private const string PlaylistCollapsedKey = MainWindowSettings.PlaylistCollapsedKey;
+    private const string MediaCollapsedKey = MainWindowSettings.MediaCollapsedKey;
+    private const string ToolsCollapsedKey = MainWindowSettings.ToolsCollapsedKey;
+    private const string LeftRailKey = MainWindowSettings.LeftRailKey;
+    private const string AudioListCollapsedKey = MainWindowSettings.AudioListCollapsedKey;
 
     private const double LibraryMinWidth = 200;
     private const double RightMinWidth = 260;
@@ -205,13 +206,13 @@ public partial class MainWindow
 
     private void RestoreLayoutOptions()
     {
-        _mirrored = _settings?.Get(MirroredKey) == "1";
-        _playlistOnTop = _settings?.Get(PlaylistTopKey) == "1";
-        _mediaOnTop = _settings?.Get(MediaTopKey) == "1";
-        _liveAtBottom = _settings?.Get(LiveBottomKey) == "1";
-        _outputSplit = _settings?.Get(OutputSplitKey) == "1";
+        _mirrored = _settings?.ReadFlag(MirroredKey) == true;
+        _playlistOnTop = _settings?.ReadFlag(PlaylistTopKey) == true;
+        _mediaOnTop = _settings?.ReadFlag(MediaTopKey) == true;
+        _liveAtBottom = _settings?.ReadFlag(LiveBottomKey) == true;
+        _outputSplit = _settings?.ReadFlag(OutputSplitKey) == true;
         foreach (var fold in Folds)
-            fold.Set(_settings?.Get(fold.Key) == "1");
+            fold.Set(_settings?.ReadFlag(fold.Key) == true);
         _libraryShowsGrid = LibraryWantsGrid;
         _playlistFoldedByGrid = false;
         FoldPlaylistForGrid();
@@ -223,17 +224,17 @@ public partial class MainWindow
         if (_settings is null)
             return;
 
-        _settings.Set(MirroredKey, _mirrored ? "1" : "0");
-        _settings.Set(PlaylistTopKey, _playlistOnTop ? "1" : "0");
-        _settings.Set(MediaTopKey, _mediaOnTop ? "1" : "0");
-        _settings.Set(LiveBottomKey, _liveAtBottom ? "1" : "0");
-        _settings.Set(OutputSplitKey, _outputSplit ? "1" : "0");
+        _settings.WriteFlag(MirroredKey, _mirrored);
+        _settings.WriteFlag(PlaylistTopKey, _playlistOnTop);
+        _settings.WriteFlag(MediaTopKey, _mediaOnTop);
+        _settings.WriteFlag(LiveBottomKey, _liveAtBottom);
+        _settings.WriteFlag(OutputSplitKey, _outputSplit);
         foreach (var fold in Folds)
         {
             // The grid's own fold is not saved: the next session opens the
             // playlist again when it leaves the grid.
             var folded = fold.Key == PlaylistCollapsedKey ? PlaylistCollapsedByOperator : fold.Get();
-            _settings.Set(fold.Key, folded ? "1" : "0");
+            _settings.WriteFlag(fold.Key, folded);
         }
     }
 
