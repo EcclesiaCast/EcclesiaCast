@@ -9,6 +9,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 - Por dentro, sin cambios para quien usa el programa: las pruebas del núcleo
   ahora también corren en una Mac, y los nombres de archivo que arma el programa
   (fondos de Pixabay, instalador descargado) siguen las mismas reglas en todos los sistemas.
+- Por dentro, sin cambios para quien usa el programa: lo que no dibuja (servicios, control
+  remoto, avisos, carpetas) pasó a una parte común, para que la versión de Mac use la misma lógica.
 
 ## [1.4.0] - 2026-11-17
 
