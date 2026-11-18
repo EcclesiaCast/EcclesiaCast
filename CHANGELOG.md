@@ -11,6 +11,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   (fondos de Pixabay, instalador descargado) siguen las mismas reglas en todos los sistemas.
 - Por dentro, sin cambios para quien usa el programa: lo que no dibuja (servicios, control
   remoto, avisos, carpetas) pasó a una parte común, para que la versión de Mac use la misma lógica.
+- Por dentro, sin cambios para quien usa el programa: los modelos de vista (la lógica de cada
+  pantalla) ya no dependen de las ventanas de Windows; piden esas cosas por medio de avisos
+  y servicios, para poder pasarlos a la parte común.
 
 ## [1.4.0] - 2026-11-17
 
