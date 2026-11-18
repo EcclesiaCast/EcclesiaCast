@@ -7,7 +7,7 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
-- **La salida en una ventana.** En la lista «Salida:» está **«🪟 En una ventana»**: la proyección
+- **La salida en una ventana.** En la lista «Salida:» está **«⧉ En una ventana»**: la proyección
   sale en una ventana común (se mueve, se minimiza, se comparte por Discord o una videollamada) en vez
   de a pantalla completa. Con el clic derecho se elige la forma, 16:9 o 4:3, que se conserva al
   agrandarla; tamaños rápidos (640×360, 1280×720, 1920×1080 o 640×480, 1024×768, 1440×1080) y
@@ -27,8 +27,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 ### Arreglado
 
 - **Un video de YouTube ya no deja atrapado con una sola pantalla.** El video en la salida no toma
-  el mouse ni el teclado: el doble clic y la tecla Esc vuelven al programa también con YouTube, Esc
+  el mouse ni el teclado (tampoco asoman sus controles): el doble clic y la tecla Esc vuelven al
+  programa también con YouTube, aunque se haya hecho clic sobre el video; Esc
   sobre la salida la apaga, y el aviso «Para volver al programa» se ve encima del video.
+- **La ventana «Cómo preparar una Biblia para importar» entra en la pantalla.** En una notebook
+  quedaba más alta que la pantalla y los botones de abajo no se alcanzaban.
 
 ## [1.4.0] - 2026-11-17
 

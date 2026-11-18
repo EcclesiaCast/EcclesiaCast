@@ -444,7 +444,7 @@ dirección y un **PIN de cuatro dígitos**.
 
 ### La salida en una ventana (Discord, una sola pantalla)
 
-En la lista **Salida:** elegí **🪟 En una ventana**. Al poner en vivo se abre una
+En la lista **Salida:** elegí **⧉ En una ventana**. Al poner en vivo se abre una
 ventana común de Windows con lo mismo que ve la congregación: se mueve, se agranda,
 se minimiza y se comparte por Discord o por una videollamada como cualquier otra.
 Cerrarla es lo mismo que **Apagar salida**.

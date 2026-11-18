@@ -22,7 +22,7 @@ public partial class OutputWindow : Window
     }
 
     /// <param name="floating">
-    /// An ordinary window («🪟 En una ventana») instead of a full screen on a display.
+    /// An ordinary window («⧉ En una ventana») instead of a full screen on a display.
     /// </param>
     public OutputWindow(bool floating)
     {
@@ -32,6 +32,9 @@ public partial class OutputWindow : Window
             MakeFloating();
         DataContextChanged += OnDataContextChanged;
         YouTube.Ended += (_, _) => VideoEnded?.Invoke(this, EventArgs.Empty);
+        YouTube.DoubleClicked += (_, _) => TurnOffForDoubleClick();
+        YouTube.EscapePressed += (_, _) => OnYouTubeEscape();
+        YouTube.MenuRequested += (_, _) => OpenFloatingMenu();
         Video.Ended += (_, _) => VideoEnded?.Invoke(this, EventArgs.Empty);
 
         // Changing media never goes through black: whatever was on screen stays
@@ -201,6 +204,14 @@ public partial class OutputWindow : Window
     /// </summary>
     private void ShowWayBackHint()
     {
+        // A YouTube video already on screen would hide it (native window): the
+        // page shows it over the video instead.
+        if (YouTube.Visibility == Visibility.Visible && !s_youTubeWayBackShown)
+        {
+            s_youTubeWayBackShown = true;
+            YouTube.ShowHint(WayBackText);
+        }
+
         WayBackHint.BeginAnimation(OpacityProperty, null);
         WayBackHint.Visibility = Visibility.Visible;
         WayBackHint.Opacity = 1;
@@ -213,13 +224,28 @@ public partial class OutputWindow : Window
         WayBackHint.BeginAnimation(OpacityProperty, fade);
     }
 
-    private void Output_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void Output_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) =>
+        e.Handled = TurnOffForDoubleClick();
+
+    /// <summary>A double click over the picture (or over a YouTube video, which reports its own).</summary>
+    private bool TurnOffForDoubleClick()
     {
         if (_display is null || !OperatorScreen.Holds(_display))
+            return false;
+
+        TurnOffRequested?.Invoke(this, EventArgs.Empty);
+        Application.Current?.MainWindow?.Activate();
+        return true;
+    }
+
+    /// <summary>Esc pressed while the keyboard was in a YouTube video: the same as Esc anywhere else.</summary>
+    private void OnYouTubeEscape()
+    {
+        if (IsFloating)
             return;
 
-        e.Handled = true;
         TurnOffRequested?.Invoke(this, EventArgs.Empty);
+        Application.Current?.MainWindow?.Activate();
     }
 
     // ── Apagar la salida con fundido ─────────────────────────────
@@ -628,6 +654,11 @@ public partial class OutputWindow : Window
 
     protected override void OnClosed(EventArgs e)
     {
+        // A closed window (swapped for the floating one, or back) stops
+        // following the projection: its players are gone.
+        if (DataContext is INotifyPropertyChanged vm)
+            vm.PropertyChanged -= OnProjectionChanged;
+
         Video.Stop();
         LogoVideo.Stop();
         YouTube.Clear();

@@ -29,6 +29,21 @@ public partial class YouTubeSurface : UserControl
     /// <summary>Raised when the video reaches its end and shouldn't loop.</summary>
     public event EventHandler<VideoEndBehavior>? Ended;
 
+    /// <summary>
+    /// A double click, a right click or Esc over the video. The video is a
+    /// separate native window that WPF never hears from, so a cover inside the
+    /// page catches them: the YouTube player itself never gets the mouse (no
+    /// controls appearing, no keyboard trapped in it) and the output window
+    /// does with them what it does over anything else.
+    /// </summary>
+    public event EventHandler? DoubleClicked;
+
+    /// <inheritdoc cref="DoubleClicked"/>
+    public event EventHandler? MenuRequested;
+
+    /// <inheritdoc cref="DoubleClicked"/>
+    public event EventHandler? EscapePressed;
+
     private async Task EnsureBrowserAsync()
     {
         if (_ready)
@@ -130,7 +145,8 @@ public partial class YouTubeSurface : UserControl
         _state = PlaybackState.None;
         _pausedForHiddenOutput = false;
         _pausedForCover = false;
-        if (_ready)
+        // CoreWebView2 is null again once the window that held it has closed.
+        if (_ready && Browser.CoreWebView2 is not null)
             Browser.NavigateToString("<html><body style='margin:0;background:#000'></body></html>");
     }
 
@@ -277,6 +293,21 @@ public partial class YouTubeSurface : UserControl
             return;
         }
 
+        // What the mouse and the keyboard do over the video: the page catches
+        // them (the YouTube player never gets them) and passes them on.
+        switch (message)
+        {
+            case "dblclick":
+                DoubleClicked?.Invoke(this, EventArgs.Empty);
+                return;
+            case "menu":
+                MenuRequested?.Invoke(this, EventArgs.Empty);
+                return;
+            case "esc":
+                EscapePressed?.Invoke(this, EventArgs.Empty);
+                return;
+        }
+
         // The page posts "ended" when playback finishes without looping.
         if (message == "ended")
         {
@@ -303,9 +334,12 @@ public partial class YouTubeSurface : UserControl
           <head><meta charset="utf-8"><style>
             html,body{margin:0;height:100%;background:#000;overflow:hidden}
             #player{width:100%;height:100%}
+            #cover{position:fixed;left:0;top:0;right:0;bottom:0;z-index:5;background:transparent}
           </style></head>
           <body>
             <div id="player"></div>
+            <!-- Over the player: the mouse lands here, never in YouTube's player. -->
+            <div id="cover"></div>
             <script src="https://www.youtube.com/iframe_api"></script>
             <script>
               var params = new URLSearchParams(location.search);
@@ -317,6 +351,14 @@ public partial class YouTubeSurface : UserControl
               function post(text) {
                 try { window.chrome.webview.postMessage(String(text)); } catch (e) {}
               }
+              // The mouse and Esc over the video belong to the program, not to
+              // YouTube: they are passed on to the output window.
+              var cover = document.getElementById('cover');
+              cover.addEventListener('dblclick', function (e) { e.preventDefault(); post('dblclick'); });
+              cover.addEventListener('contextmenu', function (e) { e.preventDefault(); post('menu'); });
+              document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') { e.preventDefault(); post('esc'); }
+              });
               function onYouTubeIframeAPIReady() {
                 player = new YT.Player('player', {
                   videoId: videoId,

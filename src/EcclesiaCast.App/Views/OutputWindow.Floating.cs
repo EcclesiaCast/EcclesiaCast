@@ -9,7 +9,7 @@ using EcclesiaCast.Core.Displays;
 namespace EcclesiaCast.App.Views;
 
 /// <summary>
-/// «🪟 En una ventana»: the same output in an ordinary window, for a church
+/// «⧉ En una ventana»: the same output in an ordinary window, for a church
 /// that shares it by Discord, a notebook with a single screen, or trying things
 /// without a projector. It has a border and a taskbar button, it moves,
 /// minimizes and closes (closing switches the output off), and it keeps the
@@ -187,6 +187,18 @@ public partial class OutputWindow
     }
 
     // ── Menú del clic derecho ────────────────────────────────────
+
+    /// <summary>A right click over a YouTube video, which WPF does not hear by itself.</summary>
+    private void OpenFloatingMenu()
+    {
+        if (!IsFloating || ContextMenu is null)
+            return;
+
+        FillMenu();
+        ContextMenu.PlacementTarget = this;
+        ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;
+        ContextMenu.IsOpen = true;
+    }
 
     private void FillMenu()
     {

@@ -17,6 +17,11 @@ public partial class BibleFormatHelpWindow : Window
     public BibleFormatHelpWindow()
     {
         InitializeComponent();
+
+        // Never taller than the screen: with three formats it no longer fits on
+        // a notebook, and the buttons at the bottom were left out of reach.
+        MaxHeight = Math.Min(MaxHeight, SystemParameters.WorkArea.Height - 16);
+
         JsonPreview.Text = BibleImportHelp.JsonPreview();
         XmlPreview.Text = BibleImportHelp.ExampleZefaniaXml();
         OpenSongPreview.Text = BibleImportHelp.ExampleOpenSongXml();

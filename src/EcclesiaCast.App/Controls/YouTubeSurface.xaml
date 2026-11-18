@@ -3,10 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf">
     <Grid Background="Black">
-        <!-- Apagado para el mouse y el teclado: el video no se toca en la salida
-             (el operador lo maneja desde el panel). Así un clic no le pasa el
-             teclado al navegador, y el doble clic y la tecla Esc siguen sirviendo
-             para volver al programa cuando la salida tapa la única pantalla. -->
-        <wv2:WebView2 x:Name="Browser" DefaultBackgroundColor="Black" IsEnabled="False" Focusable="False"/>
+        <!-- El video no se toca en la salida (el operador lo maneja desde el panel).
+             El mouse y Esc los atrapa una capa dentro de la página del reproductor y
+             los pasa al programa (DoubleClicked, MenuRequested, EscapePressed): así
+             el doble clic y Esc siguen sirviendo para volver cuando la salida tapa
+             la única pantalla. -->
+        <wv2:WebView2 x:Name="Browser" DefaultBackgroundColor="Black" Focusable="False"/>
     </Grid>
 </UserControl>

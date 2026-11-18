@@ -26,7 +26,7 @@ public readonly record struct ScreenRect(int Left, int Top, int Right, int Botto
 }
 
 /// <summary>
-/// «🪟 En una ventana»: the output in an ordinary window that can be moved,
+/// «⧉ En una ventana»: the output in an ordinary window that can be moved,
 /// resized, minimized and shared (Discord, a call) — also handy on a notebook
 /// with a single screen or to try things without a projector. It travels as a
 /// <see cref="DisplayInfo"/> like any screen, the way «only the stream» does,
@@ -37,7 +37,7 @@ public static class FloatingOutput
     /// <summary>Not a Windows device name, so it can never match a real screen.</summary>
     public const string DeviceName = "ecclesiacast:ventana";
 
-    public const string Label = "🪟 En una ventana";
+    public const string Label = "⧉ En una ventana";
 
     public static bool IsFloating(DisplayInfo? display) => display?.DeviceName == DeviceName;
 

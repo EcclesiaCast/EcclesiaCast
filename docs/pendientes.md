@@ -14,41 +14,42 @@ Hay cuatro tipos de cosas, cada una en su sección:
 
 ## 1. Para probar (lo prueba Alexis)
 
+### Arreglos del formulario de comentarios y salida en una ventana (18/11/2026)
+
+Claude los probó el 18/11 con el programa abierto en esta PC (con una copia de la biblioteca;
+la real no se tocó). **Anduvo:** «➕ Agregar» y su menú; «Enviar» apagado con la caja vacía y
+prendido al escribir; la ayuda de formatos con los tres ejemplos (y ahora entra en la pantalla);
+importar un XML de OpenSong con los 66 libros en inglés (Juan 3:16 y Salmos 23 en su lugar, 67
+versículos); la ventana flotante (abre centrada con la imagen en 1280×720 exactos, bordes y
+esquinas sin deformar, 4:3 y 16:9 desde el menú con EN VIVO del panel siguiéndola, tamaños rápidos
+exactos, «Siempre visible», maximizada con bandas negras, doble clic y Esc no la apagan, la X la
+apaga, se acuerda de forma, tamaño y lugar, YouTube adentro con el clic derecho encima, pasar a
+pantalla completa y volver en vivo, cerrar el programa con ella abierta); YouTube a pantalla
+completa en la pantalla del programa: el aviso «Para volver…» se ve encima del video, y después de
+hacer clic sobre el video, Esc vuelve al programa; el doble clic también.
+
+Falta probar a mano:
+
+- [ ] **YouTube en Windows 10** (donde le pasó a la iglesia), con la notebook sola: lo mismo de
+  arriba (clic sobre el video y Esc; doble clic).
+- [ ] **Ventana flotante con Discord:** compartirla por Discord (o una videollamada) y ver que se
+  transmite bien; minimizarla y volver; un video, el logo, el aviso al pie y la cuenta regresiva
+  adentro; que las páginas /salida (OBS, celular, escenario) siguen igual. Con dos monitores:
+  dejarla en el segundo, cerrar el programa, desenchufarlo y abrir: tiene que aparecer en el medio
+  de la principal.
+- [ ] Si se toca la ventana flotante, el teclado queda en ella: las teclas del panel (flechas,
+  Ctrl+Enter) no andan hasta volver a hacer clic en el panel. Ver si molesta.
+- [ ] **«➕ Agregar» en Canciones** con el panel angosto: que el título «CANCIONES» no quede tapado.
+- [ ] **Biblia XML real** de OpenSong o de Beblia (la que exporta Holyrics o FreeShow). Ojo: si el
+  archivo trae los nombres de los libros en inglés, así se muestran (por ejemplo «John 3:16»).
+- [ ] La página `sitio/cargar-canciones.html` sigue diciendo «botón ➕»: cambiarlo a «➕ Agregar» cuando salga la versión.
+
+### Lo de antes
+
 Se probaron el 14/10/2026 con la beta.11 y quedaron **dados por buenos**: el mini
 reproductor de Spotify, «mismo título, distinto artista» y las flechas del
 teclado en Propiedades. Lo que sigue se corrigió o se agregó después de esa
 prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
-
-### Arreglos del formulario de comentarios (18/11/2026, sin abrir el programa)
-
-- [ ] **«🪟 En una ventana»** (pedido para transmitir por Discord). En «Salida:» elegirla y poner
-  una canción en vivo: se abre una ventana con borde, en la barra de tareas, sin taparle el teclado al
-  panel. Probar: moverla, minimizarla y volver; arrastrar un borde y una esquina (la imagen no se
-  deforma); maximizarla (bandas negras a los costados, nada estirado); clic derecho → «Forma: 4:3»
-  (la ventana se angosta y EN VIVO / VISTA PREVIA del panel pasan a 4:3) y los tres tamaños rápidos;
-  «Siempre visible»; un video, un YouTube (que el clic derecho también ande encima), el logo, el aviso
-  al pie y la cuenta regresiva. Cerrarla con la X: la salida se apaga y el botón del panel lo muestra.
-  Cerrar el programa con la ventana abierta: tiene que cerrar sin trabarse. Abrirlo de nuevo: misma
-  forma, tamaño y lugar. Pasar de «En una ventana» a una pantalla y volver, estando en vivo. Ver que
-  el doble clic y Esc sobre la ventana no la apagan, que el puntero del mouse se ve, y que las páginas
-  /salida (OBS, celular, escenario) siguen igual. Con dos monitores: dejarla en el segundo, cerrar el
-  programa, desenchufarlo y abrir: tiene que aparecer en el medio de la principal.
-- [ ] Si se toca la ventana flotante, el teclado queda en ella: las teclas del panel (flechas,
-  Ctrl+Enter) no andan hasta volver a hacer clic en el panel. Ver si molesta.
-- [ ] **YouTube con una sola pantalla** (lo que le pasó a alguien con la 1.4.0 en Windows 10, que
-  tuvo que reiniciar la PC). Con la notebook sola: proyectar un video de YouTube y probar, en este orden,
-  1) que arriba aparece unos segundos «Para volver al programa: tecla Esc o doble clic»; 2) hacer clic
-  sobre el video y después tocar Esc: tiene que volver al programa; 3) proyectarlo otra vez y hacer
-  doble clic sobre el video: también tiene que volver. Ver además que el video se sigue viendo y suena
-  (el navegador quedó «apagado» para el mouse, no para reproducir).
-- [ ] **«➕ Agregar» en Canciones**: que el botón entra bien con el panel angosto y que el título
-  «CANCIONES» no queda tapado.
-- [ ] **Comentarios**: con la caja vacía «Enviar» está gris y se ve la línea que explica por qué;
-  al escribir algo se prende.
-- [ ] **Biblia XML de OpenSong**: importar una real (por ejemplo una de Beblia o la que exporta
-  Holyrics/FreeShow) y mirar Juan 3:16 y Salmos 23. Si tiene los nombres en inglés y no los 66 libros,
-  revisar que cada libro caiga en su lugar.
-- [ ] La página `sitio/cargar-canciones.html` sigue diciendo «botón ➕»: cambiarlo a «➕ Agregar» cuando salga la versión.
 
 - [ ] **Con el logo puesto no queda nada corriendo detrás** (lo comprobó Claude el
       14/10 en la PC: con un video de fondo el uso de procesador bajó de 18,7 %

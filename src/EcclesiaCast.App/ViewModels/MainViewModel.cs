@@ -144,7 +144,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 
     [ObservableProperty]
     private string _statusText =
-        "Creá una canción con ➕, o escribí un texto rápido y presioná Ctrl+Enter.";
+        "Creá una canción con «➕ Agregar», o escribí un texto rápido y presioná Ctrl+Enter.";
 
     /// <summary>Goes up by one every time something went wrong that the operator has to see: the window makes the status bar flash.</summary>
     [ObservableProperty]
