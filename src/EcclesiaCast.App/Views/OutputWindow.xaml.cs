@@ -17,9 +17,19 @@ public partial class OutputWindow : Window
 {
     private DisplayInfo? _display;
 
-    public OutputWindow()
+    public OutputWindow() : this(floating: false)
+    {
+    }
+
+    /// <param name="floating">
+    /// An ordinary window («🪟 En una ventana») instead of a full screen on a display.
+    /// </param>
+    public OutputWindow(bool floating)
     {
         InitializeComponent();
+        IsFloating = floating;
+        if (floating)
+            MakeFloating();
         DataContextChanged += OnDataContextChanged;
         YouTube.Ended += (_, _) => VideoEnded?.Invoke(this, EventArgs.Empty);
         Video.Ended += (_, _) => VideoEnded?.Invoke(this, EventArgs.Empty);
@@ -130,6 +140,16 @@ public partial class OutputWindow : Window
         CancelFadeOut();
 
         _display = display;
+        if (IsFloating)
+        {
+            // Stays where the operator left it; back from «off» it comes up again
+            // even if it had been minimized.
+            Show();
+            if (wasHidden && WindowState == WindowState.Minimized)
+                WindowState = WindowState.Normal;
+            return;
+        }
+
         Show();
         MoveToDisplay();
 
@@ -161,7 +181,8 @@ public partial class OutputWindow : Window
     /// </summary>
     protected override void OnPreviewKeyDown(System.Windows.Input.KeyEventArgs e)
     {
-        if (e.Key == System.Windows.Input.Key.Escape)
+        // The floating window is handled like any other: Esc there does nothing.
+        if (e.Key == System.Windows.Input.Key.Escape && !IsFloating)
         {
             e.Handled = true;
             TurnOffRequested?.Invoke(this, EventArgs.Empty);
@@ -592,6 +613,13 @@ public partial class OutputWindow : Window
         base.OnSourceInitialized(e);
 
         var hwnd = new WindowInteropHelper(this).Handle;
+        if (IsFloating)
+        {
+            // An ordinary window: it activates, and it is sized and placed as it was left.
+            SetUpFloating(hwnd);
+            return;
+        }
+
         _ = SetWindowLong(hwnd, GWL_EXSTYLE,
             GetWindowLong(hwnd, GWL_EXSTYLE) | WS_EX_NOACTIVATE);
 

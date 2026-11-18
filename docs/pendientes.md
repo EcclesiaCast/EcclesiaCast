@@ -21,6 +21,20 @@ prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
 
 ### Arreglos del formulario de comentarios (18/11/2026, sin abrir el programa)
 
+- [ ] **«🪟 En una ventana»** (pedido para transmitir por Discord). En «Salida:» elegirla y poner
+  una canción en vivo: se abre una ventana con borde, en la barra de tareas, sin taparle el teclado al
+  panel. Probar: moverla, minimizarla y volver; arrastrar un borde y una esquina (la imagen no se
+  deforma); maximizarla (bandas negras a los costados, nada estirado); clic derecho → «Forma: 4:3»
+  (la ventana se angosta y EN VIVO / VISTA PREVIA del panel pasan a 4:3) y los tres tamaños rápidos;
+  «Siempre visible»; un video, un YouTube (que el clic derecho también ande encima), el logo, el aviso
+  al pie y la cuenta regresiva. Cerrarla con la X: la salida se apaga y el botón del panel lo muestra.
+  Cerrar el programa con la ventana abierta: tiene que cerrar sin trabarse. Abrirlo de nuevo: misma
+  forma, tamaño y lugar. Pasar de «En una ventana» a una pantalla y volver, estando en vivo. Ver que
+  el doble clic y Esc sobre la ventana no la apagan, que el puntero del mouse se ve, y que las páginas
+  /salida (OBS, celular, escenario) siguen igual. Con dos monitores: dejarla en el segundo, cerrar el
+  programa, desenchufarlo y abrir: tiene que aparecer en el medio de la principal.
+- [ ] Si se toca la ventana flotante, el teclado queda en ella: las teclas del panel (flechas,
+  Ctrl+Enter) no andan hasta volver a hacer clic en el panel. Ver si molesta.
 - [ ] **YouTube con una sola pantalla** (lo que le pasó a alguien con la 1.4.0 en Windows 10, que
   tuvo que reiniciar la PC). Con la notebook sola: proyectar un video de YouTube y probar, en este orden,
   1) que arriba aparece unos segundos «Para volver al programa: tecla Esc o doble clic»; 2) hacer clic

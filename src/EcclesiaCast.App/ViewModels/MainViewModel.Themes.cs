@@ -47,13 +47,15 @@ public sealed partial class MainViewModel
 
         // The last entry opens no window at all: the words go only to the pages
         // for OBS. The stage never lands on it, so it stays out of that list.
+        // An ordinary window (to share by Discord, or with a single screen)...
+        Displays.Add(new DisplayOption(FloatingOutput.For(FloatingOutputSettings.Current.Shape), FloatingOutput.Label));
         Displays.Add(new DisplayOption(BroadcastOnlyOutput.For(all), BroadcastOnlyOutput.Label));
 
         // Prefer the remembered display, then the first secondary one; the
         // stream-only entry is only ever picked by hand.
         SelectedDisplay =
             Displays.FirstOrDefault(o => o.Info.DeviceName == saved)
-            ?? Displays.FirstOrDefault(o => !o.BroadcastOnly && !o.Info.IsPrimary)
+            ?? Displays.FirstOrDefault(o => !o.BroadcastOnly && !o.Floating && !o.Info.IsPrimary)
             ?? Displays.FirstOrDefault();
 
         // The stage goes anywhere but the congregation's screen.

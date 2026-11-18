@@ -20,9 +20,19 @@ public sealed class ProjectionWindowService(ProjectionViewModel projectionViewMo
 
     public void EnsureVisible(DisplayInfo display)
     {
+        // Full screen and the floating window are different kinds of window
+        // (border, taskbar, activation): going from one to the other makes a new one.
+        var floating = FloatingOutput.IsFloating(display);
+        if (_window is not null && _window.IsFloating != floating)
+        {
+            var old = _window;
+            _window = null;
+            old.CloseForGood();
+        }
+
         if (_window is null || !_window.IsLoaded)
         {
-            _window = new OutputWindow { DataContext = projectionViewModel };
+            _window = new OutputWindow(floating) { DataContext = projectionViewModel };
             _window.IsVisibleChanged += (_, _) =>
                 VisibilityChanged?.Invoke(this, EventArgs.Empty);
             _window.VideoEnded += (_, _) => VideoEnded?.Invoke(this, EventArgs.Empty);

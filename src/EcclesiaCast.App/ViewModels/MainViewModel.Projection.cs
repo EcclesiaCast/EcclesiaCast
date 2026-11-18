@@ -463,10 +463,13 @@ public sealed partial class MainViewModel
             ShowOutputWindow();
             StatusText = "En vivo sólo en la transmisión: no hay ventana de salida.";
         }
-        else if (oldValue?.BroadcastOnly == true)
+        else if (oldValue?.BroadcastOnly == true || newValue.Floating || oldValue?.Floating == true)
         {
+            // Into or out of the floating window: the output moves to the new place.
             ShowOutputWindow();
-            StatusText = $"Salida en vivo en {newValue.Label}.";
+            StatusText = newValue.Floating
+                ? "Salida en vivo en una ventana: se mueve, se agranda y se comparte como cualquier otra."
+                : $"Salida en vivo en {newValue.Label}.";
         }
     }
 

@@ -29,6 +29,9 @@ public sealed record DisplayOption(DisplayInfo Info, string Label)
 {
     /// <summary>The «only the stream» entry: going live with it opens no output window.</summary>
     public bool BroadcastOnly => BroadcastOnlyOutput.IsBroadcastOnly(Info);
+
+    /// <summary>The «in a window» entry: going live opens an ordinary window instead of a full screen.</summary>
+    public bool Floating => FloatingOutput.IsFloating(Info);
 }
 
 public sealed partial class MainViewModel : ObservableObject, IRemoteHost
@@ -131,9 +134,13 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     public bool IsBroadcastOnlyLive => IsProjecting && IsBroadcastOnly;
 
     /// <summary>Width over height of the output screen: LIVE and PREVIEW are drawn at this proportion.</summary>
-    public double OutputAspectRatio => SelectedDisplay is { Info: var info }
-        ? AspectFit.RatioOf(info.Width, info.Height)
-        : AspectFit.DefaultRatio;
+    public double OutputAspectRatio => SelectedDisplay switch
+    {
+        // The floating window has the shape chosen on it, and it can change while live.
+        { Floating: true } => FloatingOutput.RatioOf(FloatingOutputSettings.Current.Shape),
+        { Info: var info } => AspectFit.RatioOf(info.Width, info.Height),
+        _ => AspectFit.DefaultRatio,
+    };
 
     [ObservableProperty]
     private string _statusText =
@@ -410,7 +417,9 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         };
         _projection.VideoEnded += (_, _) => OnProjectedVideoEnded();
         // A double click on an output that covers the panel: same as Esc.
+        // Closing the floating window too: the same as «Apagar salida».
         _projection.TurnOffRequested += (_, _) => HideOutput();
+        FloatingOutputSettings.ShapeChanged += (_, _) => OnPropertyChanged(nameof(OutputAspectRatio));
         _stage.VisibilityChanged += (_, _) => IsStageVisible = _stage.IsVisible;
         LoadStageLayouts();
         LoadSongMaxLines();

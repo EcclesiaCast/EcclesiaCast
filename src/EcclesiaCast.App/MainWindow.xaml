@@ -514,7 +514,7 @@
                               SelectedItem="{Binding SelectedDisplay}"
                               DisplayMemberPath="Label"
                               VerticalAlignment="Center"
-                              ToolTip="Monitor o proyector donde sale la imagen"/>
+                              ToolTip="Monitor o proyector donde sale la imagen; también «En una ventana» (para compartirla por Discord o con una sola pantalla) o sólo la transmisión"/>
                     <Button Content="↻"
                             Style="{StaticResource DarkButton}"
                             AutomationProperties.Name="Actualizar pantallas"

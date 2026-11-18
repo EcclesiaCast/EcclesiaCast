@@ -442,6 +442,18 @@ dirección y un **PIN de cuatro dígitos**.
   para *redes privadas*.
 - Queda encendido para el próximo servicio. Se apaga desde la misma ventana.
 
+### La salida en una ventana (Discord, una sola pantalla)
+
+En la lista **Salida:** elegí **🪟 En una ventana**. Al poner en vivo se abre una
+ventana común de Windows con lo mismo que ve la congregación: se mueve, se agranda,
+se minimiza y se comparte por Discord o por una videollamada como cualquier otra.
+Cerrarla es lo mismo que **Apagar salida**.
+
+Con el **clic derecho** sobre la ventana elegís la **forma** (16:9 o 4:3), un
+**tamaño** rápido (por ejemplo 1280×720) y **Siempre visible**. Al arrastrar un
+borde la imagen conserva la forma; si la maximizás, sobran bandas negras a los
+costados. El programa recuerda la forma, el tamaño y el lugar para la próxima vez.
+
 ### Para la transmisión (OBS o vMix)
 
 En la misma ventana del 📱 está la dirección **para la transmisión**. Copiala y
