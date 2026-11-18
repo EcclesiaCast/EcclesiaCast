@@ -72,6 +72,43 @@ public class BiblePackageTests
     }
 
     [Fact]
+    public void A_package_left_on_disk_in_a_folder_with_spaces_and_accents_is_read_back()
+    {
+        // Real files in a temporary folder, built with Path.Combine only: no
+        // Windows path, and a name with spaces and accents like a person would
+        // give it (a Mac keeps those names in its own way).
+        var folder = Path.Combine(Path.GetTempPath(), $"ecclesiacast-paquete-{Guid.NewGuid():N}", "Mis Biblias ñandú");
+        Directory.CreateDirectory(folder);
+        try
+        {
+            var file = Path.Combine(folder, "Reina Valera ñ" + BiblePackage.Extension);
+            using (var output = File.Create(file))
+                BiblePackage.Write(output, [("Reina-Valera 1909", "RV1909", "es", Sample("En el principio crió Dios los cielos y la tierra."))]);
+
+            var found = Directory.EnumerateFiles(folder, "*" + BiblePackage.Extension).Single();
+            Assert.Equal("Reina Valera ñ.ecbiblias", Path.GetFileName(found));
+
+            IReadOnlyList<BiblePackageEntry> entries;
+            using (var stream = File.OpenRead(found))
+                entries = BiblePackage.ReadManifest(stream);
+
+            var entry = Assert.Single(entries);
+            Assert.Equal("RV1909", entry.Abbreviation);
+
+            ParsedBible bible;
+            using (var stream = File.OpenRead(found))
+                bible = BiblePackage.ReadVersion(stream, entry);
+
+            Assert.Equal(3, bible.VerseCount);
+            Assert.Equal("En el principio crió Dios los cielos y la tierra.", bible.Books.Single(b => b.Number == 1).Verses[0].Text);
+        }
+        finally
+        {
+            Directory.Delete(Path.GetDirectoryName(folder)!, recursive: true);
+        }
+    }
+
+    [Fact]
     public void A_zip_without_a_manifest_is_not_a_package()
     {
         using var zip = HandMade(("otro.txt", "hola"));
