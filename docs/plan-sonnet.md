@@ -12,7 +12,7 @@ hacerlos, dónde está cada cosa en el código y cómo probarlos.
 ## 1. El proyecto en dos minutos
 
 - **EcclesiaCast**: software libre de proyección para iglesias. WPF sobre
-  .NET 8, Windows. Solución `EcclesiaCast.slnx`:
+  .NET 10, Windows. Solución `EcclesiaCast.slnx`:
   - `src/EcclesiaCast.Core`: modelo y lógica sin interfaz (Biblia,
     canciones, playlists, presentación, temas). Acá van las pruebas.
   - `src/EcclesiaCast.Data`: SQLite con EF Core (`Persistence/*Repository.cs`).
@@ -77,7 +77,7 @@ hacerlos, dónde está cada cosa en el código y cómo probarlos.
     `ECCLESIACAST_DATA_DIR` apuntando ahí:
     ```powershell
     $env:ECCLESIACAST_DATA_DIR = "<carpeta con la copia>"
-    & "src\EcclesiaCast.App\bin\Debug\net8.0-windows10.0.19041.0\EcclesiaCast.App.exe"
+    & "src\EcclesiaCast.App\bin\Debug\net10.0-windows10.0.19041.0\EcclesiaCast.App.exe"
     ```
   - Puede haber un EcclesiaCast **instalado** abierto
     (`C:\Program Files\EcclesiaCast\...`). Es el de Alexis: no lo cierres ni

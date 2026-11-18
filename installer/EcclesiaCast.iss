@@ -35,7 +35,7 @@ OutputBaseFilename=EcclesiaCast-{#AppVersion}-setup
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
-; La app es de 64 bits (.NET 8 self-contained x64)
+; La app es de 64 bits (.NET 10 self-contained x64)
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 UninstallDisplayIcon={app}\EcclesiaCast.App.exe

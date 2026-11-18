@@ -5,7 +5,7 @@ que cualquier iglesia pueda proyectar sus servicios sin pagar licencias.
 
 ## Poner el proyecto en marcha
 
-Necesitás **Windows** y el **SDK de .NET 8**:
+Necesitás **Windows** y el **SDK de .NET 10**:
 
 ```bash
 git clone https://github.com/EcclesiaCast/EcclesiaCast.git

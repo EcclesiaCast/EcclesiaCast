@@ -37,7 +37,7 @@ no lo sea, porque la solicitud la revisa una persona.
 EcclesiaCast is a free, open source Windows application for projecting song
 lyrics, multi-version Bible verses, announcements, images and videos in
 churches. It replaces two or three paid programs with a single free one. It is
-written in C# / .NET 8 (WPF) and is used every week in a real church service.
+written in C# / .NET 10 (WPF) and is used every week in a real church service.
 
 ## Reputation
 

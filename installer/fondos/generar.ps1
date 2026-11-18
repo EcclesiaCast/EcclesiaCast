@@ -1,5 +1,5 @@
 # Vuelve a dibujar los fondos en video (installer\fondos\*.mp4).
-# Necesita el SDK de .NET 8 y ffmpeg en el PATH. Tarda: entre 1 y 6 minutos
+# Necesita el SDK de .NET 10 y ffmpeg en el PATH. Tarda: entre 1 y 6 minutos
 # por video.
 #   powershell -File installer\fondos\generar.ps1              (todos)
 #   powershell -File installer\fondos\generar.ps1 "Aurora"     (sólo uno)

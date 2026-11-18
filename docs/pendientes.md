@@ -675,7 +675,7 @@ Con una copia de la biblioteca (la real no cambió) y la grabación del 13/11:
       español estarían disponibles?, ¿cómo se pide que una editorial se sume?
       Borrador (en inglés, porque es a ellos):
       > Hello, I'm Alexis, a volunteer in a church in Uruguay. I'm building
-      > EcclesiaCast, a free and open-source program (WPF/.NET 8, on GitHub:
+      > EcclesiaCast, a free and open-source program (WPF/.NET 10, on GitHub:
       > https://github.com/EcclesiaCast/EcclesiaCast) to project song lyrics and
       > Bible verses in church services and to feed a livestream (OBS). We'd
       > like to let churches use YouVersion Bibles inside it, especially

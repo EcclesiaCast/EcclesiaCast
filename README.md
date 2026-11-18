@@ -29,11 +29,11 @@ Muchas iglesias necesitan dos programas a la vez (uno para canciones, otro para 
 
 ## Stack
 
-C# / .NET 8 · WPF (MVVM) · SQLite + EF Core · LibVLCSharp
+C# / .NET 10 · WPF (MVVM) · SQLite + EF Core · LibVLCSharp
 
 ## Compilar y ejecutar
 
-Requisitos: [SDK de .NET 8](https://dotnet.microsoft.com/download/dotnet/8.0) en Windows 10/11.
+Requisitos: [SDK de .NET 10](https://dotnet.microsoft.com/download/dotnet/10.0) en Windows 10/11.
 
 ```
 dotnet build

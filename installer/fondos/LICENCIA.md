@@ -28,7 +28,7 @@ nombrar a nadie.
 
 ## Volver a dibujarlos
 
-Con el SDK de .NET 8 y ffmpeg instalados:
+Con el SDK de .NET 10 y ffmpeg instalados:
 
 ```powershell
 powershell -File installer\fondos\generar.ps1            # todos
