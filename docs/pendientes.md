@@ -19,6 +19,23 @@ reproductor de Spotify, «mismo título, distinto artista» y las flechas del
 teclado en Propiedades. Lo que sigue se corrigió o se agregó después de esa
 prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
 
+### Arreglos del formulario de comentarios (18/11/2026, sin abrir el programa)
+
+- [ ] **YouTube con una sola pantalla** (lo que le pasó a alguien con la 1.4.0 en Windows 10, que
+  tuvo que reiniciar la PC). Con la notebook sola: proyectar un video de YouTube y probar, en este orden,
+  1) que arriba aparece unos segundos «Para volver al programa: tecla Esc o doble clic»; 2) hacer clic
+  sobre el video y después tocar Esc: tiene que volver al programa; 3) proyectarlo otra vez y hacer
+  doble clic sobre el video: también tiene que volver. Ver además que el video se sigue viendo y suena
+  (el navegador quedó «apagado» para el mouse, no para reproducir).
+- [ ] **«➕ Agregar» en Canciones**: que el botón entra bien con el panel angosto y que el título
+  «CANCIONES» no queda tapado.
+- [ ] **Comentarios**: con la caja vacía «Enviar» está gris y se ve la línea que explica por qué;
+  al escribir algo se prende.
+- [ ] **Biblia XML de OpenSong**: importar una real (por ejemplo una de Beblia o la que exporta
+  Holyrics/FreeShow) y mirar Juan 3:16 y Salmos 23. Si tiene los nombres en inglés y no los 66 libros,
+  revisar que cada libro caiga en su lugar.
+- [ ] La página `sitio/cargar-canciones.html` sigue diciendo «botón ➕»: cambiarlo a «➕ Agregar» cuando salga la versión.
+
 - [ ] **Con el logo puesto no queda nada corriendo detrás** (lo comprobó Claude el
       14/10 en la PC: con un video de fondo el uso de procesador bajó de 18,7 %
       a 8,4 % de un núcleo con el logo puesto, y al sacarlo el video siguió en el

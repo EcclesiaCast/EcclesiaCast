@@ -247,9 +247,9 @@
                 <MenuItem Header="Bajar Biblias de internet…" Command="{Binding DownloadBiblePackCommand}"
                           ToolTip="Baja el paquete de Biblias sólo a esta computadora y elegís cuáles agregar."/>
                 <Separator/>
-                <MenuItem Header="Importar una Biblia (JSON o Zefania XML)…" Command="{Binding ImportBibleCommand}"/>
+                <MenuItem Header="Importar una Biblia (JSON o XML)…" Command="{Binding ImportBibleCommand}"/>
                 <MenuItem Header="Cómo preparar una Biblia para importar…" Command="{Binding ShowBibleFormatHelpCommand}"
-                          ToolTip="Los dos formatos que se leen, un ejemplo de cada uno y unas instrucciones para pedirle a una IA que convierta tu archivo."/>
+                          ToolTip="Los formatos que se leen, un ejemplo de cada uno y unas instrucciones para pedirle a una IA que convierta tu archivo."/>
                 <Separator/>
                 <MenuItem Header="Exportar paquete de Biblias…" Command="{Binding ExportBiblePackageCommand}"
                           ToolTip="Guarda varias versiones en un solo archivo (.ecbiblias) para llevarlas a otra computadora tuya."/>
@@ -631,11 +631,13 @@
                                 <DockPanel DockPanel.Dock="Top">
                                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
                                                 VerticalAlignment="Center" Margin="0,0,10,8">
-                                        <Button Content="➕" FontSize="11" Padding="7,4"
+                                        <!-- Con la palabra, como «➕ Playlist» en Biblia: el ➕ solo no se
+                                             encontraba («quiero agregar una canción desde cero y no me da opción») -->
+                                        <Button Content="➕ Agregar" FontSize="11" Padding="7,4"
                                                 Style="{StaticResource DarkButton}"
                                                 AutomationProperties.Name="Agregar canciones"
                                                 Click="AddSongMenu_Click"
-                                                ToolTip="Agregar canciones: crear una desde cero, buscarla en internet, traerlas de ProPresenter o importar archivos"/>
+                                                ToolTip="Agregar canciones: escribir una nueva desde cero, buscarla en internet, traerlas de ProPresenter o EasyWorship, o importar archivos"/>
                                         <Button Content="✏️" FontSize="11" Padding="7,4" Margin="4,0,0,0"
                                                 Style="{StaticResource DarkButton}"
                                                 Command="{Binding EditSongCommand}"
@@ -800,7 +802,7 @@
                                                     <MenuItem Header="Bajar Biblias de internet…" Command="{Binding DownloadBiblePackCommand}"
                                                               ToolTip="Baja el paquete de Biblias sólo a esta computadora y elegís cuáles agregar."/>
                                                     <MenuItem Header="Importar paquete de Biblias (.ecbiblias)…" Command="{Binding ImportBiblePackageCommand}"/>
-                                                    <MenuItem Header="Importar una Biblia (JSON o Zefania XML)…" Command="{Binding ImportBibleCommand}"/>
+                                                    <MenuItem Header="Importar una Biblia (JSON o XML)…" Command="{Binding ImportBibleCommand}"/>
                                                     <Separator/>
                                                     <MenuItem Header="Cómo preparar una Biblia para importar…" Command="{Binding ShowBibleFormatHelpCommand}"/>
                                                 </ContextMenu>

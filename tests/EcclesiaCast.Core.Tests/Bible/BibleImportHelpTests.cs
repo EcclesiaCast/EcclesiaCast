@@ -30,15 +30,26 @@ public class BibleImportHelpTests
     }
 
     [Fact]
-    public void Both_examples_say_the_same_thing()
+    public void The_three_examples_say_the_same_thing()
     {
         var json = JsonBibleImporter.Parse(BibleImportHelp.ExampleJson());
         var xml = ZefaniaBibleImporter.Parse(BibleImportHelp.ExampleZefaniaXml());
+        var openSong = OpenSongBibleImporter.Parse(BibleImportHelp.ExampleOpenSongXml());
 
         static string Flat(ParsedBible bible) => string.Join("|", bible.Books.Where(b => b.Verses.Count > 0)
             .OrderBy(b => b.Number).SelectMany(b => b.Verses.Select(v => $"{b.Number}:{v.Chapter}:{v.Verse}:{v.Text}")));
 
         Assert.Equal(Flat(json), Flat(xml));
+        Assert.Equal(Flat(json), Flat(openSong));
+    }
+
+    [Fact]
+    public void Both_xml_examples_go_through_the_importer_the_program_uses_for_xml()
+    {
+        Assert.Equal(Sample.VerseCount, XmlBibleImporter.Parse(BibleImportHelp.ExampleZefaniaXml()).VerseCount);
+        Assert.Equal(Sample.VerseCount, XmlBibleImporter.Parse(BibleImportHelp.ExampleOpenSongXml()).VerseCount);
+        Assert.Contains("crió", BibleImportHelp.ExampleOpenSongXml());
+        Assert.DoesNotContain("&#", BibleImportHelp.ExampleOpenSongXml());
     }
 
     [Fact]

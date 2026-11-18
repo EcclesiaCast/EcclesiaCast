@@ -126,6 +126,7 @@ public partial class YouTubeSurface : UserControl
     {
         _pending = null;
         _currentId = null;
+        _hint = null;
         _state = PlaybackState.None;
         _pausedForHiddenOutput = false;
         _pausedForCover = false;
@@ -208,6 +209,14 @@ public partial class YouTubeSurface : UserControl
 
     private double _blur;
     private bool _blurApplied;
+    private string? _hint;
+
+    /// <summary>
+    /// Shows a line of text over the video for a few seconds, from inside the
+    /// page: a WPF element cannot be drawn over this native window. It waits
+    /// for the player to report, so it appears with the video.
+    /// </summary>
+    public void ShowHint(string text) => _hint = text;
 
     /// <summary>Calls one of the page's helper functions; ignored if it isn't ready.</summary>
     private void Run(string call)
@@ -258,6 +267,12 @@ public partial class YouTubeSurface : UserControl
             {
                 _blurApplied = true;
                 SetBlur(_blur);
+            }
+
+            if (_hint is { } hint)
+            {
+                _hint = null;
+                Run($"hint({System.Text.Json.JsonSerializer.Serialize(hint)})");
             }
             return;
         }
@@ -358,6 +373,18 @@ public partial class YouTubeSurface : UserControl
                   var box = document.getElementById('player');
                   box.style.filter = px > 0 ? 'blur(' + px + 'px)' : '';
                   box.style.transform = px > 0 ? 'scale(1.08)' : '';
+                },
+                // The way back to the program, as the output shows it over
+                // anything else: on top, for six seconds, then it fades.
+                hint: function (text) {
+                  var note = document.createElement('div');
+                  note.textContent = text;
+                  note.style.cssText = 'position:fixed;top:0;left:50%;transform:translateX(-50%);'
+                    + 'background:rgba(47,99,201,.8);color:#fff;font:20px "Segoe UI",sans-serif;'
+                    + 'padding:12px 26px;border-radius:0 0 10px 10px;z-index:10;transition:opacity .7s';
+                  document.body.appendChild(note);
+                  setTimeout(function () { note.style.opacity = '0'; }, 6000);
+                  setTimeout(function () { note.remove(); }, 6800);
                 }
               };
             </script>

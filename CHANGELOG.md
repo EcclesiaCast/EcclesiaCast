@@ -5,6 +5,25 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+### Agregado
+
+- **Biblias en el XML de OpenSong.** Además de JSON y Zefania, se importan las Biblias en el
+  XML que usan ProPresenter, Holyrics y FreeShow (y páginas como Beblia): `<bible><b n="Juan"><c n="3"><v n="16">`.
+  La ventana «Cómo preparar una Biblia para importar» trae su ejemplo y las instrucciones para la IA lo nombran.
+
+### Cambiado
+
+- **«➕ Agregar» en Canciones.** El botón para agregar canciones ahora dice «Agregar» al lado del ➕,
+  como «➕ Playlist» en Biblia: alguien no encontraba cómo crear una canción desde cero.
+- **Los comentarios necesitan texto.** «Enviar» queda apagado hasta que se escribe algo, y la ventana
+  explica por qué: seis envíos llegaron sólo con el resumen de uso y no se podían entender ni contestar.
+
+### Arreglado
+
+- **Un video de YouTube ya no deja atrapado con una sola pantalla.** El video en la salida no toma
+  el mouse ni el teclado: el doble clic y la tecla Esc vuelven al programa también con YouTube, Esc
+  sobre la salida la apaga, y el aviso «Para volver al programa» se ve encima del video.
+
 ## [1.4.0] - 2026-11-17
 
 ### Agregado

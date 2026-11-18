@@ -3,6 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf">
     <Grid Background="Black">
-        <wv2:WebView2 x:Name="Browser" DefaultBackgroundColor="Black"/>
+        <!-- Apagado para el mouse y el teclado: el video no se toca en la salida
+             (el operador lo maneja desde el panel). Así un clic no le pasa el
+             teclado al navegador, y el doble clic y la tecla Esc siguen sirviendo
+             para volver al programa cuando la salida tapa la única pantalla. -->
+        <wv2:WebView2 x:Name="Browser" DefaultBackgroundColor="Black" IsEnabled="False" Focusable="False"/>
     </Grid>
 </UserControl>

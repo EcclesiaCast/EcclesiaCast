@@ -149,6 +149,29 @@ public partial class OutputWindow : Window
     /// </summary>
     private static bool s_wayBackShown;
 
+    /// <summary>The same, over a YouTube video: the first one projected on the operator's screen.</summary>
+    private static bool s_youTubeWayBackShown;
+
+    private const string WayBackText = "Para volver al programa: tecla Esc o doble clic en esta pantalla";
+
+    /// <summary>
+    /// Esc, if the keyboard ever ends up here instead of in the operator panel,
+    /// does what it does there: switches the output off. A 1.4.0 user on a
+    /// single screen was left behind a YouTube video with no way out.
+    /// </summary>
+    protected override void OnPreviewKeyDown(System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key == System.Windows.Input.Key.Escape)
+        {
+            e.Handled = true;
+            TurnOffRequested?.Invoke(this, EventArgs.Empty);
+            Application.Current?.MainWindow?.Activate();
+            return;
+        }
+
+        base.OnPreviewKeyDown(e);
+    }
+
     /// <summary>
     /// With a single screen the output covers the operator panel, and someone
     /// new has no way to know that Esc brings it back: the first beta tester
@@ -389,6 +412,14 @@ public partial class OutputWindow : Window
             YouTube.Visibility = Visibility.Visible;
             YouTube.Play(background);
             UpdateYouTubeCover();
+
+            // The WPF hint cannot be drawn over the video (it is a native
+            // window), so with a single screen the page shows it itself.
+            if (!s_youTubeWayBackShown && _display is not null && OperatorScreen.Holds(_display))
+            {
+                s_youTubeWayBackShown = true;
+                YouTube.ShowHint(WayBackText);
+            }
         }
         else
         {
