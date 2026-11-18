@@ -1,0 +1,41 @@
+{
+  "Case": "interlineado-grande-seis-renglones",
+  "Theme": "cancion",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 88,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "Sublime gracia del Señor",
+        "Que a un infeliz salvó",
+        "Yo ciego fui, mas veo hoy",
+        "Perdido y Él me halló",
+        "Fue la gracia que me enseñó a temer",
+        "Y mis dudas ahuyentó"
+      ],
+      "Rect": {
+        "X": 226.94,
+        "Y": 83.6,
+        "Width": 1466.12,
+        "Height": 844.8
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Interlineado"
+      ],
+      "Rect": {
+        "X": 1598.08,
+        "Y": 986.8,
+        "Width": 211.92,
+        "Height": 53.2
+      }
+    }
+  ]
+}

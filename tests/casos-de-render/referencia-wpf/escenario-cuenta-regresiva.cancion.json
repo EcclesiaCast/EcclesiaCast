@@ -1,0 +1,22 @@
+{
+  "Case": "escenario-cuenta-regresiva",
+  "Theme": "cancion",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "stage",
+      "FontSize": 220,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "5:00"
+      ],
+      "Rect": {
+        "X": 750.26,
+        "Y": 353.69,
+        "Width": 419.49,
+        "Height": 292.62
+      }
+    }
+  ]
+}

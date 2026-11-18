@@ -1,0 +1,41 @@
+{
+  "Case": "biblia-numeros-de-versiculo",
+  "Theme": "biblia",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 106,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "16 Porque de tal manera amó Dios",
+        "al mundo, que ha dado a su Hijo",
+        "unigénito. 17 Porque no envió Dios",
+        "a su Hijo al mundo para condenar al",
+        "mundo, sino para que el mundo sea",
+        "salvo por él."
+      ],
+      "Rect": {
+        "X": 113.71,
+        "Y": 83.04,
+        "Width": 1692.58,
+        "Height": 845.92
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Juan 3:16-17 · PRUEBA"
+      ],
+      "Rect": {
+        "X": 1413.3,
+        "Y": 986.8,
+        "Width": 396.7,
+        "Height": 53.2
+      }
+    }
+  ]
+}

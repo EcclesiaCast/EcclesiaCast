@@ -1,0 +1,41 @@
+{
+  "Case": "cancion-6-renglones",
+  "Theme": "cancion",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "Sublime gracia del Señor",
+        "Que a un infeliz salvó",
+        "Yo ciego fui, mas veo hoy",
+        "Perdido y Él me halló",
+        "Fue la gracia que me enseñó a temer",
+        "Y mis dudas ahuyentó"
+      ],
+      "Rect": {
+        "X": 193.63,
+        "Y": 138.9,
+        "Width": 1532.74,
+        "Height": 734.2
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Sublime gracia"
+      ],
+      "Rect": {
+        "X": 1550.57,
+        "Y": 986.8,
+        "Width": 259.43,
+        "Height": 53.2
+      }
+    }
+  ]
+}

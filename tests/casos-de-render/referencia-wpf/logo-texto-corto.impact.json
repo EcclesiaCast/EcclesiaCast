@@ -1,0 +1,22 @@
+{
+  "Case": "logo-texto-corto",
+  "Theme": "impact",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "logo",
+      "FontSize": 120,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Iglesia Nueva Vida"
+      ],
+      "Rect": {
+        "X": 488.99,
+        "Y": 466.82,
+        "Width": 942.01,
+        "Height": 146.37
+      }
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "Case": "alineacion-arriba-izquierda",
+  "Theme": "biblia",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 120,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Santo, santo, santo, Señor",
+        "omnipotente",
+        "Siempre el labio mío loores te",
+        "dará"
+      ],
+      "Rect": {
+        "X": 110,
+        "Y": 80,
+        "Width": 1581.39,
+        "Height": 638.44
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Alineación"
+      ],
+      "Rect": {
+        "X": 1626.69,
+        "Y": 986.8,
+        "Width": 183.31,
+        "Height": 53.2
+      }
+    }
+  ]
+}

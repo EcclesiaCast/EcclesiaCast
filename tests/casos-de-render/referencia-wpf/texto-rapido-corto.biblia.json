@@ -1,0 +1,22 @@
+{
+  "Case": "texto-rapido-corto",
+  "Theme": "biblia",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 120,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Bienvenidos a todos"
+      ],
+      "Rect": {
+        "X": 426.36,
+        "Y": 460.2,
+        "Width": 1067.28,
+        "Height": 159.61
+      }
+    }
+  ]
+}

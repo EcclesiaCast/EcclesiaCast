@@ -1,0 +1,22 @@
+{
+  "Case": "texto-rapido-corto",
+  "Theme": "impact",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 110,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Bienvenidos a todos"
+      ],
+      "Rect": {
+        "X": 504.55,
+        "Y": 472.92,
+        "Width": 910.89,
+        "Height": 134.17
+      }
+    }
+  ]
+}

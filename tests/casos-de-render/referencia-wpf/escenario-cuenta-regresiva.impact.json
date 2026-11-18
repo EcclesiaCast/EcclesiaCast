@@ -1,0 +1,22 @@
+{
+  "Case": "escenario-cuenta-regresiva",
+  "Theme": "impact",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "stage",
+      "FontSize": 220,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "5:00"
+      ],
+      "Rect": {
+        "X": 760.78,
+        "Y": 365.83,
+        "Width": 398.43,
+        "Height": 268.34
+      }
+    }
+  ]
+}

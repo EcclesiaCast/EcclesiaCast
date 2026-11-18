@@ -1,0 +1,36 @@
+{
+  "Case": "ajuste-ancho-prendido-larguisimo",
+  "Theme": "cancion",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 36,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "Aleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluya"
+      ],
+      "Rect": {
+        "X": 153.57,
+        "Y": 482.06,
+        "Width": 1612.86,
+        "Height": 47.88
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Ajuste"
+      ],
+      "Rect": {
+        "X": 1700.43,
+        "Y": 986.8,
+        "Width": 109.57,
+        "Height": 53.2
+      }
+    }
+  ]
+}

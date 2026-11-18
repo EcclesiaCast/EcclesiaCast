@@ -1,0 +1,39 @@
+{
+  "Case": "interlineado-grande",
+  "Theme": "biblia",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 104,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Cuán grande es Él, cuán grande es Él",
+        "Canta mi alma a Ti, Señor",
+        "Cuán grande es Él, cuán grande es Él",
+        "Tu nombre alabaré"
+      ],
+      "Rect": {
+        "X": 121.07,
+        "Y": 173.2,
+        "Width": 1677.86,
+        "Height": 665.6
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Interlineado"
+      ],
+      "Rect": {
+        "X": 1598.08,
+        "Y": 986.8,
+        "Width": 211.92,
+        "Height": 53.2
+      }
+    }
+  ]
+}

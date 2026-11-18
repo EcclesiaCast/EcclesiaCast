@@ -1,0 +1,43 @@
+{
+  "Case": "margenes-grandes",
+  "Theme": "biblia",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 56,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Sublime es tu gracia que me alcanzó en el camino",
+        "cuando yo andaba perdido",
+        "Tu mano me levantó y me puso sobre la roca firme",
+        "donde ya no caeré",
+        "Hoy canto con todo mi corazón porque tu",
+        "misericordia nunca se acaba",
+        "Por siempre y para siempre te alabaré, Señor, mi",
+        "fortaleza y mi canción"
+      ],
+      "Rect": {
+        "X": 332.16,
+        "Y": 208.07,
+        "Width": 1255.67,
+        "Height": 595.87
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Márgenes"
+      ],
+      "Rect": {
+        "X": 1444.83,
+        "Y": 926.8,
+        "Width": 175.17,
+        "Height": 53.2
+      }
+    }
+  ]
+}

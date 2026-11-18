@@ -1,0 +1,23 @@
+{
+  "Case": "logo-texto-largo",
+  "Theme": "biblia",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "logo",
+      "FontSize": 110,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "Iglesia Evangélica Bautista Nueva",
+        "Vida de Villa Mercedes"
+      ],
+      "Rect": {
+        "X": 133.41,
+        "Y": 393.69,
+        "Width": 1653.17,
+        "Height": 292.62
+      }
+    }
+  ]
+}

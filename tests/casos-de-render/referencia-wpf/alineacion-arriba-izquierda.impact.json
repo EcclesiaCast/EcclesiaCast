@@ -1,0 +1,38 @@
+{
+  "Case": "alineacion-arriba-izquierda",
+  "Theme": "impact",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 110,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Santo, santo, santo, Señor",
+        "omnipotente",
+        "Siempre el labio mío loores te dará"
+      ],
+      "Rect": {
+        "X": 110,
+        "Y": 80,
+        "Width": 1570.86,
+        "Height": 402.51
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Alineación"
+      ],
+      "Rect": {
+        "X": 1634.14,
+        "Y": 991.21,
+        "Width": 175.86,
+        "Height": 48.79
+      }
+    }
+  ]
+}

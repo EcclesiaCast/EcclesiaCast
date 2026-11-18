@@ -1,0 +1,22 @@
+{
+  "Case": "texto-rapido-corto",
+  "Theme": "cancion",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "Bienvenidos a todos"
+      ],
+      "Rect": {
+        "X": 539.49,
+        "Y": 478.82,
+        "Width": 841.02,
+        "Height": 122.37
+      }
+    }
+  ]
+}

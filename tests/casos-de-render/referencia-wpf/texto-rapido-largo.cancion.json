@@ -1,0 +1,25 @@
+{
+  "Case": "texto-rapido-largo",
+  "Theme": "cancion",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "Les pedimos que apaguen sus teléfonos",
+        "y que los padres de los niños de la",
+        "escuela dominical pasen a recogerlos al",
+        "terminar el culto de hoy"
+      ],
+      "Rect": {
+        "X": 128.84,
+        "Y": 295.27,
+        "Width": 1662.31,
+        "Height": 489.47
+      }
+    }
+  ]
+}

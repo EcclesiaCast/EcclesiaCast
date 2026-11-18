@@ -1,0 +1,40 @@
+{
+  "Case": "biblia-versiculo-medio",
+  "Theme": "impact",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 110,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Porque de tal manera amó Dios al",
+        "mundo, que ha dado a su Hijo",
+        "unigénito, para que todo aquel que en",
+        "él cree, no se pierda, mas tenga vida",
+        "eterna."
+      ],
+      "Rect": {
+        "X": 113.75,
+        "Y": 170.57,
+        "Width": 1692.5,
+        "Height": 670.85
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Juan 3:16 · PRUEBA"
+      ],
+      "Rect": {
+        "X": 1511.59,
+        "Y": 991.21,
+        "Width": 298.41,
+        "Height": 48.79
+      }
+    }
+  ]
+}

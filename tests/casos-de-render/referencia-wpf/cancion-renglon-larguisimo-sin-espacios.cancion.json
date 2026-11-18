@@ -1,0 +1,38 @@
+{
+  "Case": "cancion-renglon-larguisimo-sin-espacios",
+  "Theme": "cancion",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "Aleluyaaleluyaaleluyaaleluyaaleluyaalelu",
+        "yaaleluyaaleluyaaleluyaaleluyaaleluyaale",
+        "luyaaleluyaaleluya"
+      ],
+      "Rect": {
+        "X": 118.59,
+        "Y": 322.45,
+        "Width": 1682.83,
+        "Height": 367.1
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Aleluya"
+      ],
+      "Rect": {
+        "X": 1681.57,
+        "Y": 986.8,
+        "Width": 128.43,
+        "Height": 53.2
+      }
+    }
+  ]
+}

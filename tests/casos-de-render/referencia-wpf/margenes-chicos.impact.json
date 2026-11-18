@@ -1,0 +1,43 @@
+{
+  "Case": "margenes-chicos",
+  "Theme": "impact",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 96,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Sublime es tu gracia que me alcanzó en el",
+        "camino cuando yo andaba perdido",
+        "Tu mano me levantó y me puso sobre la roca",
+        "firme donde ya no caeré",
+        "Hoy canto con todo mi corazón porque tu",
+        "misericordia nunca se acaba",
+        "Por siempre y para siempre te alabaré, Señor,",
+        "mi fortaleza y mi canción"
+      ],
+      "Rect": {
+        "X": 74.65,
+        "Y": 37.63,
+        "Width": 1770.69,
+        "Height": 936.75
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Márgenes"
+      ],
+      "Rect": {
+        "X": 1715.47,
+        "Y": 1016.21,
+        "Width": 164.53,
+        "Height": 48.79
+      }
+    }
+  ]
+}

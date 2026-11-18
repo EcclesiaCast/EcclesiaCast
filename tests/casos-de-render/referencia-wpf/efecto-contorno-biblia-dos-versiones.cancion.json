@@ -1,0 +1,55 @@
+{
+  "Case": "efecto-contorno-biblia-dos-versiones",
+  "Theme": "cancion",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "Porque de tal manera amó Dios al",
+        "mundo, que ha dado a su Hijo",
+        "unigénito, para que todo aquel que en",
+        "él cree, no se pierda, mas tenga vida",
+        "eterna."
+      ],
+      "Rect": {
+        "X": 156.99,
+        "Y": 99.22,
+        "Width": 1606.02,
+        "Height": 611.83
+      }
+    },
+    {
+      "Name": "secondary",
+      "FontSize": 57.04,
+      "FontUsed": "Segoe UI Italic",
+      "Lines": [
+        "Porque tanto amó Dios al mundo que dio a su Hijo único, para que",
+        "todo el que cree en él no muera, sino que tenga vida eterna."
+      ],
+      "Rect": {
+        "X": 135.79,
+        "Y": 761.05,
+        "Width": 1648.43,
+        "Height": 151.73
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Juan 3:16 · PRUEBA / OTRA"
+      ],
+      "Rect": {
+        "X": 1335.88,
+        "Y": 986.8,
+        "Width": 474.12,
+        "Height": 53.2
+      }
+    }
+  ]
+}

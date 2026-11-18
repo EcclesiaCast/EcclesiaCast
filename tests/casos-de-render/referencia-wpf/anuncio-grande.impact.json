@@ -1,0 +1,52 @@
+{
+  "Case": "anuncio-grande",
+  "Theme": "impact",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 110,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Santo, santo, santo, Señor",
+        "omnipotente",
+        "Siempre el labio mío loores te dará"
+      ],
+      "Rect": {
+        "X": 174.57,
+        "Y": 304.74,
+        "Width": 1570.86,
+        "Height": 402.51
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Aviso"
+      ],
+      "Rect": {
+        "X": 1721.97,
+        "Y": 991.21,
+        "Width": 88.03,
+        "Height": 48.79
+      }
+    },
+    {
+      "Name": "overlay",
+      "FontSize": 90,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Bautismos el domingo próximo"
+      ],
+      "Rect": {
+        "X": 388.45,
+        "Y": 940.22,
+        "Width": 1143.1,
+        "Height": 109.78
+      }
+    }
+  ]
+}

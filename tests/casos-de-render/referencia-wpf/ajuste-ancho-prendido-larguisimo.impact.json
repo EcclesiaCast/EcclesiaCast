@@ -1,0 +1,36 @@
+{
+  "Case": "ajuste-ancho-prendido-larguisimo",
+  "Theme": "impact",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 38,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Aleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluya"
+      ],
+      "Rect": {
+        "X": 151.89,
+        "Y": 482.82,
+        "Width": 1616.21,
+        "Height": 46.35
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Ajuste"
+      ],
+      "Rect": {
+        "X": 1706.13,
+        "Y": 991.21,
+        "Width": 103.87,
+        "Height": 48.79
+      }
+    }
+  ]
+}

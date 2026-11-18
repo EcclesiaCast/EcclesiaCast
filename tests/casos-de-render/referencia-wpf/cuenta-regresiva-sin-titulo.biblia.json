@@ -1,0 +1,22 @@
+{
+  "Case": "cuenta-regresiva-sin-titulo",
+  "Theme": "biblia",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "countdown-clock",
+      "FontSize": 260,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "12:30"
+      ],
+      "Rect": {
+        "X": 659.82,
+        "Y": 372.09,
+        "Width": 600.36,
+        "Height": 345.82
+      }
+    }
+  ]
+}

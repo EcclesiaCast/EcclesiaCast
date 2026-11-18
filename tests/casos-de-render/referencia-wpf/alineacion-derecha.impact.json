@@ -1,0 +1,39 @@
+{
+  "Case": "alineacion-derecha",
+  "Theme": "impact",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 110,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Cuán grande es Él, cuán grande es Él",
+        "Canta mi alma a Ti, Señor",
+        "Cuán grande es Él, cuán grande es Él",
+        "Tu nombre alabaré"
+      ],
+      "Rect": {
+        "X": 186.42,
+        "Y": 237.66,
+        "Width": 1623.58,
+        "Height": 536.68
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Alineación"
+      ],
+      "Rect": {
+        "X": 1634.14,
+        "Y": 991.21,
+        "Width": 175.86,
+        "Height": 48.79
+      }
+    }
+  ]
+}

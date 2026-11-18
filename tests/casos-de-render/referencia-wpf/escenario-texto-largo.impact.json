@@ -1,0 +1,27 @@
+{
+  "Case": "escenario-texto-largo",
+  "Theme": "impact",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "stage",
+      "FontSize": 39.9,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Digno es el Cordero que",
+        "fue inmolado de recibir el",
+        "poder, las riquezas, la",
+        "sabiduría, la fortaleza, la",
+        "honra, la gloria y la",
+        "alabanza"
+      ],
+      "Rect": {
+        "X": 340.11,
+        "Y": 104,
+        "Width": 419.77,
+        "Height": 292
+      }
+    }
+  ]
+}

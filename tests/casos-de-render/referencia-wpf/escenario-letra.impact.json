@@ -1,0 +1,25 @@
+{
+  "Case": "escenario-letra",
+  "Theme": "impact",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "stage",
+      "FontSize": 70,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Santo, santo, santo, Señor",
+        "omnipotente",
+        "Siempre el labio mío loores te",
+        "dará"
+      ],
+      "Rect": {
+        "X": 108,
+        "Y": 109.24,
+        "Width": 855.31,
+        "Height": 341.52
+      }
+    }
+  ]
+}

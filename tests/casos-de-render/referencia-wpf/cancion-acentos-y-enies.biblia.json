@@ -1,0 +1,40 @@
+{
+  "Case": "cancion-acentos-y-enies",
+  "Theme": "biblia",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 110,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Mañana será un día de gozo,",
+        "¡Señor!",
+        "Ñandú, cigüeña, camión y corazón",
+        "Ángeles, árbol, éxodo, íntimo,",
+        "óleo, único"
+      ],
+      "Rect": {
+        "X": 125.01,
+        "Y": 140.23,
+        "Width": 1669.98,
+        "Height": 731.55
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Acentos"
+      ],
+      "Rect": {
+        "X": 1668.21,
+        "Y": 986.8,
+        "Width": 141.79,
+        "Height": 53.2
+      }
+    }
+  ]
+}

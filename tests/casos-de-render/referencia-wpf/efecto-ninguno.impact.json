@@ -1,0 +1,38 @@
+{
+  "Case": "efecto-ninguno",
+  "Theme": "impact",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 110,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Santo, santo, santo, Señor",
+        "omnipotente",
+        "Siempre el labio mío loores te dará"
+      ],
+      "Rect": {
+        "X": 174.57,
+        "Y": 304.74,
+        "Width": 1570.86,
+        "Height": 402.51
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Efectos"
+      ],
+      "Rect": {
+        "X": 1690.12,
+        "Y": 991.21,
+        "Width": 119.88,
+        "Height": 48.79
+      }
+    }
+  ]
+}

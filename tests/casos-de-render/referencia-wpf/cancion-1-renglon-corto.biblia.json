@@ -1,0 +1,36 @@
+{
+  "Case": "cancion-1-renglon-corto",
+  "Theme": "biblia",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 120,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Aleluya"
+      ],
+      "Rect": {
+        "X": 767.34,
+        "Y": 426.2,
+        "Width": 385.31,
+        "Height": 159.61
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Aleluya · Coros"
+      ],
+      "Rect": {
+        "X": 1548.46,
+        "Y": 986.8,
+        "Width": 261.54,
+        "Height": 53.2
+      }
+    }
+  ]
+}

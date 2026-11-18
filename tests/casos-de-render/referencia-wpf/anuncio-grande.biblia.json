@@ -1,0 +1,53 @@
+{
+  "Case": "anuncio-grande",
+  "Theme": "biblia",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 120,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Santo, santo, santo, Señor",
+        "omnipotente",
+        "Siempre el labio mío loores te",
+        "dará"
+      ],
+      "Rect": {
+        "X": 169.31,
+        "Y": 186.78,
+        "Width": 1581.39,
+        "Height": 638.44
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Aviso"
+      ],
+      "Rect": {
+        "X": 1715.72,
+        "Y": 986.8,
+        "Width": 94.28,
+        "Height": 53.2
+      }
+    },
+    {
+      "Name": "overlay",
+      "FontSize": 90,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "Bautismos el domingo próximo"
+      ],
+      "Rect": {
+        "X": 320.35,
+        "Y": 930.29,
+        "Width": 1279.29,
+        "Height": 119.71
+      }
+    }
+  ]
+}

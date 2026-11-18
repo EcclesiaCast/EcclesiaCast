@@ -1,0 +1,66 @@
+{
+  "Case": "cuadros-de-texto-extra",
+  "Theme": "impact",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 110,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Santo, santo, santo, Señor",
+        "omnipotente",
+        "Siempre el labio mío loores te dará"
+      ],
+      "Rect": {
+        "X": 174.57,
+        "Y": 304.74,
+        "Width": 1570.86,
+        "Height": 402.51
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Extra"
+      ],
+      "Rect": {
+        "X": 1729.38,
+        "Y": 991.21,
+        "Width": 80.62,
+        "Height": 48.79
+      }
+    },
+    {
+      "Name": "extra1",
+      "FontSize": 44,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Serie: El Padre nuestro"
+      ],
+      "Rect": {
+        "X": 60,
+        "Y": 93.17,
+        "Width": 700,
+        "Height": 53.67
+      }
+    },
+    {
+      "Name": "extra2",
+      "FontSize": 40,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Domingo 18 de noviembre"
+      ],
+      "Rect": {
+        "X": 1160,
+        "Y": 915.6,
+        "Width": 700,
+        "Height": 48.79
+      }
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "Case": "cancion-renglones-cortos",
+  "Theme": "cancion",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "Gloria",
+        "Aleluya",
+        "Amén",
+        "Cristo vive"
+      ],
+      "Rect": {
+        "X": 743.32,
+        "Y": 261.27,
+        "Width": 433.36,
+        "Height": 489.47
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Coros"
+      ],
+      "Rect": {
+        "X": 1707.48,
+        "Y": 986.8,
+        "Width": 102.52,
+        "Height": 53.2
+      }
+    }
+  ]
+}

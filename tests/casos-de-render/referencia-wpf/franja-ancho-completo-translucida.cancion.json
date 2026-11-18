@@ -1,0 +1,39 @@
+{
+  "Case": "franja-ancho-completo-translucida",
+  "Theme": "cancion",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "Cuán grande es Él, cuán grande es Él",
+        "Canta mi alma a Ti, Señor",
+        "Cuán grande es Él, cuán grande es Él",
+        "Tu nombre alabaré"
+      ],
+      "Rect": {
+        "X": 199.13,
+        "Y": 261.27,
+        "Width": 1521.74,
+        "Height": 489.47
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Franjas"
+      ],
+      "Rect": {
+        "X": 1686.57,
+        "Y": 986.8,
+        "Width": 123.43,
+        "Height": 53.2
+      }
+    }
+  ]
+}

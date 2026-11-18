@@ -1,0 +1,25 @@
+{
+  "Case": "escenario-letra",
+  "Theme": "biblia",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "stage",
+      "FontSize": 66.161,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Santo, santo, santo, Señor",
+        "omnipotente",
+        "Siempre el labio mío loores te",
+        "dará"
+      ],
+      "Rect": {
+        "X": 108,
+        "Y": 104,
+        "Width": 871.88,
+        "Height": 352
+      }
+    }
+  ]
+}

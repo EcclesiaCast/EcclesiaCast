@@ -1,0 +1,23 @@
+{
+  "Case": "cuenta-regresiva-terminada",
+  "Theme": "impact",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "countdown-clock",
+      "FontSize": 150,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "¡Bienvenidos a la casa de",
+        "Dios!"
+      ],
+      "Rect": {
+        "X": 114.45,
+        "Y": 345.49,
+        "Width": 1691.09,
+        "Height": 399.03
+      }
+    }
+  ]
+}

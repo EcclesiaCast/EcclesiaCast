@@ -1,0 +1,39 @@
+{
+  "Case": "cancion-escrita-en-mayusculas",
+  "Theme": "impact",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 110,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "CUÁN GRANDE ES ÉL, CUÁN GRANDE ES ÉL",
+        "CANTA MI ALMA A TI, SEÑOR",
+        "CUÁN GRANDE ES ÉL, CUÁN GRANDE ES ÉL",
+        "TU NOMBRE ALABARÉ"
+      ],
+      "Rect": {
+        "X": 112.98,
+        "Y": 237.66,
+        "Width": 1694.04,
+        "Height": 536.68
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Cuán grande es Él"
+      ],
+      "Rect": {
+        "X": 1520.51,
+        "Y": 991.21,
+        "Width": 289.49,
+        "Height": 48.79
+      }
+    }
+  ]
+}

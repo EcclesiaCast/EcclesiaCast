@@ -1,0 +1,26 @@
+{
+  "Case": "biblia-cita-oculta-por-el-tema",
+  "Theme": "cancion",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "Porque de tal manera amó Dios al",
+        "mundo, que ha dado a su Hijo",
+        "unigénito, para que todo aquel que en",
+        "él cree, no se pierda, mas tenga vida",
+        "eterna."
+      ],
+      "Rect": {
+        "X": 156.99,
+        "Y": 234.08,
+        "Width": 1606.02,
+        "Height": 611.83
+      }
+    }
+  ]
+}

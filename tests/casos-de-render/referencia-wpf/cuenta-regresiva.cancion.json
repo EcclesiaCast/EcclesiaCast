@@ -1,0 +1,36 @@
+{
+  "Case": "cuenta-regresiva",
+  "Theme": "cancion",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "countdown-heading",
+      "FontSize": 72,
+      "FontUsed": "Segoe UI Light",
+      "Lines": [
+        "Empezamos en"
+      ],
+      "Rect": {
+        "X": 728.54,
+        "Y": 314.21,
+        "Width": 462.93,
+        "Height": 95.77
+      }
+    },
+    {
+      "Name": "countdown-clock",
+      "FontSize": 260,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "5:30"
+      ],
+      "Rect": {
+        "X": 712.12,
+        "Y": 419.97,
+        "Width": 495.75,
+        "Height": 345.82
+      }
+    }
+  ]
+}

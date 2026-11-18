@@ -1,0 +1,44 @@
+{
+  "Case": "biblia-versiculo-muy-largo",
+  "Theme": "impact",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 72,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Y por la mañana, cuando todo el pueblo se había reunido",
+        "en la plaza, los escribanos del rey fueron llamados y se",
+        "escribió, conforme a todo lo que se mandaba, a los jefes,",
+        "a los gobernadores y a los príncipes de las provincias",
+        "que había desde la India hasta Etiopía, ciento veintisiete",
+        "provincias, a cada provincia según su escritura, a cada",
+        "pueblo según su lengua, y también a los judíos conforme",
+        "a su escritura y a su lengua, para que todos supieran lo",
+        "que el rey había dispuesto y lo cumplieran sin tardanza."
+      ],
+      "Rect": {
+        "X": 126.02,
+        "Y": 110.81,
+        "Width": 1667.96,
+        "Height": 790.38
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Ester 8:9 · PRUEBA"
+      ],
+      "Rect": {
+        "X": 1519.46,
+        "Y": 991.21,
+        "Width": 290.54,
+        "Height": 48.79
+      }
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "Case": "franja-biblia-dos-versiones",
+  "Theme": "impact",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 104,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Porque de tal manera amó Dios al",
+        "mundo, que ha dado a su Hijo unigénito,",
+        "para que todo aquel que en él cree, no",
+        "se pierda, mas tenga vida eterna."
+      ],
+      "Rect": {
+        "X": 121.25,
+        "Y": 148.65,
+        "Width": 1677.5,
+        "Height": 507.4
+      }
+    },
+    {
+      "Name": "secondary",
+      "FontSize": 64.48,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Porque tanto amó Dios al mundo que dio a su Hijo único, para",
+        "que todo el que cree en él no muera, sino que tenga vida eterna."
+      ],
+      "Rect": {
+        "X": 124.58,
+        "Y": 706.05,
+        "Width": 1670.84,
+        "Height": 157.29
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Juan 3:16 · PRUEBA / OTRA"
+      ],
+      "Rect": {
+        "X": 1399.52,
+        "Y": 991.21,
+        "Width": 410.48,
+        "Height": 48.79
+      }
+    }
+  ]
+}

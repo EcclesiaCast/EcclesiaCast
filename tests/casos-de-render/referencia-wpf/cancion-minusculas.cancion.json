@@ -1,0 +1,39 @@
+{
+  "Case": "cancion-minusculas",
+  "Theme": "cancion",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "cuán grande es él, cuán grande es él",
+        "canta mi alma a ti, señor",
+        "cuán grande es él, cuán grande es él",
+        "tu nombre alabaré"
+      ],
+      "Rect": {
+        "X": 204.81,
+        "Y": 261.27,
+        "Width": 1510.37,
+        "Height": 489.47
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Cuán grande es Él"
+      ],
+      "Rect": {
+        "X": 1494.01,
+        "Y": 986.8,
+        "Width": 315.99,
+        "Height": 53.2
+      }
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "Case": "biblia-dos-versiones-mismo-estilo",
+  "Theme": "biblia",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 86,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Porque de tal manera amó Dios al mundo,",
+        "que ha dado a su Hijo unigénito, para que",
+        "todo aquel que en él cree, no se pierda, mas",
+        "tenga vida eterna."
+      ],
+      "Rect": {
+        "X": 121.23,
+        "Y": 80.65,
+        "Width": 1677.54,
+        "Height": 457.55
+      }
+    },
+    {
+      "Name": "secondary",
+      "FontSize": 86,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Porque tanto amó Dios al mundo que dio a",
+        "su Hijo único, para que todo el que cree en",
+        "él no muera, sino que tenga vida eterna."
+      ],
+      "Rect": {
+        "X": 138.87,
+        "Y": 588.19,
+        "Width": 1642.27,
+        "Height": 343.16
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Juan 3:16 · PRUEBA / OTRA"
+      ],
+      "Rect": {
+        "X": 1335.88,
+        "Y": 986.8,
+        "Width": 474.12,
+        "Height": 53.2
+      }
+    }
+  ]
+}

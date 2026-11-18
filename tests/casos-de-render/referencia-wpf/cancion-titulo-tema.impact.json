@@ -1,0 +1,39 @@
+{
+  "Case": "cancion-titulo-tema",
+  "Theme": "impact",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 110,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Cuán Grande Es Él, Cuán Grande Es Él",
+        "Canta Mi Alma A Ti, Señor",
+        "Cuán Grande Es Él, Cuán Grande Es Él",
+        "Tu Nombre Alabaré"
+      ],
+      "Rect": {
+        "X": 151.89,
+        "Y": 237.66,
+        "Width": 1616.21,
+        "Height": 536.68
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Cuán grande es Él"
+      ],
+      "Rect": {
+        "X": 1520.51,
+        "Y": 991.21,
+        "Width": 289.49,
+        "Height": 48.79
+      }
+    }
+  ]
+}

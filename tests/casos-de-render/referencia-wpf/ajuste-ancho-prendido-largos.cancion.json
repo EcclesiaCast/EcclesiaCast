@@ -1,0 +1,39 @@
+{
+  "Case": "ajuste-ancho-prendido-largos",
+  "Theme": "cancion",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 48,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "Sublime es tu gracia que me alcanzó en el camino cuando yo andaba perdido",
+        "Tu mano me levantó y me puso sobre la roca firme donde ya no caeré",
+        "Hoy canto con todo mi corazón porque tu misericordia nunca se acaba",
+        "Por siempre y para siempre te alabaré, Señor, mi fortaleza y mi canción"
+      ],
+      "Rect": {
+        "X": 119.05,
+        "Y": 378.31,
+        "Width": 1681.89,
+        "Height": 255.37
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Ajuste"
+      ],
+      "Rect": {
+        "X": 1700.43,
+        "Y": 986.8,
+        "Width": 109.57,
+        "Height": 53.2
+      }
+    }
+  ]
+}

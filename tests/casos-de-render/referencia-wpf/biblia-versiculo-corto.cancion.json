@@ -1,0 +1,36 @@
+{
+  "Case": "biblia-versiculo-corto",
+  "Theme": "cancion",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "Jesús lloró."
+      ],
+      "Rect": {
+        "X": 731.48,
+        "Y": 444.82,
+        "Width": 457.03,
+        "Height": 122.37
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Juan 11:35 · PRUEBA"
+      ],
+      "Rect": {
+        "X": 1450.86,
+        "Y": 986.8,
+        "Width": 359.14,
+        "Height": 53.2
+      }
+    }
+  ]
+}

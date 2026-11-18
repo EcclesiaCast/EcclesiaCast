@@ -1,0 +1,54 @@
+{
+  "Case": "anuncio-largo-dos-renglones",
+  "Theme": "biblia",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 120,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Santo, santo, santo, Señor",
+        "omnipotente",
+        "Siempre el labio mío loores te",
+        "dará"
+      ],
+      "Rect": {
+        "X": 169.31,
+        "Y": 186.78,
+        "Width": 1581.39,
+        "Height": 638.44
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Aviso"
+      ],
+      "Rect": {
+        "X": 1715.72,
+        "Y": 986.8,
+        "Width": 94.28,
+        "Height": 53.2
+      }
+    },
+    {
+      "Name": "overlay",
+      "FontSize": 54,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "Esta semana no hay reunión de jóvenes. El próximo viernes nos",
+        "encontramos a las 19:30 en el templo para la vigilia de oración y ayuno"
+      ],
+      "Rect": {
+        "X": 96.05,
+        "Y": 906.35,
+        "Width": 1727.91,
+        "Height": 143.65
+      }
+    }
+  ]
+}

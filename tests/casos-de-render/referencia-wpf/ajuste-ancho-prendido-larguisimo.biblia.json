@@ -1,0 +1,36 @@
+{
+  "Case": "ajuste-ancho-prendido-larguisimo",
+  "Theme": "biblia",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 38,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Aleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluya"
+      ],
+      "Rect": {
+        "X": 139.55,
+        "Y": 480.73,
+        "Width": 1640.89,
+        "Height": 50.54
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Ajuste"
+      ],
+      "Rect": {
+        "X": 1700.43,
+        "Y": 986.8,
+        "Width": 109.57,
+        "Height": 53.2
+      }
+    }
+  ]
+}

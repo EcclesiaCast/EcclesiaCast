@@ -1,0 +1,36 @@
+{
+  "Case": "cancion-1-renglon-corto",
+  "Theme": "impact",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 110,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Aleluya"
+      ],
+      "Rect": {
+        "X": 792.72,
+        "Y": 438.92,
+        "Width": 334.57,
+        "Height": 134.17
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Aleluya · Coros"
+      ],
+      "Rect": {
+        "X": 1564.7,
+        "Y": 991.21,
+        "Width": 245.3,
+        "Height": 48.79
+      }
+    }
+  ]
+}

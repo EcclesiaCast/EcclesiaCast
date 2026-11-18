@@ -1,0 +1,43 @@
+{
+  "Case": "cancion-renglones-largos",
+  "Theme": "cancion",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 80,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "Sublime es tu gracia que me alcanzó en el",
+        "camino cuando yo andaba perdido",
+        "Tu mano me levantó y me puso sobre la roca",
+        "firme donde ya no caeré",
+        "Hoy canto con todo mi corazón porque tu",
+        "misericordia nunca se acaba",
+        "Por siempre y para siempre te alabaré, Señor,",
+        "mi fortaleza y mi canción"
+      ],
+      "Rect": {
+        "X": 144.31,
+        "Y": 80.37,
+        "Width": 1631.38,
+        "Height": 851.25
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Sublime es tu gracia"
+      ],
+      "Rect": {
+        "X": 1454.58,
+        "Y": 986.8,
+        "Width": 355.42,
+        "Height": 53.2
+      }
+    }
+  ]
+}

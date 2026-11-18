@@ -1,0 +1,23 @@
+{
+  "Case": "logo-texto-largo",
+  "Theme": "impact",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "logo",
+      "FontSize": 110,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Iglesia Evangélica Bautista Nueva",
+        "Vida de Villa Mercedes"
+      ],
+      "Rect": {
+        "X": 169.21,
+        "Y": 405.83,
+        "Width": 1581.57,
+        "Height": 268.34
+      }
+    }
+  ]
+}

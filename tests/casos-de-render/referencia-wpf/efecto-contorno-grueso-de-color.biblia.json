@@ -1,0 +1,39 @@
+{
+  "Case": "efecto-contorno-grueso-de-color",
+  "Theme": "biblia",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 120,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Santo, santo, santo, Señor",
+        "omnipotente",
+        "Siempre el labio mío loores te",
+        "dará"
+      ],
+      "Rect": {
+        "X": 169.31,
+        "Y": 186.78,
+        "Width": 1581.39,
+        "Height": 638.44
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Efectos"
+      ],
+      "Rect": {
+        "X": 1683.89,
+        "Y": 986.8,
+        "Width": 126.11,
+        "Height": 53.2
+      }
+    }
+  ]
+}

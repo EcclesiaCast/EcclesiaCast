@@ -1,0 +1,41 @@
+{
+  "Case": "cancion-todo-mayusculas-tema",
+  "Theme": "cancion",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "CUÁN GRANDE ES ÉL, CUÁN GRANDE",
+        "ES ÉL",
+        "CANTA MI ALMA A TI, SEÑOR",
+        "CUÁN GRANDE ES ÉL, CUÁN GRANDE",
+        "ES ÉL",
+        "TU NOMBRE ALABARÉ"
+      ],
+      "Rect": {
+        "X": 169,
+        "Y": 138.9,
+        "Width": 1582.01,
+        "Height": 734.2
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Cuán grande es Él"
+      ],
+      "Rect": {
+        "X": 1494.01,
+        "Y": 986.8,
+        "Width": 315.99,
+        "Height": 53.2
+      }
+    }
+  ]
+}

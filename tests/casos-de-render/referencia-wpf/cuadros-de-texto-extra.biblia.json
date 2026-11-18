@@ -1,0 +1,67 @@
+{
+  "Case": "cuadros-de-texto-extra",
+  "Theme": "biblia",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 120,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Santo, santo, santo, Señor",
+        "omnipotente",
+        "Siempre el labio mío loores te",
+        "dará"
+      ],
+      "Rect": {
+        "X": 169.31,
+        "Y": 186.78,
+        "Width": 1581.39,
+        "Height": 638.44
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Extra"
+      ],
+      "Rect": {
+        "X": 1723.6,
+        "Y": 986.8,
+        "Width": 86.4,
+        "Height": 53.2
+      }
+    },
+    {
+      "Name": "extra1",
+      "FontSize": 44,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Serie: El Padre nuestro"
+      ],
+      "Rect": {
+        "X": 60,
+        "Y": 90.74,
+        "Width": 700,
+        "Height": 58.52
+      }
+    },
+    {
+      "Name": "extra2",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Bold",
+      "Lines": [
+        "Domingo 18 de noviembre"
+      ],
+      "Rect": {
+        "X": 1160,
+        "Y": 913.4,
+        "Width": 700,
+        "Height": 53.2
+      }
+    }
+  ]
+}

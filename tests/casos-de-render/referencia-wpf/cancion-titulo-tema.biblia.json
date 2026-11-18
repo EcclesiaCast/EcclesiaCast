@@ -1,0 +1,41 @@
+{
+  "Case": "cancion-titulo-tema",
+  "Theme": "biblia",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 106,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Cuán Grande Es Él, Cuán Grande Es",
+        "Él",
+        "Canta Mi Alma A Ti, Señor",
+        "Cuán Grande Es Él, Cuán Grande Es",
+        "Él",
+        "Tu Nombre Alabaré"
+      ],
+      "Rect": {
+        "X": 142.28,
+        "Y": 83.04,
+        "Width": 1635.43,
+        "Height": 845.92
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Cuán grande es Él"
+      ],
+      "Rect": {
+        "X": 1494.01,
+        "Y": 986.8,
+        "Width": 315.99,
+        "Height": 53.2
+      }
+    }
+  ]
+}

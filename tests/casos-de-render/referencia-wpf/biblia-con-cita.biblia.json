@@ -1,0 +1,40 @@
+{
+  "Case": "biblia-con-cita",
+  "Theme": "biblia",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 120,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Porque de tal manera amó Dios",
+        "al mundo, que ha dado a su",
+        "Hijo unigénito, para que todo",
+        "aquel que en él cree, no se",
+        "pierda, mas tenga vida eterna."
+      ],
+      "Rect": {
+        "X": 124.16,
+        "Y": 106.97,
+        "Width": 1671.67,
+        "Height": 798.05
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Juan 3:16 · PRUEBA"
+      ],
+      "Rect": {
+        "X": 1472.42,
+        "Y": 986.8,
+        "Width": 337.58,
+        "Height": 53.2
+      }
+    }
+  ]
+}

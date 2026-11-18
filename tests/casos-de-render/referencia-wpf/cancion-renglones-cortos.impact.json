@@ -1,0 +1,39 @@
+{
+  "Case": "cancion-renglones-cortos",
+  "Theme": "impact",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 110,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Gloria",
+        "Aleluya",
+        "Amén",
+        "Cristo vive"
+      ],
+      "Rect": {
+        "X": 723.08,
+        "Y": 237.66,
+        "Width": 473.84,
+        "Height": 536.68
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Impact Regular",
+      "Lines": [
+        "Coros"
+      ],
+      "Rect": {
+        "X": 1713.81,
+        "Y": 991.21,
+        "Width": 96.19,
+        "Height": 48.79
+      }
+    }
+  ]
+}

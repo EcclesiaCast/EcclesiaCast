@@ -1,0 +1,26 @@
+{
+  "Case": "biblia-sin-cita",
+  "Theme": "biblia",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 120,
+      "FontUsed": "Segoe UI Regular",
+      "Lines": [
+        "Porque de tal manera amó Dios",
+        "al mundo, que ha dado a su",
+        "Hijo unigénito, para que todo",
+        "aquel que en él cree, no se",
+        "pierda, mas tenga vida eterna."
+      ],
+      "Rect": {
+        "X": 124.16,
+        "Y": 140.97,
+        "Width": 1671.67,
+        "Height": 798.05
+      }
+    }
+  ]
+}

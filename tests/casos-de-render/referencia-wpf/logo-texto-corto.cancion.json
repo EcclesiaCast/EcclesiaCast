@@ -1,0 +1,22 @@
+{
+  "Case": "logo-texto-corto",
+  "Theme": "cancion",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "logo",
+      "FontSize": 120,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "Iglesia Nueva Vida"
+      ],
+      "Rect": {
+        "X": 457.65,
+        "Y": 460.2,
+        "Width": 1004.7,
+        "Height": 159.61
+      }
+    }
+  ]
+}
