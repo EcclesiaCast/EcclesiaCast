@@ -55,10 +55,7 @@ public sealed partial class MainViewModel
     /// Saves a moment after the operator lets go of the slider. Every save
     /// opens the database, so one write per slider step would be too many.
     /// </summary>
-    private readonly System.Windows.Threading.DispatcherTimer _cardZoomSaveTimer = new()
-    {
-        Interval = TimeSpan.FromMilliseconds(400),
-    };
+    private readonly IUiTimer _cardZoomSaveTimer;
 
     /// <summary>Off while the saved sizes are read, so starting up writes nothing.</summary>
     private bool _cardZoomReady;

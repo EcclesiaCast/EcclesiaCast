@@ -372,6 +372,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _dialogs = dialogs;
         _audioTimer = timers.Create(TimeSpan.FromMilliseconds(250));
         _timesTimer = timers.Create(TimeSpan.FromMilliseconds(500));
+        _cardZoomSaveTimer = timers.Create(TimeSpan.FromMilliseconds(400));
         _dispatcher = dispatcher;
         _timers = timers;
         _playbackTimer = timers.Create(TimeSpan.FromMilliseconds(300));
