@@ -19,6 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="EcclesiaCast.Presentation.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\EcclesiaCast.Core\EcclesiaCast.Core.csproj" />
     <ProjectReference Include="..\EcclesiaCast.Data\EcclesiaCast.Data.csproj" />
   </ItemGroup>

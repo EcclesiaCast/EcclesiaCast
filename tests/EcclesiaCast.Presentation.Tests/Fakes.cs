@@ -166,3 +166,40 @@ public class Stub : DispatchProxy
         return type.IsValueType ? Activator.CreateInstance(type) : null;
     }
 }
+
+/// <summary>
+/// Answers the program's notices with the button the test chose and writes
+/// down what was asked. Set it as <c>PlatformServices.Notices</c> (the tests
+/// that use it live in the «ViewModels» collection, which never runs in parallel).
+/// </summary>
+internal sealed class ScriptedNotices : INotices, IDisposable
+{
+    private readonly Queue<Func<IReadOnlyList<string>, int>> _answers = new();
+    private readonly INotices? _before = PlatformServices.Notices;
+
+    public ScriptedNotices() => PlatformServices.Notices = this;
+
+    /// <summary>Every notice shown, in order.</summary>
+    public List<(string Message, string? Title, IReadOnlyList<string> Buttons)> Asked { get; } = [];
+
+    /// <summary>The next question is answered «yes» (the last button of a two-button question).</summary>
+    public ScriptedNotices Yes() => Answer(buttons => buttons.Count - 1);
+
+    /// <summary>The next question is answered «no» / cancel (the first button).</summary>
+    public ScriptedNotices No() => Answer(_ => 0);
+
+    public ScriptedNotices Answer(Func<IReadOnlyList<string>, int> answer)
+    {
+        _answers.Enqueue(answer);
+        return this;
+    }
+
+    public int Ask(string message, string? title, NoticeKind kind, IReadOnlyList<string> buttons,
+        int defaultIndex, int cancelIndex, bool destructive)
+    {
+        Asked.Add((message, title, buttons));
+        return _answers.Count > 0 ? _answers.Dequeue()(buttons) : cancelIndex;
+    }
+
+    public void Dispose() => PlatformServices.Notices = _before;
+}

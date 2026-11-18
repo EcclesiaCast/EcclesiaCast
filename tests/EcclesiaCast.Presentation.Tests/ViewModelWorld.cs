@@ -27,6 +27,8 @@ public sealed class ViewModelWorld : IDisposable
 
     public ISongRepository Songs { get; }
 
+    public IThemeRepository Themes { get; }
+
     public IBibleRepository Bibles { get; }
 
     public ViewModelWorld()
@@ -40,7 +42,8 @@ public sealed class ViewModelWorld : IDisposable
         Settings = new SqliteSettingsStore(_dbPath);
         Songs = new SongRepository(_dbPath);
         Bibles = new BibleRepository(_dbPath);
-        ThemeSeeder.EnsureDefaults(new ThemeRepository(_dbPath), Settings);
+        Themes = new ThemeRepository(_dbPath);
+        ThemeSeeder.EnsureDefaults(Themes, Settings);
     }
 
     /// <summary>Call after putting in the songs, Bibles and settings the test needs: the view model reads them when it is built.</summary>
