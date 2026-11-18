@@ -1,5 +1,4 @@
 using System.IO;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EcclesiaCast.App.Services;
@@ -123,7 +122,7 @@ public sealed partial class MainViewModel
         }
     }
 
-    private static string WebCapturesFolder => Path.Combine(App.DataDir, "capturas");
+    private string WebCapturesFolder => Path.Combine(_paths.DataFolder, "capturas");
 
     // ── El panel ─────────────────────────────────────────────────
 
