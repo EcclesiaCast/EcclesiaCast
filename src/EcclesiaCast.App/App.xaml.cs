@@ -224,6 +224,8 @@ public partial class App : Application
         services.AddSingleton<IBackupDialog>(_ => new BackupDialogService(dbPath));
         services.AddSingleton<ICountdownDialog, CountdownDialogService>();
         services.AddSingleton<ILightCopyDialog, LightCopyDialogService>();
+        services.AddSingleton<IBroadcastDialog, BroadcastDialogService>();
+        services.AddSingleton<IRemoteControlDialog, RemoteControlDialogService>();
         services.AddSingleton<IGlobalSearchDialog, GlobalSearchDialogService>();
         services.AddSingleton(sp => new UpdateChecker(
             sp.GetRequiredService<ISettingsStore>(),

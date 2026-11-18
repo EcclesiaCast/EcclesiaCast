@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EcclesiaCast.Presentation.Remote;
@@ -55,13 +54,12 @@ public sealed partial class MainViewModel
             return;
         }
 
-        new Views.BroadcastWindow(_remote!, _settings) { Owner = Application.Current.MainWindow }.ShowDialog();
+        _broadcastDialog.ShowPages(_remote!);
     }
 
     /// <summary>«Transmisión → Estilos de la transmisión…».</summary>
     [RelayCommand]
-    private void OpenBroadcastStyles() =>
-        new Views.BroadcastStyleWindow(_settings) { Owner = Application.Current.MainWindow }.ShowDialog();
+    private void OpenBroadcastStyles() => _broadcastDialog.ShowStyles();
 
     /// <summary>
     /// Starts listening. Left on between sessions on purpose: whoever set the
@@ -114,13 +112,9 @@ public sealed partial class MainViewModel
             return;
         }
 
-        var window = new Views.RemoteControlWindow(_remote!)
-        {
-            Owner = Application.Current.MainWindow,
-        };
-        window.ShowDialog();
+        var stopRequested = _remoteDialog.Show(_remote!);
 
-        if (window.StopRequested)
+        if (stopRequested)
         {
             _remote!.Stop();
             _settings.Set(RemoteEnabledKey, "0");
@@ -223,7 +217,7 @@ public sealed partial class MainViewModel
 
         // Only what the program itself drew into its posters folder: whatever
         // else a media's poster field might point to is not for the network.
-        var folder = Path.GetFullPath(MediaThumbnails.Directory).TrimEnd('\\') + "\\";
+        var folder = Path.GetFullPath(_thumbnails.Directory).TrimEnd('\\') + "\\";
         return Path.GetFullPath(poster).StartsWith(folder, StringComparison.OrdinalIgnoreCase) ? poster : null;
     }
 
