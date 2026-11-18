@@ -37,6 +37,10 @@ Falta probar a mano:
   adentro; que las páginas /salida (OBS, celular, escenario) siguen igual. Con dos monitores:
   dejarla en el segundo, cerrar el programa, desenchufarlo y abrir: tiene que aparecer en el medio
   de la principal.
+- [ ] **Con una sola pantalla** (una notebook sin proyector, en una instalación nueva o en otra PC):
+  «⧉ En una ventana» tiene que ser la primera de la lista «Salida:» y venir elegida. Ojo con una
+  notebook con el proyector en «duplicar»: ahí Windows ve una sola pantalla, así que también arranca
+  en la ventana; para pantalla completa hay que elegir «Pantalla 1» (después lo recuerda).
 - [ ] Si se toca la ventana flotante, el teclado queda en ella: las teclas del panel (flechas,
   Ctrl+Enter) no andan hasta volver a hacer clic en el panel. Ver si molesta.
 - [ ] **«➕ Agregar» en Canciones** con el panel angosto: que el título «CANCIONES» no quede tapado.

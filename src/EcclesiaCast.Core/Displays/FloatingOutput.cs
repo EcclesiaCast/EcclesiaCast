@@ -41,6 +41,30 @@ public static class FloatingOutput
 
     public static bool IsFloating(DisplayInfo? display) => display?.DeviceName == DeviceName;
 
+    /// <summary>
+    /// With a single screen the window is the first entry of the list: the full
+    /// screen would cover the program itself.
+    /// </summary>
+    public static bool GoesFirst(IReadOnlyList<DisplayInfo> screens) => screens.Count <= 1;
+
+    /// <summary>
+    /// Which output to start on: the one remembered if it is still there; with a
+    /// single screen and nothing remembered, the window; otherwise a screen that
+    /// is not the main one (the projector), or the main one.
+    /// </summary>
+    /// <remarks>
+    /// Someone who already went live on their only screen keeps it: that may be
+    /// a projector set to «duplicate», where the full screen is what they want.
+    /// </remarks>
+    public static string StartingChoice(IReadOnlyList<DisplayInfo> screens, string? remembered)
+    {
+        if (remembered == DeviceName || screens.Any(s => s.DeviceName == remembered))
+            return remembered!;
+        if (GoesFirst(screens))
+            return DeviceName;
+        return (screens.FirstOrDefault(s => !s.IsPrimary) ?? screens[0]).DeviceName;
+    }
+
     /// <summary>The entry for the list of screens, sized as a full-HD picture of the shape.</summary>
     public static DisplayInfo For(OutputShape shape)
     {

@@ -15,6 +15,35 @@ public class FloatingOutputTests
         Assert.False(FloatingOutput.IsFloating(null));
     }
 
+    private static readonly DisplayInfo Notebook = new(@"\\.\DISPLAY1", 0, 0, 1920, 1080, true);
+    private static readonly DisplayInfo Projector = new(@"\\.\DISPLAY2", 1920, 0, 1920, 1080, false);
+
+    [Fact]
+    public void With_a_single_screen_the_window_goes_first_and_is_the_starting_choice()
+    {
+        Assert.True(FloatingOutput.GoesFirst([Notebook]));
+        Assert.True(FloatingOutput.GoesFirst([]));
+        Assert.Equal(FloatingOutput.DeviceName, FloatingOutput.StartingChoice([Notebook], null));
+        Assert.Equal(FloatingOutput.DeviceName, FloatingOutput.StartingChoice([], null));
+    }
+
+    [Fact]
+    public void With_a_projector_it_starts_on_the_projector_and_the_window_is_not_first()
+    {
+        Assert.False(FloatingOutput.GoesFirst([Notebook, Projector]));
+        Assert.Equal(Projector.DeviceName, FloatingOutput.StartingChoice([Notebook, Projector], null));
+    }
+
+    [Fact]
+    public void What_was_used_last_time_wins_while_it_is_still_there()
+    {
+        // Someone on a single screen (a projector set to «duplicate») who already went live on it keeps it.
+        Assert.Equal(Notebook.DeviceName, FloatingOutput.StartingChoice([Notebook], Notebook.DeviceName));
+        Assert.Equal(FloatingOutput.DeviceName, FloatingOutput.StartingChoice([Notebook, Projector], FloatingOutput.DeviceName));
+        // The projector that was used is unplugged: back to the window.
+        Assert.Equal(FloatingOutput.DeviceName, FloatingOutput.StartingChoice([Notebook], Projector.DeviceName));
+    }
+
     [Fact]
     public void The_entry_has_the_proportion_of_the_shape()
     {
