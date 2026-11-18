@@ -88,6 +88,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private readonly IOperatorScreen _operatorScreen;
     private readonly IBroadcastDialog _broadcastDialog;
     private readonly IRemoteControlDialog _remoteDialog;
+    private readonly ITrashDialog _trashDialog;
 
     /// <summary>Copied slide (label + text + style) for paste/duplicate.</summary>
     private (string Label, string Text, string? StyleJson)? _clipboardSlide;
@@ -385,8 +386,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         IInstallerSettings installer,
         IOperatorScreen operatorScreen,
         IBroadcastDialog broadcastDialog,
-        IRemoteControlDialog remoteDialog)
+        IRemoteControlDialog remoteDialog,
+        ITrashDialog trashDialog)
     {
+        _trashDialog = trashDialog;
         _broadcastDialog = broadcastDialog;
         _remoteDialog = remoteDialog;
         _operatorScreen = operatorScreen;

@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EcclesiaCast.Presentation.Remote;
@@ -526,7 +525,7 @@ public sealed partial class MainViewModel
     [RelayCommand]
     private void OpenTrash()
     {
-        new Views.TrashWindow(_songs, _themes) { Owner = Application.Current.MainWindow }.ShowDialog();
+        _trashDialog.Show();
         LoadSongs();
         ThemeSeeder.EnsureDefaults(_themes, _settings);
         StatusText = "Papelera cerrada.";
@@ -563,22 +562,22 @@ public sealed partial class MainViewModel
     [RelayCommand]
     private void ImportSongs()
     {
-        var dialog = new Microsoft.Win32.OpenFileDialog
-        {
-            Title = "Importar canciones",
-            Filter = "Canciones (*.txt, *.pro)|*.txt;*.pro|Texto plano (*.txt)|*.txt|ProPresenter 7 (*.pro)|*.pro",
-            Multiselect = true,
-        };
-        if (dialog.ShowDialog() != true)
+        var files = _dialogs.OpenFiles(new OpenFileRequest("Importar canciones",
+        [
+            new FileFilter("Canciones (*.txt, *.pro)", ["*.txt", "*.pro"]),
+            new FileFilter("Texto plano (*.txt)", ["*.txt"]),
+            new FileFilter("ProPresenter 7 (*.pro)", ["*.pro"]),
+        ]));
+        if (files is null)
             return;
 
         int imported = 0, replaced = 0, skipped = 0, discarded = 0, failed = 0;
 
         // One question about a repeated title is asked once per song, unless
         // the operator ticks "the same for the rest".
-        var session = _songSaver.Begin(several: dialog.FileNames.Length > 1);
+        var session = _songSaver.Begin(several: files.Count > 1);
 
-        foreach (var path in dialog.FileNames)
+        foreach (var path in files)
         {
             try
             {
