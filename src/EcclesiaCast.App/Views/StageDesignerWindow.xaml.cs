@@ -6,6 +6,7 @@ using System.Windows.Media;
 using EcclesiaCast.App.Controls;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Stage;
+using EcclesiaCast.Presentation.ViewModels;
 
 namespace EcclesiaCast.App.Views;
 
@@ -17,21 +18,21 @@ namespace EcclesiaCast.App.Views;
 /// </summary>
 public partial class StageDesignerWindow : Window
 {
-    private const double CanvasW = StageLayout.CanvasWidth;
-    private const double CanvasH = StageLayout.CanvasHeight;
-
     private sealed record LayoutChoice(StageLayout Layout, string Text);
     private sealed record BoxChoice(StageBox Box, string Text);
     private sealed record KindChoice(StageBoxKind Kind, string Text);
 
-    private readonly List<StageLayout> _layouts;
+    private readonly StageDesignerViewModel _vm;
     private readonly Dictionary<StageBox, StageBoxView> _views = [];
     private readonly List<KindChoice> _kinds =
         [.. Enum.GetValues<StageBoxKind>().Select(k => new KindChoice(k, StageBox.KindName(k)))];
 
-    private StageLayout _inUse;
-    private StageLayout _current;
-    private StageBox? _selected;
+    /// <summary>The box chosen: the view model keeps it.</summary>
+    private StageBox? _selected
+    {
+        get => _vm.Selected;
+        set => _vm.Selected = value;
+    }
 
     /// <summary>True while the panels are being filled in, so that does not count as an edit.</summary>
     private bool _loading;
@@ -41,20 +42,13 @@ public partial class StageDesignerWindow : Window
     private Point _dragStart;
     private Point _boxStart;
 
-    public StageDesignerWindow(IReadOnlyList<StageLayout> layouts, string activeName)
+    public StageDesignerWindow(StageDesignerViewModel viewModel)
     {
         InitializeComponent();
-
-        _layouts = [.. layouts.Select(l => l.Clone())];
-        if (_layouts.Count == 0)
-            _layouts.Add(new StageLayout { Name = StageLayoutStore.SingersName });
-
-        _inUse = _layouts.FirstOrDefault(l => string.Equals(l.Name, activeName, StringComparison.OrdinalIgnoreCase))
-                 ?? _layouts[0];
-        _current = _inUse;
+        _vm = viewModel;
 
         KindBox.ItemsSource = _kinds;
-        FontBox.ItemsSource = Fonts.SystemFontFamilies.Select(f => f.Source).OrderBy(n => n).ToList();
+        FontBox.ItemsSource = _vm.FontNames;
         BuildHandles();
         ReloadLayoutPicker();
     }
@@ -67,16 +61,16 @@ public partial class StageDesignerWindow : Window
     private void ReloadLayoutPicker()
     {
         _loading = true;
-        var choices = _layouts
-            .Select(l => new LayoutChoice(l, ReferenceEquals(l, _inUse) ? $"{l.Name}  ·  en uso" : l.Name))
+        var choices = _vm.Layouts
+            .Select(l => new LayoutChoice(l, _vm.LayoutText(l)))
             .ToList();
         LayoutPicker.ItemsSource = choices;
-        LayoutPicker.SelectedItem = choices.First(c => ReferenceEquals(c.Layout, _current));
+        LayoutPicker.SelectedItem = choices.First(c => ReferenceEquals(c.Layout, _vm.Current));
         _loading = false;
 
-        InUseText.Text = $"En la pantalla de escenario se usa: «{_inUse.Name}». Se cambia también desde el ▾ junto al botón Escenario.";
-        UseButton.IsEnabled = !ReferenceEquals(_current, _inUse);
-        ShowLayout(_current);
+        InUseText.Text = _vm.InUseText;
+        UseButton.IsEnabled = _vm.CanUseCurrent;
+        ShowLayout(_vm.Current);
     }
 
     private void LayoutPicker_Changed(object sender, SelectionChangedEventArgs e)
@@ -84,9 +78,9 @@ public partial class StageDesignerWindow : Window
         if (_loading || LayoutPicker.SelectedItem is not LayoutChoice choice)
             return;
 
-        _current = choice.Layout;
-        UseButton.IsEnabled = !ReferenceEquals(_current, _inUse);
-        ShowLayout(_current);
+        _vm.OpenLayout(choice.Layout);
+        UseButton.IsEnabled = _vm.CanUseCurrent;
+        ShowLayout(_vm.Current);
     }
 
     private void ShowLayout(StageLayout layout)
@@ -106,69 +100,36 @@ public partial class StageDesignerWindow : Window
 
     private void NewLayout_Click(object sender, RoutedEventArgs e)
     {
-        if (Ask("Nuevo escenario", "Nombre del escenario", "Escenario") is not { Length: > 0 } name)
-            return;
-
-        var layout = new StageLayout
-        {
-            Name = StageLayoutStore.UniqueName(_layouts.Select(l => l.Name), name),
-            Boxes =
-            [
-                NewBox(StageBoxKind.LiveText),
-            ],
-        };
-        _layouts.Add(layout);
-        _current = layout;
-        ReloadLayoutPicker();
+        if (_vm.NewLayout())
+            ReloadLayoutPicker();
     }
 
     private void DuplicateLayout_Click(object sender, RoutedEventArgs e)
     {
-        var copy = _current.Clone();
-        copy.Name = StageLayoutStore.UniqueName(_layouts.Select(l => l.Name), $"{_current.Name} copia");
-        foreach (var box in copy.Boxes)
-            box.Id = Guid.NewGuid().ToString("N")[..8];
-        _layouts.Add(copy);
-        _current = copy;
+        _vm.DuplicateLayout();
         ReloadLayoutPicker();
     }
 
     private void RenameLayout_Click(object sender, RoutedEventArgs e)
     {
-        if (Ask("Cambiar el nombre", "Nombre del escenario", _current.Name) is not { Length: > 0 } name)
-            return;
-
-        _current.Name = StageLayoutStore.UniqueName(
-            _layouts.Where(l => !ReferenceEquals(l, _current)).Select(l => l.Name), name);
-        ReloadLayoutPicker();
+        if (_vm.RenameLayout())
+            ReloadLayoutPicker();
     }
 
     private void DeleteLayout_Click(object sender, RoutedEventArgs e)
     {
-        if (_layouts.Count <= 1)
-        {
-            Notice.Show("Tiene que quedar al menos un escenario.");
-            return;
-        }
-
-        if (!Notice.Confirm($"¿Eliminar el escenario «{_current.Name}»?", "Eliminar", destructive: true))
-            return;
-
-        var index = _layouts.IndexOf(_current);
-        _layouts.Remove(_current);
-        if (ReferenceEquals(_current, _inUse))
-            _inUse = _layouts[Math.Min(index, _layouts.Count - 1)];
-        _current = _layouts[Math.Min(index, _layouts.Count - 1)];
-        ReloadLayoutPicker();
+        if (_vm.DeleteLayout())
+            ReloadLayoutPicker();
     }
 
     private void UseLayout_Click(object sender, RoutedEventArgs e)
     {
-        _inUse = _current;
+        _vm.UseCurrent();
         ReloadLayoutPicker();
     }
 
-    private string? Ask(string title, string message, string initial)
+    /// <summary>The text prompt, over this window.</summary>
+    public string? Ask(string title, string message, string initial)
     {
         var window = new TextPromptWindow(title, message, initial) { Owner = this };
         return window.ShowDialog() == true ? window.Value : null;
@@ -176,7 +137,7 @@ public partial class StageDesignerWindow : Window
 
     private void Save_Click(object sender, RoutedEventArgs e)
     {
-        Result = new StageLayoutState(_layouts, _inUse.Name);
+        Result = _vm.Build();
         DialogResult = true;
     }
 
@@ -186,20 +147,10 @@ public partial class StageDesignerWindow : Window
     {
         var keep = _selected;
         _loading = true;
-        var choices = _current.Boxes.Select(b => new BoxChoice(b, BoxTitle(b))).ToList();
+        var choices = _vm.Current.Boxes.Select(b => new BoxChoice(b, StageDesignerViewModel.BoxTitle(b))).ToList();
         BoxList.ItemsSource = choices;
         BoxList.SelectedItem = choices.FirstOrDefault(c => ReferenceEquals(c.Box, keep));
         _loading = false;
-    }
-
-    private static string BoxTitle(StageBox box)
-    {
-        var name = StageBox.KindName(box.Kind);
-        if (box.Kind != StageBoxKind.FixedText || string.IsNullOrWhiteSpace(box.Text))
-            return name;
-
-        var oneLine = box.Text.Replace('\r', ' ').Replace('\n', ' ').Trim();
-        return $"{name}: {(oneLine.Length > 22 ? oneLine[..22] + "…" : oneLine)}";
     }
 
     private void BoxList_Changed(object sender, SelectionChangedEventArgs e)
@@ -208,35 +159,6 @@ public partial class StageDesignerWindow : Window
             return;
 
         Select((BoxList.SelectedItem as BoxChoice)?.Box);
-    }
-
-    private static StageBox NewBox(StageBoxKind kind)
-    {
-        // Sizes that read well for each kind; the operator moves and stretches
-        // them afterwards.
-        var (w, h, size) = kind switch
-        {
-            StageBoxKind.LiveText => (1600d, 560d, 110d),
-            StageBoxKind.NextSlide => (1600d, 200d, 48d),
-            StageBoxKind.Clock or StageBoxKind.Timer or StageBoxKind.Countdown or StageBoxKind.SectionTimer => (460d, 150d, 120d),
-            StageBoxKind.Notes => (1600d, 600d, 60d),
-            StageBoxKind.Mirror => (960d, 540d, 60d),
-            StageBoxKind.Overlay => (1600d, 70d, 36d),
-            _ => (900d, 100d, 48d),
-        };
-
-        return new StageBox
-        {
-            Kind = kind,
-            Width = w,
-            Height = h,
-            X = (CanvasW - w) / 2,
-            Y = (CanvasH - h) / 2,
-            FontSize = size,
-            Align = kind is StageBoxKind.Notes ? StageAlign.Left : StageAlign.Center,
-            Bold = kind is StageBoxKind.LiveText,
-            Text = kind == StageBoxKind.FixedText ? "Texto" : string.Empty,
-        };
     }
 
     private void AddBox_Click(object sender, RoutedEventArgs e)
@@ -250,7 +172,7 @@ public partial class StageDesignerWindow : Window
         foreach (var kind in _kinds)
         {
             var item = new MenuItem { Header = kind.Text };
-            item.Click += (_, _) => AddBox(NewBox(kind.Kind));
+            item.Click += (_, _) => AddBox(StageDesignerViewModel.NewBox(kind.Kind));
             menu.Items.Add(item);
         }
 
@@ -259,42 +181,38 @@ public partial class StageDesignerWindow : Window
 
     private void AddBox(StageBox box)
     {
-        _current.Boxes.Add(box);
+        _vm.AddBox(box);
+        ShowAdded(box);
+    }
+
+    /// <summary>Draws a box the view model just added and selects it.</summary>
+    private void ShowAdded(StageBox box)
+    {
         var view = new StageBoxView(box, projection: null) { IsHitTestVisible = false };
         _views[box] = view;
         Surface.Children.Add(view);
-        _selected = box;
         ReloadBoxList();
         Select(box);
     }
 
     private void DuplicateBox_Click(object sender, RoutedEventArgs e)
     {
-        if (_selected is not { } box)
-            return;
-
-        var copy = box.Clone();
-        copy.Id = Guid.NewGuid().ToString("N")[..8];
-        copy.X = Math.Min(box.X + 40, CanvasW - copy.Width);
-        copy.Y = Math.Min(box.Y + 40, CanvasH - copy.Height);
-        AddBox(copy);
+        if (_vm.DuplicateSelected() is { } copy)
+            ShowAdded(copy);
     }
 
     private void DeleteBox_Click(object sender, RoutedEventArgs e) => DeleteSelected();
 
     private void DeleteSelected()
     {
-        if (_selected is not { } box)
+        if (_vm.DeleteSelected() is not { } box)
             return;
 
-        var index = _current.Boxes.IndexOf(box);
-        _current.Boxes.Remove(box);
         if (_views.Remove(box, out var view))
             Surface.Children.Remove(view);
 
-        _selected = null;
         ReloadBoxList();
-        Select(_current.Boxes.Count == 0 ? null : _current.Boxes[Math.Min(index, _current.Boxes.Count - 1)]);
+        Select(_vm.Selected);
     }
 
     // ── Selección y panel de propiedades ─────────────────────────
@@ -354,21 +272,7 @@ public partial class StageDesignerWindow : Window
         TextLabel.Visibility = fixedText ? Visibility.Visible : Visibility.Collapsed;
         FixedTextBox.Visibility = fixedText ? Visibility.Visible : Visibility.Collapsed;
 
-        KindHint.Text = box.Kind switch
-        {
-            StageBoxKind.LiveText => "Las palabras que están en pantalla ahora. Durante una cuenta regresiva muestra la cuenta.",
-            StageBoxKind.NextSlide => "La diapositiva que sigue, para que los cantantes se preparen.",
-            StageBoxKind.Clock => "La hora de la computadora.",
-            StageBoxKind.Timer => "Cuánto lleva el servicio. Se maneja desde la pestaña Tiempos o el menú Proyección.",
-            StageBoxKind.Countdown => "Lo que falta de la cuenta regresiva que se proyecta antes de empezar. Queda vacío si no hay ninguna corriendo.",
-            StageBoxKind.SectionTimer => "Lo que le queda a la sección en marcha (pestaña Tiempos). Pasado el tiempo sigue contando en negativo y se pone en rojo.",
-            StageBoxKind.Notes => "Las notas que escribís en la pestaña Notas. La congregación nunca las ve.",
-            StageBoxKind.LiveName => "El nombre de lo que está en vivo: «Coro», «Juan 3:16».",
-            StageBoxKind.FixedText => "Un texto que no cambia: un título o un recordatorio.",
-            StageBoxKind.Overlay => "El aviso al pie, el mismo que ve la congregación. Sólo aparece mientras hay uno.",
-            StageBoxKind.Mirror => "Exactamente lo que se proyecta, con su fondo. El tamaño de letra no cuenta acá.",
-            _ => string.Empty,
-        };
+        KindHint.Text = StageDesignerViewModel.KindHint(box.Kind);
     }
 
     /// <summary>The frame and handles follow the selected box.</summary>
@@ -409,81 +313,71 @@ public partial class StageDesignerWindow : Window
         if (_loading || _selected is not { } box || KindBox.SelectedItem is not KindChoice choice)
             return;
 
-        box.Kind = choice.Kind;
+        _vm.SetKind(choice.Kind);
         ShowKindSpecifics(box);
         Touch(listChanged: true);
     }
 
     private void FixedText_Changed(object sender, TextChangedEventArgs e)
     {
-        if (_loading || _selected is not { } box)
+        if (_loading || _selected is null)
             return;
 
-        box.Text = FixedTextBox.Text;
+        _vm.SetText(FixedTextBox.Text);
         Touch(listChanged: true);
     }
 
     private void Font_Changed(object sender, RoutedEventArgs e)
     {
-        if (_loading || _selected is not { } box)
+        if (_loading || _selected is null)
             return;
 
-        var typed = FontBox.Text.Trim();
-        box.FontFamily = string.IsNullOrWhiteSpace(typed) ? null : typed;
+        _vm.SetFont(FontBox.Text);
         Touch();
     }
 
     private void FontSize_Changed(object sender, RoutedEventArgs e)
     {
-        if (_loading || _selected is not { } box)
+        if (_loading || _selected is null)
             return;
 
-        box.FontSize = Math.Clamp(FontSizeField.Value, 8, 600);
+        _vm.SetFontSize(FontSizeField.Value);
         Touch();
     }
 
     private void Color_Click(object sender, RoutedEventArgs e)
     {
-        if (_selected is not { } box)
+        if (_vm.PickColor() is not { } hex)
             return;
 
-        if (ColorPickerHelper.Pick(box.Color) is not { } hex)
-            return;
-
-        box.Color = hex;
         ShowColor(hex);
         Touch();
     }
 
     private void Align_Click(object sender, RoutedEventArgs e)
     {
-        if (_selected is not { } box || sender is not RadioButton { Tag: string tag })
+        if (_selected is null || sender is not RadioButton { Tag: string tag })
             return;
 
-        box.Align = Enum.Parse<StageAlign>(tag);
+        _vm.SetAlign(tag);
         Touch();
     }
 
     private void Bold_Click(object sender, RoutedEventArgs e)
     {
-        if (_selected is not { } box)
+        if (_selected is null)
             return;
 
-        box.Bold = BoldBox.IsChecked == true;
+        _vm.SetBold(BoldBox.IsChecked == true);
         Touch();
     }
 
     private void Geometry_Changed(object sender, RoutedEventArgs e)
     {
-        if (_loading || _selected is not { } box)
+        if (_loading || _selected is null)
             return;
 
-        var w = Math.Clamp(WField.Value, 20, CanvasW);
-        var h = Math.Clamp(HField.Value, 20, CanvasH);
-        box.Width = w;
-        box.Height = h;
-        box.X = Math.Clamp(XField.Value, 0, CanvasW - w);
-        box.Y = Math.Clamp(YField.Value, 0, CanvasH - h);
+        _vm.SetGeometry(XField.Value, YField.Value, WField.Value, HField.Value);
         Touch();
     }
 
@@ -495,8 +389,7 @@ public partial class StageDesignerWindow : Window
         var p = e.GetPosition(Overlay);
 
         // The topmost box under the pointer wins: later boxes are drawn on top.
-        var hit = _current.Boxes.LastOrDefault(b =>
-            p.X >= b.X && p.X <= b.X + b.Width && p.Y >= b.Y && p.Y <= b.Y + b.Height);
+        var hit = _vm.BoxAt(p.X, p.Y);
 
         if (!ReferenceEquals(hit, _selected))
             Select(hit);
@@ -516,8 +409,7 @@ public partial class StageDesignerWindow : Window
             return;
 
         var p = e.GetPosition(Overlay);
-        box.X = Math.Round(Math.Clamp(_boxStart.X + p.X - _dragStart.X, 0, CanvasW - box.Width));
-        box.Y = Math.Round(Math.Clamp(_boxStart.Y + p.Y - _dragStart.Y, 0, CanvasH - box.Height));
+        _vm.MoveTo(_boxStart.X + p.X - _dragStart.X, _boxStart.Y + p.Y - _dragStart.Y);
         ShowGeometryWhileLoading(box);
         Touch();
     }
@@ -547,10 +439,10 @@ public partial class StageDesignerWindow : Window
         var step = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) ? 10 : 1;
         switch (e.Key)
         {
-            case Key.Left: box.X = Math.Max(0, box.X - step); break;
-            case Key.Right: box.X = Math.Min(CanvasW - box.Width, box.X + step); break;
-            case Key.Up: box.Y = Math.Max(0, box.Y - step); break;
-            case Key.Down: box.Y = Math.Min(CanvasH - box.Height, box.Y + step); break;
+            case Key.Left: _vm.Nudge(-1, 0, step); break;
+            case Key.Right: _vm.Nudge(1, 0, step); break;
+            case Key.Up: _vm.Nudge(0, -1, step); break;
+            case Key.Down: _vm.Nudge(0, 1, step); break;
             case Key.Delete:
                 DeleteSelected();
                 e.Handled = true;
@@ -610,14 +502,7 @@ public partial class StageDesignerWindow : Window
         if (_selected is not { } box || sender is not Thumb { Tag: string handle })
             return;
 
-        var (x, y, w, h) = BoxGeometry.Resize(
-            handle, box.X, box.Y, box.Width, box.Height,
-            e.HorizontalChange, e.VerticalChange, CanvasW, CanvasH);
-
-        box.X = Math.Round(x);
-        box.Y = Math.Round(y);
-        box.Width = Math.Round(w);
-        box.Height = Math.Round(h);
+        _vm.Resize(handle, e.HorizontalChange, e.VerticalChange);
         ShowGeometryWhileLoading(box);
         Touch();
     }
