@@ -9,6 +9,7 @@ using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Core.Songs;
 using EcclesiaCast.Core.Themes;
+using EcclesiaCast.Presentation.ViewModels;
 
 namespace EcclesiaCast.App.Views;
 
@@ -20,9 +21,9 @@ namespace EcclesiaCast.App.Views;
 /// </summary>
 public partial class SongDesignerWindow : Window
 {
-    private const double Scale = 0.5;
-    private const double CanvasW = 960;
-    private const double CanvasH = 540;
+    private const double Scale = SongDesignerViewModel.Scale;
+    private const double CanvasW = SongDesignerViewModel.CanvasW;
+    private const double CanvasH = SongDesignerViewModel.CanvasH;
 
     /// <summary>A thumbnail row bound to the slide list.</summary>
     public sealed partial class Thumb(string label, SlideContent slide) : ObservableObject
@@ -33,29 +34,15 @@ public partial class SongDesignerWindow : Window
         private SlideContent _slide = slide;
     }
 
-    private readonly Song _song;
-    private readonly SlideTheme _theme;
-    private readonly List<SlideOverride?> _overrides;
-    private readonly List<string> _texts;
+    private readonly SongDesignerViewModel _vm;
     private readonly List<Thumb> _thumbs = [];
 
-    /// <summary>
-    /// Slides the operator actually changed in this session. Only these get
-    /// their format written out in full; the rest keep whatever they had.
-    ///
-    /// Selecting a slide is not editing it — opening the designer gives every
-    /// slide a box so it can be dragged, and treating that as an edit would
-    /// freeze the whole song against its theme.
-    /// </summary>
-    private readonly HashSet<int> _touched = [];
-
-    /// <summary>
-    /// What the box on the canvas is editing: -1 is the song's own words,
-    /// 0 and up are the extra boxes of the selected slide. One box with a
-    /// changing target, rather than a canvas full of boxes, keeps dragging,
-    /// the handles and the arrow keys working exactly as they did.
-    /// </summary>
-    private int _selectedBox = -1;
+    /// <summary>What the box on the canvas is editing (-1 the song's words, 0 and up the extra boxes): the view model keeps it.</summary>
+    private int _selectedBox
+    {
+        get => _vm.SelectedBox;
+        set => _vm.SelectedBox = value;
+    }
 
     private bool _loading;
     private bool _dragging;
@@ -65,47 +52,21 @@ public partial class SongDesignerWindow : Window
     private bool _editing;
     private int _editingIndex = -1;
 
-    public SongDesignerWindow(Song song, SlideTheme theme, int selectIndex)
+    public SongDesignerWindow(SongDesignerViewModel viewModel, int selectIndex)
     {
         InitializeComponent();
-        _song = song;
-        _theme = theme;
-        _overrides = song.Sections.Select(s => s.GetOverride()).ToList();
-        _texts = song.Sections.Select(s => s.Text).ToList();
+        _vm = viewModel;
 
-        FontCombo.ItemsSource = Fonts.SystemFontFamilies.Select(f => f.Source).OrderBy(n => n).ToList();
+        FontCombo.ItemsSource = _vm.FontNames;
 
-        for (var i = 0; i < song.Sections.Count; i++)
-            _thumbs.Add(new Thumb(song.Sections[i].Label, BuildSlide(i)));
+        for (var i = 0; i < _vm.SlideCount; i++)
+            _thumbs.Add(new Thumb(_vm.SlideLabel(i), _vm.BuildSlide(i)));
         SlidesList.ItemsSource = _thumbs;
 
         SlidesList.SelectedIndex = Math.Clamp(selectIndex, 0, Math.Max(0, _thumbs.Count - 1));
     }
 
-    public bool Saved { get; private set; }
-
     private int Selected => SlidesList.SelectedIndex;
-
-    // ── Construcción de contenido ────────────────────────────────
-
-    private SlideContent BuildSlide(int index)
-    {
-        // Caption omitted in the editor so the box uses the full canvas.
-        return new SlideContent(_texts[index], null, null, _theme, _overrides[index]);
-    }
-
-    private SlideOverride EnsureBox(SlideOverride? over)
-    {
-        if (over?.HasBox == true)
-            return over;
-
-        // Default box = the theme's margin area, made explicit for editing.
-        var x = _theme.MarginHorizontal;
-        var y = _theme.MarginVertical;
-        var w = 1920 - 2 * _theme.MarginHorizontal;
-        var h = 1080 - 2 * _theme.MarginVertical;
-        return (over ?? new SlideOverride()) with { BoxX = x, BoxY = y, BoxWidth = w, BoxHeight = h };
-    }
 
     // ── Selección de diapositiva ─────────────────────────────────
 
@@ -117,35 +78,27 @@ public partial class SongDesignerWindow : Window
         if (Selected < 0)
             return;
 
-        // Changing slide always goes back to the words: the extra boxes of
-        // the slide you just left mean nothing on this one.
-        _selectedBox = -1;
-        _overrides[Selected] = EnsureBox(_overrides[Selected]);
+        var over = _vm.SelectSlide(Selected);
         RebuildBoxPicker();
-        LoadControls(_overrides[Selected]!);
+        LoadControls(over);
         RefreshSelected();
     }
 
     private void LoadControls(SlideOverride over)
     {
         _loading = true;
+        var panel = _vm.Panel(over);
 
         // Editing one of the extra boxes: the panel shows that box's own few
         // settings instead of the song's.
-        if (_selectedBox >= 0 && _selectedBox < over.TextBoxes.Count)
+        if (panel.IsExtraBox)
         {
-            var extra = over.TextBoxes[_selectedBox];
-            FontCombo.Text = extra.FontFamily ?? _theme.FontFamily;
-            SizeField.SetSilently(extra.FontSize);
-            BoldToggle.IsChecked = extra.Bold;
-            ItalicToggle.IsChecked = extra.Italic;
-            ColorBox.Text = extra.Color;
-            HLeft.IsChecked = extra.AlignH == HAlign.Left;
-            HCenter.IsChecked = extra.AlignH == HAlign.Center;
-            HRight.IsChecked = extra.AlignH == HAlign.Right;
-            VTop.IsChecked = extra.AlignV == VAlign.Top;
-            VCenter.IsChecked = extra.AlignV == VAlign.Center;
-            VBottom.IsChecked = extra.AlignV == VAlign.Bottom;
+            FontCombo.Text = panel.FontFamily;
+            SizeField.SetSilently(panel.FontSize);
+            BoldToggle.IsChecked = panel.Bold;
+            ItalicToggle.IsChecked = panel.Italic;
+            ColorBox.Text = panel.Color;
+            ShowAlign(panel);
 
             PlaceBox(over);
             UpdateColorSwatch();
@@ -156,33 +109,34 @@ public partial class SongDesignerWindow : Window
 
         EnableSongOnlyControls(true);
 
-        FontCombo.Text = over.FontFamily ?? _theme.FontFamily;
-        SizeField.SetSilently(over.FontSize ?? _theme.MaxFontSize);
-        BoldToggle.IsChecked = over.Bold ?? _theme.Bold;
-        ItalicToggle.IsChecked = over.Italic ?? _theme.Italic;
-        UnderlineToggle.IsChecked = over.Underline ?? false;
-        StrikeToggle.IsChecked = over.Strikethrough ?? false;
-        ShadowCheck.IsChecked = over.Shadow ?? _theme.Shadow;
-        ShadowField.SetSilently((over.ShadowOpacity ?? _theme.ShadowOpacity) * 100);
-        OutlineField.SetSilently(over.OutlineWidth ?? _theme.OutlineWidth);
-        OutlineColorBox.Text = over.OutlineColor ?? _theme.OutlineColor;
-        ColorBox.Text = over.TextColor ?? _theme.TextColor;
-        CaseCombo.SelectedIndex = (int)(over.Case ?? _theme.TextCase);
-        LineField.SetSilently(over.LineSpacing is > 0 ? over.LineSpacing.Value : 1);
-        FitWidthCheck.IsChecked = over.FitToWidth ?? _theme.FitToWidth;
-
-        var alignH = over.AlignH ?? _theme.AlignH;
-        HLeft.IsChecked = alignH == HAlign.Left;
-        HCenter.IsChecked = alignH == HAlign.Center;
-        HRight.IsChecked = alignH == HAlign.Right;
-
-        var alignV = over.AlignV ?? _theme.AlignV;
-        VTop.IsChecked = alignV == VAlign.Top;
-        VCenter.IsChecked = alignV == VAlign.Center;
-        VBottom.IsChecked = alignV == VAlign.Bottom;
+        FontCombo.Text = panel.FontFamily;
+        SizeField.SetSilently(panel.FontSize);
+        BoldToggle.IsChecked = panel.Bold;
+        ItalicToggle.IsChecked = panel.Italic;
+        UnderlineToggle.IsChecked = panel.Underline;
+        StrikeToggle.IsChecked = panel.Strikethrough;
+        ShadowCheck.IsChecked = panel.Shadow;
+        ShadowField.SetSilently(panel.ShadowPercent);
+        OutlineField.SetSilently(panel.OutlineWidth);
+        OutlineColorBox.Text = panel.OutlineColor;
+        ColorBox.Text = panel.Color;
+        CaseCombo.SelectedIndex = panel.CaseIndex;
+        LineField.SetSilently(panel.LineSpacing);
+        FitWidthCheck.IsChecked = panel.FitToWidth;
+        ShowAlign(panel);
 
         PlaceBox(over);
         _loading = false;
+    }
+
+    private void ShowAlign(SongStylePanel panel)
+    {
+        HLeft.IsChecked = panel.AlignH == HAlign.Left;
+        HCenter.IsChecked = panel.AlignH == HAlign.Center;
+        HRight.IsChecked = panel.AlignH == HAlign.Right;
+        VTop.IsChecked = panel.AlignV == VAlign.Top;
+        VCenter.IsChecked = panel.AlignV == VAlign.Center;
+        VBottom.IsChecked = panel.AlignV == VAlign.Bottom;
     }
 
     /// <summary>
@@ -211,51 +165,28 @@ public partial class SongDesignerWindow : Window
         if (_loading || Selected < 0)
             return;
 
-        _touched.Add(Selected);
-
         var alignH = HRight.IsChecked == true ? HAlign.Right
             : HLeft.IsChecked == true ? HAlign.Left : HAlign.Center;
         var alignV = VTop.IsChecked == true ? VAlign.Top
             : VBottom.IsChecked == true ? VAlign.Bottom : VAlign.Center;
 
-        // An extra box carries only the handful of settings that make sense on
-        // its own; the rest of the panel belongs to the song's words.
-        if (_selectedBox >= 0)
-        {
-            _overrides[Selected] = ReplaceBox(_overrides[Selected]!, _selectedBox, b => b with
-            {
-                FontFamily = string.IsNullOrWhiteSpace(FontCombo.Text) ? null : FontCombo.Text.Trim(),
-                FontSize = Math.Round(SizeField.Value),
-                Bold = BoldToggle.IsChecked == true,
-                Italic = ItalicToggle.IsChecked == true,
-                Color = ColorBox.Text.Trim(),
-                AlignH = alignH,
-                AlignV = alignV,
-            });
-            RefreshSelected();
-            return;
-        }
-
-        var box = _overrides[Selected]!;
-        _overrides[Selected] = box with
-        {
-            FontFamily = string.IsNullOrWhiteSpace(FontCombo.Text) ? _theme.FontFamily : FontCombo.Text.Trim(),
-            FontSize = Math.Round(SizeField.Value),
-            Bold = BoldToggle.IsChecked == true,
-            Italic = ItalicToggle.IsChecked == true,
-            Underline = UnderlineToggle.IsChecked == true,
-            Strikethrough = StrikeToggle.IsChecked == true,
-            Shadow = ShadowCheck.IsChecked == true,
-            ShadowOpacity = ShadowField.Value / 100,
-            OutlineWidth = OutlineField.Value,
-            OutlineColor = OutlineColorBox.Text.Trim(),
-            TextColor = ColorBox.Text.Trim(),
-            AlignH = alignH,
-            AlignV = alignV,
-            Case = (TextCase)Math.Clamp(CaseCombo.SelectedIndex, 0, 4),
-            LineSpacing = LineField.Value,
-            FitToWidth = FitWidthCheck.IsChecked == true,
-        };
+        _vm.ApplyStyle(Selected, new SongStyleForm(
+            FontCombo.Text,
+            SizeField.Value,
+            BoldToggle.IsChecked == true,
+            ItalicToggle.IsChecked == true,
+            ColorBox.Text,
+            alignH,
+            alignV,
+            UnderlineToggle.IsChecked == true,
+            StrikeToggle.IsChecked == true,
+            ShadowCheck.IsChecked == true,
+            ShadowField.Value,
+            OutlineField.Value,
+            OutlineColorBox.Text,
+            CaseCombo.SelectedIndex,
+            LineField.Value,
+            FitWidthCheck.IsChecked == true));
 
         RefreshSelected();
     }
@@ -264,8 +195,8 @@ public partial class SongDesignerWindow : Window
     {
         if (Selected < 0)
             return;
-        Preview.Slide = BuildSlide(Selected);
-        _thumbs[Selected].Slide = BuildSlide(Selected);
+        Preview.Slide = _vm.BuildSlide(Selected);
+        _thumbs[Selected].Slide = _vm.BuildSlide(Selected);
         UpdateColorSwatch();
         UpdateBoxInfo();
         DrawGhosts();
@@ -287,62 +218,30 @@ public partial class SongDesignerWindow : Window
         _editing = true;
         _editingIndex = Selected;
 
-        var over = _overrides[Selected]!;
-
-        // An extra box edits its own words, on the spot, with its own look.
-        if (_selectedBox >= 0 && _selectedBox < over.TextBoxes.Count)
-        {
-            var extra = over.TextBoxes[_selectedBox];
-            InlineEditor.Text = extra.Text;
-            InlineEditor.FontFamily = new FontFamily(extra.FontFamily ?? _theme.FontFamily);
-            InlineEditor.FontSize = Math.Max(8, extra.FontSize * Scale);
-            InlineEditor.FontWeight = extra.Bold ? FontWeights.SemiBold : FontWeights.Normal;
-            InlineEditor.FontStyle = extra.Italic ? FontStyles.Italic : FontStyles.Normal;
-            InlineEditor.Foreground = BrushFromHex(extra.Color);
-            InlineEditor.TextAlignment = extra.AlignH switch
-            {
-                HAlign.Left => TextAlignment.Left,
-                HAlign.Right => TextAlignment.Right,
-                _ => TextAlignment.Center,
-            };
-            InlineEditor.VerticalContentAlignment = extra.AlignV switch
-            {
-                VAlign.Top => VerticalAlignment.Top,
-                VAlign.Bottom => VerticalAlignment.Bottom,
-                _ => VerticalAlignment.Center,
-            };
-
-            // The box being edited is blanked on the preview behind, so the
-            // editable copy is the only one showing.
-            Preview.Slide = new SlideContent(_texts[Selected], null, null, _theme,
-                ReplaceBox(over, _selectedBox, b => b with { Text = string.Empty }));
-            InlineEditor.Visibility = Visibility.Visible;
-            InlineEditor.Focus();
-            InlineEditor.SelectAll();
-            return;
-        }
-
-        InlineEditor.Text = _texts[Selected];
-        InlineEditor.FontFamily = new FontFamily(over.FontFamily ?? _theme.FontFamily);
-        InlineEditor.FontSize = Math.Max(8, (over.FontSize ?? _theme.MaxFontSize) * Scale);
-        InlineEditor.FontWeight = (over.Bold ?? _theme.Bold) ? FontWeights.SemiBold : FontWeights.Normal;
-        InlineEditor.FontStyle = (over.Italic ?? _theme.Italic) ? FontStyles.Italic : FontStyles.Normal;
-        InlineEditor.Foreground = BrushFromHex(over.TextColor ?? _theme.TextColor);
-        InlineEditor.TextAlignment = (over.AlignH ?? _theme.AlignH) switch
+        // An extra box edits its own words, on the spot, with its own look; the
+        // box being edited is blanked on the preview behind, so the editable
+        // copy is the only one showing.
+        var edit = _vm.BeginEdit(Selected);
+        InlineEditor.Text = edit.Text;
+        InlineEditor.FontFamily = new FontFamily(edit.FontFamily);
+        InlineEditor.FontSize = Math.Max(8, edit.FontSize * Scale);
+        InlineEditor.FontWeight = edit.Bold ? FontWeights.SemiBold : FontWeights.Normal;
+        InlineEditor.FontStyle = edit.Italic ? FontStyles.Italic : FontStyles.Normal;
+        InlineEditor.Foreground = BrushFromHex(edit.Color);
+        InlineEditor.TextAlignment = edit.AlignH switch
         {
             HAlign.Left => TextAlignment.Left,
             HAlign.Right => TextAlignment.Right,
             _ => TextAlignment.Center,
         };
-        InlineEditor.VerticalContentAlignment = (over.AlignV ?? _theme.AlignV) switch
+        InlineEditor.VerticalContentAlignment = edit.AlignV switch
         {
             VAlign.Top => VerticalAlignment.Top,
             VAlign.Bottom => VerticalAlignment.Bottom,
             _ => VerticalAlignment.Center,
         };
 
-        // Hide the rendered text behind so only the editable copy shows.
-        Preview.Slide = new SlideContent(string.Empty, null, null, _theme, over);
+        Preview.Slide = edit.PreviewMeanwhile;
         InlineEditor.Visibility = Visibility.Visible;
         InlineEditor.Focus();
         InlineEditor.SelectAll();
@@ -358,21 +257,8 @@ public partial class SongDesignerWindow : Window
         _editingIndex = -1;
         InlineEditor.Visibility = Visibility.Collapsed;
 
-        if (index >= 0 && index < _texts.Count)
-        {
-            if (_selectedBox >= 0)
-            {
-                _touched.Add(index);
-                _overrides[index] = ReplaceBox(_overrides[index]!, _selectedBox,
-                    b => b with { Text = InlineEditor.Text });
-            }
-            else
-            {
-                _texts[index] = InlineEditor.Text;
-            }
-
-            _thumbs[index].Slide = BuildSlide(index);
-        }
+        if (_vm.CommitEdit(index, InlineEditor.Text))
+            _thumbs[index].Slide = _vm.BuildSlide(index);
 
         RefreshSelected();
     }
@@ -391,18 +277,10 @@ public partial class SongDesignerWindow : Window
         if (_editing)
             CommitEdit();
 
-        var over = _overrides[Selected]!;
-        var boxes = over.TextBoxes.ToList();
-        // Not on top of the ones already there: two boxes on the same spot
-        // cannot be told apart with the mouse.
-        boxes.Add(SlideTextBox.FreshAvoiding(boxes));
-
-        _touched.Add(Selected);
-        _overrides[Selected] = over with { Boxes = boxes };
-        _selectedBox = boxes.Count - 1;
+        _vm.AddTextBox(Selected);
 
         RebuildBoxPicker();
-        LoadControls(_overrides[Selected]!);
+        LoadControls(_vm.OverrideOf(Selected)!);
         RefreshSelected();
     }
 
@@ -414,18 +292,11 @@ public partial class SongDesignerWindow : Window
         if (_editing)
             CommitEdit();
 
-        var over = _overrides[Selected]!;
-        var boxes = over.TextBoxes.ToList();
-        if (_selectedBox >= boxes.Count)
+        if (!_vm.RemoveTextBox(Selected))
             return;
 
-        boxes.RemoveAt(_selectedBox);
-        _touched.Add(Selected);
-        _overrides[Selected] = over with { Boxes = boxes };
-        _selectedBox = -1;
-
         RebuildBoxPicker();
-        LoadControls(_overrides[Selected]!);
+        LoadControls(_vm.OverrideOf(Selected)!);
         RefreshSelected();
     }
 
@@ -436,14 +307,12 @@ public partial class SongDesignerWindow : Window
         _loading = true;
 
         BoxPicker.Items.Clear();
-        BoxPicker.Items.Add("Letra de la canción");
-
-        var count = Selected >= 0 ? _overrides[Selected]?.TextBoxes.Count ?? 0 : 0;
-        for (var i = 0; i < count; i++)
-            BoxPicker.Items.Add($"Cuadro {i + 1}");
+        var names = _vm.BoxNames(Selected);
+        foreach (var name in names)
+            BoxPicker.Items.Add(name);
 
         BoxPicker.SelectedIndex = Math.Clamp(_selectedBox + 1, 0, BoxPicker.Items.Count - 1);
-        UpdateBoxButtons(count);
+        UpdateBoxButtons(names.Count - 1);
 
         _loading = previous;
     }
@@ -451,9 +320,10 @@ public partial class SongDesignerWindow : Window
     /// <summary>Remove and order buttons only mean something on an extra box, and the order ones need a neighbour.</summary>
     private void UpdateBoxButtons(int extraCount)
     {
-        RemoveBoxButton.IsEnabled = _selectedBox >= 0;
-        BringForwardButton.IsEnabled = _selectedBox >= 0 && _selectedBox < extraCount - 1;
-        SendBackButton.IsEnabled = _selectedBox > 0;
+        var (remove, bringForward, sendBack) = _vm.BoxButtons(extraCount);
+        RemoveBoxButton.IsEnabled = remove;
+        BringForwardButton.IsEnabled = bringForward;
+        SendBackButton.IsEnabled = sendBack;
     }
 
     private void BoxPicker_Changed(object sender, SelectionChangedEventArgs e)
@@ -468,8 +338,9 @@ public partial class SongDesignerWindow : Window
         CommitPendingFont();
 
         _selectedBox = BoxPicker.SelectedIndex - 1;
-        UpdateBoxButtons(_overrides[Selected]!.TextBoxes.Count);
-        LoadControls(_overrides[Selected]!);
+        var over = _vm.OverrideOf(Selected)!;
+        UpdateBoxButtons(over.TextBoxes.Count);
+        LoadControls(over);
         RefreshSelected();
     }
 
@@ -481,15 +352,10 @@ public partial class SongDesignerWindow : Window
     /// </summary>
     private void CommitPendingFont()
     {
-        if (_loading || Selected < 0 || string.IsNullOrWhiteSpace(FontCombo.Text))
+        if (_loading || Selected < 0)
             return;
 
-        var over = _overrides[Selected]!;
-        var current = _selectedBox >= 0 && _selectedBox < over.TextBoxes.Count
-            ? over.TextBoxes[_selectedBox].FontFamily ?? _theme.FontFamily
-            : over.FontFamily ?? _theme.FontFamily;
-
-        if (!string.Equals(FontCombo.Text.Trim(), current, StringComparison.OrdinalIgnoreCase))
+        if (_vm.FontDiffers(Selected, FontCombo.Text))
             Style_Changed(FontCombo, new RoutedEventArgs());
     }
 
@@ -502,19 +368,11 @@ public partial class SongDesignerWindow : Window
         if (_editing)
             CommitEdit();
 
-        var over = _overrides[Selected]!;
-        var boxes = over.TextBoxes.ToList();
-        var target = _selectedBox + direction;
-        if (_selectedBox >= boxes.Count || target < 0 || target >= boxes.Count)
+        if (!_vm.MoveBoxOrder(Selected, direction))
             return;
 
-        (boxes[_selectedBox], boxes[target]) = (boxes[target], boxes[_selectedBox]);
-        _touched.Add(Selected);
-        _overrides[Selected] = over with { Boxes = boxes };
-        _selectedBox = target;
-
         RebuildBoxPicker();
-        LoadControls(_overrides[Selected]!);
+        LoadControls(_vm.OverrideOf(Selected)!);
         RefreshSelected();
     }
 
@@ -547,14 +405,14 @@ public partial class SongDesignerWindow : Window
 
     private void PickColor_Click(object sender, RoutedEventArgs e)
     {
-        var picked = ColorPickerHelper.Pick(ColorBox.Text.Trim());
+        var picked = _vm.PickColor(ColorBox.Text);
         if (picked is not null)
             ColorBox.Text = picked; // dispara Style_Changed
     }
 
     private void PickOutlineColor_Click(object sender, RoutedEventArgs e)
     {
-        var picked = ColorPickerHelper.Pick(OutlineColorBox.Text.Trim());
+        var picked = _vm.PickColor(OutlineColorBox.Text);
         if (picked is not null)
             OutlineColorBox.Text = picked;
     }
@@ -609,10 +467,7 @@ public partial class SongDesignerWindow : Window
 
     private void PlaceBox(SlideOverride over)
     {
-        var (x, y, w, h) = _selectedBox < 0 || _selectedBox >= over.TextBoxes.Count
-            ? (over.BoxX ?? 0, over.BoxY ?? 0, over.BoxWidth ?? 1920, over.BoxHeight ?? 1080)
-            : (over.TextBoxes[_selectedBox].X, over.TextBoxes[_selectedBox].Y,
-               over.TextBoxes[_selectedBox].Width, over.TextBoxes[_selectedBox].Height);
+        var (x, y, w, h) = _vm.BoxRect(over);
 
         Canvas.SetLeft(BoxBorder, x * Scale);
         Canvas.SetTop(BoxBorder, y * Scale);
@@ -630,14 +485,11 @@ public partial class SongDesignerWindow : Window
     private void DrawGhosts()
     {
         GhostLayer.Children.Clear();
-        if (Selected < 0 || _overrides[Selected] is not { } over)
-            return;
+        foreach (var ghost in _vm.Ghosts(Selected))
+            Ghost(ghost.Label, ghost.X, ghost.Y, ghost.Width, ghost.Height);
 
-        void Ghost(int index, string label, double x, double y, double w, double h)
+        void Ghost(string label, double x, double y, double w, double h)
         {
-            if (index == _selectedBox)
-                return;
-
             var outline = new System.Windows.Shapes.Rectangle
             {
                 Width = w * Scale,
@@ -665,89 +517,28 @@ public partial class SongDesignerWindow : Window
             Canvas.SetTop(tag, y * Scale);
             GhostLayer.Children.Add(tag);
         }
-
-        if (over.HasBox)
-            Ghost(-1, "Letra", over.BoxX ?? 0, over.BoxY ?? 0, over.BoxWidth ?? 1920, over.BoxHeight ?? 1080);
-
-        for (var i = 0; i < over.TextBoxes.Count; i++)
-        {
-            var b = over.TextBoxes[i];
-            Ghost(i, $"Cuadro {i + 1}", b.X, b.Y, b.Width, b.Height);
-        }
     }
 
+    /// <summary>The box was moved or stretched on the canvas: its place is handed to the view model.</summary>
     private void CommitBox()
     {
         if (Selected < 0)
             return;
 
-        _touched.Add(Selected);
-
-        var x = Math.Round(Canvas.GetLeft(BoxBorder) / Scale);
-        var y = Math.Round(Canvas.GetTop(BoxBorder) / Scale);
-        var w = Math.Round(BoxBorder.Width / Scale);
-        var h = Math.Round(BoxBorder.Height / Scale);
-
-        var over = _overrides[Selected]!;
-        _overrides[Selected] = _selectedBox < 0
-            ? over with { BoxX = x, BoxY = y, BoxWidth = w, BoxHeight = h }
-            : ReplaceBox(over, _selectedBox, b => b with { X = x, Y = y, Width = w, Height = h });
+        _vm.SetBoxGeometry(
+            Selected,
+            Math.Round(Canvas.GetLeft(BoxBorder) / Scale),
+            Math.Round(Canvas.GetTop(BoxBorder) / Scale),
+            Math.Round(BoxBorder.Width / Scale),
+            Math.Round(BoxBorder.Height / Scale));
 
         RefreshSelected();
-    }
-
-    /// <summary>Rewrites one extra box of an override, leaving the rest alone.</summary>
-    private static SlideOverride ReplaceBox(SlideOverride over, int index, Func<SlideTextBox, SlideTextBox> change)
-    {
-        var boxes = over.TextBoxes.ToList();
-        if (index < 0 || index >= boxes.Count)
-            return over;
-
-        boxes[index] = change(boxes[index]);
-        return over with { Boxes = boxes };
-    }
-
-    /// <summary>
-    /// Which box lies under a point of the canvas: -1 is the song's words, 0
-    /// and up the extra boxes, null is none. The smallest wins, so a small box
-    /// sitting inside the big one of the words can still be reached.
-    /// </summary>
-    private int? BoxAt(Point p)
-    {
-        if (Selected < 0 || _overrides[Selected] is not { } over)
-            return null;
-
-        int? best = null;
-        var bestArea = double.MaxValue;
-
-        void Consider(int index, double x, double y, double w, double h)
-        {
-            var area = w * h;
-            if (p.X >= x * Scale && p.X <= (x + w) * Scale && p.Y >= y * Scale && p.Y <= (y + h) * Scale
-                && area <= bestArea)
-            {
-                best = index;
-                bestArea = area;
-            }
-        }
-
-        if (over.HasBox)
-            Consider(-1, over.BoxX ?? 0, over.BoxY ?? 0, over.BoxWidth ?? 1920, over.BoxHeight ?? 1080);
-
-        // Later boxes are drawn over earlier ones, so on a tie they win.
-        for (var i = 0; i < over.TextBoxes.Count; i++)
-        {
-            var b = over.TextBoxes[i];
-            Consider(i, b.X, b.Y, b.Width, b.Height);
-        }
-
-        return best;
     }
 
     /// <summary>Makes the box under the pointer the one being edited; true when it changed.</summary>
     private bool SelectBoxAt(Point p)
     {
-        if (BoxAt(p) is not { } index || index == _selectedBox)
+        if (_vm.BoxAt(Selected, p.X, p.Y) is not { } index || index == _selectedBox)
             return false;
 
         // Writing on one box and clicking another used to leave the operator
@@ -765,7 +556,7 @@ public partial class SongDesignerWindow : Window
     {
         _selectedBox = index;
         RebuildBoxPicker();
-        LoadControls(_overrides[Selected]!);
+        LoadControls(_vm.OverrideOf(Selected)!);
         RefreshSelected();
     }
 
@@ -860,10 +651,7 @@ public partial class SongDesignerWindow : Window
         // Tab walks through the boxes of the slide (the words first), Shift+Tab backwards.
         if (e.Key == Key.Tab && Selected >= 0)
         {
-            var count = (_overrides[Selected]?.TextBoxes.Count ?? 0) + 1;
-            var shift = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
-            var position = _selectedBox + 1;
-            var next = (position + (shift ? count - 1 : 1)) % count - 1;
+            var next = _vm.NextBox(Selected, (Keyboard.Modifiers & ModifierKeys.Shift) != 0);
 
             CommitPendingFont();
             SelectBox(next);
@@ -893,17 +681,15 @@ public partial class SongDesignerWindow : Window
     /// <summary>Mirrors the box the canvas shows into the numeric fields.</summary>
     private void UpdateBoxInfo()
     {
-        var x = Canvas.GetLeft(BoxBorder) / Scale;
-        var y = Canvas.GetTop(BoxBorder) / Scale;
-        var w = BoxBorder.Width / Scale;
-        var h = BoxBorder.Height / Scale;
+        var (x, y, w, h, percent) = SongDesignerViewModel.BoxInfo(
+            Canvas.GetLeft(BoxBorder), Canvas.GetTop(BoxBorder), BoxBorder.Width, BoxBorder.Height);
 
         _syncingBox = true;
-        BoxXField.SetSilently(Math.Round(x));
-        BoxYField.SetSilently(Math.Round(y));
-        BoxWField.SetSilently(Math.Round(w));
-        BoxHField.SetSilently(Math.Round(h));
-        BoxPercentField.SetSilently(Math.Round(w / CanvasW * Scale * 100));
+        BoxXField.SetSilently(x);
+        BoxYField.SetSilently(y);
+        BoxWField.SetSilently(w);
+        BoxHField.SetSilently(h);
+        BoxPercentField.SetSilently(percent);
         _syncingBox = false;
     }
 
@@ -922,14 +708,12 @@ public partial class SongDesignerWindow : Window
         if (_loading || _syncingBox || Selected < 0)
             return;
 
-        var percent = Math.Clamp(BoxPercentField.Value / 100, 0.1, 1);
-        var w = CanvasW * percent;
-        var h = CanvasH * percent;
-        var centerX = Canvas.GetLeft(BoxBorder) + BoxBorder.Width / 2;
-        var centerY = Canvas.GetTop(BoxBorder) + BoxBorder.Height / 2;
+        var (left, top, w, h) = SongDesignerViewModel.ResizeToPercent(
+            Canvas.GetLeft(BoxBorder), Canvas.GetTop(BoxBorder), BoxBorder.Width, BoxBorder.Height,
+            BoxPercentField.Value);
 
-        Canvas.SetLeft(BoxBorder, Math.Clamp(centerX - w / 2, 0, CanvasW - w));
-        Canvas.SetTop(BoxBorder, Math.Clamp(centerY - h / 2, 0, CanvasH - h));
+        Canvas.SetLeft(BoxBorder, left);
+        Canvas.SetTop(BoxBorder, top);
         BoxBorder.Width = w;
         BoxBorder.Height = h;
         CommitBox();
@@ -941,10 +725,10 @@ public partial class SongDesignerWindow : Window
         if (_loading || _syncingBox || Selected < 0)
             return;
 
-        var w = Math.Clamp(BoxWField.Value * Scale, 20, CanvasW);
-        var h = Math.Clamp(BoxHField.Value * Scale, 20, CanvasH);
-        Canvas.SetLeft(BoxBorder, Math.Clamp(BoxXField.Value * Scale, 0, CanvasW - w));
-        Canvas.SetTop(BoxBorder, Math.Clamp(BoxYField.Value * Scale, 0, CanvasH - h));
+        var (left, top, w, h) = SongDesignerViewModel.FromTypedFields(
+            BoxXField.Value, BoxYField.Value, BoxWField.Value, BoxHField.Value);
+        Canvas.SetLeft(BoxBorder, left);
+        Canvas.SetTop(BoxBorder, top);
         BoxBorder.Width = w;
         BoxBorder.Height = h;
         CommitBox();
@@ -955,20 +739,8 @@ public partial class SongDesignerWindow : Window
         if (Selected < 0 || sender is not FrameworkElement fe)
             return;
 
-        var w = BoxBorder.Width;
-        var h = BoxBorder.Height;
-        double x = Canvas.GetLeft(BoxBorder), y = Canvas.GetTop(BoxBorder);
-
-        switch (fe.Tag as string)
-        {
-            case "HL": x = 0; break;
-            case "HC": x = (CanvasW - w) / 2; break;
-            case "HR": x = CanvasW - w; break;
-            case "VT": y = 0; break;
-            case "VC": y = (CanvasH - h) / 2; break;
-            case "VB": y = CanvasH - h; break;
-            case "CC": x = (CanvasW - w) / 2; y = (CanvasH - h) / 2; break;
-        }
+        var (x, y) = SongDesignerViewModel.AlignBox(
+            fe.Tag as string, Canvas.GetLeft(BoxBorder), Canvas.GetTop(BoxBorder), BoxBorder.Width, BoxBorder.Height);
 
         Canvas.SetLeft(BoxBorder, x);
         Canvas.SetTop(BoxBorder, y);
@@ -982,18 +754,9 @@ public partial class SongDesignerWindow : Window
         if (Selected < 0)
             return;
 
-        var source = _overrides[Selected];
-        for (var i = 0; i < _overrides.Count; i++)
-        {
-            // The button applies format. The extra boxes are words belonging to
-            // one slide — copying them everywhere would stamp "Serie: …" across
-            // the whole song — so each slide keeps its own.
-            // A slide under the theme has no format to hand out; the button
-            // then means "put them all back under the theme".
-            _overrides[i] = source is null ? null : source with { Boxes = _overrides[i]?.Boxes };
-            _touched.Add(i);
-            _thumbs[i].Slide = BuildSlide(i);
-        }
+        _vm.ApplyToAll(Selected);
+        for (var i = 0; i < _thumbs.Count; i++)
+            _thumbs[i].Slide = _vm.BuildSlide(i);
         RefreshSelected();
     }
 
@@ -1003,9 +766,7 @@ public partial class SongDesignerWindow : Window
         if (Selected < 0)
             return;
 
-        _overrides[Selected] = EnsureBox(null);
-        _touched.Remove(Selected);
-        LoadControls(_overrides[Selected]!);
+        LoadControls(_vm.ResetSlide(Selected));
         RefreshSelected();
     }
 
@@ -1014,43 +775,7 @@ public partial class SongDesignerWindow : Window
         if (_editing)
             CommitEdit();
 
-        for (var i = 0; i < _song.Sections.Count; i++)
-        {
-            var text = _texts[i].Trim();
-            if (text.Length > 0)
-                _song.Sections[i].Text = text;
-
-            // Slides the operator worked on keep exactly what the panel shows;
-            // the rest are left alone so they keep following the theme.
-            if (_touched.Contains(i))
-                _song.Sections[i].SetOverride(Clean(_overrides[i]));
-        }
-
-        Saved = true;
+        _vm.Save();
         DialogResult = true;
-    }
-
-    /// <summary>
-    /// Tidies an edited slide's design without second-guessing it. It used to
-    /// null out every field matching the theme, which quietly threw away
-    /// deliberate choices that happened to agree with it — pick the theme's own
-    /// typeface in the designer and the slide was left with none, so changing
-    /// the theme later moved a song that had been designed by hand.
-    ///
-    /// Only decorations that are off are dropped, since false and "not set"
-    /// mean the same thing for them.
-    /// </summary>
-    private static SlideOverride? Clean(SlideOverride? over)
-    {
-        if (over is null)
-            return null;
-
-        var result = over with
-        {
-            Underline = over.Underline == true ? true : null,
-            Strikethrough = over.Strikethrough == true ? true : null,
-        };
-
-        return result.IsEmpty ? null : result;
     }
 }
