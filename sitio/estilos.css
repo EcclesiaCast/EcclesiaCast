@@ -572,3 +572,37 @@ details p { color: var(--suave); padding-right: 2rem; }
 .texto ol, .texto ul { padding-left: 1.3rem; }
 .texto li { margin: .4rem 0; }
 .texto .llamada { margin-top: 2.5rem; padding-top: 1.2rem; border-top: 1px solid var(--linea); }
+
+/* ---------- Cartel del celular: mandarse el enlace a la compu ---------- */
+
+.boton-hueco {
+  background: transparent; color: var(--texto); border: 1.5px solid var(--linea);
+  box-shadow: none; font: inherit; font-weight: 700; font-size: 1rem;
+  padding: .75em 1em; cursor: pointer;
+}
+.boton-hueco:hover { background: var(--azul-claro); color: #fff; box-shadow: none; }
+
+.cartel-celular {
+  width: min(28rem, calc(100% - 32px)); max-width: none; margin: auto;
+  padding: 1.6rem 1.4rem 1.4rem; border: 1px solid var(--linea); border-radius: 20px;
+  background: var(--superficie); color: var(--texto); box-shadow: var(--sombra);
+}
+.cartel-celular::backdrop { background: rgba(4, 10, 22, .72); }
+.cartel-celular[open] { animation: aparece .45s var(--salida) both; }
+.cartel-celular h2 { margin: 0 2.4rem .5rem 0; font-family: var(--letra-titulo); font-size: 1.45rem; line-height: 1.2; }
+.cartel-celular p { margin: 0 0 1.1rem; color: var(--suave); line-height: 1.5; }
+.cartel-celular .boton-grande { width: 100%; font-size: 1.05rem; padding: .9em 1em; white-space: nowrap; }
+.cartel-celular .cartel-nota { margin: .6rem 0 1.1rem; font-size: .9rem; text-align: center; }
+.cartel-otras .boton { white-space: nowrap; }
+.cartel-otras { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+.cartel-enlace {
+  width: 100%; margin-top: .8rem; padding: .6em .8em; border: 1px solid var(--linea); border-radius: 10px;
+  background: var(--fondo); color: var(--suave); font: inherit; font-size: .9rem; text-align: center;
+}
+.cartel-cerrar { position: absolute; top: .7rem; right: .7rem; margin: 0; }
+.cartel-cerrar button {
+  display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 12px;
+  background: transparent; color: var(--suave); cursor: pointer;
+}
+.cartel-cerrar button:hover { background: var(--linea); color: var(--texto); }
+@media (prefers-reduced-motion: reduce) { .cartel-celular[open] { animation: none; } }
