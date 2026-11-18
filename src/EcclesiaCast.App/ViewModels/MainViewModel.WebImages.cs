@@ -1,6 +1,5 @@
 using System.IO;
 using System.Net.Http;
-using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EcclesiaCast.App.Services;
@@ -38,10 +37,10 @@ public sealed partial class MainViewModel
     private bool _webImageFreeOnly;
 
     /// <summary>Where the pictures brought in from the web live: the library points here.</summary>
-    private static string WebImagesFolder => Path.Combine(App.DataDir, "imagenes-web");
+    private string WebImagesFolder => Path.Combine(_paths.DataFolder, "imagenes-web");
 
     /// <summary>True when this is a picture the program downloaded (it goes with its library item).</summary>
-    private static bool IsDownloadedWebImage(string path) =>
+    private bool IsDownloadedWebImage(string path) =>
         path.StartsWith(WebImagesFolder + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>«🖼 Imágenes» of the media bar: the web panel, on Google Images.</summary>
@@ -134,7 +133,7 @@ public sealed partial class MainViewModel
             var path = Path.Combine(folder, file);
             await File.WriteAllBytesAsync(path, bytes);
 
-            var size = ReadImageSize(bytes);
+            var size = _images.ReadSize(bytes);
             NoteAction($"Agregar la imagen «{baseName}» de Google a los medios");
             ImportMediaFiles([path]);
 
@@ -184,18 +183,4 @@ public sealed partial class MainViewModel
         return buffer.ToArray();
     }
 
-    /// <summary>Width and height of a picture, or null when Windows cannot read them (a format it has no codec for).</summary>
-    private static (int Width, int Height)? ReadImageSize(byte[] bytes)
-    {
-        try
-        {
-            using var stream = new MemoryStream(bytes);
-            var frame = BitmapDecoder.Create(stream, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None).Frames[0];
-            return (frame.PixelWidth, frame.PixelHeight);
-        }
-        catch (Exception ex) when (ex is NotSupportedException or InvalidOperationException or IOException or ArgumentException)
-        {
-            return null;
-        }
-    }
 }
