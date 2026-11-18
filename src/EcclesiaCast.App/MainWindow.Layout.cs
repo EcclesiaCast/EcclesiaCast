@@ -529,11 +529,11 @@ public partial class MainWindow
         try
         {
             System.Diagnostics.Process.Start(
-                new System.Diagnostics.ProcessStartInfo(EcclesiaCast.App.Services.AppInfo.DonateUrl) { UseShellExecute = true });
+                new System.Diagnostics.ProcessStartInfo(EcclesiaCast.Presentation.Services.AppInfo.DonateUrl) { UseShellExecute = true });
         }
         catch
         {
-            Notice.Show($"La página está en:\n\n{EcclesiaCast.App.Services.AppInfo.DonateUrl}", "No se pudo abrir el navegador");
+            Notice.Show($"La página está en:\n\n{EcclesiaCast.Presentation.Services.AppInfo.DonateUrl}", "No se pudo abrir el navegador");
         }
     }
 
@@ -541,7 +541,7 @@ public partial class MainWindow
         Services.FeedbackCoordinator.ShowFromMenu(this);
 
     private void About_Click(object sender, RoutedEventArgs e) =>
-        new Views.AboutWindow(Services.AppInfo.Version) { Owner = this }.ShowDialog();
+        new Views.AboutWindow(EcclesiaCast.Presentation.Services.AppInfo.Version) { Owner = this }.ShowDialog();
 
     /// <summary>Everything back where it comes out of the box.</summary>
     private void ResetLayout_Click(object sender, RoutedEventArgs e)

@@ -253,7 +253,7 @@ public partial class App : Application
             // Once, the first time the program ever opens.
             var firstRun = OneTimeNotice.ShouldShow(settings, AboutSeenKey);
             if (firstRun)
-                new Views.AboutWindow(Services.AppInfo.Version, firstRun: true) { Owner = mainWindow }.ShowDialog();
+                new Views.AboutWindow(EcclesiaCast.Presentation.Services.AppInfo.Version, firstRun: true) { Owner = mainWindow }.ShowDialog();
 
             // A Bible package chosen on the installer's page opens its import window (once).
             var biblePackage = _services.GetRequiredService<MainViewModel>().OfferInstalledBiblePackageAsync();

@@ -50,7 +50,7 @@ public partial class YouTubeDownloadWindow : Window
         try
         {
             DownloadedPath = await YtDlp.DownloadAsync(
-                _videoId, YtDlp.DownloadsFolder, progress, _cancellation.Token);
+                _videoId, YtDlp.DownloadsFolder, () => YouTubeCookies.ExportAsync(), progress, _cancellation.Token);
 
             if (DownloadedPath is null)
             {

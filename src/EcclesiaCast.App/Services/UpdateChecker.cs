@@ -38,18 +38,10 @@ public sealed class UpdateChecker(
         set => UpdateSchedule.SetEnabled(settings, value);
     }
 
-    /// <summary>
-    /// A build made to develop the program, which has no business updating
-    /// itself: a Debug build, or one whose version can not be read.
-    /// </summary>
-    public static bool IsDevelopmentBuild =>
-#if DEBUG
-        true;
-#else
-        InstalledVersion is null;
-#endif
+    /// <inheritdoc cref="AppInfo.IsDevelopmentBuild"/>
+    public static bool IsDevelopmentBuild => AppInfo.IsDevelopmentBuild;
 
-    private static AppVersion? InstalledVersion => AppVersion.TryParse(AppInfo.Version);
+    private static AppVersion? InstalledVersion => AppInfo.InstalledVersion;
 
     /// <summary>Starts the quiet search of every start-up. Call once, when the main window is up.</summary>
     public void StartAutomaticCheck()

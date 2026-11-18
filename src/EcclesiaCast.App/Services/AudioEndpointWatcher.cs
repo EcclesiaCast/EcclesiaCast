@@ -1,5 +1,3 @@
-using System.Windows;
-using System.Windows.Threading;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
 using Serilog;
@@ -8,14 +6,8 @@ namespace EcclesiaCast.App.Services;
 
 /// <summary>
 /// Notices when Windows changes, adds or removes an audio output (the speakers
-/// the operator picks in the taskbar, headphones, a Bluetooth speaker…).
-///
-/// LibVLC 3 keeps the audio output it opened inside each player. When Windows
-/// swaps the device underneath, that output can stay dead until the player is
-/// rebuilt: the church heard nothing until the program was closed and opened
-/// again. The players compare <see cref="Generation"/> before each play and
-/// open a fresh output when it moved, and listen to <see cref="OutputChanged"/>
-/// to reopen the one that is playing right now.
+/// the operator picks in the taskbar, headphones, a Bluetooth speaker…) and
+/// tells <see cref="AudioOutputChanges"/>, which the players watch.
 ///
 /// It talks to Windows through NAudio, like the sound input of «Seguir la
 /// canción». It used to declare the same Windows component on its own, and
@@ -24,20 +16,8 @@ namespace EcclesiaCast.App.Services;
 /// </summary>
 public static class AudioEndpointWatcher
 {
-    private static int _generation;
     private static MMDeviceEnumerator? _enumerator;
     private static Client? _client;
-    private static DispatcherTimer? _debounce;
-
-    /// <summary>Moves every time Windows changes an audio device; read it before playing.</summary>
-    public static int Generation => Volatile.Read(ref _generation);
-
-    /// <summary>
-    /// Raised on the UI thread, a moment after Windows moved the sound to
-    /// another device (or the operator asked to restart the sound): whatever is
-    /// playing should reopen its audio output.
-    /// </summary>
-    public static event EventHandler? OutputChanged;
 
     public static void Start()
     {
@@ -78,50 +58,6 @@ public static class AudioEndpointWatcher
         _enumerator = null;
     }
 
-    /// <summary>
-    /// «Reiniciar el sonido»: the same as if Windows had changed the device.
-    /// For when the sound is dead and nothing was noticed.
-    /// </summary>
-    public static void RequestRestart()
-    {
-        Interlocked.Increment(ref _generation);
-        Log.Information("Se pidió reiniciar el sonido");
-        NotifyOnUiThread();
-    }
-
-    private static void NotifyOnUiThread()
-    {
-        if (Application.Current?.Dispatcher is not { } dispatcher)
-            return;
-
-        dispatcher.BeginInvoke(() =>
-        {
-            // Windows reports one change several times (once per role): wait
-            // until it settles, and reopen the sound once.
-            _debounce ??= CreateDebounce();
-            _debounce.Stop();
-            _debounce.Start();
-        });
-    }
-
-    private static DispatcherTimer CreateDebounce()
-    {
-        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(700) };
-        timer.Tick += (_, _) =>
-        {
-            timer.Stop();
-            try
-            {
-                OutputChanged?.Invoke(null, EventArgs.Empty);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Falló al reabrir la salida de audio");
-            }
-        };
-        return timer;
-    }
-
     // ── Avisos de Windows ────────────────────────────────────────
 
     private sealed class Client : IMMNotificationClient
@@ -129,7 +65,7 @@ public static class AudioEndpointWatcher
         // Called by Windows on its own threads: only count, log and hand over.
         public void OnDeviceStateChanged(string deviceId, DeviceState newState)
         {
-            Interlocked.Increment(ref _generation);
+            AudioOutputChanges.Count();
             var playback = IsPlayback(deviceId);
             Log.Information("Cambió el estado de un dispositivo de audio ({State}, {Kind})",
                 newState, playback ? "salida" : "entrada");
@@ -139,7 +75,7 @@ public static class AudioEndpointWatcher
             // Windows reports no change of default: without this, what was
             // playing kept its dead output until the program was restarted.
             if (playback && newState == DeviceState.Active)
-                NotifyOnUiThread();
+                AudioOutputChanges.NotifyOnUiThread();
         }
 
         /// <summary>
@@ -153,7 +89,7 @@ public static class AudioEndpointWatcher
 
         public void OnDeviceRemoved(string deviceId)
         {
-            Interlocked.Increment(ref _generation);
+            AudioOutputChanges.Count();
             Log.Information("Se quitó un dispositivo de audio");
         }
 
@@ -163,9 +99,9 @@ public static class AudioEndpointWatcher
             if (flow != DataFlow.Render)
                 return;
 
-            Interlocked.Increment(ref _generation);
+            AudioOutputChanges.Count();
             Log.Information("Cambió la salida de audio predeterminada de Windows");
-            NotifyOnUiThread();
+            AudioOutputChanges.NotifyOnUiThread();
         }
 
         public void OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key) { }

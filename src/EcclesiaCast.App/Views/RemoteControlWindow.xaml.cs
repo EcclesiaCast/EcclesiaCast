@@ -1,7 +1,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
-using EcclesiaCast.App.Remote;
+using EcclesiaCast.Presentation.Remote;
 using QRCoder;
 using Serilog;
 

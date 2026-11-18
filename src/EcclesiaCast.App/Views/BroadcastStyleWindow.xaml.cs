@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using EcclesiaCast.App.Remote;
+using EcclesiaCast.Presentation.Remote;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Remote;

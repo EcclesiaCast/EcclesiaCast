@@ -4,7 +4,7 @@ using System.Text;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using EcclesiaCast.App.Remote;
+using EcclesiaCast.Presentation.Remote;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Bible;

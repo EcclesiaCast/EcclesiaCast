@@ -1,5 +1,5 @@
 using System.Windows;
-using EcclesiaCast.App.Remote;
+using EcclesiaCast.Presentation.Remote;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Remote;
 using Serilog;

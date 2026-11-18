@@ -33,7 +33,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         InputBindings.Add(new KeyBinding(
             new CommunityToolkit.Mvvm.Input.RelayCommand(OpenSettings), Key.OemComma, ModifierKeys.Control));
-        if (EcclesiaCast.App.Services.AppInfo.HasDonateUrl)
+        if (EcclesiaCast.Presentation.Services.AppInfo.HasDonateUrl)
             DonateMenuItem.Visibility = Visibility.Visible;
 
         DataContextChanged += (_, _) =>
@@ -869,7 +869,7 @@ public partial class MainWindow : Window
 
     internal void RestartSound()
     {
-        AudioEndpointWatcher.RequestRestart();
+        AudioOutputChanges.RequestRestart();
         if (DataContext is MainViewModel vm)
             vm.StatusText = "Sonido reiniciado: la música y los videos vuelven a abrir la salida de audio.";
     }

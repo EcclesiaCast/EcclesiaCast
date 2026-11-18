@@ -16,9 +16,9 @@ public partial class AboutWindow : Window
     {
         InitializeComponent();
         VersionText.Text = $"versión {version}";
-        if (Services.AppInfo.HasDonateUrl)
+        if (EcclesiaCast.Presentation.Services.AppInfo.HasDonateUrl)
         {
-            DonateLink.NavigateUri = new Uri(Services.AppInfo.DonateUrl);
+            DonateLink.NavigateUri = new Uri(EcclesiaCast.Presentation.Services.AppInfo.DonateUrl);
             DonateLine.Visibility = Visibility.Visible;
         }
         if (firstRun)

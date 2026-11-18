@@ -82,8 +82,8 @@ public partial class VlcVideoSurface : UserControl
         Unloaded += (_, _) => Dispose();
         Loaded += (_, _) =>
         {
-            AudioEndpointWatcher.OutputChanged -= OnAudioOutputChanged;
-            AudioEndpointWatcher.OutputChanged += OnAudioOutputChanged;
+            AudioOutputChanges.OutputChanged -= OnAudioOutputChanged;
+            AudioOutputChanges.OutputChanged += OnAudioOutputChanged;
         };
 
         // The framing is given over a 1920×1080 canvas: a different window
@@ -235,9 +235,9 @@ public partial class VlcVideoSurface : UserControl
         // ask for a fresh one (the default device of the moment) now that it is
         // stopped. The player itself is never rebuilt — its video callbacks
         // must stay assigned for as long as it lives.
-        if (_audioGeneration != AudioEndpointWatcher.Generation)
+        if (_audioGeneration != AudioOutputChanges.Generation)
         {
-            _audioGeneration = AudioEndpointWatcher.Generation;
+            _audioGeneration = AudioOutputChanges.Generation;
             try
             {
                 var ok = player.SetAudioOutput("mmdevice");
@@ -364,7 +364,7 @@ public partial class VlcVideoSurface : UserControl
     /// <summary>The item playing now, to reopen it in place if the sound device changes.</summary>
     private MediaItem? _playing;
 
-    /// <summary>The <see cref="AudioEndpointWatcher.Generation"/> this player's output was opened under.</summary>
+    /// <summary>The <see cref="AudioOutputChanges.Generation"/> this player's output was opened under.</summary>
     private int _audioGeneration;
 
     /// <summary>
@@ -800,7 +800,7 @@ public partial class VlcVideoSurface : UserControl
 
     private void Dispose()
     {
-        AudioEndpointWatcher.OutputChanged -= OnAudioOutputChanged;
+        AudioOutputChanges.OutputChanged -= OnAudioOutputChanged;
         PlayerSound.MasterChanged -= OnMasterChanged;
         _holdTimer.Stop();
         ClearHold();
