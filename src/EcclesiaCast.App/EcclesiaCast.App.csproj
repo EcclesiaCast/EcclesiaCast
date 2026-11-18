@@ -34,6 +34,7 @@
   <ItemGroup>
     <ProjectReference Include="..\EcclesiaCast.Core\EcclesiaCast.Core.csproj" />
     <ProjectReference Include="..\EcclesiaCast.Data\EcclesiaCast.Data.csproj" />
+    <ProjectReference Include="..\EcclesiaCast.Presentation\EcclesiaCast.Presentation.csproj" />
   </ItemGroup>
 
   <ItemGroup>
