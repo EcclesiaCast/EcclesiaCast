@@ -5,6 +5,10 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+- Por dentro, sin cambios para quien usa el programa: las pruebas del núcleo
+  ahora también corren en una Mac, y los nombres de archivo que arma el programa
+  (fondos de Pixabay, instalador descargado) siguen las mismas reglas en todos los sistemas.
+
 ## [1.4.0] - 2026-11-17
 
 ### Agregado

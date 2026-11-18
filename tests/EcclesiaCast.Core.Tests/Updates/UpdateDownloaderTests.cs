@@ -220,23 +220,48 @@ public class UpdateDownloaderTests : IDisposable
         Assert.Empty(Directory.GetFiles(_folder));
     }
 
-    [Theory]
-    [InlineData("..\\..\\evil.exe")]
-    [InlineData("../evil.exe")]
-    public async Task A_file_name_that_walks_out_of_the_folder_lands_inside_it(string name)
+    [Fact]
+    public async Task A_file_name_that_walks_out_of_the_folder_lands_inside_it()
     {
         var content = Content(10);
         var server = Serve(_ => ServerResponse.Ok(content));
 
-        var path = await Downloader().DownloadAsync(Asset(server, content, name), _folder, null, CancellationToken.None);
+        var path = await Downloader().DownloadAsync(Asset(server, content, "../evil.exe"), _folder, null, CancellationToken.None);
 
         Assert.Equal(Path.Combine(_folder, "evil.exe"), path);
         Assert.Single(Directory.GetFiles(_folder));
     }
 
+    [Fact]
+    public async Task A_windows_style_walk_out_lands_inside_the_folder_on_windows_and_is_refused_elsewhere()
+    {
+        var content = Content(10);
+        var server = Serve(_ => ServerResponse.Ok(content));
+        var asset = Asset(server, content, "..\\..\\evil.exe");
+
+        if (OperatingSystem.IsWindows())
+        {
+            // Both bars are separators there, so only the file name is kept.
+            var path = await Downloader().DownloadAsync(asset, _folder, null, CancellationToken.None);
+
+            Assert.Equal(Path.Combine(_folder, "evil.exe"), path);
+            Assert.Single(Directory.GetFiles(_folder));
+        }
+        else
+        {
+            // On a Mac «\» is not a separator, so the whole text stays as the
+            // name, and a name with «\» in it is not accepted.
+            var ex = await Assert.ThrowsAsync<UpdateException>(
+                () => Downloader().DownloadAsync(asset, _folder, null, CancellationToken.None));
+
+            Assert.Equal(UpdateFailure.Invalid, ex.Failure);
+        }
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData("a|b.exe")]
+    [InlineData("a?b.exe")]
     public async Task A_file_name_that_is_not_a_name_is_refused(string name)
     {
         var content = Content(10);

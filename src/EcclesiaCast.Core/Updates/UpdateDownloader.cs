@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using EcclesiaCast.Core.IO;
 
 namespace EcclesiaCast.Core.Updates;
 
@@ -58,7 +59,7 @@ public sealed class UpdateDownloader(HttpClient client)
         // The name comes from the network: keep only the file name, so a
         // crafted one can not walk out of the folder.
         var name = Path.GetFileName(asset.Name);
-        if (string.IsNullOrWhiteSpace(name) || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+        if (string.IsNullOrWhiteSpace(name) || FileNameRules.HasInvalid(name))
             throw UpdateException.NotValid($"El nombre del archivo no sirve: {asset.Name}");
 
         Directory.CreateDirectory(folder);

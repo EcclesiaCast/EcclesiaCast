@@ -22,13 +22,14 @@ public class AudioListTests
     [Fact]
     public void A_track_is_named_after_its_file_without_the_extension()
     {
-        Assert.Equal("Sublime gracia", AudioFiles.DisplayName(@"C:\musica\Sublime gracia.mp3"));
+        // A path of this computer: «C:\musica\...» is not a folder path on a Mac.
+        Assert.Equal("Sublime gracia", AudioFiles.DisplayName(Path.Combine(Path.GetTempPath(), "musica", "Sublime gracia.mp3")));
     }
 
     [Fact]
     public void A_file_with_only_an_extension_keeps_its_whole_name()
     {
-        Assert.Equal(".mp3", AudioFiles.DisplayName(@"C:\musica\.mp3"));
+        Assert.Equal(".mp3", AudioFiles.DisplayName(Path.Combine(Path.GetTempPath(), "musica", ".mp3")));
     }
 
     [Theory]

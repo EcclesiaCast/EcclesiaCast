@@ -117,6 +117,10 @@ public class ProPresenterLocatorTests : IDisposable
     [Fact]
     public void Files_marked_offline_are_counted_as_cloud_only()
     {
+        // Windows only: a Mac does not keep the «Offline» mark on a file.
+        if (!OperatingSystem.IsWindows())
+            return;
+
         // How OneDrive leaves a placeholder: the entry is there, the bytes
         // are not, and reading it fails unless OneDrive downloads it first.
         var folder = MakeLibrary("ProPresenter", "Canciones", "Nube.pro", "Local.pro");
@@ -133,6 +137,10 @@ public class ProPresenterLocatorTests : IDisposable
     [Fact]
     public void A_library_entirely_in_the_cloud_says_so()
     {
+        // Windows only, as above.
+        if (!OperatingSystem.IsWindows())
+            return;
+
         var folder = MakeLibrary("ProPresenter", "Canciones", "Una.pro", "Otra.pro");
         foreach (var file in Directory.GetFiles(folder))
             File.SetAttributes(file, File.GetAttributes(file) | FileAttributes.Offline);

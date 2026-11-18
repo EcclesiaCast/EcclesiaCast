@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using EcclesiaCast.Core.IO;
 
 namespace EcclesiaCast.Core.Media;
 
@@ -115,11 +116,10 @@ public static class PixabayBackgrounds
     /// <summary>Without what Windows does not allow in a file name, without doubled spaces, at most 40 letters.</summary>
     private static string Clean(string text)
     {
-        var invalid = Path.GetInvalidFileNameChars();
         var kept = new StringBuilder(text.Length);
         foreach (var ch in text.Trim())
         {
-            if (invalid.Contains(ch) || char.IsControl(ch))
+            if (FileNameRules.IsInvalid(ch) || char.IsControl(ch))
                 continue;
             if (ch == ' ' && kept.Length > 0 && kept[^1] == ' ')
                 continue;
