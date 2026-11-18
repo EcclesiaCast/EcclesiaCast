@@ -23,6 +23,13 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <!-- The Windows folders are pinned by a test. The project itself targets
+       Windows only, so its one file that needs nothing of Windows is compiled
+       in here; the test runs only on Windows. -->
+  <ItemGroup>
+    <Compile Include="..\..\src\EcclesiaCast.Platform.Windows\WindowsPlatformPaths.cs" Link="Linked\WindowsPlatformPaths.cs" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\EcclesiaCast.Core\EcclesiaCast.Core.csproj" />
     <ProjectReference Include="..\..\src\EcclesiaCast.Data\EcclesiaCast.Data.csproj" />
