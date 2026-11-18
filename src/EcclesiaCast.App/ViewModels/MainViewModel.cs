@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EcclesiaCast.Presentation.Remote;
@@ -77,6 +76,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private readonly IBackupDialog _backup;
     private readonly ICountdownDialog _countdownDialog;
     private readonly IGlobalSearchDialog _globalSearch;
+    private readonly IUiDispatcher _dispatcher;
 
     /// <summary>Copied slide (label + text + style) for paste/duplicate.</summary>
     private (string Label, string Text, string? StyleJson)? _clipboardSlide;
@@ -162,8 +162,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private string _quickTextFont = string.Empty;
 
     /// <summary>The installed typefaces, for the quick text's list, in alphabetical order.</summary>
-    public IReadOnlyList<string> SystemFonts { get; } =
-        System.Windows.Media.Fonts.SystemFontFamilies.Select(f => f.Source).OrderBy(n => n).ToList();
+    public IReadOnlyList<string> SystemFonts { get; }
 
     /// <summary>What is being prepared; the Preview box binds to it.</summary>
     [ObservableProperty]
@@ -362,8 +361,12 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         IAudioRepository audios,
         IAudioPlayer audioPlayer,
         IUpdates updates,
-        ProjectionViewModel projectionViewModel)
+        ProjectionViewModel projectionViewModel,
+        IUiDispatcher dispatcher,
+        IFontCatalog fonts)
     {
+        _dispatcher = dispatcher;
+        SystemFonts = fonts.InstalledFamilies();
         _displayProvider = displayProvider;
         _projection = projection;
         _settings = settings;
@@ -452,7 +455,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         // Light copies of the heavy videos, made in the background; the
         // status bar says when one is being prepared or is ready.
         LightVideoCache.StatusChanged += message =>
-            Application.Current?.Dispatcher.BeginInvoke(() => StatusText = message);
+            _dispatcher.Post(() => StatusText = message);
         RefreshLightCopies();
 
         if (bundledNote is not null || backgroundsNote is not null)
