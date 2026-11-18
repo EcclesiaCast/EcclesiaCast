@@ -35,9 +35,9 @@ public sealed partial class MainViewModel
         Restart(_outputVolumeSave);
     }
 
-    private System.Windows.Threading.DispatcherTimer? _outputVolumeSave;
-    private System.Windows.Threading.DispatcherTimer? _backgroundVolumeApply;
-    private System.Windows.Threading.DispatcherTimer? _backgroundVolumeSave;
+    private IUiTimer? _outputVolumeSave;
+    private IUiTimer? _backgroundVolumeApply;
+    private IUiTimer? _backgroundVolumeSave;
     private MediaItem? _backgroundVolumeItem;
 
     partial void OnBackgroundVolumeChanged(int value)
@@ -85,9 +85,9 @@ public sealed partial class MainViewModel
         UpdateBackgroundSoundFlags();
     }
 
-    private static System.Windows.Threading.DispatcherTimer NewRestTimer(TimeSpan interval, Action action)
+    private IUiTimer NewRestTimer(TimeSpan interval, Action action)
     {
-        var timer = new System.Windows.Threading.DispatcherTimer { Interval = interval };
+        var timer = _timers.Create(interval);
         timer.Tick += (_, _) =>
         {
             timer.Stop();
@@ -96,7 +96,7 @@ public sealed partial class MainViewModel
         return timer;
     }
 
-    private static void Restart(System.Windows.Threading.DispatcherTimer timer)
+    private static void Restart(IUiTimer timer)
     {
         timer.Stop();
         timer.Start();
