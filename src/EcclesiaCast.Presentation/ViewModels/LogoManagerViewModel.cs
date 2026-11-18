@@ -170,15 +170,7 @@ public sealed class LogoManagerViewModel
     }
 
     /// <summary>The width and height a size preset of the box stands for (index 0 and unknown ones: none).</summary>
-    public static (double Width, double Height)? PresetSize(int presetIndex) => presetIndex switch
-    {
-        1 => (1920, 1080),
-        2 => (1280, 720),
-        3 => (1440, 1080),
-        4 => (1080, 1080),
-        5 => (1080, 1920),
-        _ => null,
-    };
+    public static (double Width, double Height)? PresetSize(int presetIndex) => FramePresets.SizeOf(presetIndex);
 
     /// <summary>
     /// The choices for the borders: the colour alone, the logo itself blurred

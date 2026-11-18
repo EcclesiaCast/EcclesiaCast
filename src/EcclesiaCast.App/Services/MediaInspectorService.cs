@@ -1,13 +1,14 @@
 using EcclesiaCast.App.Views;
 using EcclesiaCast.Core.Media;
+using EcclesiaCast.Presentation.ViewModels;
 
 namespace EcclesiaCast.App.Services;
 
-public sealed class MediaInspectorService : IMediaInspector
+public sealed class MediaInspectorService(IColorPicker colorPicker) : IMediaInspector
 {
     public bool Edit(MediaItem item, IReadOnlyList<string> categories, IReadOnlyList<MediaItem> library)
     {
-        var window = new MediaInspectorWindow(item, categories, library)
+        var window = new MediaInspectorWindow(new MediaInspectorViewModel(item, categories, library, colorPicker))
         {
             Owner = System.Windows.Application.Current.MainWindow,
         };

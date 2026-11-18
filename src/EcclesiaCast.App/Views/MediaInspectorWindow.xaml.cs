@@ -4,11 +4,19 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Media;
+using EcclesiaCast.Presentation.ViewModels;
 
 namespace EcclesiaCast.App.Views;
 
+/// <summary>
+/// The properties of a media item. What the fields mean, what is checked
+/// when it saves and what the preview draws are in
+/// <see cref="MediaInspectorViewModel"/>; this window places the controls and
+/// moves the picture with the mouse and the arrow keys.
+/// </summary>
 public partial class MediaInspectorWindow : Window
 {
+    private readonly MediaInspectorViewModel _viewModel;
     private readonly MediaItem _item;
 
     /// <summary>False while the form is being filled in: the fields must not redraw the preview half-loaded.</summary>
@@ -16,90 +24,63 @@ public partial class MediaInspectorWindow : Window
 
     private string _fillColor = "#000000";
 
-    public MediaInspectorWindow(MediaItem item, IReadOnlyList<string> categories, IReadOnlyList<MediaItem> library)
+    public MediaInspectorWindow(MediaInspectorViewModel viewModel)
     {
         InitializeComponent();
-        _item = item;
+        _viewModel = viewModel;
+        _item = viewModel.Item;
+        var item = _item;
+        var form = viewModel.Initial();
 
         // Encuadre.
-        ZoomField.SetSilently(Math.Round((item.Zoom <= 0 ? 1 : item.Zoom) * 100));
-        OffsetXField.SetSilently(Math.Round(item.OffsetX * 100));
-        OffsetYField.SetSilently(Math.Round(item.OffsetY * 100));
-        FixedSizeCheck.IsChecked = item.HasFrame;
-        FrameWidthField.SetSilently(item.FrameWidth ?? 1920);
-        FrameHeightField.SetSilently(item.FrameHeight ?? 1080);
-        SizeRow.IsEnabled = item.HasFrame;
-        PresetBox.IsEnabled = item.HasFrame;
+        ZoomField.SetSilently(form.ZoomPercent);
+        OffsetXField.SetSilently(form.OffsetXPercent);
+        OffsetYField.SetSilently(form.OffsetYPercent);
+        FixedSizeCheck.IsChecked = form.FixedSize;
+        FrameWidthField.SetSilently(form.FrameWidth);
+        FrameHeightField.SetSilently(form.FrameHeight);
+        SizeRow.IsEnabled = form.FixedSize;
+        PresetBox.IsEnabled = form.FixedSize;
         PresetBox.SelectedIndex = 0;
 
-        _fillColor = string.IsNullOrWhiteSpace(item.FillColor) ? "#000000" : item.FillColor;
+        _fillColor = form.FillColor;
         UpdateFillSwatch();
 
         // Recorte.
-        TrimStartField.SetSilently(item.TrimStart);
-        TrimEndField.SetSilently(item.TrimEnd);
-        TrimOptions.Visibility = item.Type == MediaType.Video ? Visibility.Visible : Visibility.Collapsed;
+        TrimStartField.SetSilently(form.TrimStart);
+        TrimEndField.SetSilently(form.TrimEnd);
+        TrimOptions.Visibility = viewModel.IsVideoFile ? Visibility.Visible : Visibility.Collapsed;
 
-        // "Sin nada" first, then everything except this very item — filling a
-        // background with itself would be a mirror facing a mirror.
-        var options = new List<MediaItem> { new() { Id = 0, Name = "(sólo el color)" } };
+        FillOptionsBox.Fill(FillMediaBox, viewModel.FillOptions);
+        FillMediaBox.SelectedItem = viewModel.FillOptionFor(form.FillMediaId);
 
-        // A picture or a video can fill its own bars with a soft copy of itself,
-        // which makes it look like one picture with no border. The video's copy
-        // is made from the frames it already decodes: no second player.
-        if (item.Type == MediaType.Image)
-            options.Add(new MediaItem { Id = MediaItem.FillWithSelfId, Name = "(la misma imagen, desenfocada)" });
-        else if (item.Type == MediaType.Video)
-            options.Add(new MediaItem { Id = MediaItem.FillWithSelfId, Name = "(el mismo video, desenfocado)" });
+        NameBox.Text = form.Name;
+        TypeText.Text = viewModel.TypeText;
+        VideoOptions.Visibility = viewModel.IsVideo ? Visibility.Visible : Visibility.Collapsed;
+        AudioOptions.Visibility = viewModel.IsVideo ? Visibility.Visible : Visibility.Collapsed;
+        ImageOptions.Visibility = viewModel.IsVideo ? Visibility.Collapsed : Visibility.Visible;
 
-        options.AddRange(library
-            .Where(m => m.Id != item.Id && m.Type != MediaType.YouTube)
-            .OrderBy(m => m.Name));
-        EcclesiaCast.App.Services.FillOptionsBox.Fill(FillMediaBox, options);
-        FillMediaBox.SelectedItem = options.FirstOrDefault(m => m.Id == (item.FillMediaId ?? 0)) ?? options[0];
+        NextMediaBox.ItemsSource = viewModel.Followers;
+        NextMediaBox.SelectedItem = viewModel.FollowerFor(form.NextMediaId);
 
-        NameBox.Text = item.Name;
-        TypeText.Text = item.Type switch
-        {
-            MediaType.Video => "Video",
-            MediaType.YouTube => $"YouTube · {item.YouTubeId}",
-            _ => "Imagen",
-        };
-        var isVideo = item.Type is MediaType.Video or MediaType.YouTube;
-        VideoOptions.Visibility = isVideo ? Visibility.Visible : Visibility.Collapsed;
-        AudioOptions.Visibility = isVideo ? Visibility.Visible : Visibility.Collapsed;
-        ImageOptions.Visibility = isVideo ? Visibility.Collapsed : Visibility.Visible;
+        ScalingBox.IsEnabled = viewModel.CanChangeScaling;
 
-        // What can follow: any other media of the library.
-        var followers = library.Where(m => m.Id != item.Id).OrderBy(m => m.Name).ToList();
-        NextMediaBox.ItemsSource = followers;
-        NextMediaBox.SelectedItem = followers.FirstOrDefault(m => m.Id == item.NextMediaId);
+        CategoryBox.ItemsSource = viewModel.Categories;
+        CategoryBox.Text = form.Category;
 
-        // YouTube always fills the screen with its own player.
-        ScalingBox.IsEnabled = item.Type != MediaType.YouTube;
-
-        CategoryBox.ItemsSource = categories;
-        CategoryBox.Text = item.Category;
-
-        BehaviorBox.SelectedIndex = (int)item.Behavior;
-        ScalingBox.SelectedIndex = (int)item.Scaling;
-        EndBox.SelectedIndex = (int)item.EndBehavior;
-        ShowSecondsField.SetSilently(item.ShowSeconds);
-        // An image has no loop: the default of a new one (Loop) means "nothing".
-        ImageEndBox.SelectedIndex = item.EndBehavior switch
-        {
-            VideoEndBehavior.Logo => 1,
-            VideoEndBehavior.NextMedia => 2,
-            _ => 0,
-        };
+        BehaviorBox.SelectedIndex = form.BehaviorIndex;
+        ScalingBox.SelectedIndex = form.ScalingIndex;
+        EndBox.SelectedIndex = form.EndIndex;
+        ShowSecondsField.SetSilently(form.ShowSeconds);
+        ImageEndBox.SelectedIndex = form.ImageEndIndex;
         UpdateAfterOptions();
-        MuteCheck.IsChecked = item.Muted;
-        VolSlider.Value = item.Volume;
-        BlurField.SetSilently(item.Blur);
+        MuteCheck.IsChecked = form.Muted;
+        VolSlider.Value = form.Volume;
+        BlurField.SetSilently(form.Blur);
 
         // Vencimiento: the day of the event and how long it stays after it.
-        EventDatePicker.SelectedDate = item.EventDate?.Date;
-        ArchiveDaysField.SetSilently(item.EventDate is null ? MediaExpiry.DefaultDays : item.ArchiveAfterDays);
+        EventDatePicker.SelectedDate = form.EventDate;
+        ArchiveDaysField.SetSilently(form.ArchiveDays);
         UpdateEventNote();
 
         // From here on the fields drive the preview.
@@ -112,20 +93,41 @@ public partial class MediaInspectorWindow : Window
 
     public bool Saved { get; private set; }
 
+    /// <summary>What the fields say right now.</summary>
+    private MediaForm ReadForm() => new(
+        EventDatePicker.SelectedDate?.Date,
+        ArchiveDaysField.Value,
+        NameBox.Text,
+        CategoryBox.Text,
+        BehaviorBox.SelectedIndex,
+        ScalingBox.SelectedIndex,
+        EndBox.SelectedIndex,
+        ImageEndBox.SelectedIndex,
+        ShowSecondsField.Value,
+        (NextMediaBox.SelectedItem as MediaItem)?.Id,
+        MuteCheck.IsChecked == true,
+        VolSlider.Value,
+        BlurField.Value,
+        ZoomField.Value,
+        OffsetXField.Value,
+        OffsetYField.Value,
+        FixedSizeCheck.IsChecked == true,
+        FrameWidthField.Value,
+        FrameHeightField.Value,
+        TrimStartField.Value,
+        TrimEndField.Value,
+        _fillColor,
+        (FillMediaBox.SelectedItem as MediaItem)?.Id);
+
     private void After_Changed(object sender, SelectionChangedEventArgs e) => UpdateAfterOptions();
 
-    /// <summary>
-    /// Shows the box that picks the next media only when «seguir con otro
-    /// medio» is chosen. An image's seconds count whether it goes in front of
-    /// the words or behind them.
-    /// </summary>
+    /// <summary>Shows the box that picks the next media only when «seguir con otro medio» is chosen.</summary>
     private void UpdateAfterOptions()
     {
-        if (NextPanel is null || ImageEndBox is null || EndBox is null || BehaviorBox is null)
+        if (_viewModel is null || NextPanel is null || ImageEndBox is null || EndBox is null || BehaviorBox is null)
             return;
 
-        var isVideo = _item.Type is MediaType.Video or MediaType.YouTube;
-        var follows = isVideo ? EndBox.SelectedIndex == 3 : ImageEndBox.SelectedIndex == 2;
+        var follows = _viewModel.FollowsNextMedia(EndBox.SelectedIndex, ImageEndBox.SelectedIndex);
         NextPanel.Visibility = follows ? Visibility.Visible : Visibility.Collapsed;
     }
 
@@ -172,50 +174,28 @@ public partial class MediaInspectorWindow : Window
 
     private void ClearEventDate_Click(object sender, RoutedEventArgs e) => EventDatePicker.SelectedDate = null;
 
-    /// <summary>Says, under the date, what it will do: «pasa a Eventos pasados el 27/10/2026».</summary>
+    /// <summary>Says, under the date, what it will do.</summary>
     private void UpdateEventNote()
     {
         if (EventDateNote is null)
             return;
 
-        if (EventDatePicker.SelectedDate is not { } date)
-        {
-            EventDateNote.Text = "Sin fecha: no vence. Con la fecha de un evento, pasa sola a «Eventos pasados» unos días después.";
-            return;
-        }
-
-        var day = MediaExpiry.MovesOn(date, (int)ArchiveDaysField.Value)!.Value;
-        EventDateNote.Text = day <= DateTime.Today
-            ? $"Esa fecha ya pasó: al guardar se mueve a «{MediaExpiry.ArchiveTab}»."
-            : $"Pasa a «{MediaExpiry.ArchiveTab}» el {MediaExpiry.Format(day)}.";
+        EventDateNote.Text = MediaInspectorViewModel.EventNote(
+            EventDatePicker.SelectedDate, ArchiveDaysField.Value, DateTime.Today);
     }
 
     private void Field_SelectionChanged(object sender, SelectionChangedEventArgs e) => RefreshPreview();
 
-    /// <summary>
-    /// Redraws the preview from what the fields say right now — before
-    /// saving — by handing it a copy of the item with those values on it.
-    /// The real item is only touched by «Guardar».
-    /// </summary>
+    /// <summary>Redraws the preview from what the fields say right now, before saving.</summary>
     private void RefreshPreview()
     {
         if (!_ready)
             return;
 
-        var shown = _item.Clone();
-        shown.Scaling = (MediaScaling)Math.Max(0, ScalingBox.SelectedIndex);
-        shown.Zoom = Math.Clamp(ZoomField.Value / 100, 0.1, 4);
-        shown.OffsetX = Math.Clamp(OffsetXField.Value / 100, -MediaFraming.MaxOffset, MediaFraming.MaxOffset);
-        shown.OffsetY = Math.Clamp(OffsetYField.Value / 100, -MediaFraming.MaxOffset, MediaFraming.MaxOffset);
-        shown.FrameWidth = FixedSizeCheck.IsChecked == true ? (int)Math.Clamp(FrameWidthField.Value, 16, 1920) : null;
-        shown.FrameHeight = FixedSizeCheck.IsChecked == true ? (int)Math.Clamp(FrameHeightField.Value, 16, 1080) : null;
-        shown.FillColor = _fillColor;
-
-        var chosenFill = FillMediaBox.SelectedItem as MediaItem;
-        shown.FillMediaId = chosenFill is { Id: not 0 } ? chosenFill.Id : null;
-        Preview.FillMedia = chosenFill is { Id: > 0 } fill ? fill : shown.FillsWithSelf || shown.FillsWithOwnVideo ? shown : null;
-        Preview.Blur = BlurField.Value;
-        Preview.Media = shown;
+        var preview = _viewModel.PreviewOf(ReadForm());
+        Preview.FillMedia = preview.FillMedia;
+        Preview.Blur = preview.Blur;
+        Preview.Media = preview.Media;
     }
 
     private Point? _dragFrom;
@@ -294,45 +274,22 @@ public partial class MediaInspectorWindow : Window
 
     private void Preset_Changed(object sender, SelectionChangedEventArgs e)
     {
-        (double w, double h)? size = PresetBox.SelectedIndex switch
-        {
-            1 => (1920, 1080),
-            2 => (1280, 720),
-            3 => (1440, 1080),
-            4 => (1080, 1080),
-            5 => (1080, 1920),
-            _ => null,
-        };
-
-        if (size is not { } chosen)
+        if (FramePresets.SizeOf(PresetBox.SelectedIndex) is not { } chosen)
             return;
 
-        FrameWidthField.SetSilently(chosen.w);
-        FrameHeightField.SetSilently(chosen.h);
+        FrameWidthField.SetSilently(chosen.Width);
+        FrameHeightField.SetSilently(chosen.Height);
         FixedSizeCheck.IsChecked = true;
         RefreshPreview();
     }
 
     private void PickFillColor_Click(object sender, RoutedEventArgs e)
     {
-        if (ColorPickerHelper.Pick(_fillColor) is { } picked)
+        if (_viewModel.PickFillColor(_fillColor) is { } picked)
         {
             _fillColor = picked;
             UpdateFillSwatch();
             RefreshPreview();
-        }
-    }
-
-    private static System.Windows.Media.Brush SwatchBrush(string hex)
-    {
-        try
-        {
-            return new System.Windows.Media.SolidColorBrush(
-                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(hex));
-        }
-        catch (FormatException)
-        {
-            return System.Windows.Media.Brushes.Black;
         }
     }
 
@@ -351,56 +308,7 @@ public partial class MediaInspectorWindow : Window
 
     private void Save_Click(object sender, RoutedEventArgs e)
     {
-        _item.EventDate = EventDatePicker.SelectedDate?.Date;
-        _item.ArchiveAfterDays = (int)Math.Clamp(ArchiveDaysField.Value, 0, 365);
-        _item.Name = string.IsNullOrWhiteSpace(NameBox.Text) ? _item.Name : NameBox.Text.Trim();
-        _item.Category = string.IsNullOrWhiteSpace(CategoryBox.Text) ? "Fondos" : CategoryBox.Text.Trim();
-        _item.Behavior = (MediaBehavior)Math.Max(0, BehaviorBox.SelectedIndex);
-        _item.Scaling = (MediaScaling)Math.Max(0, ScalingBox.SelectedIndex);
-        var isVideo = _item.Type is MediaType.Video or MediaType.YouTube;
-        _item.EndBehavior = isVideo
-            ? (VideoEndBehavior)Math.Max(0, EndBox.SelectedIndex)
-            : ImageEndBox.SelectedIndex switch
-            {
-                1 => VideoEndBehavior.Logo,
-                2 => VideoEndBehavior.NextMedia,
-                _ => VideoEndBehavior.Stop,
-            };
-
-        // Seconds and a following media only mean something with the choice that uses them.
-        _item.ShowSeconds = isVideo ? 0 : (int)Math.Clamp(ShowSecondsField.Value, 0, 3600);
-        var next = (NextMediaBox.SelectedItem as MediaItem)?.Id;
-        if (_item.EndBehavior == VideoEndBehavior.NextMedia && next is null)
-            _item.EndBehavior = VideoEndBehavior.Stop; // none chosen: nothing follows
-        _item.NextMediaId = _item.EndBehavior == VideoEndBehavior.NextMedia ? next : null;
-        _item.Muted = MuteCheck.IsChecked == true;
-        _item.Volume = (int)VolSlider.Value;
-        _item.Blur = BlurField.Value;
-
-        _item.Zoom = Math.Clamp(ZoomField.Value / 100, 0.1, 4);
-        _item.OffsetX = Math.Clamp(OffsetXField.Value / 100, -MediaFraming.MaxOffset, MediaFraming.MaxOffset);
-        _item.OffsetY = Math.Clamp(OffsetYField.Value / 100, -MediaFraming.MaxOffset, MediaFraming.MaxOffset);
-
-        if (FixedSizeCheck.IsChecked == true)
-        {
-            _item.FrameWidth = (int)Math.Clamp(FrameWidthField.Value, 16, 1920);
-            _item.FrameHeight = (int)Math.Clamp(FrameHeightField.Value, 16, 1080);
-        }
-        else
-        {
-            _item.FrameWidth = null;
-            _item.FrameHeight = null;
-        }
-
-        // Brillo y tinte se sacaron (15/10/2026): lo que hubiera quedado guardado se borra.
-        _item.Brightness = 0;
-        _item.Tint = null;
-        _item.TintStrength = 0;
-        _item.TrimStart = Math.Max(0, TrimStartField.Value);
-        _item.TrimEnd = Math.Max(0, TrimEndField.Value);
-
-        _item.FillColor = _fillColor;
-        _item.FillMediaId = (FillMediaBox.SelectedItem as MediaItem)?.Id is int fillId and not 0 ? fillId : null;
+        _viewModel.Apply(ReadForm());
 
         Saved = true;
         DialogResult = true;
