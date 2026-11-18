@@ -1,16 +1,8 @@
 using System.Diagnostics;
-using System.Windows.Threading;
 using EcclesiaCast.Core.Listening;
 using Serilog;
 
 namespace EcclesiaCast.App.Services.Listening;
-
-/// <summary>What the listener made of the last seconds of sound.</summary>
-/// <param name="Text">The words that were plausibly sung; empty when there were none.</param>
-/// <param name="Seconds">How long the stretch listened to was.</param>
-/// <param name="Cost">How long the recogniser took: the singing went on meanwhile.</param>
-/// <param name="Level">The loudest moment of the stretch, 0 to 1, before it was evened out.</param>
-public readonly record struct HeardWindow(string Text, double Seconds, double Cost, float Level);
 
 /// <summary>
 /// Keeps listening while it is on: as soon as the recogniser is free it hands
@@ -18,7 +10,7 @@ public readonly record struct HeardWindow(string Text, double Seconds, double Co
 /// the work happens on a thread of its own, at low priority; the window only
 /// hears about results.
 /// </summary>
-public sealed class SongListener(Dispatcher dispatcher) : IDisposable
+public sealed class SongListener(IUiDispatcher dispatcher) : ISongListener
 {
     /// <summary>
     /// How much sound is listened to each time: a sung line and a bit. Longer
@@ -34,7 +26,7 @@ public sealed class SongListener(Dispatcher dispatcher) : IDisposable
     private static readonly TimeSpan Pace = TimeSpan.FromSeconds(1);
 
     /// <summary>Quieter than this nothing is coming in at all (a muted input): the recogniser is not even asked.</summary>
-    public const float Silence = 0.002f;
+    public const float Silence = ISongListener.Silence;
 
     /// <summary>
     /// A quiet input (a notebook microphone across the room) is raised to
@@ -93,7 +85,7 @@ public sealed class SongListener(Dispatcher dispatcher) : IDisposable
             lock (_ear)
                 _ear.Load();
             var onCard = _ear.OnVideoCard;
-            dispatcher.BeginInvoke(() =>
+            dispatcher.Post(() =>
             {
                 if (!cancel.IsCancellationRequested)
                     Ready?.Invoke(onCard);
@@ -129,7 +121,7 @@ public sealed class SongListener(Dispatcher dispatcher) : IDisposable
                 }
 
                 var heard = new HeardWindow(text, seconds, clock.Elapsed.TotalSeconds, level);
-                dispatcher.BeginInvoke(() =>
+                dispatcher.Post(() =>
                 {
                     if (!cancel.IsCancellationRequested)
                         Heard?.Invoke(heard);
@@ -146,7 +138,7 @@ public sealed class SongListener(Dispatcher dispatcher) : IDisposable
             var reason = ex is DllNotFoundException or BadImageFormatException or TypeInitializationException
                 ? "Esta PC no puede correr el reconocedor de voz."
                 : $"Se detuvo: {ex.Message}";
-            dispatcher.BeginInvoke(() => Failed?.Invoke(reason));
+            dispatcher.Post(() => Failed?.Invoke(reason));
         }
     }
 

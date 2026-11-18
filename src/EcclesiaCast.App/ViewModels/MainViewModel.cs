@@ -395,8 +395,18 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         IYouTubeDownloadDialog youTubeDownload,
         IShell shell,
         Func<IWindowCapture> newWindowCapture,
-        IWindowPickerDialog windowPicker)
+        IWindowPickerDialog windowPicker,
+        Func<ISongListener> newListener,
+        ISoundInput soundInput,
+        ISpeechEar speechEar)
     {
+        _newListener = newListener;
+        _soundInput = soundInput;
+        _speechEar = speechEar;
+        IsListeningAvailable = HiddenFeatures.IsEnabled(paths.DataFolder, HiddenFeatures.FollowTheSong);
+        _hasListenModel = speechEar.HasModel;
+        _listenModelText =
+            $"Hace falta bajar una sola vez el reconocedor de voz ({speechEar.ModelSizeText}). Queda en esta PC; lo que escucha no sale de acá.";
         _newWindowCapture = newWindowCapture;
         WindowPicker = windowPicker;
         _youTubeDownload = youTubeDownload;

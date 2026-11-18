@@ -1,9 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using EcclesiaCast.App.Services.Listening;
 using EcclesiaCast.Core.Diagnostics;
 using EcclesiaCast.Core.Listening;
 using Serilog;
@@ -26,10 +24,13 @@ public sealed partial class MainViewModel
     /// <summary>How the program acts on what it hears: 0 only marks the slide, 1 follows, 2 moves on ahead.</summary>
     public const int ListenSuggest = 0, ListenFollow = 1, ListenAnticipate = 2;
 
-    private SongListener? _listener;
+    private ISongListener? _listener;
     private FollowPilot? _pilot;
     private string _pilotSong = string.Empty;
-    private DispatcherTimer? _listenMeter;
+    private IUiTimer? _listenMeter;
+    private readonly Func<ISongListener> _newListener;
+    private readonly ISoundInput _soundInput;
+    private readonly ISpeechEar _speechEar;
     private CancellationTokenSource? _modelDownload;
     private bool _listenOnCard;
 
@@ -40,8 +41,7 @@ public sealed partial class MainViewModel
     /// program to turn it on or off. Everything that shows or starts the
     /// function depends on this.
     /// </summary>
-    public bool IsListeningAvailable { get; } =
-        HiddenFeatures.IsEnabled(App.DataDir, HiddenFeatures.FollowTheSong);
+    public bool IsListeningAvailable { get; }
 
     public ObservableCollection<SoundInputDevice> ListenDevices { get; } = [];
 
@@ -72,7 +72,7 @@ public sealed partial class MainViewModel
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NeedsListenModel))]
-    private bool _hasListenModel = SpeechEar.HasModel;
+    private bool _hasListenModel;
 
     public bool NeedsListenModel => !HasListenModel;
 
@@ -80,8 +80,7 @@ public sealed partial class MainViewModel
     private bool _isDownloadingListenModel;
 
     [ObservableProperty]
-    private string _listenModelText =
-        $"Hace falta bajar una sola vez el reconocedor de voz ({SpeechEar.ModelSizeText}). Queda en esta PC; lo que escucha no sale de acá.";
+    private string _listenModelText = string.Empty;
 
     public string ListenButtonText => IsListening ? "Dejar de escuchar" : "Empezar a escuchar";
 
@@ -117,7 +116,7 @@ public sealed partial class MainViewModel
         var keep = SelectedListenDevice;
 
         ListenDevices.Clear();
-        foreach (var device in SoundInput.Devices())
+        foreach (var device in _soundInput.Devices())
             ListenDevices.Add(device);
 
 
@@ -131,7 +130,7 @@ public sealed partial class MainViewModel
         if (double.TryParse(_settings.Get(ListenLeadKey), NumberStyles.Float, CultureInfo.InvariantCulture, out var lead)
             && lead is >= 0 and <= 12)
             ListenLeadWords = lead;
-        HasListenModel = SpeechEar.HasModel;
+        HasListenModel = _speechEar.HasModel;
     }
 
     [RelayCommand]
@@ -151,7 +150,7 @@ public sealed partial class MainViewModel
         try
         {
             var progress = new Progress<double>(mb => ListenModelText = $"Bajando el reconocedor de voz… {mb:0} MB");
-            await SpeechEar.DownloadModelAsync(progress, _modelDownload.Token);
+            await _speechEar.DownloadModelAsync(progress, _modelDownload.Token);
             HasListenModel = true;
             ListenModelText = "Reconocedor de voz listo.";
         }
@@ -185,7 +184,7 @@ public sealed partial class MainViewModel
         if (!IsListeningAvailable)
             return;
 
-        if (!SpeechEar.HasModel)
+        if (!_speechEar.HasModel)
         {
             ListenStatus = "Primero hay que bajar el reconocedor de voz.";
             return;
@@ -203,7 +202,7 @@ public sealed partial class MainViewModel
         {
             if (_listener is null)
             {
-                _listener = new SongListener(System.Windows.Application.Current.Dispatcher);
+                _listener = _newListener();
                 _listener.Heard += OnHeard;
                 _listener.Failed += reason => StopListening(reason);
                 _listener.Ready += onCard =>
@@ -242,9 +241,9 @@ public sealed partial class MainViewModel
         Log.Information("Seguir la canción: apagado ({Status})", status);
     }
 
-    private DispatcherTimer CreateListenMeter()
+    private IUiTimer CreateListenMeter()
     {
-        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(120) };
+        var timer = _timers.Create(TimeSpan.FromMilliseconds(120));
         timer.Tick += (_, _) =>
         {
             // Sound levels are heard in steps, not in a straight line.
@@ -261,7 +260,7 @@ public sealed partial class MainViewModel
             return;
 
         ListenHeard = heard.Text.Length > 0 ? heard.Text
-            : heard.Level < SongListener.Silence ? "(no llega sonido por esta entrada: revisá que no esté silenciada en Windows)"
+            : heard.Level < ISongListener.Silence ? "(no llega sonido por esta entrada: revisá que no esté silenciada en Windows)"
             : "(no distingo palabras)";
         var slow = heard.Cost > 2.5
             ? _listenOnCard ? " · esta PC va justa: el reconocedor tarda" : " · va lento: esta PC no tiene placa de video que lo ayude"

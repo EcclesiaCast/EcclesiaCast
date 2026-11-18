@@ -1,17 +1,9 @@
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
+using EcclesiaCast.Presentation.Platform;
 using Serilog;
 
 namespace EcclesiaCast.Platform.Windows.Listening;
-
-/// <summary>One place the program can listen to: a microphone or line input, or what this PC is playing.</summary>
-/// <param name="Id">The Windows id of the device; empty for the default input.</param>
-/// <param name="Name">What the operator reads in the list.</param>
-/// <param name="Loopback">True when it is an output being listened to (what the PC plays), for trying things out.</param>
-public sealed record SoundInputDevice(string Id, string Name, bool Loopback)
-{
-    public override string ToString() => Name;
-}
 
 /// <summary>
 /// Listens to a sound input and keeps the last half minute as the speech
