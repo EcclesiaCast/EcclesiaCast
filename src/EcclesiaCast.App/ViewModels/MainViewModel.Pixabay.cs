@@ -17,7 +17,7 @@ public sealed partial class MainViewModel
     private static readonly HttpClient PixabayHttp = CreatePixabayClient();
 
     /// <summary>Where the downloads are kept: the library's own copy, like the other backgrounds.</summary>
-    private static string PixabayFolder => Path.Combine(App.DataDir, "fondos-pixabay");
+    private string PixabayFolder => Path.Combine(_paths.DataFolder, "fondos-pixabay");
 
     private static HttpClient CreatePixabayClient()
     {

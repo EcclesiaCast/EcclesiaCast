@@ -79,6 +79,8 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private readonly IUiDispatcher _dispatcher;
     private readonly IUiTimerFactory _timers;
     private readonly IDialogs _dialogs;
+    private readonly IPlatformPaths _paths;
+    private readonly IImageFactory _images;
 
     /// <summary>Copied slide (label + text + style) for paste/duplicate.</summary>
     private (string Label, string Text, string? StyleJson)? _clipboardSlide;
@@ -367,9 +369,13 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         IUiDispatcher dispatcher,
         IFontCatalog fonts,
         IUiTimerFactory timers,
-        IDialogs dialogs)
+        IDialogs dialogs,
+        IPlatformPaths paths,
+        IImageFactory images)
     {
+        _images = images;
         _dialogs = dialogs;
+        _paths = paths;
         _audioTimer = timers.Create(TimeSpan.FromMilliseconds(250));
         _timesTimer = timers.Create(TimeSpan.FromMilliseconds(500));
         _cardZoomSaveTimer = timers.Create(TimeSpan.FromMilliseconds(400));
