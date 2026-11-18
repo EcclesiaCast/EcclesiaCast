@@ -29,12 +29,7 @@ public static class LightVideoCache
     /// copies there too: the clean-up deletes every copy its own library does
     /// not know, so one that looked in the real folder would empty it.
     /// </summary>
-    public static string Folder =>
-        Environment.GetEnvironmentVariable("ECCLESIACAST_DATA_DIR") is { Length: > 0 } dataDir
-            ? Path.Combine(dataDir, "copias-livianas")
-            : Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "EcclesiaCast", "copias-livianas");
+    public static string Folder => PlatformServices.Paths.LightCopiesFolder;
 
     /// <summary>
     /// A copy at 1080p looks like the original only while it is not zoomed

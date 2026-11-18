@@ -1,11 +1,11 @@
-using System.Windows;
-using EcclesiaCast.App.Views;
+using EcclesiaCast.Presentation.Platform;
 
-namespace EcclesiaCast.App.Services;
+namespace EcclesiaCast.Presentation.Services;
 
 /// <summary>
 /// Notices and questions in the program's own look, in place of the grey
-/// system message boxes. Safe to call from any thread.
+/// system message boxes. Safe to call from any thread. Shown by the
+/// <see cref="INotices"/> each interface sets at start-up.
 /// </summary>
 public static class Notice
 {
@@ -37,23 +37,8 @@ public static class Notice
         return chosen switch { 2 => true, 1 => false, _ => null };
     }
 
+    /// <summary>-1 when there is no screen to ask on (the tests).</summary>
     private static int Run(string message, string? title, NoticeKind kind, IReadOnlyList<string> buttons,
-        int defaultIndex, int cancelIndex, bool destructive)
-    {
-        var app = Application.Current;
-        if (app is null)
-            return -1;
-        if (!app.Dispatcher.CheckAccess())
-            return app.Dispatcher.Invoke(() => Run(message, title, kind, buttons, defaultIndex, cancelIndex, destructive));
-
-        var owner = app.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive && w.IsVisible)
-            ?? (app.MainWindow is { IsVisible: true } main ? main : null);
-
-        var window = new NoticeWindow(message, title, kind, buttons, defaultIndex, cancelIndex, destructive,
-            hasOwner: owner is not null);
-        if (owner is not null)
-            window.Owner = owner;
-        window.ShowDialog();
-        return window.Chosen;
-    }
+        int defaultIndex, int cancelIndex, bool destructive) =>
+        PlatformServices.Notices?.Ask(message, title, kind, buttons, defaultIndex, cancelIndex, destructive) ?? -1;
 }

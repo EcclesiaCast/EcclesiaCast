@@ -17,13 +17,10 @@ namespace EcclesiaCast.App.Services;
 public static partial class YtDlp
 {
     /// <summary>Where the helper programs live; yt-dlp finds a runtime placed next to it.</summary>
-    public static string ToolsFolder => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "EcclesiaCast", "tools");
+    public static string ToolsFolder => PlatformServices.Paths.ToolsFolder;
 
     /// <summary>Default home for downloaded videos.</summary>
-    public static string DownloadsFolder => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), "EcclesiaCast");
+    public static string DownloadsFolder => PlatformServices.Paths.DownloadsFolder;
 
     private static readonly ToolInstaller Installer = new(ToolsFolder);
 

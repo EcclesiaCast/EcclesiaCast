@@ -144,7 +144,7 @@ public partial class UpdateWindow : Window
     /// </summary>
     private bool ConfirmClosingProjection() =>
         !_isProjecting()
-        || EcclesiaCast.App.Services.Notice.Confirm(
+        || EcclesiaCast.Presentation.Services.Notice.Confirm(
             "Se va a cerrar la proyección para actualizar.",
             "Actualizar", "Ahora no", "Actualizar EcclesiaCast");
 

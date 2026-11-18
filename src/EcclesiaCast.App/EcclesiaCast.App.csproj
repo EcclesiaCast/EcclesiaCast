@@ -32,6 +32,7 @@
     <!-- What moved out of the app to the shared Presentation project keeps
          being seen everywhere, as when it lived in the app. -->
     <Using Include="EcclesiaCast.Presentation.Platform" />
+    <Using Include="EcclesiaCast.Presentation.Services" />
   </ItemGroup>
 
   <ItemGroup>

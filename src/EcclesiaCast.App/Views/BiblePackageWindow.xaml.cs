@@ -111,7 +111,7 @@ public partial class BiblePackageWindow : Window
     {
         if (_rows.All(r => !r.IsChecked))
         {
-            EcclesiaCast.App.Services.Notice.Show("Marcá al menos una versión.");
+            EcclesiaCast.Presentation.Services.Notice.Show("Marcá al menos una versión.");
             return;
         }
 

@@ -43,9 +43,7 @@ public sealed class SpeechEar : IDisposable
     /// <summary>True when the video card does the work: about five times faster than the processor on the church notebook.</summary>
     public bool OnVideoCard { get; private set; }
 
-    public static string ModelPath => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "EcclesiaCast", "modelos", ModelFile);
+    public static string ModelPath => Path.Combine(PlatformServices.Paths.ModelsFolder, ModelFile);
 
     public static bool HasModel => File.Exists(ModelPath);
 

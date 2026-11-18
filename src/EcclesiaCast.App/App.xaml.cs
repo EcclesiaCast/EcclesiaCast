@@ -1,6 +1,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using EcclesiaCast.App.Platform;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.App.ViewModels;
 using EcclesiaCast.Core.Abstractions;
@@ -8,6 +9,7 @@ using EcclesiaCast.Core.Displays;
 using EcclesiaCast.Core.Feedback;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Data.Persistence;
+using EcclesiaCast.Platform.Windows;
 using LibVLCSharp.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +26,22 @@ public partial class App : Application
 
     /// <summary>Set once the "Acerca de" of the very first start has been shown.</summary>
     private const string AboutSeenKey = "app.about.seen";
+
+    // The platform services, made first: the static helpers (Notice, the
+    // importers, the sound watcher) and App.DataDir reach them from here on.
+    private readonly WpfUiDispatcher _uiDispatcher;
+    private readonly WpfUiTimerFactory _uiTimers = new();
+    private readonly WpfNotices _notices = new();
+    private readonly WindowsPlatformPaths _paths = new();
+
+    public App()
+    {
+        _uiDispatcher = new WpfUiDispatcher(Dispatcher);
+        PlatformServices.Dispatcher = _uiDispatcher;
+        PlatformServices.Timers = _uiTimers;
+        PlatformServices.Notices = _notices;
+        PlatformServices.Paths = _paths;
+    }
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -148,13 +166,25 @@ public partial class App : Application
             Log.Error(ex, "No se pudo inicializar LibVLC; los videos de fondo quedan deshabilitados");
         }
 
-        VideoEngine = libVlc;
+        var videoEngine = new VideoEngine(libVlc);
+        PlatformServices.Video = videoEngine;
 
         // Hears when Windows changes the audio device, so the players can open
         // their sound output again instead of staying mute until a restart.
         AudioEndpointWatcher.Start();
 
         var services = new ServiceCollection();
+        services.AddSingleton<IUiDispatcher>(_uiDispatcher);
+        services.AddSingleton<IUiTimerFactory>(_uiTimers);
+        services.AddSingleton<INotices>(_notices);
+        services.AddSingleton<IPlatformPaths>(_paths);
+        services.AddSingleton<IVideoEngine>(videoEngine);
+        services.AddSingleton<IDialogs, WpfDialogs>();
+        services.AddSingleton<IImageFactory, WpfImageFactory>();
+        services.AddSingleton<IFontCatalog, WpfFontCatalog>();
+        services.AddSingleton<IClipboardText, WpfClipboardText>();
+        services.AddSingleton<IShell, WindowsShell>();
+        services.AddSingleton<IPlatformInfo, WindowsPlatformInfo>();
         services.AddSingleton<IDisplayProvider, ScreenDisplayProvider>();
         services.AddSingleton<IPresentationService, PresentationService>();
         services.AddSingleton<EcclesiaCast.Core.Timing.MeetingClocks>();
@@ -280,19 +310,17 @@ public partial class App : Application
         base.OnExit(e);
     }
 
-    /// <summary>Convenience for windows/services that optionally use video.</summary>
-    public static LibVLC? VideoEngine { get; internal set; }
+    /// <summary>
+    /// Convenience for windows/services that optionally use video. The view
+    /// models move to <see cref="IVideoEngine"/> when they leave the app.
+    /// </summary>
+    public static LibVLC? VideoEngine => PlatformServices.Video?.Instance;
 
     /// <summary>
-    /// Where the library, thumbnails and imported pages live. A test build
-    /// pointed at a copy (ECCLESIACAST_DATA_DIR) must keep <i>all</i> of it
-    /// there: the thumbnail sweep deletes every PNG its library does not
-    /// reference, so one that looked in the real folder would empty it.
+    /// Where the library, thumbnails and imported pages live
+    /// (<see cref="IPlatformPaths.DataFolder"/>, which follows
+    /// ECCLESIACAST_DATA_DIR). The view models move to
+    /// <see cref="IPlatformPaths"/> when they leave the app.
     /// </summary>
-    public static string DataDir { get; } =
-        Environment.GetEnvironmentVariable("ECCLESIACAST_DATA_DIR") is { Length: > 0 } dataDir
-            ? dataDir
-            : Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "EcclesiaCast");
+    public static string DataDir => PlatformServices.Paths.DataFolder;
 }

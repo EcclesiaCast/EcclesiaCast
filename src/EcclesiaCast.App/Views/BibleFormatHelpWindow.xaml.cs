@@ -51,7 +51,7 @@ public partial class BibleFormatHelpWindow : Window
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             Log.Warning(ex, "No se pudo guardar el ejemplo de Biblia {Path}", dialog.FileName);
-            EcclesiaCast.App.Services.Notice.Show(ex.Message, "No se pudo guardar el archivo",
+            EcclesiaCast.Presentation.Services.Notice.Show(ex.Message, "No se pudo guardar el archivo",
                 NoticeKind.Warning);
         }
     }
