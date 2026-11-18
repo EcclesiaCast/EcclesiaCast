@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
@@ -23,6 +23,11 @@
   <ItemGroup>
     <!-- A real answer of the GitHub releases API, trimmed, for the update tests. -->
     <None Update="Updates\releases-sample.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- A library made by the 1.4.0 program (.NET 8), to open it with the .NET 10 code. -->
+    <None Update="Persistence\library-1.4.0.db" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
