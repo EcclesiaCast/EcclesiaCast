@@ -52,7 +52,7 @@ public partial class BibleFormatHelpWindow : Window
         {
             Log.Warning(ex, "No se pudo guardar el ejemplo de Biblia {Path}", dialog.FileName);
             EcclesiaCast.App.Services.Notice.Show(ex.Message, "No se pudo guardar el archivo",
-                EcclesiaCast.App.Services.NoticeKind.Warning);
+                NoticeKind.Warning);
         }
     }
 

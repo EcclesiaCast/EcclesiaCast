@@ -3,8 +3,6 @@ using EcclesiaCast.App.Views;
 
 namespace EcclesiaCast.App.Services;
 
-public enum NoticeKind { Info, Warning, Error, Question }
-
 /// <summary>
 /// Notices and questions in the program's own look, in place of the grey
 /// system message boxes. Safe to call from any thread.
