@@ -39,11 +39,11 @@ public sealed partial class ProjectionViewModel : ObservableObject
     /// for YouTube and when nothing is playing.
     /// </summary>
     [ObservableProperty]
-    private System.Windows.Media.ImageSource? _liveFrame;
+    private object? _liveFrame;
 
     /// <summary>The moving picture of a video logo, for the operator's Live panel (it was black there).</summary>
     [ObservableProperty]
-    private System.Windows.Media.ImageSource? _liveLogoFrame;
+    private object? _liveLogoFrame;
 
     /// <summary>
     /// The background the PREVIEW draws behind the next slide: the live one,
