@@ -811,8 +811,10 @@ iglesia (11:22–12:53): ningún error ni cierre.
 - **Versión para Mac** (la piden en Instagram; Alexis quiere hacerla,
   14/11/2026). **El plan completo está en [plan-mac.md](plan-mac.md)**
   (15/11/2026), con las decisiones de Alexis en su sección 19 y los encargos
-  en `plan-mac-1.md` a `plan-mac-8.md`. Estado: plan escrito; falta lanzar la
-  tanda 1 (prototipo). Lo de abajo es la nota inicial; donde no coincida,
+  en `plan-mac-1.md` a `plan-mac-8.md`. Estado (17/11): el prototipo
+  (tanda 1) está hecho en la rama `proto/tanda-1` y GitHub arma su `.zip`;
+  falta probarlo en la Mac prestada con `docs/pruebas-mac-1.md` de esa rama.
+  El trabajo sigue en la rama `mac`, cortada de la 1.4.0. Lo de abajo es la nota inicial; donde no coincida,
   vale el plan. Es el trabajo más grande que queda:
   - **Qué se aprovecha:** `EcclesiaCast.Core` y `EcclesiaCast.Data` (unas
     24.000 líneas: canciones, Biblias, playlists, base SQLite, control remoto)
