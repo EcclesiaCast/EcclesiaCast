@@ -16,24 +16,25 @@ public sealed class ToolDownloadException(string message, Exception? inner = nul
 /// Fetches the helper programs EcclesiaCast manages for itself (yt-dlp and the
 /// JavaScript runtime it needs for YouTube), so the operator never has to
 /// install anything by hand. The addresses are properties so a test can point
-/// them at a local server instead of GitHub.
+/// them at a local server instead of GitHub. The names and addresses of each
+/// system come from <see cref="HelperTools"/>.
 /// </summary>
 public sealed class ToolInstaller(string folder)
 {
+    private static readonly HelperTools Tools = HelperTools.Current;
+
     /// <summary>The official yt-dlp release; "latest/download" always serves the newest.</summary>
-    public string YtDlpUrl { get; init; } =
-        "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe";
+    public string YtDlpUrl { get; init; } = Tools.YtDlpUrl;
 
     /// <summary>
     /// Deno is the runtime yt-dlp uses by default to solve YouTube's
     /// JavaScript challenges. It is a single executable inside a zip.
     /// </summary>
-    public string DenoUrl { get; init; } =
-        "https://github.com/denoland/deno/releases/latest/download/deno-x86_64-pc-windows-msvc.zip";
+    public string DenoUrl { get; init; } = Tools.DenoUrl;
 
-    public string YtDlpPath => Path.Combine(folder, "yt-dlp.exe");
+    public string YtDlpPath => Path.Combine(folder, Tools.YtDlpFile);
 
-    public string DenoPath => Path.Combine(folder, "deno.exe");
+    public string DenoPath => Path.Combine(folder, Tools.DenoFile);
 
     public async Task DownloadYtDlpAsync(
         IProgress<(double Percent, string Message)> progress, CancellationToken cancellation)
@@ -56,7 +57,7 @@ public sealed class ToolInstaller(string folder)
             progress.Report((-1, "Preparando el componente de YouTube…"));
 
             using var archive = ZipFile.OpenRead(zip);
-            var entry = archive.GetEntry("deno.exe")
+            var entry = archive.GetEntry(Tools.DenoFile)
                 ?? throw new ToolDownloadException("El componente de YouTube bajado no es el esperado.");
             var partial = DenoPath + ".part";
             entry.ExtractToFile(partial, overwrite: true);

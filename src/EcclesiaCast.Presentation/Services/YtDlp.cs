@@ -35,20 +35,20 @@ public static partial class YtDlp
 
     /// <summary>The JavaScript runtime YouTube needs, or null when it isn't around.</summary>
     private static string? FindRuntime() =>
-        File.Exists(Installer.DenoPath) ? Installer.DenoPath : Find("deno.exe");
+        File.Exists(Installer.DenoPath) ? Installer.DenoPath : Find(HelperTools.Current.DenoFile);
 
     /// <summary>
     /// True when ffmpeg is around. Without it yt-dlp can't join the separate
     /// video and audio streams YouTube serves above 720p, so the download
     /// falls back to a single lower-resolution file.
     /// </summary>
-    public static bool HasFfmpeg() => Find("ffmpeg.exe") is not null;
+    public static bool HasFfmpeg() => Find(HelperTools.Current.FfmpegFile) is not null;
 
     /// <summary>Full path to ffmpeg, or null; the light video copies use it too.</summary>
-    public static string? FindFfmpeg() => Find("ffmpeg.exe");
+    public static string? FindFfmpeg() => Find(HelperTools.Current.FfmpegFile);
 
     /// <summary>Full path to ffprobe, which ships next to ffmpeg; null when missing.</summary>
-    public static string? FindFfprobe() => Find("ffprobe.exe");
+    public static string? FindFfprobe() => Find(HelperTools.Current.FfprobeFile);
 
     private static string? Find(string fileName)
     {
