@@ -6,7 +6,8 @@ using EcclesiaCast.Core.Songs;
 namespace EcclesiaCast.App.Services;
 
 public sealed class ThemeManagerDialogService(
-    IThemeRepository themes, ISettingsStore settings, ISongRepository songs)
+    IThemeRepository themes, ISettingsStore settings, ISongRepository songs,
+    IUiDispatcher dispatcher, IDialogs dialogs, ITextPrompt prompt, IColorPicker colorPicker)
     : IThemeManagerDialog
 {
     public bool Show() => Open(null);
@@ -15,7 +16,7 @@ public sealed class ThemeManagerDialogService(
 
     private bool Open(Song? song)
     {
-        var viewModel = new ThemeManagerViewModel(themes, settings, songs, song);
+        var viewModel = new ThemeManagerViewModel(themes, settings, songs, dispatcher, dialogs, prompt, colorPicker, song);
         var window = new ThemeManagerWindow(viewModel)
         {
             Owner = System.Windows.Application.Current.MainWindow,

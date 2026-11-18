@@ -1,8 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text.Json;
-using System.Windows;
-using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EcclesiaCast.App.Services;
@@ -50,6 +48,10 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
 
     private readonly IThemeRepository _themes;
     private readonly ISettingsStore _settings;
+    private readonly IUiDispatcher _dispatcher;
+    private readonly IDialogs _dialogs;
+    private readonly ITextPrompt _prompt;
+    private readonly IColorPicker _colorPicker;
     private bool _loading;
 
     /// <summary>True while the list is filled again: selection changes in between ask nothing.</summary>
@@ -279,8 +281,15 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     [ObservableProperty]
     private bool _isMainSongTheme;
 
-    public ThemeManagerViewModel(IThemeRepository themes, ISettingsStore settings, ISongRepository songs, Song? song = null)
+    public ThemeManagerViewModel(
+        IThemeRepository themes, ISettingsStore settings, ISongRepository songs,
+        IUiDispatcher dispatcher, IDialogs dialogs, ITextPrompt prompt, IColorPicker colorPicker,
+        Song? song = null)
     {
+        _dispatcher = dispatcher;
+        _dialogs = dialogs;
+        _prompt = prompt;
+        _colorPicker = colorPicker;
         _themes = themes;
         _settings = settings;
         _song = song;
@@ -425,7 +434,7 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
                     // Stay on the theme being edited. The list is put back once
                     // it has finished its own change of selection.
                     _restoringSelection = true;
-                    Dispatcher.CurrentDispatcher.BeginInvoke(() =>
+                    _dispatcher.Post(() =>
                     {
                         SelectedRow = oldValue;
                         _restoringSelection = false;
@@ -528,11 +537,11 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         _baseline = Fingerprint();
         IsDirty = false;
         var version = ++_loadVersion;
-        Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Loaded, () =>
+        _dispatcher.Post(() =>
         {
             if (version == _loadVersion)
                 SettleBaseline();
-        });
+        }, UiPriority.Loaded);
     }
 
     /// <summary>
@@ -836,12 +845,8 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
             options.Add(("Aplicar el tema y borrar también los diseños por diapositiva", true));
         options.Add(("Cancelar", null));
 
-        var app = Application.Current;
-        var window = new Views.ChoiceWindow("Aplicar a todas las canciones", message, options.Select(o => o.Label).ToList())
-        {
-            Owner = app.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive) ?? app.MainWindow,
-        };
-        if (window.ShowDialog() != true || window.Chosen < 0 || options[window.Chosen].ClearDesigns is not bool clear)
+        var chosen = _prompt.Choose("Aplicar a todas las canciones", message, options.Select(o => o.Label).ToList());
+        if (chosen < 0 || options[chosen].ClearDesigns is not bool clear)
             return;
 
         SaveSelectedKeepingOpen();
@@ -1011,13 +1016,10 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     [RelayCommand]
     private void BrowseBackgroundImage()
     {
-        var dialog = new Microsoft.Win32.OpenFileDialog
-        {
-            Title = "Imagen de fondo",
-            Filter = "Imágenes|*.jpg;*.jpeg;*.png;*.bmp;*.webp",
-        };
-        if (dialog.ShowDialog() == true)
-            BackgroundImagePath = dialog.FileName;
+        var file = _dialogs.OpenFile(new OpenFileRequest("Imagen de fondo",
+            [new FileFilter("Imágenes", ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.webp"])]));
+        if (file is not null)
+            BackgroundImagePath = file;
     }
 
     [RelayCommand]
@@ -1026,7 +1028,7 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     [RelayCommand]
     private void PickTextColor()
     {
-        var picked = ColorPickerHelper.Pick(TextColor);
+        var picked = _colorPicker.Pick(TextColor);
         if (picked is not null)
             TextColor = picked;
     }
@@ -1034,11 +1036,11 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     [RelayCommand]
     private void PickBackgroundColor()
     {
-        var picked = ColorPickerHelper.Pick(BackgroundColor, allowTransparent: true);
+        var picked = _colorPicker.Pick(BackgroundColor, allowTransparent: true);
         if (picked is null)
             return;
 
-        if (picked == ColorPickerHelper.Transparent)
+        if (picked == _colorPicker.Transparent)
         {
             TransparentBackground = true;
         }
@@ -1052,7 +1054,7 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     [RelayCommand]
     private void PickLineBandColor()
     {
-        var picked = ColorPickerHelper.Pick(LineBandColor);
+        var picked = _colorPicker.Pick(LineBandColor);
         if (picked is not null)
             LineBandColor = picked;
     }
@@ -1075,7 +1077,7 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     [RelayCommand]
     private void PickOutlineColor()
     {
-        var picked = ColorPickerHelper.Pick(OutlineColor);
+        var picked = _colorPicker.Pick(OutlineColor);
         if (picked is not null)
             OutlineColor = picked;
     }
@@ -1083,7 +1085,7 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     [RelayCommand]
     private void PickCaptionColor()
     {
-        var picked = ColorPickerHelper.Pick(CaptionColor);
+        var picked = _colorPicker.Pick(CaptionColor);
         if (picked is not null)
             CaptionColor = picked;
     }
@@ -1091,7 +1093,7 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     [RelayCommand]
     private void PickSecondaryColor()
     {
-        var picked = ColorPickerHelper.Pick(SecondaryColor);
+        var picked = _colorPicker.Pick(SecondaryColor);
         if (picked is not null)
             SecondaryColor = picked;
     }
