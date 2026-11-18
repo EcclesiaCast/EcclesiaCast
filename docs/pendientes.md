@@ -454,6 +454,37 @@ las respuestas automáticas de la tabla); toca dar estos pasos.
 
 ### Pedidos de la prueba de la 1.4.0 prueba.11 (17/11/2026)
 
+- [ ] **Biblias de BibliaTodo para «Bajar Biblias»: NTBT (español), BTNT
+      (inglés) y NTB-BR (portugués)** (17/11/2026, Alexis dijo que sí). Las
+      ofreció BibliaTodo Bible Society por correo (info@bibliatodo.org).
+      Licencia pública gratuita v1.7 (en vigor desde el 12/11/2026), leída en el
+      archivo y en https://www.bibliatodo.org/es/license: permite distribuirlas
+      completas en aplicaciones gratuitas, sin regalías ni registro. Tiene tres
+      condiciones: (1) **no cambiar la redacción, ni los corchetes** (hay
+      versículos enteros entre corchetes, como Mt 18:11 y Mc 16:9–20); (2)
+      **atribución** visible con enlace: «Santa Biblia, Nueva Traducción
+      BibliaTodo (NTBT). Publicada por BibliaTodo Bible Society, sello editorial
+      de BibliaTodo LLC. https://www.bibliatodo.org/es/ntbt/» (las de inglés y
+      portugués están en el punto 7 de la licencia); (3) no decir que
+      BibliaTodo respalda el programa.
+      Qué hay que hacer:
+      1. Convertir su JSON (schema 3: `libros > capitulos > versiculos`, códigos
+         USFM) al formato de «Bajar Biblias»: `JsonBibleImporter` no lo lee hoy.
+         El JSON de la NTBT que mandó Alexis está en el scratchpad de la sesión
+         del 17/11. Las otras dos se bajan de la página oficial de materiales de
+         cada una, no de los enlaces del correo.
+      2. `BibleTextCleaner` borra en pantalla los textos entre corchetes de
+         hasta 6 palabras (son títulos en otras Biblias): con estas versiones
+         **no tiene que tocar los corchetes**, o se pierden versículos.
+      3. Mostrar la atribución con enlace en «Bajar Biblias» y en la
+         información de la versión.
+      4. Sumarlas a `catalogo.json` como opcionales (no en el instalador) y que
+         Alexis suba los archivos a R2.
+      Es una traducción nueva (noviembre de 2026): se ofrece como opción, no
+      por defecto. **Las demás versiones que muestra bibliatodo.com (RVR1960,
+      NVI, NTV, LBLA…) NO se pueden tomar de ahí**: son de sus editoriales y la
+      licencia de BibliaTodo dice que los recursos de terceros conservan sus
+      condiciones (punto 8).
 - [ ] **Para próximas versiones (pedidos del 17/11/2026):**
       1. **Máximo de caracteres por versículo:** poder poner el tope; si el
          versículo lo pasa, se corta y sigue en la diapositiva que viene.
