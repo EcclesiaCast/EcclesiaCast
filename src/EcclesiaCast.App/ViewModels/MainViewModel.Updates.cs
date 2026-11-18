@@ -71,7 +71,7 @@ public sealed partial class MainViewModel
     private void InitializeUpdates()
     {
         // The search runs by itself, so the answer may come from any thread.
-        _updates.PendingChanged += (_, _) => System.Windows.Application.Current?.Dispatcher.BeginInvoke(SyncUpdate);
+        _updates.PendingChanged += (_, _) => _dispatcher.Post(SyncUpdate);
         SyncUpdate();
     }
 
