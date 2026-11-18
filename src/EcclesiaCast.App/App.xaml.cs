@@ -191,6 +191,7 @@ public partial class App : Application
         services.AddSingleton<IThumbnailer, WpfThumbnailer>();
         services.AddSingleton<IInstallerSettings, WindowsInstallerSettings>();
         services.AddSingleton<IOperatorScreen, WpfOperatorScreen>();
+        services.AddSingleton<IWebEngine, WpfWebEngine>();
         services.AddSingleton<IShell, WindowsShell>();
         services.AddSingleton<IPlatformInfo, WindowsPlatformInfo>();
         services.AddSingleton<IDisplayProvider, ScreenDisplayProvider>();
@@ -224,6 +225,7 @@ public partial class App : Application
         services.AddSingleton<IBackupDialog>(_ => new BackupDialogService(dbPath));
         services.AddSingleton<ICountdownDialog, CountdownDialogService>();
         services.AddSingleton<ILightCopyDialog, LightCopyDialogService>();
+        services.AddSingleton<IYouTubeDownloadDialog, YouTubeDownloadDialogService>();
         services.AddSingleton<ITrashDialog, TrashDialogService>();
         services.AddSingleton<IBroadcastDialog, BroadcastDialogService>();
         services.AddSingleton<IRemoteControlDialog, RemoteControlDialogService>();

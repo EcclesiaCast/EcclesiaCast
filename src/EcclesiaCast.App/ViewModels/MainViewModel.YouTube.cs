@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EcclesiaCast.Presentation.Remote;
@@ -32,7 +31,7 @@ public sealed partial class MainViewModel
     [RelayCommand]
     private void OpenYouTube()
     {
-        if (!WebViewProfile.IsRuntimeAvailable())
+        if (!_webEngine.IsRuntimeAvailable())
         {
             Notice.Show(
                 "Es el Microsoft Edge WebView2, que EcclesiaCast usa para YouTube.\n\n" +
@@ -162,12 +161,7 @@ public sealed partial class MainViewModel
     /// </summary>
     private bool DownloadYouTubeCore(MediaItem item, string targetTab, bool removeOnlineEntry)
     {
-        var window = new Views.YouTubeDownloadWindow(item.YouTubeId!, item.Name)
-        {
-            Owner = Application.Current.MainWindow,
-        };
-
-        if (window.ShowDialog() != true || window.DownloadedPath is not { } path)
+        if (_youTubeDownload.Download(item.YouTubeId!, item.Name) is not { } path)
         {
             StatusText = "La descarga no se completó.";
             return false;
@@ -179,7 +173,7 @@ public sealed partial class MainViewModel
             Name = name,
             Path = path,
             Type = MediaType.Video,
-            ThumbnailPath = MediaThumbnails.Create(path, MediaType.Video, App.VideoEngine),
+            ThumbnailPath = _thumbnails.Create(path, MediaType.Video, _video.Instance),
             Category = targetTab,
             // A downloaded announcement behaves like the YouTube one did.
             Behavior = item.Behavior,
@@ -248,14 +242,10 @@ public sealed partial class MainViewModel
         string? original = null;
         if (!DocumentImporter.HasSource(item.Path))
         {
-            var dialog = new Microsoft.Win32.OpenFileDialog
-            {
-                Title = $"Elegí el documento original de «{item.Name}»",
-                Filter = "PDF y PowerPoint|*.pdf;*.pptx;*.ppt",
-            };
-            if (dialog.ShowDialog() != true)
+            original = _dialogs.OpenFile(new OpenFileRequest($"Elegí el documento original de «{item.Name}»",
+                [new FileFilter("PDF y PowerPoint", ["*.pdf", "*.pptx", "*.ppt"])]));
+            if (original is null)
                 return;
-            original = dialog.FileName;
         }
 
         NoteAction($"Volver a importar en alta calidad «{item.Name}»");
@@ -276,8 +266,8 @@ public sealed partial class MainViewModel
             .ToList();
         foreach (var page in pages)
         {
-            MediaThumbnails.Delete(page.ThumbnailPath);
-            page.ThumbnailPath = MediaThumbnails.Create(page.Path, MediaType.Image, videoEngine: null);
+            _thumbnails.Delete(page.ThumbnailPath);
+            page.ThumbnailPath = _thumbnails.Create(page.Path, MediaType.Image, videoEngine: null);
             _media.Update(page);
         }
 
@@ -299,12 +289,7 @@ public sealed partial class MainViewModel
             return;
         }
 
-        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-        {
-            FileName = "explorer.exe",
-            Arguments = $"/select,\"{item.Path}\"",
-            UseShellExecute = true,
-        });
+        _shell.ShowInFolder(item.Path);
     }
 
     /// <summary>Right click → «Quitar de la biblioteca»: the whole selection when the card belongs to it.</summary>

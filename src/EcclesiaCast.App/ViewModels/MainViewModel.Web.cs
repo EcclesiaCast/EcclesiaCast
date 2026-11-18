@@ -15,7 +15,7 @@ namespace EcclesiaCast.App.ViewModels;
 /// What goes to the screen is always a media item that is not in the library
 /// (a negative id, like the logos used as a background): a photo is an
 /// ordinary image in the folder of captures, and the live page is a
-/// <see cref="MediaType.Web"/> whose picture is <see cref="WebLiveFeed"/>.
+/// <see cref="MediaType.Web"/> whose picture is the web panel's live feed.
 /// </summary>
 public sealed partial class MainViewModel
 {
@@ -67,14 +67,14 @@ public sealed partial class MainViewModel
 
     partial void OnShowWebPointerChanged(bool value)
     {
-        WebLiveFeed.ShowPointer = value;
+        _webEngine.ShowPointer = value;
         _settings.Set(WebPointerKey, value ? "1" : "0");
     }
 
     private void InitializeWeb()
     {
         ShowWebPointer = _settings.Get(WebPointerKey) != "0";
-        WebLiveFeed.ShowPointer = ShowWebPointer;
+        _webEngine.ShowPointer = ShowWebPointer;
         _ = CleanOldWebCapturesAsync();
     }
 
@@ -151,7 +151,7 @@ public sealed partial class MainViewModel
 
     private bool EnsureWebRuntime()
     {
-        if (WebViewProfile.IsRuntimeAvailable())
+        if (_webEngine.IsRuntimeAvailable())
             return true;
 
         Notice.Show(
@@ -290,7 +290,7 @@ public sealed partial class MainViewModel
                 Name = photo.Name,
                 Path = photo.Path,
                 Type = MediaType.Image,
-                ThumbnailPath = MediaThumbnails.Create(photo.Path, MediaType.Image, videoEngine: null),
+                ThumbnailPath = _thumbnails.Create(photo.Path, MediaType.Image, videoEngine: null),
                 Category = tab,
                 Scaling = MediaScaling.Fit,
                 Behavior = MediaBehavior.Foreground,
@@ -328,7 +328,7 @@ public sealed partial class MainViewModel
     }
 
     /// <summary>The card's picture: a photo of the page, made small like the other posters. Null if it could not be taken.</summary>
-    private static async Task<string?> MakeWebThumbnailAsync(IWebPageHost host)
+    private async Task<string?> MakeWebThumbnailAsync(IWebPageHost host)
     {
         var temp = Path.Combine(Path.GetTempPath(), $"ecclesiacast-web-{Guid.NewGuid():N}.png");
         try
@@ -336,14 +336,14 @@ public sealed partial class MainViewModel
             if (!await host.CaptureAsync(temp))
                 return null;
 
-            var poster = MediaThumbnails.Create(temp, MediaType.Image, videoEngine: null);
+            var poster = _thumbnails.Create(temp, MediaType.Image, videoEngine: null);
 
             // When no poster could be drawn the answer is the source itself,
             // which is about to go: keep a copy where the library keeps its own.
             if (string.Equals(poster, temp, StringComparison.OrdinalIgnoreCase))
             {
-                Directory.CreateDirectory(MediaThumbnails.Directory);
-                poster = Path.Combine(MediaThumbnails.Directory, $"{Guid.NewGuid():N}.png");
+                Directory.CreateDirectory(_thumbnails.Directory);
+                poster = Path.Combine(_thumbnails.Directory, $"{Guid.NewGuid():N}.png");
                 File.Copy(temp, poster);
             }
 
