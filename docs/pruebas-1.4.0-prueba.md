@@ -322,6 +322,28 @@ abrió con el programa.
 en Cloudflare (Workers → `ecclesiacast-api` → Edit code → Deploy). El resumen
 ahora tiene al final «Iglesias que pusieron su nombre».
 
+## 11. Prueba de Claude con la prueba.14 abierta (17/11/2026, 20:30–21:10)
+
+Con una copia de la biblioteca (la real no cambió: mismo código de
+verificación antes y después) y el programa de `publish\`:
+
+- **Botón de las fichas:** «Fichas: Nombre» → «Gn» → «Gn + nombre» → «Nombre»: bien.
+- **`1jn 3 1` + Enter:** la grilla bajó hasta 1 Juan, lo marcó y proyectó 3:1: bien.
+- **Teclas con la salida apagada:** F3 (dos veces seguidas, con Esc en el medio),
+  F1, F2 y F4 prenden la salida con lo que dicen: bien. Ojo: con el cursor en el
+  buscador de la Biblia, Esc no apaga la salida (borra la búsqueda): es así
+  desde antes.
+- **Controles de sonido del LIVE:** en el panel angosto el control «Video»
+  quedaba sin ancho y «Salida» cortado: **arreglado** (ahora van en dos
+  renglones). El botón 🔇/🔊 cambia y el registro anota «Se vuelve a abrir el
+  video 01 con sonido»; el de la barra de abajo también.
+- **Ancho del panel:** grilla y lista (y Canciones) con anchos distintos: bien.
+- **Ajustes → Actualizaciones:** el recuadro del nombre se ve entero: bien.
+- **Una canción:** se proyecta y la flecha pasa a la siguiente: bien.
+- Registro del día sin errores.
+- No se pudo probar con el mouse: la parte derecha de la pantalla (LIVE, panel
+  derecho de Temas) la tapa la ventana de Claude; se usó UI Automation.
+
 ## Si algo falla
 
 El registro del día está en
