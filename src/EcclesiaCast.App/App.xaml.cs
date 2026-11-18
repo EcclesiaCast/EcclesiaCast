@@ -190,6 +190,7 @@ public partial class App : Application
         services.AddSingleton<IClipboardText, WpfClipboardText>();
         services.AddSingleton<IThumbnailer, WpfThumbnailer>();
         services.AddSingleton<IInstallerSettings, WindowsInstallerSettings>();
+        services.AddSingleton<IOperatorScreen, WpfOperatorScreen>();
         services.AddSingleton<IShell, WindowsShell>();
         services.AddSingleton<IPlatformInfo, WindowsPlatformInfo>();
         services.AddSingleton<IDisplayProvider, ScreenDisplayProvider>();

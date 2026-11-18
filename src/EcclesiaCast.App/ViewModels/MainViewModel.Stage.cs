@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EcclesiaCast.Presentation.Remote;
@@ -178,7 +177,7 @@ public sealed partial class MainViewModel
         // With only two screens the stage can only land on the operator's own,
         // covering the panel it was started from. Say so, and say how to get
         // out, before it happens.
-        if (OperatorScreen.Holds(SelectedStageDisplay.Info))
+        if (_operatorScreen.Holds(SelectedStageDisplay.Info))
         {
             var answer = Notice.Confirm(
                 "El escenario va a ocupar esta misma pantalla y va a tapar el panel del operador.\n\n"

@@ -85,6 +85,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private readonly IVideoEngine _video;
     private readonly ILightCopyDialog _lightCopy;
     private readonly IInstallerSettings _installer;
+    private readonly IOperatorScreen _operatorScreen;
 
     /// <summary>Copied slide (label + text + style) for paste/duplicate.</summary>
     private (string Label, string Text, string? StyleJson)? _clipboardSlide;
@@ -379,8 +380,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         IThumbnailer thumbnails,
         IVideoEngine video,
         ILightCopyDialog lightCopy,
-        IInstallerSettings installer)
+        IInstallerSettings installer,
+        IOperatorScreen operatorScreen)
     {
+        _operatorScreen = operatorScreen;
         _installer = installer;
         _lightCopy = lightCopy;
         _video = video;
