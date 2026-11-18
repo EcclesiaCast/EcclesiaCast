@@ -14,4 +14,8 @@
     <ProjectReference Include="..\EcclesiaCast.Presentation\EcclesiaCast.Presentation.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="NAudio.Wasapi" Version="2.2.1" />
+  </ItemGroup>
+
 </Project>

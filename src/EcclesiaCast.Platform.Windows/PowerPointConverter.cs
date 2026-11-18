@@ -1,8 +1,9 @@
 using System.IO;
 using System.Runtime.InteropServices;
+using EcclesiaCast.Presentation.Platform;
 using Serilog;
 
-namespace EcclesiaCast.App.Services;
+namespace EcclesiaCast.Platform.Windows;
 
 /// <summary>
 /// Saves a PowerPoint deck as PDF using the copy of PowerPoint the church
@@ -14,13 +15,13 @@ namespace EcclesiaCast.App.Services;
 /// Driving it through COM keeps the fidelity — fonts, animations flattened,
 /// the church's own template — that any third-party reader would lose.
 /// </summary>
-public static class PowerPointConverter
+public sealed class PowerPointConverter : IDeckConverter
 {
     /// <summary>PowerPoint's own "save as PDF" format id.</summary>
     private const int PpSaveAsPdf = 32;
 
     /// <summary>Returns the PDF's path, or null when PowerPoint is not installed.</summary>
-    public static string? ToPdf(string deckPath)
+    public string? ToPdf(string deckPath)
     {
         var type = Type.GetTypeFromProgID("PowerPoint.Application");
         if (type is null)

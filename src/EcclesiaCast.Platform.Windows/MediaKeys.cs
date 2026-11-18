@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace EcclesiaCast.App.Services;
+namespace EcclesiaCast.Platform.Windows;
 
 /// <summary>The multimedia keys of the keyboard, sent as if one had been pressed.</summary>
 public enum MediaKey

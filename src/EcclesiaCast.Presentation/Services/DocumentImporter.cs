@@ -1,10 +1,8 @@
 using System.IO;
+using EcclesiaCast.Presentation.Platform;
 using Serilog;
-using Windows.Data.Pdf;
-using Windows.Storage;
-using Windows.Storage.Streams;
 
-namespace EcclesiaCast.App.Services;
+namespace EcclesiaCast.Presentation.Services;
 
 /// <summary>What came out of importing a document, page by page.</summary>
 public sealed record DocumentPages(IReadOnlyList<string> Pages, string? Error);
@@ -12,7 +10,9 @@ public sealed record DocumentPages(IReadOnlyList<string> Pages, string? Error);
 /// <summary>
 /// Turns a PDF — or a PowerPoint deck, through PowerPoint itself — into one
 /// image per page, so the pages join the media library and project like any
-/// other background.
+/// other background. The system draws the pages
+/// (<see cref="PlatformServices.Documents"/>) and converts the decks
+/// (<see cref="PlatformServices.Decks"/>).
 ///
 /// Rendering happens once, on import, rather than every time a page goes up:
 /// a service is no place to find out that a document is slow to draw, and
@@ -21,7 +21,7 @@ public sealed record DocumentPages(IReadOnlyList<string> Pages, string? Error);
 public static class DocumentImporter
 {
     /// <summary>Where the rendered pages live, beside the rest of the church's data.</summary>
-    private static string Root => Path.Combine(App.DataDir, "documents");
+    private static string Root => Path.Combine(PlatformServices.Paths.DataFolder, "documents");
 
     public static bool IsDocument(string path) =>
         Path.GetExtension(path).ToLowerInvariant() is ".pdf" or ".pptx" or ".ppt";
@@ -56,10 +56,10 @@ public static class DocumentImporter
 
             var document = await LoadAsync(Path.Combine(folder, SourceName));
             var pages = new List<string>();
-            for (uint index = 0; index < document.PageCount; index++)
+            for (var index = 0; index < document.PageCount; index++)
             {
                 var target = Path.Combine(folder, $"pagina-{index + 1:000}.png");
-                await RenderPageAsync(document, index, target, longEdge);
+                await document.RenderPageAsync(index, target, longEdge);
                 pages.Add(target);
             }
 
@@ -131,7 +131,7 @@ public static class DocumentImporter
             {
                 // Drawn aside and swapped in, so a failure halfway never leaves a half-written page.
                 var temporary = existing[index] + ".nuevo";
-                await RenderPageAsync(document, (uint)index, temporary, longEdge);
+                await document.RenderPageAsync(index, temporary, longEdge);
                 File.Move(temporary, existing[index], overwrite: true);
             }
 
@@ -161,7 +161,7 @@ public static class DocumentImporter
             // PowerPoint takes its time with a big deck, and it is driven
             // through COM, which blocks whoever calls it. Off the UI
             // thread, so the operator's window keeps answering.
-            if (await Task.Run(() => PowerPointConverter.ToPdf(path)) is not { } converted)
+            if (await Task.Run(() => PlatformServices.Decks?.ToPdf(path)) is not { } converted)
             {
                 return "Para traer una presentación de PowerPoint hace falta tener PowerPoint instalado en esta "
                     + "computadora. Si no lo tenés, abrila donde sí esté y guardala como PDF: el PDF entra sin problema.";
@@ -177,26 +177,10 @@ public static class DocumentImporter
         return null;
     }
 
-    private static async Task<PdfDocument> LoadAsync(string pdfPath) =>
-        await PdfDocument.LoadFromFileAsync(await StorageFile.GetFileFromPathAsync(pdfPath));
-
-    private static async Task RenderPageAsync(PdfDocument document, uint index, string target, int longEdge)
-    {
-        using var page = document.GetPage(index);
-
-        // Only one side is given and the other follows the page's shape.
-        var options = new PdfPageRenderOptions();
-        if (page.Size.Width >= page.Size.Height)
-            options.DestinationWidth = (uint)longEdge;
-        else
-            options.DestinationHeight = (uint)longEdge;
-
-        using var stream = new InMemoryRandomAccessStream();
-        await page.RenderToStreamAsync(stream, options);
-
-        using var output = File.Create(target);
-        await stream.AsStreamForRead().CopyToAsync(output);
-    }
+    private static Task<IRenderableDocument> LoadAsync(string pdfPath) =>
+        (PlatformServices.Documents
+            ?? throw new InvalidOperationException("No hay con qué dibujar las páginas de un PDF en este sistema."))
+        .OpenAsync(pdfPath);
 
     /// <summary>
     /// Deletes the image of a page the operator removed from the library, and

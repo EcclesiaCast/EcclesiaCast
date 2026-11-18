@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using EcclesiaCast.Core.Updates;
 
-namespace EcclesiaCast.App.Services;
+namespace EcclesiaCast.Platform.Windows;
 
 /// <summary>
 /// Starts the installer of an update. It asks for administrator permission

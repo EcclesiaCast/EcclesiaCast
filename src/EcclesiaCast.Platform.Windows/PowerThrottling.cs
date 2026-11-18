@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using Serilog;
 
-namespace EcclesiaCast.App.Services;
+namespace EcclesiaCast.Platform.Windows;
 
 /// <summary>
 /// Asks Windows not to run this process in "efficiency mode" (EcoQoS).

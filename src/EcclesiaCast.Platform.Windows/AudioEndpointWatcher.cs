@@ -1,8 +1,9 @@
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
+using EcclesiaCast.Presentation.Services;
 using Serilog;
 
-namespace EcclesiaCast.App.Services;
+namespace EcclesiaCast.Platform.Windows;
 
 /// <summary>
 /// Notices when Windows changes, adds or removes an audio output (the speakers

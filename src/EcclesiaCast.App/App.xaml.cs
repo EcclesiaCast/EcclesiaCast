@@ -9,7 +9,6 @@ using EcclesiaCast.Core.Displays;
 using EcclesiaCast.Core.Feedback;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Data.Persistence;
-using EcclesiaCast.Platform.Windows;
 using LibVLCSharp.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,6 +32,8 @@ public partial class App : Application
     private readonly WpfUiTimerFactory _uiTimers = new();
     private readonly WpfNotices _notices = new();
     private readonly WindowsPlatformPaths _paths = new();
+    private readonly WindowsPdfRenderer _documents = new();
+    private readonly PowerPointConverter _decks = new();
 
     public App()
     {
@@ -41,6 +42,8 @@ public partial class App : Application
         PlatformServices.Timers = _uiTimers;
         PlatformServices.Notices = _notices;
         PlatformServices.Paths = _paths;
+        PlatformServices.Documents = _documents;
+        PlatformServices.Decks = _decks;
     }
 
     protected override void OnStartup(StartupEventArgs e)
@@ -179,6 +182,8 @@ public partial class App : Application
         services.AddSingleton<INotices>(_notices);
         services.AddSingleton<IPlatformPaths>(_paths);
         services.AddSingleton<IVideoEngine>(videoEngine);
+        services.AddSingleton<IDocumentRenderer>(_documents);
+        services.AddSingleton<IDeckConverter>(_decks);
         services.AddSingleton<IDialogs, WpfDialogs>();
         services.AddSingleton<IImageFactory, WpfImageFactory>();
         services.AddSingleton<IFontCatalog, WpfFontCatalog>();

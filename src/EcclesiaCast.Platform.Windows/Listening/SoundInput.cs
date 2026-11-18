@@ -2,7 +2,7 @@ using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using Serilog;
 
-namespace EcclesiaCast.App.Services.Listening;
+namespace EcclesiaCast.Platform.Windows.Listening;
 
 /// <summary>One place the program can listen to: a microphone or line input, or what this PC is playing.</summary>
 /// <param name="Id">The Windows id of the device; empty for the default input.</param>
