@@ -82,7 +82,14 @@ public sealed class WindowsSignatureReader : ISignatureReader
         string subject;
         try
         {
+            // .NET 10 marks CreateFromSignedFile obsolete (SYSLIB0057) and points to
+            // X509CertificateLoader, but the loader only reads loose certificates and
+            // PFX files, not the signature inside an .exe. Rewriting this would mean
+            // parsing the PE signature by hand and could change what the updater
+            // accepts, so the old call stays, silenced on these lines only.
+#pragma warning disable SYSLIB0057
             using var certificate = new X509Certificate2(X509Certificate.CreateFromSignedFile(path));
+#pragma warning restore SYSLIB0057
             subject = certificate.Subject;
         }
         catch (CryptographicException)

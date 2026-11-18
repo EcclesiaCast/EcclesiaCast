@@ -113,9 +113,13 @@ public sealed partial class MainViewModel
     private void LoadSongMaxLines()
     {
         // The field, not the property: nothing is open yet to rebuild.
+        // MVVMTK0034 asks for the property, but its setter would run
+        // OnSongMaxLinesChanged and write the setting back: silenced here only.
+#pragma warning disable MVVMTK0034
         _songMaxLines = int.TryParse(_settings.Get(SongMaxLinesKey), out var lines)
             ? Math.Clamp(lines, 0, SlideSplitter.MaxLinesLimit)
             : 0;
+#pragma warning restore MVVMTK0034
     }
 
     partial void OnSongMaxLinesChanged(int value)
