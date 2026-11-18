@@ -17,3 +17,16 @@ jobs:
         run: dotnet build --configuration Release
       - name: Test
         run: dotnet test --configuration Release --no-build --verbosity normal
+
+  # Core and Data are plain .NET, so their tests must also pass on a Mac with
+  # an Apple chip. The test project is targeted directly (not the solution)
+  # because the app itself is WPF and only builds on Windows.
+  test-mac:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 8.0.x
+      - name: Test
+        run: dotnet test tests/EcclesiaCast.Core.Tests --configuration Release --verbosity normal
