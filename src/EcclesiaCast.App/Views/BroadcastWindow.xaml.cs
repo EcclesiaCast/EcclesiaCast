@@ -13,13 +13,13 @@ namespace EcclesiaCast.App.Views;
 public partial class BroadcastWindow : Window
 {
     private readonly RemoteControlServer _server;
-    private readonly ISettingsStore _settings;
+    private readonly Action<Window> _editStyles;
 
-    public BroadcastWindow(RemoteControlServer server, ISettingsStore settings)
+    public BroadcastWindow(RemoteControlServer server, Action<Window> editStyles)
     {
         InitializeComponent();
         _server = server;
-        _settings = settings;
+        _editStyles = editStyles;
         BroadcastBox.Text = server.BroadcastAddress;
     }
 
@@ -55,8 +55,7 @@ public partial class BroadcastWindow : Window
         }
     }
 
-    private void EditStyles_Click(object sender, RoutedEventArgs e) =>
-        new BroadcastStyleWindow(_settings) { Owner = this }.ShowDialog();
+    private void EditStyles_Click(object sender, RoutedEventArgs e) => _editStyles(this);
 
     private void Done_Click(object sender, RoutedEventArgs e) => Close();
 }

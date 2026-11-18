@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using EcclesiaCast.Presentation.Remote;
+using EcclesiaCast.Presentation.ViewModels;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Remote;
@@ -38,11 +39,7 @@ public partial class BroadcastStyleWindow : Window
         + "radial-gradient(60% 40% at 50% 105%, rgba(255,255,255,.14), transparent 70%),"
         + "linear-gradient(135deg, #3a1c6b 0%, #1a1747 45%, #0c1230 100%)';";
 
-    private readonly ISettingsStore _settings;
-    /// <summary>What was saved when the window opened. The stream shows the draft while editing, and goes back to this on Cancelar.</summary>
-    private readonly BroadcastStyles _saved = BroadcastStyleSettings.Current;
-    private BroadcastStyles _draft = BroadcastStyleSettings.Current;
-    private OutputChannel _channel = OutputChannel.Bible;
+    private readonly BroadcastStyleViewModel _vm;
 
     /// <summary>True while the controls are being filled from a style, so filling does not count as editing.</summary>
     private bool _loading = true;
@@ -52,10 +49,10 @@ public partial class BroadcastStyleWindow : Window
     private bool _pageLoaded;
     private string? _mappedFolder;
 
-    public BroadcastStyleWindow(ISettingsStore settings)
+    public BroadcastStyleWindow(BroadcastStyleViewModel viewModel)
     {
         InitializeComponent();
-        _settings = settings;
+        _vm = viewModel;
 
         FontCombo.ItemsSource = System.Windows.Media.Fonts.SystemFontFamilies
             .Select(f => f.Source)
@@ -82,15 +79,14 @@ public partial class BroadcastStyleWindow : Window
         {
             _web?.Dispose();
             // Closed without saving: the stream goes back to what was saved.
-            if (DialogResult != true)
-                BroadcastStyleSettings.Preview(_saved);
+            _vm.Closed();
         };
 
         Fill();
         _ready = true;
     }
 
-    private BroadcastStyle Current => _draft.For(_channel);
+    private BroadcastStyle Current => _vm.Current;
 
     // ── Controls ↔ style ─────────────────────────────────────────
 
@@ -192,13 +188,13 @@ public partial class BroadcastStyleWindow : Window
         if (_loading)
             return;
 
-        _draft = _draft.With(_channel, Read().Clamp());
+        _vm.Edit(Read());
 
         // Choosing «Imagen o video…» with no file yet asks for one right away;
         // if none is picked the background goes back to transparent.
         if (ReferenceEquals(sender, BgFile) && string.IsNullOrEmpty(Current.BackgroundFile) && !AskForFile())
         {
-            _draft = _draft.With(_channel, Current with { Background = BroadcastBackground.None });
+            _vm.ClearBackground();
             _loading = true;
             Pick("None", BgNone, BgColor, BgFile);
             _loading = false;
@@ -215,7 +211,7 @@ public partial class BroadcastStyleWindow : Window
         if (!_ready || sender is not RadioButton { Tag: string name } || !Enum.TryParse<OutputChannel>(name, out var channel))
             return;
 
-        _channel = channel;
+        _vm.Channel = channel;
         Fill();
     }
 
@@ -287,29 +283,8 @@ public partial class BroadcastStyleWindow : Window
         if (sender is not FrameworkElement { Tag: string which })
             return;
 
-        var s = Current;
-        var current = which switch
-        {
-            "Text" => s.TextColor,
-            "Accent" => s.AccentColor,
-            "Plate" => s.PlateColor,
-            "BoxBorder" => s.BoxBorderColor,
-            _ => s.BackgroundColor,
-        };
-
-        var picked = ColorPickerHelper.Pick(current);
-        if (picked is null)
-            return;
-
-        _draft = _draft.With(_channel, (which switch
-        {
-            "Text" => s with { TextColor = picked },
-            "Accent" => s with { AccentColor = picked },
-            "Plate" => s with { PlateColor = picked },
-            "BoxBorder" => s with { BoxBorderColor = picked },
-            _ => s with { BackgroundColor = picked },
-        }).Clamp());
-        Refresh();
+        if (_vm.PickColor(which))
+            Refresh();
     }
 
     private void PickFile_Click(object sender, RoutedEventArgs e)
@@ -329,7 +304,7 @@ public partial class BroadcastStyleWindow : Window
         if (dialog.ShowDialog(this) != true)
             return false;
 
-        _draft = _draft.With(_channel, Current with { BackgroundFile = dialog.FileName, Background = BroadcastBackground.File });
+        _vm.SetBackgroundFile(dialog.FileName);
         return true;
     }
 
@@ -338,25 +313,19 @@ public partial class BroadcastStyleWindow : Window
         if (sender is not FrameworkElement { Tag: BroadcastPreset preset })
             return;
 
-        _draft = _draft.With(_channel, preset.ApplyTo(Current));
+        _vm.ApplyPreset(preset);
         Fill();
     }
 
     private void Defaults_Click(object sender, RoutedEventArgs e)
     {
-        _draft = _draft.With(_channel, BroadcastStyle.Default(_channel));
+        _vm.ResetToDefaults();
         Fill();
     }
 
     private void Save_Click(object sender, RoutedEventArgs e)
     {
-        foreach (var channel in new[] { OutputChannel.Bible, OutputChannel.Songs, OutputChannel.Announcements })
-        {
-            // The stream already shows the draft, so it is compared with what was saved.
-            if (_draft.For(channel) != _saved.For(channel))
-                BroadcastStyleSettings.Set(channel, _draft.For(channel), _settings);
-        }
-
+        _vm.Save();
         DialogResult = true;
     }
 
@@ -414,7 +383,7 @@ public partial class BroadcastStyleWindow : Window
         _web.Height = height;
     }
 
-    private (string Main, string Label) Sample() => _channel switch
+    private (string Main, string Label) Sample() => _vm.Channel switch
     {
         OutputChannel.Songs => ("Santo, santo, santo, Señor omnipotente", "CORO"),
         OutputChannel.Announcements => ("Reunión de jóvenes · Sábado 19 h", string.Empty),
