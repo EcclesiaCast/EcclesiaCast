@@ -29,6 +29,10 @@ public sealed partial class MainViewModel
     public bool HasMediaFile(string path) =>
         _allMedia.Any(m => string.Equals(m.Path, path, StringComparison.OrdinalIgnoreCase));
 
+    /// <summary>Where a result is (or would be) saved, for «Ya está en tus medios».</summary>
+    public string PixabayFilePath(PixabayHit hit, string query) =>
+        Path.Combine(PixabayFolder, PixabayBackgrounds.FileName(hit, query));
+
     /// <summary>
     /// One page of results. Throws <see cref="PixabaySearchException"/> with a
     /// sentence for the operator when it can not search.
