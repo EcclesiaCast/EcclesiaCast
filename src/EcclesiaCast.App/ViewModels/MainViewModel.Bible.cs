@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EcclesiaCast.Presentation.Remote;
@@ -85,7 +84,7 @@ public sealed partial class MainViewModel
         if (option is null)
             return;
 
-        if ((System.Windows.Input.Keyboard.Modifiers & System.Windows.Input.ModifierKeys.Control) == 0)
+        if (!_keyboard.IsControlDown)
         {
             SelectSoloVersion(option);
             return;
@@ -511,15 +510,13 @@ public sealed partial class MainViewModel
     /// </summary>
     private List<BibleBookInfo> FilterBooks(string? typed)
     {
-        var view = System.Windows.Data.CollectionViewSource.GetDefaultView(BibleBooksAvailable);
         if (string.IsNullOrWhiteSpace(typed))
         {
-            if (view.Filter is not null)
-                view.Filter = null;
+            _listFilter.Apply(BibleBooksAvailable, null);
             return BibleBooksAvailable.ToList();
         }
 
-        view.Filter = item => item is BibleBookInfo book && BibleBookCatalog.StartsWith(book, typed);
+        _listFilter.Apply(BibleBooksAvailable, book => BibleBookCatalog.StartsWith(book, typed));
         return BibleBooksAvailable.Where(b => BibleBookCatalog.StartsWith(b, typed)).ToList();
     }
 
@@ -616,7 +613,7 @@ public sealed partial class MainViewModel
 
             // A verse too long to read in one slide goes over several,
             // rather than shrinking past the theme's minimum.
-            var parts = Controls.SlideTextFit.SplitToFit(
+            var parts = _textMeasurer.SplitToFit(
                 new SlideContent(mainText, caption, group.SecondaryText, theme), label, secondaryLabel);
 
             for (var part = 0; part < parts.Count; part++)
@@ -1035,34 +1032,33 @@ public sealed partial class MainViewModel
     [RelayCommand]
     private void ShowBibleFormatHelp()
     {
-        var window = new Views.BibleFormatHelpWindow { Owner = Application.Current.MainWindow };
-        window.ShowDialog();
-        if (window.ImportRequested)
+        if (_bibleFormatHelp.Show())
             ImportBible();
     }
 
     [RelayCommand]
     private void ImportBible()
     {
-        var dialog = new Microsoft.Win32.OpenFileDialog
-        {
-            Title = "Importar Biblia",
-            Filter = "Biblias (*.json, *.xml)|*.json;*.xml|JSON|*.json|Zefania XML|*.xml",
-        };
-        if (dialog.ShowDialog() != true)
+        var file = _dialogs.OpenFile(new OpenFileRequest("Importar Biblia",
+        [
+            new FileFilter("Biblias (*.json, *.xml)", ["*.json", "*.xml"]),
+            new FileFilter("JSON", ["*.json"]),
+            new FileFilter("Zefania XML", ["*.xml"]),
+        ]));
+        if (file is null)
             return;
 
         ParsedBible parsed;
         try
         {
-            var content = ReadTextFile(dialog.FileName);
-            parsed = Path.GetExtension(dialog.FileName).ToLowerInvariant() == ".xml"
+            var content = ReadTextFile(file);
+            parsed = Path.GetExtension(file).ToLowerInvariant() == ".xml"
                 ? ZefaniaBibleImporter.Parse(content)
                 : JsonBibleImporter.Parse(content);
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Falló el análisis de la Biblia {Path}", dialog.FileName);
+            Log.Error(ex, "Falló el análisis de la Biblia {Path}", file);
             Notice.Show(ex.Message + HelpHint, "No se pudo leer el archivo", NoticeKind.Error);
             return;
         }
@@ -1076,7 +1072,7 @@ public sealed partial class MainViewModel
             return;
         }
 
-        var suggestion = Path.GetFileNameWithoutExtension(dialog.FileName);
+        var suggestion = Path.GetFileNameWithoutExtension(file);
         var metadata = _bibleImportDialog.Prompt(suggestion);
         if (metadata is null)
             return;
@@ -1182,21 +1178,20 @@ public sealed partial class MainViewModel
 
         var invalid = Path.GetInvalidFileNameChars();
         var fileName = new string(target.Name.Select(c => invalid.Contains(c) ? '_' : c).ToArray());
-        var dialog = new Microsoft.Win32.SaveFileDialog
+        var path = _dialogs.SaveFile(new SaveFileRequest("Exportar Biblia",
+            [new FileFilter("Biblia (*.json)", ["*.json"])])
         {
-            Title = "Exportar Biblia",
-            Filter = "Biblia (*.json)|*.json",
             FileName = fileName + ".json",
             AddExtension = true,
-            DefaultExt = ".json",
-        };
-        if (dialog.ShowDialog() != true)
+            DefaultExtension = ".json",
+        });
+        if (path is null)
             return;
 
         try
         {
             var json = JsonBibleExporter.ToJson(_bibles.ReadVersion(target.Id));
-            File.WriteAllText(dialog.FileName, json, new UTF8Encoding(false));
+            File.WriteAllText(path, json, new UTF8Encoding(false));
         }
         catch (Exception ex)
         {
@@ -1206,6 +1201,6 @@ public sealed partial class MainViewModel
         }
 
         BibleStatusText = $"«{target.Name}» exportada. Se vuelve a traer con el botón 📥.";
-        Log.Information("Biblia exportada: {Name} a {Path}", target.Name, dialog.FileName);
+        Log.Information("Biblia exportada: {Name} a {Path}", target.Name, path);
     }
 }

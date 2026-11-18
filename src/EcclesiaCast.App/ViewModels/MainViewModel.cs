@@ -92,6 +92,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private readonly IWebEngine _webEngine;
     private readonly IYouTubeDownloadDialog _youTubeDownload;
     private readonly IShell _shell;
+    private readonly IKeyboardState _keyboard;
+    private readonly IListFilter _listFilter;
+    private readonly ITextMeasurer _textMeasurer;
+    private readonly IBibleFormatHelpDialog _bibleFormatHelp;
 
     /// <summary>Copied slide (label + text + style) for paste/duplicate.</summary>
     private (string Label, string Text, string? StyleJson)? _clipboardSlide;
@@ -399,8 +403,16 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         Func<ISongListener> newListener,
         ISoundInput soundInput,
         ISpeechEar speechEar,
-        IBiblePackageDialog biblePackageDialog)
+        IBiblePackageDialog biblePackageDialog,
+        IKeyboardState keyboard,
+        IListFilter listFilter,
+        ITextMeasurer textMeasurer,
+        IBibleFormatHelpDialog bibleFormatHelp)
     {
+        _keyboard = keyboard;
+        _listFilter = listFilter;
+        _textMeasurer = textMeasurer;
+        _bibleFormatHelp = bibleFormatHelp;
         _biblePackageDialog = biblePackageDialog;
         _newListener = newListener;
         _soundInput = soundInput;
