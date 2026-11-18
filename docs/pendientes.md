@@ -485,6 +485,11 @@ las respuestas automáticas de la tabla); toca dar estos pasos.
       NVI, NTV, LBLA…) NO se pueden tomar de ahí**: son de sus editoriales y la
       licencia de BibliaTodo dice que los recursos de terceros conservan sus
       condiciones (punto 8).
+- [ ] **Detalle visto el 17/11 armando las historias:** con un video que rellena
+      sus bordes con «el mismo video, desenfocado», el **panel LIVE** muestra los
+      bordes con su imagen fija (el primer cuadro), no con el video: con
+      `presentacion-v3-final.mp4` se veían de color crema. En la salida real
+      está bien (el video desenfocado). Chico.
 - [ ] **Para próximas versiones (pedidos del 17/11/2026):**
       1. **Máximo de caracteres por versículo:** poder poner el tope; si el
          versículo lo pasa, se corta y sigue en la diapositiva que viene.
