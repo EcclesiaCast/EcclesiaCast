@@ -1,7 +1,6 @@
 using CommunityToolkit.Mvvm.Input;
 using System.IO;
 using System.Net.Http;
-using System.Windows;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Media;
 using Serilog;
@@ -15,16 +14,16 @@ namespace EcclesiaCast.App.ViewModels;
 public sealed partial class MainViewModel
 {
     /// <summary>Where the installer copies them, when the box was ticked.</summary>
-    private static string BundledBackgroundsFolder => Path.Combine(AppContext.BaseDirectory, "fondos");
+    private string BundledBackgroundsFolder => Path.Combine(_paths.BundledFolder, "fondos");
 
     /// <summary>
     /// Where the library keeps its own copy. The program's folder is replaced
     /// at every update and goes away with an uninstall; the library must not
     /// lose its pictures with it.
     /// </summary>
-    private static string SampleBackgroundsFolder => Path.Combine(App.DataDir, "fondos-de-ejemplo");
+    private string SampleBackgroundsFolder => Path.Combine(_paths.DataFolder, "fondos-de-ejemplo");
 
-    private static bool IsSampleBackground(string path) =>
+    private bool IsSampleBackground(string path) =>
         path.StartsWith(SampleBackgroundsFolder + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
@@ -63,7 +62,7 @@ public sealed partial class MainViewModel
                         Name = BundledBackgrounds.DisplayName(file),
                         Path = copy,
                         Type = MediaType.Video,
-                        ThumbnailPath = MediaThumbnails.Create(copy, MediaType.Video, videoEngine: null),
+                        ThumbnailPath = _thumbnails.Create(copy, MediaType.Video, videoEngine: null),
                         Category = BundledBackgrounds.Tab,
                         Behavior = MediaBehavior.Background,
                         // Drawn at 1920×1080 to loop without a seam, and silent.
@@ -96,7 +95,7 @@ public sealed partial class MainViewModel
     }
 
     /// <summary>Where the packs are unzipped: the library's own copy, like the sample backgrounds.</summary>
-    private static string PackBackgroundsFolder => Path.Combine(App.DataDir, "fondos-agregados");
+    private string PackBackgroundsFolder => Path.Combine(_paths.DataFolder, "fondos-agregados");
 
     /// <summary>
     /// «Fondos → Agregar paquete de fondos…»: unzips a pack of backgrounds
@@ -106,18 +105,15 @@ public sealed partial class MainViewModel
     [RelayCommand]
     private async Task ImportBackgroundPack()
     {
-        var dialog = new Microsoft.Win32.OpenFileDialog
-        {
-            Title = "Agregar paquete de fondos",
-            Filter = "Paquete de fondos (.zip)|*.zip",
-        };
-        if (dialog.ShowDialog() != true)
+        var zipFile = _dialogs.OpenFile(new OpenFileRequest("Agregar paquete de fondos",
+            [new FileFilter("Paquete de fondos (.zip)", ["*.zip"])]));
+        if (zipFile is null)
             return;
 
         try
         {
             StatusText = "Abriendo el paquete de fondos…";
-            var files = await Task.Run(() => BackgroundPack.Extract(dialog.FileName, PackBackgroundsFolder));
+            var files = await Task.Run(() => BackgroundPack.Extract(zipFile, PackBackgroundsFolder));
             if (files.Count == 0)
             {
                 StatusText = "El paquete no tiene videos ni imágenes para usar de fondo.";
@@ -144,7 +140,7 @@ public sealed partial class MainViewModel
                 Name = Path.GetFileNameWithoutExtension(file),
                 Path = file,
                 Type = type,
-                ThumbnailPath = MediaThumbnails.Create(file, type, videoEngine: null),
+                ThumbnailPath = _thumbnails.Create(file, type, videoEngine: null),
                 Category = BackgroundPack.Tab,
                 Behavior = MediaBehavior.Background,
                 Scaling = MediaScaling.Fill,

@@ -81,6 +81,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private readonly IDialogs _dialogs;
     private readonly IPlatformPaths _paths;
     private readonly IImageFactory _images;
+    private readonly IThumbnailer _thumbnails;
 
     /// <summary>Copied slide (label + text + style) for paste/duplicate.</summary>
     private (string Label, string Text, string? StyleJson)? _clipboardSlide;
@@ -371,8 +372,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         IUiTimerFactory timers,
         IDialogs dialogs,
         IPlatformPaths paths,
-        IImageFactory images)
+        IImageFactory images,
+        IThumbnailer thumbnails)
     {
+        _thumbnails = thumbnails;
         _images = images;
         _dialogs = dialogs;
         _paths = paths;
