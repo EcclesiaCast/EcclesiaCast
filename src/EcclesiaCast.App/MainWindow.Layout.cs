@@ -94,7 +94,7 @@ public partial class MainWindow
 
     /// <summary>The library is showing the Bible as a grid (and not the songs, or the Bible as a list).</summary>
     private bool LibraryWantsGrid =>
-        DataContext is ViewModels.MainViewModel { IsBibleTabActive: true, IsBibleGridView: true };
+        DataContext is Presentation.ViewModels.MainViewModel { IsBibleTabActive: true, IsBibleGridView: true };
 
     /// <summary>
     /// Switches the library column to the width of what it shows now: the
@@ -388,7 +388,7 @@ public partial class MainWindow
         rightRows[3].Height = new GridLength(_outputSplit ? 10 : 0);
         Grid.SetRow(LivePanel, _outputSplit && _liveAtBottom ? 2 : 0);
         Grid.SetRow(PreviewPanel, !_outputSplit ? 0 : _liveAtBottom ? 0 : 2);
-        if (DataContext is ViewModels.MainViewModel vm)
+        if (DataContext is Presentation.ViewModels.MainViewModel vm)
             vm.IsOutputMerged = !_outputSplit;
     }
 
@@ -436,14 +436,14 @@ public partial class MainWindow
         LeaveRail(() =>
         {
             _libraryCollapsed = false;
-            (DataContext as ViewModels.MainViewModel)?.ShowSongsTabCommand.Execute(null);
+            (DataContext as Presentation.ViewModels.MainViewModel)?.ShowSongsTabCommand.Execute(null);
         });
 
     private void LeftRail_Bible_Click(object sender, RoutedEventArgs e) =>
         LeaveRail(() =>
         {
             _libraryCollapsed = false;
-            (DataContext as ViewModels.MainViewModel)?.ShowBibleTabCommand.Execute(null);
+            (DataContext as Presentation.ViewModels.MainViewModel)?.ShowBibleTabCommand.Execute(null);
         });
 
     private void LeftRail_Playlist_Click(object sender, RoutedEventArgs e) =>

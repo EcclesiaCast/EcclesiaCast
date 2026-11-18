@@ -37,7 +37,7 @@ public partial class SettingsWindow : Window
 
     private void NewVideoColor_Click(object sender, RoutedEventArgs e)
     {
-        if (DataContext is ViewModels.MainViewModel vm
+        if (DataContext is Presentation.ViewModels.MainViewModel vm
             && Services.ColorPickerHelper.Pick(vm.NewVideoFitColor) is { } picked)
             vm.NewVideoFitColor = picked;
     }

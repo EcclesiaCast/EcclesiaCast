@@ -7,7 +7,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using EcclesiaCast.App.Controls;
 using EcclesiaCast.App.Services;
-using EcclesiaCast.App.ViewModels;
+using EcclesiaCast.Presentation.ViewModels;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Audio;
 using EcclesiaCast.Core.Bible;
@@ -848,7 +848,7 @@ public partial class MainWindow : Window
     /// </summary>
     internal void OpenListening()
     {
-        if (DataContext is not ViewModels.MainViewModel { IsListeningAvailable: true })
+        if (DataContext is not Presentation.ViewModels.MainViewModel { IsListeningAvailable: true })
             return;
 
         if (DataContext is not MainViewModel vm)

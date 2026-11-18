@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
-using EcclesiaCast.App.ViewModels;
+using EcclesiaCast.Presentation.ViewModels;
 using EcclesiaCast.Core.Stage;
 
 namespace EcclesiaCast.App.Controls;

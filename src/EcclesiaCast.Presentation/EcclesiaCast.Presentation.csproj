@@ -11,6 +11,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <!-- The view models are in their own namespace and use the platform
+       interfaces and the services all the time. -->
+  <ItemGroup>
+    <Using Include="EcclesiaCast.Presentation.Platform" />
+    <Using Include="EcclesiaCast.Presentation.Services" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\EcclesiaCast.Core\EcclesiaCast.Core.csproj" />
     <ProjectReference Include="..\EcclesiaCast.Data\EcclesiaCast.Data.csproj" />

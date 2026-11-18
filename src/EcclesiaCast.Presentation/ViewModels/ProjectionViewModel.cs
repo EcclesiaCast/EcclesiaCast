@@ -1,0 +1,126 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using EcclesiaCast.Core.Presentation;
+
+namespace EcclesiaCast.Presentation.ViewModels;
+
+/// <summary>
+/// Bindable mirror of <see cref="IPresentationService"/>. The output window
+/// and the operator's Live preview both bind to this single instance, so
+/// they can never disagree about what is on the projector.
+/// </summary>
+public sealed partial class ProjectionViewModel : ObservableObject
+{
+    [ObservableProperty]
+    private SlideContent? _slide;
+
+    [ObservableProperty]
+    private OutputState _state;
+
+    [ObservableProperty]
+    private string? _overlay;
+
+    [ObservableProperty]
+    private HighlightSet _highlight = HighlightSet.None;
+
+    [ObservableProperty]
+    private EcclesiaCast.Core.Media.MediaItem? _background;
+
+    /// <summary>
+    /// How blurred the background is right now, 0–100. It lives here rather
+    /// than only on the media item so the operator can turn the dial mid-song
+    /// and see both previews and the projector follow immediately.
+    /// </summary>
+    [ObservableProperty]
+    private double _backgroundBlur;
+
+    /// <summary>
+    /// The picture the projector is drawing right now, shared with the
+    /// operator's Live panel so the video moves there too. Null for images,
+    /// for YouTube and when nothing is playing.
+    /// </summary>
+    [ObservableProperty]
+    private object? _liveFrame;
+
+    /// <summary>The moving picture of a video logo, for the operator's Live panel (it was black there).</summary>
+    [ObservableProperty]
+    private object? _liveLogoFrame;
+
+    /// <summary>
+    /// The background the PREVIEW draws behind the next slide: the live one,
+    /// unless it is a foreground announcement, which the next slide takes off.
+    /// </summary>
+    [ObservableProperty]
+    private EcclesiaCast.Core.Media.MediaItem? _previewBackground;
+
+    /// <summary>What fills the screen behind <see cref="PreviewBackground"/>.</summary>
+    [ObservableProperty]
+    private EcclesiaCast.Core.Media.MediaItem? _previewBackgroundFill;
+
+    /// <summary>What fills the screen behind a framed background.</summary>
+    [ObservableProperty]
+    private EcclesiaCast.Core.Media.MediaItem? _backgroundFill;
+
+    /// <summary>Notes for the platform, shown only on the stage display.</summary>
+    [ObservableProperty]
+    private string? _stageNotes;
+
+    /// <summary>
+    /// Typeface and size of the lower-third announcement. They come from the
+    /// operator's choice (the Aviso al pie tab), not from the presentation
+    /// service, so <see cref="Sync"/> leaves them alone.
+    /// </summary>
+    [ObservableProperty]
+    private string _overlayFontFamily = OverlayStyle.DefaultFont;
+
+    [ObservableProperty]
+    private double _overlayFontSize = OverlayStyle.DefaultSize;
+
+    /// <summary>The countdown running before the service, if any.</summary>
+    [ObservableProperty]
+    private Countdown? _countdown;
+
+    /// <summary>The logo the Logo state shows right now.</summary>
+    [ObservableProperty]
+    private EcclesiaCast.Core.Logos.Logo? _activeLogo;
+
+    /// <summary>
+    /// The slide after the live one. The stage display shows it so the singers
+    /// know what is coming; the operator sets it as the grid moves.
+    /// </summary>
+    [ObservableProperty]
+    private SlideContent? _nextSlide;
+
+    /// <summary>Label of the live slide ("Coro", "3:16"), for the stage display.</summary>
+    [ObservableProperty]
+    private string? _slideLabel;
+
+    /// <summary>
+    /// The service stopwatch and the timer of the section that is running.
+    /// Kept here so the stage screen and its copy in the operator's preview
+    /// read the same time as the Tiempos tab that sets them.
+    /// </summary>
+    public EcclesiaCast.Core.Timing.MeetingClocks Clocks { get; }
+
+    public ProjectionViewModel(IPresentationService presentation, EcclesiaCast.Core.Timing.MeetingClocks clocks)
+    {
+        Clocks = clocks;
+        presentation.Changed += (_, _) => Sync(presentation);
+        Sync(presentation);
+    }
+
+    private void Sync(IPresentationService presentation)
+    {
+        Slide = presentation.CurrentSlide;
+        State = presentation.State;
+        Overlay = presentation.OverlayMessage;
+        Highlight = presentation.Highlight;
+        Background = presentation.Background;
+        BackgroundBlur = presentation.Background?.Blur ?? 0;
+        BackgroundFill = presentation.BackgroundFill;
+        PreviewBackground = NextSlideBackground.Resolve(presentation.Background);
+        PreviewBackgroundFill = PreviewBackground is null ? null : presentation.BackgroundFill;
+        ActiveLogo = presentation.ActiveLogo;
+        Countdown = presentation.Countdown;
+        StageNotes = presentation.StageNotes;
+    }
+}

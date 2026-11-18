@@ -4,7 +4,7 @@ using System.Windows.Controls;
 using EcclesiaCast.App.Platform;
 using EcclesiaCast.App.Services.Listening;
 using EcclesiaCast.App.Services;
-using EcclesiaCast.App.ViewModels;
+using EcclesiaCast.Presentation.ViewModels;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Displays;
 using EcclesiaCast.Core.Feedback;

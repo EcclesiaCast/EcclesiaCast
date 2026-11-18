@@ -4,7 +4,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
-using EcclesiaCast.App.ViewModels;
+using EcclesiaCast.Presentation.ViewModels;
 using EcclesiaCast.Core.Media;
 
 namespace EcclesiaCast.App.Views;

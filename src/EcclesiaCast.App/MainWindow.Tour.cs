@@ -1,6 +1,6 @@
 using System.Windows;
 using System.Windows.Input;
-using EcclesiaCast.App.ViewModels;
+using EcclesiaCast.Presentation.ViewModels;
 using EcclesiaCast.Core.Ui;
 
 namespace EcclesiaCast.App;

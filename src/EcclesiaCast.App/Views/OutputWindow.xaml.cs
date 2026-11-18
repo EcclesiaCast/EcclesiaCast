@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Animation;
 using EcclesiaCast.App.Services;
-using EcclesiaCast.App.ViewModels;
+using EcclesiaCast.Presentation.ViewModels;
 using EcclesiaCast.Core.Displays;
 using EcclesiaCast.Core.Logos;
 using EcclesiaCast.Core.Media;

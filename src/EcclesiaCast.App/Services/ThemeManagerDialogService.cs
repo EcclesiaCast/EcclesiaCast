@@ -1,4 +1,4 @@
-using EcclesiaCast.App.ViewModels;
+using EcclesiaCast.Presentation.ViewModels;
 using EcclesiaCast.App.Views;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Songs;
