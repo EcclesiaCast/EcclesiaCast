@@ -2,6 +2,8 @@ using System.Windows;
 using EcclesiaCast.App.Views;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Songs;
+using EcclesiaCast.Core.Songs.Web;
+using EcclesiaCast.Presentation.ViewModels;
 
 namespace EcclesiaCast.App.Services;
 
@@ -9,12 +11,13 @@ public sealed class WebSongSearchDialogService(SongSaver songSaver, ISongReposit
 {
     public IReadOnlyList<Song> Show()
     {
-        var window = new WebSongSearchWindow(songSaver, songs)
+        var viewModel = new WebSongSearchViewModel(songSaver, songs, new WebSongClient());
+        var window = new WebSongSearchWindow(viewModel)
         {
             Owner = Application.Current.MainWindow,
         };
 
         window.ShowDialog();
-        return window.Imported;
+        return viewModel.Imported;
     }
 }

@@ -1,89 +1,87 @@
-using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
-using CommunityToolkit.Mvvm.ComponentModel;
 using EcclesiaCast.App.Services;
-using EcclesiaCast.Core.Abstractions;
-using EcclesiaCast.Core.Songs;
-using EcclesiaCast.Core.Songs.Web;
-using Serilog;
+using EcclesiaCast.Presentation.ViewModels;
 
 namespace EcclesiaCast.App.Views;
 
 /// <summary>
-/// Finds a song on the internet and brings it into the library in one step,
-/// instead of copying the lyrics from a browser and pasting them slide by
-/// slide.
-///
-/// One box covers the three ways people remember a song: its name, who sings
-/// it, or a line of the lyrics. musica.com is asked first, both through the
-/// quick search (names) and its full search (lines of lyrics); LRCLIB fills in
-/// for what musica.com does not have.
+/// Finds a song on the internet and brings it into the library in one step.
+/// The search, the choice of the result and the import are in
+/// <see cref="WebSongSearchViewModel"/>; what stays here is the invisible
+/// browser the full search of musica.com runs in, and placing the controls.
 /// </summary>
 public partial class WebSongSearchWindow : Window
 {
-    /// <summary>A result in the list.</summary>
-    public sealed partial class Row(WebSongHit hit, int rank) : ObservableObject
-    {
-        public WebSongHit Hit { get; } = hit;
-
-        /// <summary>Order of the source in the list: musica.com first, the fallback last.</summary>
-        public int Rank { get; } = rank;
-
-        public string Detail => Hit.Artist.Length > 0
-            ? $"{Hit.Artist} · {Hit.SourceName}"
-            : Hit.SourceName;
-
-        [ObservableProperty]
-        private bool _imported;
-    }
-
-    private const int QuickRank = 0;
-    private const int FullRank = 1;
-    private const int FallbackRank = 2;
-
-    private readonly SongSaver _songSaver;
-    private readonly WebSongClient _client = new();
-    private readonly ObservableCollection<Row> _results = [];
-    private readonly Dictionary<string, WebSong> _fetched = [];
-    private readonly List<SongTitle> _libraryTitles;
-    private readonly List<Song> _imported = [];
-    private readonly HashSet<string> _importedUrls = [];
-
+    private readonly WebSongSearchViewModel _viewModel;
     private MusicaComBrowserSearch? _browserSearch;
-    private CancellationTokenSource? _searchCancel;
-    private CancellationTokenSource? _previewCancel;
-    private Row? _previewRow;
 
-    public WebSongSearchWindow(SongSaver songSaver, ISongRepository songs)
+    /// <summary>True while the view model fills the fields: that is not the operator typing.</summary>
+    private bool _filling;
+
+    public WebSongSearchWindow(WebSongSearchViewModel viewModel)
     {
         InitializeComponent();
-        _songSaver = songSaver;
-        ResultsList.ItemsSource = _results;
+        _viewModel = viewModel;
+        ResultsList.ItemsSource = _viewModel.Results;
 
-        _libraryTitles = songs.GetTitles().ToList();
+        _viewModel.PropertyChanged += ViewModel_PropertyChanged;
+        _viewModel.PreviewTextChanged += FillPreview;
+        _viewModel.SelectRequested += row =>
+        {
+            if (ResultsList.SelectedItem is null)
+                ResultsList.SelectedItem = row;
+        };
+        _viewModel.ImportDone += () =>
+        {
+            QueryBox.Focus();
+            QueryBox.SelectAll();
+        };
 
         Loaded += (_, _) =>
         {
             if (WebViewProfile.IsRuntimeAvailable())
+            {
                 _browserSearch = new MusicaComBrowserSearch(new WindowInteropHelper(this).Handle);
+                _viewModel.BrowserSearch = _browserSearch.SearchAsync;
+            }
+
             QueryBox.Focus();
         };
 
         Closed += (_, _) =>
         {
-            _searchCancel?.Cancel();
-            _previewCancel?.Cancel();
             _browserSearch?.Dispose();
-            _client.Dispose();
+            _viewModel.Dispose();
         };
 
-        ShowEmptyPreview();
+        ShowState();
     }
 
-    /// <summary>Songs added to the library, in the order they were imported.</summary>
-    public IReadOnlyList<Song> Imported => _imported;
+    private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e) => ShowState();
+
+    private void ShowState()
+    {
+        SearchStatusText.Text = _viewModel.SearchStatus;
+        StatusText.Text = _viewModel.Status;
+        PreviewInfoText.Text = _viewModel.PreviewInfo;
+        ImportButton.IsEnabled = _viewModel.CanImport;
+        SourceLink.Visibility = _viewModel.SourceLinkVisible ? Visibility.Visible : Visibility.Collapsed;
+        SourceLinkText.Text = _viewModel.SourceLinkText.Length > 0 ? _viewModel.SourceLinkText : "Ver en la web";
+    }
+
+    private void FillPreview(string title, string artist, string lyrics, bool scrollToTop)
+    {
+        _filling = true;
+        TitleBox.Text = title;
+        ArtistBox.Text = artist;
+        LyricsBox.Text = lyrics;
+        _filling = false;
+        if (scrollToTop)
+            LyricsBox.ScrollToHome();
+    }
 
     // ── Búsqueda ─────────────────────────────────────────────────
 
@@ -97,193 +95,28 @@ public partial class WebSongSearchWindow : Window
 
     private void Search_Click(object sender, RoutedEventArgs e) => Search();
 
-    private async void Search()
-    {
-        var query = QueryBox.Text.Trim();
-        if (query.Length < 2)
-        {
-            SearchStatusText.Text = "Escribí al menos un par de letras.";
-            return;
-        }
-
-        _searchCancel?.Cancel();
-        var cancel = (_searchCancel = new CancellationTokenSource()).Token;
-
-        _results.Clear();
-        ShowEmptyPreview();
-        SearchStatusText.Text = "Buscando en musica.com…";
-
-        var failures = new List<string>();
-
-        async Task Collect(int rank, string source, Func<Task<IReadOnlyList<WebSongHit>>> search)
-        {
-            try
-            {
-                var hits = await search();
-                if (!cancel.IsCancellationRequested)
-                    AddResults(rank, hits);
-            }
-            catch (OperationCanceledException) when (cancel.IsCancellationRequested)
-            {
-            }
-            catch (Exception ex)
-            {
-                Log.Warning(ex, "Falló la búsqueda de canciones en {Source} ({Query})", source, query);
-                failures.Add(source);
-            }
-        }
-
-        var searches = new List<Task>
-        {
-            Collect(QuickRank, "musica.com", () => _client.SearchMusicaComAsync(query, cancel)),
-            Collect(FallbackRank, "lrclib.net", () => _client.SearchLrclibAsync(query, cancel)),
-        };
-        if (_browserSearch is { } browser)
-            searches.Add(Collect(FullRank, "musica.com (por frase)", () => browser.SearchAsync(query, cancel)));
-
-        await Task.WhenAll(searches);
-        if (cancel.IsCancellationRequested)
-            return;
-
-        SearchStatusText.Text = _results.Count switch
-        {
-            0 when failures.Count == searches.Count =>
-                "No me pude conectar. ¿Hay internet en esta computadora?",
-            0 => "No encontré nada. Probá con otras palabras, o con una frase distinta de la letra.",
-            1 => "1 resultado.",
-            _ => $"{_results.Count} resultados.",
-        };
-
-        if (failures.Count > 0 && _results.Count > 0)
-            SearchStatusText.Text += $" (No respondió: {string.Join(", ", failures)}.)";
-    }
-
-    /// <summary>
-    /// Adds a source's results in its place in the list as soon as they
-    /// arrive: the quick search answers in a moment, the full one takes a few
-    /// seconds, and there is no reason to make the operator wait for both.
-    /// </summary>
-    private void AddResults(int rank, IReadOnlyList<WebSongHit> hits)
-    {
-        foreach (var hit in hits)
-        {
-            if (_results.Any(r => r.Hit.Url == hit.Url))
-                continue;
-
-            var index = 0;
-            while (index < _results.Count && _results[index].Rank <= rank)
-                index++;
-
-            _results.Insert(index, new Row(hit, rank) { Imported = _importedUrls.Contains(hit.Url) });
-        }
-
-        if (_results.Count > 0)
-        {
-            SearchStatusText.Text = $"{_results.Count} resultados hasta ahora… sigo buscando.";
-            if (ResultsList.SelectedItem is null)
-                ResultsList.SelectedIndex = 0;
-        }
-    }
+    private async void Search() => await _viewModel.SearchAsync(QueryBox.Text);
 
     // ── Vista previa ─────────────────────────────────────────────
 
     private async void Results_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
     {
-        if (ResultsList.SelectedItem is not Row row || row == _previewRow)
+        if (ResultsList.SelectedItem is not WebSongRow row)
             return;
 
-        _previewCancel?.Cancel();
-        var cancel = (_previewCancel = new CancellationTokenSource()).Token;
-
-        _previewRow = row;
-        ImportButton.IsEnabled = false;
-        TitleBox.Text = row.Hit.Title;
-        ArtistBox.Text = row.Hit.Artist;
-        LyricsBox.Text = string.Empty;
-        SourceLink.Visibility = Visibility.Visible;
-        SourceLinkText.Text = $"Ver en {row.Hit.SourceName}";
-        PreviewInfoText.Text = "Trayendo la letra…";
-
-        WebSong? song;
-        try
-        {
-            if (!_fetched.TryGetValue(row.Hit.Url, out song))
-            {
-                song = await _client.GetSongAsync(row.Hit, cancel);
-                if (song is not null)
-                    _fetched[row.Hit.Url] = song;
-            }
-        }
-        catch (OperationCanceledException) when (cancel.IsCancellationRequested)
-        {
-            return;
-        }
-        catch (Exception ex)
-        {
-            // Mostly no connection or a timeout; nothing here is worth crashing over.
-            Log.Warning(ex, "No se pudo traer la letra de {Url}", row.Hit.Url);
-            PreviewInfoText.Text = "No pude traer la letra. Revisá la conexión y volvé a elegirla.";
-            _previewRow = null;
-            return;
-        }
-
-        if (cancel.IsCancellationRequested)
-            return;
-
-        if (song is null)
-        {
-            PreviewInfoText.Text = "Esa página no tiene la letra. Probá con otro resultado.";
-            return;
-        }
-
-        TitleBox.Text = song.Title;
-        ArtistBox.Text = song.Artist;
-        LyricsBox.Text = song.Lyrics;
-        LyricsBox.ScrollToHome();
-        UpdatePreviewInfo();
+        await _viewModel.ShowPreviewAsync(row);
     }
 
     private void Preview_Changed(object sender, System.Windows.Controls.TextChangedEventArgs e)
     {
-        if (_previewRow is not null && LyricsBox.Text.Length > 0)
-            UpdatePreviewInfo();
-    }
-
-    private void UpdatePreviewInfo()
-    {
-        var slides = LyricsParser.Parse(LyricsBox.Text).Count;
-        var title = TitleBox.Text.Trim();
-
-        var info = slides == 1 ? "1 diapositiva." : $"{slides} diapositivas.";
-        var artist = ArtistBox.Text.Trim();
-        if (title.Length > 0 && SongTitles.FindSame(_libraryTitles, title, artist) is not null)
-            info += $"  Ojo: ya tenés una canción llamada «{title}» en la biblioteca; al importar te pregunto qué hacer.";
-
-        PreviewInfoText.Text = info;
-        ImportButton.IsEnabled = slides > 0 && title.Length > 0;
-    }
-
-    private void ShowEmptyPreview()
-    {
-        _previewCancel?.Cancel();
-        _previewRow = null;
-        TitleBox.Text = string.Empty;
-        ArtistBox.Text = string.Empty;
-        LyricsBox.Text = string.Empty;
-        SourceLink.Visibility = Visibility.Collapsed;
-        PreviewInfoText.Text = "Elegí un resultado para ver la letra.";
-        ImportButton.IsEnabled = false;
+        if (!_filling)
+            _viewModel.PreviewEdited(TitleBox.Text, ArtistBox.Text, LyricsBox.Text);
     }
 
     private void OpenSource_Click(object sender, RoutedEventArgs e)
     {
-        if (_previewRow is null)
+        if (_viewModel.SourceUrl is not { } url)
             return;
-
-        // LRCLIB's link is the API; its site has no page per song worth opening.
-        var url = _previewRow.Hit.Source == WebSongSource.Lrclib
-            ? $"https://lrclib.net/search/{Uri.EscapeDataString(_previewRow.Hit.Title + " " + _previewRow.Hit.Artist)}"
-            : _previewRow.Hit.Url;
 
         System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
         {
@@ -294,52 +127,6 @@ public partial class WebSongSearchWindow : Window
 
     // ── Importación ──────────────────────────────────────────────
 
-    private void Import_Click(object sender, RoutedEventArgs e)
-    {
-        var title = TitleBox.Text.Trim();
-        var sections = LyricsParser.Parse(LyricsBox.Text);
-        if (title.Length == 0 || sections.Count == 0)
-            return;
-
-        try
-        {
-            // A repeated title is asked about: replace, keep both or drop it.
-            var outcome = _songSaver.Begin().Save(new Song
-            {
-                Title = title,
-                Artist = ArtistBox.Text.Trim(),
-                Sections = sections,
-            });
-
-            if (outcome.Song is not { } song)
-            {
-                StatusText.Text = $"«{title}» no se importó: ya estaba en tu biblioteca.";
-                return;
-            }
-
-            title = song.Title;
-            _imported.RemoveAll(s => s.Id == song.Id);
-            _imported.Add(song);
-            _libraryTitles.Add(new SongTitle(song.Id, title, song.Artist));
-            if (_previewRow is not null)
-            {
-                _previewRow.Imported = true;
-                _importedUrls.Add(_previewRow.Hit.Url);
-            }
-
-            Log.Information("Canción importada de {Url}: {Title}", _previewRow?.Hit.Url, title);
-            StatusText.Text = _imported.Count == 1
-                ? $"«{title}» ya está en tu biblioteca. Podés buscar otra o cerrar."
-                : $"«{title}» ya está en tu biblioteca ({_imported.Count} importadas). Podés buscar otra o cerrar.";
-            UpdatePreviewInfo();
-            QueryBox.Focus();
-            QueryBox.SelectAll();
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "No se pudo guardar la canción {Title}", title);
-            Notice.Show("El detalle está en el registro de la aplicación.",
-                "No se pudo guardar la canción", NoticeKind.Error);
-        }
-    }
+    private void Import_Click(object sender, RoutedEventArgs e) =>
+        _viewModel.Import(TitleBox.Text, ArtistBox.Text, LyricsBox.Text);
 }

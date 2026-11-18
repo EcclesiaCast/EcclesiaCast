@@ -9,7 +9,7 @@ namespace EcclesiaCast.Core.Songs.Web;
 /// lyrics) runs inside a browser and lives in the app; this class covers
 /// what plain HTTP can reach.
 /// </summary>
-public sealed class WebSongClient : IDisposable
+public sealed class WebSongClient : IWebSongSource
 {
     private readonly HttpClient _http;
 

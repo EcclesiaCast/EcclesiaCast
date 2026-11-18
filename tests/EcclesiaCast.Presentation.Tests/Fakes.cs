@@ -239,3 +239,75 @@ internal sealed class FixedColorPicker(string? picked) : IColorPicker
         return picked;
     }
 }
+
+/// <summary>Answers «Choose» with the option the test picked (-1: the window was closed) and writes down what was asked.</summary>
+internal sealed class ScriptedPrompt(int choice = 0) : ITextPrompt
+{
+    public List<string> Messages { get; } = [];
+
+    public string? Ask(string title, string message, string initialValue = "") => null;
+
+    public int Choose(string title, string message, IReadOnlyList<string> options)
+    {
+        Messages.Add(message);
+        return choice;
+    }
+
+    public (int Index, bool Repeat) ChooseAndRemember(
+        string title, string message, IReadOnlyList<string> options, string? rememberLabel)
+    {
+        Messages.Add(message);
+        return (choice, false);
+    }
+
+    public (string First, string Second)? AskTwo(
+        string title, string firstLabel, string firstValue, string secondLabel, string secondValue) => null;
+}
+
+/// <summary>
+/// Songs «on the internet» that the test hands over: what each search answers,
+/// what each page holds, and what failed. Writes down what was asked.
+/// </summary>
+internal sealed class FakeWebSongs : EcclesiaCast.Core.Songs.Web.IWebSongSource
+{
+    public List<EcclesiaCast.Core.Songs.Web.WebSongHit> Quick { get; } = [];
+
+    public List<EcclesiaCast.Core.Songs.Web.WebSongHit> Fallback { get; } = [];
+
+    public Dictionary<string, EcclesiaCast.Core.Songs.Web.WebSong?> Pages { get; } = [];
+
+    public bool QuickFails { get; set; }
+
+    public bool FallbackFails { get; set; }
+
+    public bool PagesFail { get; set; }
+
+    public List<string> Queries { get; } = [];
+
+    public List<string> PagesAsked { get; } = [];
+
+    public bool Disposed { get; private set; }
+
+    public Task<IReadOnlyList<EcclesiaCast.Core.Songs.Web.WebSongHit>> SearchMusicaComAsync(string query, CancellationToken cancel = default)
+    {
+        Queries.Add(query);
+        return QuickFails
+            ? Task.FromException<IReadOnlyList<EcclesiaCast.Core.Songs.Web.WebSongHit>>(new HttpRequestException("sin internet"))
+            : Task.FromResult<IReadOnlyList<EcclesiaCast.Core.Songs.Web.WebSongHit>>(Quick.ToList());
+    }
+
+    public Task<IReadOnlyList<EcclesiaCast.Core.Songs.Web.WebSongHit>> SearchLrclibAsync(string query, CancellationToken cancel = default) =>
+        FallbackFails
+            ? Task.FromException<IReadOnlyList<EcclesiaCast.Core.Songs.Web.WebSongHit>>(new HttpRequestException("sin internet"))
+            : Task.FromResult<IReadOnlyList<EcclesiaCast.Core.Songs.Web.WebSongHit>>(Fallback.ToList());
+
+    public Task<EcclesiaCast.Core.Songs.Web.WebSong?> GetSongAsync(EcclesiaCast.Core.Songs.Web.WebSongHit hit, CancellationToken cancel = default)
+    {
+        PagesAsked.Add(hit.Url);
+        if (PagesFail)
+            return Task.FromException<EcclesiaCast.Core.Songs.Web.WebSong?>(new HttpRequestException("sin internet"));
+        return Task.FromResult(Pages.GetValueOrDefault(hit.Url));
+    }
+
+    public void Dispose() => Disposed = true;
+}
