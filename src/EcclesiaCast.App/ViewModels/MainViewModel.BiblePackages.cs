@@ -13,17 +13,17 @@ namespace EcclesiaCast.App.ViewModels;
 /// </summary>
 public sealed partial class MainViewModel
 {
-    private readonly IBiblePackageDialog _biblePackageDialog = new BiblePackageDialogService();
+    private readonly IBiblePackageDialog _biblePackageDialog;
 
     /// <summary>Where the installer copies the Bibles that were ticked.</summary>
-    private static string BundledBiblesFolder => Path.Combine(AppContext.BaseDirectory, "bibles");
+    private string BundledBiblesFolder => Path.Combine(_paths.BundledFolder, "bibles");
 
     /// <summary>
     /// Where the installer copies the package the operator chose on its own
     /// page. It is a folder apart so the start-up import (which brings in the
     /// free Bibles without asking) never takes it.
     /// </summary>
-    private static string InstalledPackageFolder => Path.Combine(BundledBiblesFolder, "paquete");
+    private string InstalledPackageFolder => Path.Combine(BundledBiblesFolder, "paquete");
 
     /// <summary>
     /// At start-up, brings into the library the Bibles the installer left that
@@ -82,18 +82,16 @@ public sealed partial class MainViewModel
         if (chosen is null)
             return;
 
-        var dialog = new Microsoft.Win32.SaveFileDialog
+        var path = _dialogs.SaveFile(new SaveFileRequest("Exportar paquete de Biblias",
+            [new FileFilter("Paquete de Biblias (*.ecbiblias)", ["*.ecbiblias"])])
         {
-            Title = "Exportar paquete de Biblias",
-            Filter = "Paquete de Biblias (*.ecbiblias)|*.ecbiblias",
             FileName = "Biblias" + BiblePackage.Extension,
             AddExtension = true,
-            DefaultExt = BiblePackage.Extension,
-        };
-        if (dialog.ShowDialog() != true)
+            DefaultExtension = BiblePackage.Extension,
+        });
+        if (path is null)
             return;
 
-        var path = dialog.FileName;
         StatusText = "Guardando el paquete de Biblias…";
         try
         {
@@ -135,15 +133,12 @@ public sealed partial class MainViewModel
     [RelayCommand]
     private async Task ImportBiblePackageAsync()
     {
-        var dialog = new Microsoft.Win32.OpenFileDialog
-        {
-            Title = "Importar paquete de Biblias",
-            Filter = "Paquete de Biblias (*.ecbiblias)|*.ecbiblias",
-        };
-        if (dialog.ShowDialog() != true)
+        var file = _dialogs.OpenFile(new OpenFileRequest("Importar paquete de Biblias",
+            [new FileFilter("Paquete de Biblias (*.ecbiblias)", ["*.ecbiblias"])]));
+        if (file is null)
             return;
 
-        await ImportBiblePackageFileAsync(dialog.FileName);
+        await ImportBiblePackageFileAsync(file);
     }
 
     private async Task ImportBiblePackageFileAsync(string path)

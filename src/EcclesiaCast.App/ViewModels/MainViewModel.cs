@@ -398,8 +398,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         IWindowPickerDialog windowPicker,
         Func<ISongListener> newListener,
         ISoundInput soundInput,
-        ISpeechEar speechEar)
+        ISpeechEar speechEar,
+        IBiblePackageDialog biblePackageDialog)
     {
+        _biblePackageDialog = biblePackageDialog;
         _newListener = newListener;
         _soundInput = soundInput;
         _speechEar = speechEar;

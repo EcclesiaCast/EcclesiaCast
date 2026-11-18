@@ -226,6 +226,7 @@ public partial class App : Application
         services.AddSingleton<IBackupDialog>(_ => new BackupDialogService(dbPath));
         services.AddSingleton<ICountdownDialog, CountdownDialogService>();
         services.AddSingleton<ILightCopyDialog, LightCopyDialogService>();
+        services.AddSingleton<IBiblePackageDialog, BiblePackageDialogService>();
         services.AddSingleton<ISoundInput, WindowsSoundInput>();
         services.AddSingleton<ISpeechEar, SpeechEarModel>();
         services.AddSingleton<Func<ISongListener>>(sp =>
