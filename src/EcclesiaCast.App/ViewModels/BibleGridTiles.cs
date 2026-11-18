@@ -1,4 +1,3 @@
-using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using EcclesiaCast.Core.Bible;
 
@@ -13,9 +12,10 @@ public sealed partial class BibleBookTile : ObservableObject
         Abbreviation = BibleBookGroups.Abbreviation(info);
         var group = BibleBookGroups.GroupOf(info.Number);
         GroupName = BibleBookGroups.GroupName(group);
-        var color = (Color)ColorConverter.ConvertFromString(BibleBookGroups.ColorHex(group));
-        AccentBrush = Freeze(new SolidColorBrush(color));
-        FillBrush = Freeze(new SolidColorBrush(Color.FromArgb(0x30, color.R, color.G, color.B)));
+        // «#RRGGBB» for the border and the letters, and the same colour at
+        // low opacity («#AARRGGBB») for the fill; the screen makes the brushes.
+        AccentColor = BibleBookGroups.ColorHex(group);
+        FillColor = "#30" + AccentColor[1..];
     }
 
     public BibleBookInfo Info { get; }
@@ -23,8 +23,8 @@ public sealed partial class BibleBookTile : ObservableObject
     public string Name => Info.Name;
     public string Abbreviation { get; }
     public string GroupName { get; }
-    public Brush AccentBrush { get; }
-    public Brush FillBrush { get; }
+    public string AccentColor { get; }
+    public string FillColor { get; }
 
     [ObservableProperty]
     private bool _isSelected;
@@ -33,11 +33,6 @@ public sealed partial class BibleBookTile : ObservableObject
     [ObservableProperty]
     private BibleGridFormat _format;
 
-    private static SolidColorBrush Freeze(SolidColorBrush brush)
-    {
-        brush.Freeze();
-        return brush;
-    }
 }
 
 /// <summary>One numbered button in the verse grid.</summary>

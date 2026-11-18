@@ -1261,13 +1261,13 @@
                                                             </Button.ToolTip>
                                                             <Button.Template>
                                                                 <ControlTemplate TargetType="Button">
-                                                                    <Border x:Name="bd" Background="{Binding FillBrush}"
-                                                                            BorderBrush="{Binding AccentBrush}"
+                                                                    <Border x:Name="bd" Background="{Binding FillColor, Converter={StaticResource HexToBrush}}"
+                                                                            BorderBrush="{Binding AccentColor, Converter={StaticResource HexToBrush}}"
                                                                             BorderThickness="1" CornerRadius="4">
                                                                         <StackPanel VerticalAlignment="Center">
                                                                             <TextBlock x:Name="abbr" Text="{Binding Abbreviation}"
                                                                                        FontSize="{Binding DataContext.BibleTileAbbrSize, ElementName=BibleGridHost}" FontWeight="Bold"
-                                                                                       Foreground="{Binding AccentBrush}"
+                                                                                       Foreground="{Binding AccentColor, Converter={StaticResource HexToBrush}}"
                                                                                        HorizontalAlignment="Center"/>
                                                                             <TextBlock x:Name="full" Text="{Binding Name}"
                                                                                        FontSize="8.5"
@@ -1285,13 +1285,13 @@
                                                                             <Setter TargetName="abbr" Property="Visibility" Value="Collapsed"/>
                                                                             <Setter TargetName="full" Property="FontSize" Value="11"/>
                                                                             <Setter TargetName="full" Property="FontWeight" Value="SemiBold"/>
-                                                                            <Setter TargetName="full" Property="Foreground" Value="{Binding AccentBrush}"/>
+                                                                            <Setter TargetName="full" Property="Foreground" Value="{Binding AccentColor, Converter={StaticResource HexToBrush}}"/>
                                                                         </DataTrigger>
                                                                         <Trigger Property="IsMouseOver" Value="True">
                                                                             <Setter TargetName="bd" Property="BorderThickness" Value="2"/>
                                                                         </Trigger>
                                                                         <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                                            <Setter TargetName="bd" Property="Background" Value="{Binding AccentBrush}"/>
+                                                                            <Setter TargetName="bd" Property="Background" Value="{Binding AccentColor, Converter={StaticResource HexToBrush}}"/>
                                                                             <Setter TargetName="abbr" Property="Foreground" Value="{StaticResource BgBrush}"/>
                                                                             <Setter TargetName="full" Property="Foreground" Value="{StaticResource BgBrush}"/>
                                                                         </DataTrigger>
