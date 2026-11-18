@@ -51,6 +51,65 @@ public sealed partial class MainViewModel
     [ObservableProperty]
     private bool _isSongOpen;
 
+    /// <summary>Which theme the open song uses, for the button over its slides («Tema principal», «Tema propio»…).</summary>
+    [ObservableProperty]
+    private string _songThemeLabel = string.Empty;
+
+    [ObservableProperty]
+    private string _songThemeHint = string.Empty;
+
+    private void UpdateSongThemeLabel(Song song)
+    {
+        switch (new SongThemes(_themes, _songs).StateOf(song))
+        {
+            case SongThemeState.Own:
+                SongThemeLabel = "🎨 Tema propio";
+                SongThemeHint = "Esta canción tiene su propio tema: cambiar el tema principal no la toca. Clic para cambiarlo o volver al principal.";
+                break;
+            case SongThemeState.Chosen:
+                SongThemeLabel = $"🎨 Tema: {ResolveSongTheme(song).Name}";
+                SongThemeHint = "Esta canción usa otro tema, no el principal. Clic para cambiarlo o volver al principal.";
+                break;
+            default:
+                SongThemeLabel = "🎨 Tema principal";
+                SongThemeHint = "Esta canción sigue al tema principal. Clic para darle un tema propio.";
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Opens the theme editor on the open song's theme. A change made there
+    /// becomes the song's own theme, which the main theme no longer reaches.
+    /// </summary>
+    [RelayCommand]
+    private void EditSongTheme()
+    {
+        if (SelectedSong is null)
+            return;
+
+        var song = _songs.Get(SelectedSong.Id) ?? SelectedSong;
+        if (!_themeManager.ShowForSong(song))
+            return;
+
+        NoteAction($"Cambiar el tema de la canción «{song.Title}»");
+        ReloadSongKeepingPlace(song.Id);
+        StatusText = new SongThemes(_themes, _songs).StateOf(song) switch
+        {
+            SongThemeState.Own => $"«{song.Title}» tiene ahora su propio tema.",
+            SongThemeState.Chosen => $"«{song.Title}» usa ahora el tema «{ResolveSongTheme(song).Name}».",
+            _ => $"«{song.Title}» sigue al tema principal.",
+        };
+    }
+
+    [RelayCommand]
+    private void EditSongThemeFor(Song? song)
+    {
+        if (song is null)
+            return;
+        SelectedSong = Songs.FirstOrDefault(s => s.Id == song.Id) ?? song;
+        EditSongTheme();
+    }
+
     private void LoadSongMaxLines()
     {
         // The field, not the property: nothing is open yet to rebuild.
@@ -93,7 +152,19 @@ public sealed partial class MainViewModel
         foreach (var song in _songs.Search(SearchText))
             Songs.Add(song);
         SelectedSong = Songs.FirstOrDefault(s => s.Id == keepId) ?? SelectedSong;
+        var none = Songs.Count == 0;
+        var filtering = !string.IsNullOrWhiteSpace(SearchText);
+        IsSongLibraryEmpty = none && !filtering;
+        IsSongSearchEmpty = none && filtering;
     }
+
+    /// <summary>The library has no songs at all (not just the search): the list says what to do.</summary>
+    [ObservableProperty]
+    private bool _isSongLibraryEmpty;
+
+    /// <summary>The search box found nothing.</summary>
+    [ObservableProperty]
+    private bool _isSongSearchEmpty;
 
     private void BuildSongSlides()
     {
@@ -113,6 +184,7 @@ public sealed partial class MainViewModel
             return;
 
         var theme = ResolveSongTheme(SelectedSong);
+        UpdateSongThemeLabel(SelectedSong);
         var caption = string.IsNullOrWhiteSpace(SelectedSong.Artist)
             ? SelectedSong.Title
             : $"{SelectedSong.Title} — {SelectedSong.Artist}";
@@ -361,7 +433,6 @@ public sealed partial class MainViewModel
             Title = $"{source.Title} (copia)",
             Artist = source.Artist,
             Copyright = source.Copyright,
-            ThemeId = source.ThemeId,
             Sections = source.Sections
                 .Select(s => new SongSection { Order = s.Order, Label = s.Label, Text = s.Text, StyleJson = s.StyleJson })
                 .ToList(),
@@ -369,6 +440,10 @@ public sealed partial class MainViewModel
 
         NoteAction($"Guardar la canción «{copy.Title}»");
         var saved = _songs.Save(copy);
+
+        // An own theme is copied, not shared: each song keeps its own.
+        if (source.ThemeId is not null)
+            new SongThemes(_themes, _songs).CopyTheme(source, saved);
         LoadSongs();
         SelectedSong = Songs.FirstOrDefault(s => s.Id == saved.Id);
         StatusText = $"Canción duplicada: \"{saved.Title}\".";
@@ -430,18 +505,27 @@ public sealed partial class MainViewModel
         if (SelectedSong is null)
             return;
 
-        var confirm = MessageBox.Show(
-            $"¿Eliminar \"{SelectedSong.Title}\" de la biblioteca?",
-            "EcclesiaCast",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Question);
-        if (confirm != MessageBoxResult.Yes)
+        var confirm = Notice.Confirm(
+            $"¿Eliminar \"{SelectedSong.Title}\" de la biblioteca?\n\n"
+            + "Va a la papelera y se guarda 30 días: la podés recuperar desde Edición → Papelera.",
+            "Mandar a la papelera");
+        if (!confirm)
             return;
 
         _songs.Delete(SelectedSong.Id);
         SelectedSong = null;
         LoadSongs();
-        StatusText = "Canción eliminada.";
+        StatusText = "Canción enviada a la papelera (se guarda 30 días).";
+    }
+
+    /// <summary>Edición → «Papelera…»: lo borrado en los últimos 30 días, para recuperarlo.</summary>
+    [RelayCommand]
+    private void OpenTrash()
+    {
+        new Views.TrashWindow(_songs, _themes) { Owner = Application.Current.MainWindow }.ShowDialog();
+        LoadSongs();
+        ThemeSeeder.EnsureDefaults(_themes, _settings);
+        StatusText = "Papelera cerrada.";
     }
 
     /// <summary>Brings the libraries of another program (ProPresenter, EasyWorship) over, on the window's own choice.</summary>

@@ -435,6 +435,10 @@ public sealed partial class MainViewModel
         if (SelectedDisplay is null)
             return;
 
+        // Something goes on the air (the screen or only the stream): the
+        // first time each day, the anonymous count of use hears about it.
+        UsageReporter.NoteProjected(_settings);
+
         if (SelectedDisplay.BroadcastOnly)
         {
             if (_projection.IsOutputVisible)
@@ -500,7 +504,9 @@ public sealed partial class MainViewModel
     [RelayCommand]
     private void ToggleClear()
     {
-        _presentation.ToggleClear();
+        // With the output off the key turns it on showing what it names; it
+        // must not «toggle back» from a state left over from before.
+        if (IsProjecting) _presentation.ToggleClear(); else _presentation.ShowState(OutputState.Clear);
         EnsureOutputOn();
     }
 
@@ -508,15 +514,26 @@ public sealed partial class MainViewModel
     private void ToggleBlack()
     {
         NoteAction("Pantalla negra (Black)");
-        _presentation.ToggleBlack();
+        if (IsProjecting) _presentation.ToggleBlack(); else _presentation.ShowState(OutputState.Black);
         EnsureOutputOn();
     }
 
     [RelayCommand]
     private void ToggleLogo()
     {
-        _presentation.ToggleLogo();
+        if (IsProjecting) _presentation.ToggleLogo(); else _presentation.ShowState(OutputState.Logo);
         EnsureOutputOn();
+    }
+
+    /// <summary>
+    /// The Esc key switches the output off at once. (For a while it asked for
+    /// two presses; the 15/11 test asked to go back to one.)
+    /// </summary>
+    [RelayCommand]
+    private void EscapeOutput()
+    {
+        if (IsProjecting)
+            HideOutput();
     }
 
     [RelayCommand]

@@ -135,6 +135,7 @@ public sealed partial class MainViewModel
     /// </summary>
     private void RefreshAfterVersionChange()
     {
+        SaveCheckedVersions();
         UpdateVersionBadges();
         RebuildSlidesPreservingLive(() =>
         {
@@ -148,6 +149,7 @@ public sealed partial class MainViewModel
     {
         var keepNumber = SelectedBibleBook?.Number;
         BibleBooksAvailable.Clear();
+        BibleBookTiles.Clear();
         SelectedBibleBook = null;
 
         if (PrimaryVersion is null)
@@ -160,7 +162,10 @@ public sealed partial class MainViewModel
         {
             var info = BibleBookCatalog.FindByNumber(number);
             if (info is not null)
+            {
                 BibleBooksAvailable.Add(info);
+                BibleBookTiles.Add(new BibleBookTile(info) { Format = BibleGridFormat });
+            }
         }
 
         if (keepNumber is int n)
@@ -172,7 +177,12 @@ public sealed partial class MainViewModel
     partial void OnSelectedBibleBookChanged(BibleBookInfo? value)
     {
         BibleChapters.Clear();
+        BibleVerses.Clear();
         ChaptersTitle = value?.Name ?? string.Empty;
+        foreach (var tile in BibleBookTiles)
+            tile.IsSelected = tile.Number == value?.Number;
+        if (value is not null && BibleBookTiles.FirstOrDefault(t => t.Number == value.Number) is { } focus)
+            BibleBookTileFocusRequested?.Invoke(this, focus);
 
         if (value is not null && PrimaryVersion is not null)
         {
@@ -185,6 +195,167 @@ public sealed partial class MainViewModel
 
     [RelayCommand]
     private void BackToBooks() => SelectedBibleBook = null;
+
+    // ── Versiones que quedaron marcadas ───────────────────────────
+
+    private const string BibleVersionsKey = "bible.versions";
+
+    /// <summary>Remembers which Bibles were active (the first is the one read), for the next time the program opens.</summary>
+    private void SaveCheckedVersions()
+    {
+        if (_startingUp || _checkedVersionIds.Count == 0)
+            return;
+        _settings.Set(BibleVersionsKey, string.Join(",", _checkedVersionIds));
+    }
+
+    private void RestoreCheckedVersions()
+    {
+        var saved = (_settings.Get(BibleVersionsKey) ?? string.Empty)
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(s => int.TryParse(s, out var id) ? id : -1)
+            .Where(id => id > 0)
+            .Distinct()
+            .Take(2);
+        _checkedVersionIds.AddRange(saved);
+    }
+
+    // ── Vista en grilla ──────────────────────────────────────────
+
+    private const string BibleGridFormatKey = "bible.grid.format";
+
+    /// <summary>A grid tile asks to be shown: the book picked (or typed) may be far down.</summary>
+    public event EventHandler<BibleBookTile>? BibleBookTileFocusRequested;
+
+    /// <summary>The chapters and verses under the grid are open; closed, the books get the room.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(BibleTileHeight), nameof(BibleTileWidth), nameof(BibleTileAbbrSize))]
+    private bool _bibleChaptersOpen = true;
+
+    /// <summary>How the book tiles look: only the abbreviation, abbreviation and name, or the name.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(BibleTileHeight), nameof(BibleTileWidth), nameof(BibleTileAbbrSize),
+        nameof(IsBibleGridAbbreviation), nameof(IsBibleGridBoth), nameof(IsBibleGridNames))]
+    private BibleGridFormat _bibleGridFormat = BibleGridFormat.Abbreviation;
+
+    public bool IsBibleGridAbbreviation
+    {
+        get => BibleGridFormat == BibleGridFormat.Abbreviation;
+        set { if (value) BibleGridFormat = BibleGridFormat.Abbreviation; }
+    }
+
+    public bool IsBibleGridBoth
+    {
+        get => BibleGridFormat == BibleGridFormat.Both;
+        set { if (value) BibleGridFormat = BibleGridFormat.Both; }
+    }
+
+    public bool IsBibleGridNames
+    {
+        get => BibleGridFormat == BibleGridFormat.Names;
+        set { if (value) BibleGridFormat = BibleGridFormat.Names; }
+    }
+
+    public double BibleTileWidth => BibleGridFormat switch
+    {
+        BibleGridFormat.Abbreviation => BibleChaptersOpen ? 42 : 54,
+        BibleGridFormat.Both => BibleChaptersOpen ? 60 : 78,
+        _ => BibleChaptersOpen ? 92 : 112,
+    };
+
+    public double BibleTileHeight => BibleGridFormat switch
+    {
+        BibleGridFormat.Abbreviation => BibleChaptersOpen ? 30 : 40,
+        BibleGridFormat.Both => BibleChaptersOpen ? 46 : 60,
+        _ => BibleChaptersOpen ? 34 : 42,
+    };
+
+    public double BibleTileAbbrSize => BibleGridFormat switch
+    {
+        BibleGridFormat.Abbreviation => BibleChaptersOpen ? 13 : 16,
+        _ => BibleChaptersOpen ? 15 : 19,
+    };
+
+    partial void OnBibleGridFormatChanged(BibleGridFormat value)
+    {
+        _settings.Set(BibleGridFormatKey, value.ToString());
+        foreach (var tile in BibleBookTiles)
+            tile.Format = value;
+    }
+
+    /// <summary>The one button over the grid: abbreviation → abbreviation and name → name → abbreviation.</summary>
+    [RelayCommand]
+    private void CycleBibleGridFormat() => BibleGridFormat = BibleGridFormat switch
+    {
+        BibleGridFormat.Abbreviation => BibleGridFormat.Both,
+        BibleGridFormat.Both => BibleGridFormat.Names,
+        _ => BibleGridFormat.Abbreviation,
+    };
+
+    private void LoadBibleGridFormat() =>
+        BibleGridFormat = Enum.TryParse<BibleGridFormat>(_settings.Get(BibleGridFormatKey), out var format)
+            && Enum.IsDefined(format) ? format : BibleGridFormat.Abbreviation;
+
+    [RelayCommand]
+    private void ToggleBibleChapters() => BibleChaptersOpen = !BibleChaptersOpen;
+
+    private const string BibleGridViewKey = "bible.view.grid";
+
+    /// <summary>The books of the primary version as coloured tiles (grid view).</summary>
+    public ObservableCollection<BibleBookTile> BibleBookTiles { get; } = [];
+
+    /// <summary>Verses of the chapter on screen, as numbered buttons (grid view).</summary>
+    public ObservableCollection<VerseOption> BibleVerses { get; } = [];
+
+    /// <summary>The Bible tab shows books, chapters and verses as grids instead of the list.</summary>
+    [ObservableProperty]
+    private bool _isBibleGridView;
+
+    /// <summary>The grid is what is on screen right now (and no text search is covering it).</summary>
+    [ObservableProperty]
+    private bool _showBibleGrid;
+
+    partial void OnIsBibleGridViewChanged(bool value)
+    {
+        _settings.Set(BibleGridViewKey, value ? "1" : "0");
+        UpdateBibleViewState();
+    }
+
+    [RelayCommand]
+    private void ToggleBibleView() => IsBibleGridView = !IsBibleGridView;
+
+    [RelayCommand]
+    private void SelectBibleBookTile(BibleBookTile? tile)
+    {
+        if (tile is null)
+            return;
+
+        BibleChaptersOpen = true;
+        // Browsing replaces whatever was typed, as with the chapter buttons.
+        if (!string.IsNullOrEmpty(BibleQuery))
+            BibleQuery = string.Empty;
+        SelectedBibleBook = tile.Info;
+    }
+
+    /// <summary>A verse button does what a click on that verse's slide does: it projects it.</summary>
+    [RelayCommand]
+    private void SelectVerse(VerseOption? option)
+    {
+        if (option is null || _currentPassage is null)
+            return;
+
+        var index = FindVerseSlide(_currentPassage.Chapter, option.Number);
+        if (index < 0)
+            return;
+
+        MarkVerseSelected(Slides[index].Verses);
+        GoLiveSlide(index);
+    }
+
+    private void MarkVerseSelected(VerseGroup? group)
+    {
+        foreach (var option in BibleVerses)
+            option.IsSelected = group is not null && group.Contains(option.Number);
+    }
 
     [RelayCommand]
     private void SelectChapter(ChapterOption? option)
@@ -208,8 +379,9 @@ public sealed partial class MainViewModel
     private void UpdateBibleViewState()
     {
         ShowBibleResults = BibleSearchResults.Count > 0;
-        ShowChaptersView = !ShowBibleResults && SelectedBibleBook is not null;
-        ShowBooksList = !ShowBibleResults && !ShowChaptersView;
+        ShowBibleGrid = IsBibleGridView && !ShowBibleResults;
+        ShowChaptersView = !ShowBibleResults && !IsBibleGridView && SelectedBibleBook is not null;
+        ShowBooksList = !ShowBibleResults && !IsBibleGridView && !ShowChaptersView;
     }
 
     partial void OnBibleQueryChanged(string value)
@@ -475,7 +647,12 @@ public sealed partial class MainViewModel
         }
 
         if (SelectedBibleBook?.Number == reference.BookNumber)
+        {
             MarkChapterSelected(reference.Chapter);
+            BibleVerses.Clear();
+            foreach (var number in verses.Where(v => v.Chapter == reference.Chapter).Select(v => v.Verse).Distinct().Order())
+                BibleVerses.Add(new VerseOption(number));
+        }
 
         PreviewSlide = Slides.FirstOrDefault(s => s.JumpTarget is null)?.Slide;
         BibleStatusText = $"{verses.Count} versículo(s). Clic en una diapositiva para proyectar.";
@@ -546,6 +723,7 @@ public sealed partial class MainViewModel
         PreviewSlideIndex = index;
         if (index >= 0 && index < Slides.Count)
             PreviewSlide = Slides[index].Slide;
+        MarkVerseSelected(index >= 0 && index < Slides.Count ? Slides[index].Verses : null);
     }
 
     /// <summary>Projects the verse a typed reference points to (Enter in the search box).</summary>
@@ -807,6 +985,9 @@ public sealed partial class MainViewModel
 
     private void LoadBibleVersions()
     {
+        if (_checkedVersionIds.Count == 0)
+            RestoreCheckedVersions();
+
         _suppressVersionEvents = true;
 
         var keepSelectedId = SelectedBibleVersionOption?.Info.Id;
@@ -845,7 +1026,7 @@ public sealed partial class MainViewModel
 
     /// <summary>Added to the messages of an import that did not work: where the formats are explained.</summary>
     private const string HelpHint =
-        "\n\nEn «Archivo → Cómo preparar una Biblia para importar…» hay un ejemplo de cada formato.";
+        "\n\nEn «Biblias → Cómo preparar una Biblia para importar…» hay un ejemplo de cada formato.";
 
     /// <summary>
     /// «Cómo preparar una Biblia para importar…»: the two formats, an example of
@@ -882,18 +1063,16 @@ public sealed partial class MainViewModel
         catch (Exception ex)
         {
             Log.Error(ex, "Falló el análisis de la Biblia {Path}", dialog.FileName);
-            MessageBox.Show(
-                $"No se pudo leer el archivo:\n\n{ex.Message}" + HelpHint,
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Error);
+            Notice.Show(ex.Message + HelpHint, "No se pudo leer el archivo", NoticeKind.Error);
             return;
         }
 
         if (parsed.VerseCount == 0)
         {
-            MessageBox.Show(
+            Notice.Show(
                 "El archivo no contiene versículos reconocibles."
                 + HelpHint,
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
+                kind: NoticeKind.Warning);
             return;
         }
 
@@ -902,8 +1081,18 @@ public sealed partial class MainViewModel
         if (metadata is null)
             return;
 
+        // One the library already has: asked first, and the new copy takes its place.
+        var entry = new BiblePackageEntry(string.Empty, metadata.Name, metadata.Abbreviation, metadata.Language);
+        var plan = ConfirmReplacing([entry], e => e, "importar");
+        if (plan is null || plan.Count == 0)
+            return;
+
         var saved = _bibles.Import(metadata.Name, metadata.Abbreviation, metadata.Language, parsed);
+        ReplaceOldCopies(plan[0].Replaces, saved.Id);
+        var activeReplaced = KeepActiveAfterReplacing([(plan[0].Replaces, saved.Id)]);
         LoadBibleVersions();
+        if (activeReplaced)
+            RefreshAfterVersionChange();
 
         // Leave the freshly imported version active for projection.
         var imported = BibleVersionOptions.FirstOrDefault(o => o.Info.Id == saved.Id);
@@ -964,10 +1153,10 @@ public sealed partial class MainViewModel
         if (target is null)
             return;
 
-        var confirm = MessageBox.Show(
+        var confirm = Notice.Confirm(
             $"¿Eliminar la versión \"{target.Name}\" y sus {target.VerseCount} versículos?",
-            "EcclesiaCast", MessageBoxButton.YesNo, MessageBoxImage.Question);
-        if (confirm != MessageBoxResult.Yes)
+            "Eliminar", destructive: true);
+        if (!confirm)
             return;
 
         var wasActive = _checkedVersionIds.Contains(target.Id);
@@ -1012,9 +1201,7 @@ public sealed partial class MainViewModel
         catch (Exception ex)
         {
             Log.Error(ex, "Falló la exportación de la Biblia {Name}", target.Name);
-            MessageBox.Show(
-                $"No se pudo guardar el archivo:\n\n{ex.Message}",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Error);
+            Notice.Show(ex.Message, "No se pudo guardar el archivo", NoticeKind.Error);
             return;
         }
 

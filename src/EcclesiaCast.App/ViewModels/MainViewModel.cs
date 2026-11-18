@@ -384,6 +384,8 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _youTube = youTube;
         _logos = logos;
         _logoManager = logoManager;
+        MediaLookup.Find = FindMedia;
+        MediaLookup.All = () => _allMedia.ToList();
         _songImport = songImport;
         _webSongSearch = webSongSearch;
         _stage = stage;
@@ -413,6 +415,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         LoadStageLayouts();
         LoadSongMaxLines();
         LoadLowPerformance();
+        LoadOutputVolume();
         LoadMeetingSections();
         Slides.CollectionChanged += (_, _) =>
         {
@@ -423,6 +426,8 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         RefreshDisplays();
         LoadSongs();
         IsBibleVersionsExpanded = _settings.Get(BibleVersionsExpandedKey) == "1";
+        IsBibleGridView = _settings.Get(BibleGridViewKey) == "1";
+        LoadBibleGridFormat();
 
         // The Bibles the installer left, before anything reads the library:
         // the window is not up yet, so there is no one to keep waiting.

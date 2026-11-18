@@ -83,6 +83,18 @@ public partial class ProjectedView : UserControl
             new PropertyMetadata(null, (d, e) =>
                 ((ProjectedView)d).SlideView.Logo = (EcclesiaCast.Core.Logos.Logo?)e.NewValue));
 
+    /// <summary>The moving picture of a video logo, on the real output (see <see cref="SlideView.LogoVideoFrame"/>).</summary>
+    public static readonly DependencyProperty LogoVideoFrameProperty =
+        DependencyProperty.Register(nameof(LogoVideoFrame), typeof(ImageSource), typeof(ProjectedView),
+            new PropertyMetadata(null, (d, e) =>
+                ((ProjectedView)d).SlideView.LogoVideoFrame = (ImageSource?)e.NewValue));
+
+    public ImageSource? LogoVideoFrame
+    {
+        get => (ImageSource?)GetValue(LogoVideoFrameProperty);
+        set => SetValue(LogoVideoFrameProperty, value);
+    }
+
     /// <summary>Blur applied to the background image layer, 0–100.</summary>
     public static readonly DependencyProperty BackgroundBlurProperty =
         DependencyProperty.Register(nameof(BackgroundBlur), typeof(double), typeof(ProjectedView),
@@ -774,13 +786,15 @@ public partial class ProjectedView : UserControl
         // A video used as fill can only play in the output window, which owns
         // the VLC surfaces; here its poster stands in, exactly like the
         // background video's poster does in the previews.
-        var fillPath = needsFill && media is { FillsWithSelf: true }
-            ? media.Path
+        // A video that fills its bars with itself: in a preview, its poster.
+        var ownFill = needsFill && media is { FillsWithSelf: true } or { FillsWithOwnVideo: true };
+        var fillPath = ownFill
+            ? media!.Type == MediaType.Image ? media.Path : media.ThumbnailPath
             : fill?.Type == MediaType.Image ? fill.Path : fill?.ThumbnailPath;
 
         // An image that fills its own bars shows itself, already blurred; any
         // other fill is the picture as it is.
-        var selfFill = needsFill && media is { FillsWithSelf: true } && fillPath is not null;
+        var selfFill = ownFill && fillPath is not null;
         var fillKey = selfFill ? "blur:" + fillPath : fillPath;
 
         if (fillKey != _lastFillImagePath)

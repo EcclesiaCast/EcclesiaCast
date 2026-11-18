@@ -248,4 +248,26 @@ public class BroadcastStyleTests
         Assert.Equal(styles.Songs, changed.For(OutputChannel.Songs));
         Assert.Equal(styles.Announcements, changed.For(OutputChannel.All));
     }
+
+    [Fact]
+    public void The_edge_gradient_has_an_intensity_that_is_kept_and_limited()
+    {
+        var read = BroadcastStyle.Parse(new BroadcastStyle { EdgeGradient = true, EdgeGradientIntensity = 40 }.ToSetting(), OutputChannel.Bible);
+        Assert.Equal(40, read.EdgeGradientIntensity);
+        Assert.Equal(100, BroadcastStyle.Parse("{}", OutputChannel.Bible).EdgeGradientIntensity);
+        Assert.Equal(100, BroadcastStyle.Parse("{\"edgeGradientIntensity\":500}", OutputChannel.Bible).EdgeGradientIntensity);
+    }
+
+    [Fact]
+    public void The_edge_gradient_goes_with_any_plate_and_is_off_unless_asked_for()
+    {
+        var style = new BroadcastStyle { Plate = BroadcastPlate.Line, EdgeGradient = true };
+
+        var read = BroadcastStyle.Parse(style.ToSetting(), OutputChannel.Bible);
+
+        Assert.True(read.EdgeGradient);
+        Assert.Equal(BroadcastPlate.Line, read.Plate);
+        Assert.Contains("\"edgeGradient\":true", style.ToSetting());
+        Assert.False(BroadcastStyle.Parse("{\"plate\":\"line\"}", OutputChannel.Bible).EdgeGradient);
+    }
 }

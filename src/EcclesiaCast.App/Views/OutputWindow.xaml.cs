@@ -29,6 +29,16 @@ public partial class OutputWindow : Window
         // • Image to video: the image (kept by the projected view) goes when the
         //   video draws its first picture.
         Video.FirstFrame += (_, _) => Projected.ReleaseHeldImage(MediaFade);
+
+        // The video logo's frames are drawn by the logo layer, not by its player.
+        LogoVideo.FrameSourceChanged += (_, frame) =>
+        {
+            if (_logoVideoId is not null)
+            {
+                Projected.LogoVideoFrame = frame;
+                LogoFrameChanged?.Invoke(this, frame);
+            }
+        };
         // • Video to image: the video's last picture (kept by the surface) goes
         //   when the image has finished fading in over it.
         Projected.BackgroundImageSettled += (_, _) => Video.ReleaseHold(TimeSpan.Zero);
@@ -99,6 +109,9 @@ public partial class OutputWindow : Window
 
     /// <summary>Raised when the small copy of the video for the operator's preview changes.</summary>
     public event EventHandler<System.Windows.Media.ImageSource?>? VideoFrameChanged;
+
+    /// <summary>The frames of a video logo, copied to the operator's Live panel.</summary>
+    public event EventHandler<System.Windows.Media.ImageSource?>? LogoFrameChanged;
 
     /// <summary>
     /// Raised when the operator double-clicks the output to switch it off.
@@ -293,8 +306,10 @@ public partial class OutputWindow : Window
     }
 
     /// <summary>
-    /// A video logo plays on its own surface, above the background and below
-    /// the text — so the lower-third announcement still shows over it.
+    /// A video logo is decoded by its own player, which is never on screen:
+    /// its frames are drawn in the logo layer of the projected view, like an
+    /// image logo, so no background (a theme colour, a picture) can cover it
+    /// and it fades, frames and fills with everything an image logo has.
     /// </summary>
     private void UpdateLogoVideo()
     {
@@ -304,27 +319,18 @@ public partial class OutputWindow : Window
             && logo is { Kind: LogoKind.Video }
             && !string.IsNullOrWhiteSpace(logo.Path);
 
-        var fade = PerformanceMode.IsLow ? TimeSpan.Zero : TransitionSettings.Current.Logo;
         var version = ++_logoVideoVersion;
-
         if (showing)
         {
-            var wasShown = LogoVideo.Visibility == Visibility.Visible;
-            var from = wasShown ? LogoVideo.Opacity : 0;
-            LogoVideo.Show(AsLoopingVideo(logo!));
-            LogoVideo.Visibility = Visibility.Visible;
+            // Another video: its poster shows until its first frame arrives.
+            if (_logoVideoId != logo!.Id)
+            {
+                _logoVideoId = logo.Id;
+                Projected.LogoVideoFrame = null;
+                LogoFrameChanged?.Invoke(this, null);
+            }
 
-            // Fades in only when it was not already up (a change of logo while
-            // the logo is on screen must not blink).
-            if (fade > TimeSpan.Zero && (!wasShown || from < 1))
-            {
-                LogoVideo.BeginAnimation(OpacityProperty, new DoubleAnimation(from, 1, fade));
-            }
-            else
-            {
-                LogoVideo.BeginAnimation(OpacityProperty, null);
-                LogoVideo.Opacity = 1;
-            }
+            LogoVideo.Show(AsLoopingVideo(logo));
             return;
         }
 
@@ -334,18 +340,23 @@ public partial class OutputWindow : Window
             if (version != _logoVideoVersion)
                 return;
 
-            LogoVideo.BeginAnimation(OpacityProperty, null);
-            LogoVideo.Opacity = 1;
-            LogoVideo.Visibility = Visibility.Collapsed;
             LogoVideo.Show(null);
+            _logoVideoId = null;
+            Projected.LogoVideoFrame = null;
+            LogoFrameChanged?.Invoke(this, null);
         }
 
-        // The video keeps playing under its fade; it is stopped when it is gone.
-        if (fade > TimeSpan.Zero && LogoVideo.Visibility == Visibility.Visible)
+        // The video keeps playing while the logo layer fades away.
+        var fade = PerformanceMode.IsLow ? TimeSpan.Zero : TransitionSettings.Current.Logo;
+        if (fade > TimeSpan.Zero && _logoVideoId is not null)
         {
-            var away = new DoubleAnimation(LogoVideo.Opacity, 0, fade);
-            away.Completed += (_, _) => Remove();
-            LogoVideo.BeginAnimation(OpacityProperty, away);
+            var timer = new System.Windows.Threading.DispatcherTimer { Interval = fade };
+            timer.Tick += (_, _) =>
+            {
+                timer.Stop();
+                Remove();
+            };
+            timer.Start();
         }
         else
         {
@@ -353,20 +364,12 @@ public partial class OutputWindow : Window
         }
     }
 
+    private int? _logoVideoId;
+
     private int _logoVideoVersion;
 
     /// <summary>Wraps a video logo as a media item so the VLC surface can play it.</summary>
-    private static MediaItem AsLoopingVideo(Logo logo) => new()
-    {
-        // Negative ids never collide with the media library's own rows.
-        Id = -1000 - logo.Id,
-        Name = logo.Name,
-        Path = logo.Path!,
-        Type = MediaType.Video,
-        Scaling = logo.Scaling,
-        Muted = logo.Muted,
-        EndBehavior = VideoEndBehavior.Loop,
-    };
+    private static MediaItem AsLoopingVideo(Logo logo) => logo.AsFramedMedia();
 
     private void UpdateVideo()
     {
@@ -529,6 +532,8 @@ public partial class OutputWindow : Window
         Video.PauseForHiddenOutput();
         LogoVideo.PauseForHiddenOutput();
         FillVideo.PauseForHiddenOutput();
+        // The LIVE panel shows the logo's poster, still, while the output is off.
+        LogoFrameChanged?.Invoke(this, null);
     }
 
     public void ResumeAfterHiddenOutput()
@@ -537,6 +542,8 @@ public partial class OutputWindow : Window
         Video.ResumeAfterHiddenOutput();
         LogoVideo.ResumeAfterHiddenOutput();
         FillVideo.ResumeAfterHiddenOutput();
+        if (_logoVideoId is not null)
+            LogoFrameChanged?.Invoke(this, Projected.LogoVideoFrame);
     }
 
     /// <summary>Blurs the background layer (video, YouTube or image), 0–100.</summary>

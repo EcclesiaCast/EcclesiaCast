@@ -14,6 +14,17 @@ public class PresentationServiceTests
     }
 
     [Fact]
+    public void ShowState_sets_the_state_without_toggling_back()
+    {
+        _service.GoLive(new SlideContent("Hola"));
+        _service.ShowState(OutputState.Logo);
+        // The output was switched off and F3 is pressed again: still the logo, not the words.
+        _service.ShowState(OutputState.Logo);
+
+        Assert.Equal(OutputState.Logo, _service.State);
+    }
+
+    [Fact]
     public void GoLive_shows_the_slide_as_content()
     {
         var slide = new SlideContent("Bienvenidos");

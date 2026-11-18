@@ -19,13 +19,17 @@
         <Image x:Name="FillImage" Stretch="UniformToFill" Visibility="Collapsed"/>
         <controls:VlcVideoSurface x:Name="FillVideo" Visibility="Collapsed"/>
 
-        <!-- Video de fondo (frames a WriteableBitmap), detrás de todo -->
-        <controls:VlcVideoSurface x:Name="Video"/>
+        <!-- Video de fondo (frames a WriteableBitmap), detrás de todo. Si el
+             video pide «el mismo video, desenfocado», dibuja él mismo esa copia
+             en los bordes, con los cuadros que ya decodifica. -->
+        <controls:VlcVideoSurface x:Name="Video" DrawsOwnBackdrop="True"/>
 
         <!-- YouTube a pantalla completa (solo visible mientras se proyecta) -->
         <controls:YouTubeSurface x:Name="YouTube" Visibility="Collapsed"/>
 
-        <!-- Video del logo: encima del fondo, debajo del texto y del aviso al pie -->
+        <!-- Video del logo: nunca se ve acá. Sólo decodifica; sus cuadros se
+             dibujan en la capa del logo (ProjectedView.LogoVideoFrame), encima
+             de cualquier fondo. -->
         <controls:VlcVideoSurface x:Name="LogoVideo" Visibility="Collapsed"/>
 
         <!-- Fondo de imagen + texto + estados, compuesto encima -->

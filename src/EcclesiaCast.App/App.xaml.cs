@@ -20,6 +20,7 @@ public partial class App : Application
     private ServiceProvider? _services;
     private UiWatchdog? _watchdog;
     private CrashMarker? _crashMarker;
+    private readonly EcclesiaCast.Core.Diagnostics.ErrorNoticeGate _errorGate = new(TimeSpan.FromSeconds(30));
 
     /// <summary>Set once the "Acerca de" of the very first start has been shown.</summary>
     private const string AboutSeenKey = "app.about.seen";
@@ -63,10 +64,33 @@ public partial class App : Application
         DispatcherUnhandledException += (_, args) =>
         {
             Log.Error(args.Exception, "Unhandled exception");
-            MessageBox.Show(
-                $"Ocurrió un error inesperado:\n\n{args.Exception.Message}",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Error);
+            if (_services?.GetService<MainViewModel>() is { } vm && MainWindow is { IsLoaded: true })
+            {
+                // The operator keeps going: no dialog, a line in the status bar, at most every 30 s.
+                if (_errorGate.ShouldNotify(DateTimeOffset.Now))
+                    vm.StatusText = "Hubo un error; el programa sigue. Quedó anotado en el registro.";
+            }
+            else
+            {
+                // Start-up error: nobody is using the program yet, so a dialog is fine.
+                Notice.Show(
+                    args.Exception.Message,
+                    "Ocurrió un error inesperado",
+                    NoticeKind.Error);
+            }
             args.Handled = true;
+        };
+
+        AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+        {
+            Log.Fatal(args.ExceptionObject as Exception, "Fatal unhandled exception (terminating: {Terminating})", args.IsTerminating);
+            Log.CloseAndFlush();
+        };
+
+        TaskScheduler.UnobservedTaskException += (_, args) =>
+        {
+            Log.Error(args.Exception, "Unobserved task exception");
+            args.SetObserved();
         };
 
         var dbPath = Path.Combine(appDataDir, "ecclesiacast.db");
@@ -79,27 +103,31 @@ public partial class App : Application
         if (restore.Restored)
         {
             Log.Information("Biblioteca restaurada desde una copia de seguridad");
-            MessageBox.Show(
-                "Se restauró la copia de seguridad.\n\n"
-                + "Por las dudas, la biblioteca que tenías antes quedó guardada en:\n\n"
+            Notice.Show(
+                "Por las dudas, la biblioteca que tenías antes quedó guardada en:\n\n"
                 + DatabaseBackup.ReplacedLibraryPath(dbPath),
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Information);
+                "Se restauró la copia de seguridad");
         }
         else if (restore.WasStaged)
         {
             Log.Error("No se pudo aplicar la restauración pendiente: {Error}", restore.Error);
-            MessageBox.Show(
-                "No se pudo restaurar la copia: algo está usando la biblioteca.\n\n"
-                + "Suele ser otra ventana de EcclesiaCast abierta. Cerralas todas y volvé a abrir el "
+            Notice.Show(
+                "Suele ser otra ventana de EcclesiaCast abierta. Cerralas todas y volvé a abrir el "
                 + "programa; la copia sigue esperando y se restaura sola.\n\n"
                 + $"Detalle: {restore.Error}",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
+                "No se pudo restaurar la copia: algo está usando la biblioteca",
+                NoticeKind.Warning);
         }
 
         using (var db = new AppDbContext(dbPath))
             db.Database.Migrate();
 
         // Temas iniciales (Canciones y Biblia) en la primera ejecución.
+        // What has been in the trash for more than 30 days goes for good.
+        var purgeLimit = EcclesiaCast.Core.Songs.TrashPolicy.PurgeLimit(DateTime.UtcNow);
+        new SongRepository(dbPath).PurgeOlderThan(purgeLimit);
+        new ThemeRepository(dbPath).PurgeOlderThan(purgeLimit);
+
         ThemeSeeder.EnsureDefaults(new ThemeRepository(dbPath), new SqliteSettingsStore(dbPath));
 
         // Motor de video (VLC) para los fondos en movimiento.
@@ -172,6 +200,7 @@ public partial class App : Application
             DataContext = _services.GetRequiredService<MainViewModel>()
         };
         var settings = _services.GetRequiredService<ISettingsStore>();
+        ColorPickerHelper.Settings = settings;
         TransitionSettings.Load(settings);
         BroadcastStyleSettings.Load(settings);
         mainWindow.AttachLayoutPersistence(settings);
@@ -244,6 +273,7 @@ public partial class App : Application
         // Stop listening on the network before the process goes away.
         _services?.GetService<MainViewModel>()?.StopRemote();
         _services?.GetService<MainViewModel>()?.StopAudio();
+        _services?.GetService<MainViewModel>()?.ShutDownListening();
         _services?.GetService<MainViewModel>()?.StopWindowCapture();
         Log.CloseAndFlush();
         _services?.Dispose();

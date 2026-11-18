@@ -64,9 +64,38 @@ entra a la lista sólo con el permiso por escrito de su editorial anotado en
 
 ## Agregar o cambiar una Biblia después
 
-Poner el `.ecbiblias` nuevo en la carpeta, volver a correr `lista` y subir a R2
-el archivo nuevo y el `catalogo.json` nuevo. No hace falta sacar otra versión
-del programa: lo lee la próxima vez que alguien abre «Bajar Biblias…».
+El programa no mira qué hay en R2: muestra sólo lo que dice `catalogo.json`.
+Para eso está **«Actualizar catalogo.bat»** (con su `Actualizar catalogo.ps1`):
+se copian los dos a la carpeta de las Biblias y se le da doble clic.
+
+1. Poner el `.ecbiblias` nuevo en la carpeta, o cambiar a mano lo que haga
+   falta en `catalogo.json` (un nombre, una licencia, el orden).
+2. Doble clic en «Actualizar catalogo.bat». Para cada `.ecbiblias` de la
+   carpeta se fija si ya está en la lista: si está, le pone el tamaño y la
+   huella del archivo; si no, lo agrega al final con el nombre, la sigla y el
+   idioma que trae adentro, y la licencia vacía para completar. Lo escrito a
+   mano se respeta.
+3. Al final muestra cada Biblia con **OK** (el programa la muestra), **FALTA**
+   (el archivo no está en la carpeta: no se pudo revisar) o **ERROR** (el
+   programa no la muestra, y dice por qué), y la lista de archivos para subir.
+4. Subir a R2 esos archivos (siempre `catalogo.json`, y los `.ecbiblias` nuevos
+   o cambiados). Los dos del script no hace falta subirlos.
+
+No hace falta sacar otra versión del programa: lo lee la próxima vez que
+alguien abre «Bajar Biblias…». Si `catalogo.json` tiene un error de escritura
+(una coma o una llave de más), el script avisa y no lo toca.
+
+Cada línea de la lista tiene:
+
+| Etiqueta | Qué es | ¿Obligatoria? |
+|---|---|---|
+| `name` | El nombre que se ve | Sí |
+| `abbreviation` | La sigla; con ella el programa sabe si ya está instalada | Sí |
+| `file` | El archivo, al lado de `catalogo.json` (o una dirección https completa) | Sí |
+| `size` | El tamaño en bytes (lo pone el script) | Sí |
+| `sha256` | La huella del archivo (lo pone el script) | Sí |
+| `language` | `es`, `en`, `pt`, `fr`…; para agrupar por idioma | No (si falta, `es`) |
+| `license` | Se muestra al lado del tamaño | No |
 
 Para probar una lista antes de subirla: servir la carpeta en
 `http://localhost:<puerto>/` y abrir el programa con

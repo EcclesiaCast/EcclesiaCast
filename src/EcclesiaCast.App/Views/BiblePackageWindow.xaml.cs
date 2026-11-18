@@ -111,8 +111,7 @@ public partial class BiblePackageWindow : Window
     {
         if (_rows.All(r => !r.IsChecked))
         {
-            MessageBox.Show(this, "Marcá al menos una versión.", "EcclesiaCast",
-                MessageBoxButton.OK, MessageBoxImage.Information);
+            EcclesiaCast.App.Services.Notice.Show("Marcá al menos una versión.");
             return;
         }
 

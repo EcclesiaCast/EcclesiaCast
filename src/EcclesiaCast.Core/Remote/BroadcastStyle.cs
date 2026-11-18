@@ -85,6 +85,15 @@ public sealed record BroadcastStyle
     /// <summary>Path of the picture or video, for <see cref="BroadcastBackground.File"/>.</summary>
     public string BackgroundFile { get; init; } = string.Empty;
 
+    /// <summary>
+    /// The dark gradient from the edge of the screen that the «Degradé» plate
+    /// draws, added behind any other plate (15/11: asked for the «Noticiero» look).
+    /// </summary>
+    public bool EdgeGradient { get; init; }
+
+    /// <summary>How strong that gradient is, 0 to 100 (100 is as the plate draws it).</summary>
+    public int EdgeGradientIntensity { get; init; } = 100;
+
     /// <summary>The operator's own box (see <see cref="BroadcastBox"/>); the fields below only count when it is not Auto.</summary>
     public BroadcastBox Box { get; init; } = BroadcastBox.Auto;
 
@@ -165,6 +174,7 @@ public sealed record BroadcastStyle
         TextColor = Color(TextColor, "#FFFFFF"),
         BackgroundColor = Color(BackgroundColor, "#000000"),
         PlateOpacity = Math.Clamp(PlateOpacity, 0, 100),
+        EdgeGradientIntensity = Math.Clamp(EdgeGradientIntensity, 0, 100),
         FontSize = double.IsNaN(FontSize) || double.IsInfinity(FontSize) ? 54 : Math.Clamp(FontSize, MinFontSize, MaxFontSize),
         WidthPercent = Math.Clamp(WidthPercent, MinWidthPercent, MaxWidthPercent),
         MarginPercent = Math.Clamp(MarginPercent, 0, MaxMarginPercent),
@@ -206,6 +216,8 @@ public sealed record BroadcastStyle
     private static BroadcastStyle Apply(BroadcastStyle style, string name, JsonElement value) => name switch
     {
         "followprojector" => IsBool(value) ? style with { FollowProjector = value.GetBoolean() } : style,
+        "edgegradient" => IsBool(value) ? style with { EdgeGradient = value.GetBoolean() } : style,
+        "edgegradientintensity" => value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var egi) ? style with { EdgeGradientIntensity = egi } : style,
         "position" => Enum.TryParse<BroadcastPosition>(Text(value), true, out var p) ? style with { Position = p } : style,
         "plate" => Enum.TryParse<BroadcastPlate>(Text(value), true, out var pl) ? style with { Plate = pl } : style,
         "background" => Enum.TryParse<BroadcastBackground>(Text(value), true, out var b) ? style with { Background = b } : style,

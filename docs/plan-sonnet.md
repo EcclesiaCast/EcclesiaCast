@@ -45,7 +45,7 @@ hacerlos, dónde está cada cosa en el código y cómo probarlos.
 
 **Idioma**
 - Todo lo que ve el usuario (botones, mensajes, tooltips), el `CHANGELOG.md`
-  y `docs/` van en **castellano rioplatense** («elegí», «tocá», «podés»).
+  y `docs/` van en **español rioplatense** («elegí», «tocá», «podés»).
 - Los comentarios del código van en inglés, como el resto del código:
   explican el porqué, no el qué. Copiá la densidad y el tono de los que hay.
 
@@ -253,7 +253,7 @@ sirve para el Spotify instalado en la PC.
 
 1. `dotnet build` y `dotnet test` en verde. Los commits hechos en `beta6`.
 2. `docs/pendientes.md` sin los puntos que cerraste y `CHANGELOG.md` al día.
-3. Un informe final **en castellano, para Alexis**, corto y sin jerga:
+3. Un informe final **en español, para Alexis**, corto y sin jerga:
    qué quedó hecho, qué probaste y cómo, qué no pudiste probar, y qué
    decidiste vos cuando hubo que elegir. Si algo quedó a medias, decilo
    claro y dejalo anotado en `pendientes.md`.

@@ -1,6 +1,7 @@
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Threading;
+using NAudio.CoreAudioApi;
+using NAudio.CoreAudioApi.Interfaces;
 using Serilog;
 
 namespace EcclesiaCast.App.Services;
@@ -15,11 +16,16 @@ namespace EcclesiaCast.App.Services;
 /// again. The players compare <see cref="Generation"/> before each play and
 /// open a fresh output when it moved, and listen to <see cref="OutputChanged"/>
 /// to reopen the one that is playing right now.
+///
+/// It talks to Windows through NAudio, like the sound input of «Seguir la
+/// canción». It used to declare the same Windows component on its own, and
+/// .NET then handed NAudio this watcher's type for it: listening failed with
+/// «Unable to cast MMDeviceEnumeratorComObject». One declaration only.
 /// </summary>
 public static class AudioEndpointWatcher
 {
     private static int _generation;
-    private static IMMDeviceEnumerator? _enumerator;
+    private static MMDeviceEnumerator? _enumerator;
     private static Client? _client;
     private static DispatcherTimer? _debounce;
 
@@ -40,11 +46,11 @@ public static class AudioEndpointWatcher
 
         try
         {
-            _enumerator = (IMMDeviceEnumerator)new MMDeviceEnumeratorComObject();
+            _enumerator = new MMDeviceEnumerator();
             _client = new Client();
             var hr = _enumerator.RegisterEndpointNotificationCallback(_client);
             if (hr != 0)
-                throw new COMException("RegisterEndpointNotificationCallback", hr);
+                throw new System.Runtime.InteropServices.COMException("RegisterEndpointNotificationCallback", hr);
         }
         catch (Exception ex)
         {
@@ -68,6 +74,7 @@ public static class AudioEndpointWatcher
         }
 
         _client = null;
+        _enumerator?.Dispose();
         _enumerator = null;
     }
 
@@ -115,91 +122,52 @@ public static class AudioEndpointWatcher
         return timer;
     }
 
-    // ── COM ──────────────────────────────────────────────────────
+    // ── Avisos de Windows ────────────────────────────────────────
 
     private sealed class Client : IMMNotificationClient
     {
         // Called by Windows on its own threads: only count, log and hand over.
-        public int OnDeviceStateChanged(string deviceId, int newState)
+        public void OnDeviceStateChanged(string deviceId, DeviceState newState)
         {
             Interlocked.Increment(ref _generation);
-            Log.Information("Cambió el estado de un dispositivo de audio ({State})", newState);
-            return 0;
+            var playback = IsPlayback(deviceId);
+            Log.Information("Cambió el estado de un dispositivo de audio ({State}, {Kind})",
+                newState, playback ? "salida" : "entrada");
+
+            // An output that comes back (a cable with a loose contact, a
+            // projector that renegotiates its HDMI) stays the default one, so
+            // Windows reports no change of default: without this, what was
+            // playing kept its dead output until the program was restarted.
+            if (playback && newState == DeviceState.Active)
+                NotifyOnUiThread();
         }
 
-        public int OnDeviceAdded(string deviceId) => 0;
+        /// <summary>
+        /// Windows writes the direction in the id of the endpoint:
+        /// «{0.0.0.…» is an output, «{0.0.1.…» an input (a microphone).
+        /// </summary>
+        private static bool IsPlayback(string? deviceId) =>
+            deviceId is null || !deviceId.StartsWith("{0.0.1.", StringComparison.Ordinal);
 
-        public int OnDeviceRemoved(string deviceId)
+        public void OnDeviceAdded(string pwstrDeviceId) { }
+
+        public void OnDeviceRemoved(string deviceId)
         {
             Interlocked.Increment(ref _generation);
             Log.Information("Se quitó un dispositivo de audio");
-            return 0;
         }
 
-        public int OnDefaultDeviceChanged(int flow, int role, string defaultDeviceId)
+        public void OnDefaultDeviceChanged(DataFlow flow, Role role, string defaultDeviceId)
         {
-            // Flow 0 is playback; a new microphone does not move the sound.
-            if (flow != 0)
-                return 0;
+            // A new microphone does not move the sound.
+            if (flow != DataFlow.Render)
+                return;
 
             Interlocked.Increment(ref _generation);
             Log.Information("Cambió la salida de audio predeterminada de Windows");
             NotifyOnUiThread();
-            return 0;
         }
 
-        public int OnPropertyValueChanged(string deviceId, PropertyKey key) => 0;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct PropertyKey
-    {
-        public Guid FormatId;
-        public int PropertyId;
-    }
-
-    [ComImport, Guid("BCDE0395-E52F-467C-8E3D-C4579291692E")]
-    private class MMDeviceEnumeratorComObject
-    {
-    }
-
-    [ComImport, Guid("A95664D2-9614-4F35-A746-DE8DB63617E6"),
-     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    private interface IMMDeviceEnumerator
-    {
-        [PreserveSig]
-        int EnumAudioEndpoints(int dataFlow, int stateMask, out IntPtr devices);
-
-        [PreserveSig]
-        int GetDefaultAudioEndpoint(int dataFlow, int role, out IntPtr endpoint);
-
-        [PreserveSig]
-        int GetDevice([MarshalAs(UnmanagedType.LPWStr)] string id, out IntPtr device);
-
-        [PreserveSig]
-        int RegisterEndpointNotificationCallback(IMMNotificationClient client);
-
-        [PreserveSig]
-        int UnregisterEndpointNotificationCallback(IMMNotificationClient client);
-    }
-
-    [ComImport, Guid("7991EEC9-7E89-4D85-8390-6C703CEC60C0"),
-     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    private interface IMMNotificationClient
-    {
-        [PreserveSig]
-        int OnDeviceStateChanged([MarshalAs(UnmanagedType.LPWStr)] string deviceId, int newState);
-
-        [PreserveSig]
-        int OnDeviceAdded([MarshalAs(UnmanagedType.LPWStr)] string deviceId);
-
-        [PreserveSig]
-        int OnDeviceRemoved([MarshalAs(UnmanagedType.LPWStr)] string deviceId);
-
-        [PreserveSig]
-        int OnDefaultDeviceChanged(int flow, int role, [MarshalAs(UnmanagedType.LPWStr)] string defaultDeviceId);
-
-        [PreserveSig]
-        int OnPropertyValueChanged([MarshalAs(UnmanagedType.LPWStr)] string deviceId, PropertyKey key);
+        public void OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key) { }
     }
 }

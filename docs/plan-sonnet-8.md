@@ -18,7 +18,7 @@ Valen las **reglas de trabajo** de [plan-sonnet.md](plan-sonnet.md) (sección 2)
 - Sin push. **Un commit por punto**, mensaje en inglés, en imperativo,
   explicando el porqué, terminado en
   `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`.
-- Castellano rioplatense para todo lo que se ve.
+- Español rioplatense para todo lo que se ve.
 - Archivos con CRLF y acentos: **herramienta Edit**, nunca sed/perl/
   Set-Content. Al final de cada punto: `grep -rn "Ã\|â€" src` vacío.
 - Antes de cada commit: `dotnet build` sin errores ni advertencias nuevas y
@@ -757,7 +757,7 @@ esas, el operador arma un paquete con las que ya tiene en su biblioteca y lo
 elige al instalar en sus propias PC.
 
 ### G1. Biblias libres como componentes del instalador
-- Investigá qué versiones en castellano se pueden redistribuir y conseguí el
+- Investigá qué versiones en español se pueden redistribuir y conseguí el
   texto de una fuente seria (por ejemplo eBible.org, que publica la licencia de
   cada una): seguro la Reina-Valera 1909 (dominio público); evaluá otras
   libres (por ejemplo «Biblia Libre para el Mundo» o «Versión Biblia Libre»,

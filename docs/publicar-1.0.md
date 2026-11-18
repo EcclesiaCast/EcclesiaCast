@@ -10,7 +10,7 @@ Alexis haya usado el programa en un servicio real sin fallas graves.
 El flujo de publicación toma de `CHANGELOG.md` la sección de la versión que se
 publica (`## [1.0.0]`) y, si no la encuentra, la de `## [Sin publicar]`. Esa
 sección es lo que ve la gente en el aviso de actualización, así que tiene que
-estar en castellano y bien escrita.
+estar en español y bien escrita.
 
 1. Renombrar `## [Sin publicar]` a `## [1.0.0] - AAAA-MM-DD` (la fecha del día).
 2. Arriba de esa línea, dejar un `## [Sin publicar]` **vacío** para lo que venga

@@ -8,7 +8,7 @@ consola STA en tu carpeta temporal), no escribir nunca en la biblioteca real
 (`\\localhost\C$\Users\alexi\AppData\Roaming\EcclesiaCast`; para datos reales
 copiá sólo `ecclesiacast.db` a una carpeta temporal), rama `beta6`, sin push,
 un commit por punto en inglés con `Co-Authored-By: Claude Sonnet 5.5
-<noreply@anthropic.com>`, castellano rioplatense para lo que se ve, CHANGELOG
+<noreply@anthropic.com>`, español rioplatense para lo que se ve, CHANGELOG
 [Sin publicar] y `docs/pendientes.md` al día. Mirá los tres puntos antes de
 empezar: tocan los mismos archivos (la plantilla de la barra de medios en
 `MainWindow.xaml`, `MediaInspectorWindow`, `MediaFraming`).
@@ -88,6 +88,6 @@ Rearmá el instalador de la beta.7 como en `.github/workflows/release.yml`
 -p:PublishSingleFile=false -p:Version=1.0.0-beta.7 --output publish`, y
 `"%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe" /DAppVersion=1.0.0-beta.7
 installer\EcclesiaCast.iss`). Sumá a `docs/pendientes.md`, sección 1 «Para
-probar», cómo probarlo. Informe final en castellano, para Alexis: qué quedó
+probar», cómo probarlo. Informe final en español, para Alexis: qué quedó
 hecho (con commits), cómo lo probaste, qué no pudiste probar y qué decidiste
 vos.

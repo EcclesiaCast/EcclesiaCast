@@ -18,7 +18,30 @@ public interface ISongRepository
     /// <summary>Inserts (Id 0) or updates a song, replacing its sections.</summary>
     Song Save(Song song);
 
+    /// <summary>
+    /// Sends the song to the trash (it is not erased: see <see cref="Purge"/>).
+    /// Its own theme stays with it, and goes when the song is erased for good.
+    /// </summary>
     void Delete(int id);
+
+    /// <summary>The songs in the trash, the most recently deleted first.</summary>
+    IReadOnlyList<Song> GetDeleted();
+
+    /// <summary>Takes a song back out of the trash.</summary>
+    void Restore(int id);
+
+    /// <summary>Erases a trashed song for good.</summary>
+    void Purge(int id);
+
+    /// <summary>Erases for good what was trashed before <paramref name="limit"/> (UTC).</summary>
+    void PurgeOlderThan(DateTime limit);
+
+    /// <summary>
+    /// Points a song at another theme (null: the main one) without touching
+    /// its lyrics. Like <see cref="Save"/>, an own theme the song leaves
+    /// behind is deleted: nothing else can use it.
+    /// </summary>
+    void SetTheme(int songId, int? themeId);
 
     /// <summary>
     /// Notes that a song went on the projector. Called every time a slide of

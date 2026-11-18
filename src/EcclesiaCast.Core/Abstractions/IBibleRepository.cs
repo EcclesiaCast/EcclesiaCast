@@ -24,6 +24,13 @@ public interface IBibleRepository
     void DeleteVersion(int versionId);
 
     /// <summary>
+    /// A new copy of a version takes the place of the old one: the playlist
+    /// passages that used the old one move to the new one, and the old one is
+    /// deleted.
+    /// </summary>
+    void ReplaceVersion(int oldVersionId, int newVersionId);
+
+    /// <summary>
     /// Every book and verse of a version as it would be parsed from a file —
     /// what Export writes, and what importing the file again gives back.
     /// </summary>

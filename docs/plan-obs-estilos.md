@@ -6,7 +6,7 @@ ahora quiere que **cada capa tenga su propio diseño**, pensado para la
 transmisión y no copiado del proyector, con plantillas como las de Reuna
 (ver abajo), y que lo de OBS deje de estar dentro de la ventana del celular.
 
-Todo el texto que ve el usuario va en castellano rioplatense. Comentarios de
+Todo el texto que ve el usuario va en español rioplatense. Comentarios de
 código en inglés, como el resto del proyecto. No abrir el programa: se
 comprueba con compilación, pruebas y dibujando a imagen.
 

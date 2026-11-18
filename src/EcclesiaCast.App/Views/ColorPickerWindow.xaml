@@ -14,12 +14,17 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Preview + hex -->
+        <!-- El color elegido y su código -->
         <DockPanel Grid.Row="0" Margin="0,0,0,14">
             <Border x:Name="Preview" DockPanel.Dock="Left" Width="56" Height="56" CornerRadius="6"
                     BorderBrush="{StaticResource LineBrush}" BorderThickness="1" Background="White"/>
+            <Button DockPanel.Dock="Right" Content="💧 Gotero" Style="{StaticResource DarkButton}"
+                    VerticalAlignment="Bottom" Padding="10,5" Margin="8,0,0,0" Click="Dropper_Click"
+                    AutomationProperties.Name="Tomar un color de la pantalla"
+                    ToolTip="Tomá un color de cualquier parte de la pantalla: clic donde está el color, Esc cancela"/>
             <StackPanel VerticalAlignment="Center" Margin="14,0,0,0">
                 <TextBlock Text="Código (hex)" FontSize="11" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,3"/>
                 <TextBox x:Name="HexBox" Background="{StaticResource SurfaceAltBrush}" Foreground="White"
@@ -28,54 +33,48 @@
             </StackPanel>
         </DockPanel>
 
-        <!-- Paleta de colores frecuentes -->
-        <TextBlock Grid.Row="1" Text="Colores frecuentes" FontSize="11" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,6"/>
-        <ItemsControl Grid.Row="2" x:Name="Swatches" Margin="0,0,0,14">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Button Width="30" Height="30" Margin="3" Cursor="Hand"
-                            Click="Swatch_Click" Tag="{Binding}">
-                        <Button.Template>
-                            <ControlTemplate TargetType="Button">
-                                <Border Background="{Binding}" CornerRadius="4"
-                                        BorderBrush="{StaticResource LineBrush}" BorderThickness="1"/>
-                            </ControlTemplate>
-                        </Button.Template>
-                    </Button>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        <!-- La paleta grande: tonos en columnas, de claro a oscuro; abajo, los grises -->
+        <UniformGrid Grid.Row="1" x:Name="PaletteGrid" Columns="10" Margin="0,0,0,12"/>
 
-        <!-- Sliders RGB -->
-        <StackPanel Grid.Row="3">
+        <!-- Los usados hace poco -->
+        <StackPanel Grid.Row="2" x:Name="RecentPanel" Margin="0,0,0,12" Visibility="Collapsed">
+            <TextBlock Text="Usados hace poco" FontSize="11" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,4"/>
+            <WrapPanel x:Name="RecentGrid"/>
+        </StackPanel>
+
+        <!-- Ajuste fino: tono, intensidad y claridad -->
+        <ToggleButton Grid.Row="3" x:Name="FineToggle" Content="Ajuste fino ▾" HorizontalAlignment="Left"
+                      Padding="12,5" Cursor="Hand" Foreground="White"
+                      Background="{StaticResource SurfaceAltBrush}" BorderBrush="{StaticResource LineBrush}"
+                      ToolTip="Mover el tono, la intensidad y la claridad de a poco"/>
+        <StackPanel Grid.Row="4" Margin="0,10,0,0"
+                    Visibility="{Binding IsChecked, ElementName=FineToggle, Converter={StaticResource BoolToVis}}">
             <DockPanel Margin="0,0,0,4">
-                <TextBlock Text="R" DockPanel.Dock="Left" Width="16" Foreground="#E06666" FontWeight="SemiBold"/>
-                <TextBlock x:Name="RValue" DockPanel.Dock="Right" Width="34" TextAlignment="Right" Foreground="White"/>
-                <Slider x:Name="RSlider" Minimum="0" Maximum="255" ValueChanged="Rgb_Changed"/>
+                <TextBlock Text="Tono" DockPanel.Dock="Left" Width="70" Foreground="White" FontWeight="SemiBold"/>
+                <TextBlock x:Name="HueValue" DockPanel.Dock="Right" Width="34" TextAlignment="Right" Foreground="White"/>
+                <Slider x:Name="HueSlider" Minimum="0" Maximum="360" ValueChanged="Hsv_Changed"/>
             </DockPanel>
             <DockPanel Margin="0,0,0,4">
-                <TextBlock Text="G" DockPanel.Dock="Left" Width="16" Foreground="#6FBF8F" FontWeight="SemiBold"/>
-                <TextBlock x:Name="GValue" DockPanel.Dock="Right" Width="34" TextAlignment="Right" Foreground="White"/>
-                <Slider x:Name="GSlider" Minimum="0" Maximum="255" ValueChanged="Rgb_Changed"/>
+                <TextBlock Text="Intensidad" DockPanel.Dock="Left" Width="70" Foreground="White" FontWeight="SemiBold"/>
+                <TextBlock x:Name="SatValue" DockPanel.Dock="Right" Width="34" TextAlignment="Right" Foreground="White"/>
+                <Slider x:Name="SatSlider" Minimum="0" Maximum="100" ValueChanged="Hsv_Changed"/>
             </DockPanel>
             <DockPanel>
-                <TextBlock Text="B" DockPanel.Dock="Left" Width="16" Foreground="#7CA4EF" FontWeight="SemiBold"/>
-                <TextBlock x:Name="BValue" DockPanel.Dock="Right" Width="34" TextAlignment="Right" Foreground="White"/>
-                <Slider x:Name="BSlider" Minimum="0" Maximum="255" ValueChanged="Rgb_Changed"/>
+                <TextBlock Text="Claridad" DockPanel.Dock="Left" Width="70" Foreground="White" FontWeight="SemiBold"/>
+                <TextBlock x:Name="ValValue" DockPanel.Dock="Right" Width="34" TextAlignment="Right" Foreground="White"/>
+                <Slider x:Name="ValSlider" Minimum="0" Maximum="100" ValueChanged="Hsv_Changed"/>
             </DockPanel>
         </StackPanel>
 
-        <DockPanel Grid.Row="4" Margin="0,16,0,0">
+        <DockPanel Grid.Row="5" Margin="0,16,0,0">
             <Button x:Name="TransparentButton" DockPanel.Dock="Left"
                     Content="Transparente" Style="{StaticResource DarkButton}"
                     Click="Transparent_Click" Padding="14,8"
                     Visibility="Collapsed"
                     ToolTip="Sin color de fondo: se verá el video/imagen detrás"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="Aceptar" Style="{StaticResource AccentButton}" Click="Accept_Click" Padding="20,8"/>
+                <Button Content="Aceptar" Style="{StaticResource AccentButton}" Click="Accept_Click"
+                        IsDefault="True" Padding="20,8"/>
                 <Button Content="Cancelar" Style="{StaticResource DarkButton}" IsCancel="True" Padding="20,8" Margin="8,0,0,0"/>
             </StackPanel>
         </DockPanel>

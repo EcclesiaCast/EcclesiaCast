@@ -34,10 +34,10 @@ public sealed partial class MainViewModel
     {
         if (!WebViewProfile.IsRuntimeAvailable())
         {
-            MessageBox.Show(
-                "Falta el runtime de WebView2 (Microsoft Edge WebView2), que EcclesiaCast usa para YouTube.\n\n" +
+            Notice.Show(
+                "Es el Microsoft Edge WebView2, que EcclesiaCast usa para YouTube.\n\n" +
                 "Se descarga gratis desde el sitio de Microsoft; en Windows 11 suele venir instalado.",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Information);
+                "Falta el runtime de WebView2");
             return;
         }
 
@@ -174,7 +174,7 @@ public sealed partial class MainViewModel
         }
 
         var name = Path.GetFileNameWithoutExtension(path);
-        _media.Add(new MediaItem
+        var downloaded = new MediaItem
         {
             Name = name,
             Path = path,
@@ -186,7 +186,10 @@ public sealed partial class MainViewModel
             EndBehavior = item.EndBehavior,
             Muted = item.Muted,
             Volume = item.Volume,
-        });
+        };
+        // Now a file like any other: fitted as Ajustes → Videos says (a Short is vertical).
+        ApplyNewVideoFit(downloaded);
+        _media.Add(downloaded);
 
         if (removeOnlineEntry)
             _media.Delete(item.Id);

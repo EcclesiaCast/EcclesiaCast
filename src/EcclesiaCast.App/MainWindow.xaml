@@ -14,10 +14,9 @@
         <KeyBinding Key="F2" Command="{Binding ToggleClearCommand}"/>
         <KeyBinding Key="F3" Command="{Binding ToggleLogoCommand}"/>
         <KeyBinding Key="F4" Command="{Binding ClearBackgroundCommand}"/>
-        <KeyBinding Key="Escape" Command="{Binding HideOutputCommand}"/>
+        <KeyBinding Key="Escape" Command="{Binding EscapeOutputCommand}"/>
         <!-- Una sola caja para buscar en canciones, versículos y medios -->
-        <KeyBinding Key="K" Modifiers="Control" Command="{Binding SearchEverythingCommand}"/>
-        <KeyBinding Key="F" Modifiers="Control" Command="{Binding SearchEverythingCommand}"/>
+        <KeyBinding Key="K" Modifiers="Control" Command="{Binding SearchEverythingCommand}"/>        <KeyBinding Key="F" Modifiers="Control" Command="{Binding SearchEverythingCommand}"/>
     </Window.InputBindings>
 
     <Window.Resources>
@@ -90,6 +89,46 @@
                         Value="{Binding PlaybackPositionSeconds}"
                         IsMoveToPointEnabled="True" Margin="0,6,0,0"
                         ToolTip="Arrastrá para moverte dentro del video"/>
+                <!-- Sonido: si el video está silenciado, su volumen y el de toda la salida.
+                     Dos renglones: el panel LIVE es angosto. -->
+                <Grid Margin="0,6,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="Video" FontSize="11" VerticalAlignment="Center"
+                               Foreground="{StaticResource MutedBrush}" Margin="0,0,6,0"/>
+                    <Slider Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="100" Value="{Binding BackgroundVolume}"
+                            IsMoveToPointEnabled="True" VerticalAlignment="Center"
+                            AutomationProperties.Name="Volumen del video"
+                            ToolTip="Volumen de este video (queda guardado en sus Propiedades)."/>
+                    <Button Grid.Row="0" Grid.Column="2" Content="🔇 Sin sonido" FontSize="11" Padding="6,2" Margin="6,0,0,0"
+                            Style="{StaticResource DarkButton}"
+                            Command="{Binding ToggleBackgroundSoundCommand}"
+                            Visibility="{Binding IsBackgroundMuted, Converter={StaticResource BoolToVis}}"
+                            AutomationProperties.Name="Dar sonido al video"
+                            ToolTip="Este video está silenciado. Clic: que suene."/>
+                    <Button Grid.Row="0" Grid.Column="2" Content="🔊 Suena" FontSize="11" Padding="6,2" Margin="6,0,0,0"
+                            Style="{StaticResource DarkButton}"
+                            Command="{Binding ToggleBackgroundSoundCommand}"
+                            Visibility="{Binding IsBackgroundMuted, Converter={StaticResource InverseBoolToVis}}"
+                            AutomationProperties.Name="Silenciar el video"
+                            ToolTip="Este video suena. Clic: silenciarlo."/>
+                    <TextBlock Grid.Row="1" Text="Salida" FontSize="11" VerticalAlignment="Center"
+                               Foreground="{StaticResource MutedBrush}" Margin="0,6,6,0"/>
+                    <Slider Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="100" Value="{Binding OutputVolume}"
+                            IsMoveToPointEnabled="True" VerticalAlignment="Center" Margin="0,6,0,0"
+                            AutomationProperties.Name="Volumen de toda la salida"
+                            ToolTip="Volumen de todo lo que sale de EcclesiaCast (videos y música). No toca el volumen de Windows."/>
+                    <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding OutputVolume, StringFormat={}{0} %}" FontSize="11"
+                               VerticalAlignment="Center" TextAlignment="Right" Margin="6,6,0,0"
+                               Foreground="{StaticResource MutedBrush}"/>
+                </Grid>
             </StackPanel>
         </DataTemplate>
         <!-- Menú de clic derecho de las tarjetas de la barra de medios. Es uno solo,
@@ -172,24 +211,15 @@
              para lo que se usa en medio del servicio. -->
         <Menu Grid.Row="0" Padding="6,2" FontSize="12">
 
+            <!-- Archivo quedó sólo con la biblioteca entera, Ajustes y Salir; lo
+                 de canciones, Biblias y fondos tiene su propio menú (pedido de
+                 Alexis, 13/11/2026: «hay muchas opciones»). -->
             <MenuItem Header="_Archivo">
-                <MenuItem Header="Buscar canciones en internet…" Command="{Binding SearchSongsOnlineCommand}"/>
-                <MenuItem Header="Traer canciones de otro programa…" Command="{Binding ImportFromOtherProgramCommand}"/>
-                <MenuItem Header="Importar canciones (.txt, .pro)…" Command="{Binding ImportSongsCommand}"/>
-                <MenuItem Header="Importar una Biblia (JSON o Zefania XML)…" Command="{Binding ImportBibleCommand}"/>
-                <MenuItem Header="Cómo preparar una Biblia para importar…" Command="{Binding ShowBibleFormatHelpCommand}"
-                          ToolTip="Los dos formatos que se leen, un ejemplo de cada uno y unas instrucciones para pedirle a una IA que convierta tu archivo."/>
-                <MenuItem Header="Exportar paquete de Biblias…" Command="{Binding ExportBiblePackageCommand}"
-                          ToolTip="Guarda varias versiones en un solo archivo (.ecbiblias) para llevarlas a otra computadora tuya."/>
-                <MenuItem Header="Importar paquete de Biblias…" Command="{Binding ImportBiblePackageCommand}"/>
-                <MenuItem Header="Bajar Biblias de internet…" Command="{Binding DownloadBiblePackCommand}"
-                          ToolTip="Baja el paquete de Biblias sólo a esta computadora y elegís cuáles agregar."/>
-                <MenuItem Header="Agregar imágenes, videos, PDF o PowerPoint…" Command="{Binding ImportMediaCommand}"/>
-                <MenuItem Header="Agregar paquete de fondos (.zip)…" Command="{Binding ImportBackgroundPackCommand}"/>
-                <MenuItem Header="Bajar más fondos de internet…" Command="{Binding DownloadBackgroundPackCommand}"/>
-                <Separator/>
                 <MenuItem Header="Guardar una copia de la biblioteca…" Command="{Binding SaveBackupCommand}"/>
                 <MenuItem Header="Restaurar desde una copia…" Command="{Binding RestoreBackupCommand}"/>
+                <Separator/>
+                <MenuItem Header="Ajustes…" InputGestureText="Ctrl+," Click="Settings_Click"
+                          ToolTip="Pantallas, sonido, transiciones, celular, rendimiento, actualizaciones y aspecto, todo en una ventana."/>
                 <Separator/>
                 <MenuItem Header="Salir" Click="Exit_Click"/>
             </MenuItem>
@@ -202,8 +232,37 @@
                 <Separator/>
                 <MenuItem Header="Temas…" Command="{Binding OpenThemesCommand}"/>
                 <MenuItem Header="Logos…" Command="{Binding OpenLogosCommand}"/>
+                <MenuItem Header="Papelera…" Command="{Binding OpenTrashCommand}"/>
                 <Separator/>
                 <MenuItem Header="Buscar en todo" InputGestureText="Ctrl+K" Command="{Binding SearchEverythingCommand}"/>
+            </MenuItem>
+
+            <MenuItem Header="_Canciones">
+                <MenuItem Header="Buscar canciones en internet…" Command="{Binding SearchSongsOnlineCommand}"/>
+                <MenuItem Header="Traer canciones de otro programa…" Command="{Binding ImportFromOtherProgramCommand}"/>
+                <MenuItem Header="Importar canciones (.txt, .pro)…" Command="{Binding ImportSongsCommand}"/>
+            </MenuItem>
+
+            <MenuItem Header="_Biblias">
+                <MenuItem Header="Bajar Biblias de internet…" Command="{Binding DownloadBiblePackCommand}"
+                          ToolTip="Baja el paquete de Biblias sólo a esta computadora y elegís cuáles agregar."/>
+                <Separator/>
+                <MenuItem Header="Importar una Biblia (JSON o Zefania XML)…" Command="{Binding ImportBibleCommand}"/>
+                <MenuItem Header="Cómo preparar una Biblia para importar…" Command="{Binding ShowBibleFormatHelpCommand}"
+                          ToolTip="Los dos formatos que se leen, un ejemplo de cada uno y unas instrucciones para pedirle a una IA que convierta tu archivo."/>
+                <Separator/>
+                <MenuItem Header="Exportar paquete de Biblias…" Command="{Binding ExportBiblePackageCommand}"
+                          ToolTip="Guarda varias versiones en un solo archivo (.ecbiblias) para llevarlas a otra computadora tuya."/>
+                <MenuItem Header="Importar paquete de Biblias…" Command="{Binding ImportBiblePackageCommand}"/>
+            </MenuItem>
+
+            <MenuItem Header="_Fondos">
+                <MenuItem Header="Agregar imágenes, videos, PDF o PowerPoint…" Command="{Binding ImportMediaCommand}"/>
+                <MenuItem Header="Agregar paquete de fondos (.zip)…" Command="{Binding ImportBackgroundPackCommand}"/>
+                <Separator/>
+                <MenuItem Header="Bajar más fondos de internet…" Command="{Binding DownloadBackgroundPackCommand}"/>
+                <MenuItem Header="Buscar fondos en Pixabay…" Click="Pixabay_Click"
+                          ToolTip="Videos y fotos de fondo que se pueden usar gratis, para bajar a una pestaña de medios"/>
             </MenuItem>
 
             <MenuItem Header="_Ver" SubmenuOpened="ViewMenu_SubmenuOpened">
@@ -280,6 +339,9 @@
                 <MenuItem Header="Transiciones…" Click="Transitions_Click"
                           ToolTip="Cuántos segundos tardan en aparecer y desaparecer el logo, los cambios de imagen o video, la pantalla negra y el apagado de la salida."/>
                 <MenuItem Header="Controlar desde el celular…" Command="{Binding OpenRemoteCommand}"/>
+                <MenuItem Header="Seguir la canción por lo que se escucha (beta)…" Click="Listening_Click"
+                          Visibility="{Binding IsListeningAvailable, Converter={StaticResource BoolToVis}}"
+                          ToolTip="El programa escucha el micrófono o la entrada de línea y sugiere o pasa las diapositivas de la canción abierta. Está en prueba."/>
                 <Separator/>
                 <MenuItem Header="Actualizar la lista de pantallas" Command="{Binding RefreshDisplaysCommand}"/>
             </MenuItem>
@@ -460,7 +522,7 @@
                             ToolTip="Actualizar pantallas"
                             Padding="9,6" Margin="6,0,14,0"/>
                     <Button Command="{Binding ToggleOutputCommand}"
-                            ToolTip="Prende o apaga la ventana de salida en la pantalla elegida. Con la salida prendida, la tecla Esc la apaga.">
+                            ToolTip="Prende o apaga la ventana de salida en la pantalla elegida. Con la salida prendida, Esc también la apaga.">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
                                 <Setter Property="Content" Value="🔴  Poner en vivo"/>
@@ -472,7 +534,7 @@
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding IsProjecting}" Value="True">
                                         <Setter Property="Content" Value="Apagar salida"/>
-                                        <Setter Property="controls:ShortcutHint.Text" Value="Esc"/>
+                                        <Setter Property="controls:ShortcutHint.Text" Value="Esc ×2"/>
                                         <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
                                         <Setter Property="BorderThickness" Value="1"/>
                                     </DataTrigger>
@@ -598,6 +660,7 @@
                                          FontSize="13"
                                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                                          ToolTip="Buscar por título, artista o letra"/>
+                                <Grid>
                                 <ListBox x:Name="SongsList" ItemsSource="{Binding Songs}"
                                          PreviewMouseLeftButtonDown="SongsList_PreviewMouseLeftButtonDown"
                                          PreviewMouseMove="SongsList_PreviewMouseMove"
@@ -627,6 +690,9 @@
                                                                   CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                                         <MenuItem Header="Editar como texto plano"
                                                                   Command="{Binding PlacementTarget.Tag.EditSongTextForCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                        <MenuItem Header="Tema de esta canción…"
+                                                                  Command="{Binding PlacementTarget.Tag.EditSongThemeForCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                                   CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                                         <Separator/>
                                                         <MenuItem Header="Agregar a la playlist"
@@ -690,6 +756,25 @@
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
                                 </ListBox>
+                                <!-- Lista vacía: dice qué hacer (biblioteca sin canciones) -->
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16"
+                                            Visibility="{Binding IsSongLibraryEmpty, Converter={StaticResource BoolToVis}}">
+                                    <TextBlock Text="Todavía no hay canciones." Style="{StaticResource PlaceholderText}"
+                                               Margin="0,0,0,8"/>
+                                    <Button Content="Buscar en internet" Padding="10,6" Style="{StaticResource DarkButton}"
+                                            Command="{Binding SearchSongsOnlineCommand}"/>
+                                    <Button Content="Traer de otro programa" Padding="10,6" Margin="0,6,0,0"
+                                            Style="{StaticResource DarkButton}"
+                                            Command="{Binding ImportFromOtherProgramCommand}"/>
+                                    <Button Content="Escribir una nueva" Padding="10,6" Margin="0,6,0,0"
+                                            Style="{StaticResource DarkButton}"
+                                            Command="{Binding NewSongCommand}"/>
+                                </StackPanel>
+                                <!-- El buscador no encontró nada -->
+                                <TextBlock Text="Ninguna canción con eso." IsHitTestVisible="False"
+                                           Style="{StaticResource PlaceholderText}"
+                                           Visibility="{Binding IsSongSearchEmpty, Converter={StaticResource BoolToVis}}"/>
+                                </Grid>
                             </DockPanel>
 
                             <!-- ── Pestaña Biblia ── -->
@@ -880,6 +965,22 @@
                                         Click="BibleHistoryButton_Click"
                                         AutomationProperties.Name="Historial de versículos"
                                         ToolTip="Historial de los versículos que proyectaste: clic carga y marca el versículo, doble clic lo proyecta. También: flecha ↓ en la caja vacía."/>
+                                <Button x:Name="BibleViewToggleButton" DockPanel.Dock="Right"
+                                        FontSize="11" Padding="8,6" Margin="6,0,0,0"
+                                        Command="{Binding ToggleBibleViewCommand}"
+                                        AutomationProperties.Name="Cambiar la vista de la Biblia"
+                                        ToolTip="Vista en grilla: los libros como fichas de colores, con los capítulos y versículos al lado. Vista en lista: la de siempre. Escribir una cita («jn 3 16») + Enter funciona en las dos.">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                            <Setter Property="Content" Value="▦ Grilla"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsBibleGridView}" Value="True">
+                                                    <Setter Property="Content" Value="☰ Lista"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
                                 <TextBox x:Name="BibleQueryBox"
                                          Padding="8,6"
                                          PreviewKeyDown="BibleQueryBox_PreviewKeyDown"
@@ -1069,6 +1170,235 @@
                                             </ItemsControl>
                                         </ScrollViewer>
                                     </DockPanel>
+
+                                    <!-- Vista en grilla: los libros como fichas de colores por grupo,
+                                         y al pie los capítulos y los versículos del libro elegido -->
+                                    <Grid x:Name="BibleGridHost"
+                                          Visibility="{Binding ShowBibleGrid, Converter={StaticResource BoolToVis}}">
+                                        <!-- Los libros y, con un libro elegido, sus capítulos y versículos:
+                                             se reparten el alto en lugar de que el pie tenga uno fijo -->
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition>
+                                                <RowDefinition.Style>
+                                                    <Style TargetType="RowDefinition">
+                                                        <Setter Property="Height" Value="*"/>
+                                                        <Setter Property="MinHeight" Value="120"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding BibleChaptersOpen}" Value="False">
+                                                                <Setter Property="Height" Value="0"/>
+                                                                <Setter Property="MinHeight" Value="0"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding SelectedBibleBook}" Value="{x:Null}">
+                                                                <Setter Property="Height" Value="0"/>
+                                                                <Setter Property="MinHeight" Value="0"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </RowDefinition.Style>
+                                            </RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <!-- Cómo se ven las fichas, y capítulos abiertos o cerrados -->
+                                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="8,0,4,4">
+                                            <!-- Un solo botón: cada toque pasa a la forma siguiente de las fichas -->
+                                            <Button FontSize="11" Padding="8,3" MinWidth="96"
+                                                    Command="{Binding CycleBibleGridFormatCommand}"
+                                                    AutomationProperties.Name="Forma de las fichas"
+                                                    ToolTip="Cambia cómo se ven las fichas: sólo la abreviatura, abreviatura y nombre, o el nombre. Cada toque pasa a la siguiente.">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                                        <Setter Property="Content" Value="Fichas: Gn"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding BibleGridFormat}" Value="Both">
+                                                                <Setter Property="Content" Value="Fichas: Gn + nombre"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding BibleGridFormat}" Value="Names">
+                                                                <Setter Property="Content" Value="Fichas: Nombre"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                            <Button FontSize="11" Padding="8,3" Margin="10,0,0,0"
+                                                    Command="{Binding ToggleBibleChaptersCommand}"
+                                                    AutomationProperties.Name="Mostrar u ocultar capítulos y versículos"
+                                                    ToolTip="Oculta los capítulos y versículos para ver todos los libros más grandes">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                                        <Setter Property="Content" Value="▾ Ocultar capítulos"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding BibleChaptersOpen}" Value="False">
+                                                                <Setter Property="Content" Value="▴ Mostrar capítulos"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                        </StackPanel>
+
+                                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                                                      HorizontalScrollBarVisibility="Disabled">
+                                            <ItemsControl x:Name="BibleTilesControl" ItemsSource="{Binding BibleBookTiles}" Margin="8,0,4,4">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <WrapPanel/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Button Width="{Binding DataContext.BibleTileWidth, ElementName=BibleGridHost}"
+                                                                Height="{Binding DataContext.BibleTileHeight, ElementName=BibleGridHost}" Margin="2"
+                                                                Command="{Binding DataContext.SelectBibleBookTileCommand, ElementName=BibleGridHost}"
+                                                                CommandParameter="{Binding}"
+                                                                AutomationProperties.Name="{Binding Name}">
+                                                            <Button.ToolTip>
+                                                                <TextBlock>
+                                                                    <Run Text="{Binding Name, Mode=OneWay}" FontWeight="SemiBold"/>
+                                                                    <Run Text=" · "/>
+                                                                    <Run Text="{Binding GroupName, Mode=OneWay}"/>
+                                                                </TextBlock>
+                                                            </Button.ToolTip>
+                                                            <Button.Template>
+                                                                <ControlTemplate TargetType="Button">
+                                                                    <Border x:Name="bd" Background="{Binding FillBrush}"
+                                                                            BorderBrush="{Binding AccentBrush}"
+                                                                            BorderThickness="1" CornerRadius="4">
+                                                                        <StackPanel VerticalAlignment="Center">
+                                                                            <TextBlock x:Name="abbr" Text="{Binding Abbreviation}"
+                                                                                       FontSize="{Binding DataContext.BibleTileAbbrSize, ElementName=BibleGridHost}" FontWeight="Bold"
+                                                                                       Foreground="{Binding AccentBrush}"
+                                                                                       HorizontalAlignment="Center"/>
+                                                                            <TextBlock x:Name="full" Text="{Binding Name}"
+                                                                                       FontSize="8.5"
+                                                                                       Foreground="{StaticResource MutedBrush}"
+                                                                                       HorizontalAlignment="Center"
+                                                                                       TextTrimming="CharacterEllipsis"
+                                                                                       Margin="3,0"/>
+                                                                        </StackPanel>
+                                                                    </Border>
+                                                                    <ControlTemplate.Triggers>
+                                                                        <DataTrigger Binding="{Binding Format}" Value="Abbreviation">
+                                                                            <Setter TargetName="full" Property="Visibility" Value="Collapsed"/>
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Format}" Value="Names">
+                                                                            <Setter TargetName="abbr" Property="Visibility" Value="Collapsed"/>
+                                                                            <Setter TargetName="full" Property="FontSize" Value="11"/>
+                                                                            <Setter TargetName="full" Property="FontWeight" Value="SemiBold"/>
+                                                                            <Setter TargetName="full" Property="Foreground" Value="{Binding AccentBrush}"/>
+                                                                        </DataTrigger>
+                                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                                            <Setter TargetName="bd" Property="BorderThickness" Value="2"/>
+                                                                        </Trigger>
+                                                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                            <Setter TargetName="bd" Property="Background" Value="{Binding AccentBrush}"/>
+                                                                            <Setter TargetName="abbr" Property="Foreground" Value="{StaticResource BgBrush}"/>
+                                                                            <Setter TargetName="full" Property="Foreground" Value="{StaticResource BgBrush}"/>
+                                                                        </DataTrigger>
+                                                                    </ControlTemplate.Triggers>
+                                                                </ControlTemplate>
+                                                            </Button.Template>
+                                                        </Button>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+
+                                        <!-- Capítulos y versículos, uno al lado del otro -->
+                                        <Grid Grid.Row="2" Margin="8,4,8,0">
+                                            <Grid.Style>
+                                                <Style TargetType="Grid">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding BibleChaptersOpen}" Value="False">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding SelectedBibleBook}" Value="{x:Null}">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Grid.Style>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="6"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <DockPanel Grid.Column="0">
+                                                <TextBlock DockPanel.Dock="Top" Text="{Binding ChaptersTitle}"
+                                                           FontSize="11" FontWeight="SemiBold" Foreground="White"
+                                                           Margin="2,0,0,3" TextTrimming="CharacterEllipsis"/>
+                                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                                    <ItemsControl ItemsSource="{Binding BibleChapters}">
+                                                        <ItemsControl.ItemsPanel>
+                                                            <ItemsPanelTemplate>
+                                                                <WrapPanel/>
+                                                            </ItemsPanelTemplate>
+                                                        </ItemsControl.ItemsPanel>
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Button Content="{Binding Number}"
+                                                                        Width="31" Height="26" Margin="1"
+                                                                        Padding="0" FontSize="11"
+                                                                        Command="{Binding DataContext.SelectChapterCommand, ElementName=BibleGridHost}"
+                                                                        CommandParameter="{Binding}">
+                                                                    <Button.Style>
+                                                                        <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                                                            <Style.Triggers>
+                                                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                                    <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                                                                    <Setter Property="BorderThickness" Value="0"/>
+                                                                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                                                                </DataTrigger>
+                                                                            </Style.Triggers>
+                                                                        </Style>
+                                                                    </Button.Style>
+                                                                </Button>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </ScrollViewer>
+                                            </DockPanel>
+
+                                            <DockPanel Grid.Column="2">
+                                                <TextBlock DockPanel.Dock="Top" Text="Versículos"
+                                                           FontSize="11" FontWeight="SemiBold" Foreground="White"
+                                                           Margin="2,0,0,3"/>
+                                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                                    <ItemsControl ItemsSource="{Binding BibleVerses}">
+                                                        <ItemsControl.ItemsPanel>
+                                                            <ItemsPanelTemplate>
+                                                                <WrapPanel/>
+                                                            </ItemsPanelTemplate>
+                                                        </ItemsControl.ItemsPanel>
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Button Content="{Binding Number}"
+                                                                        Width="31" Height="26" Margin="1"
+                                                                        Padding="0" FontSize="11"
+                                                                        Command="{Binding DataContext.SelectVerseCommand, ElementName=BibleGridHost}"
+                                                                        CommandParameter="{Binding}"
+                                                                        ToolTip="Proyecta este versículo">
+                                                                    <Button.Style>
+                                                                        <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                                                            <Style.Triggers>
+                                                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                                    <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                                                                    <Setter Property="BorderThickness" Value="0"/>
+                                                                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                                                                </DataTrigger>
+                                                                            </Style.Triggers>
+                                                                        </Style>
+                                                                    </Button.Style>
+                                                                </Button>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </ScrollViewer>
+                                            </DockPanel>
+                                        </Grid>
+                                    </Grid>
 
                                     <!-- Resultados de búsqueda por texto -->
                                     <ListBox x:Name="BibleResultsList"
@@ -1342,6 +1672,14 @@
                                 <ComboBoxItem Content="4"/>
                             </ComboBox>
                         </StackPanel>
+                        <!-- Sólo con una canción en la grilla: qué tema usa (el principal, uno
+                             propio u otro elegido); clic abre el tema de esta canción. -->
+                        <Button DockPanel.Dock="Right" Content="{Binding SongThemeLabel}" FontSize="11" Padding="8,3" Margin="10,0,0,0"
+                                Style="{StaticResource DarkButton}"
+                                Command="{Binding EditSongThemeCommand}"
+                                Visibility="{Binding IsSongOpen, Converter={StaticResource BoolToVis}}"
+                                AutomationProperties.Name="Tema de esta canción"
+                                ToolTip="{Binding SongThemeHint}"/>
                         <!-- Sólo con una presentación en la grilla -->
                         <Button DockPanel.Dock="Right" Content="➕ Playlist" FontSize="11" Padding="8,3" Margin="10,0,0,0"
                                 Style="{StaticResource DarkButton}"
@@ -1419,6 +1757,8 @@
                                                         <MenuItem Header="Editar como texto plano (canción)"
                                                                   Command="{Binding PlacementTarget.Tag.EditSongAsTextCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                                   CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                        <MenuItem Header="Tema de esta canción…"
+                                                                  Command="{Binding PlacementTarget.Tag.EditSongThemeCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                                         <Separator/>
                                                         <MenuItem Header="Copiar"
                                                                   Command="{Binding PlacementTarget.Tag.CopySlideCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
@@ -1660,6 +2000,7 @@
                                                     FillMedia="{Binding Projection.BackgroundFill}"
                                                     BackgroundBlur="{Binding Projection.BackgroundBlur}"
                                                     LiveVideoFrame="{Binding Projection.LiveFrame}"
+                                                    LogoVideoFrame="{Binding Projection.LiveLogoFrame}"
                                                     Logo="{Binding Projection.ActiveLogo}"/>
                         </Border>
                         </controls:AspectFitBox>
@@ -2242,6 +2583,11 @@
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding OpenImageSearchCommand}"
                                 ToolTip="Buscar imágenes y GIF en Google Imágenes y agregarlos a la pestaña actual con clic derecho → Agregar a medios"/>
+                        <Button Content="🎞 Fondos" FontSize="11" Padding="8,4" Margin="6,0,0,0"
+                                Style="{StaticResource DarkButton}"
+                                Click="Pixabay_Click"
+                                AutomationProperties.Name="Buscar fondos en Pixabay"
+                                ToolTip="Buscar videos y fotos de fondo en Pixabay, que se pueden usar gratis, y bajarlos a una pestaña"/>
                         <Button Content="🖥 Ventana" FontSize="11" Padding="8,4" Margin="6,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding OpenWindowPickerCommand}"
@@ -2537,6 +2883,32 @@
                     <TextBlock Text="📡 EN VIVO SÓLO EN LA TRANSMISIÓN · sin ventana de salida"
                                FontSize="12" FontWeight="SemiBold" Foreground="White"/>
                 </Border>
+                <!-- Seguir la canción (beta): mientras escucha, se ve acá qué está haciendo -->
+                <Button DockPanel.Dock="Right"
+                        Margin="4,4,6,4" Padding="8,2" VerticalAlignment="Center"
+                        Click="Listening_Click"
+                        ToolTip="Seguir la canción por lo que se escucha (beta). Clic para abrir sus opciones.">
+                    <Button.Style>
+                        <!-- Sólo se ve si la función está disponible (archivo señal) y escuchando -->
+                        <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsListeningAvailable}" Value="True"/>
+                                        <Condition Binding="{Binding IsListening}" Value="True"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Width="8" Height="8" Fill="#6FBF8F" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding ListenStatus}" FontSize="12" MaxWidth="460"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                </Button>
                 <TextBlock x:Name="StatusLine"
                            Text="{Binding StatusText}"
                            FontSize="12" Foreground="{StaticResource MutedBrush}"

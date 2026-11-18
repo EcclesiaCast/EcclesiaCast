@@ -740,7 +740,7 @@ public sealed partial class MainViewModel
 
             // Videos the shell can't decode get their poster from VLC afterwards,
             // in the background, so a batch import doesn't freeze the window.
-            _media.Add(new MediaItem
+            var item = new MediaItem
             {
                 Name = Path.GetFileNameWithoutExtension(path),
                 Path = path,
@@ -753,10 +753,13 @@ public sealed partial class MainViewModel
 
                 // A picture goes in whole («Ajustar»), and the bars the screen shape
                 // leaves are filled with a blurred copy of itself, so it looks like
-                // one picture. A video keeps what it always had.
+                // one picture. A video gets what Ajustes → Videos says (by
+                // default the same: whole, with itself blurred in the bars).
                 Scaling = type == MediaType.Image ? MediaScaling.Fit : default,
                 FillMediaId = type == MediaType.Image ? MediaItem.FillWithSelfId : null,
-            });
+            };
+            ApplyNewVideoFit(item);
+            _media.Add(item);
             added++;
             if (type == MediaType.Video)
                 newVideos.Add((path, Path.GetFileNameWithoutExtension(path)));
@@ -788,7 +791,6 @@ public sealed partial class MainViewModel
         if (newVideos.Count > 0)
         {
             _ = OfferLightCopiesAsync(newVideos);
-            _ = GiveSoundToLongVideosAsync(newVideos.Select(v => v.Path).ToList());
         }
 
         if (documents.Count > 0)
@@ -829,7 +831,7 @@ public sealed partial class MainViewModel
                     continue;
                 }
 
-                _media.Add(new MediaItem
+                var gifVideo = new MediaItem
                 {
                     Name = name,
                     Path = video,
@@ -840,7 +842,10 @@ public sealed partial class MainViewModel
                     // A GIF has no sound and never ends: it loops, silent.
                     Muted = true,
                     EndBehavior = VideoEndBehavior.Loop,
-                });
+                };
+                // GIFs come in every shape: fitted as Ajustes → Videos says.
+                ApplyNewVideoFit(gifVideo);
+                _media.Add(gifVideo);
                 converted++;
             }
         }
@@ -1224,62 +1229,6 @@ public sealed partial class MainViewModel
     /// Every path that puts a media on the output, or puts it there again
     /// after a change, goes through this.
     /// </summary>
-    /// <summary>
-    /// A video longer than this, with sound, comes in with its sound on: it
-    /// is a testimony or an announcement, not a loop (loops are seconds long).
-    /// </summary>
-    private static readonly TimeSpan SoundedVideoMinimum = TimeSpan.FromSeconds(40);
-
-    /// <summary>
-    /// Videos come in silent, as backgrounds. One that carries sound and
-    /// lasts more than <see cref="SoundedVideoMinimum"/> gets its sound on,
-    /// unless its tab is one of backgrounds or is silenced: a church that
-    /// brought in a testimony video found it mute and did not know about
-    /// Propiedades.
-    /// </summary>
-    private async Task GiveSoundToLongVideosAsync(IReadOnlyList<string> paths)
-    {
-        try
-        {
-            if (App.VideoEngine is not { } engine)
-                return;
-
-            var sounded = new List<string>();
-            foreach (var path in paths)
-            {
-                var probe = await Task.Run(() => VideoSoundProbe.Probe(engine, path));
-                if (probe is { HasSound: true } p && p.Duration >= SoundedVideoMinimum)
-                    sounded.Add(path);
-            }
-            if (sounded.Count == 0)
-                return;
-
-            var names = new List<string>();
-            foreach (var item in _allMedia.Where(m => m.Type == MediaType.Video && m.Muted
-                         && sounded.Contains(m.Path, StringComparer.OrdinalIgnoreCase)).ToList())
-            {
-                var rule = string.IsNullOrWhiteSpace(item.Category) ? MediaTabRule.Default : TabRule(item.Category);
-                if (rule.Mode == MediaTabMode.Background || rule.Muted)
-                    continue;
-
-                item.Muted = false;
-                _media.Update(item);
-                names.Add(item.Name);
-            }
-            if (names.Count == 0)
-                return;
-
-            Serilog.Log.Information("Entran con sonido los videos largos con sonido: {Names}", string.Join(", ", names));
-            StatusText = names.Count == 1
-                ? $"«{names[0]}» trae sonido: se va a escuchar. Para silenciarlo, 🔊 en la barra del fondo o sus Propiedades."
-                : $"{names.Count} videos traen sonido y se van a escuchar. Para silenciar uno, 🔊 en la barra del fondo o sus Propiedades.";
-        }
-        catch (Exception ex)
-        {
-            Serilog.Log.Warning(ex, "No se pudo ver si los videos nuevos traen sonido");
-        }
-    }
-
     private MediaItem Resolved(MediaItem item)
     {
         item = Playable(item);
@@ -1418,6 +1367,14 @@ public sealed partial class MainViewModel
 
         if (_presentation.State == OutputState.Clear && _presentation.CurrentSlide is not null)
             _presentation.ToggleClear();
+
+        // F4 with the output off turns it on showing the text, like F1 to F3.
+        if (!IsProjecting)
+        {
+            if (_presentation.CurrentSlide is not null)
+                _presentation.ShowState(OutputState.Content);
+            EnsureOutputOn();
+        }
 
         StatusText = "Fondo quitado; la letra sigue en pantalla.";
     }

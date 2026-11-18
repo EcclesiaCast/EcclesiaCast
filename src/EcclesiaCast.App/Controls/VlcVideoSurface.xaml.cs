@@ -87,8 +87,13 @@ public partial class VlcVideoSurface : UserControl
         };
 
         // The framing is given over a 1920×1080 canvas: a different window
-        // size means different numbers.
-        SizeChanged += (_, _) => MediaFraming.Apply(Surface, _framing, ActualWidth, ActualHeight);
+        // size means different numbers. A different shape may also make bars
+        // appear or go.
+        SizeChanged += (_, _) =>
+        {
+            MediaFraming.Apply(Surface, _framing, ActualWidth, ActualHeight);
+            UpdateBackdrop();
+        };
 
         // A held picture keeps the framing it was taken with, so it only needs
         // the new size (it never lives long enough for anything else).
@@ -128,10 +133,10 @@ public partial class VlcVideoSurface : UserControl
         // Every change of slide puts the same background on again: the
         // equalizer is only touched when the volume really changed.
         PlayerSound.KeepSessionFull(player);
-        var volume = Math.Clamp(media.Volume, 0, 100);
+        var volume = PlayerSound.Effective(media.Volume);
         if (volume != _appliedVolume)
         {
-            PlayerSound.SetVolume(player, volume);
+            PlayerSound.SetVolume(player, media.Volume);
             _appliedVolume = volume;
         }
 
@@ -433,6 +438,16 @@ public partial class VlcVideoSurface : UserControl
     /// <summary>Raised on the UI thread when a video draws its first picture.</summary>
     public event EventHandler? FirstFrame;
 
+    /// <summary>
+    /// The bitmap the frames are written into, raised with the first frame
+    /// of every video put on. Whoever draws it elsewhere (the logo layer, for
+    /// a video logo) sees the video move without a second player.
+    /// </summary>
+    public event EventHandler<ImageSource>? FrameSourceChanged;
+
+    /// <summary>The playback whose first frame was last announced.</summary>
+    private int _announcedGeneration = -1;
+
     private readonly DispatcherTimer _holdTimer = new() { Interval = TimeSpan.FromSeconds(2) };
     private bool _holdTimerHooked;
     private int _holdVersion;
@@ -523,6 +538,10 @@ public partial class VlcVideoSurface : UserControl
                 ClearHold();
         };
         Hold.BeginAnimation(OpacityProperty, animation);
+
+        // No video follows: its blurred bars fade out with its last picture.
+        if (_currentId < 0 && Backdrop.Visibility == Visibility.Visible)
+            Backdrop.BeginAnimation(OpacityProperty, new System.Windows.Media.Animation.DoubleAnimation(0, fade));
     }
 
     private void ClearHold()
@@ -533,6 +552,10 @@ public partial class VlcVideoSurface : UserControl
         Hold.Opacity = 1;
         Hold.Visibility = Visibility.Collapsed;
         Hold.Source = null;
+
+        // The blurred bars of a video that is gone go with its last picture.
+        if (_currentId < 0)
+            HideBackdrop();
     }
 
     private void StartHoldTimer()
@@ -727,6 +750,12 @@ public partial class VlcVideoSurface : UserControl
             MediaFraming.SetBlur(Hold, radius);
     }
 
+    private void OnMasterChanged(object? sender, EventArgs e)
+    {
+        if (_player is { } player)
+            PlayerSound.KeepSessionFull(player);
+    }
+
     private MediaPlayer? EnsurePlayer(LibVLC engine)
     {
         if (_player is not null)
@@ -759,6 +788,7 @@ public partial class VlcVideoSurface : UserControl
 
             _player = player;
             _appliedVolume = -1;
+            PlayerSound.MasterChanged += OnMasterChanged;
             return player;
         }
         catch (Exception ex)
@@ -771,6 +801,7 @@ public partial class VlcVideoSurface : UserControl
     private void Dispose()
     {
         AudioEndpointWatcher.OutputChanged -= OnAudioOutputChanged;
+        PlayerSound.MasterChanged -= OnMasterChanged;
         _holdTimer.Stop();
         ClearHold();
 
@@ -824,7 +855,126 @@ public partial class VlcVideoSurface : UserControl
     /// </summary>
     private void ApplyStretch() =>
         Dispatcher.BeginInvoke(() =>
-            MediaFraming.Apply(Surface, _framing, ActualWidth, ActualHeight));
+        {
+            MediaFraming.Apply(Surface, _framing, ActualWidth, ActualHeight);
+            UpdateBackdrop();
+        });
+
+    // ── El mismo video, desenfocado, en los bordes ───────────────
+
+    /// <summary>
+    /// Set on the output's background video only: it draws a blurred copy of
+    /// itself in the bars when its item asks for it. The logo's player and the
+    /// one that plays another video as fill never do.
+    /// </summary>
+    public bool DrawsOwnBackdrop { get; set; }
+
+    /// <summary>Read by VLC's thread on every frame: whether to make the small blurred copy.</summary>
+    private volatile bool _backdropWanted;
+
+    private uint[]? _backdropPixels, _backdropScratch;
+    private int _backdropWidth, _backdropHeight;
+    private bool _backdropReady;
+    private WriteableBitmap? _backdropBitmap;
+
+    /// <summary>
+    /// Decides whether the blurred copy is drawn, from the item, the shape of
+    /// the video and the shape of the screen. UI thread. While the shape of a
+    /// new video is not known yet the copy of the previous one stays, under
+    /// its held last frame, so the bars do not flash black in the change.
+    /// </summary>
+    private void UpdateBackdrop()
+    {
+        if (!DrawsOwnBackdrop)
+            return;
+
+        if (_currentId < 0 || _framing is not { FillsWithOwnVideo: true })
+        {
+            _backdropWanted = false;
+            HideBackdrop();
+            return;
+        }
+
+        int width, height;
+        lock (_sync)
+        {
+            width = _bitmapWidth;
+            height = _bitmapHeight;
+        }
+
+        if (width <= 0 || height <= 0)
+        {
+            _backdropWanted = false;
+            return;
+        }
+
+        var wanted = VideoBackdrop.ShowsBars(_framing, width, height, ActualWidth, ActualHeight);
+        _backdropWanted = wanted;
+        if (!wanted)
+            HideBackdrop();
+    }
+
+    private void HideBackdrop()
+    {
+        Backdrop.BeginAnimation(OpacityProperty, null);
+        Backdrop.Opacity = 1;
+        Backdrop.Visibility = Visibility.Collapsed;
+        Backdrop.Source = null;
+        _backdropBitmap = null;
+    }
+
+    /// <summary>
+    /// Shrinks and softens the frame in the buffer into the small copy. VLC's
+    /// thread, with <see cref="_sync"/> held. About 9 000 pixels: hundredths
+    /// of a millisecond.
+    /// </summary>
+    private unsafe void MakeBackdrop()
+    {
+        if (_buffer == IntPtr.Zero || _width <= 0 || _height <= 0)
+            return;
+
+        var (w, h) = VideoBackdrop.SmallSize(_width, _height);
+        if (_backdropPixels is null || _backdropPixels.Length != w * h)
+        {
+            _backdropPixels = new uint[w * h];
+            _backdropScratch = new uint[w * h];
+        }
+
+        _backdropWidth = w;
+        _backdropHeight = h;
+        var frame = new ReadOnlySpan<byte>((void*)_buffer, _stride * _height);
+        VideoBackdrop.Shrink(frame, _width, _height, _stride, _backdropPixels, w, h);
+        VideoBackdrop.Soften(_backdropPixels, w, h, _backdropScratch);
+        _backdropReady = true;
+    }
+
+    /// <summary>Puts the small copy just made on screen. UI thread, with <see cref="_sync"/> held.</summary>
+    private void ShowBackdrop()
+    {
+        _backdropReady = false;
+        if (!_backdropWanted || _backdropPixels is null)
+            return;
+
+        if (_backdropBitmap is null
+            || _backdropBitmap.PixelWidth != _backdropWidth
+            || _backdropBitmap.PixelHeight != _backdropHeight)
+        {
+            _backdropBitmap = new WriteableBitmap(_backdropWidth, _backdropHeight, 96, 96, PixelFormats.Bgr32, null);
+            Backdrop.Source = _backdropBitmap;
+        }
+
+        _backdropBitmap.WritePixels(
+            new Int32Rect(0, 0, _backdropWidth, _backdropHeight), _backdropPixels, _backdropWidth * 4, 0);
+
+        // A video put on while the bars of the one before were fading away.
+        if (Backdrop.HasAnimatedProperties)
+        {
+            Backdrop.BeginAnimation(OpacityProperty, null);
+            Backdrop.Opacity = 1;
+        }
+
+        Backdrop.Visibility = Visibility.Visible;
+    }
 
     // ── Callbacks de VLC (hilo de decodificación) ────────────────
 
@@ -910,6 +1060,13 @@ public partial class VlcVideoSurface : UserControl
             }
         }
 
+        // The blurred copy for the bars, from this same frame.
+        if (_backdropWanted)
+        {
+            lock (_sync)
+                MakeBackdrop();
+        }
+
         Dispatcher.BeginInvoke(DispatcherPriority.Render, () =>
         {
             var firstFrame = false;
@@ -944,6 +1101,9 @@ public partial class VlcVideoSurface : UserControl
                     _bitmap.WritePixels(
                         new Int32Rect(0, 0, _width, _height), _buffer, _stride * _height, _stride);
 
+                    if (_backdropReady)
+                        ShowBackdrop();
+
                     if (_previewReady)
                     {
                         _previewReady = false;
@@ -964,8 +1124,16 @@ public partial class VlcVideoSurface : UserControl
 
                 // The new picture is drawn: the old one held in front of it
                 // can fade away now, and so can whatever else was kept for it.
+                if ((firstFrame || generation != _announcedGeneration) && _bitmap is { } made)
+                {
+                    _announcedGeneration = generation;
+                    FrameSourceChanged?.Invoke(this, made);
+                }
+
                 if (firstFrame)
                 {
+                    // The shape of the video is known now: bars or not.
+                    UpdateBackdrop();
                     ReleaseHold(HoldFade);
                     FirstFrame?.Invoke(this, EventArgs.Empty);
                 }

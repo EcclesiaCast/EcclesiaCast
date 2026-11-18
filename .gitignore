@@ -487,3 +487,6 @@ dist/
 # Website design reviews (screenshots) and local preview settings
 .impeccable/review/
 .claude/launch.json
+
+# Campaign pieces are rendered by docs/campana/generar.ps1
+docs/campana/salida/

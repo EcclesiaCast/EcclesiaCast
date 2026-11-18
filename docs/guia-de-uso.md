@@ -7,7 +7,8 @@ secciones en orden.
 
 Arriba a la derecha, en **Salida**, elegí el monitor del proyector (EcclesiaCast
 prefiere solo el que no es el principal). El botón **🔴 Poner en vivo** enciende
-y apaga la proyección; **Esc** también la apaga.
+y apaga la proyección; **Esc**
+también la apaga.
 
 La pantalla elegida se recuerda para la próxima vez.
 
@@ -26,7 +27,9 @@ En la pestaña **Canciones**:
   **Importar archivo (.txt, .pro)…**. Crear desde cero abre una canción en
   blanco: pegá la letra, y **cada párrafo** (bloque separado por
   una línea en blanco) es una diapositiva. Opcionalmente, una línea `[Coro]` o
-  `[Verso 1]` no se proyecta, solo le pone nombre a los párrafos que siguen.
+  `[Estrofa 1]` no se proyecta, solo le pone nombre a los párrafos que siguen:
+  los botones **Coro**, **Estrofa**, **Puente** y **Final**, arriba de la letra,
+  la escriben por vos sobre el párrafo donde está el cursor.
 - **➕ → Traer de otro programa…** trae **todas** las canciones de ProPresenter o de
   EasyWorship de una vez. Arriba elegís el programa (cada opción dice cuántas
   canciones encontró); la ventana busca sola dónde está instalado (ProPresenter
@@ -34,7 +37,7 @@ En la pestaña **Canciones**:
   canciones tiene cada una y las importa. Si una canción ya está, pregunta qué
   hacer. Si están en otro lado (un disco externo, una copia de otra máquina), usá
   **Elegir carpeta…**: en EasyWorship es la que tiene `Songs.db` y `SongWords.db`.
-- **➕ → Buscar en internet…** (también en **Archivo**) trae una canción
+- **➕ → Buscar en internet…** (también en el menú **Canciones**) trae una canción
   nueva sin copiar y pegar: escribí el **nombre**, el **artista** o **una frase
   de la letra** y apretá Enter. Busca en musica.com y, si no está ahí, en
   lrclib.net. Al elegir un resultado ves la letra ya separada en diapositivas
@@ -56,13 +59,13 @@ desde la primera. Las flechas **←→** navegan en vivo.
 
 En la pestaña **Biblia**:
 
-- **📥** importa una Biblia en **JSON** o **Zefania XML**. Si la tuya está en otro formato (Word, PDF, texto), **Archivo → Cómo preparar una Biblia para importar…** trae un ejemplo de cada formato y unas instrucciones para pedirle a una IA que la convierta.
+- **📥** importa una Biblia en **JSON** o **Zefania XML**. Si la tuya está en otro formato (Word, PDF, texto), **Biblias → Cómo preparar una Biblia para importar…** trae un ejemplo de cada formato y unas instrucciones para pedirle a una IA que la convierta.
 - El instalador te deja elegir qué **Biblias libres** instalar (Reina-Valera
   1909, Biblia libre para el mundo y Versión Biblia Libre); aparecen solas la
   primera vez que abrís el programa. Las que tienen derechos (RVR1960, NVI…)
   no vienen con el instalador: para llevarlas a otra computadora tuya, en
-  **Archivo → Exportar paquete de Biblias…** marcás las versiones y se guarda
-  un archivo `.ecbiblias`; en la otra, **Archivo → Importar paquete de
+  **Biblias → Exportar paquete de Biblias…** marcás las versiones y se guarda
+  un archivo `.ecbiblias`; en la otra, **Biblias → Importar paquete de
   Biblias…** (o la página «Paquete de Biblias propio» del instalador) las
   trae. Usá los paquetes sólo en tus propias computadoras.
 - Las versiones van en una fila de botones con su abreviatura. Un **clic**
@@ -111,7 +114,12 @@ En la barra **MEDIOS**, abajo:
 - **Clic derecho → Propiedades** abre el Inspector:
   - **Comportamiento**: *Fondo* (detrás del texto) o *Primer plano* (pantalla
     completa, tapa el texto — para anuncios o videos institucionales).
-  - **Escala**: *Rellenar* (recorta), *Ajustar* (con barras) o *Estirar*.
+  - **Escala**: *Rellenar* (recorta), *Ajustar* (entero, con bordes) o
+    *Estirar*. Un video nuevo entra como diga **Archivo → Ajustes… → Videos**:
+    de fábrica, *Ajustar* con **el mismo video, desenfocado** en los bordes,
+    así un video vertical, cuadrado o 4:3 (o cualquiera en un proyector de
+    1024×768) se ve entero y sin franjas negras. Cambiar ese ajuste no toca
+    los videos que ya están en la biblioteca.
   - **Qué sigue después**: en un video, repetir en bucle, nada, el logo u
     **otro medio de la biblioteca**. En una imagen en primer plano, cuántos
     segundos se ve y qué pasa pasados esos segundos (nada: sale de la
@@ -129,9 +137,10 @@ En la barra **MEDIOS**, abajo:
   - **Recorte del video**: desde qué segundo arranca y hasta cuál llega. Sirve
     para saltear la cortina o el logo del principio; el bucle respeta el
     recorte y vuelve al segundo que marcaste, no al cero.
-  - **Los bordes se rellenan con**: un color, o **otra imagen o video** de la
-    biblioteca detrás. El truco de siempre es poner una copia desenfocada del
-    mismo video como relleno.
+  - **Los bordes se rellenan con**: un color, **la misma imagen o el mismo
+    video, desenfocado** (parece uno solo, sin bordes), u **otra imagen o
+    video** de la biblioteca detrás. El video desenfocado sale de los mismos
+    cuadros que ya se están dibujando: no abre un segundo reproductor.
 - **Sin fondo (F4)**, arriba, lo quita **sin sacar la letra**.
 - Con un video en pantalla aparece la **barra de reproducción**: volver al
   principio, ±10 segundos, reproducir/pausar y una barra para moverte. Al lado
@@ -340,15 +349,20 @@ programa recuerda lo que elijas.
 | **F2** | *Clear* — oculta el texto, deja el fondo |
 | **F3** | *Logo* |
 | **F4** | Quita el fondo, dejando la letra |
-| **Esc** | Apaga la salida |
+| **Esc** dos veces | Apaga la salida (el primer toque sólo avisa) |
 | **Ctrl+Enter** | Proyecta el texto rápido |
 
 - **Logos**: la flecha **▾** al lado de *Logo (F3)* elige cuál se muestra —
   podés tener uno para la reunión general, otro para jóvenes, otro para
   mujeres. Cada logo puede ser una **imagen**, un **video en bucle** o un
   **texto libre** con su tipografía y colores; se arman en *Administrar
-  logos…*. El botón **🖼▦** de al lado pone el logo **de fondo**, detrás de la
-  letra, con el desenfoque que le hayas puesto.
+  logos…*. Una imagen o un video que no es 16:9 (un logo cuadrado, por
+  ejemplo) se acomoda igual que un fondo: entero, rellenando o estirado, con
+  zoom, corrido, a un tamaño fijo, y con los bordes del color de fondo, de la
+  misma imagen desenfocada o de otra imagen de la biblioteca. En la vista
+  previa se arrastra para correrlo y la ruedita hace zoom. El botón **🖼▦** de
+  al lado pone el logo **de fondo**, detrás de la letra, con el desenfoque que
+  le hayas puesto.
 
 - **Texto rápido**: escribí un anuncio y proyectalo al momento.
 - **Aviso al pie**: un mensaje que aparece sobre todo lo demás (ideal para
@@ -476,7 +490,9 @@ un **Browser Source** distinto cada una:
 - Cada página muestra lo suyo sólo cuando eso está al aire en el proyector, y
   queda vacía (transparente) el resto del tiempo.
 - Las imágenes y los videos se ajustan como en el proyector (Rellenar, Ajustar o
-  Estirar). El zoom y el corrimiento de Propiedades **no** se aplican.
+  Estirar), y si los bordes llevan la misma imagen o el mismo video
+  desenfocado, también. El zoom y el corrimiento de Propiedades **no** se
+  aplican.
 - El video **va sin sonido** en la transmisión, porque el sonido ya sale por la
   computadora del proyector. Si lo querés ahí, agregá `&sonido=1` al final.
 - Un video en la transmisión empieza cuando aparece, no necesariamente al mismo

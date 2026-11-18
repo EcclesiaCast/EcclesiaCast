@@ -1,0 +1,117 @@
+<Window x:Class="EcclesiaCast.App.Views.ListeningWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:EcclesiaCast.App.Controls"
+        Title="Seguir la canción (beta)"
+        Width="470" SizeToContent="Height"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BgBrush}"
+        FontFamily="Segoe UI">
+    <Window.Resources>
+        <Style x:Key="Label" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="Margin" Value="0,14,0,4"/>
+        </Style>
+        <Style x:Key="Hint" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="{StaticResource FaintBrush}"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Margin" Value="0,4,0,0"/>
+        </Style>
+        <Style TargetType="RadioButton">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Margin" Value="0,6,0,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+
+    <StackPanel Margin="20">
+        <TextBlock Foreground="{StaticResource MutedBrush}" FontSize="12" TextWrapping="Wrap"
+                   Text="El programa escucha lo que entra por el micrófono o la entrada de línea y sigue la canción que está abierta. Está en prueba: anda mejor con canciones lentas y voces claras, y vos siempre mandás con las flechas."/>
+
+        <!-- El reconocedor de voz se baja una sola vez -->
+        <Border Margin="0,14,0,0" Padding="12" CornerRadius="6"
+                Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
+                Visibility="{Binding NeedsListenModel, Converter={StaticResource BoolToVis}}">
+            <StackPanel>
+                <TextBlock Text="{Binding ListenModelText}" Foreground="White" FontSize="12" TextWrapping="Wrap"/>
+                <Button Margin="0,10,0,0" HorizontalAlignment="Left" Padding="14,6"
+                        Style="{StaticResource AccentButton}"
+                        Command="{Binding DownloadListenModelCommand}">
+                    <Button.Content>
+                        <TextBlock>
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text" Value="Bajar el reconocedor de voz"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsDownloadingListenModel}" Value="True">
+                                            <Setter Property="Text" Value="Cancelar la descarga"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Button.Content>
+                </Button>
+            </StackPanel>
+        </Border>
+
+        <TextBlock Text="De dónde escucha" Style="{StaticResource Label}"/>
+        <DockPanel>
+            <Button DockPanel.Dock="Right" Content="↻" Padding="9,3" Margin="6,0,0,0"
+                    Style="{StaticResource DarkButton}"
+                    Command="{Binding RefreshListenDevicesCommand}" ToolTip="Volver a buscar las entradas"/>
+            <ComboBox ItemsSource="{Binding ListenDevices}" SelectedItem="{Binding SelectedListenDevice}"
+                      DisplayMemberPath="Name" FontSize="12"/>
+        </DockPanel>
+        <!-- Nivel de la entrada -->
+        <Border Height="8" Margin="0,8,0,0" CornerRadius="4" Background="{StaticResource SurfaceAltBrush}">
+            <ProgressBar Minimum="0" Maximum="100" Value="{Binding ListenLevel, Mode=OneWay}"
+                         Background="Transparent" BorderThickness="0"
+                         Foreground="#6FBF8F"/>
+        </Border>
+        <TextBlock Style="{StaticResource Hint}"
+                   Text="Con el programa escuchando, la barra tiene que moverse con la música. «Lo que suena en esta PC» sirve para probar en casa con una grabación."/>
+
+        <TextBlock Text="Qué hace con lo que escucha" Style="{StaticResource Label}"/>
+        <RadioButton GroupName="ListenMode" Content="Sólo sugerir: marca la diapositiva que sigue y vos apretás Enter"
+                     IsChecked="{Binding ListenModeIndex, Converter={StaticResource IndexIs}, ConverterParameter=0}"/>
+        <RadioButton GroupName="ListenMode" Content="Seguir: pone la diapositiva cuando escucha que la están cantando"
+                     IsChecked="{Binding ListenModeIndex, Converter={StaticResource IndexIs}, ConverterParameter=1}"/>
+        <RadioButton GroupName="ListenMode" Content="Adelantarse: pasa a la que sigue cuando la actual está terminando"
+                     IsChecked="{Binding ListenModeIndex, Converter={StaticResource IndexIs}, ConverterParameter=2}"/>
+
+        <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+            <TextBlock Text="Pasar cuando falten" Foreground="White" FontSize="12" VerticalAlignment="Center"/>
+            <controls:NumericField Minimum="0" Maximum="12" Step="1" Margin="8,0"
+                                   Value="{Binding ListenLeadWords}"
+                                   ToolTip="Para sugerir y adelantarse. Más palabras = pasa antes. Con 2 la diapositiva suele llegar justo antes de que la canten; si llega tarde, subilo."/>
+            <TextBlock Text="palabras de la diapositiva" Foreground="White" FontSize="12" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <Border Margin="0,16,0,0" Padding="12" CornerRadius="6"
+                Background="#0B0D12" BorderBrush="{StaticResource LineBrush}" BorderThickness="1">
+            <StackPanel>
+                <TextBlock Text="{Binding ListenStatus}" Foreground="{StaticResource AccentSoftBrush}"
+                           FontSize="13" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding ListenHeard}" Foreground="{StaticResource MutedBrush}"
+                           FontSize="12" FontStyle="Italic" TextWrapping="Wrap" Margin="0,6,0,0"
+                           MinHeight="34"/>
+            </StackPanel>
+        </Border>
+
+        <DockPanel Margin="0,16,0,0">
+            <Button DockPanel.Dock="Right" Content="Cerrar" Style="{StaticResource DarkButton}"
+                    Padding="18,8" IsCancel="True" Click="Close_Click"
+                    ToolTip="La ventana se cierra; si está escuchando, sigue escuchando"/>
+            <Button Content="{Binding ListenButtonText}" Style="{StaticResource AccentButton}"
+                    HorizontalAlignment="Left" Padding="18,8"
+                    Command="{Binding ToggleListeningCommand}"/>
+        </DockPanel>
+    </StackPanel>
+</Window>

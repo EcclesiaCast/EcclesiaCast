@@ -20,6 +20,7 @@ namespace EcclesiaCast.App;
 public partial class MainWindow : Window
 {
     private const string LayoutLibraryKey = "layout.library.width";
+    private const string LayoutBibleGridKey = "layout.biblegrid.width";
     private const string LayoutPreviewKey = "layout.preview.width";
     private const string LayoutPlaylistKey = "layout.playlist.height";
     private const string LayoutMediaKey = "layout.media.height";
@@ -30,6 +31,8 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        InputBindings.Add(new KeyBinding(
+            new CommunityToolkit.Mvvm.Input.RelayCommand(OpenSettings), Key.OemComma, ModifierKeys.Control));
         if (EcclesiaCast.App.Services.AppInfo.HasDonateUrl)
             DonateMenuItem.Visibility = Visibility.Visible;
 
@@ -41,6 +44,11 @@ public partial class MainWindow : Window
             vm.IsOutputMerged = !_outputSplit;
             vm.MediaSelectionChanged += (_, _) => RefreshMediaSelectionVisuals();
 
+            // The grid of the Bible scrolls to the book picked or typed.
+            vm.BibleBookTileFocusRequested += (_, tile) => Dispatcher.BeginInvoke(
+                System.Windows.Threading.DispatcherPriority.Loaded,
+                () => (BibleTilesControl.ItemContainerGenerator.ContainerFromItem(tile) as FrameworkElement)?.BringIntoView());
+
             // The web panel: the view model decides when it is open or live;
             // this window shows or hides it and keeps the keyboard honest.
             vm.WebHost = WebPanelView;
@@ -48,6 +56,14 @@ public partial class MainWindow : Window
             {
                 if (args.PropertyName == nameof(MainViewModel.StatusAlert))
                     FlashStatusBar();
+            };
+
+            // The Bible grid has a library width of its own; the songs and the
+            // Bible as a list share the other one.
+            vm.PropertyChanged += (_, args) =>
+            {
+                if (args.PropertyName is nameof(MainViewModel.IsBibleTabActive) or nameof(MainViewModel.IsBibleGridView))
+                    SyncLibraryWidth();
             };
             WebPanelView.KeyboardFocusChanged += (_, _) => SyncShortcutsWithWebFocus();
             vm.PropertyChanged += (_, args) =>
@@ -139,6 +155,8 @@ public partial class MainWindow : Window
         // the right keeps the width it had on the left.
         if (ReadDouble(LayoutLibraryKey) is double library)
             _libraryWidth = library;
+        if (ReadDouble(LayoutBibleGridKey) is double bibleGrid)
+            _bibleGridWidth = bibleGrid;
         if (ReadDouble(LayoutPreviewKey) is double preview)
             _rightWidth = preview;
         if (ReadDouble(LayoutPlaylistKey) is double playlist)
@@ -175,6 +193,7 @@ public partial class MainWindow : Window
         {
             CaptureSizes();
             _settings.Set(LayoutLibraryKey, _libraryWidth.ToString("0"));
+            _settings.Set(LayoutBibleGridKey, _bibleGridWidth.ToString("0"));
             _settings.Set(LayoutPreviewKey, _rightWidth.ToString("0"));
             _settings.Set(LayoutPlaylistKey, _playlistHeight.ToString("0"));
             _settings.Set(LayoutMediaKey, _mediaHeight.ToString("0"));
@@ -637,7 +656,7 @@ public partial class MainWindow : Window
         MediaCardState.SetIsLive(card, vm.LiveMediaId == media.Id);
         if (media.FillMediaId is int fillId
             && card.Template.FindName("preview", card) is FramedMediaPreview preview)
-            preview.FillMedia = media.FillsWithSelf ? media : vm.FindMedia(fillId);
+            preview.FillMedia = media.FillsWithSelf || media.FillsWithOwnVideo ? media : vm.FindMedia(fillId);
     }
 
     /// <summary>
@@ -789,20 +808,90 @@ public partial class MainWindow : Window
     /// changed and nothing is heard even though the automatic reopening ran
     /// (or did not notice).
     /// </summary>
-    private void Transitions_Click(object sender, RoutedEventArgs e)
+    private void Transitions_Click(object sender, RoutedEventArgs e) => OpenTransitions(this);
+
+    /// <summary>Opens the transitions window over <paramref name="owner"/> (the menu and the Ajustes window share it).</summary>
+    internal void OpenTransitions(Window owner)
     {
         if (_settings is null)
             return;
 
-        new Views.TransitionsWindow(_settings) { Owner = this }.ShowDialog();
+        new Views.TransitionsWindow(_settings) { Owner = owner }.ShowDialog();
     }
 
-    private void RestartSound_Click(object sender, RoutedEventArgs e)
+    private Views.PixabayWindow? _pixabayWindow;
+
+    /// <summary>«Buscar fondos en Pixabay»: one window, beside this one, that keeps its results.</summary>
+    private void Pixabay_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm)
+            return;
+
+        if (_pixabayWindow is { IsLoaded: true })
+        {
+            _pixabayWindow.Activate();
+            return;
+        }
+
+        _pixabayWindow = new Views.PixabayWindow(vm) { Owner = this };
+        _pixabayWindow.Closed += (_, _) => _pixabayWindow = null;
+        _pixabayWindow.Show();
+    }
+
+    private Views.ListeningWindow? _listeningWindow;
+
+    private void Listening_Click(object sender, RoutedEventArgs e) => OpenListening();
+
+    /// <summary>
+    /// «Seguir la canción (beta)»: its window stays beside this one (it is
+    /// not modal), so the operator sees what the program hears while working.
+    /// </summary>
+    internal void OpenListening()
+    {
+        if (DataContext is not ViewModels.MainViewModel { IsListeningAvailable: true })
+            return;
+
+        if (DataContext is not MainViewModel vm)
+            return;
+
+        if (_listeningWindow is { IsLoaded: true })
+        {
+            _listeningWindow.Activate();
+            return;
+        }
+
+        _listeningWindow = new Views.ListeningWindow(vm) { Owner = this };
+        _listeningWindow.Closed += (_, _) => _listeningWindow = null;
+        _listeningWindow.Show();
+    }
+
+    private void RestartSound_Click(object sender, RoutedEventArgs e) => RestartSound();
+
+    internal void RestartSound()
     {
         AudioEndpointWatcher.RequestRestart();
         if (DataContext is MainViewModel vm)
             vm.StatusText = "Sonido reiniciado: la música y los videos vuelven a abrir la salida de audio.";
     }
+
+    /// <summary>Ctrl+, and Archivo → «Ajustes…».</summary>
+    private void Settings_Click(object sender, RoutedEventArgs e) => OpenSettings();
+
+    private void OpenSettings()
+    {
+        if (_settingsWindow is { IsLoaded: true })
+        {
+            _settingsWindow.Activate();
+            return;
+        }
+
+        // Not modal: it is a place to look around while the service goes on.
+        _settingsWindow = new Views.SettingsWindow(this) { Owner = this, DataContext = DataContext };
+        _settingsWindow.Closed += (_, _) => _settingsWindow = null;
+        _settingsWindow.Show();
+    }
+
+    private Views.SettingsWindow? _settingsWindow;
 
     private void MediaMenu_Opened(object sender, RoutedEventArgs e)
     {

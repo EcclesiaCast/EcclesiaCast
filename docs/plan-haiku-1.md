@@ -11,7 +11,7 @@ Leelo entero antes de tocar nada. Valen las **reglas de trabajo** de
 - Rama `beta6`, sin push. **Un commit por punto**, mensaje en inglés en
   imperativo, y al final:
   `Co-Authored-By: Claude Haiku 5.5 <noreply@anthropic.com>`
-- Castellano rioplatense para todo lo que se ve («elegí», «podés»).
+- Español rioplatense para todo lo que se ve («elegí», «podés»).
 - Los archivos tienen fin de línea CRLF y acentos: **usá la herramienta Edit**.
   Nunca sed, perl ni Set-Content (rompen los acentos). Después de cada punto:
   `grep -rn "Ã\|â€" src` tiene que dar vacío.

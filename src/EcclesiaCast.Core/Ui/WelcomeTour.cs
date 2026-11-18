@@ -58,7 +58,7 @@ public static class WelcomeTour
         new(ScreenButtons, "Botones de pantalla",
             "Black tapa todo, Clear saca la letra y deja el fondo, Logo muestra el logo. 🎨 Temas cambia el diseño, 🎭 Escenario prende la pantalla de los músicos y 📱 lo manejás desde el celular."),
         new(GoLive, "Salir en vivo",
-            "Elegí en «Salida» el proyector o la pantalla, y apretá «Poner en vivo». La tecla Esc apaga la salida."),
+            "Elegí en «Salida» el proyector o la pantalla, y apretá «Poner en vivo». Apretar Esc apaga la salida."),
         new(null, "¡Listo!",
             "Lo podés volver a ver cuando quieras en Ayuda → «Recorrido del programa». ¡Que sea de bendición!"),
     ];

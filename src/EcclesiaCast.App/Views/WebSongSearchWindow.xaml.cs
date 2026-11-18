@@ -338,8 +338,8 @@ public partial class WebSongSearchWindow : Window
         catch (Exception ex)
         {
             Log.Error(ex, "No se pudo guardar la canción {Title}", title);
-            MessageBox.Show("No se pudo guardar la canción. El detalle está en el registro de la aplicación.",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Error);
+            Notice.Show("El detalle está en el registro de la aplicación.",
+                "No se pudo guardar la canción", NoticeKind.Error);
         }
     }
 }

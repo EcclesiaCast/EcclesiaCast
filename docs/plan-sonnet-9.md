@@ -98,5 +98,5 @@ publicar]`); sí para el punto 15 si cambia el arranque.
     al empezar otro fundido. Arreglo: `max(2 s, fundido + margen)` y detener
     `_heldImageTimer` al empezar un fundido de imagen.
 
-Informe final en castellano: por punto, commit, qué hiciste y cómo lo
+Informe final en español: por punto, commit, qué hiciste y cómo lo
 verificaste, o por qué no lo tocaste.

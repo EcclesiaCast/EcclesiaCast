@@ -48,10 +48,10 @@ public sealed partial class MainViewModel
     {
         if (!StartRemote())
         {
-            MessageBox.Show(
-                "No se pudo abrir ningún puerto para la salida de OBS. "
-                + "Puede que otro programa los esté usando.",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
+            Notice.Show(
+                "Puede que otro programa los esté usando.",
+                "No se pudo abrir ningún puerto para la salida de OBS",
+                NoticeKind.Warning);
             return;
         }
 
@@ -107,10 +107,10 @@ public sealed partial class MainViewModel
     {
         if (!StartRemote())
         {
-            MessageBox.Show(
-                "No se pudo abrir ningún puerto para el control remoto. "
-                + "Puede que otro programa los esté usando.",
-                "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Warning);
+            Notice.Show(
+                "Puede que otro programa los esté usando.",
+                "No se pudo abrir ningún puerto para el control remoto",
+                NoticeKind.Warning);
             return;
         }
 
@@ -305,7 +305,8 @@ public sealed partial class MainViewModel
                 MediaScaling.Stretch => "fill",
                 _ => "cover",
             },
-            Loop: media.Type == MediaType.Video && media.EndBehavior == VideoEndBehavior.Loop);
+            Loop: media.Type == MediaType.Video && media.EndBehavior == VideoEndBehavior.Loop,
+            Backdrop: media.Scaling == MediaScaling.Fit && (media.FillsWithSelf || media.FillsWithOwnVideo));
     }
 
     /// <summary>

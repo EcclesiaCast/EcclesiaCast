@@ -37,6 +37,37 @@ public sealed partial class MainViewModel
         }
     }
 
+    /// <summary>
+    /// «Contar en forma anónima que se usó» in Ajustes → Actualizaciones.
+    /// Turning it off forgets the installation's number.
+    /// </summary>
+    public bool IsUsageCountEnabled
+    {
+        get => EcclesiaCast.Core.Diagnostics.UsageCount.IsEnabled(_settings);
+        set
+        {
+            if (IsUsageCountEnabled == value)
+                return;
+
+            EcclesiaCast.Core.Diagnostics.UsageCount.SetEnabled(_settings, value);
+            if (!value)
+                EcclesiaCast.Core.Diagnostics.UsageCount.Forget(_settings);
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(UsageChurchName));
+        }
+    }
+
+    /// <summary>The optional name of the church, told with the count of use (Ajustes → Actualizaciones).</summary>
+    public string UsageChurchName
+    {
+        get => EcclesiaCast.Core.Diagnostics.UsageCount.ChurchName(_settings);
+        set
+        {
+            EcclesiaCast.Core.Diagnostics.UsageCount.SetChurchName(_settings, value);
+            OnPropertyChanged();
+        }
+    }
+
     private void InitializeUpdates()
     {
         // The search runs by itself, so the answer may come from any thread.

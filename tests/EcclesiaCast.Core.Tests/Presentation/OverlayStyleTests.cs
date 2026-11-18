@@ -37,7 +37,7 @@ public class OverlayStyleTests
     }
 
     [Fact]
-    public void El_tamano_se_guarda_con_punto_aunque_Windows_este_en_castellano()
+    public void El_tamano_se_guarda_con_punto_aunque_Windows_este_en_espanol()
     {
         var previous = CultureInfo.CurrentCulture;
         try

@@ -11,11 +11,14 @@ namespace EcclesiaCast.App;
 /// </summary>
 public partial class MainWindow
 {
+    /// <summary>True while the «avanzado» layout (no shortcut hints) is on.</summary>
+    internal bool IsAdvancedUi => AdvancedModeItem.IsChecked;
+
     private void RestoreUiMode() =>
         ApplyUiMode(OperatorLayout.IsAdvanced(_settings?.Get(OperatorLayout.SettingKey)));
 
     /// <summary>Changes the layout and remembers the choice for the next service.</summary>
-    private void SetUiMode(bool advanced)
+    internal void SetUiMode(bool advanced)
     {
         ApplyUiMode(advanced);
         _settings?.Set(OperatorLayout.SettingKey, OperatorLayout.ToSetting(advanced));
