@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EcclesiaCast.Presentation.Remote;
@@ -57,10 +56,7 @@ public sealed partial class MainViewModel
     [ObservableProperty]
     private bool _isStopwatchRunning;
 
-    private readonly System.Windows.Threading.DispatcherTimer _timesTimer = new()
-    {
-        Interval = TimeSpan.FromMilliseconds(500),
-    };
+    private readonly IUiTimer _timesTimer;
 
     private bool _loadingSections;
 
