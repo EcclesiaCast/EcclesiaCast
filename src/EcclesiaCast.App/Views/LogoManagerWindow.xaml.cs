@@ -1,13 +1,10 @@
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Threading;
 using EcclesiaCast.App.Services;
-using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Logos;
 using EcclesiaCast.Core.Media;
+using EcclesiaCast.Presentation.ViewModels;
 
 namespace EcclesiaCast.App.Views;
 
@@ -15,62 +12,42 @@ namespace EcclesiaCast.App.Views;
 /// Manages the church's logos: one per kind of meeting (general, youth,
 /// women's…), each an image, a looping video or plain text. Edits are written
 /// as they happen, so the picker in the main window is always up to date.
+/// What is decided and written is in <see cref="LogoManagerViewModel"/>; this
+/// window places the controls and moves the logo in the preview.
 /// </summary>
 public partial class LogoManagerWindow : Window
 {
-    private readonly ILogoRepository _logos;
-    private readonly List<Logo> _items = [];
+    private readonly LogoManagerViewModel _viewModel;
     private bool _loading;
 
-    public LogoManagerWindow(ILogoRepository logos)
+    public LogoManagerWindow(LogoManagerViewModel viewModel)
     {
         InitializeComponent();
-        _logos = logos;
+        _viewModel = viewModel;
 
-        FontCombo.ItemsSource = Fonts.SystemFontFamilies.Select(f => f.Source).OrderBy(n => n).ToList();
+        FontCombo.ItemsSource = _viewModel.FontNames;
 
         // Dragging the logo in the preview changes the fields many times a
         // second: the preview follows at once, the library is written when it stops.
-        _saveTimer.Tick += (_, _) => FlushSave();
-        Closing += (_, _) => FlushSave();
+        _viewModel.PreviewChanged += logo => Preview.Logo = logo;
+        _viewModel.Saved += logo =>
+        {
+            // The list shows the name and an icon per kind, so it has to redraw.
+            LogosList.Items.Refresh();
+            Preview.Logo = logo.Clone();
+        };
+        Closing += (_, _) => _viewModel.FlushSave();
 
         Reload(null);
     }
-
-    private readonly DispatcherTimer _saveTimer = new() { Interval = TimeSpan.FromMilliseconds(400) };
-    private Logo? _pendingSave;
-
-    private void SaveSoon(Logo logo)
-    {
-        _pendingSave = logo;
-        Preview.Logo = logo.Clone();
-        _saveTimer.Stop();
-        _saveTimer.Start();
-    }
-
-    private void FlushSave()
-    {
-        _saveTimer.Stop();
-        if (_pendingSave is { } logo)
-        {
-            _pendingSave = null;
-            Save(logo);
-        }
-    }
-
-    /// <summary>True if anything was added, edited or removed.</summary>
-    public bool ChangesMade { get; private set; }
 
     private Logo? Current => LogosList.SelectedItem as Logo;
 
     private void Reload(int? keepId)
     {
-        _items.Clear();
-        _items.AddRange(_logos.GetAll());
-
         LogosList.ItemsSource = null;
-        LogosList.ItemsSource = _items;
-        LogosList.SelectedItem = _items.FirstOrDefault(l => l.Id == keepId) ?? _items.FirstOrDefault();
+        LogosList.ItemsSource = _viewModel.Items;
+        LogosList.SelectedItem = _viewModel.Pick(keepId);
 
         // Nothing left to edit: blank the form out.
         if (Current is null)
@@ -79,7 +56,7 @@ public partial class LogoManagerWindow : Window
 
     private void LogosList_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        FlushSave();
+        _viewModel.FlushSave();
         if (Current is not { } logo)
         {
             Fields.IsEnabled = false;
@@ -89,28 +66,28 @@ public partial class LogoManagerWindow : Window
         Fields.IsEnabled = true;
         _loading = true;
 
-        NameBox.Text = logo.Name;
-        KindBox.SelectedIndex = (int)logo.Kind;
-        PathBox.Text = logo.Path ?? string.Empty;
-        ScalingBox.SelectedIndex = (int)logo.Scaling;
-        MuteCheck.IsChecked = logo.Muted;
-        TextBoxField.Text = logo.Text;
-        FontCombo.Text = logo.FontFamily;
-        SizeField.SetSilently(logo.FontSize);
-        BoldCheck.IsChecked = logo.Bold;
-        TextColorBox.Text = logo.TextColor;
-        BackColorBox.Text = logo.BackgroundColor;
-        BlurField.SetSilently(logo.BackgroundBlur);
+        var form = LogoForm.Of(logo);
+        NameBox.Text = form.Name;
+        KindBox.SelectedIndex = form.KindIndex;
+        PathBox.Text = form.Path;
+        ScalingBox.SelectedIndex = form.ScalingIndex;
+        MuteCheck.IsChecked = form.Muted;
+        TextBoxField.Text = form.Text;
+        FontCombo.Text = form.FontFamily;
+        SizeField.SetSilently(form.FontSize);
+        BoldCheck.IsChecked = form.Bold;
+        TextColorBox.Text = form.TextColor;
+        BackColorBox.Text = form.BackgroundColor;
+        BlurField.SetSilently(form.BackgroundBlur);
 
         // Encuadre.
-        ZoomField.SetSilently(Math.Round((logo.Zoom <= 0 ? 1 : logo.Zoom) * 100));
-        OffsetXField.SetSilently(Math.Round(logo.OffsetX * 1000) / 10);
-        OffsetYField.SetSilently(Math.Round(logo.OffsetY * 1000) / 10);
-        var hasFrame = logo.FrameWidth is > 0 && logo.FrameHeight is > 0;
-        FixedSizeCheck.IsChecked = hasFrame;
-        FrameWidthField.SetSilently(logo.FrameWidth ?? 1920);
-        FrameHeightField.SetSilently(logo.FrameHeight ?? 1080);
-        SizeRow.IsEnabled = PresetBox.IsEnabled = hasFrame;
+        ZoomField.SetSilently(form.ZoomPercent);
+        OffsetXField.SetSilently(form.OffsetXPercent);
+        OffsetYField.SetSilently(form.OffsetYPercent);
+        FixedSizeCheck.IsChecked = form.FixedSize;
+        FrameWidthField.SetSilently(form.FrameWidth);
+        FrameHeightField.SetSilently(form.FrameHeight);
+        SizeRow.IsEnabled = PresetBox.IsEnabled = form.FixedSize;
         PresetBox.SelectedIndex = 0;
         LoadFillOptions(logo.Kind, logo.FillMediaId);
 
@@ -133,53 +110,42 @@ public partial class LogoManagerWindow : Window
         if (_loading || Current is not { } logo)
             return;
 
-        logo.Name = string.IsNullOrWhiteSpace(NameBox.Text) ? "Logo" : NameBox.Text.Trim();
-        logo.Kind = (LogoKind)Math.Clamp(KindBox.SelectedIndex, 0, 2);
-        logo.Scaling = (MediaScaling)Math.Max(0, ScalingBox.SelectedIndex);
-        logo.Muted = MuteCheck.IsChecked == true;
-        logo.Text = TextBoxField.Text;
-        logo.FontFamily = string.IsNullOrWhiteSpace(FontCombo.Text) ? "Segoe UI" : FontCombo.Text.Trim();
-        logo.FontSize = SizeField.Value;
-        logo.Bold = BoldCheck.IsChecked == true;
-        logo.TextColor = TextColorBox.Text.Trim();
-        logo.BackgroundColor = BackColorBox.Text.Trim();
-        logo.BackgroundBlur = BlurField.Value;
-
-        logo.Zoom = Math.Clamp(ZoomField.Value / 100, 0.1, 4);
-        logo.OffsetX = Math.Clamp(OffsetXField.Value / 100, -MediaFraming.MaxOffset, MediaFraming.MaxOffset);
-        logo.OffsetY = Math.Clamp(OffsetYField.Value / 100, -MediaFraming.MaxOffset, MediaFraming.MaxOffset);
-        var fixedSize = FixedSizeCheck.IsChecked == true;
-        logo.FrameWidth = fixedSize ? (int)Math.Clamp(FrameWidthField.Value, 16, 1920) : null;
-        logo.FrameHeight = fixedSize ? (int)Math.Clamp(FrameHeightField.Value, 16, 1080) : null;
+        var chosenFill = (FillMediaBox.SelectedItem as MediaItem)?.Id is int fillId and not 0 ? fillId : (int?)null;
+        _viewModel.ApplyFields(logo, new LogoForm(
+            NameBox.Text,
+            KindBox.SelectedIndex,
+            PathBox.Text,
+            ScalingBox.SelectedIndex,
+            MuteCheck.IsChecked == true,
+            TextBoxField.Text,
+            FontCombo.Text,
+            SizeField.Value,
+            BoldCheck.IsChecked == true,
+            TextColorBox.Text,
+            BackColorBox.Text,
+            BlurField.Value,
+            ZoomField.Value,
+            OffsetXField.Value,
+            OffsetYField.Value,
+            FixedSizeCheck.IsChecked == true,
+            FrameWidthField.Value,
+            FrameHeightField.Value,
+            chosenFill));
 
         // A video has no blurred copy of itself: switching the kind drops that choice.
-        var chosenFill = (FillMediaBox.SelectedItem as MediaItem)?.Id is int fillId and not 0 ? fillId : (int?)null;
         LoadFillOptions(logo.Kind, chosenFill);
-        logo.FillMediaId = (FillMediaBox.SelectedItem as MediaItem)?.Id is int kept and not 0 ? kept : null;
 
         UpdatePanels();
-        SaveSoon(logo);
     }
 
-    /// <summary>
-    /// The choices for the borders: the colour alone, the logo itself blurred
-    /// (for a video, a still of it: a moving copy would need a second player)
-    /// or an image of the media library.
-    /// </summary>
+    /// <summary>Puts the choices for the borders in the box and selects the one in use.</summary>
     private void LoadFillOptions(LogoKind kind, int? selectedId)
     {
-        var options = new List<MediaItem> { new() { Id = 0, Name = "El color de fondo" } };
-        if (kind == LogoKind.Image)
-            options.Add(new MediaItem { Id = MediaItem.FillWithSelfId, Name = "La misma imagen, desenfocada" });
-        else if (kind == LogoKind.Video)
-            options.Add(new MediaItem { Id = MediaItem.FillWithSelfId, Name = "Una imagen fija del video, desenfocada" });
-        options.AddRange(MediaLookup.All()
-            .Where(m => m.Type == MediaType.Image)
-            .OrderBy(m => m.Name));
+        var options = _viewModel.FillOptions(kind);
 
         var wasLoading = _loading;
         _loading = true;
-        EcclesiaCast.App.Services.FillOptionsBox.Fill(FillMediaBox, options);
+        FillOptionsBox.Fill(FillMediaBox, options);
         FillMediaBox.SelectedItem = options.FirstOrDefault(m => m.Id == (selectedId ?? 0)) ?? options[0];
         _loading = wasLoading;
     }
@@ -208,21 +174,12 @@ public partial class LogoManagerWindow : Window
 
     private void Preset_Changed(object sender, SelectionChangedEventArgs e)
     {
-        (double w, double h)? size = PresetBox.SelectedIndex switch
-        {
-            1 => (1920, 1080),
-            2 => (1280, 720),
-            3 => (1440, 1080),
-            4 => (1080, 1080),
-            5 => (1080, 1920),
-            _ => null,
-        };
-        if (size is not { } chosen || _loading)
+        if (LogoManagerViewModel.PresetSize(PresetBox.SelectedIndex) is not { } chosen || _loading)
             return;
 
         _loading = true;
-        FrameWidthField.SetSilently(chosen.w);
-        FrameHeightField.SetSilently(chosen.h);
+        FrameWidthField.SetSilently(chosen.Width);
+        FrameHeightField.SetSilently(chosen.Height);
         FixedSizeCheck.IsChecked = true;
         SizeRow.IsEnabled = PresetBox.IsEnabled = true;
         _loading = false;
@@ -236,7 +193,7 @@ public partial class LogoManagerWindow : Window
         return new Size(width, width * 9 / 16);
     }
 
-    private bool CanFrame => Current is { Kind: LogoKind.Image or LogoKind.Video };
+    private bool CanFrame => LogoManagerViewModel.CanFrame(Current);
 
     private Point? _dragFrom;
     private double _dragStartX;
@@ -302,21 +259,11 @@ public partial class LogoManagerWindow : Window
         e.Handled = true;
     }
 
-    private void Save(Logo logo)
-    {
-        _logos.Save(logo);
-        ChangesMade = true;
-
-        // The list shows the name and an icon per kind, so it has to redraw.
-        LogosList.Items.Refresh();
-        Preview.Logo = logo.Clone();
-    }
-
     // ── Archivo ──────────────────────────────────────────────────
 
     private void Browse_Click(object sender, RoutedEventArgs e)
     {
-        FlushSave();
+        _viewModel.FlushSave();
         if (Current is not { } logo)
             return;
 
@@ -331,35 +278,23 @@ public partial class LogoManagerWindow : Window
         if (dialog.ShowDialog() != true)
             return;
 
-        logo.Path = dialog.FileName;
+        var nameBefore = logo.Name;
+        _viewModel.SetFile(logo, dialog.FileName);
         PathBox.Text = dialog.FileName;
-
-        // A video logo needs a still for the operator's preview boxes, where
-        // no video plays — the projector shows the real thing.
-        MediaThumbnails.Delete(logo.PosterPath);
-        logo.PosterPath = isVideo
-            ? MediaThumbnails.Create(dialog.FileName, MediaType.Video, App.VideoEngine)
-            : null;
-
-        if (string.IsNullOrWhiteSpace(logo.Name) || logo.Name == "Logo nuevo")
-        {
-            logo.Name = Path.GetFileNameWithoutExtension(dialog.FileName);
+        if (logo.Name != nameBefore)
             NameBox.Text = logo.Name;
-        }
-
-        Save(logo);
     }
 
     private void PickTextColor_Click(object sender, RoutedEventArgs e)
     {
-        var picked = ColorPickerHelper.Pick(TextColorBox.Text.Trim());
+        var picked = _viewModel.PickColor(TextColorBox.Text.Trim());
         if (picked is not null)
             TextColorBox.Text = picked;
     }
 
     private void PickBackColor_Click(object sender, RoutedEventArgs e)
     {
-        var picked = ColorPickerHelper.Pick(BackColorBox.Text.Trim());
+        var picked = _viewModel.PickColor(BackColorBox.Text.Trim());
         if (picked is not null)
             BackColorBox.Text = picked;
     }
@@ -368,14 +303,7 @@ public partial class LogoManagerWindow : Window
 
     private void New_Click(object sender, RoutedEventArgs e)
     {
-        FlushSave();
-        var created = _logos.Save(new Logo
-        {
-            Name = "Logo nuevo",
-            Kind = LogoKind.Image,
-            Order = _items.Count,
-        });
-        ChangesMade = true;
+        var created = _viewModel.CreateNew();
         Reload(created.Id);
         NameBox.Focus();
         NameBox.SelectAll();
@@ -383,35 +311,21 @@ public partial class LogoManagerWindow : Window
 
     private void Duplicate_Click(object sender, RoutedEventArgs e)
     {
-        FlushSave();
+        _viewModel.FlushSave();
         if (Current is not { } logo)
             return;
 
-        var copy = logo.Clone();
-        copy.Id = 0;
-        copy.Name = $"{logo.Name} (copia)";
-        copy.Order = _items.Count;
-        var created = _logos.Save(copy);
-        ChangesMade = true;
-        Reload(created.Id);
+        Reload(_viewModel.Duplicate(logo).Id);
     }
 
     private void Delete_Click(object sender, RoutedEventArgs e)
     {
-        FlushSave();
+        _viewModel.FlushSave();
         if (Current is not { } logo)
             return;
 
-        var confirm = Notice.Confirm(
-            $"¿Eliminar el logo \"{logo.Name}\"?",
-            "Eliminar", destructive: true);
-        if (!confirm)
-            return;
-
-        MediaThumbnails.Delete(logo.PosterPath);
-        _logos.Delete(logo.Id);
-        ChangesMade = true;
-        Reload(null);
+        if (_viewModel.Delete(logo))
+            Reload(null);
     }
 
     private void MoveUp_Click(object sender, RoutedEventArgs e) => Move(-1);
@@ -420,24 +334,12 @@ public partial class LogoManagerWindow : Window
 
     private void Move(int direction)
     {
-        FlushSave();
+        _viewModel.FlushSave();
         if (Current is not { } logo)
             return;
 
-        var index = _items.IndexOf(logo);
-        var target = index + direction;
-        if (index < 0 || target < 0 || target >= _items.Count)
-            return;
-
-        (_items[index], _items[target]) = (_items[target], _items[index]);
-        for (var i = 0; i < _items.Count; i++)
-        {
-            _items[i].Order = i;
-            _logos.Save(_items[i]);
-        }
-
-        ChangesMade = true;
-        Reload(logo.Id);
+        if (_viewModel.Move(logo, direction))
+            Reload(logo.Id);
     }
 
     private void Done_Click(object sender, RoutedEventArgs e) => Close();

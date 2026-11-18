@@ -24,6 +24,13 @@ public readonly record struct FramedRect(double X, double Y, double Width, doubl
 /// </summary>
 public static class FillFraming
 {
+    /// <summary>
+    /// How far the shift can go, in screens. A tall page covering the screen
+    /// is 2½ screens high and has to be brought up from the bottom, and more
+    /// so when zoomed in, so the old ±1 was too short.
+    /// </summary>
+    public const double MaxOffset = 10;
+
     /// <summary>The canvas the fixed sizes of a media are expressed over.</summary>
     public const double CanvasWidth = 1920;
     public const double CanvasHeight = 1080;

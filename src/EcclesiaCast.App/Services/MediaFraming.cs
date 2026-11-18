@@ -28,12 +28,8 @@ namespace EcclesiaCast.App.Services;
 /// </summary>
 public static class MediaFraming
 {
-    /// <summary>
-    /// How far the shift can go, in screens. A tall page covering the screen
-    /// is 2½ screens high and has to be brought up from the bottom, and more
-    /// so when zoomed in, so the old ±1 was too short.
-    /// </summary>
-    public const double MaxOffset = 10;
+    /// <summary>How far the shift can go, in screens (the number lives in the core, for the windows' view models).</summary>
+    public const double MaxOffset = FillFraming.MaxOffset;
 
     /// <summary>What a picture remembers between calls, so a late size or a blur can be redone.</summary>
     private sealed class State

@@ -203,3 +203,39 @@ internal sealed class ScriptedNotices : INotices, IDisposable
 
     public void Dispose() => PlatformServices.Notices = _before;
 }
+
+/// <summary>Posters made of nothing: writes down what was asked, and answers with a made-up path.</summary>
+internal sealed class RecordingThumbnailer : IThumbnailer
+{
+    public string Directory => "posters";
+
+    public List<string> Created { get; } = [];
+
+    public List<string?> Deleted { get; } = [];
+
+    public string? Create(string sourcePath, EcclesiaCast.Core.Media.MediaType type, LibVLCSharp.Shared.LibVLC? videoEngine)
+    {
+        Created.Add(sourcePath);
+        return "poster-of-" + Path.GetFileName(sourcePath);
+    }
+
+    public void Delete(string? thumbnailPath) => Deleted.Add(thumbnailPath);
+
+    public void DeleteOrphans(IEnumerable<string?> referenced)
+    {
+    }
+}
+
+/// <summary>A colour picker that always picks the same colour (null: the operator cancelled).</summary>
+internal sealed class FixedColorPicker(string? picked) : IColorPicker
+{
+    public string? AskedWith { get; private set; }
+
+    public string Transparent => "transparent";
+
+    public string? Pick(string? currentHex, bool allowTransparent = false)
+    {
+        AskedWith = currentHex;
+        return picked;
+    }
+}

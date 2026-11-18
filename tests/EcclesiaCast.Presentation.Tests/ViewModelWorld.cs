@@ -29,6 +29,8 @@ public sealed class ViewModelWorld : IDisposable
 
     public IThemeRepository Themes { get; }
 
+    public ILogoRepository Logos { get; }
+
     public IBibleRepository Bibles { get; }
 
     public ViewModelWorld()
@@ -42,6 +44,7 @@ public sealed class ViewModelWorld : IDisposable
         Settings = new SqliteSettingsStore(_dbPath);
         Songs = new SongRepository(_dbPath);
         Bibles = new BibleRepository(_dbPath);
+        Logos = new LogoRepository(_dbPath);
         Themes = new ThemeRepository(_dbPath);
         ThemeSeeder.EnsureDefaults(Themes, Settings);
     }
