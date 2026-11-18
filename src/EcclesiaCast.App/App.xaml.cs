@@ -226,6 +226,7 @@ public partial class App : Application
         services.AddSingleton<IBackupDialog>(_ => new BackupDialogService(dbPath));
         services.AddSingleton<ICountdownDialog, CountdownDialogService>();
         services.AddSingleton<ILightCopyDialog, LightCopyDialogService>();
+        services.AddSingleton<IColorPicker, ColorPickerService>();
         services.AddSingleton<IBibleFormatHelpDialog, BibleFormatHelpDialogService>();
         services.AddSingleton<IKeyboardState, WpfKeyboardState>();
         services.AddSingleton<IListFilter, WpfListFilter>();
