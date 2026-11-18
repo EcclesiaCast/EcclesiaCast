@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- What talks to Windows and does not draw (PowerPoint, the media keys,
+       the PDF pages, the sound devices). No WPF and no Windows Forms: what
+       uses their images or windows stays in EcclesiaCast.App. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EcclesiaCast.Presentation\EcclesiaCast.Presentation.csproj" />
+  </ItemGroup>
+
+</Project>
