@@ -1,5 +1,3 @@
-using System.Windows;
-using System.Windows.Interop;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EcclesiaCast.App.Services;
@@ -13,8 +11,8 @@ namespace EcclesiaCast.App.ViewModels;
 /// browser) live, with Windows' own window capture.
 ///
 /// Like the live web page, what goes to the screen is a media item that is not
-/// in the library (a negative id) whose picture is a feed, here
-/// <see cref="WindowCaptureFeed"/>; anything else that takes the background
+/// in the library (a negative id) whose picture is a feed, here the window
+/// capture's own; anything else that takes the background
 /// switches the capture off (see <see cref="OnIsWindowLiveChanged"/>).
 /// </summary>
 public sealed partial class MainViewModel
@@ -30,12 +28,15 @@ public sealed partial class MainViewModel
     /// <summary>The window capture. Made when first needed, so a program that never projects a window pays nothing.</summary>
     public IWindowCapture WindowCaptureService
     {
-        get => _windowCapture ??= new WindowCapture();
+        get => _windowCapture ??= _newWindowCapture();
         set => _windowCapture = value;
     }
 
+    /// <summary>Makes the window capture, the first time it is needed.</summary>
+    private readonly Func<IWindowCapture> _newWindowCapture;
+
     /// <summary>The list of windows the operator picks from.</summary>
-    public IWindowPickerDialog WindowPicker { get; set; } = new WindowPickerDialogService();
+    public IWindowPickerDialog WindowPicker { get; set; }
 
     /// <summary>True while another program's window is on the screen in motion.</summary>
     [ObservableProperty]
@@ -188,8 +189,7 @@ public sealed partial class MainViewModel
         else
         {
             NoteAction("Proyectar en vivo lo que se elija en el selector de Windows");
-            var owner = Application.Current.MainWindow is { } main ? new WindowInteropHelper(main).Handle : 0;
-            var (name, error) = await capture.StartFromPickerAsync(owner, pick.ShowCursor);
+            var (name, error) = await capture.StartFromPickerAsync(pick.ShowCursor);
             if (name is null)
             {
                 // Cancelling the picker leaves the capture alone; a failure

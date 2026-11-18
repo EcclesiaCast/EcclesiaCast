@@ -135,8 +135,14 @@ public sealed class WindowCapture : IWindowCapture
         }
     }
 
-    public async Task<(string? Title, string? Error)> StartFromPickerAsync(nint owner, bool showCursor)
+    public async Task<(string? Title, string? Error)> StartFromPickerAsync(bool showCursor)
     {
+        // The picker belongs to the operator's window: found here, on the
+        // caller's thread and before anything is awaited.
+        nint owner = Application.Current.MainWindow is { } main
+            ? new System.Windows.Interop.WindowInteropHelper(main).Handle
+            : 0;
+
         try
         {
             var picker = new GraphicsCapturePicker();

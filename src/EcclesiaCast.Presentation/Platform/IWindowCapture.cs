@@ -27,9 +27,10 @@ public interface IWindowCapture
 
     /// <summary>
     /// Lets the operator choose in Windows' own picker (windows and screens)
-    /// and captures the choice. Null title with no error: they cancelled.
+    /// and captures the choice. The picker opens over the operator's window,
+    /// which the capture finds by itself. Null title with no error: they cancelled.
     /// </summary>
-    Task<(string? Title, string? Error)> StartFromPickerAsync(nint owner, bool showCursor);
+    Task<(string? Title, string? Error)> StartFromPickerAsync(bool showCursor);
 
     /// <summary>Stops, frees everything and empties the picture.</summary>
     void Stop();

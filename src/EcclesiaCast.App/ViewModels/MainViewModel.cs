@@ -393,8 +393,12 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         ITrashDialog trashDialog,
         IWebEngine webEngine,
         IYouTubeDownloadDialog youTubeDownload,
-        IShell shell)
+        IShell shell,
+        Func<IWindowCapture> newWindowCapture,
+        IWindowPickerDialog windowPicker)
     {
+        _newWindowCapture = newWindowCapture;
+        WindowPicker = windowPicker;
         _youTubeDownload = youTubeDownload;
         _shell = shell;
         _webEngine = webEngine;

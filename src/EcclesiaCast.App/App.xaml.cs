@@ -225,6 +225,8 @@ public partial class App : Application
         services.AddSingleton<IBackupDialog>(_ => new BackupDialogService(dbPath));
         services.AddSingleton<ICountdownDialog, CountdownDialogService>();
         services.AddSingleton<ILightCopyDialog, LightCopyDialogService>();
+        services.AddSingleton<Func<IWindowCapture>>(_ => () => new WindowCapture());
+        services.AddSingleton<IWindowPickerDialog, WindowPickerDialogService>();
         services.AddSingleton<IYouTubeDownloadDialog, YouTubeDownloadDialogService>();
         services.AddSingleton<ITrashDialog, TrashDialogService>();
         services.AddSingleton<IBroadcastDialog, BroadcastDialogService>();
