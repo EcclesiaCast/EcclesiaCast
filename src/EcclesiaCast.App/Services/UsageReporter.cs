@@ -1,3 +1,4 @@
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Json;
 using EcclesiaCast.Core.Abstractions;
@@ -22,11 +23,28 @@ public static class UsageReporter
     private static readonly TimeSpan RetryAfter = TimeSpan.FromHours(1);
     private static DateTimeOffset _nextTry = DateTimeOffset.MinValue;
 
+    /// <summary>
+    /// This copy, as the count sees it: a test version, a test library or a
+    /// loose folder are not counted (they would count us, not the churches).
+    /// Worked out once; none of it changes while the program runs.
+    /// </summary>
+    private static readonly Lazy<UsageCopy> ThisCopy = new(() =>
+    {
+        var copy = UsageCopy.Of(
+            AppInfo.Version,
+            UpdateChecker.IsDevelopmentBuild,
+            Environment.GetEnvironmentVariable("ECCLESIACAST_DATA_DIR"),
+            File.Exists(Path.Combine(AppContext.BaseDirectory, UsageCopy.UninstallerFile)));
+        if (!copy.Counts)
+            Log.Information("Esta copia no se cuenta en el uso: {Copy}", copy);
+        return copy;
+    });
+
     /// <summary>Called whenever something goes on the air. Does nothing after the first time each day.</summary>
     public static void NoteProjected(ISettingsStore settings)
     {
         var now = DateTimeOffset.Now;
-        if (now < _nextTry || !UsageCount.ShouldSend(settings, now, UpdateChecker.IsDevelopmentBuild))
+        if (now < _nextTry || !UsageCount.ShouldSend(settings, now, ThisCopy.Value))
             return;
 
         // One send at a time: the next slide comes a second later.

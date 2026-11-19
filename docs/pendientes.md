@@ -27,6 +27,10 @@ lista y se acordó al reabrir.
 
 Falta probar a mano:
 
+- [ ] **Contador de uso, al sacar la 1.5.0:** subir el `worker.js` nuevo y borrar lo contado
+  (pasos en `servicios/api/LEEME.md`, «Empezar de cero»). Después, con la 1.5.0 **instalada**,
+  proyectar algo y mirar a los minutos el resumen: tiene que aparecer esa instalación con la
+  versión 1.5.0. Un instalador de prueba (`1.5.0-prueba.N`) no tiene que aparecer.
 - [ ] **Placas con imagen o video** (se hizo de día y no abrí el programa: sólo hay pruebas y dibujos a
   imagen, que se ven bien, incluidas las cuatro animaciones a mitad de camino). Probar: «Elegir…» con un
   logo de la lista y con un archivo; un video (que se mueva en bucle en el proyector y en el EN VIVO);

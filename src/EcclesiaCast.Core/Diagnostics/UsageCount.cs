@@ -15,6 +15,44 @@ namespace EcclesiaCast.Core.Diagnostics;
 public sealed record UsagePing(string Install, string Day, string Version, string Church = "");
 
 /// <summary>
+/// What kind of copy of the program is running, for the count of use. Only a
+/// copy a church really uses counts: a released version, installed by the
+/// installer, on its own library. Copies made to try things out would count
+/// the people who make the program, not the churches.
+/// </summary>
+/// <param name="IsDevelopmentBuild">A Debug build, or one whose version can not be read.</param>
+/// <param name="IsPreRelease">A test version: «1.4.0-prueba.4», «1.5.0-beta.1» (anything with «-»).</param>
+/// <param name="UsesTestLibrary">Pointed at a copy of a library (ECCLESIACAST_DATA_DIR), as when trying it on someone's PC.</param>
+/// <param name="IsInstalled">
+/// Runs from where the installer put it. The installer always leaves its
+/// uninstaller («unins000.exe») next to the program; a copy run from a loose
+/// folder (a build, an unzipped test) has none.
+/// </param>
+public sealed record UsageCopy(bool IsDevelopmentBuild, bool IsPreRelease, bool UsesTestLibrary, bool IsInstalled)
+{
+    /// <summary>Name of the uninstaller Inno Setup leaves next to the program.</summary>
+    public const string UninstallerFile = "unins000.exe";
+
+    public bool Counts => !IsDevelopmentBuild && !IsPreRelease && !UsesTestLibrary && IsInstalled;
+
+    /// <param name="version">The program's version, as it reports it («1.5.0», «1.5.0-prueba.2+abc123»).</param>
+    /// <param name="testLibrary">The value of ECCLESIACAST_DATA_DIR, if any.</param>
+    /// <param name="uninstallerNextToProgram">Whether <see cref="UninstallerFile"/> is in the program's folder.</param>
+    public static UsageCopy Of(string? version, bool isDevelopmentBuild, string? testLibrary, bool uninstallerNextToProgram) =>
+        new(isDevelopmentBuild,
+            IsPreReleaseVersion(version),
+            !string.IsNullOrWhiteSpace(testLibrary),
+            uninstallerNextToProgram);
+
+    /// <summary>A version with a «-» before its build data is a test one; an unreadable one counts as a test too.</summary>
+    public static bool IsPreReleaseVersion(string? version)
+    {
+        var plain = (version ?? string.Empty).Split('+')[0].Trim();
+        return plain.Length == 0 || plain.Contains('-');
+    }
+}
+
+/// <summary>
 /// The anonymous count of use (Ajustes → Actualizaciones, on unless turned
 /// off). The first time something is projected each day, the program says
 /// «this installation was used today». Counting on projecting rather than on
@@ -34,12 +72,19 @@ public static class UsageCount
         settings.Set(EnabledKey, enabled ? "1" : "0");
 
     /// <summary>
-    /// Whether today's use still has to be told. Never from a build made to
-    /// develop the program (it would count the developer), never when it is
-    /// off, and once a day.
+    /// Whether today's use still has to be told. Only from a copy a church
+    /// really uses (see <see cref="UsageCopy"/>), never when it is off, and
+    /// once a day.
+    /// </summary>
+    public static bool ShouldSend(ISettingsStore settings, DateTimeOffset now, UsageCopy copy) =>
+        copy.Counts && IsEnabled(settings) && settings.Get(LastSentKey) != Day(now);
+
+    /// <summary>
+    /// The same, for a copy that is installed, released and on its own
+    /// library: only the build kind decides.
     /// </summary>
     public static bool ShouldSend(ISettingsStore settings, DateTimeOffset now, bool isDevelopmentBuild) =>
-        !isDevelopmentBuild && IsEnabled(settings) && settings.Get(LastSentKey) != Day(now);
+        ShouldSend(settings, now, new UsageCopy(isDevelopmentBuild, IsPreRelease: false, UsesTestLibrary: false, IsInstalled: true));
 
     /// <summary>What to send for today. Draws the installation's number the first time.</summary>
     public static UsagePing Ping(ISettingsStore settings, DateTimeOffset now, string version)

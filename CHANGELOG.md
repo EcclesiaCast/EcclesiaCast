@@ -40,6 +40,12 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Cambiado
 
+- **Las copias de prueba ya no cuentan en el contador anónimo de uso.** No mandan el aviso (ni
+  inventan su número) las versiones de prueba (con «-», como `1.5.0-prueba.2`), las que corren con
+  una biblioteca de prueba (`ECCLESIACAST_DATA_DIR`) y las que no están instaladas (sin el
+  desinstalador `unins000.exe` al lado del programa). El servicio rechaza los avisos de versiones de
+  prueba y su resumen deja afuera las filas viejas que quedaron. Cómo poner los contadores en cero:
+  `servicios/api/LEEME.md`, «Empezar de cero».
 - **El orden de las diapositivas se puede trabar (🔒).** Arranca trabado, para no desacomodarlas sin
   querer: arrastrar no las mueve y la barra de abajo dice cómo destrabarlo. Un clic en el candado lo
   destraba (queda amarillo, «🔓 Orden destrabado») y el programa se acuerda. (GitHub #32.)

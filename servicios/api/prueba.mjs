@@ -3,7 +3,7 @@
 import { DatabaseSync } from "node:sqlite";
 import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
-import contador, { validar, paisDe, nombreDePais, pedidoDeFondos, mejorArchivo, resumirPixabay } from "./worker.js";
+import contador, { validar, paisDe, nombreDePais, pedidoDeFondos, mejorArchivo, resumirPixabay, esVersionDePrueba } from "./worker.js";
 
 const sqlite = new DatabaseSync(":memory:");
 sqlite.exec(readFileSync(new URL("./schema.sql", import.meta.url), "utf8"));
@@ -33,9 +33,18 @@ const avisar = (cuerpo, pais) => contador.fetch(Object.assign(new Request("https
 // Lo que manda el programa se cuenta, una vez por día.
 assert.equal((await avisar({ instalacion: uno, dia: hoy, version: "1.4.0" })).status, 204);
 assert.equal((await avisar({ instalacion: uno, dia: hoy, version: "1.4.0" })).status, 204);
-assert.equal((await avisar({ instalacion: otro, dia: hoy, version: "1.4.0-prueba.2+d5929187" }, "UY")).status, 204);
+assert.equal((await avisar({ instalacion: otro, dia: hoy, version: "1.4.0+d5929187" }, "UY")).status, 204);
 assert.equal(sqlite.prepare("SELECT COUNT(*) AS n FROM uso").get().n, 2);
-assert.equal(sqlite.prepare("SELECT version FROM uso WHERE instalacion = ?").get(otro).version, "1.4.0-prueba.2");
+assert.equal(sqlite.prepare("SELECT version FROM uso WHERE instalacion = ?").get(otro).version, "1.4.0");
+
+// Las versiones de prueba (llevan «-») son de quienes hacen el programa: no se guardan.
+const tercero = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+for (const prueba of ["1.4.0-prueba.2+d5929187", "1.5.0-beta.1", "1.5.0-rc.1"])
+  assert.equal((await avisar({ instalacion: tercero, dia: hoy, version: prueba }, "UY")).status, 400, prueba);
+assert.equal(sqlite.prepare("SELECT COUNT(*) AS n FROM uso WHERE instalacion = ?").get(tercero).n, 0);
+assert.equal(esVersionDePrueba("1.4.0-prueba.4"), true);
+assert.equal(esVersionDePrueba("1.5.0+abc-def"), false); // el «-» de los datos de compilación no cuenta
+assert.equal(esVersionDePrueba("1.5.0"), false);
 
 // El nombre de la iglesia es opcional: sin nombre queda vacío; si lo ponen después el mismo día, se actualiza.
 assert.equal(sqlite.prepare("SELECT iglesia FROM uso WHERE instalacion = ?").get(uno).iglesia, "");
@@ -100,6 +109,23 @@ assert.deepEqual(datos.semanas, [
 // fijas, así que «últimas 4 semanas» depende del día en que se corre.
 assert.deepEqual(datos.paises.map((p) => [p.pais, p.nombre, p.instalaciones]),
   [["MX", "México", 1], ["UY", "Uruguay", 1]]);
+// Las filas viejas de versiones de prueba (de antes de rechazarlas) no entran
+// en ninguna tabla: ni semanas, ni nuevas, ni versiones, ni países, ni iglesias.
+{
+  const vieja = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+  sqlite.prepare("INSERT INTO uso (dia, instalacion, version, pais, iglesia) VALUES (?, ?, '1.4.0-prueba.4', 'AR', 'Iglesia de prueba')")
+    .run(hoy, vieja);
+  sqlite.prepare("INSERT INTO uso (dia, instalacion, version, pais, iglesia) VALUES ('2026-11-15', ?, '1.4.0-prueba.4', 'AR', '')")
+    .run(vieja);
+  const sin = await (await ver("?clave=secreto&formato=json")).json();
+  assert.deepEqual(sin.semanas.filter((s) => s.semana === "2026-11-09" || s.semana === "2026-11-16"), datos.semanas);
+  assert.ok(sin.semanas.every((s) => s.semana === "2026-11-09" || s.semana === "2026-11-16"));
+  assert.ok(!sin.paises.some((p) => p.pais === "AR"));
+  assert.ok(!sin.iglesias.some((i) => i.iglesia === "Iglesia de prueba"));
+  assert.ok(!sin.versiones_ultimas_4_semanas.some((v) => v.version.includes("-")));
+  sqlite.prepare("DELETE FROM uso WHERE instalacion = ?").run(vieja);
+}
+
 const html = await (await ver("?clave=secreto")).text();
 assert.match(html, /Sábado o domingo/);
 assert.match(html, /Por país/);

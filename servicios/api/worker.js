@@ -16,6 +16,14 @@ const INSTALACION = /^[0-9a-f]{32}$/;
 const DIA = /^\d{4}-\d{2}-\d{2}$/;
 const VERSION = /^[0-9A-Za-z.+\-]{1,40}$/;
 
+// Las versiones de prueba («1.4.0-prueba.4», «1.5.0-beta.1»: llevan «-») son
+// de quienes hacen el programa, no de iglesias: no se guardan, y las filas
+// viejas que quedaron no entran en el resumen.
+export function esVersionDePrueba(version) {
+  return String(version ?? "").split("+")[0].includes("-");
+}
+const REALES = "(SELECT * FROM uso WHERE version NOT LIKE '%-%')";
+
 /** Revisa lo que mandó el programa. Devuelve la fila a guardar, o null si algo no cuadra. */
 export function validar(cuerpo, ahora = new Date()) {
   if (!cuerpo || typeof cuerpo !== "object") return null;
@@ -23,6 +31,7 @@ export function validar(cuerpo, ahora = new Date()) {
   const dia = String(cuerpo.dia ?? "");
   const version = String(cuerpo.version ?? "").split("+")[0];
   if (!INSTALACION.test(instalacion) || !DIA.test(dia) || !VERSION.test(version)) return null;
+  if (esVersionDePrueba(version)) return null;
 
   // El día lo pone la PC de la iglesia: se acepta el de hoy en cualquier
   // huso horario (un día antes o después de hoy en UTC), nada más.
@@ -47,19 +56,19 @@ const RESUMEN_SQL = `
          COUNT(DISTINCT instalacion)                                         AS en_la_semana,
          COUNT(DISTINCT CASE WHEN strftime('%w', dia) IN ('0', '6')
                              THEN instalacion END)                           AS en_el_fin_de_semana
-    FROM uso
+    FROM ${REALES}
    GROUP BY semana
    ORDER BY semana DESC
    LIMIT 52`;
 
 const NUEVAS_SQL = `
   SELECT date(primera, '-6 days', 'weekday 1') AS semana, COUNT(*) AS nuevas
-    FROM (SELECT instalacion, MIN(dia) AS primera FROM uso GROUP BY instalacion)
+    FROM (SELECT instalacion, MIN(dia) AS primera FROM ${REALES} GROUP BY instalacion)
    GROUP BY semana`;
 
 const VERSIONES_SQL = `
   SELECT version, COUNT(DISTINCT instalacion) AS instalaciones
-    FROM uso
+    FROM ${REALES}
    WHERE dia >= date('now', '-28 days')
    GROUP BY version
    ORDER BY instalaciones DESC`;
@@ -69,16 +78,16 @@ const PAISES_SQL = `
   SELECT pais,
          COUNT(*)                                                   AS instalaciones,
          SUM(CASE WHEN ultimo >= date('now', '-28 days') THEN 1 ELSE 0 END) AS ultimas_4_semanas
-    FROM (SELECT instalacion, pais, MAX(dia) AS ultimo FROM uso GROUP BY instalacion)
+    FROM (SELECT instalacion, pais, MAX(dia) AS ultimo FROM ${REALES} GROUP BY instalacion)
    GROUP BY pais
    ORDER BY instalaciones DESC, pais`;
 
 // Las iglesias que pusieron su nombre (opcional): el último nombre de cada instalación.
 const IGLESIAS_SQL = `
   SELECT u.iglesia, u.pais, MAX(u.dia) AS ultimo
-    FROM uso u
+    FROM ${REALES} u
    WHERE u.iglesia <> ''
-     AND u.dia = (SELECT MAX(dia) FROM uso WHERE instalacion = u.instalacion AND iglesia <> '')
+     AND u.dia = (SELECT MAX(dia) FROM ${REALES} WHERE instalacion = u.instalacion AND iglesia <> '')
    GROUP BY u.instalacion
    ORDER BY ultimo DESC, u.iglesia`;
 
