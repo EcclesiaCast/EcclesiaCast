@@ -190,7 +190,7 @@ public sealed class RenderBenchTests
             foreach (var holder in slide.GetVisualDescendants().OfType<Canvas>().FirstOrDefault(x => x.Name == "ExtraBoxLayer")?.Children.OfType<Grid>() ?? [])
             {
                 if (holder.Children.OfType<TextBlock>().FirstOrDefault() is { } box)
-                    Add(result, drawing.Host, "extra" + n++, box);
+                    Add(result, drawing.Host, "extra" + n++, box, frame: true);
             }
         }
 
@@ -205,15 +205,29 @@ public sealed class RenderBenchTests
     }
 
     /// <summary>Records a text that is on the screen; the ones hidden or empty are left out.</summary>
-    private static void Add(RenderResult result, Grid host, string name, TextBlock text)
+    private static void Add(RenderResult result, Grid host, string name, TextBlock text, bool frame = false)
     {
         var empty = string.IsNullOrEmpty(text.Text) && text.Inlines is not { Count: > 0 };
         if (empty || !text.IsEffectivelyVisible)
             return;
 
         var matrix = text.TransformToVisual(host) ?? Matrix.Identity;
-        var rect = new Rect(0, 0, text.Bounds.Width, text.Bounds.Height).TransformToAABB(matrix);
-        var scale = text.Bounds.Width > 0 ? rect.Width / text.Bounds.Width : 1;
+        // The frame of an Avalonia TextBlock that wraps is as wide as the room
+        // it was given, or as its widest line *with* the space that line ends
+        // in; WPF's is the widest line without it, and nothing of that is
+        // drawn. The block is measured as the widest line, kept where the
+        // lines are (left, centre or right). The extra boxes are a frame on
+        // purpose (the box the user drew) and are left as they are.
+        var ink = frame ? text.Bounds.Width : Math.Min(text.Bounds.Width, text.TextLayout.Width);
+        var trailing = Math.Max(0, text.Bounds.Width - ink);
+        var shift = text.TextAlignment switch
+        {
+            TextAlignment.Right or TextAlignment.End => trailing,
+            TextAlignment.Center => trailing / 2,
+            _ => 0,
+        };
+        var rect = new Rect(shift, 0, ink, text.Bounds.Height).TransformToAABB(matrix);
+        var scale = ink > 0 ? rect.Width / ink : 1;
 
         result.Texts.Add(new RenderedText
         {
