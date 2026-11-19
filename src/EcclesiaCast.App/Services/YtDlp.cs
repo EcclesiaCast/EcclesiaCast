@@ -293,8 +293,14 @@ public static partial class YtDlp
 
         // Above 720p YouTube serves video and audio apart, and joining them
         // needs ffmpeg; without it, ask for the best single file instead.
+        // H.264 first: «best» used to pick YouTube's AV1, which at 1080p comes
+        // at about 1 Mb/s and looks soft on a projector (19/11: 1.1 Mb/s); its
+        // H.264 has around three times the data, every graphics card decodes it,
+        // and the stream page (OBS) plays it too. AAC sound goes with it in MP4.
         var format = HasFfmpeg()
-            ? "bestvideo[height<=?1080]+bestaudio/best[height<=?1080]/best"
+            ? "bestvideo[height<=?1080][vcodec^=avc1]+bestaudio[ext=m4a]"
+              + "/bestvideo[height<=?1080][vcodec^=avc1]+bestaudio"
+              + "/bestvideo[height<=?1080]+bestaudio/best[height<=?1080]/best"
             : "best[height<=?1080][ext=mp4]/best[ext=mp4]/best";
 
         var arguments = new List<string>

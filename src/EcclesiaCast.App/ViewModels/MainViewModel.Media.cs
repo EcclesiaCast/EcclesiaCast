@@ -1379,6 +1379,35 @@ public sealed partial class MainViewModel
         StatusText = "Fondo quitado; la letra sigue en pantalla.";
     }
 
+    /// <summary>
+    /// YouTube refused the video projected «desde internet». The screen is
+    /// already black (the congregation does not see YouTube's error card); the
+    /// operator is told why and, when only a copy can work, offered to download it.
+    /// </summary>
+    private void OnYouTubeRefused(int code)
+    {
+        var media = _presentation.Background is { Id: > 0 } on
+            ? _allMedia.FirstOrDefault(m => m.Id == on.Id) ?? on
+            : null;
+        StatusText = YouTubePlayerError.Title(code) + ".";
+        StatusAlert++;
+
+        // After the page's message has been handled: the notice waits for an answer.
+        Application.Current?.Dispatcher.BeginInvoke(() =>
+        {
+            if (media is { Type: MediaType.YouTube }
+                && Notice.Confirm(YouTubePlayerError.Explain(code), "Descargar ahora", "Ahora no",
+                    YouTubePlayerError.Title(code)))
+            {
+                DownloadYouTubeCommand.Execute(media);
+            }
+            else if (media is not { Type: MediaType.YouTube })
+            {
+                Notice.Show(YouTubePlayerError.Explain(code), YouTubePlayerError.Title(code), NoticeKind.Warning);
+            }
+        });
+    }
+
     /// <summary>A non-looping video finished: honour its end behaviour.</summary>
     private void OnProjectedVideoEnded()
     {

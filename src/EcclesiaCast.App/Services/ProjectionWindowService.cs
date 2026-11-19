@@ -16,6 +16,8 @@ public sealed class ProjectionWindowService(ProjectionViewModel projectionViewMo
 
     public event EventHandler? VideoEnded;
 
+    public event EventHandler<int>? YouTubeRefused;
+
     public event EventHandler? TurnOffRequested;
 
     public void EnsureVisible(DisplayInfo display)
@@ -36,6 +38,7 @@ public sealed class ProjectionWindowService(ProjectionViewModel projectionViewMo
             _window.IsVisibleChanged += (_, _) =>
                 VisibilityChanged?.Invoke(this, EventArgs.Empty);
             _window.VideoEnded += (_, _) => VideoEnded?.Invoke(this, EventArgs.Empty);
+            _window.YouTubeRefused += (_, code) => YouTubeRefused?.Invoke(this, code);
             _window.TurnOffRequested += (_, _) => TurnOffRequested?.Invoke(this, EventArgs.Empty);
 
             // The operator's Live panel draws the very picture the projector

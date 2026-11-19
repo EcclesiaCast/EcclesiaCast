@@ -32,6 +32,7 @@ public partial class OutputWindow : Window
             MakeFloating();
         DataContextChanged += OnDataContextChanged;
         YouTube.Ended += (_, _) => VideoEnded?.Invoke(this, EventArgs.Empty);
+        YouTube.Refused += (_, code) => YouTubeRefused?.Invoke(this, code);
         YouTube.DoubleClicked += (_, _) => TurnOffForDoubleClick();
         YouTube.EscapePressed += (_, _) => OnYouTubeEscape();
         YouTube.MenuRequested += (_, _) => OpenFloatingMenu();
@@ -119,6 +120,9 @@ public partial class OutputWindow : Window
 
     /// <summary>Raised when the projected video finishes and shouldn't loop.</summary>
     public event EventHandler? VideoEnded;
+
+    /// <summary>YouTube refused the video on the screen (its error number); the screen is black.</summary>
+    public event EventHandler<int>? YouTubeRefused;
 
     /// <summary>Raised when the small copy of the video for the operator's preview changes.</summary>
     public event EventHandler<System.Windows.Media.ImageSource?>? VideoFrameChanged;

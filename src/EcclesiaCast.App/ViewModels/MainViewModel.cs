@@ -417,6 +417,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 IsProjecting = _projection.IsOutputVisible;
         };
         _projection.VideoEnded += (_, _) => OnProjectedVideoEnded();
+        _projection.YouTubeRefused += (_, code) => OnYouTubeRefused(code);
         // A double click on an output that covers the panel: same as Esc.
         // Closing the floating window too: the same as «Apagar salida».
         _projection.TurnOffRequested += (_, _) => HideOutput();

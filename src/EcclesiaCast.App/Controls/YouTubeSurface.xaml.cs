@@ -318,8 +318,18 @@ public partial class YouTubeSurface : UserControl
         // ...and "error N" when YouTube itself refuses to play the video, which
         // otherwise only shows up as a message on the projector.
         if (message?.StartsWith("error ") == true)
+        {
             Log.Warning("El reproductor de YouTube rechazó el video {Id}: {Message}", _currentId, message);
+            if (int.TryParse(message[6..], out var code))
+                Refused?.Invoke(this, code);
+        }
     }
+
+    /// <summary>
+    /// YouTube refused the video (the IFrame API's error number). The page has
+    /// already hidden YouTube's own error card, so the screen is black.
+    /// </summary>
+    public event EventHandler<int>? Refused;
 
     /// <summary>
     /// A minimal page hosting YouTube's IFrame player API, which gives us the
@@ -386,7 +396,12 @@ public partial class YouTubeSurface : UserControl
                         else { post('ended'); }
                       }
                     },
-                    onError: function (e) { post('error ' + e.data); }
+                    // YouTube's error card is not for the congregation: the
+                    // screen goes black and the operator is told what to do.
+                    onError: function (e) {
+                      document.getElementById('player').style.visibility = 'hidden';
+                      post('error ' + e.data);
+                    }
                   }
                 });
               }
