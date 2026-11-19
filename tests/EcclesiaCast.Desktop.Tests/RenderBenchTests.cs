@@ -10,6 +10,7 @@ using Avalonia.VisualTree;
 using EcclesiaCast.Core.Themes;
 using EcclesiaCast.Desktop.Controls;
 using EcclesiaCast.Presentation.Rendering;
+using EcclesiaCast.RenderCompare;
 
 namespace EcclesiaCast.Desktop.Tests;
 
@@ -31,8 +32,73 @@ public sealed class RenderBenchTests
     public static string System =>
         OperatingSystem.IsMacOS() ? "mac" : OperatingSystem.IsWindows() ? "windows" : "linux";
 
+    // The bench is drawn once per test run, by whichever test needs it first.
+    private static readonly object Gate = new();
+    private static (int Cases, List<string> Failures)? _ran;
+
     [AvaloniaFact]
     public void Every_case_is_drawn_in_every_theme()
+    {
+        var (cases, failures) = RunBench();
+        Assert.True(cases >= 60, "Faltan casos de render.");
+        Assert.True(failures.Count == 0, "No se pudieron dibujar:\n" + string.Join("\n", failures));
+    }
+
+    /// <summary>
+    /// The comparator reads what the bench left and writes informe.html and
+    /// resumen.txt in artifacts/render/comparacion/: WPF against Avalonia on
+    /// Windows, and, when the results of a Mac are there, Windows against Mac in
+    /// the selawik theme. It never fails over a difference: it reports them.
+    /// </summary>
+    [AvaloniaFact]
+    public void The_comparator_writes_its_report()
+    {
+        RunBench();
+        var root = Path.GetDirectoryName(RenderCases.OutputFolder("avalonia"))!;
+        var avalonia = Path.Combine(root, "avalonia");
+
+        var comparisons = new List<Comparison>
+        {
+            Comparison.Run(new Comparison
+            {
+                Title = "WPF contra Avalonia en Windows (canciones, Biblia e impacto)",
+                LeftName = "WPF",
+                RightName = "Avalonia",
+                LeftFolder = Path.Combine(RenderCases.Folder, "referencia-wpf"),
+                LeftImages = Path.Combine(root, "wpf"),
+                LeftImageHint = "Correr el banco de WPF para ver la imagen.",
+                RightFolder = Path.Combine(avalonia, "windows"),
+                Criteria = Criteria.Loose,
+                Themes = ["cancion", "biblia", "impact"],
+            }),
+            Comparison.Run(new Comparison
+            {
+                Title = "Avalonia en Windows contra Avalonia en Mac (tema selawik, tiene que ser idéntico)",
+                LeftName = "Windows",
+                RightName = "Mac",
+                LeftFolder = Path.Combine(avalonia, "windows"),
+                RightFolder = Path.Combine(avalonia, "mac"),
+                Criteria = Criteria.Exact,
+                Themes = [SelawikKey],
+            }),
+        };
+
+        var output = Path.Combine(root, "comparacion");
+        Report.Write(output, comparisons);
+
+        Assert.True(File.Exists(Path.Combine(output, "informe.html")));
+        Assert.True(File.Exists(Path.Combine(output, "resumen.txt")));
+        Assert.True(comparisons[0].NotRun is null, comparisons[0].NotRun);
+        Assert.NotEmpty(comparisons[0].Results);
+    }
+
+    private static (int Cases, List<string> Failures) RunBench()
+    {
+        lock (Gate)
+            return _ran ??= Draw();
+    }
+
+    private static (int Cases, List<string> Failures) Draw()
     {
         var folder = Path.Combine(RenderCases.OutputFolder("avalonia"), System);
         Directory.CreateDirectory(folder);
@@ -64,8 +130,7 @@ public sealed class RenderBenchTests
             $"Casos: {cases.Count}\nDibujados: {drawn}\nFallaron: {failures.Count}\n" + string.Join("\n", failures.Select(f => "ERROR " + f)) + "\n",
             new UTF8Encoding(false));
 
-        Assert.True(cases.Count >= 60, "Faltan casos de render.");
-        Assert.True(failures.Count == 0, "No se pudieron dibujar:\n" + string.Join("\n", failures));
+        return (cases.Count, failures);
     }
 
     /// <summary>The themes of the case plus <c>selawik</c>, a copy of the song one with that typeface.</summary>
