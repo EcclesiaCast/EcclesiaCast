@@ -1,0 +1,115 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="EcclesiaCast.Desktop.Controls.SlideView">
+    <!-- La diapositiva, igual que SlideView.xaml de WPF: se dibuja en un lienzo
+         fijo de 1920×1080 y se escala entera, así el proyector y las vistas
+         chicas se ven iguales. -->
+    <Viewbox Stretch="Uniform">
+        <Grid x:Name="RootCanvas" Width="1920" Height="1080" Background="#10141E" ClipToBounds="True">
+
+            <!-- Fondo: imagen opcional + oscurecedor -->
+            <Image x:Name="BackgroundImage" Stretch="UniformToFill" IsVisible="False"/>
+            <Rectangle x:Name="DimLayer" Fill="Black" Opacity="0" IsHitTestVisible="False"/>
+
+            <!-- Capa de texto -->
+            <Grid x:Name="TextLayer" Margin="110,80">
+                <StackPanel x:Name="TextStack" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <!-- Como en WPF, cada elemento lleva un solo efecto: el
+                         contenedor lleva la sombra y el texto el contorno. Las
+                         franjas van detrás del texto y fuera de su sombra. -->
+                    <Grid x:Name="MainTextHost" HorizontalAlignment="Center">
+                        <Canvas x:Name="MainBands" IsHitTestVisible="False"/>
+                        <Grid x:Name="MainTextShadow" HorizontalAlignment="Center">
+                            <TextBlock x:Name="MainText"
+                                       FontSize="92" FontWeight="SemiBold"
+                                       Foreground="White"
+                                       TextWrapping="Wrap" TextAlignment="Center"/>
+                        </Grid>
+                    </Grid>
+                    <!-- Segunda versión bíblica, cuando hay dos seleccionadas -->
+                    <Grid x:Name="SecondaryTextHost" HorizontalAlignment="Center">
+                        <Canvas x:Name="SecondaryBands" IsHitTestVisible="False"/>
+                        <Grid x:Name="SecondaryTextShadow" HorizontalAlignment="Center" Margin="0,50,0,0">
+                            <TextBlock x:Name="SecondaryText"
+                                       FontSize="58" FontStyle="Italic"
+                                       Foreground="#C9D4E8"
+                                       TextWrapping="Wrap" TextAlignment="Center"
+                                       IsVisible="False"/>
+                        </Grid>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+
+            <!-- Cuadros de texto extra del diseño de esta diapositiva -->
+            <Canvas x:Name="ExtraBoxLayer" IsHitTestVisible="False"/>
+
+            <!-- Capa de leyenda: separada del texto para que nunca se pisen -->
+            <Grid x:Name="CaptionLayer" Margin="110,40" IsHitTestVisible="False">
+                <TextBlock x:Name="CaptionText"
+                           FontSize="40"
+                           Foreground="#B9C6DE"
+                           HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                           IsVisible="False">
+                    <TextBlock.Effect>
+                        <DropShadowDirectionEffect BlurRadius="12" ShadowDepth="2" Direction="315" Color="Black" Opacity="0.75"/>
+                    </TextBlock.Effect>
+                </TextBlock>
+            </Grid>
+
+            <!-- Capa de logo: color de fondo + imagen + texto -->
+            <Grid x:Name="LogoLayer" Background="#10141E" IsVisible="False" ClipToBounds="True">
+                <Image x:Name="LogoImage" Stretch="Uniform" IsVisible="False"/>
+                <TextBlock x:Name="LogoText" Text="EcclesiaCast"
+                           FontSize="120" FontWeight="SemiBold"
+                           Foreground="White"
+                           TextWrapping="Wrap" TextAlignment="Center"
+                           Margin="110,80"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+
+            <!-- Cuenta regresiva: sobre el fondo y sobre la letra -->
+            <Grid x:Name="CountdownLayer" IsVisible="False" IsHitTestVisible="False">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock x:Name="CountdownHeading"
+                               FontSize="72" FontWeight="Light"
+                               Foreground="#DCE6F7"
+                               TextWrapping="Wrap" TextAlignment="Center"
+                               HorizontalAlignment="Center">
+                        <TextBlock.Effect>
+                            <DropShadowEffect BlurRadius="18" OffsetX="0" OffsetY="0" Color="Black" Opacity="0.85"/>
+                        </TextBlock.Effect>
+                    </TextBlock>
+                    <TextBlock x:Name="CountdownClock"
+                               FontSize="260" FontWeight="SemiBold"
+                               Foreground="White"
+                               TextAlignment="Center"
+                               HorizontalAlignment="Center"
+                               Margin="0,10,0,0">
+                        <TextBlock.Effect>
+                            <DropShadowEffect BlurRadius="26" OffsetX="0" OffsetY="0" Color="Black" Opacity="0.9"/>
+                        </TextBlock.Effect>
+                    </TextBlock>
+                </StackPanel>
+            </Grid>
+
+            <!-- Capa de negro -->
+            <Rectangle x:Name="BlackLayer" Fill="Black" Opacity="0" IsHitTestVisible="False"/>
+
+            <!-- Aviso al pie: por encima de todo, incluso del negro -->
+            <Border x:Name="OverlayLayer"
+                    VerticalAlignment="Bottom"
+                    Background="#E0000000"
+                    BorderBrush="#2F63C9"
+                    BorderThickness="0,4,0,0"
+                    Padding="70,30"
+                    IsVisible="False">
+                <TextBlock x:Name="OverlayText"
+                           FontSize="54" FontWeight="Medium"
+                           Foreground="White"
+                           TextWrapping="Wrap" TextAlignment="Center"
+                           HorizontalAlignment="Center"/>
+            </Border>
+
+        </Grid>
+    </Viewbox>
+</UserControl>
