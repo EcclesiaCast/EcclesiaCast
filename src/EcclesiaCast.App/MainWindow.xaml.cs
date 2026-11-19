@@ -43,6 +43,7 @@ public partial class MainWindow : Window
 
             vm.IsOutputMerged = !_outputSplit;
             vm.MediaSelectionChanged += (_, _) => RefreshMediaSelectionVisuals();
+            vm.LyricsMatchFocused += (_, slide) => BringSlideIntoView(slide);
 
             // The grid of the Bible scrolls to the book picked or typed.
             vm.BibleBookTileFocusRequested += (_, tile) => Dispatcher.BeginInvoke(
@@ -1491,7 +1492,7 @@ public partial class MainWindow : Window
             || _slideDragItem is not { } item
             || sender is not FrameworkElement card
             || DataContext is not MainViewModel vm
-            || !vm.CanMoveSlide(item))
+            || !vm.IsSongSlide(item))
             return;
 
         var moved = e.GetPosition(this) - start;
@@ -1500,6 +1501,18 @@ public partial class MainWindow : Window
             return;
 
         _slideDragStart = null;
+
+        // The order is locked (🔒): nothing moves; the bar says how to unlock it
+        // and the lock blinks so it is found.
+        if (!vm.CanMoveSlide(item))
+        {
+            // Letting go must not project the slide: it was a drag, not a click.
+            card.ReleaseMouseCapture();
+            vm.TellSlidesOrderIsLocked();
+            BlinkSlidesLock();
+            return;
+        }
+
         var layer = AdornerLayer.GetAdornerLayer(SlidesScroll);
         _slideDragAdorner = new SlideDragAdorner(SlidesScroll, card, (Brush)FindResource("AccentBrush"));
         layer?.Add(_slideDragAdorner);
@@ -1517,6 +1530,62 @@ public partial class MainWindow : Window
             _slideDragItem = null;
         }
     }
+
+    /// <summary>Two quick blinks of the lock, to show where it is.</summary>
+    private void BlinkSlidesLock()
+    {
+        var blink = new System.Windows.Media.Animation.DoubleAnimation(1, 0.25, TimeSpan.FromMilliseconds(180))
+        {
+            AutoReverse = true,
+            RepeatBehavior = new System.Windows.Media.Animation.RepeatBehavior(2),
+        };
+        SlidesLockButton.BeginAnimation(OpacityProperty, blink);
+    }
+
+    // ── Buscar en la letra ───────────────────────────────────────
+
+    /// <summary>
+    /// Enter projects the slide found, ↓ / F3 go to the next one, ↑ to the
+    /// previous one, Esc clears the box. Handled here so F3 (Logo) and the
+    /// arrows do not reach the window while typing.
+    /// </summary>
+    private void LyricsSearchBox_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm)
+            return;
+
+        switch (e.Key)
+        {
+            case Key.Enter:
+                vm.ProjectLyricsMatchCommand.Execute(null);
+                break;
+            case Key.Down:
+            case Key.F3 when Keyboard.Modifiers == ModifierKeys.None:
+                vm.NextLyricsMatchCommand.Execute(null);
+                break;
+            case Key.Up:
+            case Key.F3 when Keyboard.Modifiers == ModifierKeys.Shift:
+                vm.PreviousLyricsMatchCommand.Execute(null);
+                break;
+            case Key.Escape:
+                if (vm.LyricsSearchText.Length == 0)
+                    return; // an empty box lets Esc do what it always does
+                vm.ClearLyricsSearchCommand.Execute(null);
+                break;
+            default:
+                return;
+        }
+
+        e.Handled = true;
+    }
+
+    /// <summary>Scrolls the grid so the slide found is in sight.</summary>
+    private void BringSlideIntoView(SlideItemViewModel slide) =>
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (SlideGrid.ItemContainerGenerator.ContainerFromItem(slide) is FrameworkElement card)
+                card.BringIntoView();
+        }, System.Windows.Threading.DispatcherPriority.Loaded);
 
     private static SlideItemViewModel? DraggedSlide(DragEventArgs e) =>
         e.Data.GetData(typeof(SlideItemViewModel)) as SlideItemViewModel;

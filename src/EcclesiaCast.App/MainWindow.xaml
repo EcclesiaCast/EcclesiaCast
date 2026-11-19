@@ -17,6 +17,10 @@
         <KeyBinding Key="Escape" Command="{Binding EscapeOutputCommand}"/>
         <!-- Una sola caja para buscar en canciones, versículos y medios -->
         <KeyBinding Key="K" Modifiers="Control" Command="{Binding SearchEverythingCommand}"/>        <KeyBinding Key="F" Modifiers="Control" Command="{Binding SearchEverythingCommand}"/>
+        <!-- Deshacer/rehacer los cambios de la canción abierta. Dentro de una caja de
+             texto, Ctrl+Z sigue deshaciendo lo escrito (la caja lo atiende primero). -->
+        <KeyBinding Key="Z" Modifiers="Control" Command="{Binding UndoSongChangeCommand}"/>
+        <KeyBinding Key="Y" Modifiers="Control" Command="{Binding RedoSongChangeCommand}"/>
     </Window.InputBindings>
 
     <Window.Resources>
@@ -1656,8 +1660,9 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
+                    <StackPanel Grid.Row="0">
                     <!-- Qué hay en la grilla y, si es otra cosa, qué está en pantalla -->
-                    <DockPanel Grid.Row="0" Margin="12,8,12,8" LastChildFill="False"
+                    <DockPanel Margin="12,8,12,8" LastChildFill="False"
                                Visibility="{Binding HasGridTitle, Converter={StaticResource BoolToVis}}">
                         <!-- Sólo con una canción en la grilla: cuántas líneas lleva cada diapositiva -->
                         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0"
@@ -1706,6 +1711,74 @@
                             <TextBlock Text="EN VIVO" FontSize="10" FontWeight="SemiBold" Foreground="White"/>
                         </Border>
                     </DockPanel>
+
+                    <!-- Herramientas de la canción abierta (pedidos de GitHub #32): buscar en la
+                         letra, diapositiva nueva, deshacer/rehacer y el candado del orden. -->
+                    <DockPanel x:Name="SongToolsBar" Margin="12,0,12,8" LastChildFill="True"
+                               Visibility="{Binding IsSongOpen, Converter={StaticResource BoolToVis}}">
+                        <!-- El candado: trabado no deja arrastrar; destrabado se ve amarillo -->
+                        <Button x:Name="SlidesLockButton" DockPanel.Dock="Right" FontSize="11" Padding="9,4" Margin="6,0,0,0"
+                                Command="{Binding ToggleSlidesOrderLockCommand}"
+                                AutomationProperties.Name="Trabar o destrabar el orden de las diapositivas">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                    <Setter Property="Content" Value="🔒 Orden trabado"/>
+                                    <Setter Property="ToolTip" Value="El orden de las diapositivas está trabado: arrastrarlas no las mueve (así no se desacomodan sin querer). Clic para destrabarlo y poder moverlas."/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SlidesOrderLocked}" Value="False">
+                                            <Setter Property="Content" Value="🔓 Orden destrabado"/>
+                                            <Setter Property="Foreground" Value="#1A1A1A"/>
+                                            <Setter Property="Background" Value="#E8B931"/>
+                                            <Setter Property="ToolTip" Value="Ahora se pueden arrastrar las diapositivas para cambiarlas de lugar. Clic para trabar el orden otra vez."/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <Button DockPanel.Dock="Right" Content="↷" FontSize="13" Padding="8,2" Margin="4,0,0,0"
+                                Style="{StaticResource DarkButton}"
+                                Command="{Binding RedoSongChangeCommand}"
+                                IsEnabled="{Binding CanRedoSongChange}"
+                                AutomationProperties.Name="Rehacer"
+                                ToolTip="{Binding RedoSongHint}" ToolTipService.ShowOnDisabled="True"/>
+                        <Button DockPanel.Dock="Right" Content="↶" FontSize="13" Padding="8,2" Margin="6,0,0,0"
+                                Style="{StaticResource DarkButton}"
+                                Command="{Binding UndoSongChangeCommand}"
+                                IsEnabled="{Binding CanUndoSongChange}"
+                                AutomationProperties.Name="Deshacer"
+                                ToolTip="{Binding UndoSongHint}" ToolTipService.ShowOnDisabled="True"/>
+                        <Button DockPanel.Dock="Right" Content="➕ Diapositiva" FontSize="11" Padding="8,4" Margin="6,0,0,0"
+                                Style="{StaticResource DarkButton}"
+                                Command="{Binding NewSlideCommand}"
+                                AutomationProperties.Name="Diapositiva nueva"
+                                ToolTip="Escribir una diapositiva nueva al final de la canción. Para ponerla en otro lugar: clic derecho sobre una diapositiva → «Nueva diapositiva después de esta»."/>
+                        <TextBlock DockPanel.Dock="Right" Text="{Binding LyricsSearchStatus}" FontSize="11"
+                                   Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                        <Grid>
+                            <TextBox x:Name="LyricsSearchBox"
+                                     Text="{Binding LyricsSearchText, UpdateSourceTrigger=PropertyChanged}"
+                                     PreviewKeyDown="LyricsSearchBox_PreviewKeyDown"
+                                     Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                                     BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
+                                     Padding="6,3" FontSize="12"
+                                     AutomationProperties.Name="Buscar en la letra"
+                                     ToolTip="Buscar en la letra de esta canción: marca las diapositivas que tienen esas palabras. Enter la proyecta · ↓ o F3 la siguiente · ↑ la anterior · Esc borra."/>
+                            <TextBlock Text="🔍 Buscar en la letra…" IsHitTestVisible="False" FontSize="12"
+                                       Foreground="{StaticResource FaintBrush}" Margin="9,0,0,0" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding LyricsSearchText}" Value="">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                    </DockPanel>
+                    </StackPanel>
 
                     <Border Grid.Row="1"
                             BorderBrush="{StaticResource LineBrush}"
@@ -1771,6 +1844,9 @@
                                                         <MenuItem Header="Duplicar"
                                                                   Command="{Binding PlacementTarget.Tag.DuplicateSlideCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                                   CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                        <MenuItem Header="Nueva diapositiva después de esta…"
+                                                                  Command="{Binding PlacementTarget.Tag.NewSlideCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                                         <Separator/>
                                                         <MenuItem Header="Eliminar"
                                                                   Command="{Binding PlacementTarget.Tag.DeleteSlideCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
@@ -1820,6 +1896,17 @@
                                                                 <Setter TargetName="pageIcon" Property="Visibility" Value="Visible"/>
                                                                 <Setter TargetName="pageImage" Property="Visibility" Value="Visible"/>
                                                                 <Setter TargetName="card" Property="Padding" Value="4"/>
+                                                            </DataTrigger>
+                                                            <!-- Buscar en la letra: las que tienen las palabras en
+                                                                 amarillo; la que proyecta Enter, más marcada -->
+                                                            <DataTrigger Binding="{Binding IsSearchMatch}" Value="True">
+                                                                <Setter TargetName="card" Property="BorderBrush" Value="#B8932A"/>
+                                                                <Setter TargetName="card" Property="BorderThickness" Value="2"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsSearchCurrent}" Value="True">
+                                                                <Setter TargetName="card" Property="BorderBrush" Value="#E8B931"/>
+                                                                <Setter TargetName="card" Property="BorderThickness" Value="3"/>
+                                                                <Setter TargetName="card" Property="Background" Value="#2A2818"/>
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding IsPreviewed}" Value="True">
                                                                 <Setter TargetName="card" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>

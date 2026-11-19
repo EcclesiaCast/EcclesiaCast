@@ -424,6 +424,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         _stage.VisibilityChanged += (_, _) => IsStageVisible = _stage.IsVisible;
         LoadStageLayouts();
         LoadSongMaxLines();
+        LoadSlidesOrderLock();
         LoadLowPerformance();
         LoadOutputVolume();
         LoadMeetingSections();
