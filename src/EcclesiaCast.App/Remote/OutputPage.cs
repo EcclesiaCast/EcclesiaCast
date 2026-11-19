@@ -97,8 +97,8 @@ public static class OutputPage
             #nplate.fuera { opacity: 0; }
             #nplate.anim-deslizar.fuera { transform: translateX(-6vh); }
             #nplate.anim-subir.fuera { transform: translateY(8vh); }
-            #nplate.anim-persiana.fuera { transform: scaleX(0); }
-            #nplate.anim-persiana { transition: opacity .16s ease, transform .52s cubic-bezier(.2,.8,.3,1); }
+            #nplate.anim-persiana { clip-path: inset(0 0 0 0); transition: opacity .16s ease, clip-path .7s ease-in; }
+            #nplate.anim-persiana.fuera { clip-path: inset(0 100% 0 0); }
             #nplateName { font-size: 6.1vh; font-weight: 600; line-height: 1.15; }
             #nplateRole { font-size: 3.7vh; color: #C9D3E6; margin-top: .4vh; }
 

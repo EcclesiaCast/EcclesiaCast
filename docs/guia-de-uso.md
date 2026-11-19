@@ -398,6 +398,11 @@ programa recuerda lo que elijas.
   en la transmisión. A la derecha elegís cuánto queda: hasta que toques
   **Quitar**, o 5, 10 o 15 segundos. Cada placa que mostrás queda en la lista de
   **Guardadas**: el próximo domingo es doble clic y listo; el 🗑 la borra.
+  Con **Elegir…** le ponés una **imagen o un video corto** al costado (uno de tus
+  logos o cualquier archivo de la computadora; el video va en bucle y sin sonido),
+  **a la izquierda o a la derecha** del texto. En la otra lista elegís **cómo entra**:
+  deslizándose desde el costado, subiendo desde abajo, abriéndose como persiana o
+  sólo apareciendo. Siempre se va desvaneciéndose. Todo queda guardado con la placa.
 - **Resaltar en vivo**: escribí una o varias palabras o frases separadas por
   **;** (`gracia; fe`) y se pintan como con marcador, en todas las veces que
   aparecen. También podés marcar con el mouse sobre el panel LIVE: un clic en

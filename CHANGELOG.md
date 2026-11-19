@@ -10,7 +10,10 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 - **Placas de nombre («lower third»).** Pestaña nueva **Placas**: nombre y cargo («Pastor Juan Pérez /
   Predicación») en una tarjeta abajo a la izquierda que entra deslizándose, en el proyector, en el EN VIVO
   y en la transmisión (OBS). Se va sola a los 5, 10 o 15 segundos, o cuando la quitás. Cada placa
-  mostrada queda guardada en una lista para usarla de nuevo con doble clic. (Pedido en GitHub #37.)
+  mostrada queda guardada en una lista para usarla de nuevo con doble clic. Puede llevar una imagen o un
+  video corto (en bucle, sin sonido) a la izquierda o a la derecha del texto, elegido de tus logos o de
+  la computadora, y entrar de cuatro maneras: deslizándose, subiendo, como persiana o sólo apareciendo.
+  (Pedido en GitHub #37.)
 - **Fondo propio de cada canción.** Con **🖼 Fondo** arriba de las diapositivas («Usar el fondo que está
   en pantalla») o con clic derecho en una imagen o video de Medios → «Usar como fondo de «…»». Al
   proyectar esa canción, su fondo se pone solo; le gana al «al azar por canción». (GitHub #32.)

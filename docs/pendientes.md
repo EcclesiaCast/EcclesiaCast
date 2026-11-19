@@ -27,6 +27,11 @@ lista y se acordó al reabrir.
 
 Falta probar a mano:
 
+- [ ] **Placas con imagen o video** (se hizo de día y no abrí el programa: sólo hay pruebas y dibujos a
+  imagen, que se ven bien, incluidas las cuatro animaciones a mitad de camino). Probar: «Elegir…» con un
+  logo de la lista y con un archivo; un video (que se mueva en bucle en el proyector y en el EN VIVO);
+  izquierda y derecha; las cuatro entradas en el proyector y en la página de OBS (la imagen o el video
+  también tienen que verse en OBS).
 - [ ] **Placas con YouTube de fondo:** con un video de YouTube a pantalla completa, lo más probable es que la placa (como el
   aviso al pie) no se vea en el proyector, porque el video es una ventana aparte; en OBS sí. Ver si
   hace falta.

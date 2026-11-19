@@ -94,8 +94,20 @@ public partial class SlideView
                     new DoubleAnimation(90, 0, PlateIn) { EasingFunction = ease });
                 break;
             case NamePlateAnimation.Wipe:
-                NamePlateScale.BeginAnimation(ScaleTransform.ScaleXProperty,
-                    new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(520)) { EasingFunction = ease });
+                // Uncovered from its left edge: a window that widens over the
+                // card (wider than any card, so it is never cut at the end).
+                var window = new RectangleGeometry(new Rect(0, 0, 0, 2000));
+                NamePlateLayer.Clip = window;
+                var open = new RectAnimation(new Rect(0, 0, 0, 2000), new Rect(0, 0, 2000, 2000), TimeSpan.FromMilliseconds(700))
+                {
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn },
+                };
+                open.Completed += (_, _) =>
+                {
+                    if (ReferenceEquals(NamePlateLayer.Clip, window))
+                        NamePlateLayer.Clip = null;
+                };
+                window.BeginAnimation(RectangleGeometry.RectProperty, open);
                 break;
             case NamePlateAnimation.Fade:
                 break;
@@ -112,6 +124,7 @@ public partial class SlideView
         NamePlateShift.BeginAnimation(TranslateTransform.XProperty, null);
         NamePlateShift.BeginAnimation(TranslateTransform.YProperty, null);
         NamePlateScale.BeginAnimation(ScaleTransform.ScaleXProperty, null);
+        NamePlateLayer.Clip = null;
         NamePlateLayer.Opacity = 1;
         NamePlateShift.X = 0;
         NamePlateShift.Y = 0;
@@ -182,15 +195,28 @@ public partial class SlideView
         _plateMediaPath = null;
     }
 
-    /// <summary>Above the «aviso al pie» when it is on, so neither covers the other.</summary>
+    private bool _plateFollowsOverlay;
+
+    /// <summary>
+    /// Above the «aviso al pie» when it is on, so neither covers the other. The
+    /// notice may not have its size yet when it appears, so the plate also
+    /// moves whenever the notice changes size.
+    /// </summary>
     private void PlaceNamePlate()
     {
-        var bottom = 110.0;
-        if (OverlayLayer.Visibility == Visibility.Visible)
+        if (!_plateFollowsOverlay)
         {
-            OverlayLayer.UpdateLayout();
-            bottom = Math.Max(bottom, OverlayLayer.ActualHeight + 40);
+            _plateFollowsOverlay = true;
+            OverlayLayer.SizeChanged += (_, _) =>
+            {
+                if (NamePlateLayer.Visibility == Visibility.Visible)
+                    PlaceNamePlate();
+            };
         }
+
+        var bottom = 110.0;
+        if (OverlayLayer.Visibility == Visibility.Visible && OverlayLayer.ActualHeight > 0)
+            bottom = Math.Max(bottom, OverlayLayer.ActualHeight + 40);
 
         NamePlateLayer.Margin = new Thickness(90, 0, 0, bottom);
     }
