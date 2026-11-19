@@ -23,8 +23,21 @@ public partial class YouTubeSurface : UserControl
     public YouTubeSurface()
     {
         InitializeComponent();
-        Loaded += async (_, _) => await EnsureBrowserAsync();
+        Loaded += async (_, _) =>
+        {
+            PlayerSound.MasterChanged -= OnMasterChanged;
+            PlayerSound.MasterChanged += OnMasterChanged;
+            await EnsureBrowserAsync();
+        };
+        Unloaded += (_, _) => PlayerSound.MasterChanged -= OnMasterChanged;
     }
+
+    /// <summary>
+    /// The program's general volume moved: YouTube plays in the browser, not in
+    /// the program's own sound, so it is told apart.
+    /// </summary>
+    private void OnMasterChanged(object? sender, EventArgs e) =>
+        Dispatcher.BeginInvoke(() => Run($"setMaster({PlayerSound.Master})"));
 
     /// <summary>Raised when the video reaches its end and shouldn't loop.</summary>
     public event EventHandler<VideoEndBehavior>? Ended;
@@ -134,7 +147,7 @@ public partial class YouTubeSurface : UserControl
         var muted = media.Muted ? "1" : "0";
         Browser.CoreWebView2.Navigate(
             $"https://{WebViewProfile.PlayerHost}/{PlayerPage}" +
-            $"?v={Uri.EscapeDataString(media.YouTubeId!)}&loop={loop}&muted={muted}&volume={media.Volume}");
+            $"?v={Uri.EscapeDataString(media.YouTubeId!)}&loop={loop}&muted={muted}&volume={media.Volume}&master={PlayerSound.Master}");
     }
 
     public void Clear()
@@ -357,6 +370,9 @@ public partial class YouTubeSurface : UserControl
               var loop = params.get('loop') === '1';
               var muted = params.get('muted') === '1';
               var volume = parseInt(params.get('volume') || '100', 10);
+              // The program's general volume («Volumen» under LIVE), over the video's own.
+              var master = parseInt(params.get('master') || '100', 10);
+              function level() { return Math.round(volume * master / 100); }
               var player;
               function post(text) {
                 try { window.chrome.webview.postMessage(String(text)); } catch (e) {}
@@ -386,7 +402,7 @@ public partial class YouTubeSurface : UserControl
                   },
                   events: {
                     onReady: function (e) {
-                      if (muted) { e.target.mute(); } else { e.target.unMute(); e.target.setVolume(volume); }
+                      if (muted) { e.target.mute(); } else { e.target.unMute(); e.target.setVolume(level()); }
                       e.target.playVideo();
                       startReporting();
                     },
@@ -423,7 +439,8 @@ public partial class YouTubeSurface : UserControl
                 pause: function () { try { player.pauseVideo(); } catch (e) {} },
                 seek: function (seconds) { try { player.seekTo(seconds, true); } catch (e) {} },
                 mute: function () { try { player.mute(); } catch (e) {} },
-                unmute: function () { try { player.unMute(); player.setVolume(volume); } catch (e) {} },
+                unmute: function () { try { player.unMute(); player.setVolume(level()); } catch (e) {} },
+                setMaster: function (m) { master = m; try { player.setVolume(level()); } catch (e) {} },
                 // Blurring shrinks the picture at the edges, so scale it up a
                 // little to keep the screen covered.
                 blur: function (px) {

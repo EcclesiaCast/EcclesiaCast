@@ -93,45 +93,38 @@
                         Value="{Binding PlaybackPositionSeconds}"
                         IsMoveToPointEnabled="True" Margin="0,6,0,0"
                         ToolTip="Arrastrá para moverte dentro del video"/>
-                <!-- Sonido: si el video está silenciado, su volumen y el de toda la salida.
-                     Dos renglones: el panel LIVE es angosto. -->
+                <!-- Sonido: un solo volumen para todo lo que suena (videos, YouTube y la
+                     música), y si el video en pantalla suena o está silenciado. El volumen
+                     propio de cada video está en sus Propiedades (19/11: dos barras confundían). -->
                 <Grid Margin="0,6,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Text="Video" FontSize="11" VerticalAlignment="Center"
+                    <TextBlock Text="Volumen" FontSize="11" VerticalAlignment="Center"
                                Foreground="{StaticResource MutedBrush}" Margin="0,0,6,0"/>
-                    <Slider Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="100" Value="{Binding BackgroundVolume}"
+                    <Slider Grid.Column="1" Minimum="0" Maximum="100" Value="{Binding OutputVolume}"
                             IsMoveToPointEnabled="True" VerticalAlignment="Center"
-                            AutomationProperties.Name="Volumen del video"
-                            ToolTip="Volumen de este video (queda guardado en sus Propiedades)."/>
-                    <Button Grid.Row="0" Grid.Column="2" Content="🔇 Sin sonido" FontSize="11" Padding="6,2" Margin="6,0,0,0"
+                            SmallChange="1" LargeChange="5"
+                            AutomationProperties.Name="Volumen"
+                            ToolTip="Volumen de todo lo que suena en EcclesiaCast: videos, YouTube y la música. No toca el volumen de Windows. El de un video solo se cambia en sus Propiedades."/>
+                    <TextBlock Grid.Column="2" Text="{Binding OutputVolume, StringFormat={}{0} %}" FontSize="11"
+                               VerticalAlignment="Center" TextAlignment="Right" Margin="6,0,0,0" MinWidth="34"
+                               Foreground="{StaticResource MutedBrush}"/>
+                    <Button Grid.Column="3" Content="🔇 Sin sonido" FontSize="11" Padding="6,2" Margin="6,0,0,0"
                             Style="{StaticResource DarkButton}"
                             Command="{Binding ToggleBackgroundSoundCommand}"
                             Visibility="{Binding IsBackgroundMuted, Converter={StaticResource BoolToVis}}"
                             AutomationProperties.Name="Dar sonido al video"
                             ToolTip="Este video está silenciado. Clic: que suene."/>
-                    <Button Grid.Row="0" Grid.Column="2" Content="🔊 Suena" FontSize="11" Padding="6,2" Margin="6,0,0,0"
+                    <Button Grid.Column="3" Content="🔊 Suena" FontSize="11" Padding="6,2" Margin="6,0,0,0"
                             Style="{StaticResource DarkButton}"
                             Command="{Binding ToggleBackgroundSoundCommand}"
                             Visibility="{Binding IsBackgroundMuted, Converter={StaticResource InverseBoolToVis}}"
                             AutomationProperties.Name="Silenciar el video"
                             ToolTip="Este video suena. Clic: silenciarlo."/>
-                    <TextBlock Grid.Row="1" Text="Salida" FontSize="11" VerticalAlignment="Center"
-                               Foreground="{StaticResource MutedBrush}" Margin="0,6,6,0"/>
-                    <Slider Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="100" Value="{Binding OutputVolume}"
-                            IsMoveToPointEnabled="True" VerticalAlignment="Center" Margin="0,6,0,0"
-                            AutomationProperties.Name="Volumen de toda la salida"
-                            ToolTip="Volumen de todo lo que sale de EcclesiaCast (videos y música). No toca el volumen de Windows."/>
-                    <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding OutputVolume, StringFormat={}{0} %}" FontSize="11"
-                               VerticalAlignment="Center" TextAlignment="Right" Margin="6,6,0,0"
-                               Foreground="{StaticResource MutedBrush}"/>
                 </Grid>
             </StackPanel>
         </DataTemplate>
