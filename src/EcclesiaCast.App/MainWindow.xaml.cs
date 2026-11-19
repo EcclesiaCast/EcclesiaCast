@@ -924,6 +924,14 @@ public partial class MainWindow : Window
                 case "OpenLocationItem":
                     item.Visibility = isWeb ? Visibility.Collapsed : Visibility.Visible;
                     break;
+                case "UseAsSongBackgroundItem":
+                    item.Visibility = count == 1 && vm.SongForBackground is { } song
+                        && media.Type is MediaType.Image or MediaType.Video or MediaType.YouTube
+                        ? Visibility.Visible : Visibility.Collapsed;
+                    item.Header = vm.SongForBackground is { } open
+                        ? $"Usar como fondo de «{open.Title}»"
+                        : "Usar como fondo de la canción";
+                    break;
                 case "UseAsLogoItem":
                     // A page drawn from a PDF or presentation, or the video made
                     // from a GIF, is deleted with its media, and the logo would
@@ -1529,6 +1537,42 @@ public partial class MainWindow : Window
             _slideDragAdorner = null;
             _slideDragItem = null;
         }
+    }
+
+    /// <summary>
+    /// «🖼 Fondo» over the slides: use the background on the screen as the
+    /// song's own, or take it away. Choosing one from the media bar is a right
+    /// click on its card, which the last line says.
+    /// </summary>
+    private void SongBackgroundButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm || sender is not FrameworkElement anchor)
+            return;
+
+        var menu = new ContextMenu
+        {
+            PlacementTarget = anchor,
+            Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom,
+        };
+        menu.Items.Add(new MenuItem
+        {
+            Header = "Usar el fondo que está en pantalla",
+            Command = vm.UseCurrentBackgroundForSongCommand,
+            ToolTip = "La imagen o el video que se ve ahora pasa a ser el fondo de esta canción",
+        });
+        menu.Items.Add(new MenuItem
+        {
+            Header = "Quitar el fondo propio",
+            Command = vm.RemoveSongBackgroundCommand,
+            IsEnabled = vm.SongHasOwnBackground,
+        });
+        menu.Items.Add(new Separator());
+        menu.Items.Add(new MenuItem
+        {
+            Header = "Otro: clic derecho en una imagen o video de Medios → «Usar como fondo de…»",
+            IsEnabled = false,
+        });
+        menu.IsOpen = true;
     }
 
     /// <summary>Two quick blinks of the lock, to show where it is.</summary>

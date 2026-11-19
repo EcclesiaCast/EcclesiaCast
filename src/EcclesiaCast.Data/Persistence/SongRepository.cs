@@ -147,6 +147,17 @@ public sealed class SongRepository(string dbPath) : ISongRepository
         db.SaveChanges();
     }
 
+    public void SetBackground(int songId, int? mediaId)
+    {
+        using var db = new AppDbContext(dbPath);
+        var song = db.Songs.FirstOrDefault(s => s.Id == songId);
+        if (song is null)
+            return;
+
+        song.BackgroundMediaId = mediaId;
+        db.SaveChanges();
+    }
+
     public void SetTheme(int songId, int? themeId)
     {
         using var db = new AppDbContext(dbPath);

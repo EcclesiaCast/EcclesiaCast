@@ -147,6 +147,12 @@
                       Command="{Binding PlacementTarget.Tag.UseMediaAsLogoCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                       CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                       ToolTip="Lo suma a la lista de logos para mostrarlo con F3. No cambia el logo que está en pantalla."/>
+            <!-- Sólo con una canción abierta y una sola tarjeta elegida (imagen, video o YouTube);
+                 el nombre de la canción se pone al abrirse -->
+            <MenuItem x:Name="UseAsSongBackgroundItem" Header="Usar como fondo de la canción"
+                      Command="{Binding PlacementTarget.Tag.UseMediaAsSongBackgroundCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      ToolTip="Cada vez que proyectes esa canción, este fondo se pone solo (le gana al «al azar por canción»)."/>
             <!-- Sus pestañas se llenan al abrirse -->
             <MenuItem x:Name="MoveToTabItem" Header="Mover a la pestaña…" SubmenuOpened="MoveToTab_SubmenuOpened">
                 <MenuItem Header="(cargando)" IsEnabled="False"/>
@@ -1687,6 +1693,14 @@
                                 Visibility="{Binding IsSongOpen, Converter={StaticResource BoolToVis}}"
                                 AutomationProperties.Name="Tema de esta canción"
                                 ToolTip="{Binding SongThemeHint}"/>
+                        <!-- Sólo con una canción: su fondo propio, que se pone solo al proyectarla -->
+                        <Button DockPanel.Dock="Right" Content="{Binding SongBackgroundLabel}" FontSize="11" Padding="8,3" Margin="10,0,0,0"
+                                MaxWidth="200"
+                                Style="{StaticResource DarkButton}"
+                                Click="SongBackgroundButton_Click"
+                                Visibility="{Binding IsSongOpen, Converter={StaticResource BoolToVis}}"
+                                AutomationProperties.Name="Fondo de esta canción"
+                                ToolTip="{Binding SongBackgroundHint}"/>
                         <!-- Sólo con una presentación en la grilla -->
                         <Button DockPanel.Dock="Right" Content="➕ Playlist" FontSize="11" Padding="8,3" Margin="10,0,0,0"
                                 Style="{StaticResource DarkButton}"

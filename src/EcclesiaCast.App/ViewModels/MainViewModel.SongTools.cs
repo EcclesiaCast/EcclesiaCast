@@ -256,6 +256,7 @@ public sealed partial class MainViewModel
     private void AfterSongSlidesBuilt()
     {
         UpdateSongUndoState();
+        UpdateSongBackgroundLabel();
         var id = SelectedSong?.Id ?? 0;
         if (id != _lyricsSearchSongId)
         {

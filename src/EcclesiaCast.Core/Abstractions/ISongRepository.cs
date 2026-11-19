@@ -43,6 +43,9 @@ public interface ISongRepository
     /// </summary>
     void SetTheme(int songId, int? themeId);
 
+    /// <summary>Gives a song a background of its own (a media id), or takes it away (null).</summary>
+    void SetBackground(int songId, int? mediaId);
+
     /// <summary>
     /// Notes that a song went on the projector. Called every time a slide of
     /// it goes live, so it stays cheap: one column, no sections.
