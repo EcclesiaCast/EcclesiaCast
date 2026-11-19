@@ -18,10 +18,10 @@ jobs:
       - name: Test
         run: dotnet test --configuration Release --no-build --verbosity normal
 
-  # Core, Data and Presentation (the view models) are plain .NET, so their
-  # tests must also pass on a Mac with an Apple chip. The test projects are
-  # targeted directly (not the solution) because the app itself is WPF and
-  # only builds on Windows.
+  # Core, Data, Presentation (the view models) and Desktop (the Avalonia
+  # interface) are not WPF, so their tests must also pass on a Mac with an
+  # Apple chip. The test projects are targeted directly (not the solution)
+  # because the app itself is WPF and only builds on Windows.
   test-mac:
     runs-on: macos-15
     steps:
@@ -33,3 +33,5 @@ jobs:
         run: dotnet test tests/EcclesiaCast.Core.Tests --configuration Release --verbosity normal
       - name: Test view models
         run: dotnet test tests/EcclesiaCast.Presentation.Tests --configuration Release --verbosity normal
+      - name: Test the Avalonia interface
+        run: dotnet test tests/EcclesiaCast.Desktop.Tests --configuration Release --verbosity normal

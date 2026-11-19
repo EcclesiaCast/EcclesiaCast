@@ -3,11 +3,13 @@
     <Project Path="src/EcclesiaCast.App/EcclesiaCast.App.csproj" />
     <Project Path="src/EcclesiaCast.Core/EcclesiaCast.Core.csproj" />
     <Project Path="src/EcclesiaCast.Data/EcclesiaCast.Data.csproj" />
+    <Project Path="src/EcclesiaCast.Desktop/EcclesiaCast.Desktop.csproj" />
     <Project Path="src/EcclesiaCast.Platform.Windows/EcclesiaCast.Platform.Windows.csproj" />
     <Project Path="src/EcclesiaCast.Presentation/EcclesiaCast.Presentation.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/EcclesiaCast.Core.Tests/EcclesiaCast.Core.Tests.csproj" />
+    <Project Path="tests/EcclesiaCast.Desktop.Tests/EcclesiaCast.Desktop.Tests.csproj" />
     <Project Path="tests/EcclesiaCast.Presentation.Tests/EcclesiaCast.Presentation.Tests.csproj" />
     <Project Path="tests/EcclesiaCast.RenderBench.Wpf/EcclesiaCast.RenderBench.Wpf.csproj" />
   </Folder>
