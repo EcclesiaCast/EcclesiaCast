@@ -17,6 +17,15 @@ jobs:
         run: dotnet build --configuration Release
       - name: Test
         run: dotnet test --configuration Release --no-build --verbosity normal
+      # The Avalonia render bench runs inside the tests above (Desktop.Tests).
+      # Its pictures and measures are kept to download and compare with a Mac's.
+      - name: Keep the Avalonia render results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: render-avalonia-windows
+          path: artifacts/render/avalonia/
+          if-no-files-found: warn
 
   # Core, Data, Presentation (the view models) and Desktop (the Avalonia
   # interface) are not WPF, so their tests must also pass on a Mac with an
@@ -33,5 +42,13 @@ jobs:
         run: dotnet test tests/EcclesiaCast.Core.Tests --configuration Release --verbosity normal
       - name: Test view models
         run: dotnet test tests/EcclesiaCast.Presentation.Tests --configuration Release --verbosity normal
+      # Includes the Avalonia render bench (every case in four themes).
       - name: Test the Avalonia interface
         run: dotnet test tests/EcclesiaCast.Desktop.Tests --configuration Release --verbosity normal
+      - name: Keep the Avalonia render results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: render-avalonia-mac
+          path: artifacts/render/avalonia/
+          if-no-files-found: warn
