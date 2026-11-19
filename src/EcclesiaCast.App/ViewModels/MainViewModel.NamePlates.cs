@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Presentation;
 
 namespace EcclesiaCast.App.ViewModels;
@@ -41,23 +42,29 @@ public sealed partial class MainViewModel
 
     /// <summary>«logo.png», «🎞 intro.mp4» or «Sin imagen», beside the «Elegir…» button.</summary>
     public string NamePlateImageLabel => NamePlateImagePath is { Length: > 0 } path
-        ? (NamePlateMedia.IsVideo(path) ? "🎞 " : "🖼 ") + System.IO.Path.GetFileName(path)
+        ? GifImporter.IsConverted(path) ? "🎞 GIF animado"
+        : (NamePlateMedia.IsVideo(path) ? "🎞 " : "🖼 ") + System.IO.Path.GetFileName(path)
         : "Sin imagen";
 
     /// <summary>0: the picture on the left of the words; 1: on the right.</summary>
     [ObservableProperty]
     private int _namePlateImageSide;
 
-    /// <summary>The way in, as the index of <see cref="NamePlateMedia.Animations"/>.</summary>
+    /// <summary>The names of the church's styles, for the list in the tab.</summary>
+    public ObservableCollection<string> NamePlateStyleNames { get; } = [];
+
+    /// <summary>The style of the plate being written (its look, its movement, where it is seen).</summary>
     [ObservableProperty]
-    private int _namePlateAnimationIndex;
+    private string _namePlateStyleName = NamePlateStyle.Classic.Name;
 
-    /// <summary>The words of each way in, for the list in the tab.</summary>
-    public IReadOnlyList<string> NamePlateAnimationNames { get; } =
-        NamePlateMedia.Animations.Select(a => a.Label).ToList();
-
-    private NamePlateAnimation ChosenPlateAnimation =>
-        NamePlateMedia.Animations[Math.Clamp(NamePlateAnimationIndex, 0, NamePlateMedia.Animations.Count - 1)].Animation;
+    private void LoadNamePlateStyleNames()
+    {
+        var keep = NamePlateStyleName;
+        NamePlateStyleNames.Clear();
+        foreach (var style in NamePlateStyleSettings.Current)
+            NamePlateStyleNames.Add(style.Name);
+        NamePlateStyleName = NamePlateStyleSettings.Find(keep).Name;
+    }
 
     private void FillNamePlateFields(NamePlate plate)
     {
@@ -65,8 +72,29 @@ public sealed partial class MainViewModel
         NamePlateRole = plate.Role;
         NamePlateImagePath = plate.ImagePath;
         NamePlateImageSide = plate.ImageRight ? 1 : 0;
-        var index = NamePlateMedia.Animations.ToList().FindIndex(a => a.Animation == plate.Animation);
-        NamePlateAnimationIndex = Math.Max(0, index);
+        NamePlateStyleName = NamePlateStyleSettings.Find(plate.StyleName).Name;
+    }
+
+    /// <summary>
+    /// «✏ Diseñar…»: the window with every option of the styles. It opens on
+    /// the style chosen in the tab, and leaves chosen the one closed on.
+    /// </summary>
+    [RelayCommand]
+    private void DesignNamePlateStyles()
+    {
+        var sample = NamePlate.Clean(NamePlateName, NamePlateRole, NamePlateImagePath, NamePlateImageSide == 1, NamePlateStyleName)
+            ?? new NamePlate("Juan Pérez", "Predicación", NamePlateImagePath, NamePlateImageSide == 1, NamePlateStyleName);
+        var window = new Views.NamePlateDesignerWindow(sample) { Owner = System.Windows.Application.Current.MainWindow };
+        if (window.ShowDialog() != true)
+            return;
+
+        NamePlateStyleSettings.Set(window.Styles);
+        NamePlateStyleName = window.ChosenStyle;
+
+        // A plate on the screen takes its style's new look at once.
+        if (_presentation.NamePlate is { } shown)
+            _presentation.ShowNamePlate(shown with { Style = NamePlateStyleSettings.Find(shown.StyleName) });
+        StatusText = $"Estilos de placa guardados. Estilo elegido: «{NamePlateStyleName}».";
     }
 
     /// <summary>The logos of the library that are a picture or a video: the first choices for a plate.</summary>
@@ -85,9 +113,31 @@ public sealed partial class MainViewModel
             return;
         }
 
+        // An animated GIF would stand still as a picture: it is made into a
+        // looping video first (a few seconds), as the library does with GIFs.
+        if (path is not null
+            && System.IO.Path.GetExtension(path).Equals(".gif", StringComparison.OrdinalIgnoreCase)
+            && System.IO.File.Exists(path) && EcclesiaCast.Core.Media.GifFile.IsAnimated(path)
+            && GifImporter.IsAvailable)
+        {
+            _ = UseNamePlateGifAsync(path);
+            return;
+        }
+
         NamePlateImagePath = path;
         if (path is not null)
             StatusText = $"La placa va a llevar «{System.IO.Path.GetFileName(path)}». Tocá «Mostrar» para verla.";
+    }
+
+    private async Task UseNamePlateGifAsync(string gif)
+    {
+        var name = System.IO.Path.GetFileName(gif);
+        StatusText = $"Preparando el GIF «{name}» para la placa…";
+        var video = await GifImporter.ConvertAsync(gif);
+        NamePlateImagePath = video ?? gif;
+        StatusText = video is null
+            ? $"El GIF «{name}» no se pudo convertir: la placa lo lleva quieto, como imagen."
+            : $"La placa va a llevar el GIF «{name}», en movimiento. Tocá «Mostrar» para verla.";
     }
 
     /// <summary>«Otra imagen o video…»: a file from the computer.</summary>
@@ -118,6 +168,9 @@ public sealed partial class MainViewModel
 
     private void LoadNamePlates()
     {
+        LoadNamePlateStyleNames();
+        NamePlateStyleSettings.Changed += (_, _) => LoadNamePlateStyleNames();
+
         foreach (var plate in NamePlateList.Parse(_settings.Get(NamePlateList.SettingKey)))
             SavedNamePlates.Add(plate);
 
@@ -153,7 +206,7 @@ public sealed partial class MainViewModel
     [RelayCommand]
     private void ShowNamePlate()
     {
-        if (NamePlate.Clean(NamePlateName, NamePlateRole, NamePlateImagePath, NamePlateImageSide == 1, ChosenPlateAnimation) is not { } plate)
+        if (NamePlate.Clean(NamePlateName, NamePlateRole, NamePlateImagePath, NamePlateImageSide == 1, NamePlateStyleName) is not { } plate)
         {
             StatusText = "Escribí el nombre (y si querés, el cargo) para mostrar la placa.";
             return;
@@ -182,7 +235,9 @@ public sealed partial class MainViewModel
         }
 
         NoteAction($"Placa: {plate}");
-        _presentation.ShowNamePlate(plate);
+        // The style goes along by name in the list, and whole to the screen.
+        var style = NamePlateStyleSettings.Find(plate.StyleName);
+        _presentation.ShowNamePlate(plate with { Style = style });
         ShowOutputWindow();
         IsProjecting = true;
         KeepNamePlate(plate);
@@ -195,9 +250,15 @@ public sealed partial class MainViewModel
             _namePlateTimer.Start();
         }
 
+        var where = style.Target switch
+        {
+            NamePlateTarget.StreamOnly => "Placa sólo en la transmisión (OBS)",
+            NamePlateTarget.ProjectorOnly => "Placa sólo en el proyector",
+            _ => "Placa en pantalla",
+        };
         StatusText = seconds > 0
-            ? $"Placa en pantalla: {plate}. Se va sola en {seconds} segundos."
-            : $"Placa en pantalla: {plate}. «Quitar» la saca.";
+            ? $"{where}: {plate}. Se va sola en {seconds} segundos."
+            : $"{where}: {plate}. «Quitar» la saca.";
     }
 
     [RelayCommand]

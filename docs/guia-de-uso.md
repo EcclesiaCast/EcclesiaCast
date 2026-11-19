@@ -22,7 +22,8 @@ EcclesiaCast**.
 
 En la pestaña **Canciones**:
 
-- **➕ Agregar** es el único botón para agregar canciones y ofrece cuatro caminos:
+- **➕ Agregar** es el botón para agregar canciones y ofrece cuatro caminos (el primero
+  también está arriba, en el menú **Canciones → Crear canción desde cero…**):
   **Crear desde cero**, **Buscar en internet…**, **Traer de otro programa…** e
   **Importar archivo (.txt, .pro)…**. Crear desde cero abre una canción en
   blanco: pegá la letra, y **cada párrafo** (bloque separado por
@@ -149,7 +150,9 @@ En la barra **MEDIOS**, abajo:
     **otro medio de la biblioteca**. En una imagen en primer plano, cuántos
     segundos se ve y qué pasa pasados esos segundos (nada: sale de la
     pantalla; el logo; u otro medio).
-  - **Audio**: silenciar o volumen.
+  - **Audio**: silenciar o volumen propio de ese video. Para todo lo que suena en la
+    salida (videos, música y YouTube) está la barra **Volumen** debajo del panel EN VIVO,
+    con el botón **Sin sonido / Suena** del video al lado.
   - **Desenfoque**: difumina el fondo para que la letra se lea encima.
   - **Encuadre**: **zoom** para acercar o alejar (100 % es como está), y
     **correr** la imagen a los lados o arriba y abajo. Con **tamaño fijo en
@@ -186,7 +189,11 @@ En la barra **MEDIOS**, abajo:
   computadora, para no depender de internet durante el servicio. Queda en la
   pestaña **Descargados**. Necesita [yt-dlp](https://github.com/yt-dlp/yt-dlp)
   instalado aparte (`winget install yt-dlp`); con ffmpeg además se baja hasta
-  1080p. Descargá solo videos propios o con licencia que lo permita.
+  1080p (en H.264, que se ve nítido en cualquier computadora). Descargá solo videos
+  propios o con licencia que lo permita.
+- Si YouTube **no deja pasar un video** fuera de su página (pasa con muchos videos
+  con derechos de autor), la pantalla queda en negro y el programa avisa que ese
+  video sólo se puede usar descargándolo, con un botón **Descargar ahora**.
 
 > Al apagar la salida, el video se **pausa** y retoma donde estaba cuando la
 > volvés a prender.
@@ -402,9 +409,19 @@ programa recuerda lo que elijas.
   logos o cualquier archivo de la computadora; el video va en bucle y sin sonido),
   **a la izquierda o a la derecha** del texto (un logo apaisado queda ancho; para OBS el
   video tiene que ser MP4 común, H.264: los videos HEVC de iPhone se ven en el proyector pero
-  no en la transmisión, donde la placa sale sin el video). En la otra lista elegís **cómo entra**:
-  deslizándose desde el costado, subiendo desde abajo, abriéndose como persiana o
-  sólo apareciendo. Siempre se va desvaneciéndose. Todo queda guardado con la placa.
+  no en la transmisión, donde la placa sale sin el video). Un **GIF animado** se convierte
+  solo en un video corto y se mueve.
+  En **Estilo** elegís cómo se ve: Clásica, Moderna, Noticias, Vidrio, Mínima, Centrada o
+  los que hagas vos. **✏ Diseñar…** abre la ventana «Estilos de placa», con la placa a la
+  vista mientras cambiás: si se ve en el proyector y en la transmisión, **sólo en la
+  transmisión (OBS)** o sólo en el proyector; color, opacidad y esquinas del recuadro;
+  **ancho y alto** (0 = que se acomode a las palabras); la franja de color (dónde, color y
+  grosor, o el nombre sobre un bloque de ese color); tipografía, tamaños y colores del
+  nombre y del cargo; negrita, mayúsculas y sombra; el lugar (abajo a la izquierda, al
+  centro o a la derecha) y la distancia a los bordes; y **cómo entra y cómo sale**, con
+  cuánto tarda (en milésimas: 400 es casi medio segundo). «▶ Ver cómo entra» y «◼ Ver
+  cómo sale» lo muestran. Con **Guardar** queda para todas las placas de ese estilo.
+  Todo queda guardado con la placa.
 - **Resaltar en vivo**: escribí una o varias palabras o frases separadas por
   **;** (`gracia; fe`) y se pintan como con marcador, en todas las veces que
   aparecen. También podés marcar con el mouse sobre el panel LIVE: un clic en
@@ -487,7 +504,8 @@ ventana común de Windows con lo mismo que ve la congregación: se mueve, se agr
 se minimiza y se comparte por Discord o por una videollamada como cualquier otra.
 Cerrarla es lo mismo que **Apagar salida**.
 
-Con el **clic derecho** sobre la ventana elegís la **forma** (16:9 o 4:3), un
+Con el **clic derecho** sobre la ventana elegís la **forma** (16:9, 4:3 o **9:16 vertical**, para una pantalla parada o una
+transmisión vertical; la letra queda en una franja al medio), un
 **tamaño** rápido (por ejemplo 1280×720) y **Siempre visible**. Al arrastrar un
 borde la imagen conserva la forma; si la maximizás, sobran bandas negras a los
 costados. El programa recuerda la forma, el tamaño y el lugar para la próxima vez.

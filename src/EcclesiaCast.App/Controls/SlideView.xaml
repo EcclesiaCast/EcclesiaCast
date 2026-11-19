@@ -104,10 +104,10 @@
             <!-- Capa de negro -->
             <Rectangle x:Name="BlackLayer" Fill="Black" Opacity="0" IsHitTestVisible="False"/>
 
-            <!-- Placa de nombre («lower third», GitHub #37): abajo a la izquierda, por
-                 encima de todo; entra deslizándose y se va desvaneciendo -->
+            <!-- Placa de nombre («lower third», GitHub #37): por encima de todo. Su aspecto,
+                 lugar y movimiento vienen de su estilo (SlideView.NamePlate.cs) -->
             <Grid x:Name="NamePlateLayer" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                  Margin="90,0,0,110" MaxWidth="1600" Visibility="Collapsed" IsHitTestVisible="False"
+                  Margin="90,0,0,110" MaxWidth="1800" Visibility="Collapsed" IsHitTestVisible="False"
                   RenderTransformOrigin="0,0.5">
                 <Grid.RenderTransform>
                     <TransformGroup>
@@ -118,7 +118,7 @@
                 <Grid.ColumnDefinitions>
                     <!-- Imagen a la izquierda · franja · texto · imagen a la derecha -->
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="14"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
@@ -132,11 +132,14 @@
                                       LoadedBehavior="Manual" UnloadedBehavior="Stop" Visibility="Collapsed"/>
                     </Grid>
                 </Border>
-                <Rectangle Grid.Column="1" Fill="#2F63C9"/>
+                <Rectangle x:Name="NamePlateBar" Grid.Column="1" Width="14" Fill="#2F63C9"/>
                 <Border x:Name="NamePlateCard" Grid.Column="2" Background="#E8101420" Padding="38,22,52,24">
-                    <StackPanel VerticalAlignment="Center">
-                        <TextBlock x:Name="NamePlateName" FontFamily="Segoe UI" FontSize="66" FontWeight="SemiBold"
-                                   Foreground="White" TextWrapping="Wrap"/>
+                    <StackPanel x:Name="NamePlateText" VerticalAlignment="Center">
+                        <!-- El nombre puede ir sobre un bloque del color de la franja («Noticias») -->
+                        <Border x:Name="NamePlateNameBox">
+                            <TextBlock x:Name="NamePlateName" FontFamily="Segoe UI" FontSize="66" FontWeight="SemiBold"
+                                       Foreground="White" TextWrapping="Wrap"/>
+                        </Border>
                         <TextBlock x:Name="NamePlateRole" FontFamily="Segoe UI" FontSize="40"
                                    Foreground="#C9D3E6" TextWrapping="Wrap" Margin="2,4,0,0"/>
                     </StackPanel>
