@@ -420,9 +420,17 @@ public sealed partial class MainViewModel
     /// </summary>
     private void RememberOutputDisplay()
     {
-        if (SelectedDisplay is { BroadcastOnly: false } display)
-            _settings.Set(OutputDisplayKey, display.Info.DeviceName);
+        if (SelectedDisplay is not { BroadcastOnly: false } display)
+            return;
+
+        // The new key is what the program goes by from 1.4.1 on (see
+        // FloatingOutput.Remembered); the old one stays for an older version.
+        _settings.Set(OutputChoiceKey, display.Info.DeviceName);
+        _settings.Set(OutputDisplayKey, display.Info.DeviceName);
     }
+
+    /// <summary>The list is being filled again: the choices it makes are not the operator's.</summary>
+    private bool _refreshingDisplays;
 
     /// <summary>
     /// Opens the output window on the selected screen. With «only the stream»
@@ -455,6 +463,12 @@ public sealed partial class MainViewModel
     /// </summary>
     partial void OnSelectedDisplayChanged(DisplayOption? oldValue, DisplayOption? newValue)
     {
+        // Picked by hand in the list: kept for the next time, even without
+        // going live. (A choice the program makes while filling the list is
+        // not kept: a projector still off at start must not lose its place.)
+        if (!_refreshingDisplays)
+            RememberOutputDisplay();
+
         if (!IsProjecting || newValue is null)
             return;
 
@@ -463,10 +477,13 @@ public sealed partial class MainViewModel
             ShowOutputWindow();
             StatusText = "En vivo sólo en la transmisión: no hay ventana de salida.";
         }
-        else if (oldValue?.BroadcastOnly == true)
+        else if (oldValue?.BroadcastOnly == true || newValue.Floating || oldValue?.Floating == true)
         {
+            // Into or out of the floating window: the output moves to the new place.
             ShowOutputWindow();
-            StatusText = $"Salida en vivo en {newValue.Label}.";
+            StatusText = newValue.Floating
+                ? "Salida en vivo en una ventana: se mueve, se agranda y se comparte como cualquier otra."
+                : $"Salida en vivo en {newValue.Label}.";
         }
     }
 

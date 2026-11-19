@@ -42,7 +42,7 @@ public static class WelcomeTour
         new(null, "Te damos la bienvenida a EcclesiaCast",
             "En un minuto te mostramos dónde está cada cosa. Podés saltar el recorrido cuando quieras."),
         new(Songs, "Canciones",
-            "Buscá por el título o por un pedazo de la letra. Doble clic la proyecta. Con ➕ creás una, la buscás en internet o traés las de otro programa."),
+            "Buscá por el título o por un pedazo de la letra. Doble clic la proyecta. Con «➕ Agregar» creás una, la buscás en internet o traés las de otro programa."),
         new(Bible, "Biblia",
             "Escribí «juan 3:16» o «sal 23» y Enter. Clic en una versión la elige; Ctrl+clic suma una segunda, que sale debajo. Con 📥 Biblias bajás más versiones."),
         new(Playlist, "La playlist del culto",

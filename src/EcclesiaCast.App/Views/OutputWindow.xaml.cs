@@ -17,11 +17,24 @@ public partial class OutputWindow : Window
 {
     private DisplayInfo? _display;
 
-    public OutputWindow()
+    public OutputWindow() : this(floating: false)
+    {
+    }
+
+    /// <param name="floating">
+    /// An ordinary window («⧉ En una ventana») instead of a full screen on a display.
+    /// </param>
+    public OutputWindow(bool floating)
     {
         InitializeComponent();
+        IsFloating = floating;
+        if (floating)
+            MakeFloating();
         DataContextChanged += OnDataContextChanged;
         YouTube.Ended += (_, _) => VideoEnded?.Invoke(this, EventArgs.Empty);
+        YouTube.DoubleClicked += (_, _) => TurnOffForDoubleClick();
+        YouTube.EscapePressed += (_, _) => OnYouTubeEscape();
+        YouTube.MenuRequested += (_, _) => OpenFloatingMenu();
         Video.Ended += (_, _) => VideoEnded?.Invoke(this, EventArgs.Empty);
 
         // Changing media never goes through black: whatever was on screen stays
@@ -130,6 +143,16 @@ public partial class OutputWindow : Window
         CancelFadeOut();
 
         _display = display;
+        if (IsFloating)
+        {
+            // Stays where the operator left it; back from «off» it comes up again
+            // even if it had been minimized.
+            Show();
+            if (wasHidden && WindowState == WindowState.Minimized)
+                WindowState = WindowState.Normal;
+            return;
+        }
+
         Show();
         MoveToDisplay();
 
@@ -149,6 +172,30 @@ public partial class OutputWindow : Window
     /// </summary>
     private static bool s_wayBackShown;
 
+    /// <summary>The same, over a YouTube video: the first one projected on the operator's screen.</summary>
+    private static bool s_youTubeWayBackShown;
+
+    private const string WayBackText = "Para volver al programa: tecla Esc o doble clic en esta pantalla";
+
+    /// <summary>
+    /// Esc, if the keyboard ever ends up here instead of in the operator panel,
+    /// does what it does there: switches the output off. A 1.4.0 user on a
+    /// single screen was left behind a YouTube video with no way out.
+    /// </summary>
+    protected override void OnPreviewKeyDown(System.Windows.Input.KeyEventArgs e)
+    {
+        // The floating window is handled like any other: Esc there does nothing.
+        if (e.Key == System.Windows.Input.Key.Escape && !IsFloating)
+        {
+            e.Handled = true;
+            TurnOffRequested?.Invoke(this, EventArgs.Empty);
+            Application.Current?.MainWindow?.Activate();
+            return;
+        }
+
+        base.OnPreviewKeyDown(e);
+    }
+
     /// <summary>
     /// With a single screen the output covers the operator panel, and someone
     /// new has no way to know that Esc brings it back: the first beta tester
@@ -157,6 +204,14 @@ public partial class OutputWindow : Window
     /// </summary>
     private void ShowWayBackHint()
     {
+        // A YouTube video already on screen would hide it (native window): the
+        // page shows it over the video instead.
+        if (YouTube.Visibility == Visibility.Visible && !s_youTubeWayBackShown)
+        {
+            s_youTubeWayBackShown = true;
+            YouTube.ShowHint(WayBackText);
+        }
+
         WayBackHint.BeginAnimation(OpacityProperty, null);
         WayBackHint.Visibility = Visibility.Visible;
         WayBackHint.Opacity = 1;
@@ -169,13 +224,28 @@ public partial class OutputWindow : Window
         WayBackHint.BeginAnimation(OpacityProperty, fade);
     }
 
-    private void Output_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void Output_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) =>
+        e.Handled = TurnOffForDoubleClick();
+
+    /// <summary>A double click over the picture (or over a YouTube video, which reports its own).</summary>
+    private bool TurnOffForDoubleClick()
     {
         if (_display is null || !OperatorScreen.Holds(_display))
+            return false;
+
+        TurnOffRequested?.Invoke(this, EventArgs.Empty);
+        Application.Current?.MainWindow?.Activate();
+        return true;
+    }
+
+    /// <summary>Esc pressed while the keyboard was in a YouTube video: the same as Esc anywhere else.</summary>
+    private void OnYouTubeEscape()
+    {
+        if (IsFloating)
             return;
 
-        e.Handled = true;
         TurnOffRequested?.Invoke(this, EventArgs.Empty);
+        Application.Current?.MainWindow?.Activate();
     }
 
     // ── Apagar la salida con fundido ─────────────────────────────
@@ -389,6 +459,14 @@ public partial class OutputWindow : Window
             YouTube.Visibility = Visibility.Visible;
             YouTube.Play(background);
             UpdateYouTubeCover();
+
+            // The WPF hint cannot be drawn over the video (it is a native
+            // window), so with a single screen the page shows it itself.
+            if (!s_youTubeWayBackShown && _display is not null && OperatorScreen.Holds(_display))
+            {
+                s_youTubeWayBackShown = true;
+                YouTube.ShowHint(WayBackText);
+            }
         }
         else
         {
@@ -561,6 +639,13 @@ public partial class OutputWindow : Window
         base.OnSourceInitialized(e);
 
         var hwnd = new WindowInteropHelper(this).Handle;
+        if (IsFloating)
+        {
+            // An ordinary window: it activates, and it is sized and placed as it was left.
+            SetUpFloating(hwnd);
+            return;
+        }
+
         _ = SetWindowLong(hwnd, GWL_EXSTYLE,
             GetWindowLong(hwnd, GWL_EXSTYLE) | WS_EX_NOACTIVATE);
 
@@ -569,6 +654,11 @@ public partial class OutputWindow : Window
 
     protected override void OnClosed(EventArgs e)
     {
+        // A closed window (swapped for the floating one, or back) stops
+        // following the projection: its players are gone.
+        if (DataContext is INotifyPropertyChanged vm)
+            vm.PropertyChanged -= OnProjectionChanged;
+
         Video.Stop();
         LogoVideo.Stop();
         YouTube.Clear();

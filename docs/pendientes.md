@@ -14,6 +14,43 @@ Hay cuatro tipos de cosas, cada una en su sección:
 
 ## 1. Para probar (lo prueba Alexis)
 
+### Arreglos del formulario de comentarios y salida en una ventana (18/11/2026)
+
+Claude los probó el 18/11 con el programa abierto en esta PC (con una copia de la biblioteca;
+la real no se tocó). **Anduvo:** «➕ Agregar» y su menú; «Enviar» apagado con la caja vacía y
+prendido al escribir; la ayuda de formatos con los tres ejemplos (y ahora entra en la pantalla);
+importar un XML de OpenSong con los 66 libros en inglés (Juan 3:16 y Salmos 23 en su lugar, 67
+versículos); la ventana flotante (abre centrada con la imagen en 1280×720 exactos, bordes y
+esquinas sin deformar, 4:3 y 16:9 desde el menú con EN VIVO del panel siguiéndola, tamaños rápidos
+exactos, «Siempre visible», maximizada con bandas negras, doble clic y Esc no la apagan, la X la
+apaga, se acuerda de forma, tamaño y lugar, YouTube adentro con el clic derecho encima, pasar a
+pantalla completa y volver en vivo, cerrar el programa con ella abierta); YouTube a pantalla
+completa en la pantalla del programa: el aviso «Para volver…» se ve encima del video, y después de
+hacer clic sobre el video, Esc vuelve al programa; el doble clic también.
+
+Falta probar a mano:
+
+- [ ] **YouTube en Windows 10** (donde le pasó a la iglesia), con la notebook sola: lo mismo de
+  arriba (clic sobre el video y Esc; doble clic).
+- [ ] **Ventana flotante con Discord:** compartirla por Discord (o una videollamada) y ver que se
+  transmite bien; minimizarla y volver; un video, el logo, el aviso al pie y la cuenta regresiva
+  adentro; que las páginas /salida (OBS, celular, escenario) siguen igual. Con dos monitores:
+  dejarla en el segundo, cerrar el programa, desenchufarlo y abrir: tiene que aparecer en el medio
+  de la principal.
+- [ ] **Con una sola pantalla** (una notebook sin proyector, en una instalación nueva o en otra PC):
+  «⧉ En una ventana» tiene que ser la primera de la lista «Salida:» y venir elegida. Ojo con una
+  notebook con el proyector en «duplicar»: ahí Windows ve una sola pantalla, así que también arranca
+  en la ventana (también si ya la usaban con la 1.4.0); para pantalla completa hay que elegir
+  «Pantalla 1» en la lista una vez, y al cerrar y abrir el programa tiene que seguir ahí.
+- [ ] Si se toca la ventana flotante, el teclado queda en ella: las teclas del panel (flechas,
+  Ctrl+Enter) no andan hasta volver a hacer clic en el panel. Ver si molesta.
+- [ ] **«➕ Agregar» en Canciones** con el panel angosto: que el título «CANCIONES» no quede tapado.
+- [ ] **Biblia XML real** de OpenSong o de Beblia (la que exporta Holyrics o FreeShow). Ojo: si el
+  archivo trae los nombres de los libros en inglés, así se muestran (por ejemplo «John 3:16»).
+- [ ] La página `sitio/cargar-canciones.html` sigue diciendo «botón ➕»: cambiarlo a «➕ Agregar» cuando salga la versión.
+
+### Lo de antes
+
 Se probaron el 14/10/2026 con la beta.11 y quedaron **dados por buenos**: el mini
 reproductor de Spotify, «mismo título, distinto artista» y las flechas del
 teclado en Propiedades. Lo que sigue se corrigió o se agregó después de esa

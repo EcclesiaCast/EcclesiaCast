@@ -29,6 +29,21 @@ public partial class YouTubeSurface : UserControl
     /// <summary>Raised when the video reaches its end and shouldn't loop.</summary>
     public event EventHandler<VideoEndBehavior>? Ended;
 
+    /// <summary>
+    /// A double click, a right click or Esc over the video. The video is a
+    /// separate native window that WPF never hears from, so a cover inside the
+    /// page catches them: the YouTube player itself never gets the mouse (no
+    /// controls appearing, no keyboard trapped in it) and the output window
+    /// does with them what it does over anything else.
+    /// </summary>
+    public event EventHandler? DoubleClicked;
+
+    /// <inheritdoc cref="DoubleClicked"/>
+    public event EventHandler? MenuRequested;
+
+    /// <inheritdoc cref="DoubleClicked"/>
+    public event EventHandler? EscapePressed;
+
     private async Task EnsureBrowserAsync()
     {
         if (_ready)
@@ -126,10 +141,12 @@ public partial class YouTubeSurface : UserControl
     {
         _pending = null;
         _currentId = null;
+        _hint = null;
         _state = PlaybackState.None;
         _pausedForHiddenOutput = false;
         _pausedForCover = false;
-        if (_ready)
+        // CoreWebView2 is null again once the window that held it has closed.
+        if (_ready && Browser.CoreWebView2 is not null)
             Browser.NavigateToString("<html><body style='margin:0;background:#000'></body></html>");
     }
 
@@ -208,6 +225,14 @@ public partial class YouTubeSurface : UserControl
 
     private double _blur;
     private bool _blurApplied;
+    private string? _hint;
+
+    /// <summary>
+    /// Shows a line of text over the video for a few seconds, from inside the
+    /// page: a WPF element cannot be drawn over this native window. It waits
+    /// for the player to report, so it appears with the video.
+    /// </summary>
+    public void ShowHint(string text) => _hint = text;
 
     /// <summary>Calls one of the page's helper functions; ignored if it isn't ready.</summary>
     private void Run(string call)
@@ -259,7 +284,28 @@ public partial class YouTubeSurface : UserControl
                 _blurApplied = true;
                 SetBlur(_blur);
             }
+
+            if (_hint is { } hint)
+            {
+                _hint = null;
+                Run($"hint({System.Text.Json.JsonSerializer.Serialize(hint)})");
+            }
             return;
+        }
+
+        // What the mouse and the keyboard do over the video: the page catches
+        // them (the YouTube player never gets them) and passes them on.
+        switch (message)
+        {
+            case "dblclick":
+                DoubleClicked?.Invoke(this, EventArgs.Empty);
+                return;
+            case "menu":
+                MenuRequested?.Invoke(this, EventArgs.Empty);
+                return;
+            case "esc":
+                EscapePressed?.Invoke(this, EventArgs.Empty);
+                return;
         }
 
         // The page posts "ended" when playback finishes without looping.
@@ -288,9 +334,12 @@ public partial class YouTubeSurface : UserControl
           <head><meta charset="utf-8"><style>
             html,body{margin:0;height:100%;background:#000;overflow:hidden}
             #player{width:100%;height:100%}
+            #cover{position:fixed;left:0;top:0;right:0;bottom:0;z-index:5;background:transparent}
           </style></head>
           <body>
             <div id="player"></div>
+            <!-- Over the player: the mouse lands here, never in YouTube's player. -->
+            <div id="cover"></div>
             <script src="https://www.youtube.com/iframe_api"></script>
             <script>
               var params = new URLSearchParams(location.search);
@@ -302,6 +351,14 @@ public partial class YouTubeSurface : UserControl
               function post(text) {
                 try { window.chrome.webview.postMessage(String(text)); } catch (e) {}
               }
+              // The mouse and Esc over the video belong to the program, not to
+              // YouTube: they are passed on to the output window.
+              var cover = document.getElementById('cover');
+              cover.addEventListener('dblclick', function (e) { e.preventDefault(); post('dblclick'); });
+              cover.addEventListener('contextmenu', function (e) { e.preventDefault(); post('menu'); });
+              document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') { e.preventDefault(); post('esc'); }
+              });
               function onYouTubeIframeAPIReady() {
                 player = new YT.Player('player', {
                   videoId: videoId,
@@ -358,6 +415,18 @@ public partial class YouTubeSurface : UserControl
                   var box = document.getElementById('player');
                   box.style.filter = px > 0 ? 'blur(' + px + 'px)' : '';
                   box.style.transform = px > 0 ? 'scale(1.08)' : '';
+                },
+                // The way back to the program, as the output shows it over
+                // anything else: on top, for six seconds, then it fades.
+                hint: function (text) {
+                  var note = document.createElement('div');
+                  note.textContent = text;
+                  note.style.cssText = 'position:fixed;top:0;left:50%;transform:translateX(-50%);'
+                    + 'background:rgba(47,99,201,.8);color:#fff;font:20px "Segoe UI",sans-serif;'
+                    + 'padding:12px 26px;border-radius:0 0 10px 10px;z-index:10;transition:opacity .7s';
+                  document.body.appendChild(note);
+                  setTimeout(function () { note.style.opacity = '0'; }, 6000);
+                  setTimeout(function () { note.remove(); }, 6800);
                 }
               };
             </script>

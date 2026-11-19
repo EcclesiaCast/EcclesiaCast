@@ -37,6 +37,7 @@ public partial class FeedbackWindow : Window
     private readonly FeedbackReason _reason;
     private readonly string _summary;
     private bool _sent;
+    private bool _sending;
 
     public FeedbackWindow(
         ISettingsStore settings, UsageStats stats, string dataDir, FeedbackReason reason, int sessionMinutes)
@@ -81,6 +82,25 @@ public partial class FeedbackWindow : Window
 
         if (reason != FeedbackReason.Closing)
             NeverCheck.Visibility = Visibility.Collapsed;
+
+        UpdateSendState();
+    }
+
+    /// <summary>Nothing written means nothing to send: «Enviar» waits for the comment and the hint says why.</summary>
+    private bool HasComment => !string.IsNullOrWhiteSpace(CommentBox.Text);
+
+    private void CommentBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e) =>
+        UpdateSendState();
+
+    private void UpdateSendState()
+    {
+        // Runs from InitializeComponent too, before every named element exists.
+        if (SendButton is null || CommentHint is null || CommentBox is null)
+            return;
+        CommentHint.Visibility = HasComment ? Visibility.Collapsed : Visibility.Visible;
+        if (_sending)
+            return;
+        SendButton.IsEnabled = HasComment;
     }
 
     private void Preview_Click(object sender, RoutedEventArgs e) =>
@@ -90,31 +110,34 @@ public partial class FeedbackWindow : Window
 
     private async void Send_Click(object sender, RoutedEventArgs e)
     {
-        var comment = CommentBox.Text.Trim();
         var attach = AttachCheck.IsChecked == true;
-        if (comment.Length == 0 && !attach)
+        var message = new FeedbackMessage(
+            KindBox.SelectedItem as string ?? "Otra cosa",
+            CommentBox.Text.Trim(),
+            ChurchBox.Text.Trim(),
+            EmailBox.Text.Trim(),
+            attach ? _summary : "");
+        if (message.IsEmpty)
         {
-            ShowStatus("Escribí un comentario o tildá el resumen de uso. Si no querés mandar nada, tocá «Ahora no».");
+            // The button is off while the box is empty; this is only a second guard.
+            ShowStatus("Escribí qué pasó o qué querés contarnos. Si no querés mandar nada, tocá «Ahora no».");
+            CommentBox.Focus();
             return;
         }
 
+        _sending = true;
         SendButton.IsEnabled = false;
         SkipButton.IsEnabled = false;
         ShowStatus("Enviando…");
 
-        var message = new FeedbackMessage(
-            KindBox.SelectedItem as string ?? "Otra cosa",
-            comment,
-            ChurchBox.Text.Trim(),
-            EmailBox.Text.Trim(),
-            attach ? _summary : "");
         var ok = await new FeedbackSender(Client).SendAsync(message);
 
         if (!ok)
         {
+            _sending = false;
             ShowStatus("No se pudo enviar. ¿Hay internet? Probá de nuevo, o tocá «Ahora no» para seguir sin enviar.");
-            SendButton.IsEnabled = true;
             SkipButton.IsEnabled = true;
+            UpdateSendState();
             return;
         }
 

@@ -1047,7 +1047,7 @@ public sealed partial class MainViewModel
         var dialog = new Microsoft.Win32.OpenFileDialog
         {
             Title = "Importar Biblia",
-            Filter = "Biblias (*.json, *.xml)|*.json;*.xml|JSON|*.json|Zefania XML|*.xml",
+            Filter = "Biblias (*.json, *.xml)|*.json;*.xml|JSON|*.json|XML (Zefania u OpenSong)|*.xml",
         };
         if (dialog.ShowDialog() != true)
             return;
@@ -1057,7 +1057,7 @@ public sealed partial class MainViewModel
         {
             var content = ReadTextFile(dialog.FileName);
             parsed = Path.GetExtension(dialog.FileName).ToLowerInvariant() == ".xml"
-                ? ZefaniaBibleImporter.Parse(content)
+                ? XmlBibleImporter.Parse(content)
                 : JsonBibleImporter.Parse(content);
         }
         catch (Exception ex)

@@ -5,6 +5,37 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+### Agregado
+
+- **La salida en una ventana.** En la lista «Salida:» está **«⧉ En una ventana»**: la proyección
+  sale en una ventana común (se mueve, se minimiza, se comparte por Discord o una videollamada) en vez
+  de a pantalla completa. Con el clic derecho se elige la forma, 16:9 o 4:3, que se conserva al
+  agrandarla; tamaños rápidos (640×360, 1280×720, 1920×1080 o 640×480, 1024×768, 1440×1080) y
+  «Siempre visible». Recuerda forma, tamaño y lugar. Cerrarla apaga la salida. Las vistas EN VIVO y
+  VISTA PREVIA siguen la forma elegida. **Con una sola pantalla es la primera opción de la lista y
+  la que viene elegida**, también para quien ya usaba el programa así. Desde ahora la salida que se
+  elige en la lista queda recordada (aunque no se ponga en vivo): si alguien elige «Pantalla 1»,
+  arranca ahí la próxima vez.
+- **Biblias en el XML de OpenSong.** Además de JSON y Zefania, se importan las Biblias en el
+  XML que usan ProPresenter, Holyrics y FreeShow (y páginas como Beblia): `<bible><b n="Juan"><c n="3"><v n="16">`.
+  La ventana «Cómo preparar una Biblia para importar» trae su ejemplo y las instrucciones para la IA lo nombran.
+
+### Cambiado
+
+- **«➕ Agregar» en Canciones.** El botón para agregar canciones ahora dice «Agregar» al lado del ➕,
+  como «➕ Playlist» en Biblia: alguien no encontraba cómo crear una canción desde cero.
+- **Los comentarios necesitan texto.** «Enviar» queda apagado hasta que se escribe algo, y la ventana
+  explica por qué: seis envíos llegaron sólo con el resumen de uso y no se podían entender ni contestar.
+
+### Arreglado
+
+- **Un video de YouTube ya no deja atrapado con una sola pantalla.** El video en la salida no toma
+  el mouse ni el teclado (tampoco asoman sus controles): el doble clic y la tecla Esc vuelven al
+  programa también con YouTube, aunque se haya hecho clic sobre el video; Esc
+  sobre la salida la apaga, y el aviso «Para volver al programa» se ve encima del video.
+- **La ventana «Cómo preparar una Biblia para importar» entra en la pantalla.** En una notebook
+  quedaba más alta que la pantalla y los botones de abajo no se alcanzaban.
+
 ## [1.4.0] - 2026-11-17
 
 ### Agregado
