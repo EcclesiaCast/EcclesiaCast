@@ -75,15 +75,15 @@ public static class OutputPage
 
             /* The name plate (who is speaking), bottom left as on the
                projector: it slides in and fades out. */
-            #plate {
+            #nplate {
               position: absolute; left: 4.7vw; bottom: 10.2vh; max-width: 78vw;
               background: rgba(16,20,32,.91); border-left: 1.3vh solid #2F63C9;
               padding: 2vh 4.8vh 2.2vh 3.5vh; color: #fff;
               transition: opacity .32s ease, transform .42s cubic-bezier(.2,.8,.3,1);
             }
-            #plate.fuera { opacity: 0; transform: translateX(-6vh); }
-            #plateName { font-size: 6.1vh; font-weight: 600; line-height: 1.15; }
-            #plateRole { font-size: 3.7vh; color: #C9D3E6; margin-top: .4vh; }
+            #nplate.fuera { opacity: 0; transform: translateX(-6vh); }
+            #nplateName { font-size: 6.1vh; font-weight: 600; line-height: 1.15; }
+            #nplateRole { font-size: 3.7vh; color: #C9D3E6; margin-top: .4vh; }
 
             #countdown {
               position: absolute; inset: 0;
@@ -256,7 +256,7 @@ public static class OutputPage
             <div id="countdownHeading"></div>
             <div id="countdownClock"></div>
           </div>
-          <div id="plate" class="oculto fuera"><div id="plateName"></div><div id="plateRole"></div></div>
+          <div id="nplate" class="oculto fuera"><div id="nplateName"></div><div id="nplateRole"></div></div>
           <div id="overlay" class="oculto"></div>
           <div id="raw">
             <p id="rlabel" class="oculto"></p>
@@ -390,27 +390,30 @@ public static class OutputPage
 
             // The name plate: in with a slide, out with a fade; above the
             // «aviso al pie» when both are on.
-            var plate = document.getElementById('plate');
-            var plateName = document.getElementById('plateName');
-            var plateRole = document.getElementById('plateRole');
-            var plateTimer = 0;
+            var nplate = document.getElementById('nplate');
+            var nplateName = document.getElementById('nplateName');
+            var nplateRole = document.getElementById('nplateRole');
+            // («nplate»: «plate» is already the box behind the words of a styled layer.)
+            var nplateTimer = 0;
             function paintPlate(s) {
               var on = !!(s.plateName || s.plateRole);
-              plate.style.bottom = s.overlay ? Math.max(10.2, overlay.offsetHeight / innerHeight * 100 + 3.7) + 'vh' : '10.2vh';
-              clearTimeout(plateTimer);
+              nplate.style.bottom = s.overlay ? Math.max(10.2, overlay.offsetHeight / innerHeight * 100 + 3.7) + 'vh' : '10.2vh';
               if (on) {
-                plateName.textContent = s.plateName || '';
-                plateRole.textContent = s.plateRole || '';
-                show(plateName, !!s.plateName);
-                show(plateRole, !!s.plateRole);
-                if (plate.classList.contains('oculto')) {
-                  show(plate, true);
-                  void plate.offsetWidth; // so the slide-in starts from outside
+                clearTimeout(nplateTimer);
+                nplateTimer = 0;
+                nplateName.textContent = s.plateName || '';
+                nplateRole.textContent = s.plateRole || '';
+                show(nplateName, !!s.plateName);
+                show(nplateRole, !!s.plateRole);
+                if (nplate.classList.contains('oculto')) {
+                  show(nplate, true);
+                  void nplate.offsetWidth; // so the slide-in starts from outside
                 }
-                plate.classList.remove('fuera');
-              } else if (!plate.classList.contains('oculto')) {
-                plate.classList.add('fuera');
-                plateTimer = setTimeout(function () { show(plate, false); }, 340);
+                nplate.classList.remove('fuera');
+              } else if (!nplate.classList.contains('oculto') && !nplateTimer) {
+                // Fading out: the next reports must not start the wait again.
+                nplate.classList.add('fuera');
+                nplateTimer = setTimeout(function () { show(nplate, false); nplateTimer = 0; }, 340);
               }
             }
 
