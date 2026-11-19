@@ -7,6 +7,21 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Placas de nombre («lower third»).** Pestaña nueva **Placas**: nombre y cargo («Pastor Juan Pérez /
+  Predicación») en una tarjeta abajo a la izquierda que entra deslizándose, en el proyector, en el EN VIVO
+  y en la transmisión (OBS). Se va sola a los 5, 10 o 15 segundos, o cuando la quitás. Cada placa
+  mostrada queda guardada en una lista para usarla de nuevo con doble clic. (Pedido en GitHub #37.)
+- **Fondo propio de cada canción.** Con **🖼 Fondo** arriba de las diapositivas («Usar el fondo que está
+  en pantalla») o con clic derecho en una imagen o video de Medios → «Usar como fondo de «…»». Al
+  proyectar esa canción, su fondo se pone solo; le gana al «al azar por canción». (GitHub #32.)
+- **Buscar en la letra.** Una caja arriba de las diapositivas marca las que tienen esas palabras (sin
+  importar acentos ni mayúsculas); Enter proyecta la marcada, ↓ / F3 pasa a la siguiente. (GitHub #32.)
+- **Deshacer y rehacer en las canciones (Ctrl+Z / Ctrl+Y y ↶ ↷).** Mover, agregar, borrar, duplicar o
+  pegar diapositivas, la edición rápida, el diseño y el editor de la letra se pueden deshacer mientras
+  el programa está abierto. (GitHub #32.)
+- **Diapositiva nueva vacía.** «➕ Diapositiva» arriba de las diapositivas, «Nueva diapositiva después
+  de esta…» en el clic derecho y «➕ Nueva diapositiva» en Editar canción (diseño). Antes sólo se podía
+  duplicar una. (GitHub #32.)
 - **La salida en una ventana.** En la lista «Salida:» está **«⧉ En una ventana»**: la proyección
   sale en una ventana común (se mueve, se minimiza, se comparte por Discord o una videollamada) en vez
   de a pantalla completa. Con el clic derecho se elige la forma, 16:9 o 4:3, que se conserva al
@@ -22,6 +37,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Cambiado
 
+- **El orden de las diapositivas se puede trabar (🔒).** Arranca trabado, para no desacomodarlas sin
+  querer: arrastrar no las mueve y la barra de abajo dice cómo destrabarlo. Un clic en el candado lo
+  destraba (queda amarillo, «🔓 Orden destrabado») y el programa se acuerda. (GitHub #32.)
 - **«➕ Agregar» en Canciones.** El botón para agregar canciones ahora dice «Agregar» al lado del ➕,
   como «➕ Playlist» en Biblia: alguien no encontraba cómo crear una canción desde cero.
 - **Los comentarios necesitan texto.** «Enviar» queda apagado hasta que se escribe algo, y la ventana
