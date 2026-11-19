@@ -10,6 +10,9 @@ public enum OutputShape
 
     /// <summary>4:3, the square projectors many churches still have.</summary>
     Classic,
+
+    /// <summary>9:16, standing up: a screen turned on its side, a phone-shaped stream.</summary>
+    Vertical,
 }
 
 /// <summary>A size of the picture, in pixels, without the window's border.</summary>
@@ -80,12 +83,20 @@ public static class FloatingOutput
         return new DisplayInfo(DeviceName, 0, 0, size.Width, size.Height, IsPrimary: false);
     }
 
-    public static double RatioOf(OutputShape shape) => shape == OutputShape.Classic ? 4d / 3d : 16d / 9d;
+    public static double RatioOf(OutputShape shape) => shape switch
+    {
+        OutputShape.Classic => 4d / 3d,
+        OutputShape.Vertical => 9d / 16d,
+        _ => 16d / 9d,
+    };
 
     /// <summary>The three sizes offered for each shape: small, medium and full height.</summary>
-    public static IReadOnlyList<PictureSize> QuickSizes(OutputShape shape) => shape == OutputShape.Classic
-        ? [new(640, 480), new(1024, 768), new(1440, 1080)]
-        : [new(640, 360), new(1280, 720), new(1920, 1080)];
+    public static IReadOnlyList<PictureSize> QuickSizes(OutputShape shape) => shape switch
+    {
+        OutputShape.Classic => [new(640, 480), new(1024, 768), new(1440, 1080)],
+        OutputShape.Vertical => [new(360, 640), new(720, 1280), new(1080, 1920)],
+        _ => [new(640, 360), new(1280, 720), new(1920, 1080)],
+    };
 
     private static PictureSize FullSize(OutputShape shape) => QuickSizes(shape)[^1];
 
@@ -192,7 +203,7 @@ public static class FloatingOutput
         public PictureSize Picture => WithWidth(Shape, PictureWidth);
 
         public string ToSetting() => string.Join(';',
-            Shape == OutputShape.Classic ? "4:3" : "16:9",
+            Shape switch { OutputShape.Classic => "4:3", OutputShape.Vertical => "9:16", _ => "16:9" },
             PictureWidth.ToString(CultureInfo.InvariantCulture),
             Left.ToString("0.#", CultureInfo.InvariantCulture),
             Top.ToString("0.#", CultureInfo.InvariantCulture),
@@ -204,7 +215,7 @@ public static class FloatingOutput
             if (parts.Length != 5)
                 return Default;
 
-            var shape = parts[0] == "4:3" ? OutputShape.Classic : OutputShape.Wide;
+            var shape = parts[0] switch { "4:3" => OutputShape.Classic, "9:16" => OutputShape.Vertical, _ => OutputShape.Wide };
             var width = int.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var w) && w > 0
                 ? Math.Clamp(w, MinWidth, 7680)
                 : Default.PictureWidth;

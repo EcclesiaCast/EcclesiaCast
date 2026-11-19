@@ -31,7 +31,8 @@ public sealed partial class MainViewModel
         _settings.Set(SlidesOrderLockedKey, value ? "1" : "0");
         StatusText = value
             ? "🔒 Orden trabado: las diapositivas ya no se mueven al arrastrarlas."
-            : "🔓 Orden destrabado: arrastrá una diapositiva para cambiarla de lugar. Tocá el candado otra vez para trabarlo.";
+            : "🔓 Orden destrabado: arrastrá una diapositiva para cambiarla de lugar, y Ctrl+Z / Ctrl+Y deshacen y rehacen. Tocá el candado otra vez para trabarlo.";
+        UpdateSongUndoState();
     }
 
     [RelayCommand]
@@ -63,6 +64,17 @@ public sealed partial class MainViewModel
     private void UpdateSongUndoState()
     {
         var id = SelectedSong?.Id ?? 0;
+
+        // With the order locked the song cannot change by accident, and that
+        // goes for Ctrl+Z / Ctrl+Y too (asked for on 19/11).
+        if (SlidesOrderLocked)
+        {
+            CanUndoSongChange = false;
+            CanRedoSongChange = false;
+            UndoSongHint = RedoSongHint = "Con el orden trabado (🔒) no se deshace ni se rehace. Destrabá el candado para usar Ctrl+Z / Ctrl+Y.";
+            return;
+        }
+
         CanUndoSongChange = _songHistory.CanUndo(id);
         CanRedoSongChange = _songHistory.CanRedo(id);
         UndoSongHint = _songHistory.NextUndo(id) is { } undo
@@ -89,6 +101,9 @@ public sealed partial class MainViewModel
     [RelayCommand]
     private void UndoSongChange()
     {
+        if (TellUndoIsLocked())
+            return;
+
         if (SelectedSong is not { Id: > 0 } song || _songHistory.Undo(song.Id, SongSnapshot.Of(song)) is not { } step)
         {
             StatusText = "No hay cambios para deshacer en esta canción.";
@@ -102,6 +117,9 @@ public sealed partial class MainViewModel
     [RelayCommand]
     private void RedoSongChange()
     {
+        if (TellUndoIsLocked())
+            return;
+
         if (SelectedSong is not { Id: > 0 } song || _songHistory.Redo(song.Id, SongSnapshot.Of(song)) is not { } step)
         {
             StatusText = "No hay nada para rehacer en esta canción.";
@@ -110,6 +128,16 @@ public sealed partial class MainViewModel
 
         PutSongState(song, step.State);
         StatusText = $"↷ Se volvió a hacer: {step.What}.";
+    }
+
+    /// <summary>With the order locked, Ctrl+Z / Ctrl+Y only say how to unlock it.</summary>
+    private bool TellUndoIsLocked()
+    {
+        if (!SlidesOrderLocked)
+            return false;
+
+        StatusText = "🔒 Con el orden trabado no se deshace ni se rehace. Tocá «🔒 Orden trabado» para destrabarlo.";
+        return true;
     }
 
     private void PutSongState(Song song, SongSnapshot state)

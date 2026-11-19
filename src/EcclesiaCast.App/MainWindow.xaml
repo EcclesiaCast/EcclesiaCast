@@ -248,6 +248,9 @@
             </MenuItem>
 
             <MenuItem Header="_Canciones">
+                <MenuItem Header="Crear canción desde cero…" Command="{Binding NewSongCommand}"
+                          ToolTip="Una canción nueva en blanco, para escribir o pegar la letra"/>
+                <Separator/>
                 <MenuItem Header="Buscar canciones en internet…" Command="{Binding SearchSongsOnlineCommand}"/>
                 <MenuItem Header="Traer canciones de otro programa…" Command="{Binding ImportFromOtherProgramCommand}"/>
                 <MenuItem Header="Importar canciones (.txt, .pro)…" Command="{Binding ImportSongsCommand}"/>

@@ -165,6 +165,24 @@ public class FloatingOutputTests
     }
 
     [Fact]
+    public void The_vertical_shape_stands_up_and_keeps_its_proportion()
+    {
+        Assert.Equal(9d / 16d, FloatingOutput.RatioOf(OutputShape.Vertical), 4);
+        Assert.Equal(["360×640", "720×1280", "1080×1920"], FloatingOutput.QuickSizes(OutputShape.Vertical).Select(s => s.ToString()));
+        Assert.Equal(new PictureSize(720, 1280), FloatingOutput.WithWidth(OutputShape.Vertical, 720));
+
+        var entry = FloatingOutput.For(OutputShape.Vertical);
+        Assert.True(entry.Height > entry.Width);
+
+        // Dragging the bottom edge of a standing window moves the width with it.
+        var kept = FloatingOutput.KeepShape(FloatingOutput.Edge.Bottom, new ScreenRect(0, 0, 500, 39 + 1280), 16, 39, 9d / 16d);
+        Assert.Equal(720, kept.Width - 16);
+
+        var layout = new FloatingOutput.Layout(OutputShape.Vertical, 720, 10, 20, false);
+        Assert.Equal(layout, FloatingOutput.Layout.Parse(layout.ToSetting()));
+    }
+
+    [Fact]
     public void The_layout_is_remembered_and_nonsense_falls_back_to_the_default()
     {
         var layout = new FloatingOutput.Layout(OutputShape.Classic, 1024, 120.5, -40, true);
