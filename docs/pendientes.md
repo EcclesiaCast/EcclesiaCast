@@ -28,7 +28,7 @@ lista y se acordó al reabrir.
 Falta probar a mano:
 
 - [ ] **Placas con YouTube de fondo:** con un video de YouTube a pantalla completa, lo más probable es que la placa (como el
-  aviso al pie) no se ve en el proyector, porque el video es una ventana aparte; en OBS sí. Ver si
+  aviso al pie) no se vea en el proyector, porque el video es una ventana aparte; en OBS sí. Ver si
   hace falta.
 - [ ] **Placas en una notebook con proyector real:** que el tamaño de la letra se lea bien desde el
   fondo de la iglesia, y con el aviso al pie puesto (la placa tiene que quedar encima del aviso).
