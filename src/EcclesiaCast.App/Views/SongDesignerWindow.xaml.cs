@@ -37,7 +37,14 @@ public partial class SongDesignerWindow : Window
     private readonly SlideTheme _theme;
     private readonly List<SlideOverride?> _overrides;
     private readonly List<string> _texts;
-    private readonly List<Thumb> _thumbs = [];
+    private readonly System.Collections.ObjectModel.ObservableCollection<Thumb> _thumbs = [];
+
+    /// <summary>
+    /// The slides as they will be saved, in order: the song's own ones plus
+    /// any new one added here. The song is only touched on «Guardar», so
+    /// «Cancelar» leaves it exactly as it was.
+    /// </summary>
+    private readonly List<SongSection> _working;
 
     /// <summary>
     /// Slides the operator actually changed in this session. Only these get
@@ -72,6 +79,7 @@ public partial class SongDesignerWindow : Window
         _theme = theme;
         _overrides = song.Sections.Select(s => s.GetOverride()).ToList();
         _texts = song.Sections.Select(s => s.Text).ToList();
+        _working = song.Sections.ToList();
 
         FontCombo.ItemsSource = Fonts.SystemFontFamilies.Select(f => f.Source).OrderBy(n => n).ToList();
 
@@ -275,6 +283,36 @@ public partial class SongDesignerWindow : Window
     {
         ColorSwatch.Background = BrushFromHex(ColorBox.Text.Trim());
         OutlineSwatch.Background = BrushFromHex(OutlineColorBox.Text.Trim());
+    }
+
+    // ── Diapositiva nueva ────────────────────────────────────────
+
+    /// <summary>
+    /// «➕ Nueva diapositiva» (GitHub #32): an empty slide after the selected
+    /// one, ready to write on. It looks like the theme until it is formatted;
+    /// left empty, it is not saved.
+    /// </summary>
+    private void NewSlide_Click(object sender, RoutedEventArgs e)
+    {
+        if (_editing)
+            CommitEdit();
+
+        var at = Selected < 0 ? _working.Count : Selected + 1;
+        _working.Insert(at, new SongSection { Label = "Nueva" });
+        _texts.Insert(at, string.Empty);
+        _overrides.Insert(at, null);
+
+        // Slides after it move one place: so do their «edited» marks.
+        var shifted = _touched.Select(i => i >= at ? i + 1 : i).ToList();
+        _touched.Clear();
+        _touched.UnionWith(shifted);
+
+        _thumbs.Insert(at, new Thumb("Nueva", BuildSlide(at)));
+        SlidesList.SelectedIndex = at;
+        SlidesList.ScrollIntoView(SlidesList.SelectedItem);
+
+        // Straight into writing, as a double click on the box would.
+        Dispatcher.BeginInvoke(EnterEdit, System.Windows.Threading.DispatcherPriority.Input);
     }
 
     // ── Edición del texto sobre la propia diapositiva ────────────
@@ -1014,17 +1052,26 @@ public partial class SongDesignerWindow : Window
         if (_editing)
             CommitEdit();
 
-        for (var i = 0; i < _song.Sections.Count; i++)
+        var keep = new List<SongSection>();
+        for (var i = 0; i < _working.Count; i++)
         {
+            var section = _working[i];
             var text = _texts[i].Trim();
             if (text.Length > 0)
-                _song.Sections[i].Text = text;
+                section.Text = text;
+            else if (section.Id == 0)
+                continue; // a new slide left empty is not kept
 
             // Slides the operator worked on keep exactly what the panel shows;
             // the rest are left alone so they keep following the theme.
             if (_touched.Contains(i))
-                _song.Sections[i].SetOverride(Clean(_overrides[i]));
+                section.SetOverride(Clean(_overrides[i]));
+            keep.Add(section);
         }
+
+        for (var i = 0; i < keep.Count; i++)
+            keep[i].Order = i;
+        _song.Sections = keep;
 
         Saved = true;
         DialogResult = true;

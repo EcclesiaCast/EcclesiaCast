@@ -43,6 +43,7 @@ public partial class MainWindow : Window
 
             vm.IsOutputMerged = !_outputSplit;
             vm.MediaSelectionChanged += (_, _) => RefreshMediaSelectionVisuals();
+            vm.LyricsMatchFocused += (_, slide) => BringSlideIntoView(slide);
 
             // The grid of the Bible scrolls to the book picked or typed.
             vm.BibleBookTileFocusRequested += (_, tile) => Dispatcher.BeginInvoke(
@@ -923,6 +924,14 @@ public partial class MainWindow : Window
                 case "OpenLocationItem":
                     item.Visibility = isWeb ? Visibility.Collapsed : Visibility.Visible;
                     break;
+                case "UseAsSongBackgroundItem":
+                    item.Visibility = count == 1 && vm.SongForBackground is { } song
+                        && media.Type is MediaType.Image or MediaType.Video or MediaType.YouTube
+                        ? Visibility.Visible : Visibility.Collapsed;
+                    item.Header = vm.SongForBackground is { } open
+                        ? $"Usar como fondo de «{open.Title}»"
+                        : "Usar como fondo de la canción";
+                    break;
                 case "UseAsLogoItem":
                     // A page drawn from a PDF or presentation, or the video made
                     // from a GIF, is deleted with its media, and the logo would
@@ -1491,7 +1500,7 @@ public partial class MainWindow : Window
             || _slideDragItem is not { } item
             || sender is not FrameworkElement card
             || DataContext is not MainViewModel vm
-            || !vm.CanMoveSlide(item))
+            || !vm.IsSongSlide(item))
             return;
 
         var moved = e.GetPosition(this) - start;
@@ -1500,6 +1509,18 @@ public partial class MainWindow : Window
             return;
 
         _slideDragStart = null;
+
+        // The order is locked (🔒): nothing moves; the bar says how to unlock it
+        // and the lock blinks so it is found.
+        if (!vm.CanMoveSlide(item))
+        {
+            // Letting go must not project the slide: it was a drag, not a click.
+            card.ReleaseMouseCapture();
+            vm.TellSlidesOrderIsLocked();
+            BlinkSlidesLock();
+            return;
+        }
+
         var layer = AdornerLayer.GetAdornerLayer(SlidesScroll);
         _slideDragAdorner = new SlideDragAdorner(SlidesScroll, card, (Brush)FindResource("AccentBrush"));
         layer?.Add(_slideDragAdorner);
@@ -1517,6 +1538,147 @@ public partial class MainWindow : Window
             _slideDragItem = null;
         }
     }
+
+    /// <summary>
+    /// «🖼 Fondo» over the slides: use the background on the screen as the
+    /// song's own, or take it away. Choosing one from the media bar is a right
+    /// click on its card, which the last line says.
+    /// </summary>
+    private void SongBackgroundButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm || sender is not FrameworkElement anchor)
+            return;
+
+        var menu = new ContextMenu
+        {
+            PlacementTarget = anchor,
+            Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom,
+        };
+        menu.Items.Add(new MenuItem
+        {
+            Header = "Usar el fondo que está en pantalla",
+            Command = vm.UseCurrentBackgroundForSongCommand,
+            ToolTip = "La imagen o el video que se ve ahora pasa a ser el fondo de esta canción",
+        });
+        menu.Items.Add(new MenuItem
+        {
+            Header = "Quitar el fondo propio",
+            Command = vm.RemoveSongBackgroundCommand,
+            IsEnabled = vm.SongHasOwnBackground,
+        });
+        menu.Items.Add(new Separator());
+        menu.Items.Add(new MenuItem
+        {
+            Header = "Otro: clic derecho en una imagen o video de Medios → «Usar como fondo de…»",
+            IsEnabled = false,
+        });
+        menu.IsOpen = true;
+    }
+
+    /// <summary>
+    /// «Elegir…» of a name plate: the logos of the library first (a picture or
+    /// a video), then any picture or video from the computer.
+    /// </summary>
+    private void ChooseNamePlateImage_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm || sender is not FrameworkElement anchor)
+            return;
+
+        var menu = new ContextMenu
+        {
+            PlacementTarget = anchor,
+            Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom,
+        };
+
+        var logos = vm.NamePlateLogoChoices();
+        if (logos.Count > 0)
+        {
+            menu.Items.Add(new MenuItem { Header = "Tus logos", IsEnabled = false });
+            foreach (var (name, path) in logos)
+            {
+                var item = new MenuItem
+                {
+                    Header = (EcclesiaCast.Core.Presentation.NamePlateMedia.IsVideo(path) ? "🎞 " : "🖼 ") + name,
+                    ToolTip = path,
+                };
+                item.Click += (_, _) => vm.UseNamePlateImage(path);
+                menu.Items.Add(item);
+            }
+            menu.Items.Add(new Separator());
+        }
+
+        menu.Items.Add(new MenuItem
+        {
+            Header = "Otra imagen o video de la computadora…",
+            Command = vm.ChooseNamePlateFileCommand,
+        });
+        menu.IsOpen = true;
+    }
+
+    /// <summary>Double click on a saved name plate: it goes on the screen.</summary>
+    private void SavedPlatesList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (DataContext is MainViewModel vm
+            && e.OriginalSource is DependencyObject source
+            && ItemsControl.ContainerFromElement(SavedPlatesList, source) is ListBoxItem { DataContext: EcclesiaCast.Core.Presentation.NamePlate plate })
+            vm.ShowSavedNamePlateCommand.Execute(plate);
+    }
+
+    /// <summary>Two quick blinks of the lock, to show where it is.</summary>
+    private void BlinkSlidesLock()
+    {
+        var blink = new System.Windows.Media.Animation.DoubleAnimation(1, 0.25, TimeSpan.FromMilliseconds(180))
+        {
+            AutoReverse = true,
+            RepeatBehavior = new System.Windows.Media.Animation.RepeatBehavior(2),
+        };
+        SlidesLockButton.BeginAnimation(OpacityProperty, blink);
+    }
+
+    // ── Buscar en la letra ───────────────────────────────────────
+
+    /// <summary>
+    /// Enter projects the slide found, ↓ / F3 go to the next one, ↑ to the
+    /// previous one, Esc clears the box. Handled here so F3 (Logo) and the
+    /// arrows do not reach the window while typing.
+    /// </summary>
+    private void LyricsSearchBox_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm)
+            return;
+
+        switch (e.Key)
+        {
+            case Key.Enter:
+                vm.ProjectLyricsMatchCommand.Execute(null);
+                break;
+            case Key.Down:
+            case Key.F3 when Keyboard.Modifiers == ModifierKeys.None:
+                vm.NextLyricsMatchCommand.Execute(null);
+                break;
+            case Key.Up:
+            case Key.F3 when Keyboard.Modifiers == ModifierKeys.Shift:
+                vm.PreviousLyricsMatchCommand.Execute(null);
+                break;
+            case Key.Escape:
+                if (vm.LyricsSearchText.Length == 0)
+                    return; // an empty box lets Esc do what it always does
+                vm.ClearLyricsSearchCommand.Execute(null);
+                break;
+            default:
+                return;
+        }
+
+        e.Handled = true;
+    }
+
+    /// <summary>Scrolls the grid so the slide found is in sight.</summary>
+    private void BringSlideIntoView(SlideItemViewModel slide) =>
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (SlideGrid.ItemContainerGenerator.ContainerFromItem(slide) is FrameworkElement card)
+                card.BringIntoView();
+        }, System.Windows.Threading.DispatcherPriority.Loaded);
 
     private static SlideItemViewModel? DraggedSlide(DragEventArgs e) =>
         e.Data.GetData(typeof(SlideItemViewModel)) as SlideItemViewModel;

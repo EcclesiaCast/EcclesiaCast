@@ -281,8 +281,14 @@ public sealed partial class MainViewModel
         // into "background only" on the way.
         if (item.SectionId != 0)
         {
-            ApplyRandomBackgroundForSong();
+            // Its own background first; only a song without one draws at random.
+            if (!ApplySongOwnBackground())
+                ApplyRandomBackgroundForSong();
             NoteSongProjected();
+        }
+        else
+        {
+            _songBackgroundRunId = 0;
         }
 
         LiveSlideIndex = index;

@@ -55,6 +55,31 @@ español de Windows, que viene instalado con el idioma.)
 **Proyectar:** clic en una diapositiva, o doble clic en la canción para empezar
 desde la primera. Las flechas **←→** navegan en vivo.
 
+### Arriba de las diapositivas de una canción
+
+- **🔍 Buscar en la letra…**: escribí unas palabras y se marcan en amarillo las
+  diapositivas que las tienen («1 de 2»). **Enter** proyecta la marcada, **↓** o
+  **F3** pasa a la siguiente, **↑** a la anterior y **Esc** borra la búsqueda. Sirve
+  cuando el cantante salta a otra parte y no sabés dónde está.
+- **➕ Diapositiva** escribe una diapositiva nueva al final. Para ponerla en otro
+  lugar: clic derecho sobre una diapositiva → **Nueva diapositiva después de
+  esta…**. En **Editar canción (diseño)** también está **➕ Nueva diapositiva**,
+  debajo de la lista.
+- **↶ / ↷** (o **Ctrl+Z** / **Ctrl+Y**) deshacen y rehacen los cambios de la
+  canción: mover, agregar, borrar, duplicar o pegar diapositivas, la edición
+  rápida, el diseño y el editor de la letra. Cada canción tiene los suyos y se
+  guardan mientras el programa está abierto.
+- **🔒 Orden trabado**: así arranca, para que las diapositivas no se desacomoden
+  sin querer al hacer clic. Si arrastrás una, no se mueve y abajo te dice cómo
+  destrabarlo. Tocá el candado y queda **🔓 Orden destrabado** (en amarillo):
+  ahí sí se arrastran. Tocalo otra vez para trabarlo. El programa se acuerda.
+- **🖼 Fondo**: el fondo propio de la canción. Poné una imagen o un video de
+  fondo y tocá **🖼 → Usar el fondo que está en pantalla**, o hacé clic derecho
+  en una imagen o video de Medios → **Usar como fondo de «…»**. Desde ahí, cada
+  vez que proyectes esa canción su fondo se pone solo (le gana al **🎲 al azar
+  por canción**). Si en medio de la canción cambiás el fondo a mano, se respeta
+  hasta la canción siguiente. **🖼 → Quitar el fondo propio** lo saca.
+
 ## 3. Biblia
 
 En la pestaña **Biblia**:
@@ -367,6 +392,19 @@ programa recuerda lo que elijas.
 - **Texto rápido**: escribí un anuncio y proyectalo al momento.
 - **Aviso al pie**: un mensaje que aparece sobre todo lo demás (ideal para
   "el auto ABC 123 está mal estacionado"). Se quita con **Quitar**.
+- **Placas de nombre** («lower third»): escribí el **nombre** y, si querés, el
+  **cargo** («Pastor Juan Pérez» / «Predicación») y tocá **Mostrar** (o Enter).
+  Aparece una tarjeta abajo a la izquierda, por encima de todo, en el proyector y
+  en la transmisión. A la derecha elegís cuánto queda: hasta que toques
+  **Quitar**, o 5, 10 o 15 segundos. Cada placa que mostrás queda en la lista de
+  **Guardadas**: el próximo domingo es doble clic y listo; el 🗑 la borra.
+  Con **Elegir…** le ponés una **imagen o un video corto** al costado (uno de tus
+  logos o cualquier archivo de la computadora; el video va en bucle y sin sonido),
+  **a la izquierda o a la derecha** del texto (un logo apaisado queda ancho; para OBS el
+  video tiene que ser MP4 común, H.264: los videos HEVC de iPhone se ven en el proyector pero
+  no en la transmisión, donde la placa sale sin el video). En la otra lista elegís **cómo entra**:
+  deslizándose desde el costado, subiendo desde abajo, abriéndose como persiana o
+  sólo apareciendo. Siempre se va desvaneciéndose. Todo queda guardado con la placa.
 - **Resaltar en vivo**: escribí una o varias palabras o frases separadas por
   **;** (`gracia; fe`) y se pintan como con marcador, en todas las veces que
   aparecen. También podés marcar con el mouse sobre el panel LIVE: un clic en

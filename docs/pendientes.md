@@ -14,6 +14,41 @@ Hay cuatro tipos de cosas, cada una en su sección:
 
 ## 1. Para probar (lo prueba Alexis)
 
+### Pedidos de GitHub #32 y #37 (19/11/2026)
+
+Claude los probó de madrugada con el programa abierto (copia de la biblioteca; la real no se tocó).
+**Anduvo:** con el orden trabado, arrastrar no mueve ni proyecta y la barra dice cómo destrabarlo;
+destrabado (amarillo) se mueve; Ctrl+Z / Ctrl+Y deshacen y rehacen mover, agregar y el diseño;
+«zarza» marcó las 2 diapositivas, ↓ pasó a la otra y Enter la proyectó, Esc borró sin apagar la
+salida; «➕ Diapositiva» y «➕ Nueva diapositiva» del diseño agregan donde corresponde; el fondo
+propio se puso solo al volver a la canción y el clic derecho en un medio lo cambia al instante; la
+placa salió en el proyector, en el EN VIVO y en la página de OBS, se fue sola a los 10 s, quedó en la
+lista y se acordó al reabrir.
+
+Falta probar a mano:
+
+- [ ] **Contador de uso, al sacar la 1.5.0:** subir el `worker.js` nuevo y borrar lo contado
+  (pasos en `servicios/api/LEEME.md`, «Empezar de cero»). Después, con la 1.5.0 **instalada**,
+  proyectar algo y mirar a los minutos el resumen: tiene que aparecer esa instalación con la
+  versión 1.5.0. Un instalador de prueba (`1.5.0-prueba.N`) no tiene que aparecer.
+- [x] **Placas con imagen o video:** probado por Claude el 19/11 al mediodía con el programa abierto.
+  Anduvo: «Elegir…» con un logo y con un archivo, la placa guardada recuerda imagen, lado y
+  entrada, el video se mueve en bucle en el proyector, «subir» y «persiana» entran bien, y en OBS
+  se ven la imagen y el video H.264. Se corrigió: un logo apaisado quedaba chiquito (ahora la
+  imagen toma el alto de la tarjeta y el ancho que pida), la lista del lado cortaba el texto, y
+  en OBS un video HEVC (el de iPhone, que el navegador no muestra) dejaba un recuadro vacío.
+- [ ] **Placa y letra a la vez:** con una letra larga, la placa tapa un poco el último renglón.
+  Ver si conviene subir la letra mientras hay placa, o dejarlo así (la placa suele ir en la prédica).
+- [ ] **Placas con YouTube de fondo:** con un video de YouTube a pantalla completa, lo más probable es que la placa (como el
+  aviso al pie) no se vea en el proyector, porque el video es una ventana aparte; en OBS sí. Ver si
+  hace falta.
+- [ ] **Placas en una notebook con proyector real:** que el tamaño de la letra se lea bien desde el
+  fondo de la iglesia, y con el aviso al pie puesto (la placa tiene que quedar encima del aviso).
+- [ ] **Fondo propio con «🎲 al azar por canción» prendido:** una canción con fondo propio, otra sin;
+  la que no tiene tiene que sortear uno nuevo, no quedarse con el de la anterior.
+- [ ] **Deshacer después de editar la letra con «Editar como texto plano»** y con «Edición rápida».
+- [ ] **Buscar en la letra con «Líneas por diapositiva» en 2:** que marque los pedazos correctos.
+
 ### Arreglos del formulario de comentarios y salida en una ventana (18/11/2026)
 
 Claude los probó el 18/11 con el programa abierto en esta PC (con una copia de la biblioteca;

@@ -45,6 +45,17 @@ public partial class ProjectedView : UserControl
         DependencyProperty.Register(nameof(Overlay), typeof(string), typeof(ProjectedView),
             new PropertyMetadata(null, (d, e) => ((ProjectedView)d).SlideView.Overlay = (string?)e.NewValue));
 
+    /// <summary>The name plate («lower third»), handed to the slide view.</summary>
+    public static readonly DependencyProperty NamePlateProperty =
+        DependencyProperty.Register(nameof(NamePlate), typeof(NamePlate), typeof(ProjectedView),
+            new PropertyMetadata(null, (d, e) => ((ProjectedView)d).SlideView.NamePlate = (NamePlate?)e.NewValue));
+
+    public NamePlate? NamePlate
+    {
+        get => (NamePlate?)GetValue(NamePlateProperty);
+        set => SetValue(NamePlateProperty, value);
+    }
+
     /// <summary>Typeface and size of the lower-third announcement, handed to the slide view.</summary>
     public static readonly DependencyProperty OverlayFontFamilyProperty =
         DependencyProperty.Register(nameof(OverlayFontFamily), typeof(string), typeof(ProjectedView),

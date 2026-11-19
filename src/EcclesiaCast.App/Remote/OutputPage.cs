@@ -73,6 +73,36 @@ public static class OutputPage
               font-size: 3.4vh; text-align: center;
             }
 
+            /* The name plate (who is speaking), bottom left as on the
+               projector: a picture or video on one side if it has one, the
+               words beside it; it comes in the way the plate says and fades out. */
+            #nplate {
+              position: absolute; left: 4.7vw; bottom: 10.2vh; max-width: 82vw;
+              display: flex; align-items: stretch; color: #fff;
+              transform-origin: left center;
+              transition: opacity .32s ease, transform .42s cubic-bezier(.2,.8,.3,1);
+            }
+            #nplate.derecha #nplateMedia { order: 2; }
+            #nplateText {
+              background: rgba(16,20,32,.91); border-left: 1.3vh solid #2F63C9;
+              padding: 2vh 4.8vh 2.2vh 3.5vh;
+              display: flex; flex-direction: column; justify-content: center;
+            }
+            #nplateMedia {
+              min-height: 16.3vh; box-sizing: border-box; padding: 1.3vh;
+              background: rgba(16,20,32,.91);
+              display: flex; align-items: center; justify-content: center;
+            }
+            /* The card's height, and the width its shape asks for (a wide logo stays wide). */
+            #nplateMedia img, #nplateMedia video { height: 13.7vh; width: auto; max-width: 45vh; object-fit: contain; }
+            #nplate.fuera { opacity: 0; }
+            #nplate.anim-deslizar.fuera { transform: translateX(-6vh); }
+            #nplate.anim-subir.fuera { transform: translateY(8vh); }
+            #nplate.anim-persiana { clip-path: inset(0 0 0 0); transition: opacity .16s ease, clip-path .7s ease-in; }
+            #nplate.anim-persiana.fuera { clip-path: inset(0 100% 0 0); }
+            #nplateName { font-size: 6.1vh; font-weight: 600; line-height: 1.15; }
+            #nplateRole { font-size: 3.7vh; color: #C9D3E6; margin-top: .4vh; }
+
             #countdown {
               position: absolute; inset: 0;
               display: flex; flex-direction: column;
@@ -244,6 +274,10 @@ public static class OutputPage
             <div id="countdownHeading"></div>
             <div id="countdownClock"></div>
           </div>
+          <div id="nplate" class="oculto fuera">
+            <div id="nplateMedia" class="oculto"></div>
+            <div id="nplateText"><div id="nplateName"></div><div id="nplateRole"></div></div>
+          </div>
           <div id="overlay" class="oculto"></div>
           <div id="raw">
             <p id="rlabel" class="oculto"></p>
@@ -372,6 +406,77 @@ public static class OutputPage
 
               show(overlay, !!s.overlay);
               overlay.textContent = s.overlay || '';
+              paintPlate(s);
+            }
+
+            // The name plate: in with a slide, out with a fade; above the
+            // «aviso al pie» when both are on.
+            var nplate = document.getElementById('nplate');
+            var nplateName = document.getElementById('nplateName');
+            var nplateRole = document.getElementById('nplateRole');
+            // («nplate»: «plate» is already the box behind the words of a styled layer.)
+            var nplateMedia = document.getElementById('nplateMedia');
+            var nplateMediaKey = '';
+            var nplateTimer = 0;
+            var nplateAnims = ['anim-deslizar', 'anim-subir', 'anim-persiana', 'anim-aparecer'];
+            function paintPlate(s) {
+              var on = !!(s.plateName || s.plateRole);
+              nplate.style.bottom = s.overlay ? Math.max(10.2, overlay.offsetHeight / innerHeight * 100 + 3.7) + 'vh' : '10.2vh';
+              if (on) {
+                clearTimeout(nplateTimer);
+                nplateTimer = 0;
+                nplateName.textContent = s.plateName || '';
+                nplateRole.textContent = s.plateRole || '';
+                show(nplateName, !!s.plateName);
+                show(nplateRole, !!s.plateRole);
+                nplate.classList.toggle('derecha', !!s.plateImageRight);
+                paintPlateMedia(s);
+                if (nplate.classList.contains('oculto')) {
+                  // Starts outside (or closed) with its own way in, then comes in.
+                  nplateAnims.forEach(function (a) { nplate.classList.remove(a); });
+                  nplate.classList.add('anim-' + (s.plateAnimation || 'deslizar'));
+                  nplate.classList.add('fuera');
+                  show(nplate, true);
+                  void nplate.offsetWidth;
+                }
+                nplate.classList.remove('fuera');
+              } else if (!nplate.classList.contains('oculto') && !nplateTimer) {
+                // Out it only fades, as on the projector. The next reports must
+                // not start the wait again.
+                nplateAnims.forEach(function (a) { nplate.classList.remove(a); });
+                nplate.classList.add('fuera');
+                nplateTimer = setTimeout(function () {
+                  show(nplate, false);
+                  nplateTimer = 0;
+                  nplateMedia.innerHTML = '';
+                  nplateMediaKey = '';
+                }, 340);
+              }
+            }
+
+            // The plate's picture or looping video, asked for again only when
+            // it is another file.
+            var nplateMediaOk = true;
+            function paintPlateMedia(s) {
+              var key = s.plateImage ? s.plateImage + ':' + s.plateImageKey : '';
+              if (key !== nplateMediaKey) nplateMediaOk = true;
+              show(nplateMedia, !!key && nplateMediaOk);
+              if (key === nplateMediaKey) return;
+              nplateMediaKey = key;
+              nplateMedia.innerHTML = '';
+              if (!key) return;
+              function fail() { nplateMediaOk = false; show(nplateMedia, false); }
+              var src = '/api/placa?pin=' + encodeURIComponent(pin) + '&k=' + encodeURIComponent(s.plateImageKey);
+              var el = document.createElement(s.plateImage === 'video' ? 'video' : 'img');
+              if (s.plateImage === 'video') {
+                el.muted = true; el.loop = true; el.autoplay = true; el.playsInline = true;
+                // A video the browser cannot draw (HEVC, the iPhone's) plays with
+                // no picture: the card then goes without the empty box.
+                el.addEventListener('loadedmetadata', function () { if (!el.videoWidth) fail(); });
+              }
+              el.addEventListener('error', fail);
+              el.src = src;
+              nplateMedia.appendChild(el);
             }
 
             // The words as plain paragraphs: the reference (or CORO) first, then

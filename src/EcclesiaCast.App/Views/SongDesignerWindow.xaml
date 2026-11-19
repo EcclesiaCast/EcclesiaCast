@@ -107,6 +107,9 @@
         <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource Panel}">
             <DockPanel>
                 <TextBlock DockPanel.Dock="Top" Text="DIAPOSITIVAS" Style="{StaticResource PanelTitle}"/>
+                <Button DockPanel.Dock="Bottom" Content="➕ Nueva diapositiva" Margin="8,6,8,8" Padding="8,6"
+                        Style="{StaticResource DarkButton}" FontSize="12" Click="NewSlide_Click"
+                        ToolTip="Agrega una diapositiva vacía después de la elegida, lista para escribir. Si queda vacía, no se guarda."/>
                 <ListBox x:Name="SlidesList" Background="Transparent" BorderThickness="0"
                          SelectionChanged="SlidesList_SelectionChanged"
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled">

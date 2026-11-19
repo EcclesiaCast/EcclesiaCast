@@ -80,6 +80,13 @@ public interface IRemoteHost
     /// </summary>
     string? GetBackgroundFile(OutputChannel channel);
 
+    /// <summary>
+    /// The picture or video of the name plate on the screen, for the stream page;
+    /// null when there is no plate, it has none, or a browser cannot show it. The
+    /// path is the plate's own, never one taken from the request.
+    /// </summary>
+    string? GetNamePlateFile();
+
     /// <summary>Runs one action; <paramref name="index"/> is used by the ones that take a target.</summary>
     void Execute(string action, int? index);
 }
@@ -121,7 +128,13 @@ public sealed record RemoteOutput(
     RemoteOutputMedia? Media = null,
     BroadcastStyle? Style = null,
     string Label = "",
-    bool Blank = false);
+    bool Blank = false,
+    string PlateName = "",
+    string PlateRole = "",
+    string PlateImage = "",
+    string PlateImageKey = "",
+    bool PlateImageRight = false,
+    string PlateAnimation = "");
 
 /// <summary>
 /// The picture or video that is alone on the screen, for the announcements page

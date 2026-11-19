@@ -292,6 +292,28 @@ public sealed class RemoteControlServer : IDisposable
             return;
         }
 
+        // The picture or video of the name plate on the screen. The request
+        // names nothing: only the current plate's own file can come out.
+        if (path == "/api/placa" && method == "GET")
+        {
+            var check = CheckPin(QueryValue(target, "pin"), caller);
+            if (!check.Ok)
+            {
+                await WriteDeniedAsync(stream, check, cancellation);
+                return;
+            }
+
+            var file = await OnUiThread(() => _host.GetNamePlateFile());
+            if (file is null)
+            {
+                await WriteAsync(stream, 404, "text/plain", "No encontrado", cancellation);
+                return;
+            }
+
+            await WriteFileAsync(stream, file, range, cancellation);
+            return;
+        }
+
         if (path == "/api/state" && method == "GET")
         {
             var check = CheckPin(QueryValue(target, "pin"), caller);

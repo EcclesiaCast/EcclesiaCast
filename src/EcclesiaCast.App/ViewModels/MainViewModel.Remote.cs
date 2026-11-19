@@ -247,6 +247,11 @@ public sealed partial class MainViewModel
         var overlays = OutputChannels.ShowsOverlays(channel);
         var style = StyleOf(channel);
 
+        // The name plate goes where the «aviso al pie» goes: the page with
+        // everything and the announcements page.
+        var plate = overlays && IsProjecting ? _presentation.NamePlate : null;
+        var plateFile = plate is null ? null : ((IRemoteHost)this).GetNamePlateFile();
+
         return new RemoteOutput(
             ShowText: belongs && IsProjecting && _presentation.State == OutputState.Content && slide is not null,
             MainText: slide?.MainText ?? string.Empty,
@@ -276,7 +281,25 @@ public sealed partial class MainViewModel
                 OnAirSource.Song => (Projection.SlideLabel ?? string.Empty).ToUpperInvariant(),
                 OnAirSource.Bible => slide?.Caption ?? string.Empty,
                 _ => string.Empty,
+            },
+            // The name plate goes where the «aviso al pie» goes: the page with
+            // everything and the announcements page.
+            PlateName: plate?.Name ?? string.Empty,
+            PlateRole: plate?.Role ?? string.Empty,
+            PlateImage: plateFile is null ? string.Empty : NamePlateMedia.IsVideo(plateFile) ? "video" : "imagen",
+            PlateImageKey: plateFile is null ? string.Empty : PlateFileKey(plateFile),
+            PlateImageRight: plate?.ImageRight == true,
+            PlateAnimation: plate?.Animation switch
+            {
+                NamePlateAnimation.Rise => "subir",
+                NamePlateAnimation.Wipe => "persiana",
+                NamePlateAnimation.Fade => "aparecer",
+                _ => "deslizar",
             });
+
+        // The page asks for the picture again only when it is another file.
+        static string PlateFileKey(string file) =>
+            $"{Path.GetFileName(file).GetHashCode():x}-{new FileInfo(file).Length}";
 
         static IReadOnlyList<int[]> Marks(IReadOnlyList<TextSpan> spans) =>
             spans.Select(s => new[] { s.Start, s.Length }).ToList();
@@ -346,6 +369,13 @@ public sealed partial class MainViewModel
     {
         ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".mp4", ".m4v", ".webm", ".mov",
     };
+
+    string? IRemoteHost.GetNamePlateFile() =>
+        _presentation.NamePlate?.ImagePath is { } path
+        && StreamableExtensions.Contains(Path.GetExtension(path))
+        && File.Exists(path)
+            ? path
+            : null;
 
     string? IRemoteHost.GetMediaFile(int mediaId)
     {

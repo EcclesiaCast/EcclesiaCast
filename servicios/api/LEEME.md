@@ -70,6 +70,47 @@ Y qué versiones se usaron en las últimas 4 semanas. Con `&formato=json`
 devuelve lo mismo en datos. Cada PC cuenta por separado: una iglesia con dos
 PCs suma dos.
 
+## Qué no se cuenta
+
+Sólo cuentan las copias que usa una iglesia de verdad. El programa **no manda
+el aviso** (y ni siquiera inventa su número) cuando:
+
+- es una **versión de prueba** (lleva un guion: `1.5.0-prueba.2`, `1.5.0-beta.1`);
+- corre con una **biblioteca de prueba** (la variable `ECCLESIACAST_DATA_DIR`,
+  que se usa para probar con una copia de la biblioteca);
+- **no está instalado**: corre desde una carpeta suelta y no desde donde lo dejó
+  el instalador (se reconoce porque el instalador siempre deja su desinstalador,
+  `unins000.exe`, al lado del programa).
+
+Además, el servicio **rechaza** los avisos con versión de prueba, y el resumen
+**no muestra** las filas viejas de versiones de prueba que hayan quedado de antes.
+
+## Empezar de cero
+
+Para que los números arranquen limpios (por ejemplo, cuando sale la 1.5.0),
+hay que hacer dos cosas, en este orden. Las dos se hacen desde el panel de
+Cloudflare (<https://dash.cloudflare.com>) y no tocan nada de las iglesias.
+
+**1. Subir el servicio nuevo** (el que rechaza las versiones de prueba):
+
+1. *Compute → Workers & Pages* → abrí `ecclesiacast-api`.
+2. Arriba a la derecha, *Edit code*.
+3. Borrá todo lo que hay, pegá **todo** el `worker.js` nuevo y tocá *Deploy*.
+4. Para confirmar: abrí `https://api.ecclesiacast.org/v1/resumen?clave=TU-CLAVE`;
+   tiene que seguir mostrando la tabla.
+
+**2. Borrar lo contado hasta ahora** (no se puede deshacer):
+
+1. *Storage & Databases → D1* → abrí la base `ecclesiacast-api`.
+2. Pestaña *Console*.
+3. Escribí exactamente `DELETE FROM uso;` y tocá *Execute*.
+4. Abrí de nuevo el resumen: las tablas tienen que quedar vacías. Se van a
+   llenar solas a medida que las iglesias proyecten con el programa.
+
+Si querés guardar los números viejos antes de borrarlos, abrí primero
+`https://api.ecclesiacast.org/v1/resumen?clave=TU-CLAVE&formato=json` y guardá
+la página (Ctrl+S).
+
 ## Si se queda corto con Pixabay
 
 Con muchas iglesias buscando, el límite de 100 búsquedas por minuto puede no

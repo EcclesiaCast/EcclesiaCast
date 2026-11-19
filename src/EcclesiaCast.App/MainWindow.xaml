@@ -17,6 +17,10 @@
         <KeyBinding Key="Escape" Command="{Binding EscapeOutputCommand}"/>
         <!-- Una sola caja para buscar en canciones, versículos y medios -->
         <KeyBinding Key="K" Modifiers="Control" Command="{Binding SearchEverythingCommand}"/>        <KeyBinding Key="F" Modifiers="Control" Command="{Binding SearchEverythingCommand}"/>
+        <!-- Deshacer/rehacer los cambios de la canción abierta. Dentro de una caja de
+             texto, Ctrl+Z sigue deshaciendo lo escrito (la caja lo atiende primero). -->
+        <KeyBinding Key="Z" Modifiers="Control" Command="{Binding UndoSongChangeCommand}"/>
+        <KeyBinding Key="Y" Modifiers="Control" Command="{Binding RedoSongChangeCommand}"/>
     </Window.InputBindings>
 
     <Window.Resources>
@@ -143,6 +147,12 @@
                       Command="{Binding PlacementTarget.Tag.UseMediaAsLogoCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                       CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                       ToolTip="Lo suma a la lista de logos para mostrarlo con F3. No cambia el logo que está en pantalla."/>
+            <!-- Sólo con una canción abierta y una sola tarjeta elegida (imagen, video o YouTube);
+                 el nombre de la canción se pone al abrirse -->
+            <MenuItem x:Name="UseAsSongBackgroundItem" Header="Usar como fondo de la canción"
+                      Command="{Binding PlacementTarget.Tag.UseMediaAsSongBackgroundCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      ToolTip="Cada vez que proyectes esa canción, este fondo se pone solo (le gana al «al azar por canción»)."/>
             <!-- Sus pestañas se llenan al abrirse -->
             <MenuItem x:Name="MoveToTabItem" Header="Mover a la pestaña…" SubmenuOpened="MoveToTab_SubmenuOpened">
                 <MenuItem Header="(cargando)" IsEnabled="False"/>
@@ -1656,8 +1666,9 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
+                    <StackPanel Grid.Row="0">
                     <!-- Qué hay en la grilla y, si es otra cosa, qué está en pantalla -->
-                    <DockPanel Grid.Row="0" Margin="12,8,12,8" LastChildFill="False"
+                    <DockPanel Margin="12,8,12,8" LastChildFill="False"
                                Visibility="{Binding HasGridTitle, Converter={StaticResource BoolToVis}}">
                         <!-- Sólo con una canción en la grilla: cuántas líneas lleva cada diapositiva -->
                         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0"
@@ -1682,6 +1693,14 @@
                                 Visibility="{Binding IsSongOpen, Converter={StaticResource BoolToVis}}"
                                 AutomationProperties.Name="Tema de esta canción"
                                 ToolTip="{Binding SongThemeHint}"/>
+                        <!-- Sólo con una canción: su fondo propio, que se pone solo al proyectarla -->
+                        <Button DockPanel.Dock="Right" Content="{Binding SongBackgroundLabel}" FontSize="11" Padding="8,3" Margin="10,0,0,0"
+                                MaxWidth="200"
+                                Style="{StaticResource DarkButton}"
+                                Click="SongBackgroundButton_Click"
+                                Visibility="{Binding IsSongOpen, Converter={StaticResource BoolToVis}}"
+                                AutomationProperties.Name="Fondo de esta canción"
+                                ToolTip="{Binding SongBackgroundHint}"/>
                         <!-- Sólo con una presentación en la grilla -->
                         <Button DockPanel.Dock="Right" Content="➕ Playlist" FontSize="11" Padding="8,3" Margin="10,0,0,0"
                                 Style="{StaticResource DarkButton}"
@@ -1706,6 +1725,74 @@
                             <TextBlock Text="EN VIVO" FontSize="10" FontWeight="SemiBold" Foreground="White"/>
                         </Border>
                     </DockPanel>
+
+                    <!-- Herramientas de la canción abierta (pedidos de GitHub #32): buscar en la
+                         letra, diapositiva nueva, deshacer/rehacer y el candado del orden. -->
+                    <DockPanel x:Name="SongToolsBar" Margin="12,0,12,8" LastChildFill="True"
+                               Visibility="{Binding IsSongOpen, Converter={StaticResource BoolToVis}}">
+                        <!-- El candado: trabado no deja arrastrar; destrabado se ve amarillo -->
+                        <Button x:Name="SlidesLockButton" DockPanel.Dock="Right" FontSize="11" Padding="9,4" Margin="6,0,0,0"
+                                Command="{Binding ToggleSlidesOrderLockCommand}"
+                                AutomationProperties.Name="Trabar o destrabar el orden de las diapositivas">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                    <Setter Property="Content" Value="🔒 Orden trabado"/>
+                                    <Setter Property="ToolTip" Value="El orden de las diapositivas está trabado: arrastrarlas no las mueve (así no se desacomodan sin querer). Clic para destrabarlo y poder moverlas."/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SlidesOrderLocked}" Value="False">
+                                            <Setter Property="Content" Value="🔓 Orden destrabado"/>
+                                            <Setter Property="Foreground" Value="#1A1A1A"/>
+                                            <Setter Property="Background" Value="#E8B931"/>
+                                            <Setter Property="ToolTip" Value="Ahora se pueden arrastrar las diapositivas para cambiarlas de lugar. Clic para trabar el orden otra vez."/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <Button DockPanel.Dock="Right" Content="↷" FontSize="13" Padding="8,2" Margin="4,0,0,0"
+                                Style="{StaticResource DarkButton}"
+                                Command="{Binding RedoSongChangeCommand}"
+                                IsEnabled="{Binding CanRedoSongChange}"
+                                AutomationProperties.Name="Rehacer"
+                                ToolTip="{Binding RedoSongHint}" ToolTipService.ShowOnDisabled="True"/>
+                        <Button DockPanel.Dock="Right" Content="↶" FontSize="13" Padding="8,2" Margin="6,0,0,0"
+                                Style="{StaticResource DarkButton}"
+                                Command="{Binding UndoSongChangeCommand}"
+                                IsEnabled="{Binding CanUndoSongChange}"
+                                AutomationProperties.Name="Deshacer"
+                                ToolTip="{Binding UndoSongHint}" ToolTipService.ShowOnDisabled="True"/>
+                        <Button DockPanel.Dock="Right" Content="➕ Diapositiva" FontSize="11" Padding="8,4" Margin="6,0,0,0"
+                                Style="{StaticResource DarkButton}"
+                                Command="{Binding NewSlideCommand}"
+                                AutomationProperties.Name="Diapositiva nueva"
+                                ToolTip="Escribir una diapositiva nueva al final de la canción. Para ponerla en otro lugar: clic derecho sobre una diapositiva → «Nueva diapositiva después de esta»."/>
+                        <TextBlock DockPanel.Dock="Right" Text="{Binding LyricsSearchStatus}" FontSize="11"
+                                   Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                        <Grid>
+                            <TextBox x:Name="LyricsSearchBox"
+                                     Text="{Binding LyricsSearchText, UpdateSourceTrigger=PropertyChanged}"
+                                     PreviewKeyDown="LyricsSearchBox_PreviewKeyDown"
+                                     Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                                     BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
+                                     Padding="6,3" FontSize="12"
+                                     AutomationProperties.Name="Buscar en la letra"
+                                     ToolTip="Buscar en la letra de esta canción: marca las diapositivas que tienen esas palabras. Enter la proyecta · ↓ o F3 la siguiente · ↑ la anterior · Esc borra."/>
+                            <TextBlock Text="🔍 Buscar en la letra…" IsHitTestVisible="False" FontSize="12"
+                                       Foreground="{StaticResource FaintBrush}" Margin="9,0,0,0" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding LyricsSearchText}" Value="">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                    </DockPanel>
+                    </StackPanel>
 
                     <Border Grid.Row="1"
                             BorderBrush="{StaticResource LineBrush}"
@@ -1771,6 +1858,9 @@
                                                         <MenuItem Header="Duplicar"
                                                                   Command="{Binding PlacementTarget.Tag.DuplicateSlideCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                                   CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                        <MenuItem Header="Nueva diapositiva después de esta…"
+                                                                  Command="{Binding PlacementTarget.Tag.NewSlideCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                                         <Separator/>
                                                         <MenuItem Header="Eliminar"
                                                                   Command="{Binding PlacementTarget.Tag.DeleteSlideCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
@@ -1820,6 +1910,17 @@
                                                                 <Setter TargetName="pageIcon" Property="Visibility" Value="Visible"/>
                                                                 <Setter TargetName="pageImage" Property="Visibility" Value="Visible"/>
                                                                 <Setter TargetName="card" Property="Padding" Value="4"/>
+                                                            </DataTrigger>
+                                                            <!-- Buscar en la letra: las que tienen las palabras en
+                                                                 amarillo; la que proyecta Enter, más marcada -->
+                                                            <DataTrigger Binding="{Binding IsSearchMatch}" Value="True">
+                                                                <Setter TargetName="card" Property="BorderBrush" Value="#B8932A"/>
+                                                                <Setter TargetName="card" Property="BorderThickness" Value="2"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsSearchCurrent}" Value="True">
+                                                                <Setter TargetName="card" Property="BorderBrush" Value="#E8B931"/>
+                                                                <Setter TargetName="card" Property="BorderThickness" Value="3"/>
+                                                                <Setter TargetName="card" Property="Background" Value="#2A2818"/>
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding IsPreviewed}" Value="True">
                                                                 <Setter TargetName="card" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
@@ -1994,6 +2095,7 @@
                                                     ToolTip="Clic en una palabra: se resalta esa en la pantalla · Arrastrá sobre varias: se resalta la frase · Shift: suma otra marca sin sacar las anteriores · Clic otra vez sobre lo resaltado: se quita"
                                                     State="{Binding Projection.State}"
                                                     Overlay="{Binding Projection.Overlay}"
+                                                    NamePlate="{Binding Projection.NamePlate}"
                                                     OverlayFontFamily="{Binding Projection.OverlayFontFamily}"
                                                     OverlayFontSize="{Binding Projection.OverlayFontSize}"
                                                     Countdown="{Binding Projection.Countdown}"
@@ -2037,6 +2139,10 @@
                                          Style="{StaticResource TabButton}" GroupName="WriteTab" Margin="4,0,0,0"
                                          AutomationProperties.Name="Aviso al pie"
                                          ToolTip="Una franja al pie de la pantalla, encima de todo lo demás"/>
+                            <RadioButton x:Name="TabPlates" Content="Placas"
+                                         Style="{StaticResource TabButton}" GroupName="WriteTab" Margin="4,0,0,0"
+                                         AutomationProperties.Name="Placas de nombre"
+                                         ToolTip="Placas de nombre («lower third»): quién predica o canta, en una tarjeta abajo a la izquierda, en el proyector y en la transmisión"/>
                             <RadioButton x:Name="TabHighlight" Content="Resaltar"
                                          Style="{StaticResource TabButton}" GroupName="WriteTab" Margin="4,0,0,0"
                                          AutomationProperties.Name="Resaltar"
@@ -2151,6 +2257,145 @@
                                         <KeyBinding Key="Enter" Modifiers="Control" Command="{Binding ShowOverlayCommand}"/>
                                     </TextBox.InputBindings>
                                 </TextBox>
+                            </DockPanel>
+
+                            <!-- ── Placas de nombre («lower third», GitHub #37) ── -->
+                            <DockPanel Visibility="{Binding IsChecked, ElementName=TabPlates, Converter={StaticResource BoolToVis}}">
+                                <TextBlock DockPanel.Dock="Top"
+                                           Style="{StaticResource LearningHint}"
+                                           Text="Una tarjeta abajo a la izquierda con el nombre de quien habla o canta. Sale en el proyector y en la transmisión, y queda guardada en la lista para la próxima."
+                                           FontSize="11" Foreground="{StaticResource FaintBrush}"
+                                           TextWrapping="Wrap" Margin="12,0,12,8"/>
+                                <StackPanel DockPanel.Dock="Top" Margin="12,0,12,0">
+                                    <TextBlock Text="Nombre" Foreground="{StaticResource MutedBrush}" FontSize="11" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding NamePlateName, UpdateSourceTrigger=PropertyChanged}"
+                                             Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                                             BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
+                                             Padding="8,5" FontSize="14"
+                                             AutomationProperties.Name="Nombre de la placa"
+                                             ToolTip="Ej: «Pastor Juan Pérez» · Enter la muestra">
+                                        <TextBox.InputBindings>
+                                            <KeyBinding Key="Enter" Command="{Binding ShowNamePlateCommand}"/>
+                                        </TextBox.InputBindings>
+                                    </TextBox>
+                                    <TextBlock Text="Cargo o detalle (opcional)" Foreground="{StaticResource MutedBrush}" FontSize="11" Margin="0,8,0,4"/>
+                                    <TextBox Text="{Binding NamePlateRole, UpdateSourceTrigger=PropertyChanged}"
+                                             Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                                             BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
+                                             Padding="8,5" FontSize="13"
+                                             AutomationProperties.Name="Cargo de la placa"
+                                             ToolTip="Ej: «Predicación», «Alabanza», «Iglesia invitada» · Enter la muestra">
+                                        <TextBox.InputBindings>
+                                            <KeyBinding Key="Enter" Command="{Binding ShowNamePlateCommand}"/>
+                                        </TextBox.InputBindings>
+                                    </TextBox>
+                                    <!-- Imagen o video al costado del texto, de qué lado, y cómo entra -->
+                                    <TextBlock Text="Imagen o video (opcional)" Foreground="{StaticResource MutedBrush}" FontSize="11" Margin="0,8,0,4"/>
+                                    <DockPanel>
+                                        <Button DockPanel.Dock="Right" Content="✕" FontSize="10" Padding="7,3" Margin="4,0,0,0"
+                                                Style="{StaticResource DarkButton}"
+                                                Command="{Binding ClearNamePlateImageCommand}"
+                                                IsEnabled="{Binding NamePlateHasImage}"
+                                                AutomationProperties.Name="Sacar la imagen de la placa"
+                                                ToolTip="La placa queda sólo con el texto"/>
+                                        <Button DockPanel.Dock="Right" Content="Elegir…" FontSize="11" Padding="9,3" Margin="6,0,0,0"
+                                                Style="{StaticResource DarkButton}"
+                                                Click="ChooseNamePlateImage_Click"
+                                                AutomationProperties.Name="Elegir la imagen de la placa"
+                                                ToolTip="Uno de tus logos, o cualquier imagen o video corto de la computadora (el video va en bucle y sin sonido)"/>
+                                        <TextBlock Text="{Binding NamePlateImageLabel}" FontSize="12" Foreground="White"
+                                                   VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                    </DockPanel>
+                                    <Grid Margin="0,6,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="8"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <ComboBox Width="116" FontSize="11" SelectedIndex="{Binding NamePlateImageSide}"
+                                                  IsEnabled="{Binding NamePlateHasImage}"
+                                                  AutomationProperties.Name="Lado de la imagen"
+                                                  ToolTip="De qué lado del texto va la imagen">
+                                            <ComboBoxItem Content="A la izquierda"/>
+                                            <ComboBoxItem Content="A la derecha"/>
+                                        </ComboBox>
+                                        <ComboBox Grid.Column="2" FontSize="11"
+                                                  ItemsSource="{Binding NamePlateAnimationNames}"
+                                                  SelectedIndex="{Binding NamePlateAnimationIndex}"
+                                                  AutomationProperties.Name="Cómo entra la placa"
+                                                  ToolTip="Cómo entra la placa a la pantalla (siempre se va desvaneciéndose)"/>
+                                    </Grid>
+                                    <DockPanel Margin="0,10,0,0">
+                                        <ComboBox DockPanel.Dock="Right" Width="118" FontSize="11" VerticalAlignment="Center"
+                                                  SelectedIndex="{Binding NamePlateAutoHide}"
+                                                  AutomationProperties.Name="Cuánto dura la placa"
+                                                  ToolTip="Cuánto queda la placa en pantalla">
+                                            <ComboBoxItem Content="Hasta quitarla"/>
+                                            <ComboBoxItem Content="Se va a los 5 s"/>
+                                            <ComboBoxItem Content="Se va a los 10 s"/>
+                                            <ComboBoxItem Content="Se va a los 15 s"/>
+                                        </ComboBox>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="Mostrar" Command="{Binding ShowNamePlateCommand}" Padding="14,7"
+                                                    ToolTip="Pone la placa en pantalla (Enter en el nombre hace lo mismo)">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsNamePlateActive}" Value="True">
+                                                                <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                                                <Setter Property="BorderThickness" Value="0"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                            <Button Content="Quitar" Style="{StaticResource DarkButton}" Padding="14,7" Margin="6,0,0,0"
+                                                    Command="{Binding HideNamePlateCommand}"
+                                                    ToolTip="Saca la placa de la pantalla"/>
+                                        </StackPanel>
+                                    </DockPanel>
+                                    <TextBlock Text="Guardadas · doble clic para mostrar" Foreground="{StaticResource MutedBrush}"
+                                               FontSize="11" Margin="0,12,0,4"/>
+                                </StackPanel>
+                                <Grid Margin="12,0,12,12">
+                                    <ListBox x:Name="SavedPlatesList" ItemsSource="{Binding SavedNamePlates}"
+                                             SelectedItem="{Binding SelectedSavedNamePlate}"
+                                             MouseDoubleClick="SavedPlatesList_MouseDoubleClick"
+                                             Background="Transparent" BorderThickness="0"
+                                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                             AutomationProperties.Name="Placas guardadas">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <DockPanel>
+                                                    <Button DockPanel.Dock="Right" Content="🗑" FontSize="10" Padding="5,1"
+                                                            Style="{StaticResource DarkButton}"
+                                                            Command="{Binding DataContext.RemoveSavedNamePlateCommand, ElementName=SavedPlatesList}"
+                                                            CommandParameter="{Binding}"
+                                                            AutomationProperties.Name="Borrar de la lista"
+                                                            ToolTip="Borrar esta placa de la lista"/>
+                                                    <StackPanel Margin="0,1,6,1">
+                                                        <TextBlock Text="{Binding Name}" FontSize="13" Foreground="White"
+                                                                   TextTrimming="CharacterEllipsis"/>
+                                                        <TextBlock Text="{Binding Role}" FontSize="11" Foreground="{StaticResource MutedBrush}"
+                                                                   TextTrimming="CharacterEllipsis"/>
+                                                    </StackPanel>
+                                                </DockPanel>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                    <TextBlock Text="Las placas que muestres quedan acá." IsHitTestVisible="False">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource PlaceholderText}">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding SavedNamePlates.Count}" Value="0">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
                             </DockPanel>
 
                             <!-- ── Resaltar en vivo ── -->
