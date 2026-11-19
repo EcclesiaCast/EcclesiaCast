@@ -122,12 +122,13 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <!-- La imagen o el video de la placa: un cuadrado al costado del texto -->
-                <Border x:Name="NamePlateMediaBox" Width="176" Background="#E8101420" Padding="14"
+                <!-- La imagen o el video de la placa, al costado del texto: con la altura de la
+                     tarjeta y el ancho que pida su forma (un logo apaisado queda ancho) -->
+                <Border x:Name="NamePlateMediaBox" MaxWidth="520" Background="#E8101420" Padding="14"
                         Visibility="Collapsed">
-                    <Grid>
-                        <Image x:Name="NamePlateImage" Stretch="Uniform"/>
-                        <MediaElement x:Name="NamePlateVideo" Stretch="Uniform" IsMuted="True"
+                    <Grid Height="148">
+                        <Image x:Name="NamePlateImage" Stretch="Uniform" Height="148"/>
+                        <MediaElement x:Name="NamePlateVideo" Stretch="Uniform" Height="148" IsMuted="True"
                                       LoadedBehavior="Manual" UnloadedBehavior="Stop" Visibility="Collapsed"/>
                     </Grid>
                 </Border>

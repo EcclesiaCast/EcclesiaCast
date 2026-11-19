@@ -139,7 +139,7 @@ public partial class SlideView
 
         // On the left of the band, or after the words on the right.
         Grid.SetColumn(NamePlateMediaBox, plate.ImageRight ? 3 : 0);
-        NamePlateCard.MinHeight = path is null ? 0 : NamePlateMediaBox.Width;
+        NamePlateCard.MinHeight = path is null ? 0 : 176; // the picture's 148 and its frame
         NamePlateMediaBox.Visibility = path is null ? Visibility.Collapsed : Visibility.Visible;
 
         if (path == _plateMediaPath)

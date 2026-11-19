@@ -31,11 +31,14 @@ Falta probar a mano:
   (pasos en `servicios/api/LEEME.md`, «Empezar de cero»). Después, con la 1.5.0 **instalada**,
   proyectar algo y mirar a los minutos el resumen: tiene que aparecer esa instalación con la
   versión 1.5.0. Un instalador de prueba (`1.5.0-prueba.N`) no tiene que aparecer.
-- [ ] **Placas con imagen o video** (se hizo de día y no abrí el programa: sólo hay pruebas y dibujos a
-  imagen, que se ven bien, incluidas las cuatro animaciones a mitad de camino). Probar: «Elegir…» con un
-  logo de la lista y con un archivo; un video (que se mueva en bucle en el proyector y en el EN VIVO);
-  izquierda y derecha; las cuatro entradas en el proyector y en la página de OBS (la imagen o el video
-  también tienen que verse en OBS).
+- [x] **Placas con imagen o video:** probado por Claude el 19/11 al mediodía con el programa abierto.
+  Anduvo: «Elegir…» con un logo y con un archivo, la placa guardada recuerda imagen, lado y
+  entrada, el video se mueve en bucle en el proyector, «subir» y «persiana» entran bien, y en OBS
+  se ven la imagen y el video H.264. Se corrigió: un logo apaisado quedaba chiquito (ahora la
+  imagen toma el alto de la tarjeta y el ancho que pida), la lista del lado cortaba el texto, y
+  en OBS un video HEVC (el de iPhone, que el navegador no muestra) dejaba un recuadro vacío.
+- [ ] **Placa y letra a la vez:** con una letra larga, la placa tapa un poco el último renglón.
+  Ver si conviene subir la letra mientras hay placa, o dejarlo así (la placa suele ir en la prédica).
 - [ ] **Placas con YouTube de fondo:** con un video de YouTube a pantalla completa, lo más probable es que la placa (como el
   aviso al pie) no se vea en el proyector, porque el video es una ventana aparte; en OBS sí. Ver si
   hace falta.

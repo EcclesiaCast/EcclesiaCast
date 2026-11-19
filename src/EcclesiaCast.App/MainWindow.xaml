@@ -2312,7 +2312,7 @@
                                             <ColumnDefinition Width="8"/>
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
-                                        <ComboBox Width="96" FontSize="11" SelectedIndex="{Binding NamePlateImageSide}"
+                                        <ComboBox Width="116" FontSize="11" SelectedIndex="{Binding NamePlateImageSide}"
                                                   IsEnabled="{Binding NamePlateHasImage}"
                                                   AutomationProperties.Name="Lado de la imagen"
                                                   ToolTip="De qué lado del texto va la imagen">

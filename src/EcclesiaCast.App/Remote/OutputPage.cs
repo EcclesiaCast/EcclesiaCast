@@ -89,11 +89,12 @@ public static class OutputPage
               display: flex; flex-direction: column; justify-content: center;
             }
             #nplateMedia {
-              width: 16.3vh; min-height: 16.3vh; box-sizing: border-box; padding: 1.3vh;
+              min-height: 16.3vh; box-sizing: border-box; padding: 1.3vh;
               background: rgba(16,20,32,.91);
               display: flex; align-items: center; justify-content: center;
             }
-            #nplateMedia img, #nplateMedia video { max-width: 100%; max-height: 100%; object-fit: contain; }
+            /* The card's height, and the width its shape asks for (a wide logo stays wide). */
+            #nplateMedia img, #nplateMedia video { height: 13.7vh; width: auto; max-width: 45vh; object-fit: contain; }
             #nplate.fuera { opacity: 0; }
             #nplate.anim-deslizar.fuera { transform: translateX(-6vh); }
             #nplate.anim-subir.fuera { transform: translateY(8vh); }
@@ -455,18 +456,25 @@ public static class OutputPage
 
             // The plate's picture or looping video, asked for again only when
             // it is another file.
+            var nplateMediaOk = true;
             function paintPlateMedia(s) {
               var key = s.plateImage ? s.plateImage + ':' + s.plateImageKey : '';
-              show(nplateMedia, !!key);
+              if (key !== nplateMediaKey) nplateMediaOk = true;
+              show(nplateMedia, !!key && nplateMediaOk);
               if (key === nplateMediaKey) return;
               nplateMediaKey = key;
               nplateMedia.innerHTML = '';
               if (!key) return;
+              function fail() { nplateMediaOk = false; show(nplateMedia, false); }
               var src = '/api/placa?pin=' + encodeURIComponent(pin) + '&k=' + encodeURIComponent(s.plateImageKey);
               var el = document.createElement(s.plateImage === 'video' ? 'video' : 'img');
               if (s.plateImage === 'video') {
                 el.muted = true; el.loop = true; el.autoplay = true; el.playsInline = true;
+                // A video the browser cannot draw (HEVC, the iPhone's) plays with
+                // no picture: the card then goes without the empty box.
+                el.addEventListener('loadedmetadata', function () { if (!el.videoWidth) fail(); });
               }
+              el.addEventListener('error', fail);
               el.src = src;
               nplateMedia.appendChild(el);
             }
