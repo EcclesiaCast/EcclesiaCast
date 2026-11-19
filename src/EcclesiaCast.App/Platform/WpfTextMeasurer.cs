@@ -1,5 +1,5 @@
-using EcclesiaCast.App.Controls;
 using EcclesiaCast.Core.Presentation;
+using EcclesiaCast.Presentation.Rendering;
 
 namespace EcclesiaCast.App.Platform;
 
@@ -9,5 +9,5 @@ public sealed class WpfTextMeasurer : ITextMeasurer
     public IReadOnlyList<(string Main, string? Secondary)> SplitToFit(
         SlideContent slide, Func<string, string>? label = null, Func<string, string>? secondaryLabel = null,
         int maxParts = 6) =>
-        SlideTextFit.SplitToFit(slide, label, secondaryLabel, maxParts);
+        SlideTextFit.SplitToFit(WpfTextMetrics.Instance, slide, label, secondaryLabel, maxParts);
 }

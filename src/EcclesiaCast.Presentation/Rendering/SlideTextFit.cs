@@ -1,24 +1,32 @@
 using System.Globalization;
-using System.Windows;
-using System.Windows.Media;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Core.Themes;
 
-namespace EcclesiaCast.App.Controls;
+namespace EcclesiaCast.Presentation.Rendering;
+
+/// <summary>The distance from each edge of the 1920×1080 canvas to a box on it.</summary>
+public readonly record struct TextMargin(double Left, double Top, double Right, double Bottom);
 
 /// <summary>Where the main text goes and at what size, for one slide.</summary>
-public readonly record struct SlideTextLayout(Thickness Margin, double Width, double Height, double FontSize, bool Readable);
+public readonly record struct SlideTextLayout(TextMargin Margin, double Width, double Height, double FontSize, bool Readable);
 
 /// <summary>
-/// How <see cref="SlideView"/> fits the words into their box. It lives apart
-/// from the control so the slide builder can ask the same question before a
-/// slide exists: does this verse fit at a size people can read, or does it
-/// need to be split over two slides?
+/// How the slide view fits the words into their box. It lives apart from the
+/// control so the slide builder can ask the same question before a slide
+/// exists: does this verse fit at a size people can read, or does it need to
+/// be split over two slides? The sum is one for both interfaces; each one only
+/// measures the text, through <see cref="ITextMetrics"/>.
 /// </summary>
 public static class SlideTextFit
 {
     public const double CanvasWidth = 1920;
     public const double CanvasHeight = 1080;
+
+    /// <summary>The OpenType weight of normal letters.</summary>
+    public const int NormalWeight = 400;
+
+    /// <summary>The weight a «bold» theme is drawn with: semibold, not bold.</summary>
+    public const int BoldWeight = 600;
 
     /// <summary>Gap between the two Bible versions.</summary>
     public const double SecondarySpacing = 50;
@@ -41,16 +49,16 @@ public static class SlideTextFit
     /// (and the second version, if any) fits there. <see cref="SlideTextLayout.Readable"/>
     /// is false when that took going under the theme's minimum.
     /// </summary>
-    public static SlideTextLayout Fit(SlideContent? slide, string? main, string? secondary, double pixelsPerDip)
+    public static SlideTextLayout Fit(ITextMetrics metrics, SlideContent? slide, string? main, string? secondary, double pixelsPerDip)
     {
-        var (style, margin, width, height) = Prepare(slide, pixelsPerDip);
+        var (style, margin, width, height) = Prepare(metrics, slide, pixelsPerDip);
         var maxSize = style.MaxFontSize;
         if (string.IsNullOrEmpty(main))
             return new SlideTextLayout(margin, width, height, maxSize, true);
 
         var minSize = MinimumSize(style);
 
-        bool FitsAt(double size) => Fits(style, main, secondary, size, width, height, pixelsPerDip);
+        bool FitsAt(double size) => Fits(metrics, style, main, secondary, size, width, height, pixelsPerDip);
 
         // Sizes go down from the preferred one in steps of 2; a bigger size
         // never fits where a smaller one doesn't, so halving the range finds
@@ -95,19 +103,19 @@ public static class SlideTextFit
     /// bigger. One measure, against the handful of finding the exact size:
     /// the slide builder asks this of every verse in a chapter.
     /// </summary>
-    public static bool IsReadable(SlideContent slide, string? main, string? secondary)
+    public static bool IsReadable(ITextMetrics metrics, SlideContent slide, string? main, string? secondary)
     {
-        var (style, _, width, height) = Prepare(slide, 1.0);
+        var (style, _, width, height) = Prepare(metrics, slide, 1.0);
         return string.IsNullOrEmpty(main) || style.FitToWidth
-            || Fits(style, main, secondary, MinimumSize(style), width, height, 1.0);
+            || Fits(metrics, style, main, secondary, MinimumSize(style), width, height, 1.0);
     }
 
-    private static (Style Style, Thickness Margin, double Width, double Height) Prepare(
-        SlideContent? slide, double pixelsPerDip)
+    private static (Style Style, TextMargin Margin, double Width, double Height) Prepare(
+        ITextMetrics metrics, SlideContent? slide, double pixelsPerDip)
     {
         var style = new Style(slide);
         var hasCaption = style.Theme.ShowCaption && !string.IsNullOrEmpty(slide?.Caption);
-        var (margin, width, height) = TextArea(style, hasCaption ? slide!.Caption : null, pixelsPerDip);
+        var (margin, width, height) = TextArea(metrics, style, hasCaption ? slide!.Caption : null, pixelsPerDip);
         return (style, margin, width, height);
     }
 
@@ -125,7 +133,7 @@ public static class SlideTextFit
     /// the two keep walking together.
     /// </summary>
     public static IReadOnlyList<(string Main, string? Secondary)> SplitToFit(
-        SlideContent slide, Func<string, string>? label = null, Func<string, string>? secondaryLabel = null,
+        ITextMetrics metrics, SlideContent slide, Func<string, string>? label = null, Func<string, string>? secondaryLabel = null,
         int maxParts = 6)
     {
         label ??= text => text;
@@ -153,7 +161,7 @@ public static class SlideTextFit
                 .Select((text, i) => (label(text), seconds is null ? null : secondaryLabel(seconds[i])))
                 .ToList();
 
-            var readable = parts.All(p => IsReadable(slide, ApplyCase(p.Item1, slide), ApplyCase(p.Item2, slide)));
+            var readable = parts.All(p => IsReadable(metrics, slide, ApplyCase(p.Item1, slide), ApplyCase(p.Item2, slide)));
             if (readable)
                 break;
         }
@@ -252,7 +260,8 @@ public static class SlideTextFit
     /// theme's box, else the theme margins. Either way it keeps clear of the
     /// caption, so the reference and the verse never sit on each other.
     /// </summary>
-    private static (Thickness Margin, double Width, double Height) TextArea(Style style, string? caption, double pixelsPerDip)
+    private static (TextMargin Margin, double Width, double Height) TextArea(
+        ITextMetrics metrics, Style style, string? caption, double pixelsPerDip)
     {
         var theme = style.Theme;
         var over = style.Override;
@@ -269,7 +278,7 @@ public static class SlideTextFit
             var w = Math.Clamp(bw.Value, 100, CanvasWidth - x);
             var h = Math.Clamp(bh.Value, 60, CanvasHeight - y);
 
-            if (caption is not null && CaptionBounds(theme, caption, pixelsPerDip) is var c
+            if (caption is not null && CaptionBounds(metrics, theme, caption, pixelsPerDip) is var c
                 && c.Left < x + w && c.Right > x && c.Top < y + h && c.Bottom > y)
             {
                 // The box was drawn over the caption: give the caption its
@@ -287,7 +296,7 @@ public static class SlideTextFit
             }
 
             (x, y, w, h) = AvoidExtraBoxes(over, x, y, w, h);
-            return (new Thickness(x, y, CanvasWidth - x - w, CanvasHeight - y - h), w, h);
+            return (new TextMargin(x, y, CanvasWidth - x - w, CanvasHeight - y - h), w, h);
         }
 
         var marginTop = theme.MarginVertical;
@@ -305,14 +314,14 @@ public static class SlideTextFit
         var height = Math.Max(150, CanvasHeight - marginTop - marginBottom);
 
         var (ax, ay, aw, ah) = AvoidExtraBoxes(over, theme.MarginHorizontal, marginTop, width, height);
-        return (new Thickness(ax, ay, CanvasWidth - ax - aw, CanvasHeight - ay - ah), aw, ah);
+        return (new TextMargin(ax, ay, CanvasWidth - ax - aw, CanvasHeight - ay - ah), aw, ah);
     }
 
     /// <summary>
     /// Takes the area the slide's extra text boxes occupy out of the words'
     /// area (see <see cref="TextAreaCarver"/>): without it a long verse was
     /// drawn right over a box sitting under it. The boxes are measured at the
-    /// size <see cref="SlideView"/> draws them.
+    /// size the slide view draws them.
     /// </summary>
     private static (double X, double Y, double W, double H) AvoidExtraBoxes(
         SlideOverride? over, double x, double y, double w, double h)
@@ -326,16 +335,17 @@ public static class SlideTextFit
         return (carved.X, carved.Y, carved.W, carved.H);
     }
 
-    /// <summary>Where <see cref="SlideView"/> draws the caption, on the 1920×1080 canvas.</summary>
-    private static Rect CaptionBounds(SlideTheme theme, string caption, double pixelsPerDip)
+    /// <summary>Where the slide view draws the caption, on the 1920×1080 canvas.</summary>
+    private static (double Left, double Top, double Right, double Bottom) CaptionBounds(
+        ITextMetrics metrics, SlideTheme theme, string caption, double pixelsPerDip)
     {
-        var text = new FormattedText(
-            caption, CultureInfo.CurrentCulture, FlowDirection.LeftToRight,
-            new Typeface(theme.CaptionFontFamily ?? theme.FontFamily),
-            theme.CaptionFontSize, Brushes.White, pixelsPerDip);
+        // The caption is measured in plain letters, whatever the theme's weight.
+        var text = metrics.Measure(
+            caption, theme.CaptionFontFamily ?? theme.FontFamily, NormalWeight, false,
+            theme.CaptionFontSize, double.PositiveInfinity, null, pixelsPerDip);
 
         var inset = theme.MarginVertical * 0.5;
-        var width = Math.Min(text.WidthIncludingTrailingWhitespace, CanvasWidth - 2 * theme.MarginHorizontal);
+        var width = Math.Min(text.Width, CanvasWidth - 2 * theme.MarginHorizontal);
         var left = theme.CaptionPosition switch
         {
             CaptionPosition.TopLeft or CaptionPosition.BottomLeft => theme.MarginHorizontal,
@@ -343,60 +353,51 @@ public static class SlideTextFit
             _ => CanvasWidth - theme.MarginHorizontal - width,
         };
         var top = IsCaptionOnTop(theme.CaptionPosition) ? inset : CanvasHeight - inset - text.Height;
-        return new Rect(left, top, width, text.Height);
+        return (left, top, left + width, top + text.Height);
     }
 
     public static bool IsCaptionOnTop(CaptionPosition position) =>
         position is CaptionPosition.TopLeft or CaptionPosition.TopCenter or CaptionPosition.TopRight;
 
-    private static bool Fits(Style style, string main, string? secondary, double size,
+    private static bool Fits(ITextMetrics metrics, Style style, string main, string? secondary, double size,
         double width, double height, double pixelsPerDip)
     {
-        var mainHeight = MeasureHeight(style, main, size, width, pixelsPerDip);
+        var mainHeight = MeasureHeight(metrics, style, main, size, width, pixelsPerDip);
         if (mainHeight > height)
             return false;
-        if (style.FitToWidth && WidestLine(style, main, size, pixelsPerDip) > width)
+        if (style.FitToWidth && WidestLine(metrics, style, main, size, pixelsPerDip) > width)
             return false;
 
         if (string.IsNullOrEmpty(secondary))
             return true;
 
         var secondarySize = Math.Max(20, size * style.SecondaryScale);
-        if (MeasureHeight(style, secondary, secondarySize, width, pixelsPerDip) + SecondarySpacing > height - mainHeight)
+        if (MeasureHeight(metrics, style, secondary, secondarySize, width, pixelsPerDip) + SecondarySpacing > height - mainHeight)
             return false;
-        return !style.FitToWidth || WidestLine(style, secondary, secondarySize, pixelsPerDip) <= width;
+        return !style.FitToWidth || WidestLine(metrics, style, secondary, secondarySize, pixelsPerDip) <= width;
     }
 
     /// <summary>Width of the longest line (split on hard breaks) at a given size, unwrapped.</summary>
-    private static double WidestLine(Style style, string text, double fontSize, double pixelsPerDip)
+    private static double WidestLine(ITextMetrics metrics, Style style, string text, double fontSize, double pixelsPerDip)
     {
         var widest = 0d;
         foreach (var line in text.Split('\n'))
         {
-            var formatted = Format(style, line.Length == 0 ? " " : line, fontSize, double.PositiveInfinity, pixelsPerDip);
-            widest = Math.Max(widest, formatted.WidthIncludingTrailingWhitespace);
+            var measured = Format(metrics, style, line.Length == 0 ? " " : line, fontSize, double.PositiveInfinity, pixelsPerDip);
+            widest = Math.Max(widest, measured.Width);
         }
         return widest;
     }
 
-    private static double MeasureHeight(Style style, string text, double fontSize, double maxWidth, double pixelsPerDip) =>
-        Format(style, text, fontSize, maxWidth, pixelsPerDip).Height;
+    private static double MeasureHeight(ITextMetrics metrics, Style style, string text, double fontSize, double maxWidth, double pixelsPerDip) =>
+        Format(metrics, style, text, fontSize, maxWidth, pixelsPerDip).Height;
 
-    private static FormattedText Format(Style style, string text, double fontSize, double maxWidth, double pixelsPerDip)
+    private static TextMeasure Format(ITextMetrics metrics, Style style, string text, double fontSize, double maxWidth, double pixelsPerDip)
     {
-        var formatted = new FormattedText(
-            text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight,
-            style.Typeface, fontSize, Brushes.White, pixelsPerDip);
-
-        if (!double.IsPositiveInfinity(maxWidth))
-            formatted.MaxTextWidth = maxWidth;
-
-        // Same line height the TextBlock uses, or the measure and the screen
-        // disagree as soon as a slide has its own line spacing.
-        if (style.LineSpacing is double spacing && spacing > 0)
-            formatted.LineHeight = fontSize * spacing;
-
-        return formatted;
+        // Same line height the text on the screen uses, or the measure and
+        // the screen disagree as soon as a slide has its own line spacing.
+        double? lineHeight = style.LineSpacing is double spacing && spacing > 0 ? fontSize * spacing : null;
+        return metrics.Measure(text, style.FontFamily, style.Weight, style.Italic, fontSize, maxWidth, lineHeight, pixelsPerDip);
     }
 
     /// <summary>The theme with the slide's own changes applied.</summary>
@@ -410,12 +411,8 @@ public static class SlideTextFit
         public double? LineSpacing => Override?.LineSpacing;
         public double SecondaryScale => Theme.SecondaryMatchesPrimary ? 1.0 : Theme.SecondaryScale;
 
-        private Typeface? _typeface;
-
-        public Typeface Typeface => _typeface ??= new(
-            new FontFamily(Override?.FontFamily ?? Theme.FontFamily),
-            (Override?.Italic ?? Theme.Italic) ? FontStyles.Italic : FontStyles.Normal,
-            (Override?.Bold ?? Theme.Bold) ? FontWeights.SemiBold : FontWeights.Normal,
-            FontStretches.Normal);
+        public string FontFamily => Override?.FontFamily ?? Theme.FontFamily;
+        public bool Italic => Override?.Italic ?? Theme.Italic;
+        public int Weight => (Override?.Bold ?? Theme.Bold) ? BoldWeight : NormalWeight;
     }
 }

@@ -9,11 +9,13 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using EcclesiaCast.App.Platform;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Logos;
 using EcclesiaCast.Core.Media;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Core.Themes;
+using EcclesiaCast.Presentation.Rendering;
 
 namespace EcclesiaCast.App.Controls;
 
@@ -532,8 +534,8 @@ public partial class SlideView : UserControl
         MainText.TextWrapping = wrapping;
         SecondaryText.TextWrapping = wrapping;
 
-        var fit = SlideTextFit.Fit(Slide, main, secondary, VisualTreeHelper.GetDpi(this).PixelsPerDip);
-        TextLayer.Margin = fit.Margin;
+        var fit = SlideTextFit.Fit(WpfTextMetrics.Instance, Slide, main, secondary, VisualTreeHelper.GetDpi(this).PixelsPerDip);
+        TextLayer.Margin = new Thickness(fit.Margin.Left, fit.Margin.Top, fit.Margin.Right, fit.Margin.Bottom);
         MainText.FontSize = fit.FontSize;
         var secondaryScale = theme.SecondaryMatchesPrimary ? 1.0 : theme.SecondaryScale;
         SecondaryText.FontSize = Math.Max(20, fit.FontSize * secondaryScale);
