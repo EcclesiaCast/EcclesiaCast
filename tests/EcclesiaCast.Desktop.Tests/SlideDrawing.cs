@@ -20,9 +20,13 @@ internal sealed class SlideDrawing : IDisposable
 
     private readonly Window _window;
 
+    /// <summary>The 1920×1080 black grid that holds the content; the bench measures against it.</summary>
+    public Grid Host { get; }
+
     public SlideDrawing(Control content)
     {
         var host = new Grid { Width = Width, Height = Height, Background = Brushes.Black, ClipToBounds = true };
+        Host = host;
         host.Children.Add(content);
         _window = new Window { Width = Width, Height = Height, Content = host };
         _window.Show();
