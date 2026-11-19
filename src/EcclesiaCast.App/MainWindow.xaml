@@ -2095,6 +2095,7 @@
                                                     ToolTip="Clic en una palabra: se resalta esa en la pantalla · Arrastrá sobre varias: se resalta la frase · Shift: suma otra marca sin sacar las anteriores · Clic otra vez sobre lo resaltado: se quita"
                                                     State="{Binding Projection.State}"
                                                     Overlay="{Binding Projection.Overlay}"
+                                                    NamePlate="{Binding Projection.NamePlate}"
                                                     OverlayFontFamily="{Binding Projection.OverlayFontFamily}"
                                                     OverlayFontSize="{Binding Projection.OverlayFontSize}"
                                                     Countdown="{Binding Projection.Countdown}"
@@ -2138,6 +2139,10 @@
                                          Style="{StaticResource TabButton}" GroupName="WriteTab" Margin="4,0,0,0"
                                          AutomationProperties.Name="Aviso al pie"
                                          ToolTip="Una franja al pie de la pantalla, encima de todo lo demás"/>
+                            <RadioButton x:Name="TabPlates" Content="Placas"
+                                         Style="{StaticResource TabButton}" GroupName="WriteTab" Margin="4,0,0,0"
+                                         AutomationProperties.Name="Placas de nombre"
+                                         ToolTip="Placas de nombre («lower third»): quién predica o canta, en una tarjeta abajo a la izquierda, en el proyector y en la transmisión"/>
                             <RadioButton x:Name="TabHighlight" Content="Resaltar"
                                          Style="{StaticResource TabButton}" GroupName="WriteTab" Margin="4,0,0,0"
                                          AutomationProperties.Name="Resaltar"
@@ -2252,6 +2257,109 @@
                                         <KeyBinding Key="Enter" Modifiers="Control" Command="{Binding ShowOverlayCommand}"/>
                                     </TextBox.InputBindings>
                                 </TextBox>
+                            </DockPanel>
+
+                            <!-- ── Placas de nombre («lower third», GitHub #37) ── -->
+                            <DockPanel Visibility="{Binding IsChecked, ElementName=TabPlates, Converter={StaticResource BoolToVis}}">
+                                <TextBlock DockPanel.Dock="Top"
+                                           Style="{StaticResource LearningHint}"
+                                           Text="Una tarjeta abajo a la izquierda con el nombre de quien habla o canta. Sale en el proyector y en la transmisión, y queda guardada en la lista para la próxima."
+                                           FontSize="11" Foreground="{StaticResource FaintBrush}"
+                                           TextWrapping="Wrap" Margin="12,0,12,8"/>
+                                <StackPanel DockPanel.Dock="Top" Margin="12,0,12,0">
+                                    <TextBlock Text="Nombre" Foreground="{StaticResource MutedBrush}" FontSize="11" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding NamePlateName, UpdateSourceTrigger=PropertyChanged}"
+                                             Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                                             BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
+                                             Padding="8,5" FontSize="14"
+                                             AutomationProperties.Name="Nombre de la placa"
+                                             ToolTip="Ej: «Pastor Juan Pérez» · Enter la muestra">
+                                        <TextBox.InputBindings>
+                                            <KeyBinding Key="Enter" Command="{Binding ShowNamePlateCommand}"/>
+                                        </TextBox.InputBindings>
+                                    </TextBox>
+                                    <TextBlock Text="Cargo o detalle (opcional)" Foreground="{StaticResource MutedBrush}" FontSize="11" Margin="0,8,0,4"/>
+                                    <TextBox Text="{Binding NamePlateRole, UpdateSourceTrigger=PropertyChanged}"
+                                             Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                                             BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
+                                             Padding="8,5" FontSize="13"
+                                             AutomationProperties.Name="Cargo de la placa"
+                                             ToolTip="Ej: «Predicación», «Alabanza», «Iglesia invitada» · Enter la muestra">
+                                        <TextBox.InputBindings>
+                                            <KeyBinding Key="Enter" Command="{Binding ShowNamePlateCommand}"/>
+                                        </TextBox.InputBindings>
+                                    </TextBox>
+                                    <DockPanel Margin="0,10,0,0">
+                                        <ComboBox DockPanel.Dock="Right" Width="118" FontSize="11" VerticalAlignment="Center"
+                                                  SelectedIndex="{Binding NamePlateAutoHide}"
+                                                  AutomationProperties.Name="Cuánto dura la placa"
+                                                  ToolTip="Cuánto queda la placa en pantalla">
+                                            <ComboBoxItem Content="Hasta quitarla"/>
+                                            <ComboBoxItem Content="Se va a los 5 s"/>
+                                            <ComboBoxItem Content="Se va a los 10 s"/>
+                                            <ComboBoxItem Content="Se va a los 15 s"/>
+                                        </ComboBox>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="Mostrar" Command="{Binding ShowNamePlateCommand}" Padding="14,7"
+                                                    ToolTip="Pone la placa en pantalla (Enter en el nombre hace lo mismo)">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsNamePlateActive}" Value="True">
+                                                                <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                                                <Setter Property="BorderThickness" Value="0"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                            <Button Content="Quitar" Style="{StaticResource DarkButton}" Padding="14,7" Margin="6,0,0,0"
+                                                    Command="{Binding HideNamePlateCommand}"
+                                                    ToolTip="Saca la placa de la pantalla"/>
+                                        </StackPanel>
+                                    </DockPanel>
+                                    <TextBlock Text="Guardadas · doble clic para mostrar" Foreground="{StaticResource MutedBrush}"
+                                               FontSize="11" Margin="0,12,0,4"/>
+                                </StackPanel>
+                                <Grid Margin="12,0,12,12">
+                                    <ListBox x:Name="SavedPlatesList" ItemsSource="{Binding SavedNamePlates}"
+                                             SelectedItem="{Binding SelectedSavedNamePlate}"
+                                             MouseDoubleClick="SavedPlatesList_MouseDoubleClick"
+                                             Background="Transparent" BorderThickness="0"
+                                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                             AutomationProperties.Name="Placas guardadas">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <DockPanel>
+                                                    <Button DockPanel.Dock="Right" Content="🗑" FontSize="10" Padding="5,1"
+                                                            Style="{StaticResource DarkButton}"
+                                                            Command="{Binding DataContext.RemoveSavedNamePlateCommand, ElementName=SavedPlatesList}"
+                                                            CommandParameter="{Binding}"
+                                                            AutomationProperties.Name="Borrar de la lista"
+                                                            ToolTip="Borrar esta placa de la lista"/>
+                                                    <StackPanel Margin="0,1,6,1">
+                                                        <TextBlock Text="{Binding Name}" FontSize="13" Foreground="White"
+                                                                   TextTrimming="CharacterEllipsis"/>
+                                                        <TextBlock Text="{Binding Role}" FontSize="11" Foreground="{StaticResource MutedBrush}"
+                                                                   TextTrimming="CharacterEllipsis"/>
+                                                    </StackPanel>
+                                                </DockPanel>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                    <TextBlock Text="Las placas que muestres quedan acá." IsHitTestVisible="False">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource PlaceholderText}">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding SavedNamePlates.Count}" Value="0">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
                             </DockPanel>
 
                             <!-- ── Resaltar en vivo ── -->

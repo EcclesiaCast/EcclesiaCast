@@ -425,6 +425,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         LoadStageLayouts();
         LoadSongMaxLines();
         LoadSlidesOrderLock();
+        LoadNamePlates();
         LoadLowPerformance();
         LoadOutputVolume();
         LoadMeetingSections();

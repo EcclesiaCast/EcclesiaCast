@@ -59,6 +59,23 @@ public sealed class PresentationService : IPresentationService
         OnChanged();
     }
 
+    public NamePlate? NamePlate { get; private set; }
+
+    public void ShowNamePlate(NamePlate plate)
+    {
+        NamePlate = plate;
+        OnChanged();
+    }
+
+    public void HideNamePlate()
+    {
+        if (NamePlate is null)
+            return;
+
+        NamePlate = null;
+        OnChanged();
+    }
+
     public HighlightSet Highlight { get; private set; } = HighlightSet.None;
 
     public void SetHighlight(HighlightSet highlight)

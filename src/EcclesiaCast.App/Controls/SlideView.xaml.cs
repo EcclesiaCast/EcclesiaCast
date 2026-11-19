@@ -1074,6 +1074,8 @@ public partial class SlideView : UserControl
         {
             OverlayText.Text = Overlay!;
             OverlayLayer.Visibility = Visibility.Visible;
+            if (NamePlateLayer.Visibility == Visibility.Visible)
+                PlaceNamePlate();
             if (AnimateTransitions)
             {
                 FadeIn(OverlayLayer);
@@ -1097,6 +1099,8 @@ public partial class SlideView : UserControl
             OverlayLayer.Opacity = 1;
             OverlayLayer.Visibility = Visibility.Collapsed;
             OverlayText.Text = string.Empty;
+            if (NamePlateLayer.Visibility == Visibility.Visible)
+                PlaceNamePlate();
         }
 
         if (AnimateTransitions && OverlayLayer.Visibility == Visibility.Visible)

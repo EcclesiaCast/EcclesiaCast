@@ -94,6 +94,14 @@ public interface IPresentationService
 
     void HideOverlay();
 
+    /// <summary>The name plate on the screen (a «lower third»), or null.</summary>
+    NamePlate? NamePlate { get; }
+
+    /// <summary>Shows who is speaking at the bottom left, over everything.</summary>
+    void ShowNamePlate(NamePlate plate);
+
+    void HideNamePlate();
+
     /// <summary>Sets what is marked in the projected text; <see cref="HighlightSet.None"/> clears it.</summary>
     void SetHighlight(HighlightSet highlight);
 

@@ -121,7 +121,9 @@ public sealed record RemoteOutput(
     RemoteOutputMedia? Media = null,
     BroadcastStyle? Style = null,
     string Label = "",
-    bool Blank = false);
+    bool Blank = false,
+    string PlateName = "",
+    string PlateRole = "");
 
 /// <summary>
 /// The picture or video that is alone on the screen, for the announcements page

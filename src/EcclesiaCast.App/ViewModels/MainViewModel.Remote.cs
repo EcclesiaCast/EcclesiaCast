@@ -276,7 +276,11 @@ public sealed partial class MainViewModel
                 OnAirSource.Song => (Projection.SlideLabel ?? string.Empty).ToUpperInvariant(),
                 OnAirSource.Bible => slide?.Caption ?? string.Empty,
                 _ => string.Empty,
-            });
+            },
+            // The name plate goes where the «aviso al pie» goes: the page with
+            // everything and the announcements page.
+            PlateName: overlays && IsProjecting ? _presentation.NamePlate?.Name ?? string.Empty : string.Empty,
+            PlateRole: overlays && IsProjecting ? _presentation.NamePlate?.Role ?? string.Empty : string.Empty);
 
         static IReadOnlyList<int[]> Marks(IReadOnlyList<TextSpan> spans) =>
             spans.Select(s => new[] { s.Start, s.Length }).ToList();

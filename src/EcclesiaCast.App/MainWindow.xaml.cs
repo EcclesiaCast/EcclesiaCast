@@ -1575,6 +1575,15 @@ public partial class MainWindow : Window
         menu.IsOpen = true;
     }
 
+    /// <summary>Double click on a saved name plate: it goes on the screen.</summary>
+    private void SavedPlatesList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (DataContext is MainViewModel vm
+            && e.OriginalSource is DependencyObject source
+            && ItemsControl.ContainerFromElement(SavedPlatesList, source) is ListBoxItem { DataContext: EcclesiaCast.Core.Presentation.NamePlate plate })
+            vm.ShowSavedNamePlateCommand.Execute(plate);
+    }
+
     /// <summary>Two quick blinks of the lock, to show where it is.</summary>
     private void BlinkSlidesLock()
     {

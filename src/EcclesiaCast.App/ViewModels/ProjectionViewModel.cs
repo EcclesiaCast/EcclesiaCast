@@ -19,6 +19,10 @@ public sealed partial class ProjectionViewModel : ObservableObject
     [ObservableProperty]
     private string? _overlay;
 
+    /// <summary>The name plate on the screen («lower third»), or null.</summary>
+    [ObservableProperty]
+    private NamePlate? _namePlate;
+
     [ObservableProperty]
     private HighlightSet _highlight = HighlightSet.None;
 
@@ -113,6 +117,7 @@ public sealed partial class ProjectionViewModel : ObservableObject
         Slide = presentation.CurrentSlide;
         State = presentation.State;
         Overlay = presentation.OverlayMessage;
+        NamePlate = presentation.NamePlate;
         Highlight = presentation.Highlight;
         Background = presentation.Background;
         BackgroundBlur = presentation.Background?.Blur ?? 0;
