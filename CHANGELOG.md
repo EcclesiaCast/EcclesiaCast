@@ -30,6 +30,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   letra y dónde corta cada renglón pasó a la parte común, y la versión de Mac ya dibuja la
   diapositiva y los recuadros del escenario con esa misma cuenta, con tres fuentes libres
   incluidas (Selawik, Carlito y Anton) para cuando falta la del tema.
+- Por dentro, sin cambios para quien usa el programa: la versión de Mac dibuja las mismas 65
+  diapositivas de prueba y un comparador dice caso por caso si la letra se ve igual que en Windows.
 
 ## [1.4.0] - 2026-11-17
 

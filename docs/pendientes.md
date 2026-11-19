@@ -853,6 +853,19 @@ iglesia (11:22–12:53): ningún error ni cierre.
     (carpeta que git ignora; el resultado está en `resultado.txt`). Las
     medidas de referencia, ya guardadas, están en
     `tests/casos-de-render/referencia-wpf/`.
+  - **Banco de Avalonia y comparador** (tanda 12): `dotnet test
+    tests/EcclesiaCast.Desktop.Tests` dibuja los 65 casos en los 3 temas más
+    `selawik` (sólo de este banco) con Avalonia en memoria, sin ventana. Deja
+    imágenes y medidas en `artifacts/render/avalonia/<windows|mac>/`. La misma
+    corrida arma el comparador (`tests/EcclesiaCast.RenderCompare`): el
+    informe queda en `artifacts/render/comparacion/informe.html` y el
+    `resumen.txt` al lado. Compara WPF contra Avalonia en Windows (los casos
+    que no pasan salen con las dos imágenes lado a lado; las de WPF aparecen
+    si antes se corrió su banco) y, si está la carpeta `mac/`, Windows contra
+    Mac en `selawik`, que tiene que dar idéntico. GitHub corre el banco en
+    Windows y en Mac y deja `artifacts/render/avalonia/` como adjunto de la
+    corrida (`render-avalonia-windows` y `render-avalonia-mac`): bajar el de
+    Mac y ponerlo en `artifacts/render/avalonia/mac/` para comparar.
 - **Ideas tomadas de G-Presenter** (gpresenter.com, mirado el 28/10/2026;
   Alexis dijo que sí a las seis, para más adelante):
   1. **Cámara o capturadora como diapositiva**, o de fondo detrás de la letra
