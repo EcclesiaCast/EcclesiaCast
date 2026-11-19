@@ -26,6 +26,10 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   Estilos de la transmisión, el diseñador del escenario, el diseñador de canciones y lo que la
   ventana principal recuerda de un servicio a otro (tamaños, lugares, bloques plegados)
   pasó a la parte común (con pruebas), para que la versión de Mac no tenga que repetirlo.
+- Por dentro, sin cambios para quien usa el programa: la cuenta que elige el tamaño de la
+  letra y dónde corta cada renglón pasó a la parte común, y la versión de Mac ya dibuja la
+  diapositiva y los recuadros del escenario con esa misma cuenta, con tres fuentes libres
+  incluidas (Selawik, Carlito y Anton) para cuando falta la del tema.
 
 ## [1.4.0] - 2026-11-17
 
