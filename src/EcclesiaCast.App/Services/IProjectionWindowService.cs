@@ -24,6 +24,9 @@ public interface IProjectionWindowService
     /// <summary>Raised when the projected video finishes without looping.</summary>
     event EventHandler? VideoEnded;
 
+    /// <summary>YouTube refused the projected video; the number is the player's error.</summary>
+    event EventHandler<int>? YouTubeRefused;
+
     /// <summary>
     /// Raised when the operator double-clicks the output while it covers the
     /// operator panel (a single screen): they want the panel back.

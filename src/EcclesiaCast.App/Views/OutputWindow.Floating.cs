@@ -208,6 +208,7 @@ public partial class OutputWindow
 
         menu.Items.Add(ShapeItem("Forma: 16:9 (pantalla ancha)", OutputShape.Wide, shape));
         menu.Items.Add(ShapeItem("Forma: 4:3 (proyector cuadrado)", OutputShape.Classic, shape));
+        menu.Items.Add(ShapeItem("Forma: 9:16 (vertical)", OutputShape.Vertical, shape));
         menu.Items.Add(new Separator());
 
         foreach (var size in FloatingOutput.QuickSizes(shape))

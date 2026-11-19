@@ -1,0 +1,238 @@
+<Window x:Class="EcclesiaCast.App.Views.NamePlateDesignerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:EcclesiaCast.App.Controls"
+        Title="Estilos de placa"
+        Width="1180" Height="780" MinWidth="980" MinHeight="620"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BgBrush}"
+        FontFamily="Segoe UI">
+    <!-- Los estilos de las placas de nombre (GitHub #37, pedido del 19/11): a la izquierda
+         la lista, en el medio cómo se ve, a la derecha todas las opciones. -->
+    <Window.Resources>
+        <Style x:Key="Section" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="Margin" Value="0,16,0,6"/>
+        </Style>
+        <Style x:Key="Label" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+        </Style>
+        <Style x:Key="Field" TargetType="TextBox">
+            <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
+            <Setter Property="CaretBrush" Value="White"/>
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="16">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="210"/>
+            <ColumnDefinition Width="14"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="14"/>
+            <ColumnDefinition Width="340"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ── Lista de estilos ── -->
+        <Border Style="{StaticResource Panel}">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="ESTILOS" Style="{StaticResource PanelTitle}"/>
+                <StackPanel DockPanel.Dock="Bottom" Margin="8,6,8,10">
+                    <Button Content="➕ Nuevo estilo" Style="{StaticResource DarkButton}" Padding="8,6" Click="New_Click"
+                            ToolTip="Un estilo nuevo, empezando por el clásico"/>
+                    <Button Content="⧉ Duplicar" Style="{StaticResource DarkButton}" Padding="8,6" Margin="0,6,0,0" Click="Duplicate_Click"
+                            ToolTip="Una copia del estilo elegido, para probar cambios sin tocarlo"/>
+                    <Button x:Name="DeleteButton" Content="🗑 Borrar" Style="{StaticResource DarkButton}" Padding="8,6" Margin="0,6,0,0"
+                            Click="Delete_Click"
+                            ToolTip="Borra el estilo elegido. Las placas que lo usaban pasan al primero de la lista."/>
+                    <Button Content="↺ Volver a los estilos listos" Style="{StaticResource DarkButton}" Padding="8,6" Margin="0,14,0,0"
+                            FontSize="11" Click="Restore_Click"
+                            ToolTip="Vuelve a sumar los estilos que trae el programa (Clásica, Moderna, Noticias…) que se hayan borrado"/>
+                </StackPanel>
+                <ListBox x:Name="StyleList" Background="Transparent" BorderThickness="0" Foreground="White" FontSize="13"
+                         SelectionChanged="StyleList_SelectionChanged" Margin="6,0"/>
+            </DockPanel>
+        </Border>
+
+        <!-- ── Vista previa ── -->
+        <DockPanel Grid.Column="2">
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+                <Button Content="▶ Ver cómo entra" Style="{StaticResource DarkButton}" Padding="12,6" Click="PlayIn_Click"/>
+                <Button Content="◼ Ver cómo sale" Style="{StaticResource DarkButton}" Padding="12,6" Margin="8,0,0,0" Click="PlayOut_Click"/>
+            </StackPanel>
+            <TextBlock DockPanel.Dock="Top" TextWrapping="Wrap" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,8"
+                       Text="Así se ve la placa sobre la pantalla. Los cambios se ven al instante; «Guardar» los deja para todas las placas que usan este estilo."/>
+            <Border Background="#0B0D12" CornerRadius="6" BorderBrush="{StaticResource LineBrush}" BorderThickness="1">
+                <controls:AspectFitBox AspectRatio="1.7777" MaxBoxHeight="2000" VerticalAlignment="Center" Margin="10">
+                    <!-- Con una letra de ejemplo detrás, como en el proyector -->
+                    <controls:SlideView x:Name="Preview"/>
+                </controls:AspectFitBox>
+            </Border>
+        </DockPanel>
+
+        <!-- ── Opciones ── -->
+        <Border Grid.Column="4" Style="{StaticResource Panel}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="14,4,14,12">
+                <StackPanel>
+                    <TextBlock Text="NOMBRE DEL ESTILO" Style="{StaticResource Section}" Margin="0,8,0,6"/>
+                    <TextBox x:Name="NameBox" Style="{StaticResource Field}" TextChanged="Any_Changed"/>
+
+                    <TextBlock Text="DÓNDE SE VE" Style="{StaticResource Section}"/>
+                    <ComboBox x:Name="TargetBox" SelectionChanged="Any_Changed" FontSize="12">
+                        <ComboBoxItem Content="En el proyector y en la transmisión"/>
+                        <ComboBoxItem Content="Sólo en la transmisión (OBS)"/>
+                        <ComboBoxItem Content="Sólo en el proyector"/>
+                    </ComboBox>
+
+                    <TextBlock Text="RECUADRO" Style="{StaticResource Section}"/>
+                    <DockPanel>
+                        <TextBlock Text="Color" Style="{StaticResource Label}" Width="92"/>
+                        <Button DockPanel.Dock="Right" x:Name="BackSwatch" Width="30" Margin="6,0,0,0" Click="Pick_Click" Tag="BackColorBox"
+                                ToolTip="Elegir de una paleta"/>
+                        <TextBox x:Name="BackColorBox" Style="{StaticResource Field}" TextChanged="Any_Changed"/>
+                    </DockPanel>
+                    <DockPanel Margin="0,6,0,0">
+                        <TextBlock Text="Opacidad" Style="{StaticResource Label}" Width="92"/>
+                        <TextBlock DockPanel.Dock="Right" Text="{Binding Value, ElementName=OpacitySlider, StringFormat={}{0:0} %}"
+                                   Foreground="{StaticResource MutedBrush}" FontSize="11" Width="40" TextAlignment="Right" VerticalAlignment="Center"/>
+                        <Slider x:Name="OpacitySlider" Minimum="0" Maximum="100" IsMoveToPointEnabled="True" ValueChanged="Any_Changed"
+                                ToolTip="0: sin recuadro (sólo las letras)"/>
+                    </DockPanel>
+                    <DockPanel Margin="0,6,0,0">
+                        <TextBlock Text="Esquinas" Style="{StaticResource Label}" Width="92"/>
+                        <controls:NumericField x:Name="CornerField" Minimum="0" Maximum="80" Step="2" ValueChanged="Any_Changed"/>
+                    </DockPanel>
+                    <DockPanel Margin="0,6,0,0">
+                        <TextBlock Text="Ancho" Style="{StaticResource Label}" Width="92"/>
+                        <controls:NumericField x:Name="WidthField" Minimum="0" Maximum="1800" Step="20" ValueChanged="Any_Changed"
+                                               ToolTip="0: el ancho que pidan las palabras"/>
+                    </DockPanel>
+                    <DockPanel Margin="0,6,0,0">
+                        <TextBlock Text="Alto" Style="{StaticResource Label}" Width="92"/>
+                        <controls:NumericField x:Name="HeightField" Minimum="0" Maximum="600" Step="10" ValueChanged="Any_Changed"
+                                               ToolTip="0: el alto que pidan las palabras"/>
+                    </DockPanel>
+                    <TextBlock Text="0 en el ancho o el alto: se acomoda a las palabras." FontSize="11"
+                               Foreground="{StaticResource FaintBrush}" Margin="92,4,0,0" TextWrapping="Wrap"/>
+
+                    <TextBlock Text="FRANJA DE COLOR" Style="{StaticResource Section}"/>
+                    <DockPanel>
+                        <TextBlock Text="Dónde" Style="{StaticResource Label}" Width="92"/>
+                        <ComboBox x:Name="AccentBox" SelectionChanged="Any_Changed" FontSize="12">
+                            <ComboBoxItem Content="A la izquierda"/>
+                            <ComboBoxItem Content="Abajo"/>
+                            <ComboBoxItem Content="Arriba"/>
+                            <ComboBoxItem Content="Sin franja"/>
+                        </ComboBox>
+                    </DockPanel>
+                    <DockPanel Margin="0,6,0,0">
+                        <TextBlock Text="Color" Style="{StaticResource Label}" Width="92"/>
+                        <Button DockPanel.Dock="Right" x:Name="AccentSwatch" Width="30" Margin="6,0,0,0" Click="Pick_Click" Tag="AccentColorBox"
+                                ToolTip="Elegir de una paleta"/>
+                        <TextBox x:Name="AccentColorBox" Style="{StaticResource Field}" TextChanged="Any_Changed"/>
+                    </DockPanel>
+                    <DockPanel Margin="0,6,0,0">
+                        <TextBlock Text="Grosor" Style="{StaticResource Label}" Width="92"/>
+                        <controls:NumericField x:Name="AccentField" Minimum="0" Maximum="60" Step="2" ValueChanged="Any_Changed"/>
+                    </DockPanel>
+                    <CheckBox x:Name="NameOnAccentCheck" Content="El nombre sobre un bloque de este color" Foreground="White"
+                              FontSize="12" Margin="0,8,0,0" Checked="Any_Changed" Unchecked="Any_Changed"/>
+
+                    <TextBlock Text="LETRAS" Style="{StaticResource Section}"/>
+                    <DockPanel>
+                        <TextBlock Text="Tipografía" Style="{StaticResource Label}" Width="92"/>
+                        <ComboBox x:Name="FontBox" IsEditable="True" FontSize="12"
+                                  SelectionChanged="Any_Changed" LostFocus="Any_Changed"/>
+                    </DockPanel>
+                    <!-- Nombre y cargo: tamaño, color y paleta -->
+                    <DockPanel Margin="0,6,0,0">
+                        <TextBlock Text="Nombre" Style="{StaticResource Label}" Width="72"/>
+                        <controls:NumericField DockPanel.Dock="Left" Width="104" x:Name="NameSizeField" Minimum="20" Maximum="160" Step="2"
+                                               ValueChanged="Any_Changed" ToolTip="Tamaño del nombre"/>
+                        <Button DockPanel.Dock="Right" x:Name="NameSwatch" Width="30" Margin="6,0,0,0" Click="Pick_Click" Tag="NameColorBox"
+                                ToolTip="Color del nombre"/>
+                        <TextBox x:Name="NameColorBox" Style="{StaticResource Field}" Margin="6,0,0,0"
+                                 TextChanged="Any_Changed" ToolTip="Color del nombre"/>
+                    </DockPanel>
+                    <DockPanel Margin="0,6,0,0">
+                        <TextBlock Text="Cargo" Style="{StaticResource Label}" Width="72"/>
+                        <controls:NumericField DockPanel.Dock="Left" Width="104" x:Name="RoleSizeField" Minimum="14" Maximum="120" Step="2"
+                                               ValueChanged="Any_Changed" ToolTip="Tamaño del cargo"/>
+                        <Button DockPanel.Dock="Right" x:Name="RoleSwatch" Width="30" Margin="6,0,0,0" Click="Pick_Click" Tag="RoleColorBox"
+                                ToolTip="Color del cargo"/>
+                        <TextBox x:Name="RoleColorBox" Style="{StaticResource Field}" Margin="6,0,0,0"
+                                 TextChanged="Any_Changed" ToolTip="Color del cargo"/>
+                    </DockPanel>
+                    <WrapPanel Margin="0,8,0,0">
+                        <CheckBox x:Name="BoldCheck" Content="Nombre en negrita" Foreground="White" FontSize="12" Margin="0,0,14,6"
+                                  Checked="Any_Changed" Unchecked="Any_Changed"/>
+                        <CheckBox x:Name="UpperCheck" Content="Todo en mayúsculas" Foreground="White" FontSize="12" Margin="0,0,14,6"
+                                  Checked="Any_Changed" Unchecked="Any_Changed"/>
+                        <CheckBox x:Name="ShadowCheck" Content="Sombra" Foreground="White" FontSize="12" Margin="0,0,0,6"
+                                  Checked="Any_Changed" Unchecked="Any_Changed"
+                                  ToolTip="Una sombra suave detrás de las letras, para un estilo sin recuadro"/>
+                    </WrapPanel>
+
+                    <TextBlock Text="LUGAR" Style="{StaticResource Section}"/>
+                    <DockPanel>
+                        <TextBlock Text="Posición" Style="{StaticResource Label}" Width="92"/>
+                        <ComboBox x:Name="AlignBox" SelectionChanged="Any_Changed" FontSize="12">
+                            <ComboBoxItem Content="Abajo a la izquierda"/>
+                            <ComboBoxItem Content="Abajo al centro"/>
+                            <ComboBoxItem Content="Abajo a la derecha"/>
+                        </ComboBox>
+                    </DockPanel>
+                    <DockPanel Margin="0,6,0,0">
+                        <TextBlock Text="Desde abajo" Style="{StaticResource Label}" Width="92"/>
+                        <controls:NumericField x:Name="BottomField" Minimum="0" Maximum="900" Step="10" ValueChanged="Any_Changed"/>
+                    </DockPanel>
+                    <DockPanel Margin="0,6,0,0">
+                        <TextBlock Text="Del costado" Style="{StaticResource Label}" Width="92"/>
+                        <controls:NumericField x:Name="SideField" Minimum="0" Maximum="800" Step="10" ValueChanged="Any_Changed"/>
+                    </DockPanel>
+
+                    <TextBlock Text="MOVIMIENTO" Style="{StaticResource Section}"/>
+                    <DockPanel>
+                        <TextBlock Text="Entrada" Style="{StaticResource Label}" Width="92"/>
+                        <ComboBox x:Name="EnterBox" SelectionChanged="Any_Changed" FontSize="12"/>
+                    </DockPanel>
+                    <DockPanel Margin="92,4,0,0">
+                        <TextBlock DockPanel.Dock="Right" Text="milésimas" FontSize="11" Foreground="{StaticResource MutedBrush}"
+                                   VerticalAlignment="Center" Margin="8,0,0,0"/>
+                        <controls:NumericField x:Name="EnterMsField" Minimum="0" Maximum="3000" Step="50"
+                                               ValueChanged="Any_Changed" ToolTip="Cuánto tarda en entrar, en milésimas de segundo"/>
+                    </DockPanel>
+                    <DockPanel Margin="0,8,0,0">
+                        <TextBlock Text="Salida" Style="{StaticResource Label}" Width="92"/>
+                        <ComboBox x:Name="ExitBox" SelectionChanged="Any_Changed" FontSize="12"/>
+                    </DockPanel>
+                    <DockPanel Margin="92,4,0,0">
+                        <TextBlock DockPanel.Dock="Right" Text="milésimas" FontSize="11" Foreground="{StaticResource MutedBrush}"
+                                   VerticalAlignment="Center" Margin="8,0,0,0"/>
+                        <controls:NumericField x:Name="ExitMsField" Minimum="0" Maximum="3000" Step="50"
+                                               ValueChanged="Any_Changed" ToolTip="Cuánto tarda en irse, en milésimas de segundo"/>
+                    </DockPanel>
+                    <TextBlock Text="400 milésimas es casi medio segundo; 0, sin movimiento." FontSize="11"
+                               Foreground="{StaticResource FaintBrush}" Margin="92,4,0,0" TextWrapping="Wrap"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <StackPanel Grid.Row="1" Grid.ColumnSpan="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+            <Button Content="Cancelar" Style="{StaticResource DarkButton}" IsCancel="True" Padding="20,8"/>
+            <Button Content="Guardar" Style="{StaticResource AccentButton}" Padding="24,8" Margin="10,0,0,0" Click="Save_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

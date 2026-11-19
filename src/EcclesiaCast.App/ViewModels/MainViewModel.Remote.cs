@@ -249,7 +249,7 @@ public sealed partial class MainViewModel
 
         // The name plate goes where the «aviso al pie» goes: the page with
         // everything and the announcements page.
-        var plate = overlays && IsProjecting ? _presentation.NamePlate : null;
+        var plate = overlays && IsProjecting && _presentation.NamePlate is { Look.OnStream: true } shown ? shown : null;
         var plateFile = plate is null ? null : ((IRemoteHost)this).GetNamePlateFile();
 
         return new RemoteOutput(
@@ -289,13 +289,14 @@ public sealed partial class MainViewModel
             PlateImage: plateFile is null ? string.Empty : NamePlateMedia.IsVideo(plateFile) ? "video" : "imagen",
             PlateImageKey: plateFile is null ? string.Empty : PlateFileKey(plateFile),
             PlateImageRight: plate?.ImageRight == true,
-            PlateAnimation: plate?.Animation switch
+            PlateAnimation: plate?.Look.Enter switch
             {
                 NamePlateAnimation.Rise => "subir",
                 NamePlateAnimation.Wipe => "persiana",
                 NamePlateAnimation.Fade => "aparecer",
                 _ => "deslizar",
-            });
+            },
+            PlateStyle: plate?.Look);
 
         // The page asks for the picture again only when it is another file.
         static string PlateFileKey(string file) =>

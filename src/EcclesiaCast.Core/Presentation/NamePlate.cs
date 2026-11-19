@@ -13,14 +13,25 @@ namespace EcclesiaCast.Core.Presentation;
 /// moving logo); null for words only. A video loops with no sound.
 /// </param>
 /// <param name="ImageRight">The picture goes on the right of the words instead of the left.</param>
-/// <param name="Animation">How the card comes in (it always fades out).</param>
+/// <param name="StyleName">The name of its <see cref="NamePlateStyle"/> (look, movement, where it is seen).</param>
 public sealed record NamePlate(
     string Name,
     string Role = "",
     string? ImagePath = null,
     bool ImageRight = false,
-    NamePlateAnimation Animation = NamePlateAnimation.Slide)
+    string StyleName = "")
 {
+    /// <summary>
+    /// The style itself, filled in when the plate goes on the screen (the list
+    /// keeps only its name, so changing a style changes every plate that uses it).
+    /// </summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public NamePlateStyle? Style { get; init; }
+
+    /// <summary>The style to draw it with: its own, or the classic one.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public NamePlateStyle Look => Style ?? NamePlateStyle.Classic;
+
     public bool IsEmpty => string.IsNullOrWhiteSpace(Name) && string.IsNullOrWhiteSpace(Role);
 
     public bool HasImage => !string.IsNullOrWhiteSpace(ImagePath);
@@ -33,17 +44,17 @@ public sealed record NamePlate(
         string.IsNullOrWhiteSpace(Role) ? Name.Trim() : $"{Name.Trim()} · {Role.Trim()}";
 
     /// <summary>Both lines trimmed; null when nothing is left.</summary>
-    public static NamePlate? Clean(string? name, string? role) => Clean(name, role, null, false, NamePlateAnimation.Slide);
+    public static NamePlate? Clean(string? name, string? role) => Clean(name, role, null, false, null);
 
     /// <inheritdoc cref="Clean(string?, string?)"/>
-    public static NamePlate? Clean(string? name, string? role, string? imagePath, bool imageRight, NamePlateAnimation animation)
+    public static NamePlate? Clean(string? name, string? role, string? imagePath, bool imageRight, string? styleName)
     {
         var plate = new NamePlate(
             (name ?? "").Trim(),
             (role ?? "").Trim(),
             string.IsNullOrWhiteSpace(imagePath) ? null : imagePath.Trim(),
             imageRight,
-            Enum.IsDefined(animation) ? animation : NamePlateAnimation.Slide);
+            (styleName ?? "").Trim());
         return plate.IsEmpty ? null : plate;
     }
 }
@@ -73,6 +84,14 @@ public static class NamePlateMedia
         (NamePlateAnimation.Rise, "Subir desde abajo"),
         (NamePlateAnimation.Wipe, "Abrirse como persiana"),
         (NamePlateAnimation.Fade, "Sólo aparecer"),
+    ];
+
+    public static readonly IReadOnlyList<(NamePlateExit Exit, string Label)> Exits =
+    [
+        (NamePlateExit.Fade, "Desvanecerse"),
+        (NamePlateExit.Slide, "Irse hacia el costado"),
+        (NamePlateExit.Drop, "Bajar"),
+        (NamePlateExit.Wipe, "Cerrarse como persiana"),
     ];
 
     private static readonly HashSet<string> Images = new(StringComparer.OrdinalIgnoreCase)
@@ -112,7 +131,7 @@ public static class NamePlateList
         try
         {
             return (JsonSerializer.Deserialize<List<NamePlate>>(json) ?? [])
-                .Select(p => p is null ? null : NamePlate.Clean(p.Name, p.Role, p.ImagePath, p.ImageRight, p.Animation))
+                .Select(p => p is null ? null : NamePlate.Clean(p.Name, p.Role, p.ImagePath, p.ImageRight, p.StyleName))
                 .OfType<NamePlate>()
                 .Take(MaxPlates)
                 .ToList();

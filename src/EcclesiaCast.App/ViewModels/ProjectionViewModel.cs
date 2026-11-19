@@ -117,7 +117,8 @@ public sealed partial class ProjectionViewModel : ObservableObject
         Slide = presentation.CurrentSlide;
         State = presentation.State;
         Overlay = presentation.OverlayMessage;
-        NamePlate = presentation.NamePlate;
+        // A plate styled «sólo en la transmisión» stays off the projector (and so off LIVE).
+        NamePlate = presentation.NamePlate is { Look.OnProjector: true } plate ? plate : null;
         Highlight = presentation.Highlight;
         Background = presentation.Background;
         BackgroundBlur = presentation.Background?.Blur ?? 0;

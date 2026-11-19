@@ -22,9 +22,9 @@ public class NamePlateTests
     }
 
     [Fact]
-    public void The_picture_the_side_and_the_animation_are_kept_in_the_list()
+    public void The_picture_the_side_and_the_style_are_kept_in_the_list()
     {
-        var plate = new NamePlate("Juan Pérez", "Pastor", @"C:\Logos\iglesia.mp4", ImageRight: true, NamePlateAnimation.Wipe);
+        var plate = new NamePlate("Juan Pérez", "Pastor", @"C:\Logos\iglesia.mp4", ImageRight: true, "Prédica");
 
         var back = Assert.Single(NamePlateList.Parse(NamePlateList.ToSetting([plate])));
 
@@ -33,21 +33,27 @@ public class NamePlateTests
     }
 
     [Fact]
-    public void A_list_saved_before_pictures_existed_still_reads()
+    public void The_list_keeps_only_the_style_name_never_the_style()
     {
-        var back = Assert.Single(NamePlateList.Parse("""[{"Name":"Juan","Role":"Pastor"}]"""));
+        var plate = new NamePlate("Juan", "Pastor", StyleName: "Moderna") { Style = NamePlateStyle.Presets[1] };
 
-        Assert.Equal(new NamePlate("Juan", "Pastor"), back);
-        Assert.False(back.HasImage);
-        Assert.Equal(NamePlateAnimation.Slide, back.Animation);
+        var json = NamePlateList.ToSetting([plate]);
+
+        Assert.Contains("Moderna", json);
+        Assert.DoesNotContain("BackgroundColor", json);
+        Assert.Null(Assert.Single(NamePlateList.Parse(json)).Style);
     }
 
     [Fact]
-    public void A_nonsense_animation_falls_back_to_sliding()
+    public void A_list_saved_before_pictures_and_styles_existed_still_reads()
     {
-        var back = Assert.Single(NamePlateList.Parse("""[{"Name":"Juan","Animation":99}]"""));
+        // The first plates (18/11) had no picture; the next ones carried an «Animation».
+        var back = NamePlateList.Parse("""[{"Name":"Juan","Role":"Pastor"},{"Name":"Ana","Animation":2}]""");
 
-        Assert.Equal(NamePlateAnimation.Slide, back.Animation);
+        Assert.Equal(new NamePlate("Juan", "Pastor"), back[0]);
+        Assert.False(back[0].HasImage);
+        Assert.Equal("", back[1].StyleName);
+        Assert.Equal(NamePlateStyle.Classic, back[1].Look);
     }
 
     [Theory]

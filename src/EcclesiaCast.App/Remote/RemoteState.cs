@@ -134,7 +134,8 @@ public sealed record RemoteOutput(
     string PlateImage = "",
     string PlateImageKey = "",
     bool PlateImageRight = false,
-    string PlateAnimation = "");
+    string PlateAnimation = "",
+    EcclesiaCast.Core.Presentation.NamePlateStyle? PlateStyle = null);
 
 /// <summary>
 /// The picture or video that is alone on the screen, for the announcements page

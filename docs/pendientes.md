@@ -14,6 +14,31 @@ Hay cuatro tipos de cosas, cada una en su sección:
 
 ## 1. Para probar (lo prueba Alexis)
 
+### Pedidos de la prueba de la 1.5.0 prueba.1 (19/11/2026)
+
+Lo pidió Alexis después de probar la prueba.1. Claude lo hizo sin abrir el programa: compila, pasan
+las 1513 pruebas, el banco de render dibujó los seis estilos de placa, uno propio (ancho y alto
+fijos, a la derecha, franja arriba) y las tres salidas a mitad de camino, y la página de OBS se
+probó en el navegador con los seis estilos y la salida «persiana».
+
+- [ ] **YouTube con derechos de autor** («Rescate – El legado, otra oportunidad»): la pantalla tiene
+  que quedar en negro (sin el cartel de YouTube) y salir el aviso con «Descargar ahora», que baja el
+  video a Descargados.
+- [ ] **Calidad de los descargados:** bajar de nuevo un video y compararlo con el de antes (ahora
+  viene en H.264, unos 3,5 Mbps a 1080p en vez de 1,1 Mbps en AV1).
+- [ ] **Un solo volumen:** la barra «Volumen» debajo del EN VIVO tiene que mover un video local, la
+  música y **un YouTube** a la vez, de a 1 %, sin saltos.
+- [ ] **Vertical 9:16:** clic derecho en la ventana de salida → Forma → 9:16; probar los tamaños
+  rápidos. La letra sale chica en una franja al medio (se dibuja en 16:9): ver si alcanza así.
+- [ ] **Orden trabado:** con 🔒, Ctrl+Z, Ctrl+Y y ↶ ↷ no hacen nada y la barra lo explica.
+- [ ] **Menú Canciones → «Crear canción desde cero…».**
+- [ ] **Estilos de placa:** «✏ Diseñar…» en la pestaña Placas; crear uno, cambiar colores, ancho y
+  alto, franja, letras, lugar, entrada y salida; «▶ Ver cómo entra» y «◼ Ver cómo sale»; Guardar
+  y mostrar una placa con ese estilo. Probar «Sólo en la transmisión (OBS)»: en el proyector no se
+  tiene que ver, en OBS sí.
+- [ ] **Placa con un GIF animado:** «Elegir…» → un GIF; tiene que decir «Preparando el GIF…» y
+  después moverse en la placa (proyector y OBS).
+
 ### Pedidos de GitHub #32 y #37 (19/11/2026)
 
 Claude los probó de madrugada con el programa abierto (copia de la biblioteca; la real no se tocó).

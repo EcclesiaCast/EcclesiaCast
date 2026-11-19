@@ -12,8 +12,24 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   y en la transmisión (OBS). Se va sola a los 5, 10 o 15 segundos, o cuando la quitás. Cada placa
   mostrada queda guardada en una lista para usarla de nuevo con doble clic. Puede llevar una imagen o un
   video corto (en bucle, sin sonido) a la izquierda o a la derecha del texto, elegido de tus logos o de
-  la computadora, y entrar de cuatro maneras: deslizándose, subiendo, como persiana o sólo apareciendo.
-  (Pedido en GitHub #37.)
+  la computadora; un **GIF animado** se convierte solo en video y se mueve. (Pedido en GitHub #37.)
+- **Estilos de placa, con «✏ Diseñar…».** Cada placa usa un estilo con nombre. Vienen seis listos
+  (Clásica, Moderna, Noticias, Vidrio, Mínima y Centrada) y en la ventana «Estilos de placa» se crean,
+  duplican, renombran y borran, viendo cómo queda mientras se cambia: **dónde se ve** (proyector y
+  transmisión, **sólo en la transmisión (OBS)** o sólo en el proyector), color y opacidad del recuadro,
+  esquinas redondeadas, **ancho y alto** (o que se acomode a las palabras), la **franja de color**
+  (a la izquierda, arriba, abajo o ninguna; color y grosor; o el nombre sobre un bloque de ese color),
+  tipografía, tamaño y color del nombre y del cargo, negrita, mayúsculas, sombra, lugar (abajo a la
+  izquierda, al centro o a la derecha, y a qué distancia del borde), y **cómo entra y cómo sale**
+  (deslizándose, subiendo o bajando, como persiana o desvaneciéndose) con su duración. La página
+  para OBS dibuja la placa con el mismo estilo.
+- **La salida en vertical (9:16).** En la ventana de salida (clic derecho → Forma) se puede elegir
+  «9:16 (vertical)», con tamaños rápidos 360×640, 720×1280 y 1080×1920, para pantallas paradas o
+  transmisiones verticales. La letra se dibuja igual que en 16:9, así que queda en una franja al medio.
+- **«Crear canción desde cero…» en el menú Canciones**, arriba de todo.
+- **Cuando YouTube no deja pasar un video fuera de su página** (por derechos de autor, errores 101 y
+  150), la pantalla queda en negro en vez de mostrar el cartel de YouTube, y el programa avisa con un
+  mensaje propio que ese video sólo se puede usar descargándolo, con un botón **«Descargar ahora»**.
 - **Fondo propio de cada canción.** Con **🖼 Fondo** arriba de las diapositivas («Usar el fondo que está
   en pantalla») o con clic derecho en una imagen o video de Medios → «Usar como fondo de «…»». Al
   proyectar esa canción, su fondo se pone solo; le gana al «al azar por canción». (GitHub #32.)
@@ -40,6 +56,15 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Cambiado
 
+- **Un solo volumen en el LIVE.** Las dos barras (la del video y la de toda la salida) eran confusas:
+  ahora hay una sola, «Volumen», que maneja todo lo que suena en la salida, **YouTube incluido**, y se
+  mueve de a 1 % (de a 5 % con la rueda o las flechas grandes). El volumen propio de cada video sigue
+  en sus Propiedades, y al lado de la barra queda el botón «Sin sonido / Suena» del video.
+- **Los videos de YouTube se descargan en mejor calidad.** Se prefiere el formato H.264 (hasta
+  1080p), que en el mismo tamaño trae bastante más detalle que el AV1 que bajaba antes, y que
+  cualquier computadora reproduce sin esfuerzo.
+- **Con el orden de las diapositivas trabado (🔒), Ctrl+Z y Ctrl+Y no hacen nada** (ni los botones
+  ↶ ↷): la barra de abajo dice que hay que destrabar el orden para deshacer.
 - **Las copias de prueba ya no cuentan en el contador anónimo de uso.** No mandan el aviso (ni
   inventan su número) las versiones de prueba (con «-», como `1.5.0-prueba.2`), las que corren con
   una biblioteca de prueba (`ECCLESIACAST_DATA_DIR`) y las que no están instaladas (sin el

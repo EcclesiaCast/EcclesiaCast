@@ -204,6 +204,7 @@ public partial class App : Application
         TransitionSettings.Load(settings);
         BroadcastStyleSettings.Load(settings);
         FloatingOutputSettings.Load(settings);
+        NamePlateStyleSettings.Load(settings);
         mainWindow.AttachLayoutPersistence(settings);
 
         // How much the program is used, and whether the last run ended badly:
