@@ -26,6 +26,15 @@
     <ProjectReference Include="..\EcclesiaCast.Presentation\EcclesiaCast.Presentation.csproj" />
   </ItemGroup>
 
+  <!-- The free fonts that come with the program (SIL OFL 1.1), each in its
+       folder with its license: Selawik (Microsoft, the measures of Segoe UI),
+       Carlito (the measures of Calibri) and Anton (titles). The licenses go
+       out next to the program. -->
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\Fonts\**\*.ttf" />
+    <None Include="Assets\Fonts\**\OFL.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="12.1.6" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.6" />
