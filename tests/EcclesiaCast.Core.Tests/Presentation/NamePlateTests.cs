@@ -22,6 +22,47 @@ public class NamePlateTests
     }
 
     [Fact]
+    public void The_picture_the_side_and_the_animation_are_kept_in_the_list()
+    {
+        var plate = new NamePlate("Juan Pérez", "Pastor", @"C:\Logos\iglesia.mp4", ImageRight: true, NamePlateAnimation.Wipe);
+
+        var back = Assert.Single(NamePlateList.Parse(NamePlateList.ToSetting([plate])));
+
+        Assert.Equal(plate, back);
+        Assert.True(back.ImageIsVideo);
+    }
+
+    [Fact]
+    public void A_list_saved_before_pictures_existed_still_reads()
+    {
+        var back = Assert.Single(NamePlateList.Parse("""[{"Name":"Juan","Role":"Pastor"}]"""));
+
+        Assert.Equal(new NamePlate("Juan", "Pastor"), back);
+        Assert.False(back.HasImage);
+        Assert.Equal(NamePlateAnimation.Slide, back.Animation);
+    }
+
+    [Fact]
+    public void A_nonsense_animation_falls_back_to_sliding()
+    {
+        var back = Assert.Single(NamePlateList.Parse("""[{"Name":"Juan","Animation":99}]"""));
+
+        Assert.Equal(NamePlateAnimation.Slide, back.Animation);
+    }
+
+    [Theory]
+    [InlineData(@"C:\a\logo.PNG", true, false)]
+    [InlineData(@"C:\a\logo.gif", true, false)]
+    [InlineData(@"C:\a\loop.mp4", false, true)]
+    [InlineData(@"C:\a\nota.txt", false, false)]
+    public void Pictures_and_videos_are_told_apart_by_their_extension(string path, bool image, bool video)
+    {
+        Assert.Equal(image, NamePlateMedia.IsImage(path));
+        Assert.Equal(video, NamePlateMedia.IsVideo(path));
+        Assert.Equal(image || video, NamePlateMedia.CanCarry(path));
+    }
+
+    [Fact]
     public void A_plate_saved_again_is_not_repeated_and_goes_to_the_top()
     {
         IReadOnlyList<NamePlate> list = [new("Juan Pérez", "Pastor"), new("Ana Gómez", "Alabanza")];

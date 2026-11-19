@@ -107,17 +107,33 @@
             <!-- Placa de nombre («lower third», GitHub #37): abajo a la izquierda, por
                  encima de todo; entra deslizándose y se va desvaneciendo -->
             <Grid x:Name="NamePlateLayer" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                  Margin="90,0,0,110" MaxWidth="1500" Visibility="Collapsed" IsHitTestVisible="False">
+                  Margin="90,0,0,110" MaxWidth="1600" Visibility="Collapsed" IsHitTestVisible="False"
+                  RenderTransformOrigin="0,0.5">
                 <Grid.RenderTransform>
-                    <TranslateTransform x:Name="NamePlateShift"/>
+                    <TransformGroup>
+                        <ScaleTransform x:Name="NamePlateScale"/>
+                        <TranslateTransform x:Name="NamePlateShift"/>
+                    </TransformGroup>
                 </Grid.RenderTransform>
                 <Grid.ColumnDefinitions>
+                    <!-- Imagen a la izquierda · franja · texto · imagen a la derecha -->
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="14"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Rectangle Fill="#2F63C9"/>
-                <Border Grid.Column="1" Background="#E8101420" Padding="38,22,52,24">
-                    <StackPanel>
+                <!-- La imagen o el video de la placa: un cuadrado al costado del texto -->
+                <Border x:Name="NamePlateMediaBox" Width="176" Background="#E8101420" Padding="14"
+                        Visibility="Collapsed">
+                    <Grid>
+                        <Image x:Name="NamePlateImage" Stretch="Uniform"/>
+                        <MediaElement x:Name="NamePlateVideo" Stretch="Uniform" IsMuted="True"
+                                      LoadedBehavior="Manual" UnloadedBehavior="Stop" Visibility="Collapsed"/>
+                    </Grid>
+                </Border>
+                <Rectangle Grid.Column="1" Fill="#2F63C9"/>
+                <Border x:Name="NamePlateCard" Grid.Column="2" Background="#E8101420" Padding="38,22,52,24">
+                    <StackPanel VerticalAlignment="Center">
                         <TextBlock x:Name="NamePlateName" FontFamily="Segoe UI" FontSize="66" FontWeight="SemiBold"
                                    Foreground="White" TextWrapping="Wrap"/>
                         <TextBlock x:Name="NamePlateRole" FontFamily="Segoe UI" FontSize="40"

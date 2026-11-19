@@ -1575,6 +1575,46 @@ public partial class MainWindow : Window
         menu.IsOpen = true;
     }
 
+    /// <summary>
+    /// «Elegir…» of a name plate: the logos of the library first (a picture or
+    /// a video), then any picture or video from the computer.
+    /// </summary>
+    private void ChooseNamePlateImage_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm || sender is not FrameworkElement anchor)
+            return;
+
+        var menu = new ContextMenu
+        {
+            PlacementTarget = anchor,
+            Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom,
+        };
+
+        var logos = vm.NamePlateLogoChoices();
+        if (logos.Count > 0)
+        {
+            menu.Items.Add(new MenuItem { Header = "Tus logos", IsEnabled = false });
+            foreach (var (name, path) in logos)
+            {
+                var item = new MenuItem
+                {
+                    Header = (EcclesiaCast.Core.Presentation.NamePlateMedia.IsVideo(path) ? "🎞 " : "🖼 ") + name,
+                    ToolTip = path,
+                };
+                item.Click += (_, _) => vm.UseNamePlateImage(path);
+                menu.Items.Add(item);
+            }
+            menu.Items.Add(new Separator());
+        }
+
+        menu.Items.Add(new MenuItem
+        {
+            Header = "Otra imagen o video de la computadora…",
+            Command = vm.ChooseNamePlateFileCommand,
+        });
+        menu.IsOpen = true;
+    }
+
     /// <summary>Double click on a saved name plate: it goes on the screen.</summary>
     private void SavedPlatesList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {

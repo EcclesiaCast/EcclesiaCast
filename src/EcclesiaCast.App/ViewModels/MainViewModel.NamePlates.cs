@@ -32,6 +32,80 @@ public sealed partial class MainViewModel
     [ObservableProperty]
     private NamePlate? _selectedSavedNamePlate;
 
+    /// <summary>The picture or short video beside the words; null for words only.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(NamePlateImageLabel), nameof(NamePlateHasImage))]
+    private string? _namePlateImagePath;
+
+    public bool NamePlateHasImage => !string.IsNullOrWhiteSpace(NamePlateImagePath);
+
+    /// <summary>«logo.png», «🎞 intro.mp4» or «Sin imagen», beside the «Elegir…» button.</summary>
+    public string NamePlateImageLabel => NamePlateImagePath is { Length: > 0 } path
+        ? (NamePlateMedia.IsVideo(path) ? "🎞 " : "🖼 ") + System.IO.Path.GetFileName(path)
+        : "Sin imagen";
+
+    /// <summary>0: the picture on the left of the words; 1: on the right.</summary>
+    [ObservableProperty]
+    private int _namePlateImageSide;
+
+    /// <summary>The way in, as the index of <see cref="NamePlateMedia.Animations"/>.</summary>
+    [ObservableProperty]
+    private int _namePlateAnimationIndex;
+
+    /// <summary>The words of each way in, for the list in the tab.</summary>
+    public IReadOnlyList<string> NamePlateAnimationNames { get; } =
+        NamePlateMedia.Animations.Select(a => a.Label).ToList();
+
+    private NamePlateAnimation ChosenPlateAnimation =>
+        NamePlateMedia.Animations[Math.Clamp(NamePlateAnimationIndex, 0, NamePlateMedia.Animations.Count - 1)].Animation;
+
+    private void FillNamePlateFields(NamePlate plate)
+    {
+        NamePlateName = plate.Name;
+        NamePlateRole = plate.Role;
+        NamePlateImagePath = plate.ImagePath;
+        NamePlateImageSide = plate.ImageRight ? 1 : 0;
+        var index = NamePlateMedia.Animations.ToList().FindIndex(a => a.Animation == plate.Animation);
+        NamePlateAnimationIndex = Math.Max(0, index);
+    }
+
+    /// <summary>The logos of the library that are a picture or a video: the first choices for a plate.</summary>
+    public IReadOnlyList<(string Name, string Path)> NamePlateLogoChoices() =>
+        _logos.GetAll()
+            .Where(l => !string.IsNullOrWhiteSpace(l.Path) && NamePlateMedia.CanCarry(l.Path) && System.IO.File.Exists(l.Path))
+            .Select(l => (l.Name, l.Path!))
+            .ToList();
+
+    /// <summary>A logo or a file chosen for the plate (from the «Elegir…» menu).</summary>
+    public void UseNamePlateImage(string? path)
+    {
+        if (path is not null && !NamePlateMedia.CanCarry(path))
+        {
+            StatusText = "La placa puede llevar una imagen (PNG, JPG, GIF…) o un video corto (MP4, WEBM…).";
+            return;
+        }
+
+        NamePlateImagePath = path;
+        if (path is not null)
+            StatusText = $"La placa va a llevar «{System.IO.Path.GetFileName(path)}». Tocá «Mostrar» para verla.";
+    }
+
+    /// <summary>«Otra imagen o video…»: a file from the computer.</summary>
+    [RelayCommand]
+    private void ChooseNamePlateFile()
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = "Imagen o video para la placa",
+            Filter = NamePlateMedia.DialogFilter,
+        };
+        if (dialog.ShowDialog() == true)
+            UseNamePlateImage(dialog.FileName);
+    }
+
+    [RelayCommand]
+    private void ClearNamePlateImage() => NamePlateImagePath = null;
+
     /// <summary>0: stays until «Quitar»; 1, 2, 3: goes by itself after 5, 10 or 15 seconds.</summary>
     [ObservableProperty]
     private int _namePlateAutoHide;
@@ -72,15 +146,14 @@ public sealed partial class MainViewModel
     {
         if (value is null)
             return;
-        NamePlateName = value.Name;
-        NamePlateRole = value.Role;
+        FillNamePlateFields(value);
     }
 
     /// <summary>«Mostrar»: the plate written in the two lines goes on the screen (and into the list).</summary>
     [RelayCommand]
     private void ShowNamePlate()
     {
-        if (NamePlate.Clean(NamePlateName, NamePlateRole) is not { } plate)
+        if (NamePlate.Clean(NamePlateName, NamePlateRole, NamePlateImagePath, NamePlateImageSide == 1, ChosenPlateAnimation) is not { } plate)
         {
             StatusText = "Escribí el nombre (y si querés, el cargo) para mostrar la placa.";
             return;
@@ -96,8 +169,7 @@ public sealed partial class MainViewModel
         if (plate is null)
             return;
 
-        NamePlateName = plate.Name;
-        NamePlateRole = plate.Role;
+        FillNamePlateFields(plate);
         PutNamePlate(plate);
     }
 

@@ -74,14 +74,31 @@ public static class OutputPage
             }
 
             /* The name plate (who is speaking), bottom left as on the
-               projector: it slides in and fades out. */
+               projector: a picture or video on one side if it has one, the
+               words beside it; it comes in the way the plate says and fades out. */
             #nplate {
-              position: absolute; left: 4.7vw; bottom: 10.2vh; max-width: 78vw;
-              background: rgba(16,20,32,.91); border-left: 1.3vh solid #2F63C9;
-              padding: 2vh 4.8vh 2.2vh 3.5vh; color: #fff;
+              position: absolute; left: 4.7vw; bottom: 10.2vh; max-width: 82vw;
+              display: flex; align-items: stretch; color: #fff;
+              transform-origin: left center;
               transition: opacity .32s ease, transform .42s cubic-bezier(.2,.8,.3,1);
             }
-            #nplate.fuera { opacity: 0; transform: translateX(-6vh); }
+            #nplate.derecha #nplateMedia { order: 2; }
+            #nplateText {
+              background: rgba(16,20,32,.91); border-left: 1.3vh solid #2F63C9;
+              padding: 2vh 4.8vh 2.2vh 3.5vh;
+              display: flex; flex-direction: column; justify-content: center;
+            }
+            #nplateMedia {
+              width: 16.3vh; min-height: 16.3vh; box-sizing: border-box; padding: 1.3vh;
+              background: rgba(16,20,32,.91);
+              display: flex; align-items: center; justify-content: center;
+            }
+            #nplateMedia img, #nplateMedia video { max-width: 100%; max-height: 100%; object-fit: contain; }
+            #nplate.fuera { opacity: 0; }
+            #nplate.anim-deslizar.fuera { transform: translateX(-6vh); }
+            #nplate.anim-subir.fuera { transform: translateY(8vh); }
+            #nplate.anim-persiana.fuera { transform: scaleX(0); }
+            #nplate.anim-persiana { transition: opacity .16s ease, transform .52s cubic-bezier(.2,.8,.3,1); }
             #nplateName { font-size: 6.1vh; font-weight: 600; line-height: 1.15; }
             #nplateRole { font-size: 3.7vh; color: #C9D3E6; margin-top: .4vh; }
 
@@ -256,7 +273,10 @@ public static class OutputPage
             <div id="countdownHeading"></div>
             <div id="countdownClock"></div>
           </div>
-          <div id="nplate" class="oculto fuera"><div id="nplateName"></div><div id="nplateRole"></div></div>
+          <div id="nplate" class="oculto fuera">
+            <div id="nplateMedia" class="oculto"></div>
+            <div id="nplateText"><div id="nplateName"></div><div id="nplateRole"></div></div>
+          </div>
           <div id="overlay" class="oculto"></div>
           <div id="raw">
             <p id="rlabel" class="oculto"></p>
@@ -394,7 +414,10 @@ public static class OutputPage
             var nplateName = document.getElementById('nplateName');
             var nplateRole = document.getElementById('nplateRole');
             // («nplate»: «plate» is already the box behind the words of a styled layer.)
+            var nplateMedia = document.getElementById('nplateMedia');
+            var nplateMediaKey = '';
             var nplateTimer = 0;
+            var nplateAnims = ['anim-deslizar', 'anim-subir', 'anim-persiana', 'anim-aparecer'];
             function paintPlate(s) {
               var on = !!(s.plateName || s.plateRole);
               nplate.style.bottom = s.overlay ? Math.max(10.2, overlay.offsetHeight / innerHeight * 100 + 3.7) + 'vh' : '10.2vh';
@@ -405,16 +428,47 @@ public static class OutputPage
                 nplateRole.textContent = s.plateRole || '';
                 show(nplateName, !!s.plateName);
                 show(nplateRole, !!s.plateRole);
+                nplate.classList.toggle('derecha', !!s.plateImageRight);
+                paintPlateMedia(s);
                 if (nplate.classList.contains('oculto')) {
+                  // Starts outside (or closed) with its own way in, then comes in.
+                  nplateAnims.forEach(function (a) { nplate.classList.remove(a); });
+                  nplate.classList.add('anim-' + (s.plateAnimation || 'deslizar'));
+                  nplate.classList.add('fuera');
                   show(nplate, true);
-                  void nplate.offsetWidth; // so the slide-in starts from outside
+                  void nplate.offsetWidth;
                 }
                 nplate.classList.remove('fuera');
               } else if (!nplate.classList.contains('oculto') && !nplateTimer) {
-                // Fading out: the next reports must not start the wait again.
+                // Out it only fades, as on the projector. The next reports must
+                // not start the wait again.
+                nplateAnims.forEach(function (a) { nplate.classList.remove(a); });
                 nplate.classList.add('fuera');
-                nplateTimer = setTimeout(function () { show(nplate, false); nplateTimer = 0; }, 340);
+                nplateTimer = setTimeout(function () {
+                  show(nplate, false);
+                  nplateTimer = 0;
+                  nplateMedia.innerHTML = '';
+                  nplateMediaKey = '';
+                }, 340);
               }
+            }
+
+            // The plate's picture or looping video, asked for again only when
+            // it is another file.
+            function paintPlateMedia(s) {
+              var key = s.plateImage ? s.plateImage + ':' + s.plateImageKey : '';
+              show(nplateMedia, !!key);
+              if (key === nplateMediaKey) return;
+              nplateMediaKey = key;
+              nplateMedia.innerHTML = '';
+              if (!key) return;
+              var src = '/api/placa?pin=' + encodeURIComponent(pin) + '&k=' + encodeURIComponent(s.plateImageKey);
+              var el = document.createElement(s.plateImage === 'video' ? 'video' : 'img');
+              if (s.plateImage === 'video') {
+                el.muted = true; el.loop = true; el.autoplay = true; el.playsInline = true;
+              }
+              el.src = src;
+              nplateMedia.appendChild(el);
             }
 
             // The words as plain paragraphs: the reference (or CORO) first, then
