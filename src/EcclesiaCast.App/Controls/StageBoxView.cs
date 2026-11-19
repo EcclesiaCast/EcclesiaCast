@@ -1,13 +1,10 @@
-using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
+using EcclesiaCast.Presentation.Rendering;
 using EcclesiaCast.Presentation.ViewModels;
-using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Core.Stage;
-using EcclesiaCast.Core.Timing;
-using EcclesiaCast.Core.Themes;
 
 namespace EcclesiaCast.App.Controls;
 
@@ -55,8 +52,7 @@ public sealed class StageBoxView : Border
             return;
         }
 
-        var single = Box.Kind is StageBoxKind.Clock or StageBoxKind.Timer or StageBoxKind.Countdown
-            or StageBoxKind.SectionTimer or StageBoxKind.LiveName or StageBoxKind.Overlay;
+        var single = StageBoxText.IsSingleLine(Box.Kind);
 
         _text = new TextBlock
         {
@@ -105,13 +101,13 @@ public sealed class StageBoxView : Border
         if (_text is null)
             return;
 
-        var text = Projection is { } vm ? LiveContent(vm) : SampleContent();
+        var text = StageBoxText.For(Box, Projection);
         _text.Text = text;
 
         // The section timer turns red once its time is over.
         if (Box.Kind == StageBoxKind.SectionTimer)
         {
-            var late = Projection?.Clocks is { HasSection: true } clocks && clocks.Section.IsOvertime(DateTimeOffset.Now);
+            var late = StageBoxText.IsLate(Box, Projection);
             _text.Foreground = late ? new SolidColorBrush(Color.FromRgb(0xFF, 0x5A, 0x5A)) : ParseBrush(Box.Color);
         }
 
@@ -131,73 +127,9 @@ public sealed class StageBoxView : Border
     /// </summary>
     public void Tick()
     {
-        if (Box.Kind is StageBoxKind.Clock or StageBoxKind.Timer or StageBoxKind.Countdown or StageBoxKind.SectionTimer
-            || Projection?.Countdown is not null)
+        if (StageBoxText.MovesEverySecond(Box, Projection))
             Refresh();
     }
-
-    // ── What each kind shows ─────────────────────────────────────
-
-    private string LiveContent(ProjectionViewModel vm)
-    {
-        var now = DateTimeOffset.Now;
-
-        // While a countdown runs it is what the congregation sees, so it is
-        // what the band and whoever is preaching need to see too: they are
-        // the ones who have to be in place when it hits zero.
-        if (vm.Countdown is { } countdown)
-        {
-            switch (Box.Kind)
-            {
-                case StageBoxKind.LiveText:
-                    return countdown.Format(now);
-                case StageBoxKind.LiveName:
-                    return "⏱  CUENTA REGRESIVA";
-                case StageBoxKind.NextSlide:
-                    return countdown.HasFinished(now) || string.IsNullOrWhiteSpace(countdown.Heading)
-                        ? "—"
-                        : countdown.Heading;
-            }
-        }
-
-        return Box.Kind switch
-        {
-            // Black and Clear hide the words from the congregation, but the
-            // stage still needs to read them: that is what a stage display is for.
-            StageBoxKind.LiveText => Transform(vm.Slide?.MainText ?? string.Empty, vm.Slide?.Theme),
-            StageBoxKind.NextSlide => vm.NextSlide is { } next ? Transform(next.MainText, next.Theme) : "—",
-            StageBoxKind.LiveName => vm.State switch
-            {
-                OutputState.Black => "⏸  PANTALLA EN NEGRO",
-                OutputState.Logo => "🖼  LOGO",
-                OutputState.Clear => vm.Slide is null ? "—" : "👁  SIN TEXTO EN PANTALLA",
-                _ => vm.SlideLabel ?? string.Empty,
-            },
-            StageBoxKind.Clock => DateTime.Now.ToString("HH:mm", CultureInfo.CurrentCulture),
-            StageBoxKind.Timer => TimeText.Elapsed(vm.Clocks.Stopwatch.Elapsed(now)),
-            StageBoxKind.SectionTimer => vm.Clocks.HasSection ? TimeText.Clock(vm.Clocks.Section.Remaining(now)) : "—",
-            StageBoxKind.Countdown => vm.Countdown?.Format(now) ?? string.Empty,
-            StageBoxKind.Notes => vm.StageNotes ?? string.Empty,
-            StageBoxKind.Overlay => vm.Overlay ?? string.Empty,
-            StageBoxKind.FixedText => Box.Text,
-            _ => string.Empty,
-        };
-    }
-
-    private string SampleContent() => Box.Kind switch
-    {
-        StageBoxKind.LiveText => "Santo, santo, santo, Señor omnipotente,\nsiempre el labio mío loores te dará.",
-        StageBoxKind.NextSlide => "Santo, santo, santo, te adoro reverente",
-        StageBoxKind.LiveName => "Coro",
-        StageBoxKind.Clock => "10:30",
-        StageBoxKind.Timer => "12:45",
-        StageBoxKind.Countdown => "5:00",
-        StageBoxKind.SectionTimer => "25:00",
-        StageBoxKind.Notes => "Los puntos del mensaje:\n1. La gracia\n2. La fe\n3. La respuesta",
-        StageBoxKind.Overlay => "Aviso al pie",
-        StageBoxKind.FixedText => string.IsNullOrEmpty(Box.Text) ? "Texto fijo" : Box.Text,
-        _ => string.Empty,
-    };
 
     private UIElement BuildMirror()
     {
@@ -263,18 +195,4 @@ public sealed class StageBoxView : Border
 
         return Brushes.White;
     }
-
-    /// <summary>
-    /// Matches the projector's casing so the singers read what the
-    /// congregation reads; everything else about the look stays plain.
-    /// </summary>
-    private static string Transform(string text, SlideTheme? theme) =>
-        (theme?.TextCase ?? TextCase.None) switch
-        {
-            TextCase.Upper => text.ToUpper(CultureInfo.CurrentCulture),
-            TextCase.Lower => text.ToLower(CultureInfo.CurrentCulture),
-            TextCase.Title => CultureInfo.CurrentCulture.TextInfo
-                .ToTitleCase(text.ToLower(CultureInfo.CurrentCulture)),
-            _ => text,
-        };
 }
