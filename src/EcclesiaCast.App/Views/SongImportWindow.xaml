@@ -13,6 +13,12 @@
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
+            <Setter Property="CaretBrush" Value="White"/>
+        </Style>
         <Style x:Key="SourceChoice" TargetType="RadioButton">
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontSize" Value="13"/>
@@ -60,6 +66,8 @@
                          Style="{StaticResource SourceChoice}" Checked="Source_Checked"/>
             <RadioButton x:Name="EasyWorshipChoice" Content="EasyWorship" GroupName="Source"
                          Style="{StaticResource SourceChoice}" Checked="Source_Checked"/>
+            <RadioButton x:Name="HolyricsChoice" Content="Holyrics" GroupName="Source"
+                         Style="{StaticResource SourceChoice}" Checked="Source_Checked"/>
         </StackPanel>
 
         <StackPanel Grid.Row="2">
@@ -68,6 +76,35 @@
             <TextBlock x:Name="RootText"
                        FontSize="11" Foreground="{StaticResource FaintBrush}"
                        TextWrapping="Wrap" Margin="0,6,0,10"/>
+
+            <!-- Holyrics keeps its songs encrypted: they come through its API Server,
+                 which needs the port and a token the operator creates in Holyrics. -->
+            <Border x:Name="HolyricsPanel" Visibility="Collapsed"
+                    Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
+                    CornerRadius="4" Padding="12,10" Margin="0,0,0,10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="70"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Puerto" FontSize="12" Foreground="{StaticResource MutedBrush}"
+                               VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <TextBox x:Name="HolyricsPort" Grid.Column="1" FontSize="12" Padding="4,3"
+                             VerticalContentAlignment="Center"/>
+                    <TextBlock Grid.Column="2" Text="Token" FontSize="12" Foreground="{StaticResource MutedBrush}"
+                               VerticalAlignment="Center" Margin="12,0,6,0"/>
+                    <TextBox x:Name="HolyricsToken" Grid.Column="3" FontSize="12" Padding="4,3"
+                             VerticalContentAlignment="Center"
+                             ToolTip="El token que creaste en Holyrics, en Archivo → Configuraciones → API Server"/>
+                    <Button x:Name="HolyricsConnect" Grid.Column="4" Content="Conectar" FontSize="12"
+                            Padding="14,4" Margin="8,0,0,0"
+                            Style="{StaticResource DarkButton}" Click="HolyricsConnect_Click"/>
+                </Grid>
+            </Border>
         </StackPanel>
 
         <Border Grid.Row="3"
