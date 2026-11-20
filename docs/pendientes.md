@@ -48,48 +48,52 @@ pasa a **Ya probado**, más abajo.
 5. **¿Cuánto tarda en sonar la música de YouTube?** Claude midió entre 18 y 25 segundos desde
    ▶ hasta que suena (la barra dice «Preparando la descarga…» mientras tanto). Decí si te parece
    aceptable o si hay que buscar que arranque antes.
+6. **«🕘 Historial» en la Biblia.** El botón a la derecha de la caja de la cita ahora dice
+   «🕘 Historial». Proyectá dos o tres versículos y abrilo: clic carga, doble clic proyecta. Achicá
+   el panel de la Biblia: el botón pasa a ser sólo 🕘 y la caja de la cita no tiene que quedar
+   chica. (Lo pidió alguien por el formulario; Claude no lo vio con el programa abierto.)
 
 **De la 1.5.0, la primera tanda (18/11)**
 
 Claude ya probó en esta PC la ventana flotante, la importación del XML de OpenSong y YouTube a
 pantalla completa con Esc y doble clic. Falta:
 
-6. **YouTube en Windows 10**, con la notebook sola (donde le pasó a la iglesia): clic sobre el
+7. **YouTube en Windows 10**, con la notebook sola (donde le pasó a la iglesia): clic sobre el
     video y Esc vuelve al programa; el doble clic también.
-7. **La ventana flotante compartida por Discord** o una videollamada.
+8. **La ventana flotante compartida por Discord** o una videollamada.
     - Que se transmita bien y que se pueda minimizar y volver.
     - Adentro: un video, el logo, el aviso al pie y la cuenta regresiva.
     - Que las páginas /salida (OBS, celular, escenario) sigan igual.
     - Con dos monitores: dejarla en el segundo, cerrar el programa, desenchufar el monitor y
       abrir: tiene que aparecer en el medio de la pantalla principal.
-8. **Con una sola pantalla** (una notebook sin proyector, instalación nueva u otra PC).
+9. **Con una sola pantalla** (una notebook sin proyector, instalación nueva u otra PC).
     - «⧉ En una ventana» tiene que ser la primera de la lista «Salida:» y venir elegida.
     - Con el proyector en «duplicar», Windows ve una sola pantalla, así que también arranca en la
       ventana.
     - Para pantalla completa se elige «Pantalla 1» una vez, y al cerrar y abrir sigue ahí.
-9. **El teclado y la ventana flotante.** Si se toca la ventana flotante, las teclas del panel
+10. **El teclado y la ventana flotante.** Si se toca la ventana flotante, las teclas del panel
     (flechas, Ctrl+Enter) no andan hasta volver a hacer clic en el panel. Ver si molesta.
-10. **«➕ Agregar» en Canciones** con el panel angosto: que el título «CANCIONES» no quede tapado.
-11. **Una Biblia XML real** de OpenSong o de Beblia (la que exportan Holyrics o FreeShow). Si el
+11. **«➕ Agregar» en Canciones** con el panel angosto: que el título «CANCIONES» no quede tapado.
+12. **Una Biblia XML real** de OpenSong o de Beblia (la que exportan Holyrics o FreeShow). Si el
     archivo trae los libros en inglés, así se muestran («John 3:16»).
 
 **De versiones anteriores, sin tu respuesta**
 
-12. **Logo y Black frenan el video de atrás.** Con el logo (F3) o el negro (F1) puestos, el video
+13. **Logo y Black frenan el video de atrás.** Con el logo (F3) o el negro (F1) puestos, el video
     de fondo se pausa y su sonido se corta, y al sacarlos sigue donde estaba.
     - Claude lo midió en la PC con un video común.
     - Falta con el proyector real y con estos casos: el video que rellena los bordes, una página
       web o una ventana en vivo, y un logo que es un video (ése tiene que seguir moviéndose).
-13. **Tipografía de cada recuadro del escenario:** en el diseñador de escenarios, una letra para
+14. **Tipografía de cada recuadro del escenario:** en el diseñador de escenarios, una letra para
     las notas y otra para la hora; cada una cambia sólo la suya.
-14. **Tipografía del texto rápido:** la lista «Tipografía» de la pestaña Texto rápido cambia la
+15. **Tipografía del texto rápido:** la lista «Tipografía» de la pestaña Texto rápido cambia la
     vista previa y queda elegida al cerrar y abrir.
-15. **«Selah» y títulos de los Salmos:** en el editor de temas (Biblia), la casilla «Mostrar Selah
+16. **«Selah» y títulos de los Salmos:** en el editor de temas (Biblia), la casilla «Mostrar Selah
     y los títulos de los Salmos» viene destildada y se guarda.
-16. **Corregir el texto de un versículo:** clic derecho en un versículo de la grilla → «Corregir el
+17. **Corregir el texto de un versículo:** clic derecho en un versículo de la grilla → «Corregir el
     texto…». El cambio se ve en la diapositiva y queda al cerrar y abrir. Probalo en una Biblia
     importada de prueba.
-17. **Menú Transmisión y estilos para OBS** (plan en [plan-obs-estilos.md](plan-obs-estilos.md)).
+18. **Menú Transmisión y estilos para OBS** (plan en [plan-obs-estilos.md](plan-obs-estilos.md)).
     Con OBS abierto:
     - **El menú:** «Transmisión» tiene «Salida para OBS o vMix…» y «Estilos de la transmisión…».
     - **Plantillas:** las seis plantillas listas cambian la vista previa.
@@ -100,70 +104,70 @@ pantalla completa con Esc y doble clic. Falta:
     - **Fondo fijo:** con un video, se ve en bucle y se va con F1, F2 y F3.
     - **«Igual que en el proyector»:** apaga el resto de los controles.
     - **OBS sigue los cambios:** cambia a los 0,3 s de guardar, sin tocar nada.
-18. **Teclas en los tooltips:** pasá el mouse por Black, Clear, Logo, Sin fondo y Poner en vivo: el
+19. **Teclas en los tooltips:** pasá el mouse por Black, Clear, Logo, Sin fondo y Poner en vivo: el
    globito dice su tecla (F1, F2, F3, F4, Esc). Claude los leyó el 19/11: anduvieron todos salvo el
    de **Logo**, que decía sólo el nombre del logo; se arregló para la prueba.4 (mirá que ahora diga
    «Muestra el logo a pantalla completa (tecla F3)…»). El de los botones de versión de la Biblia
    tenía el mismo error y también se arregló.
-19. **El paso de una imagen a otra en el proyector real:** sin cuadro negro ni tirón, el relleno de
+20. **El paso de una imagen a otra en el proyector real:** sin cuadro negro ni tirón, el relleno de
     la nueva sube con el fundido. Si el fundido te parece largo, se acorta en Proyección →
     Transiciones… → Medios.
-20. **Fecha del evento y «Eventos pasados».** En Propiedades la fecha se elige en un calendario.
+21. **Fecha del evento y «Eventos pasados».** En Propiedades la fecha se elige en un calendario.
     Una fecha vieja (por ejemplo 1/1/2026) mueve la imagen a la pestaña **Eventos pasados** al
     guardar, y la barra de estado lo avisa.
-21. **Sin Color ni Brillo en Propiedades:** una imagen que tenía brillo o tinte se ve sin ellos.
-22. **El tiempo de una imagen en la barra.** Con «Cuánto tiempo se ve» puesto, al proyectarla
+22. **Sin Color ni Brillo en Propiedades:** una imagen que tenía brillo o tinte se ve sin ellos.
+23. **El tiempo de una imagen en la barra.** Con «Cuánto tiempo se ve» puesto, al proyectarla
     aparece la barra «0:03 / 0:08». Probá ⏸, ±10 s, arrastrarla, y que se vaya al poner otra cosa.
-23. **Imágenes nuevas con «Ajustar» y relleno desenfocado:** una imagen agregada viene así en
+24. **Imágenes nuevas con «Ajustar» y relleno desenfocado:** una imagen agregada viene así en
     Propiedades. Los videos, los PDF y las imágenes de antes no cambian.
-24. **Imágenes y GIF de Google** (🖼 Imágenes en la barra de medios).
+25. **Imágenes y GIF de Google** (🖼 Imágenes en la barra de medios).
     - La fila de búsqueda con 🖼 Imágenes, 🎞 GIF y «Sólo licencia libre».
     - El clic derecho sobre una imagen abre el menú donde hiciste clic.
     - «➕ Agregar a medios» y «➕ Agregar la abierta» bajan la imagen original, grande.
     - Un GIF queda como video en bucle.
-25. **Achicar la lista de audios:** clic en «▾ AUDIOS» (o Ver → «Achicar la lista de audios»)
+26. **Achicar la lista de audios:** clic en «▾ AUDIOS» (o Ver → «Achicar la lista de audios»)
     esconde la lista y su reproductor sin cortar lo que suena, y queda así al cerrar y abrir.
-26. **Relleno con la misma imagen desenfocada:** sin ningún borde negro, en la vista previa, el
+27. **Relleno con la misma imagen desenfocada:** sin ningún borde negro, en la vista previa, el
     LIVE y la pantalla.
-27. **Buscar desde el celular.** En la página del celular, la caja «Buscar canción o versículo…»:
+28. **Buscar desde el celular.** En la página del celular, la caja «Buscar canción o versículo…»:
    «juan 3 16» sale primero el versículo; el nombre de una canción sale primero; tocar un
    resultado lo carga sin proyectarlo. (Ctrl+K en la computadora ya lo probó Claude: anduvo.)
-28. **Fondos en video del instalador:** la casilla «Agregar 10 fondos en video».
+29. **Fondos en video del instalador:** la casilla «Agregar 10 fondos en video».
     - Aparece la pestaña **Fondos de ejemplo** con los 10.
     - El bucle no se nota.
     - Uno quitado de la biblioteca no vuelve.
     - Sin la casilla, la pestaña no aparece.
-29. **Traer de otro programa** (➕ Agregar en Canciones, o Archivo).
+30. **Traer de otro programa** (➕ Agregar en Canciones, o Archivo).
     - Los botones ProPresenter y EasyWorship, cada uno con su cantidad de canciones.
     - Importar una de cada uno y probar «Elegir carpeta…».
     - Falta probar una biblioteca grande de EasyWorship.
-30. **Agregar paquete de fondos:** Archivo → «Agregar paquete de fondos (.zip)…».
+31. **Agregar paquete de fondos:** Archivo → «Agregar paquete de fondos (.zip)…».
     - Los videos van a la pestaña **Fondos agregados**, en bucle y sin sonido.
     - Un archivo que no sirve avisa sin romper nada.
-31. **Sólo el texto para OBS:** a la dirección de la Biblia agregale `&formato=no`. En OBS sale sólo
+32. **Sólo el texto para OBS:** a la dirección de la Biblia agregale `&formato=no`. En OBS sale sólo
     el texto en blanco, y el CSS de ejemplo de la guía le cambia color y tamaño.
-32. **Lo de la tanda del 1/11.**
+33. **Lo de la tanda del 1/11.**
     - Arrastrar un renglón de la playlist (marca dónde cae).
     - Temas → **Plantillas listas** con una canción y con la Biblia.
     - Transmisión → Estilos → «Configuración extra del recuadro»; «Cancelar» devuelve lo de antes.
     - Cambiar de Biblia con un versículo en pantalla: OBS no queda vacío ni un instante.
     - Al actualizar saltando versiones, se ven las notas de todas.
-33. **Presentación con una pestaña de medios:** clic derecho en una pestaña de Medios → Configurar…
+34. **Presentación con una pestaña de medios:** clic derecho en una pestaña de Medios → Configurar…
     → «Pasar los medios solos», en orden y al azar. Cada video llega al final antes de pasar.
-34. **Lo de la 1.2.0 que no viste.**
+35. **Lo de la 1.2.0 que no viste.**
     - Las franjas del tema con una **canción**.
     - La lista de **Música** sonando mientras suena un video.
     - Todo con el proyector de la iglesia.
-35. **Las flechas en el recorrido de bienvenida.** Claude pasó los 9 pasos con el mouse y con Enter y
+36. **Las flechas en el recorrido de bienvenida.** Claude pasó los 9 pasos con el mouse y con Enter y
    cerró con Esc (anduvo); las flechas ← → no pudo probarlas porque su teclado simulado no las
    manda. Probalo vos: Ayuda → «Recorrido del programa» y las flechas.
-36. **Tema de cada canción (1.4.0).**
+37. **Tema de cada canción (1.4.0).**
     - Clic derecho en una canción → «Tema de esta canción…»: cambiarla y que no cambie con el tema
       principal.
     - «Volver al tema principal» la vuelve a ligar.
-37. **Instalar encima de la versión anterior:** conserva canciones, Biblias y medios, y Ayuda →
+38. **Instalar encima de la versión anterior:** conserva canciones, Biblias y medios, y Ayuda →
     «Buscar actualizaciones…» ofrece la nueva con sus notas.
-38. **Lo de la beta.16 que nunca se miró:** la pantalla de carga, el ícono de la barra de tareas,
+39. **Lo de la beta.16 que nunca se miró:** la pantalla de carga, el ícono de la barra de tareas,
     la «Palabra de Dios para ti» del instalador y los textos de ejemplo del editor de temas y de
     escenarios.
 
@@ -715,6 +719,10 @@ iglesia (11:22–12:53): ningún error ni cierre.
 
 ## 4. Para versiones futuras
 
+- **Importar Biblias de e-Sword (.bblx)** (pedido del formulario, 20/11/2026). Que cada iglesia
+  pueda traer las Biblias que ya tiene en e-Sword. Ojo: muchas de esas versiones tienen derechos
+  de autor, así que **no se ofrecen para bajar** en «Bajar Biblias»; sólo las importa cada uno
+  con su archivo, como pasa hoy con el JSON y el XML.
 - **Versión para Mac** (la piden en Instagram; Alexis quiere hacerla,
   14/11/2026). Es el trabajo más grande que queda:
   - **Qué se aprovecha:** `EcclesiaCast.Core` y `EcclesiaCast.Data` (unas

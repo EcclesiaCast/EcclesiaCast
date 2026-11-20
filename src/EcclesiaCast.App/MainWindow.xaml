@@ -973,9 +973,13 @@
                                 </Border>
 
                                 <!-- La caja de búsqueda y, a su derecha, el historial 🕘 de lo proyectado -->
-                                <DockPanel x:Name="BibleQueryRow" DockPanel.Dock="Top" Margin="12,0,12,6">
+                                <DockPanel x:Name="BibleQueryRow" DockPanel.Dock="Top" Margin="12,0,12,6"
+                                           SizeChanged="BibleQueryRow_SizeChanged">
+                                <!-- «🕘 Historial» con la palabra (20/11: alguien pidió un historial que ya
+                                     existía; el dibujo solo no se encontraba). Con el panel angosto vuelve a
+                                     ser sólo 🕘, para que la caja de la cita no quede chica. -->
                                 <Button x:Name="BibleHistoryButton" DockPanel.Dock="Right"
-                                        Content="🕘" FontSize="13" Padding="8,5" Margin="6,0,0,0"
+                                        Content="🕘 Historial" FontSize="12" Padding="8,5" Margin="6,0,0,0"
                                         Style="{StaticResource DarkButton}"
                                         Click="BibleHistoryButton_Click"
                                         AutomationProperties.Name="Historial de versículos"

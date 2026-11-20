@@ -88,6 +88,9 @@ desde la primera. Las flechas **←→** navegan en vivo.
 
 En la pestaña **Biblia**:
 
+- **🕘 Historial**, a la derecha de la caja de la cita, tiene los versículos que proyectaste: un
+  clic lo carga y lo marca, doble clic lo proyecta (también se abre con la flecha ↓ en la caja
+  vacía). Con el panel angosto el botón es sólo 🕘.
 - **📥** importa una Biblia en **JSON** o en **XML** (Zefania, o el de OpenSong que usan ProPresenter, Holyrics y FreeShow). Si la tuya está en otro formato (Word, PDF, texto), **Biblias → Cómo preparar una Biblia para importar…** trae un ejemplo de cada formato y unas instrucciones para pedirle a una IA que la convierta.
 - El instalador te deja elegir qué **Biblias libres** instalar (Reina-Valera
   1909, Biblia libre para el mundo y Versión Biblia Libre); aparecen solas la
