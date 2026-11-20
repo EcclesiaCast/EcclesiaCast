@@ -38,6 +38,9 @@ En la pestaña **Canciones**:
   canciones tiene cada una y las importa. Si una canción ya está, pregunta qué
   hacer. Si están en otro lado (un disco externo, una copia de otra máquina), usá
   **Elegir carpeta…**: en EasyWorship es la que tiene `Songs.db` y `SongWords.db`.
+  **Holyrics** se lee con Holyrics abierto, por su API Server: en Holyrics, Archivo →
+  Configuraciones → API Server, activá el servidor local y creá un token con permiso para
+  «GetSongs» y «GetLyrics»; escribí el puerto y el token en la ventana y tocá **Conectar**.
 - **➕ → Buscar en internet…** (también en el menú **Canciones**) trae una canción
   nueva sin copiar y pegar: escribí el **nombre**, el **artista** o **una frase
   de la letra** y apretá Enter. Busca en musica.com y, si no está ahí, en

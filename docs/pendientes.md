@@ -21,6 +21,17 @@ pasa a **Ya probado**, más abajo.
 
 ### Falta probar
 
+**De la 1.5.0, traer de Holyrics (rama aparte, número nuevo para no correr los demás)**
+
+47. **Traer las canciones de Holyrics.** Cargá dos o tres canciones en Holyrics (una con acentos y
+    con estrofas y coro marcados). En Holyrics: Archivo → Configuraciones → API Server → activar el
+    servidor local, crear un token y habilitarle «GetSongs» y «GetLyrics». Con Holyrics abierto, en
+    EcclesiaCast: ➕ Agregar → **Traer de otro programa…** → **Holyrics** → puerto y token →
+    **Conectar**. Tiene que decir cuántas encontró; **Importar**, y mirar que estén título, autor,
+    acentos y las estrofas con su nombre (Estrofa 1, Coro…). Importar otra vez: tiene que preguntar
+    por las repetidas. Cerrar y abrir la ventana: se conecta sola. Con Holyrics cerrado, «Conectar»
+    explica qué falta.
+
 **De la 1.5.0, lo último (prueba.3)**
 
 1. **YouTube sólo el audio: buscar y escuchar.** Pestaña Música → buscador «BUSCAR EN YOUTUBE (SÓLO
