@@ -1,13 +1,14 @@
 using System.Windows;
 using EcclesiaCast.App.Views;
+using EcclesiaCast.Core.Abstractions;
 
 namespace EcclesiaCast.App.Services;
 
-public sealed class SongImportDialogService(SongSaver songSaver) : ISongImportDialog
+public sealed class SongImportDialogService(SongSaver songSaver, ISettingsStore settings) : ISongImportDialog
 {
     public string? Show()
     {
-        var window = new SongImportWindow(songSaver)
+        var window = new SongImportWindow(songSaver, settings)
         {
             Owner = Application.Current.MainWindow,
         };
