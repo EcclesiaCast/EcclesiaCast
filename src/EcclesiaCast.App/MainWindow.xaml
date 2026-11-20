@@ -430,8 +430,12 @@
                         </Button.Style>
                     </Button>
                     <!-- Logo: el botón lo prende/apaga, la flecha elige cuál -->
-                    <Button Content="Logo" controls:ShortcutHint.Text="F3" Command="{Binding ToggleLogoCommand}" Margin="6,0,0,0"
-                            ToolTip="{Binding ActiveLogoName, StringFormat='Muestra el logo a pantalla completa (tecla F3). Ahora está elegido: {0}'}">
+                    <Button Content="Logo" controls:ShortcutHint.Text="F3" Command="{Binding ToggleLogoCommand}" Margin="6,0,0,0">
+                        <!-- StringFormat sólo vale para un texto: puesto directo en ToolTip (que es un objeto)
+                             se ignoraba, y el globito decía sólo el nombre del logo (19/11). -->
+                        <Button.ToolTip>
+                            <TextBlock Text="{Binding ActiveLogoName, StringFormat='Muestra el logo a pantalla completa (tecla F3). Ahora está elegido: {0}'}"/>
+                        </Button.ToolTip>
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
                                 <Style.Triggers>
@@ -908,8 +912,11 @@
                                                     CommandParameter="{Binding}"
                                                     Tag="{Binding Tag, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                     AutomationProperties.Name="{Binding Info.Name}"
-                                                    ToolTip="{Binding Info.Name, StringFormat='{}{0}&#10;Clic: usar sólo esta · Ctrl+clic: sumarla como segunda versión'}"
-                                                    ContextMenu="{StaticResource VersionMenu}"/>
+                                                    ContextMenu="{StaticResource VersionMenu}">
+                                                <Button.ToolTip>
+                                                    <TextBlock Text="{Binding Info.Name, StringFormat='{}{0}&#10;Clic: usar sólo esta · Ctrl+clic: sumarla como segunda versión'}"/>
+                                                </Button.ToolTip>
+                                            </Button>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>

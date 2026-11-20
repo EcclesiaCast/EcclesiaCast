@@ -96,6 +96,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Arreglado
 
+- **Los títulos de YouTube con acentos salían mal** («Hillsong en Espa?ol») en la música de
+  YouTube y en las descargas: el descargador ahora escribe en UTF-8.
+- **El globito del botón Logo decía sólo el nombre del logo**, sin «Muestra el logo a pantalla
+  completa (tecla F3)». Lo mismo con los botones de versión de la Biblia, que no explicaban el
+  Ctrl+clic.
 - **Volver a descargar un video de YouTube que se había sacado de la biblioteca.** Decía «yt-dlp
   terminó pero no encontré el archivo descargado» porque el archivo seguía en la carpeta de
   descargas y yt-dlp no lo bajaba de nuevo; ahora se usa ese archivo.
