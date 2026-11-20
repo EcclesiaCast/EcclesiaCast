@@ -245,17 +245,19 @@ public static partial class YtDlp
         string videoId,
         string targetFolder,
         IProgress<(double Percent, string Message)> progress,
-        CancellationToken cancellation)
+        CancellationToken cancellation,
+        bool audioOnly = false,
+        bool withSession = true)
     {
         await EnsureToolsAsync(progress, cancellation);
 
         progress.Report((-1, "Preparando la descarga…"));
-        var cookies = await YouTubeCookies.ExportAsync();
+        var cookies = withSession ? await YouTubeCookies.ExportAsync() : null;
         try
         {
             try
             {
-                return await RunAsync(videoId, targetFolder, cookies, progress, cancellation);
+                return await RunAsync(videoId, targetFolder, cookies, progress, cancellation, audioOnly);
             }
             catch (InvalidOperationException ex)
                 when (DownloadFailure.Classify(ex.Message) is DownloadFailureKind.Forbidden
@@ -266,7 +268,7 @@ public static partial class YtDlp
                 Log.Warning("YouTube rechazó la descarga; se actualiza yt-dlp y se reintenta: {Error}", ex.Message);
                 await UpdateAsync(progress, cancellation);
                 progress.Report((-1, "Reintentando la descarga…"));
-                return await RunAsync(videoId, targetFolder, cookies, progress, cancellation);
+                return await RunAsync(videoId, targetFolder, cookies, progress, cancellation, audioOnly);
             }
         }
         finally
@@ -283,7 +285,8 @@ public static partial class YtDlp
         string targetFolder,
         string? cookieFile,
         IProgress<(double Percent, string Message)> progress,
-        CancellationToken cancellation)
+        CancellationToken cancellation,
+        bool audioOnly)
     {
         var executable = FindExecutable()
             ?? throw new InvalidOperationException("yt-dlp no está instalado.");
@@ -297,11 +300,15 @@ public static partial class YtDlp
         // at about 1 Mb/s and looks soft on a projector (19/11: 1.1 Mb/s); its
         // H.264 has around three times the data, every graphics card decodes it,
         // and the stream page (OBS) plays it too. AAC sound goes with it in MP4.
-        var format = HasFfmpeg()
-            ? "bestvideo[height<=?1080][vcodec^=avc1]+bestaudio[ext=m4a]"
-              + "/bestvideo[height<=?1080][vcodec^=avc1]+bestaudio"
-              + "/bestvideo[height<=?1080]+bestaudio/best[height<=?1080]/best"
-            : "best[height<=?1080][ext=mp4]/best[ext=mp4]/best";
+        // For the Música tab only the sound: the m4a YouTube keeps for every
+        // video plays everywhere and needs no converting.
+        var format = audioOnly
+            ? AudioFormat
+            : HasFfmpeg()
+                ? "bestvideo[height<=?1080][vcodec^=avc1]+bestaudio[ext=m4a]"
+                  + "/bestvideo[height<=?1080][vcodec^=avc1]+bestaudio"
+                  + "/bestvideo[height<=?1080]+bestaudio/best[height<=?1080]/best"
+                : "best[height<=?1080][ext=mp4]/best[ext=mp4]/best";
 
         var arguments = new List<string>
         {
@@ -311,7 +318,7 @@ public static partial class YtDlp
             "-P", targetFolder,
             "-o", "%(title)s [%(id)s].%(ext)s",
         };
-        if (HasFfmpeg())
+        if (!audioOnly && HasFfmpeg())
         {
             arguments.Add("--merge-output-format");
             arguments.Add("mp4");
@@ -407,8 +414,15 @@ public static partial class YtDlp
         }
 
         // If the printed path didn't survive the trip (odd characters in a
-        // title), the file is still the newest one in the folder.
-        return downloaded ?? NewestFileSince(targetFolder, startedAt);
+        // title), the file is still the newest one in the folder. And when the
+        // video had been downloaded before (taken out of the library, its file
+        // left in the folder), yt-dlp skips it and prints nothing: that file is
+        // the one (19/11: «yt-dlp terminó pero no encontré el archivo descargado»).
+        return downloaded
+            ?? NewestFileSince(targetFolder, startedAt)
+            ?? YouTubeDownloadFiles.AlreadyDownloaded(
+                new DirectoryInfo(targetFolder).EnumerateFiles().Where(f => f.Length > 0).Select(f => f.FullName),
+                videoId);
     }
 
     /// <summary>The most recently written finished video in <paramref name="folder"/> since <paramref name="since"/>.</summary>

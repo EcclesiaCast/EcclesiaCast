@@ -7,6 +7,15 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Música de YouTube, sólo el audio.** En la pestaña **Música**, debajo del reproductor, un buscador
+  de YouTube: escribí un artista, una canción o pegá un link, o tocá un tono en **Pads: Do, Do#, Re…**
+  para buscar pads. **▶** escucha el resultado ya, **➕** lo suma a la lista y **💾** guarda el audio en
+  **Música › EcclesiaCast** para que funcione sin internet. Suena sólo el sonido, sin imagen ni
+  propagandas, por el mismo reproductor de los audios: **lo que está en pantalla no cambia**. Lo que
+  todavía necesita internet lleva 🌐 en la lista, y con 💾 arriba de la lista queda guardado. Lo ya
+  escuchado arranca enseguida la próxima vez, y mientras suena una canción se va trayendo la siguiente.
+- **Botón para repetir la música** (al lado del nombre de lo que suena): sin repetir, **🔁 repetir la
+  lista** o **🔂 repetir ésta**, ideal para dejar un pad sonando debajo de una canción.
 - **Placas de nombre («lower third»).** Pestaña nueva **Placas**: nombre y cargo («Pastor Juan Pérez /
   Predicación») en una tarjeta abajo a la izquierda que entra deslizándose, en el proyector, en el EN VIVO
   y en la transmisión (OBS). Se va sola a los 5, 10 o 15 segundos, o cuando la quitás. Cada placa
@@ -56,6 +65,12 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Cambiado
 
+- **Los videos de YouTube entran sin sonido.** Un video de YouTube recién agregado sale silenciado,
+  para que nada suene de golpe. «🔇 Sin sonido», debajo del EN VIVO, le da el sonido, y el video lo
+  recuerda.
+- **La pestaña Placas, menos apretada.** Cada dato va en un renglón con su nombre al costado, el
+  lado de la imagen es un botón chico («◧» / «◨») y Mostrar y Quitar van anchos y a la
+  par: queda más lugar para las placas guardadas.
 - **Un solo volumen en el LIVE.** Las dos barras (la del video y la de toda la salida) eran confusas:
   ahora hay una sola, «Volumen», que maneja todo lo que suena en la salida, **YouTube incluido**, y se
   mueve de a 1 % (de a 5 % con la rueda o las flechas grandes). El volumen propio de cada video sigue
@@ -81,6 +96,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Arreglado
 
+- **Volver a descargar un video de YouTube que se había sacado de la biblioteca.** Decía «yt-dlp
+  terminó pero no encontré el archivo descargado» porque el archivo seguía en la carpeta de
+  descargas y yt-dlp no lo bajaba de nuevo; ahora se usa ese archivo.
 - **Un video de YouTube ya no deja atrapado con una sola pantalla.** El video en la salida no toma
   el mouse ni el teclado (tampoco asoman sus controles): el doble clic y la tecla Esc vuelven al
   programa también con YouTube, aunque se haya hecho clic sobre el video; Esc

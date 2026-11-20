@@ -185,6 +185,8 @@ En la barra **MEDIOS**, abajo:
 > el mismo dos canciones seguidas. Si en medio de una canción aplicás un fondo
 > a mano, se respeta hasta la canción siguiente. Sólo entran los medios
 > marcados como *Fondo*: los de *Primer plano* taparían la letra.
+- Un video de **YouTube** recién agregado **entra sin sonido**, para que nada suene de golpe:
+  tocá **🔇 Sin sonido** debajo del EN VIVO para que suene (el video lo recuerda).
 - **Clic derecho → Descargar para uso local** guarda un video de YouTube en la
   computadora, para no depender de internet durante el servicio. Queda en la
   pestaña **Descargados**. Necesita [yt-dlp](https://github.com/yt-dlp/yt-dlp)
@@ -401,13 +403,13 @@ programa recuerda lo que elijas.
   "el auto ABC 123 está mal estacionado"). Se quita con **Quitar**.
 - **Placas de nombre** («lower third»): escribí el **nombre** y, si querés, el
   **cargo** («Pastor Juan Pérez» / «Predicación») y tocá **Mostrar** (o Enter).
-  Aparece una tarjeta abajo a la izquierda, por encima de todo, en el proyector y
-  en la transmisión. A la derecha elegís cuánto queda: hasta que toques
+  Aparece una tarjeta por encima de todo, en el proyector y en la transmisión
+  (dónde y cómo lo dice su **estilo**). En **Dura** elegís cuánto queda: hasta que toques
   **Quitar**, o 5, 10 o 15 segundos. Cada placa que mostrás queda en la lista de
   **Guardadas**: el próximo domingo es doble clic y listo; el 🗑 la borra.
   Con **Elegir…** le ponés una **imagen o un video corto** al costado (uno de tus
   logos o cualquier archivo de la computadora; el video va en bucle y sin sonido),
-  **a la izquierda o a la derecha** del texto (un logo apaisado queda ancho; para OBS el
+  **a la izquierda o a la derecha** del texto (el botón «◧» / «◨» la cambia de lado; un logo apaisado queda ancho; para OBS el
   video tiene que ser MP4 común, H.264: los videos HEVC de iPhone se ven en el proyector pero
   no en la transmisión, donde la placa sale sin el video). Un **GIF animado** se convierte
   solo en un video corto y se mueve.
@@ -618,7 +620,7 @@ contorno, y el video se proyecta igual.
 
 ## 14. Música
 
-En la columna derecha, abajo, la pestaña **Música** tiene dos partes.
+En la columna derecha, abajo, la pestaña **Música** tiene tres partes.
 
 **Audios.** Una lista propia de archivos de sonido (mp3, wav, m4a, ogg y flac)
 para la música de antes de la reunión, la ofrenda o lo que haga falta.
@@ -634,9 +636,35 @@ para la música de antes de la reunión, la ofrenda o lo que haga falta.
 - Al terminar un audio sigue solo con el de abajo; al terminar el último, se
   detiene. **⏮** vuelve al principio del audio si ya pasaron unos segundos, y
   recién ahí pasa al anterior.
+- El botón **🔁** al lado del nombre de lo que suena cambia cómo sigue la
+  música: apagado (sin repetir), **🔁 repetir la lista** (después del último
+  vuelve al primero) o **🔂 repetir ésta** (el mismo audio una y otra vez,
+  ideal para un pad debajo de una canción).
 - Los audios suenan por la salida de sonido de la computadora, igual que el
   video. Para que no se pisen con otra cosa, bajales el volumen o pausalos
   antes de proyectar un video con sonido.
+
+**Buscar en YouTube (sólo el audio).** Debajo del reproductor hay un buscador
+para sacar música o pads de YouTube **sin mostrar nada**: suena sólo el audio,
+por el mismo reproductor de arriba, y lo que está en pantalla (el logo, la letra,
+la Biblia) no cambia. Tampoco hay propagandas.
+
+- Escribí un artista, una canción o, por ejemplo, «pad en Re», y tocá **🔍** (o
+  *Enter*). También podés pegar un link de YouTube.
+- Los botones **Pads: Do, Do#, Re…** buscan directamente pads en ese tono.
+- En cada resultado: **▶** lo escucha ya, sin tocar la lista; **➕** lo suma al
+  final de la lista; **💾** guarda el audio en la computadora y lo suma a la
+  lista. **➕ Sumar todos** pone todos los resultados en la lista, para tener
+  música de fondo de corrido.
+- La primera vez que suena una canción tarda unos segundos (se trae el audio de
+  YouTube; la barra de abajo de la ventana dice cómo va). Las siguientes veces
+  arranca enseguida.
+- En la lista, lo que viene de YouTube lleva **🌐**: necesita internet la primera
+  vez. Para que funcione sin internet, elegilo y tocá **💾** arriba de la lista:
+  el audio queda guardado en la carpeta **Música › EcclesiaCast** de Windows y el
+  🌐 desaparece. Conviene hacerlo antes de la reunión.
+- El volumen es el mismo de los audios, y la barra **Volumen** de abajo de EN VIVO
+  también lo sube o lo baja.
 
 **Spotify u otro reproductor.** Los botones **⏮ ⏯ ⏭** y de volumen mandan las
 **teclas multimedia de Windows**, así que manejan el **Spotify instalado en la

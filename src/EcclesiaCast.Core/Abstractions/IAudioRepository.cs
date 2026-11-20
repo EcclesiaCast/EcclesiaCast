@@ -12,6 +12,9 @@ public interface IAudioRepository
 
     void Delete(int id);
 
+    /// <summary>Changes the name and path of a track, keeping its place (a YouTube song saved to a file).</summary>
+    void Update(AudioTrack track);
+
     /// <summary>Saves the order of the list: the first id goes first, and so on.</summary>
     void SaveOrder(IReadOnlyList<int> idsInOrder);
 }

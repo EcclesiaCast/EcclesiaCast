@@ -48,7 +48,14 @@ public sealed partial class MainViewModel
 
     /// <summary>0: the picture on the left of the words; 1: on the right.</summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(NamePlateImageSideLabel))]
     private int _namePlateImageSide;
+
+    /// <summary>The small button beside «Elegir…»: which side the picture goes, one click switches it.</summary>
+    public string NamePlateImageSideLabel => NamePlateImageSide == 1 ? "◨" : "◧";
+
+    [RelayCommand]
+    private void ToggleNamePlateImageSide() => NamePlateImageSide = NamePlateImageSide == 1 ? 0 : 1;
 
     /// <summary>The names of the church's styles, for the list in the tab.</summary>
     public ObservableCollection<string> NamePlateStyleNames { get; } = [];

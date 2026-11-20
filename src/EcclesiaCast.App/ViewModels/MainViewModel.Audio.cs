@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Audio;
+using EcclesiaCast.Core.Media;
 using Serilog;
 
 namespace EcclesiaCast.App.ViewModels;
@@ -108,20 +109,31 @@ public sealed partial class MainViewModel
         _audioPlayer.Ended += (_, _) => OnAudioEnded();
         _audioPlayer.Failed += (_, _) => OnAudioFailed();
         LoadAudioTracks();
+        InitializeYouTubeMusic();
     }
 
     /// <summary>Reads the list from the library again, keeping the selected and the loaded track.</summary>
     private void LoadAudioTracks()
     {
         var selectedId = SelectedAudio?.Id;
-        var currentId = CurrentAudio?.Id;
+        var current = CurrentAudio;
 
         AudioTracks.Clear();
         foreach (var track in _audios.GetAll())
             AudioTracks.Add(new AudioTrackItem(track));
 
         SelectedAudio = AudioTracks.FirstOrDefault(t => t.Id == selectedId);
-        CurrentAudio = AudioTracks.FirstOrDefault(t => t.Id == currentId);
+        CurrentAudio = current switch
+        {
+            null => null,
+            // A song heard from the YouTube search is not a row: it stays the one
+            // sounding, and becomes its row once it is added to the list.
+            { IsPreview: true } preview => YouTubeAudio.TrackVideoId(preview.Path) is { } videoId
+                && AudioTracks.FirstOrDefault(t => YouTubeAudio.IsTrackOf(t.Path, videoId)) is { } row
+                    ? row
+                    : preview,
+            _ => AudioTracks.FirstOrDefault(t => t.Id == current.Id),
+        };
     }
 
     // ── Agregar, quitar y ordenar ────────────────────────────────
@@ -200,7 +212,9 @@ public sealed partial class MainViewModel
         if (AudioTracks.Count > 0)
             SelectedAudio = AudioTracks[Math.Min(index, AudioTracks.Count - 1)];
 
-        StatusText = $"«{item.Name}» salió de la lista. El archivo sigue en su lugar.";
+        StatusText = item.IsYouTube
+            ? $"«{item.Name}» salió de la lista."
+            : $"«{item.Name}» salió de la lista. El archivo sigue en su lugar.";
     }
 
     [RelayCommand]
@@ -257,29 +271,48 @@ public sealed partial class MainViewModel
             return;
         }
 
+        // A newer press wins over a YouTube song still being looked up.
+        var request = ++_audioPlayRequest;
+
+        if (YouTubeAudio.TrackVideoId(item.Path) is { } videoId)
+        {
+            _ = PlayYouTubeTrackAsync(item, videoId, request);
+            return;
+        }
+
         if (!File.Exists(item.Path))
         {
             StatusText = $"No se encuentra el archivo de «{item.Name}»: ¿lo movieron o lo borraron?";
             return;
         }
 
+        StartAudio(item, item.Path, AudioOpeningGrace);
+    }
+
+    /// <summary>Hands the player the file to play (for a YouTube song, its sound brought to this computer) and shows it as loaded.</summary>
+    private bool StartAudio(AudioTrackItem item, string source, TimeSpan grace)
+    {
         try
         {
-            _audioPlayer.Play(item.Path);
+            _audioPlayer.Play(source);
         }
         catch (Exception ex)
         {
             Log.Error(ex, "No se pudo reproducir el audio {Path}", item.Path);
             StatusText = $"No se pudo reproducir «{item.Name}».";
-            return;
+            return false;
         }
 
         CurrentAudio = item;
-        SelectedAudio = item;
-        _audioOpeningUntil = DateTime.UtcNow + AudioOpeningGrace;
+        if (!item.IsPreview)
+            SelectedAudio = item;
+        _audioOpeningUntil = DateTime.UtcNow + grace;
         _audioTimer.Start();
         RefreshAudioProgress();
-        StatusText = $"Sonando: «{item.Name}».";
+        StatusText = item.IsYouTube
+            ? $"Sonando de YouTube: «{item.Name}»."
+            : $"Sonando: «{item.Name}».";
+        return true;
     }
 
     /// <summary>The ⏯ button: pause, resume, start over a track that ended, or start the selected one.</summary>
@@ -333,7 +366,7 @@ public sealed partial class MainViewModel
     private void NextAudio()
     {
         var index = CurrentAudio is null ? -1 : AudioTracks.IndexOf(CurrentAudio);
-        if (AudioNavigator.Next(AudioTracks.Count, index) is { } target)
+        if (AudioNavigator.NextPressed(AudioTracks.Count, index, AudioRepeat) is { } target)
             PlayAudio(AudioTracks[target]);
         else if (AudioTracks.Count > 0)
             StatusText = "Es el último audio de la lista.";
@@ -364,6 +397,7 @@ public sealed partial class MainViewModel
     /// <summary>Stops the sound and lets go of the track. Also called when the program closes.</summary>
     public void StopAudio()
     {
+        _audioPlayRequest++;
         _audioTimer.Stop();
         _audioPlayer.Stop();
         _audioOpeningUntil = DateTime.MinValue;
@@ -374,26 +408,56 @@ public sealed partial class MainViewModel
 
     private void OnAudioEnded()
     {
+        // A song heard from the search, outside the list: it only goes on with
+        // «repetir esta»; it does not start the list by itself.
+        if (CurrentAudio is { IsPreview: true } preview)
+        {
+            if (AudioRepeat == AudioRepeatMode.One)
+            {
+                PlayAudio(preview);
+                return;
+            }
+
+            FinishAudio("Terminó el audio de YouTube.");
+            return;
+        }
+
         var index = CurrentAudio is null ? -1 : AudioTracks.IndexOf(CurrentAudio);
 
-        if (AudioNavigator.Next(AudioTracks.Count, index) is { } next)
+        if (AudioNavigator.AfterEnd(AudioTracks.Count, index, AudioRepeat) is { } next)
         {
             PlayAudio(AudioTracks[next]);
             return;
         }
 
-        // The last one: the music does not start over by itself.
+        // The last one, and no repeat: the music does not start over by itself.
+        FinishAudio("Terminó el último audio de la lista.");
+    }
+
+    private void FinishAudio(string message)
+    {
         _audioTimer.Stop();
         _audioOpeningUntil = DateTime.MinValue;
         IsAudioPlaying = false;
         SetAudioProgress(TimeSpan.Zero, TimeSpan.Zero);
-        StatusText = "Terminó el último audio de la lista.";
+        StatusText = message;
     }
 
     private void OnAudioFailed()
     {
-        var name = CurrentAudio?.Name ?? "el audio";
+        var current = CurrentAudio;
+        var name = current?.Name ?? "el audio";
         StopAudio();
+
+        if (current is not null && YouTubeAudio.TrackVideoId(current.Path) is { } videoId)
+        {
+            // The sound brought from YouTube came damaged (a download cut short):
+            // it is thrown away so the next ▶ brings it again.
+            YtDlp.ForgetCachedAudio(videoId);
+            StatusText = $"No se pudo reproducir «{name}»: el audio llegó incompleto de YouTube. Tocá ▶ de nuevo y se vuelve a traer.";
+            return;
+        }
+
         StatusText = $"No se pudo reproducir «{name}»: el archivo puede estar dañado.";
     }
 

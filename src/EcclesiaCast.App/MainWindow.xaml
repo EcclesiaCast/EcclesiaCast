@@ -2259,12 +2259,36 @@
                             <DockPanel Visibility="{Binding IsChecked, ElementName=TabPlates, Converter={StaticResource BoolToVis}}">
                                 <TextBlock DockPanel.Dock="Top"
                                            Style="{StaticResource LearningHint}"
-                                           Text="Una tarjeta abajo a la izquierda con el nombre de quien habla o canta. Sale en el proyector y en la transmisión, y queda guardada en la lista para la próxima."
+                                           Text="Una tarjeta con el nombre de quien habla o canta. Su estilo dice cómo se ve y dónde sale; queda guardada en la lista para la próxima."
                                            FontSize="11" Foreground="{StaticResource FaintBrush}"
                                            TextWrapping="Wrap" Margin="12,0,12,8"/>
-                                <StackPanel DockPanel.Dock="Top" Margin="12,0,12,0">
-                                    <TextBlock Text="Nombre" Foreground="{StaticResource MutedBrush}" FontSize="11" Margin="0,0,0,4"/>
-                                    <TextBox Text="{Binding NamePlateName, UpdateSourceTrigger=PropertyChanged}"
+                                <!-- 19/11: «queda todo muy apretado». Cada dato en un renglón, con su nombre a
+                                     la izquierda en vez de arriba, y el lado de la imagen en un botón chico:
+                                     cuatro renglones menos y más lugar para las guardadas. -->
+                                <Grid DockPanel.Dock="Top" Margin="12,0,12,0">
+                                    <Grid.Resources>
+                                        <Style x:Key="PlateLabel" TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+                                            <Setter Property="FontSize" Value="11"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="Margin" Value="0,0,8,0"/>
+                                        </Style>
+                                    </Grid.Resources>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Text="Nombre" Style="{StaticResource PlateLabel}"/>
+                                    <TextBox Grid.Column="1" Text="{Binding NamePlateName, UpdateSourceTrigger=PropertyChanged}"
                                              Background="{StaticResource SurfaceAltBrush}" Foreground="White"
                                              BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
                                              Padding="8,5" FontSize="14"
@@ -2274,89 +2298,95 @@
                                             <KeyBinding Key="Enter" Command="{Binding ShowNamePlateCommand}"/>
                                         </TextBox.InputBindings>
                                     </TextBox>
-                                    <TextBlock Text="Cargo o detalle (opcional)" Foreground="{StaticResource MutedBrush}" FontSize="11" Margin="0,8,0,4"/>
-                                    <TextBox Text="{Binding NamePlateRole, UpdateSourceTrigger=PropertyChanged}"
+
+                                    <TextBlock Grid.Row="1" Text="Cargo" Style="{StaticResource PlateLabel}" Margin="0,8,8,0"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Margin="0,8,0,0"
+                                             Text="{Binding NamePlateRole, UpdateSourceTrigger=PropertyChanged}"
                                              Background="{StaticResource SurfaceAltBrush}" Foreground="White"
                                              BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
                                              Padding="8,5" FontSize="13"
                                              AutomationProperties.Name="Cargo de la placa"
-                                             ToolTip="Ej: «Predicación», «Alabanza», «Iglesia invitada» · Enter la muestra">
+                                             ToolTip="Opcional. Ej: «Predicación», «Alabanza», «Iglesia invitada» · Enter la muestra">
                                         <TextBox.InputBindings>
                                             <KeyBinding Key="Enter" Command="{Binding ShowNamePlateCommand}"/>
                                         </TextBox.InputBindings>
                                     </TextBox>
-                                    <!-- Imagen o video al costado del texto, de qué lado, y cómo entra -->
-                                    <TextBlock Text="Imagen o video (opcional)" Foreground="{StaticResource MutedBrush}" FontSize="11" Margin="0,8,0,4"/>
-                                    <DockPanel>
+
+                                    <!-- Imagen o video al costado del texto (opcional), y de qué lado -->
+                                    <TextBlock Grid.Row="2" Text="Imagen" Style="{StaticResource PlateLabel}" Margin="0,8,8,0"/>
+                                    <DockPanel Grid.Row="2" Grid.Column="1" Margin="0,8,0,0">
                                         <Button DockPanel.Dock="Right" Content="✕" FontSize="10" Padding="7,3" Margin="4,0,0,0"
                                                 Style="{StaticResource DarkButton}"
                                                 Command="{Binding ClearNamePlateImageCommand}"
                                                 IsEnabled="{Binding NamePlateHasImage}"
                                                 AutomationProperties.Name="Sacar la imagen de la placa"
                                                 ToolTip="La placa queda sólo con el texto"/>
-                                        <Button DockPanel.Dock="Right" Content="Elegir…" FontSize="11" Padding="9,3" Margin="6,0,0,0"
+                                        <Button DockPanel.Dock="Right" Content="Elegir…" FontSize="11" Padding="9,3" Margin="4,0,0,0"
                                                 Style="{StaticResource DarkButton}"
                                                 Click="ChooseNamePlateImage_Click"
                                                 AutomationProperties.Name="Elegir la imagen de la placa"
-                                                ToolTip="Uno de tus logos, o cualquier imagen o video corto de la computadora (el video va en bucle y sin sonido)"/>
+                                                ToolTip="Opcional: uno de tus logos, o una imagen, un GIF o un video corto de la computadora (el video va en bucle y sin sonido)"/>
+                                        <Button DockPanel.Dock="Right" Content="{Binding NamePlateImageSideLabel}" FontSize="13" Padding="6,0" Margin="6,0,0,0"
+                                                Style="{StaticResource DarkButton}"
+                                                Command="{Binding ToggleNamePlateImageSideCommand}"
+                                                IsEnabled="{Binding NamePlateHasImage}"
+                                                AutomationProperties.Name="Lado de la imagen"
+                                                ToolTip="De qué lado del texto va la imagen (◧ a la izquierda, ◨ a la derecha): un clic la cambia de lado"/>
                                         <TextBlock Text="{Binding NamePlateImageLabel}" FontSize="12" Foreground="White"
                                                    VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                                     </DockPanel>
-                                    <ComboBox Margin="0,6,0,0" FontSize="11" SelectedIndex="{Binding NamePlateImageSide}"
-                                              IsEnabled="{Binding NamePlateHasImage}"
-                                              AutomationProperties.Name="Lado de la imagen"
-                                              ToolTip="De qué lado del texto va la imagen">
-                                        <ComboBoxItem Content="Imagen a la izquierda"/>
-                                        <ComboBoxItem Content="Imagen a la derecha"/>
-                                    </ComboBox>
+
                                     <!-- El estilo: colores, tamaño, lugar, entrada y salida, y si va sólo a OBS -->
-                                    <TextBlock Text="Estilo" Foreground="{StaticResource MutedBrush}" FontSize="11" Margin="0,8,0,4"/>
-                                    <DockPanel>
+                                    <TextBlock Grid.Row="3" Text="Estilo" Style="{StaticResource PlateLabel}" Margin="0,8,8,0"/>
+                                    <DockPanel Grid.Row="3" Grid.Column="1" Margin="0,8,0,0">
                                         <Button DockPanel.Dock="Right" Content="✏ Diseñar…" FontSize="11" Padding="9,3" Margin="6,0,0,0"
                                                 Style="{StaticResource DarkButton}"
                                                 Command="{Binding DesignNamePlateStylesCommand}"
                                                 AutomationProperties.Name="Diseñar los estilos de placa"
                                                 ToolTip="Colores, tamaño del recuadro, letras, lugar, cómo entra y cómo sale, y si se ve sólo en la transmisión (OBS)"/>
-                                        <ComboBox FontSize="11"
+                                        <ComboBox FontSize="12"
                                                   ItemsSource="{Binding NamePlateStyleNames}"
                                                   SelectedItem="{Binding NamePlateStyleName}"
                                                   AutomationProperties.Name="Estilo de la placa"
-                                                  ToolTip="Cómo se ve la placa. Se diseñan con «✏ Diseñar…»"/>
+                                                  ToolTip="Cómo se ve la placa y dónde sale. Se diseñan con «✏ Diseñar…»"/>
                                     </DockPanel>
-                                    <DockPanel Margin="0,10,0,0">
-                                        <ComboBox DockPanel.Dock="Right" Width="118" FontSize="11" VerticalAlignment="Center"
-                                                  SelectedIndex="{Binding NamePlateAutoHide}"
-                                                  AutomationProperties.Name="Cuánto dura la placa"
-                                                  ToolTip="Cuánto queda la placa en pantalla">
-                                            <ComboBoxItem Content="Hasta quitarla"/>
-                                            <ComboBoxItem Content="Se va a los 5 s"/>
-                                            <ComboBoxItem Content="Se va a los 10 s"/>
-                                            <ComboBoxItem Content="Se va a los 15 s"/>
-                                        </ComboBox>
-                                        <StackPanel Orientation="Horizontal">
-                                            <Button Content="Mostrar" Command="{Binding ShowNamePlateCommand}" Padding="14,7"
-                                                    ToolTip="Pone la placa en pantalla (Enter en el nombre hace lo mismo)">
-                                                <Button.Style>
-                                                    <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding IsNamePlateActive}" Value="True">
-                                                                <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
-                                                                <Setter Property="BorderThickness" Value="0"/>
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Button.Style>
-                                            </Button>
-                                            <Button Content="Quitar" Style="{StaticResource DarkButton}" Padding="14,7" Margin="6,0,0,0"
-                                                    Command="{Binding HideNamePlateCommand}"
-                                                    ToolTip="Saca la placa de la pantalla"/>
-                                        </StackPanel>
-                                    </DockPanel>
-                                    <TextBlock Text="Guardadas · doble clic para mostrar" Foreground="{StaticResource MutedBrush}"
-                                               FontSize="11" Margin="0,12,0,4"/>
-                                </StackPanel>
+
+                                    <TextBlock Grid.Row="4" Text="Dura" Style="{StaticResource PlateLabel}" Margin="0,8,8,0"/>
+                                    <ComboBox Grid.Row="4" Grid.Column="1" Margin="0,8,0,0" FontSize="12"
+                                              SelectedIndex="{Binding NamePlateAutoHide}"
+                                              AutomationProperties.Name="Cuánto dura la placa"
+                                              ToolTip="Cuánto queda la placa en pantalla">
+                                        <ComboBoxItem Content="Hasta quitarla"/>
+                                        <ComboBoxItem Content="Se va sola a los 5 s"/>
+                                        <ComboBoxItem Content="Se va sola a los 10 s"/>
+                                        <ComboBoxItem Content="Se va sola a los 15 s"/>
+                                    </ComboBox>
+
+                                    <!-- Mostrar y Quitar, anchos y a la par -->
+                                    <UniformGrid Grid.Row="5" Grid.ColumnSpan="2" Rows="1" Margin="0,12,0,0">
+                                        <Button Content="Mostrar" Command="{Binding ShowNamePlateCommand}" Padding="14,8" Margin="0,0,4,0"
+                                                ToolTip="Pone la placa en pantalla (Enter en el nombre hace lo mismo)">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsNamePlateActive}" Value="True">
+                                                            <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                                            <Setter Property="BorderThickness" Value="0"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <Button Content="Quitar" Style="{StaticResource DarkButton}" Padding="14,8" Margin="4,0,0,0"
+                                                Command="{Binding HideNamePlateCommand}"
+                                                ToolTip="Saca la placa de la pantalla"/>
+                                    </UniformGrid>
+                                </Grid>
+                                <TextBlock DockPanel.Dock="Top" Text="Guardadas · doble clic para mostrar" Foreground="{StaticResource MutedBrush}"
+                                           FontSize="11" Margin="12,14,12,4"/>
                                 <Grid Margin="12,0,12,12">
                                     <ListBox x:Name="SavedPlatesList" ItemsSource="{Binding SavedNamePlates}"
+                                             HorizontalContentAlignment="Stretch"
                                              SelectedItem="{Binding SelectedSavedNamePlate}"
                                              MouseDoubleClick="SavedPlatesList_MouseDoubleClick"
                                              Background="Transparent" BorderThickness="0"
@@ -2443,6 +2473,10 @@
                                             <Button Content="A–Z" FontSize="11" Padding="7,3" Margin="4,0,0,0" Style="{StaticResource DarkButton}"
                                                     Command="{Binding SortAudioByNameCommand}"
                                                     ToolTip="Ordenar toda la lista por nombre"/>
+                                            <Button Content="💾" FontSize="11" Padding="7,3" Margin="4,0,0,0" Style="{StaticResource DarkButton}"
+                                                    Command="{Binding SaveSelectedAudioCommand}"
+                                                    AutomationProperties.Name="Guardar el audio de YouTube elegido"
+                                                    ToolTip="Guardar en la computadora el audio de YouTube elegido (🌐), para que funcione sin internet"/>
                                             <Button Content="🗑" FontSize="11" Padding="7,3" Margin="4,0,0,0" Style="{StaticResource DarkButton}"
                                                     Command="{Binding RemoveAudioCommand}"
                                                     AutomationProperties.Name="Quitar el audio elegido"
@@ -2508,6 +2542,11 @@
                                                                     </Style>
                                                                 </TextBlock.Style>
                                                             </TextBlock>
+                                                            <!-- De YouTube, suena por internet (💾 lo guarda) -->
+                                                            <TextBlock DockPanel.Dock="Right" Text="🌐" FontSize="10" Margin="6,0,0,0"
+                                                                       VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}"
+                                                                       ToolTip="De YouTube: suena por internet. Con 💾 queda guardado en la computadora."
+                                                                       Visibility="{Binding IsYouTube, Converter={StaticResource BoolToVis}}"/>
                                                             <TextBlock Text="{Binding Name}" FontSize="12" TextTrimming="CharacterEllipsis"
                                                                        VerticalAlignment="Center">
                                                                 <TextBlock.Style>
@@ -2536,8 +2575,27 @@
 
                                     <!-- El reproductor: se esconde junto con la lista al achicar AUDIOS -->
                                     <StackPanel x:Name="AudioPlayerPanel">
-                                    <TextBlock Text="{Binding AudioNowPlayingText}" FontSize="12" FontWeight="SemiBold"
-                                               Foreground="White" TextTrimming="CharacterEllipsis" Margin="0,10,0,0"/>
+                                    <DockPanel Margin="0,10,0,0">
+                                        <!-- Repetir: sin repetir → la lista → ésta (para un pad) -->
+                                        <Button DockPanel.Dock="Right" Content="{Binding AudioRepeatGlyph}" FontSize="11" Padding="7,2" Margin="6,0,0,0"
+                                                Command="{Binding CycleAudioRepeatCommand}"
+                                                AutomationProperties.Name="Repetir"
+                                                ToolTip="{Binding AudioRepeatTip}">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                                    <Setter Property="Opacity" Value="0.5"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsAudioRepeatOn}" Value="True">
+                                                            <Setter Property="Opacity" Value="1"/>
+                                                            <Setter Property="Foreground" Value="{StaticResource AccentSoftBrush}"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <TextBlock Text="{Binding AudioNowPlayingText}" FontSize="12" FontWeight="SemiBold"
+                                                   Foreground="White" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                                    </DockPanel>
                                     <DockPanel Margin="0,4,0,0">
                                         <TextBlock DockPanel.Dock="Right" Text="{Binding AudioTimeText}" FontSize="11"
                                                    Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center"
@@ -2592,6 +2650,129 @@
                                         </StackPanel>
                                     </DockPanel>
                                     </StackPanel>
+
+                                    <!-- YouTube, sólo el sonido: buscar, escuchar, sumar a la lista, guardar -->
+                                    <Rectangle Height="1" Fill="{StaticResource LineBrush}" Margin="0,14,0,0"/>
+                                    <TextBlock Text="BUSCAR EN YOUTUBE (SÓLO EL AUDIO)" Style="{StaticResource PanelTitle}" Margin="0,10,0,6"/>
+                                    <DockPanel>
+                                        <Button DockPanel.Dock="Right" Content="🔍" FontSize="12" Padding="9,4" Margin="4,0,0,0"
+                                                Style="{StaticResource AccentButton}"
+                                                Command="{Binding SearchYouTubeMusicCommand}"
+                                                AutomationProperties.Name="Buscar en YouTube"
+                                                ToolTip="Buscar en YouTube"/>
+                                        <TextBox Padding="8,5"
+                                                 Background="{StaticResource SurfaceAltBrush}"
+                                                 Foreground="White" CaretBrush="White"
+                                                 BorderBrush="{StaticResource LineBrush}"
+                                                 FontSize="12"
+                                                 Text="{Binding YouTubeMusicQuery, UpdateSourceTrigger=PropertyChanged}"
+                                                 AutomationProperties.Name="Buscar música en YouTube"
+                                                 ToolTip="Un artista, una canción, «pad en Re»… o pegá un link de YouTube. Enter busca.">
+                                            <TextBox.InputBindings>
+                                                <KeyBinding Key="Enter" Command="{Binding SearchYouTubeMusicCommand}"/>
+                                            </TextBox.InputBindings>
+                                        </TextBox>
+                                    </DockPanel>
+
+                                    <!-- Pads por tono: buscan el pad en YouTube -->
+                                    <DockPanel Margin="0,6,0,0">
+                                        <TextBlock DockPanel.Dock="Left" Text="Pads:" FontSize="11" Foreground="{StaticResource MutedBrush}"
+                                                   VerticalAlignment="Top" Margin="0,3,6,0"/>
+                                        <ItemsControl ItemsSource="{Binding PadKeys}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <WrapPanel/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Button Content="{Binding}" FontSize="10.5" Padding="6,2" Margin="0,0,3,3" MinWidth="30"
+                                                            Style="{StaticResource DarkButton}"
+                                                            Command="{Binding DataContext.SearchPadCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                            CommandParameter="{Binding}"
+                                                            ToolTip="Buscar pads en este tono en YouTube"/>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </DockPanel>
+
+                                    <TextBlock Text="Buscando en YouTube…" FontSize="11" Margin="0,6,0,0"
+                                               Foreground="{StaticResource AccentSoftBrush}"
+                                               Visibility="{Binding IsSearchingYouTubeMusic, Converter={StaticResource BoolToVis}}"/>
+
+                                    <!-- Resultados -->
+                                    <StackPanel Visibility="{Binding HasYouTubeMusicResults, Converter={StaticResource BoolToVis}}">
+                                        <DockPanel Margin="0,6,0,4">
+                                            <Button DockPanel.Dock="Right" Content="✕" FontSize="10" Padding="6,2" Margin="4,0,0,0"
+                                                    Style="{StaticResource DarkButton}"
+                                                    Command="{Binding ClearYouTubeMusicResultsCommand}"
+                                                    AutomationProperties.Name="Cerrar los resultados"
+                                                    ToolTip="Cerrar los resultados"/>
+                                            <Button DockPanel.Dock="Right" Content="➕ Sumar todos" FontSize="10.5" Padding="7,2"
+                                                    Style="{StaticResource DarkButton}"
+                                                    Command="{Binding AddAllYouTubeResultsCommand}"
+                                                    ToolTip="Sumar todos los resultados a la lista (para música de fondo de corrido)"/>
+                                            <TextBlock Text="RESULTADOS" FontSize="10.5" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center"/>
+                                        </DockPanel>
+                                        <Border Background="{StaticResource BgBrush}" BorderBrush="{StaticResource LineBrush}"
+                                                BorderThickness="1" CornerRadius="4">
+                                            <ScrollViewer MaxHeight="320" VerticalScrollBarVisibility="Auto">
+                                                <ItemsControl ItemsSource="{Binding YouTubeMusicResults}" Margin="2">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Border Padding="4" Margin="0,1" CornerRadius="3">
+                                                                <Border.Style>
+                                                                    <Style TargetType="Border">
+                                                                        <Setter Property="Background" Value="Transparent"/>
+                                                                        <Style.Triggers>
+                                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                                <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+                                                                            </Trigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Border.Style>
+                                                                <DockPanel>
+                                                                    <Image DockPanel.Dock="Left" Width="64" Height="36" Stretch="UniformToFill"
+                                                                           Margin="0,0,6,0" VerticalAlignment="Center"
+                                                                           Source="{Binding ThumbnailUrl}"/>
+                                                                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                                                        <Button Content="▶" FontSize="11" Padding="7,3" Style="{StaticResource AccentButton}"
+                                                                                Command="{Binding DataContext.ListenYouTubeResultCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                                CommandParameter="{Binding}"
+                                                                                AutomationProperties.Name="Escuchar"
+                                                                                ToolTip="Escuchar ahora (sólo el audio, por internet)"/>
+                                                                        <Button Content="➕" FontSize="11" Padding="6,3" Margin="3,0,0,0" Style="{StaticResource DarkButton}"
+                                                                                Command="{Binding DataContext.AddYouTubeResultCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                                CommandParameter="{Binding}"
+                                                                                AutomationProperties.Name="Sumar a la lista"
+                                                                                ToolTip="Sumar a la lista de audios"/>
+                                                                        <Button Content="💾" FontSize="11" Padding="6,3" Margin="3,0,0,0" Style="{StaticResource DarkButton}"
+                                                                                Command="{Binding DataContext.SaveYouTubeResultCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                                CommandParameter="{Binding}"
+                                                                                AutomationProperties.Name="Guardar"
+                                                                                ToolTip="Guardar el audio en la computadora y sumarlo a la lista: funciona sin internet"/>
+                                                                    </StackPanel>
+                                                                    <StackPanel VerticalAlignment="Center">
+                                                                        <TextBlock Text="{Binding Title}" FontSize="11.5" Foreground="White"
+                                                                                   TextTrimming="CharacterEllipsis" ToolTip="{Binding Title}"/>
+                                                                        <TextBlock FontSize="10.5" Foreground="{StaticResource MutedBrush}"
+                                                                                   TextTrimming="CharacterEllipsis">
+                                                                            <Run Text="{Binding DurationText, Mode=OneWay}"/><Run Text="  ·  "/><Run Text="{Binding Channel, Mode=OneWay}"/>
+                                                                        </TextBlock>
+                                                                    </StackPanel>
+                                                                </DockPanel>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </ScrollViewer>
+                                        </Border>
+                                    </StackPanel>
+                                    <TextBlock Style="{StaticResource LearningHint}"
+                                               Text="Suena sólo el audio, por el mismo reproductor de arriba: lo que está en pantalla no cambia. Lo que suena por internet tiene 🌐; con 💾 queda guardado y funciona sin internet."
+                                               FontSize="10.5" Foreground="{StaticResource FaintBrush}"
+                                               TextWrapping="Wrap" Margin="0,8,0,0"/>
 
                                     <!-- Otro reproductor (Spotify…): las teclas multimedia de Windows -->
                                     <Rectangle Height="1" Fill="{StaticResource LineBrush}" Margin="0,14,0,0"/>
