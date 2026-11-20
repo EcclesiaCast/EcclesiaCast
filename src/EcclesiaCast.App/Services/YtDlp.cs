@@ -351,6 +351,10 @@ public static partial class YtDlp
         };
         // Python would otherwise print titles in the console's old code page.
         info.Environment["PYTHONUTF8"] = "1";
+        // Not enough for the yt-dlp.exe build: on Windows it still printed paths and
+        // titles in the old code page (19/11). Asked outright, it writes UTF-8.
+        info.ArgumentList.Add("--encoding");
+        info.ArgumentList.Add("utf-8");
         foreach (var argument in arguments)
             info.ArgumentList.Add(argument);
 

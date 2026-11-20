@@ -285,6 +285,10 @@ public static partial class YtDlp
             CreateNoWindow = true,
         };
         info.Environment["PYTHONUTF8"] = "1";
+        // Not enough for the yt-dlp.exe build: on Windows it still printed titles in the
+        // old code page («Hillsong en Espa?ol», 19/11). Asked outright, it writes UTF-8.
+        info.ArgumentList.Add("--encoding");
+        info.ArgumentList.Add("utf-8");
         foreach (var argument in arguments)
             info.ArgumentList.Add(argument);
 

@@ -1320,6 +1320,20 @@ public partial class MainWindow : Window
 
     private DateTime _historyClosedAt = DateTime.MinValue;
 
+    /// <summary>
+    /// Below this width of the row, «🕘 Historial» goes back to just 🕘: the box
+    /// for the reference keeps about 150 px, enough for «1 co 13 4-7».
+    /// </summary>
+    private const double BibleHistoryWordWidth = 360;
+
+    private void BibleQueryRow_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (!e.WidthChanged)
+            return;
+
+        BibleHistoryButton.Content = e.NewSize.Width >= BibleHistoryWordWidth ? "🕘 Historial" : "🕘";
+    }
+
     private void BibleHistoryButton_Click(object sender, RoutedEventArgs e)
     {
         // A popup that does not stay open closes on the mouse press that is
