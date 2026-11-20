@@ -7,6 +7,15 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Música de YouTube, sólo el audio.** En la pestaña **Música**, debajo del reproductor, un buscador
+  de YouTube: escribí un artista, una canción o pegá un link, o tocá un tono en **Pads: Do, Do#, Re…**
+  para buscar pads. **▶** escucha el resultado ya, **➕** lo suma a la lista y **💾** guarda el audio en
+  **Música › EcclesiaCast** para que funcione sin internet. Suena sólo el sonido, sin imagen ni
+  propagandas, por el mismo reproductor de los audios: **lo que está en pantalla no cambia**. Lo que
+  todavía necesita internet lleva 🌐 en la lista, y con 💾 arriba de la lista queda guardado. Lo ya
+  escuchado arranca enseguida la próxima vez, y mientras suena una canción se va trayendo la siguiente.
+- **Botón para repetir la música** (al lado del nombre de lo que suena): sin repetir, **🔁 repetir la
+  lista** o **🔂 repetir ésta**, ideal para dejar un pad sonando debajo de una canción.
 - **Placas de nombre («lower third»).** Pestaña nueva **Placas**: nombre y cargo («Pastor Juan Pérez /
   Predicación») en una tarjeta abajo a la izquierda que entra deslizándose, en el proyector, en el EN VIVO
   y en la transmisión (OBS). Se va sola a los 5, 10 o 15 segundos, o cuando la quitás. Cada placa

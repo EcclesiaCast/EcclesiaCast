@@ -25,6 +25,46 @@ public static class AudioNavigator
     }
 
     /// <summary>
+    /// What plays when a track ends by itself, by the repeat button: without
+    /// repeat it is <see cref="Next(int,int)"/>; «repetir esta» plays the same
+    /// one again; «repetir la lista» goes back to the first after the last.
+    /// Null means the music stops there.
+    /// </summary>
+    public static int? AfterEnd(int count, int current, AudioRepeatMode repeat)
+    {
+        if (count <= 0)
+            return null;
+
+        return repeat switch
+        {
+            AudioRepeatMode.One when current >= 0 && current < count => current,
+            AudioRepeatMode.All => current + 1 < count ? Math.Max(current + 1, 0) : 0,
+            _ => Next(count, current),
+        };
+    }
+
+    /// <summary>
+    /// The ⏭ button: like <see cref="Next(int,int)"/>, but with the whole list
+    /// on repeat the last one goes on to the first. «Repetir esta» does not
+    /// hold the button back: pressing it is asking for another song.
+    /// </summary>
+    public static int? NextPressed(int count, int current, AudioRepeatMode repeat)
+    {
+        if (Next(count, current) is { } next)
+            return next;
+
+        return repeat == AudioRepeatMode.All && count > 0 ? 0 : null;
+    }
+
+    /// <summary>The mode the repeat button goes to after <paramref name="mode"/>.</summary>
+    public static AudioRepeatMode Cycle(AudioRepeatMode mode) => mode switch
+    {
+        AudioRepeatMode.Off => AudioRepeatMode.All,
+        AudioRepeatMode.All => AudioRepeatMode.One,
+        _ => AudioRepeatMode.Off,
+    };
+
+    /// <summary>
     /// The track «anterior» goes to. Like any player, a few seconds in it
     /// starts the same track over; only at the start does it go back (and the
     /// first track just starts over). Null when the list is empty.

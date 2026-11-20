@@ -620,7 +620,7 @@ contorno, y el video se proyecta igual.
 
 ## 14. Música
 
-En la columna derecha, abajo, la pestaña **Música** tiene dos partes.
+En la columna derecha, abajo, la pestaña **Música** tiene tres partes.
 
 **Audios.** Una lista propia de archivos de sonido (mp3, wav, m4a, ogg y flac)
 para la música de antes de la reunión, la ofrenda o lo que haga falta.
@@ -636,9 +636,35 @@ para la música de antes de la reunión, la ofrenda o lo que haga falta.
 - Al terminar un audio sigue solo con el de abajo; al terminar el último, se
   detiene. **⏮** vuelve al principio del audio si ya pasaron unos segundos, y
   recién ahí pasa al anterior.
+- El botón **🔁** al lado del nombre de lo que suena cambia cómo sigue la
+  música: apagado (sin repetir), **🔁 repetir la lista** (después del último
+  vuelve al primero) o **🔂 repetir ésta** (el mismo audio una y otra vez,
+  ideal para un pad debajo de una canción).
 - Los audios suenan por la salida de sonido de la computadora, igual que el
   video. Para que no se pisen con otra cosa, bajales el volumen o pausalos
   antes de proyectar un video con sonido.
+
+**Buscar en YouTube (sólo el audio).** Debajo del reproductor hay un buscador
+para sacar música o pads de YouTube **sin mostrar nada**: suena sólo el audio,
+por el mismo reproductor de arriba, y lo que está en pantalla (el logo, la letra,
+la Biblia) no cambia. Tampoco hay propagandas.
+
+- Escribí un artista, una canción o, por ejemplo, «pad en Re», y tocá **🔍** (o
+  *Enter*). También podés pegar un link de YouTube.
+- Los botones **Pads: Do, Do#, Re…** buscan directamente pads en ese tono.
+- En cada resultado: **▶** lo escucha ya, sin tocar la lista; **➕** lo suma al
+  final de la lista; **💾** guarda el audio en la computadora y lo suma a la
+  lista. **➕ Sumar todos** pone todos los resultados en la lista, para tener
+  música de fondo de corrido.
+- La primera vez que suena una canción tarda unos segundos (se trae el audio de
+  YouTube; la barra de abajo de la ventana dice cómo va). Las siguientes veces
+  arranca enseguida.
+- En la lista, lo que viene de YouTube lleva **🌐**: necesita internet la primera
+  vez. Para que funcione sin internet, elegilo y tocá **💾** arriba de la lista:
+  el audio queda guardado en la carpeta **Música › EcclesiaCast** de Windows y el
+  🌐 desaparece. Conviene hacerlo antes de la reunión.
+- El volumen es el mismo de los audios, y la barra **Volumen** de abajo de EN VIVO
+  también lo sube o lo baja.
 
 **Spotify u otro reproductor.** Los botones **⏮ ⏯ ⏭** y de volumen mandan las
 **teclas multimedia de Windows**, así que manejan el **Spotify instalado en la

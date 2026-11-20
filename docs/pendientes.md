@@ -14,397 +14,220 @@ Hay cuatro tipos de cosas, cada una en su sección:
 
 ## 1. Para probar (lo prueba Alexis)
 
-### Pedidos de la prueba de la 1.5.0 prueba.2 (19/11/2026)
+Una sola lista numerada con **todo lo que todavía no probaste o de lo que no diste tu opinión**,
+sea de la versión que sea. Va primero lo más nuevo (lo de la 1.5.0), después lo de versiones
+anteriores. Cuando pruebes algo, decile a Claude el número («el 7 anduvo, el 12 falla así…») y
+pasa a **Ya probado**, más abajo.
 
-Hecho por Claude. Compila y pasan las pruebas. Claude abrió la pestaña Placas con una copia de la biblioteca y quedó ordenada: entra el nombre de la imagen, el botón ◧ / ◨ la cambia de lado y el 🗑 de las guardadas queda a la derecha.
+### Falta probar
 
-- [ ] **Pestaña Placas más aireada** (Alexis: «queda todo muy apretado»). Ahora cada dato va en
-  un renglón con su nombre a la izquierda (Nombre, Cargo, Imagen, Estilo, Dura). El lado de la
-  imagen es un botón chico al lado de «Elegir…» («◧» / «◨»), y Mostrar y Quitar van
-  anchos y a la par. Así quedan cuatro renglones menos y más lugar para las guardadas.
-- [ ] **YouTube entra silenciado:** un video de YouTube recién agregado sale sin sonido. Con
-  «🔇 Sin sonido» debajo del EN VIVO pasa a sonar, y el video lo recuerda. Los que ya estaban en
-  la biblioteca siguen como estaban.
-- [ ] **Volver a descargar un video que se sacó de la biblioteca:** antes decía «yt-dlp terminó
-  pero no encontré el archivo descargado», y había que borrar el archivo a mano. Ahora usa el
-  archivo que ya estaba en la carpeta de descargas.
+**De la 1.5.0, lo último (prueba.3)**
 
-### Pedidos de GitHub #32 y #37 (19/11/2026): lo que queda
+1. **YouTube sólo el audio: buscar y escuchar.** Pestaña Música → buscador «BUSCAR EN YOUTUBE (SÓLO
+   EL AUDIO)» → un artista y Enter → **▶** en un resultado. La barra de abajo dice «Trayendo… %» y a
+   los pocos segundos suena. **En el proyector no tiene que cambiar nada.**
+2. **Pads y repetir.** Tocar «Re» en «Pads:», escuchar uno con ▶ y poner **🔂** (repetir ésta) al
+   lado del nombre: al terminar vuelve a empezar solo.
+3. **Sumar a la lista.**
+   - ➕ en un resultado y «➕ Sumar todos»: aparecen en la lista con 🌐.
+   - Doble clic en uno: suena, y al terminar sigue con el de abajo sin un silencio largo.
+4. **Guardar para usar sin internet.**
+   - Uno con 🌐 en la lista → **💾** arriba de la lista: se le va el 🌐 y el archivo queda en
+     Música › EcclesiaCast.
+   - **Sin internet** tiene que sonar igual.
+5. **Link pegado:** pegar un link de YouTube en ese buscador y Enter: aparece con su título real.
+6. **La barra «Volumen»** de abajo de EN VIVO también sube y baja esa música.
+7. **Pestaña Placas más aireada.** Lo pediste («queda todo muy apretado»). Cada dato va en un
+   renglón con su nombre al costado (Nombre, Cargo, Imagen, Estilo, Dura). El botón «◧» / «◨» al
+   lado de «Elegir…» cambia la imagen de lado, y Mostrar y Quitar van anchos. Claude la vio andar
+   con una copia de la biblioteca; falta tu opinión.
+8. **YouTube entra silenciado.** Un video de YouTube recién agregado sale sin sonido; «🔇 Sin
+   sonido», debajo del EN VIVO, le da el sonido y el video lo recuerda.
+9. **Volver a descargar un video que sacaste de la biblioteca.** Ya no dice «no encontré el
+   archivo descargado»: usa el archivo que había quedado en la carpeta.
+10. **Placas con YouTube de fondo.** Con un YouTube a pantalla completa, lo más probable es que la
+    placa (como el aviso al pie) no se vea en el proyector, porque el video es una ventana aparte;
+    en OBS sí. Ver si hace falta arreglarlo.
 
-- [ ] **Contador de uso, al sacar la 1.5.0:**
-  1. Subir el `worker.js` nuevo y borrar lo contado (pasos en `servicios/api/LEEME.md`, «Empezar de cero»).
-  2. Con la 1.5.0 **instalada**, proyectar algo y mirar a los minutos el resumen: tiene que
-     aparecer esa instalación con la versión 1.5.0.
-  3. Un instalador de prueba (`1.5.0-prueba.N`) no tiene que aparecer.
-- [ ] **Placas con YouTube de fondo:** con un video de YouTube a pantalla completa, lo más probable
-  es que la placa (como el aviso al pie) no se vea en el proyector, porque el video es una ventana
-  aparte; en OBS sí. Ver si hace falta.
+**De la 1.5.0, la primera tanda (18/11)**
 
-### Ya probado (19/11/2026)
+Claude ya probó en esta PC la ventana flotante, la importación del XML de OpenSong y YouTube a
+pantalla completa con Esc y doble clic. Falta:
 
-Lo probó Alexis con la prueba.1 y la prueba.2 y anduvo. Queda anotado acá para no mezclarlo con lo
-que falta:
+11. **YouTube en Windows 10**, con la notebook sola (donde le pasó a la iglesia): clic sobre el
+    video y Esc vuelve al programa; el doble clic también.
+12. **La ventana flotante compartida por Discord** o una videollamada.
+    - Que se transmita bien y que se pueda minimizar y volver.
+    - Adentro: un video, el logo, el aviso al pie y la cuenta regresiva.
+    - Que las páginas /salida (OBS, celular, escenario) sigan igual.
+    - Con dos monitores: dejarla en el segundo, cerrar el programa, desenchufar el monitor y
+      abrir: tiene que aparecer en el medio de la pantalla principal.
+13. **Con una sola pantalla** (una notebook sin proyector, instalación nueva u otra PC).
+    - «⧉ En una ventana» tiene que ser la primera de la lista «Salida:» y venir elegida.
+    - Con el proyector en «duplicar», Windows ve una sola pantalla, así que también arranca en la
+      ventana.
+    - Para pantalla completa se elige «Pantalla 1» una vez, y al cerrar y abrir sigue ahí.
+14. **El teclado y la ventana flotante.** Si se toca la ventana flotante, las teclas del panel
+    (flechas, Ctrl+Enter) no andan hasta volver a hacer clic en el panel. Ver si molesta.
+15. **«➕ Agregar» en Canciones** con el panel angosto: que el título «CANCIONES» no quede tapado.
+16. **Una Biblia XML real** de OpenSong o de Beblia (la que exportan Holyrics o FreeShow). Si el
+    archivo trae los libros en inglés, así se muestran («John 3:16»).
 
-- **YouTube y descargas:**
-  - el aviso propio cuando YouTube no deja pasar un video por derechos de autor (hay que descargarlo);
-  - la mejor calidad de los descargados.
-- **Salida y volumen:**
-  - un solo volumen;
-  - la salida vertical 9:16.
-- **Canciones:**
-  - el orden trabado, que también traba Ctrl+Z / Ctrl+Y;
-  - «Crear canción desde cero…» en el menú Canciones;
-  - fondo propio de la canción con «🎲 al azar por canción» prendido;
-  - deshacer después de «Editar como texto plano»;
-  - buscar en la letra con «Líneas por diapositiva».
-- **Placas:**
-  - los estilos de placa y «✏ Diseñar…»;
-  - las placas en una notebook con proyector real, con el aviso al pie.
-- **Decidido:** placa y letra a la vez se deja así. Si la placa tapa el último renglón, cada uno
-  lo acomoda con el lugar del estilo («Desde abajo») o con el diseño de la letra.
+**De versiones anteriores, sin tu respuesta**
 
-### Arreglos del formulario de comentarios y salida en una ventana (18/11/2026)
+17. **Logo y Black frenan el video de atrás.** Con el logo (F3) o el negro (F1) puestos, el video
+    de fondo se pausa y su sonido se corta, y al sacarlos sigue donde estaba.
+    - Claude lo midió en la PC con un video común.
+    - Falta con el proyector real y con estos casos: el video que rellena los bordes, una página
+      web o una ventana en vivo, y un logo que es un video (ése tiene que seguir moviéndose).
+18. **«Archivo → Cómo preparar una Biblia para importar…».** Probá:
+    - **Guardar este ejemplo…** del JSON y del XML: se abren bien con el Bloc de notas, con acentos.
+    - Importar cada ejemplo y proyectar Juan 3:16.
+    - **📋 Copiar instrucciones para una IA**: se leen enteras en español. Si podés, probalas con una
+      IA y una Biblia tuya.
+    - Un archivo que no sirve (un .txt renombrado a .json): el error manda a esa ventana.
+19. **Tipografía de cada recuadro del escenario:** en el diseñador de escenarios, una letra para
+    las notas y otra para la hora; cada una cambia sólo la suya.
+20. **Tipografía del texto rápido:** la lista «Tipografía» de la pestaña Texto rápido cambia la
+    vista previa y queda elegida al cerrar y abrir.
+21. **«Selah» y títulos de los Salmos:** en el editor de temas (Biblia), la casilla «Mostrar Selah
+    y los títulos de los Salmos» viene destildada y se guarda.
+22. **Corregir el texto de un versículo:** clic derecho en un versículo de la grilla → «Corregir el
+    texto…». El cambio se ve en la diapositiva y queda al cerrar y abrir. Probalo en una Biblia
+    importada de prueba.
+23. **Menú Transmisión y estilos para OBS** (plan en [plan-obs-estilos.md](plan-obs-estilos.md)).
+    Con OBS abierto:
+    - **El menú:** «Transmisión» tiene «Salida para OBS o vMix…» y «Estilos de la transmisión…».
+    - **Plantillas:** las seis plantillas listas cambian la vista previa.
+    - **Placas:** las ocho (Ninguna, Pestaña, Vidrio, Sólida, Degradé, Halo, Filete, Línea), y las
+      posiciones Superior y Centro.
+    - **Biblia y anuncios:** en la Biblia la cita va arriba de la placa; los anuncios salen en el
+      centro.
+    - **Fondo fijo:** con un video, se ve en bucle y se va con F1, F2 y F3.
+    - **«Igual que en el proyector»:** apaga el resto de los controles.
+    - **OBS sigue los cambios:** cambia a los 0,3 s de guardar, sin tocar nada.
+24. **Teclas en los tooltips:** con el diseño avanzado, el globito de Black, Clear, Logo, Sin
+    fondo, Poner en vivo y Proyectar ▶ dice su tecla (F1…F4, Esc, Ctrl+Enter).
+25. **El paso de una imagen a otra en el proyector real:** sin cuadro negro ni tirón, el relleno de
+    la nueva sube con el fundido. Si el fundido te parece largo, se acorta en Proyección →
+    Transiciones… → Medios.
+26. **Fecha del evento y «Eventos pasados».** En Propiedades la fecha se elige en un calendario.
+    Una fecha vieja (por ejemplo 1/1/2026) mueve la imagen a la pestaña **Eventos pasados** al
+    guardar, y la barra de estado lo avisa.
+27. **Sin Color ni Brillo en Propiedades:** una imagen que tenía brillo o tinte se ve sin ellos.
+28. **El tiempo de una imagen en la barra.** Con «Cuánto tiempo se ve» puesto, al proyectarla
+    aparece la barra «0:03 / 0:08». Probá ⏸, ±10 s, arrastrarla, y que se vaya al poner otra cosa.
+29. **Imágenes nuevas con «Ajustar» y relleno desenfocado:** una imagen agregada viene así en
+    Propiedades. Los videos, los PDF y las imágenes de antes no cambian.
+30. **Imágenes y GIF de Google** (🖼 Imágenes en la barra de medios).
+    - La fila de búsqueda con 🖼 Imágenes, 🎞 GIF y «Sólo licencia libre».
+    - El clic derecho sobre una imagen abre el menú donde hiciste clic.
+    - «➕ Agregar a medios» y «➕ Agregar la abierta» bajan la imagen original, grande.
+    - Un GIF queda como video en bucle.
+31. **Achicar la lista de audios:** clic en «▾ AUDIOS» (o Ver → «Achicar la lista de audios»)
+    esconde la lista y su reproductor sin cortar lo que suena, y queda así al cerrar y abrir.
+32. **Relleno con la misma imagen desenfocada:** sin ningún borde negro, en la vista previa, el
+    LIVE y la pantalla.
+33. **Buscar desde el celular y con Ctrl+K.**
+    - «juan 3 16» o «sal 23»: sale primero el versículo.
+    - El nombre de una canción: sale primero la que se llama así.
+    - Una palabra suelta: busca en letras y versículos.
+    - Tocar un resultado lo carga sin proyectarlo.
+34. **Fondos en video del instalador:** la casilla «Agregar 10 fondos en video».
+    - Aparece la pestaña **Fondos de ejemplo** con los 10.
+    - El bucle no se nota.
+    - Uno quitado de la biblioteca no vuelve.
+    - Sin la casilla, la pestaña no aparece.
+35. **Traer de otro programa** (➕ Agregar en Canciones, o Archivo).
+    - Los botones ProPresenter y EasyWorship, cada uno con su cantidad de canciones.
+    - Importar una de cada uno y probar «Elegir carpeta…».
+    - Falta probar una biblioteca grande de EasyWorship.
+36. **Agregar paquete de fondos:** Archivo → «Agregar paquete de fondos (.zip)…».
+    - Los videos van a la pestaña **Fondos agregados**, en bucle y sin sonido.
+    - Un archivo que no sirve avisa sin romper nada.
+37. **Sólo el texto para OBS:** a la dirección de la Biblia agregale `&formato=no`. En OBS sale sólo
+    el texto en blanco, y el CSS de ejemplo de la guía le cambia color y tamaño.
+38. **Lo de la tanda del 1/11.**
+    - Arrastrar un renglón de la playlist (marca dónde cae).
+    - Temas → **Plantillas listas** con una canción y con la Biblia.
+    - Transmisión → Estilos → «Configuración extra del recuadro»; «Cancelar» devuelve lo de antes.
+    - Cambiar de Biblia con un versículo en pantalla: OBS no queda vacío ni un instante.
+    - Al actualizar saltando versiones, se ven las notas de todas.
+39. **Presentación con una pestaña de medios:** clic derecho en una pestaña de Medios → Configurar…
+    → «Pasar los medios solos», en orden y al azar. Cada video llega al final antes de pasar.
+40. **Lo de la 1.2.0 que no viste.**
+    - Las franjas del tema con una **canción**.
+    - La lista de **Música** sonando mientras suena un video.
+    - Todo con el proyector de la iglesia.
+41. **Bajar Biblias de internet (1.3.0 y 1.3.1).**
+    - Biblia → 📥 Biblias → «Bajar Biblias de internet…»: bajar una y que aparezca entre las
+      versiones.
+    - Una en español y otra en inglés: el botón dice «Descargar (2)».
+42. **El recorrido de bienvenida** (Ayuda → «Recorrido del programa»): todos los pasos con el mouse
+    y las flechas, el foco en su lugar al cambiar el tamaño de la ventana, y Esc lo cierra sin
+    apagar la salida.
+43. **Biblias repetidas (1.4.0):** bajar o importar una que ya tenés tiene que preguntar una sola
+    vez, y queda una sola.
+44. **Tema de cada canción (1.4.0).**
+    - Clic derecho en una canción → «Tema de esta canción…»: cambiarla y que no cambie con el tema
+      principal.
+    - «Volver al tema principal» la vuelve a ligar.
+45. **Instalar encima de la versión anterior:** conserva canciones, Biblias y medios, y Ayuda →
+    «Buscar actualizaciones…» ofrece la nueva con sus notas.
+46. **Lo de la beta.16 que nunca se miró:** la pantalla de carga, el ícono de la barra de tareas,
+    la «Palabra de Dios para ti» del instalador y los textos de ejemplo del editor de temas y de
+    escenarios.
 
-Claude los probó el 18/11 con el programa abierto en esta PC (con una copia de la biblioteca;
-la real no se tocó). **Anduvo:** «➕ Agregar» y su menú; «Enviar» apagado con la caja vacía y
-prendido al escribir; la ayuda de formatos con los tres ejemplos (y ahora entra en la pantalla);
-importar un XML de OpenSong con los 66 libros en inglés (Juan 3:16 y Salmos 23 en su lugar, 67
-versículos); la ventana flotante (abre centrada con la imagen en 1280×720 exactos, bordes y
-esquinas sin deformar, 4:3 y 16:9 desde el menú con EN VIVO del panel siguiéndola, tamaños rápidos
-exactos, «Siempre visible», maximizada con bandas negras, doble clic y Esc no la apagan, la X la
-apaga, se acuerda de forma, tamaño y lugar, YouTube adentro con el clic derecho encima, pasar a
-pantalla completa y volver en vivo, cerrar el programa con ella abierta); YouTube a pantalla
-completa en la pantalla del programa: el aviso «Para volver…» se ve encima del video, y después de
-hacer clic sobre el video, Esc vuelve al programa; el doble clic también.
+### Al publicar la 1.5.0 (no es para probar antes)
 
-Falta probar a mano:
+- **Contador de uso.**
+  1. Subir el `worker.js` nuevo y borrar lo contado (pasos en `servicios/api/LEEME.md`, «Empezar
+     de cero»).
+  2. Con la 1.5.0 **instalada**, proyectar algo: a los minutos tiene que aparecer en el resumen.
+     Un instalador de prueba (`1.5.0-prueba.N`) no aparece.
+- La página `sitio/cargar-canciones.html` dice «botón ➕»: cambiarlo a «➕ Agregar».
 
-- [ ] **YouTube en Windows 10** (donde le pasó a la iglesia), con la notebook sola: lo mismo de
-  arriba (clic sobre el video y Esc; doble clic).
-- [ ] **Ventana flotante con Discord:** compartirla por Discord (o una videollamada) y ver que se
-  transmite bien; minimizarla y volver; un video, el logo, el aviso al pie y la cuenta regresiva
-  adentro; que las páginas /salida (OBS, celular, escenario) siguen igual. Con dos monitores:
-  dejarla en el segundo, cerrar el programa, desenchufarlo y abrir: tiene que aparecer en el medio
-  de la principal.
-- [ ] **Con una sola pantalla** (una notebook sin proyector, en una instalación nueva o en otra PC):
-  «⧉ En una ventana» tiene que ser la primera de la lista «Salida:» y venir elegida. Ojo con una
-  notebook con el proyector en «duplicar»: ahí Windows ve una sola pantalla, así que también arranca
-  en la ventana (también si ya la usaban con la 1.4.0); para pantalla completa hay que elegir
-  «Pantalla 1» en la lista una vez, y al cerrar y abrir el programa tiene que seguir ahí.
-- [ ] Si se toca la ventana flotante, el teclado queda en ella: las teclas del panel (flechas,
-  Ctrl+Enter) no andan hasta volver a hacer clic en el panel. Ver si molesta.
-- [ ] **«➕ Agregar» en Canciones** con el panel angosto: que el título «CANCIONES» no quede tapado.
-- [ ] **Biblia XML real** de OpenSong o de Beblia (la que exporta Holyrics o FreeShow). Ojo: si el
-  archivo trae los nombres de los libros en inglés, así se muestran (por ejemplo «John 3:16»).
-- [ ] La página `sitio/cargar-canciones.html` sigue diciendo «botón ➕»: cambiarlo a «➕ Agregar» cuando salga la versión.
+### Ya probado
 
-### Lo de antes
+Para no mezclarlo con lo que falta. Lo probaste vos, salvo donde dice «Claude».
 
-Se probaron el 14/10/2026 con la beta.11 y quedaron **dados por buenos**: el mini
-reproductor de Spotify, «mismo título, distinto artista» y las flechas del
-teclado en Propiedades. Lo que sigue se corrigió o se agregó después de esa
-prueba y no se abrió desde acá: hay compilación, pruebas y dibujos a imagen.
+- **1.5.0, prueba.1 y prueba.2 (19/11):**
+  - YouTube y descargas: el aviso cuando YouTube no deja pasar un video (hay que descargarlo) y la
+    mejor calidad de los descargados.
+  - Salida y volumen: un solo volumen y la salida vertical 9:16.
+  - Canciones:
+    - el orden trabado (también traba Ctrl+Z / Ctrl+Y) y «Crear canción desde cero…» en el menú;
+    - el fondo propio con «🎲 al azar por canción»;
+    - deshacer después de «Editar como texto plano»;
+    - buscar en la letra con «Líneas por diapositiva».
+  - Placas:
+    - los estilos de placa y «✏ Diseñar…»;
+    - las placas en la notebook con proyector, con el aviso al pie;
+    - placas con imagen o video (Claude);
+    - la Biblia XML de prueba.
+  - **Decidido:** placa y letra a la vez se deja así; cada uno la acomoda con «Desde abajo» del
+    estilo o con el diseño de la letra.
+- **Pedidos de GitHub #32 y #37 (Claude, 19/11):**
+  - orden trabado y destrabado;
+  - Ctrl+Z / Ctrl+Y;
+  - buscar en la letra;
+  - «➕ Diapositiva»;
+  - fondo propio de cada canción;
+  - placa en proyector, EN VIVO y OBS, que se va sola.
+- **La ventana flotante (Claude, 18/11):**
+  - forma, tamaños rápidos, «Siempre visible», maximizada;
+  - se acuerda del lugar;
+  - YouTube adentro;
+  - pasar a pantalla completa y volver.
 
-- [ ] **Con el logo puesto no queda nada corriendo detrás** (lo comprobó Claude el
-      14/10 en la PC: con un video de fondo el uso de procesador bajó de 18,7 %
-      a 8,4 % de un núcleo con el logo puesto, y al sacarlo el video siguió en el
-      mismo segundo, 0:05 antes y 0:05 después de 8 segundos de logo). Falta
-      probarlo con el proyector real y con los casos que no se probaron: el
-      video que rellena los bordes, una página web o una ventana en vivo, y un
-      logo que es un video (ése tiene que seguir moviéndose). Apagar y prender
-      la salida con el logo puesto no tiene que arrancar el video. **Lo mismo
-      con Black (F1)** (se agregó después, no se vio andar): el video se pausa y
-      su sonido se corta mientras la pantalla está en negro, y al sacar el negro
-      sigue donde estaba. Ojo: elegir un fondo con el logo puesto saca el logo
-      solo (así funcionó siempre).
-- [x] **El error de una imagen de Google parpadea.** Comprobado el 14/10 en la
-      PC: sin ninguna imagen abierta, «➕ Agregar la abierta» pone la barra de
-      abajo en rojo, con letra blanca, pulsando unos segundos, y a los ~8 s
-      vuelve a la normalidad.
-- [ ] **Cómo preparar una Biblia para importar** (se dibujó la ventana a imagen;
-      falta abrirla en el programa). **Archivo → Cómo preparar una Biblia para
-      importar…** abre una ventana con los dos formatos que se leen, un ejemplo
-      de cada uno (Génesis 1:1-3 y Juan 3:16-17, Reina-Valera 1909) y un
-      recuadro «¿Tu Biblia está en otro formato?». Probá: 1) **Guardar este
-      ejemplo…** del JSON y del XML: se guardan y se abren bien con el Bloc de
-      notas, con los acentos bien; 2) **importá cada ejemplo** con «Importar una
-      Biblia» (cada uno trae 5 versículos: Génesis 1:1-3 y Juan 3:16-17) y
-      proyectá Juan 3:16; 3) **📋 Copiar instrucciones para una IA** y pegalas en
-      el Bloc de notas: se leen enteras y en español (idealmente probalas con
-      una IA de verdad y una Biblia tuya en Word o texto, y contame si el
-      programita que arma sirve); 4) «Importar una Biblia…» de esa ventana abre
-      el selector de archivos; 5) con un archivo que no sirve (por ejemplo un
-      .txt renombrado a .json), el mensaje de error ahora manda a esa ventana.
-- [ ] **Cuatro funciones de antes que nunca tuvieron pasos de prueba** (si ya las
-      viste, tildalas y listo):
-      1. **Tipografía de cada recuadro del escenario.** En el diseñador de
-         escenarios, elegí una letra distinta para las notas del predicador y
-         otra para la hora: cada una cambia sólo la suya, en la vista previa y
-         en la pantalla de los músicos. Un escenario guardado de antes se ve
-         igual que antes.
-      2. **Tipografía del texto rápido.** En la pestaña Texto rápido, la lista
-         «Tipografía» cambia la letra de la vista previa al instante, y queda
-         elegida al cerrar y abrir el programa. Vacía, sigue la del tema.
-      3. **«Selah» y títulos de los Salmos.** En el editor de temas, tema de
-         Biblia, la casilla «Mostrar Selah y los títulos de los Salmos» viene
-         destildada. Hoy ninguna Biblia instalada trae esos textos, así que sólo
-         se nota con una importada que los tenga (el ejemplo de «Cómo preparar
-         una Biblia» no los trae): verificá al menos que la casilla se guarda.
-      4. **Corregir el texto de un versículo.** Clic derecho sobre un versículo
-         de la grilla → «Corregir el texto…»: cambiá una palabra, guardá, y se
-         ve en la diapositiva (también en pantalla si está proyectado) y sigue
-         ahí al cerrar y abrir el programa. Probalo en una Biblia importada de
-         prueba, no en la que usás en el servicio.
-- [ ] **Menú «Transmisión» y estilos propios para OBS** (28/10/2026; hay
-      compilación, pruebas y dibujos a imagen de las placas, pero no se abrió
-      desde acá). Plan en [plan-obs-estilos.md](plan-obs-estilos.md). Probalo con
-      OBS abierto, en este orden:
-      1. **El menú.** Entre «Proyección» y «Ayuda» está **Transmisión**, con
-         «Salida para OBS o vMix…» y «Estilos de la transmisión…». La ventana
-         del celular ya no trae la caja de OBS: sólo dice que ahora está en el
-         menú Transmisión.
-      2. **Salida para OBS o vMix.** Abre con la dirección general y los
-         botones Copiar: Biblia / Canciones / Anuncios, igual que antes, más
-         «🎨 Editar los estilos…». Si el control del celular estaba apagado, se
-         prende solo. Pegá la dirección de Canciones en un Navegador de OBS
-         (1920 × 1080) arriba de la cámara.
-      3. **El estilo de cada capa.** Arriba de «Estilos de la transmisión…» hay
-         seis plantillas listas: tocá cada una y mirá que cambie la vista previa
-         sin mover la posición ni las mayúsculas; retocá algo (el tamaño) y la
-         plantilla deja de verse marcada; «Volver a los de fábrica» la marca de
-         nuevo como Moderna. Después elegí
-         Canciones, placa **Pestaña**, posición **Inferior**, y Guardar. Proyectá
-         una canción: la letra sale en mayúsculas dentro de una placa oscura con
-         una línea turquesa abajo y la pestañita «CORO» arriba. Al pasar de una
-         diapositiva a otra hay un fundido corto, y una estrofa larga se achica
-         sola en vez de salirse de la pantalla. En OBS cambia a lo sumo 0,3 s
-         después de guardar, sin tocar nada.
-      4. **Las ocho placas.** Probá cada una en la vista previa y en OBS: Ninguna,
-         Pestaña, Vidrio (se ve la cámara borrosa detrás), Sólida, Degradé,
-         Halo, Filete (línea fina que se desvanece) y Línea (vertical a la
-         izquierda). Probá también Superior y Centro, y el ancho y el margen.
-      5. **Biblia y Anuncios.** Proyectá un versículo: arriba de la placa va la
-         cita («JUAN 3:16 · RVR1909») y no aparece aparte. Con un texto rápido,
-         la placa de Anuncios sale en el centro. Con «Mostrar la etiqueta»
-         destildada no sale ni la cita ni «CORO».
-      6. **Fondo fijo.** En una capa elegí «Color» y después «Imagen o video…»
-         con un video: tiene que verse siempre mientras la página esté prendida,
-         moverse en bucle y sin sonido, y desaparecer con Black (F1), Clear (F2)
-         y Logo (F3). Un video grande no tiene que trabarse al pasar de una
-         diapositiva a otra.
-      7. **«Igual que en el proyector».** Tildala en una capa: esa capa vuelve a
-         verse como hasta ahora (con el tema de la diapositiva) y el resto de
-         los controles se apagan. «Volver a los de fábrica» sólo cambia la
-         pestaña abierta, y Cancelar no guarda nada.
-      8. **Si WebView2 no está**, la vista previa dice «No se pudo mostrar la
-         vista previa» y lo demás anda igual.
-- [x] **Biblia, canciones y anuncios en capas separadas para OBS.** Alexis lo
-      probó en OBS el 28/10/2026: llega bien. Ahora se le hace un editor de
-      estilos propio (el punto de arriba, «Menú Transmisión y estilos propios»).
-- [ ] **Teclas en los tooltips (diseño avanzado).** Pasá el mouse por Black,
-      Clear, Logo, Sin fondo, Poner en vivo / Apagar salida y Proyectar ▶: el
-      globito dice la tecla (F1, F2, F3, F4, Esc, Ctrl+Enter) aunque estés en
-      el diseño avanzado, que las esconde de los botones.
-- [ ] **Cambio de una imagen a otra (arreglado y comprobado en la PC).** El
-      14/10 a la noche Claude grabó la Pantalla 2 a 30 cuadros por segundo
-      pasando de OverFlow a «26-10-09 Encuentro» y de vuelta: al empezar el
-      cambio el relleno desenfocado de la imagen vieja desaparecía de golpe
-      (bordes negros) y al terminar el de la nueva aparecía de golpe (estaba
-      tapado por la vieja). Ahora la imagen vieja queda entera, con su relleno,
-      y la nueva se funde encima con el suyo. Con el arreglo se grabó de nuevo:
-      sin cuadro negro y sin tirón. Mirá si a vos también te parece bien, con
-      la salida en el proyector de verdad.
-- [ ] **Fecha del evento con calendario.** En Propiedades, la fecha ya no se
-      escribe: se elige en un calendario (en español, la semana empieza el
-      lunes), y la ✕ la saca. Se comprobó en la PC que abre y que la nota de
-      abajo dice el día en que pasa a «Eventos pasados». Falta ver que una
-      fecha vieja (por ejemplo del mes pasado) mueva la imagen al guardar.
-- [ ] **Sin Color ni Brillo.** En Propiedades ya no está la sección Color
-      (brillo y tinte), y no se dibujan más. Una imagen que tenía brillo o tinte
-      puestos se ve sin ellos.
-- [ ] **El tiempo de una imagen en la barra de reproducción.** «Cuánto tiempo
-      se ve» ahora vale para cualquier imagen (antes sólo en primer plano).
-      Con un tiempo puesto, al proyectarla aparece la misma barra que con un
-      video: «0:03 / 0:08» avanzando. Se comprobó en la PC con 8 segundos (al
-      terminar hizo lo que dice la pestaña: el logo). Probá también ⏸ (pausa
-      el tiempo), ±10 s, arrastrar la barra y volver al principio, y que al
-      poner otra cosa en pantalla la barra se vaya.
-- [ ] **Vencimiento de una imagen («Eventos pasados»).** En Propiedades hay
-      «Fecha del evento (opcional)» y «se queda N días más» (10 por defecto).
-      Elegí el 17/10/2026 en el calendario: la nota de abajo dice «Pasa a «Eventos pasados» el
-      27/10/2026». Cuando llega ese día (al abrir el programa o al cambiar la
-      biblioteca) la imagen pasa sola a la pestaña **Eventos pasados** (se
-      crea sola) y la barra de estado lo avisa. Para probarlo sin esperar: una
-      fecha vieja (por ejemplo 1/1/2026) se mueve al guardar. Si la sacás de
-      «Eventos pasados» a mano, no vuelve (la fecha se borra al archivarla).
-      La ventana de Propiedades entra en la pantalla de la notebook (se vio el
-      14/10).
-- [ ] **Imágenes nuevas: «Ajustar» y relleno desenfocado por defecto.** Agregá
-      una imagen con ➕ o arrastrándola, o con «Agregar a medios» de Google: en
-      Propiedades tiene que venir con Escala «Ajustar» y «Los bordes se rellenan
-      con (la misma imagen, desenfocada)». Los videos, los PDF y las imágenes
-      que ya estaban no cambian.
-- [ ] **«Agregar la abierta» en Google Imágenes.** Con una imagen abierta en
-      grande a la derecha: el botón **➕ Agregar la abierta** de la fila de
-      imágenes, y el clic derecho sobre cualquier parte de la imagen grande (o de
-      lo que la tape), ofrecen «Agregar a medios» y bajan **la imagen original**.
-- [ ] **Achicar la lista de audios.** En la pestaña Música, un clic en el título
-      **▾ AUDIOS** esconde la lista, sus botones **y el reproductor de audios**
-      (la barra, el tiempo, los botones de anterior y siguiente; queda sólo el
-      reproductor de Spotify de abajo); otro clic los devuelve. También está en
-      Ver → «Achicar la lista de audios». Con un audio sonando, achicar no lo
-      corta. Cerrá y abrí el programa: queda como lo dejaste, y «Volver al
-      diseño original» la despliega.
-- [ ] **Relleno con la misma imagen desenfocada.** Se arregló el reborde negro de
-      abajo (era un defecto del desenfoque de WPF cuando va con agrandado: se
-      midió 48 filas negras y ahora son 0). Probalo con una imagen en «Ajustar»
-      o con tamaño fijo y «(la misma imagen, desenfocada)»: no tiene que quedar
-      ningún borde negro arriba, abajo ni a los costados, en la vista previa, el
-      LIVE y la pantalla. También el pasaje **de una imagen a otra**: el relleno
-      de la nueva ahora sube con el fundido en vez de aparecer de golpe. Ojo: un
-      fundido entre dos imágenes siempre las mezcla mientras dura; si lo ves
-      demasiado largo, se acorta en **Proyección → Transiciones… → Medios** (en
-      0 corta directo).
-- [ ] **Imágenes y GIF de Google.**
-      1. En la barra de medios, **🖼 Imágenes** abre el panel web en Google
-         Imágenes. La fila nueva del panel busca con Enter, **🖼 Imágenes**,
-         **🎞 GIF** y «Sólo licencia libre». Escribir en esa caja no tiene que
-         mover diapositivas (F1 sí anda).
-      2. **Clic derecho sobre una imagen**, aunque sea una miniatura sin abrir:
-         el menú ahora es del programa y tiene que **abrirse donde hiciste clic**
-         (antes salía lejos). Con «➕ Agregar a medios» baja **la imagen
-         original** (Google pone su dirección en el vínculo de cada resultado:
-         se comprobó en el navegador y las direcciones bajan completas). Mirá que
-         entre grande y no borrosa; el estado dice si es chica.
-      3. Si por algún motivo sólo se conoce la miniatura de Google, no la baja:
-         avisa que hagas clic en la imagen para verla grande y pruebes sobre la
-         grande.
-      4. En una página común, el menú tiene Abrir vínculo, Copiar vínculo,
-         Copiar (con texto elegido), Atrás, Adelante y Recargar.
-      5. GIF animado: queda como video en bucle y sin sonido. Un webp animado
-         queda quieto. Quitar de la biblioteca borra el archivo bajado de
-         `%APPDATA%\EcclesiaCast\imagenes-web`. Sin internet: «No se pudo bajar
-         la imagen».
-      6. Cuidado con los derechos: Google muestra imágenes de cualquiera; el
-         filtro de licencia es lo que declara Google, no una garantía.
-- [ ] **Buscar desde el celular (y Ctrl+K).** Arriba de todo en la página del
-      celular hay una caja «Buscar canción o versículo…». Mejoró lo que busca:
-      1. **Escribí «juan 3 16»** (o «sal 23», «1 co 13 4-7»): el primer
-         resultado es el versículo o el capítulo (con la versión elegida), y al
-         tocarlo se carga en la computadora para elegir cuál proyectar. Lo
-         mismo en Ctrl+K.
-      2. **Escribí el nombre de una canción** («hay libertad»): sale primera la
-         que se llama así; después las que lo tienen en el nombre, el artista y,
-         al final, las que sólo lo dicen en la letra (marcadas «En la letra»).
-         Antes salían por orden alfabético y la tuya podía quedar afuera.
-      3. Una palabra suelta («gracia») sigue buscando en las letras y en el
-         texto de los versículos, sin necesidad de poner «?».
-      4. Tocar un resultado lo **carga** sin proyectarlo; la página baja a las
-         diapositivas. Sin resultados dice «No encontré nada».
-
-- [ ] **Fondos en video** (salieron en la 1.0.1, el 21/10/2026; hay pruebas,
-      pero no se instaló ni se vio andar). En el instalador, la casilla «Agregar 10
-      fondos en video» viene tildada. Al abrir el programa: pestaña nueva
-      **Fondos de ejemplo** con los 10, en orden alfabético, con su miniatura, y
-      la barra de abajo lo avisa. Proyectá varios con una canción encima: que la
-      letra se lea bien, que no tengan sonido y que **el bucle no se note** (mirá
-      el momento en que vuelve a empezar, a los 20 segundos). Mirá también que no
-      tironeen en la PC del proyector. Quitá uno de la biblioteca, cerrá y abrí:
-      no vuelve. Instalando sin la casilla, la pestaña no aparece.
-- [ ] **Traer de otro programa (ProPresenter y EasyWorship)** (28/10/2026). En el
-      **➕** de Canciones hay una sola entrada, **Traer de otro programa…** (y la
-      misma en Archivo). La ventana tiene arriba dos botones, **ProPresenter** y
-      **EasyWorship**, cada uno con la cantidad de canciones que encontró; abre
-      con el que tiene canciones. Probá los dos: ProPresenter tiene que listar sus
-      9 bibliotecas y el aviso de OneDrive como antes; EasyWorship, «Easyworship ·
-      Default · 2 canción(es)» (EasyWorship 8 guarda sus datos en una carpeta
-      llamada v6.1: es la versión del formato, no del programa). Importá una de
-      cada una (si repetís, pregunta qué hacer) y probá «Elegir carpeta…» con cada
-      programa. Falta una biblioteca grande de EasyWorship y, si hay, la de otra
-      versión (6 o 7).
-- [ ] **Agregar paquete de fondos** (28/10/2026; hay pruebas de cómo se abre el
-      .zip, no se vio en el programa). **Archivo → Agregar paquete de fondos
-      (.zip)…**: elegí un .zip con videos .mp4 y alguna imagen. Tienen que
-      aparecer en una pestaña nueva, **Fondos agregados**, andar en bucle y sin
-      sonido, y quedar al cerrar y abrir. Un .zip con otra cosa o un archivo que
-      no es .zip tiene que avisar sin romper nada. Falta la parte de **bajar**
-      el paquete desde internet: ver el punto de «Más fondos» en §3.
-- [ ] **Sólo el texto para OBS** (28/10/2026; hay prueba de que la página trae
-      los párrafos, no se vio en OBS). Copiá la dirección de la Biblia
-      (**Transmisión → Salida para OBS**) y agregale `&formato=no`. En el Browser
-      Source tendrías que ver sólo el texto en blanco, sin placa ni fondo, con la
-      cita arriba; al poner Clear desaparece. Pegá en **CSS personalizado** el
-      ejemplo de la guía («Sólo el texto, para darle estilo desde OBS») y mirá que
-      cambie el color y el tamaño.
-
-- [ ] **Lo de la tanda del 1/11/2026** (hay compilación y pruebas; nada se abrió
-      en el programa). 1) Playlist: arrastrá un renglón a otro lugar y mirá la
-      línea que marca dónde cae; con «Subir/Bajar» y las flechas del teclado
-      sigue desde el mismo renglón. 2) **Temas → Plantillas listas**: probá las
-      siete con una canción y con la Biblia; que la caja de texto se mueva sola
-      con «Tercio inferior». 3) **Transmisión → Estilos**: abrí «Configuración
-      extra del recuadro», probá degradé, borde y desenfoque, y mirá que OBS
-      cambie mientras tocás; «Cancelar» tiene que devolver lo de antes. La
-      opacidad tiene que notarse en Sólida, Filete, Línea y Halo. 4) Cambiá de
-      Biblia con un versículo en pantalla: en OBS no tiene que haber un instante
-      vacío. 5) Una canción con secciones partidas: «Editar como texto plano»
-      y «Edición rápida» tienen que dejarte en la misma diapositiva. 6) Al
-      actualizar saltando versiones, la ventana muestra las notas de todas.
-      **Salió en la 1.1.3 (5/11/2026).**
-- [ ] **Presentación con una pestaña de medios** (salió en la 1.1.3; hay
-      pruebas de la regla, no se vio andar). Clic derecho en una pestaña de
-      Medios → Configurar… → «Pasar los medios solos»: probá «En orden» y «Al
-      azar» con imágenes y videos mezclados. Cada video tiene que llegar al
-      final antes de pasar, y cada imagen durar los segundos elegidos (o los
-      suyos de Propiedades). Elegir otra cosa o sacar el fondo la corta.
-- [ ] **Lo de la 1.2.0.** **Lo probó Claude el 8/11/2026** con el programa
-      abierto (una copia con una copia de la biblioteca) y salió bien: las
-      franjas en Temas (plantillas, a mano, opacidad) y en la salida real sobre
-      un video, también al pasar de versículo; un video con sonido y un relleno
-      de bordes con video **suena** (medido con el medidor de Windows); el botón
-      🔇/🔊 lo calla y le devuelve el sonido; un video largo con sonido entra
-      con sonido; la ventana de actualización muestra la lista corta y «Ver los
-      detalles». En la prueba apareció y se arregló un cierre del programa al
-      agregar un video. Falta que lo mires vos: las franjas con una **canción**
-      (en el programa se probó la Biblia; con canción, sólo en dibujos a imagen), la lista de **Música** a otro volumen mientras
-      suena un video (probado en un banco, no en el programa) y todo con el
-      proyector de la iglesia. **Al amigo con el video mudo:** que instale la
-      1.2.0; si sigue sin sonar, que mande el registro del día
-      (`%APPDATA%\EcclesiaCast\logs\ecclesiacast-AAAAMMDD.log`): ahora dice si el
-      video está silenciado, si no trae pista de audio o qué error dio VLC.
-- [ ] **Lo de la 1.3.0** (8/11/2026). Claude probó «Bajar Biblias de
-      internet…» con el programa abierto contra una lista servida en esta PC,
-      y la lista real de Cloudflare R2 con el código del programa, sin abrirlo:
-      las 8 bajan completas y con su huella. Falta que lo mires vos: en la 1.3.0
-      instalada, Biblia → **📥 Biblias** → «Bajar Biblias de internet…», marcá
-      una (por ejemplo King James), Descargar, y fijate que aparezca en las
-      versiones. Al abrir la lista de nuevo tiene que decir «ya está en la
-      biblioteca». **El recorrido de bienvenida** se probó dibujado a imagen
-      sobre una captura de la ventana, no en el programa abierto: en la 1.3.0,
-      Ayuda → «Recorrido del programa», pasá todos los pasos (con el mouse y
-      con las flechas), y fijate que al cambiar el tamaño de la ventana el foco
-      siga en su lugar y que Esc lo cierre sin apagar la salida. En una PC
-      donde nunca se instaló, tiene que salir solo después de «Acerca de».
-- [ ] **Lo de la 1.3.1** (9/11/2026). El selector de idioma de «Bajar
-      Biblias» se probó dibujado a imagen, no en el programa abierto. En la
-      1.3.1: tiene que abrir en Español; marcá una en español, pasá a Inglés y
-      marcá otra, y el botón tiene que decir «Descargar (2)» y bajar las dos.
-      «Todas» y «Ninguna» tocan sólo el idioma que se ve.
-- [ ] **Lo de la 1.4.0** (9/11/2026), para probar en
-      `dist\EcclesiaCast-1.4.0-prueba1-setup.exe` antes de publicarla. Nada se
-      probó con el programa abierto, sólo con pruebas automáticas.
-      **Biblias repetidas:** Importar paquete o «Bajar Biblias…» con una que
-      ya tenés (por ejemplo la NTV, que está dos veces) → tiene que preguntar
-      una sola vez; Sí → queda una sola NTV y los pasajes de las listas que la
-      usaban siguen andando. Con varias marcadas, algunas nuevas: No → baja
-      sólo las nuevas.
-      **Tema de cada canción:** clic derecho en una canción → «Tema de esta
-      canción…» (o 🎨 Tema arriba de las diapositivas): cambiale la letra o el
-      fondo y fijate que quede como tema propio. Después editá el tema
-      principal: esa canción no tiene que cambiar y las demás sí. «Volver al
-      tema principal» la vuelve a ligar. En Temas, con el principal elegido,
-      «Aplicar a todas las canciones…» tiene que avisar cuántas cambian.
-      Las canciones que ya tenías tienen que verse igual que antes.
+  También en esa tanda: el formulario de comentarios, «➕ Agregar» y su menú, e importar un XML de
+  OpenSong.
+- **Transmisión:** Biblia, canciones y anuncios en capas separadas para OBS (28/10).
+- **Beta.11 (14/10):**
+  - el mini reproductor de Spotify;
+  - «mismo título, distinto artista»;
+  - las flechas del teclado en Propiedades;
+  - el error de una imagen de Google que parpadea (Claude).
 
 ## 2. Después de publicar la v1.0.0
 
@@ -417,14 +240,7 @@ las computadoras de la iglesia**: no se sube a ningún lado. Para armarlo de
 nuevo (con otro paquete o con otra versión), después de `dotnet publish`:
 `iscc /DAppVersion=<versión> /DPaqueteBiblias="<ruta del .ecbiblias>" installer\EcclesiaCast.iss`.
 
-- [ ] **Comprobar la 1.0 instalada** (lo de «Después de publicar» de
-      [publicar-1.0.md](publicar-1.0.md), salvo la firma): instalarla **sobre**
-      una beta y ver que conserva canciones, Biblias y medios; con una beta
-      instalada, que Ayuda → «Buscar actualizaciones…» ofrezca la 1.0 con las
-      notas nuevas en español; y el instalador con tus Biblias en una PC de
-      la iglesia (que al abrir el programa ofrezca traerlas).
-- [ ] **Usar la 1.0 en la reunión del domingo** y anotar lo que falle o no
-      guste.
+- Lo que quedaba por probar de la 1.0 (instalar encima, la beta.16) pasó a la lista numerada de §1.
 - [ ] **Una prueba que a veces falla en GitHub.** Al publicar la 1.0.1,
       `ReleaseFeedTests.A_server_error_is_a_failure` tardó 17 segundos en la
       máquina de GitHub y dio «sin conexión» en vez de «error del servidor»;
@@ -493,12 +309,6 @@ nuevo (con otro paquete o con otra versión), después de `dotnet publish`:
       demostración, contarlo en comunidades de iglesias y que otras iglesias lo
       usen y lo marquen con estrella. Volver a pedir la firma a SignPath cuando
       haya señales.
-- [ ] **Probar lo que llegó con la beta.16, ahora en la 1.0**: la pantalla de
-      carga nueva (se dibujó a imagen, pero no se vio abrir de verdad), el ícono
-      nuevo en la barra de tareas y el instalador con la «Palabra de Dios para
-      ti» (que aparezca entre las Biblias y que entre al abrir el programa). Los
-      textos de ejemplo del editor de temas y de escenarios ahora son libres:
-      mirar que se vean bien.
 
 ## Pedidos de permiso para Biblias con derechos (enviados el 15/10/2026)
 

@@ -32,6 +32,18 @@ public sealed class AudioRepository(string dbPath) : IAudioRepository
         db.SaveChanges();
     }
 
+    public void Update(AudioTrack track)
+    {
+        using var db = new AppDbContext(dbPath);
+        var stored = db.AudioTracks.Find(track.Id);
+        if (stored is null)
+            return;
+
+        stored.Name = track.Name;
+        stored.Path = track.Path;
+        db.SaveChanges();
+    }
+
     public void SaveOrder(IReadOnlyList<int> idsInOrder)
     {
         using var db = new AppDbContext(dbPath);
