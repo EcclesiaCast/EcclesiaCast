@@ -14,6 +14,25 @@ Hay cuatro tipos de cosas, cada una en su sección:
 
 ## 1. Para probar (lo prueba Alexis)
 
+### Música de YouTube, sólo el audio (19/11/2026)
+
+Lo empezó una sesión el 13/11 y quedó sin guardar; se retomó el 19/11 sobre la 1.5.0. Claude lo
+hizo sin abrir el programa: compila, pasan las pruebas, y con el yt-dlp instalado se probó la
+búsqueda («worship pad D»), el título de un link pegado y que el audio que se baja es el m4a sin imagen.
+
+- [ ] **Buscar y escuchar:** pestaña Música → buscador «BUSCAR EN YOUTUBE (SÓLO EL AUDIO)» → escribir
+  un artista y Enter. Tocar **▶** en un resultado: la barra de abajo dice «Trayendo… %» y a los pocos
+  segundos suena. **En el proyector no tiene que cambiar nada.**
+- [ ] **Pads:** tocar «Re» en «Pads:»; escuchar uno con ▶ y poner **🔂** (repetir ésta) al lado del
+  nombre: al terminar tiene que volver a empezar solo.
+- [ ] **Sumar a la lista:** ➕ en un resultado y «➕ Sumar todos»; en la lista aparecen con 🌐. Doble
+  clic en uno: suena, y al terminar sigue con el de abajo sin un silencio largo.
+- [ ] **Guardar para usar sin internet:** elegir uno con 🌐 en la lista y tocar **💾** arriba de la
+  lista: se le va el 🌐 y el archivo queda en Música › EcclesiaCast. Después, **sin internet**, tiene
+  que sonar igual.
+- [ ] **Link pegado:** pegar un link de YouTube en el buscador y Enter: aparece con su título real.
+- [ ] **Volumen:** la barra «Volumen» de abajo de EN VIVO también sube y baja esta música.
+
 ### Pedidos de la prueba de la 1.5.0 prueba.1 (19/11/2026)
 
 Lo pidió Alexis después de probar la prueba.1. Claude lo hizo sin abrir el programa: compila, pasan
