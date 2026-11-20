@@ -16,7 +16,7 @@ Hay cuatro tipos de cosas, cada una en su sección:
 
 ### Pedidos de la prueba de la 1.5.0 prueba.2 (19/11/2026)
 
-Hecho por Claude. Compila y pasan las pruebas. La pestaña Placas no se vio todavía con el programa abierto.
+Hecho por Claude. Compila y pasan las pruebas. Claude abrió la pestaña Placas con una copia de la biblioteca y quedó ordenada: entra el nombre de la imagen, el botón ◧ / ◨ la cambia de lado y el 🗑 de las guardadas queda a la derecha.
 
 - [ ] **Pestaña Placas más aireada** (Alexis: «queda todo muy apretado»). Ahora cada dato va en
   un renglón con su nombre a la izquierda (Nombre, Cargo, Imagen, Estilo, Dura). El lado de la
