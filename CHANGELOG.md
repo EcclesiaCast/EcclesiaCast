@@ -73,6 +73,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Cambiado
 
+- **«🕘 Historial» en la Biblia, con la palabra.** El historial de los versículos proyectados ya
+  existía, pero el botón era sólo el dibujo y alguien lo pidió por el formulario sin encontrarlo.
+  Con el panel angosto vuelve a ser sólo 🕘, para que la caja de la cita no quede chica.
 - **Los videos de YouTube entran sin sonido.** Un video de YouTube recién agregado sale silenciado,
   para que nada suene de golpe. «🔇 Sin sonido», debajo del EN VIVO, le da el sonido, y el video lo
   recuerda.
