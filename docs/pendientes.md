@@ -20,7 +20,7 @@ Hecho por Claude. Compila y pasan las pruebas. La pestaña Placas no se vio toda
 
 - [ ] **Pestaña Placas más aireada** (Alexis: «queda todo muy apretado»). Ahora cada dato va en
   un renglón con su nombre a la izquierda (Nombre, Cargo, Imagen, Estilo, Dura). El lado de la
-  imagen es un botón chico al lado de «Elegir…» («◧ Izq.» / «Der. ◨»), y Mostrar y Quitar van
+  imagen es un botón chico al lado de «Elegir…» («◧» / «◨»), y Mostrar y Quitar van
   anchos y a la par. Así quedan cuatro renglones menos y más lugar para las guardadas.
 - [ ] **YouTube entra silenciado:** un video de YouTube recién agregado sale sin sonido. Con
   «🔇 Sin sonido» debajo del EN VIVO pasa a sonar, y el video lo recuerda. Los que ya estaban en

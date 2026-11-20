@@ -52,7 +52,7 @@ public sealed partial class MainViewModel
     private int _namePlateImageSide;
 
     /// <summary>The small button beside «Elegir…»: which side the picture goes, one click switches it.</summary>
-    public string NamePlateImageSideLabel => NamePlateImageSide == 1 ? "Der. ◨" : "◧ Izq.";
+    public string NamePlateImageSideLabel => NamePlateImageSide == 1 ? "◨" : "◧";
 
     [RelayCommand]
     private void ToggleNamePlateImageSide() => NamePlateImageSide = NamePlateImageSide == 1 ? 0 : 1;

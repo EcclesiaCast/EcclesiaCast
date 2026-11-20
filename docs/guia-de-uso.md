@@ -409,7 +409,7 @@ programa recuerda lo que elijas.
   **Guardadas**: el próximo domingo es doble clic y listo; el 🗑 la borra.
   Con **Elegir…** le ponés una **imagen o un video corto** al costado (uno de tus
   logos o cualquier archivo de la computadora; el video va en bucle y sin sonido),
-  **a la izquierda o a la derecha** del texto (el botón «◧ Izq.» / «Der. ◨» la cambia de lado; un logo apaisado queda ancho; para OBS el
+  **a la izquierda o a la derecha** del texto (el botón «◧» / «◨» la cambia de lado; un logo apaisado queda ancho; para OBS el
   video tiene que ser MP4 común, H.264: los videos HEVC de iPhone se ven en el proyector pero
   no en la transmisión, donde la placa sale sin el video). Un **GIF animado** se convierte
   solo en un video corto y se mueve.

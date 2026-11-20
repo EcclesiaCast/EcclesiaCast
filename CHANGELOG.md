@@ -60,7 +60,7 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   para que nada suene de golpe. «🔇 Sin sonido», debajo del EN VIVO, le da el sonido, y el video lo
   recuerda.
 - **La pestaña Placas, menos apretada.** Cada dato va en un renglón con su nombre al costado, el
-  lado de la imagen es un botón chico («◧ Izq.» / «Der. ◨») y Mostrar y Quitar van anchos y a la
+  lado de la imagen es un botón chico («◧» / «◨») y Mostrar y Quitar van anchos y a la
   par: queda más lugar para las placas guardadas.
 - **Un solo volumen en el LIVE.** Las dos barras (la del video y la de toda la salida) eran confusas:
   ahora hay una sola, «Volumen», que maneja todo lo que suena en la salida, **YouTube incluido**, y se

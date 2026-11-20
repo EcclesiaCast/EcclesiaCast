@@ -2326,12 +2326,12 @@
                                                 Click="ChooseNamePlateImage_Click"
                                                 AutomationProperties.Name="Elegir la imagen de la placa"
                                                 ToolTip="Opcional: uno de tus logos, o una imagen, un GIF o un video corto de la computadora (el video va en bucle y sin sonido)"/>
-                                        <Button DockPanel.Dock="Right" Content="{Binding NamePlateImageSideLabel}" FontSize="11" Padding="7,3" Margin="6,0,0,0"
+                                        <Button DockPanel.Dock="Right" Content="{Binding NamePlateImageSideLabel}" FontSize="13" Padding="6,0" Margin="6,0,0,0"
                                                 Style="{StaticResource DarkButton}"
                                                 Command="{Binding ToggleNamePlateImageSideCommand}"
                                                 IsEnabled="{Binding NamePlateHasImage}"
                                                 AutomationProperties.Name="Lado de la imagen"
-                                                ToolTip="De qué lado del texto va la imagen: un clic la cambia de lado"/>
+                                                ToolTip="De qué lado del texto va la imagen (◧ a la izquierda, ◨ a la derecha): un clic la cambia de lado"/>
                                         <TextBlock Text="{Binding NamePlateImageLabel}" FontSize="12" Foreground="White"
                                                    VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                                     </DockPanel>
@@ -2386,6 +2386,7 @@
                                            FontSize="11" Margin="12,14,12,4"/>
                                 <Grid Margin="12,0,12,12">
                                     <ListBox x:Name="SavedPlatesList" ItemsSource="{Binding SavedNamePlates}"
+                                             HorizontalContentAlignment="Stretch"
                                              SelectedItem="{Binding SelectedSavedNamePlate}"
                                              MouseDoubleClick="SavedPlatesList_MouseDoubleClick"
                                              Background="Transparent" BorderThickness="0"
