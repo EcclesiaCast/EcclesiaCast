@@ -14,65 +14,54 @@ Hay cuatro tipos de cosas, cada una en su sección:
 
 ## 1. Para probar (lo prueba Alexis)
 
-### Pedidos de la prueba de la 1.5.0 prueba.1 (19/11/2026)
+### Pedidos de la prueba de la 1.5.0 prueba.2 (19/11/2026)
 
-Lo pidió Alexis después de probar la prueba.1. Claude lo hizo sin abrir el programa: compila, pasan
-las 1513 pruebas, el banco de render dibujó los seis estilos de placa, uno propio (ancho y alto
-fijos, a la derecha, franja arriba) y las tres salidas a mitad de camino, y la página de OBS se
-probó en el navegador con los seis estilos y la salida «persiana».
+Hecho por Claude. Compila y pasan las pruebas. La pestaña Placas no se vio todavía con el programa abierto.
 
-- [ ] **YouTube con derechos de autor** («Rescate – El legado, otra oportunidad»): la pantalla tiene
-  que quedar en negro (sin el cartel de YouTube) y salir el aviso con «Descargar ahora», que baja el
-  video a Descargados.
-- [ ] **Calidad de los descargados:** bajar de nuevo un video y compararlo con el de antes (ahora
-  viene en H.264, unos 3,5 Mbps a 1080p en vez de 1,1 Mbps en AV1).
-- [ ] **Un solo volumen:** la barra «Volumen» debajo del EN VIVO tiene que mover un video local, la
-  música y **un YouTube** a la vez, de a 1 %, sin saltos.
-- [ ] **Vertical 9:16:** clic derecho en la ventana de salida → Forma → 9:16; probar los tamaños
-  rápidos. La letra sale chica en una franja al medio (se dibuja en 16:9): ver si alcanza así.
-- [ ] **Orden trabado:** con 🔒, Ctrl+Z, Ctrl+Y y ↶ ↷ no hacen nada y la barra lo explica.
-- [ ] **Menú Canciones → «Crear canción desde cero…».**
-- [ ] **Estilos de placa:** «✏ Diseñar…» en la pestaña Placas; crear uno, cambiar colores, ancho y
-  alto, franja, letras, lugar, entrada y salida; «▶ Ver cómo entra» y «◼ Ver cómo sale»; Guardar
-  y mostrar una placa con ese estilo. Probar «Sólo en la transmisión (OBS)»: en el proyector no se
-  tiene que ver, en OBS sí.
-- [ ] **Placa con un GIF animado:** «Elegir…» → un GIF; tiene que decir «Preparando el GIF…» y
-  después moverse en la placa (proyector y OBS).
+- [ ] **Pestaña Placas más aireada** (Alexis: «queda todo muy apretado»). Ahora cada dato va en
+  un renglón con su nombre a la izquierda (Nombre, Cargo, Imagen, Estilo, Dura). El lado de la
+  imagen es un botón chico al lado de «Elegir…» («◧ Izq.» / «Der. ◨»), y Mostrar y Quitar van
+  anchos y a la par. Así quedan cuatro renglones menos y más lugar para las guardadas.
+- [ ] **YouTube entra silenciado:** un video de YouTube recién agregado sale sin sonido. Con
+  «🔇 Sin sonido» debajo del EN VIVO pasa a sonar, y el video lo recuerda. Los que ya estaban en
+  la biblioteca siguen como estaban.
+- [ ] **Volver a descargar un video que se sacó de la biblioteca:** antes decía «yt-dlp terminó
+  pero no encontré el archivo descargado», y había que borrar el archivo a mano. Ahora usa el
+  archivo que ya estaba en la carpeta de descargas.
 
-### Pedidos de GitHub #32 y #37 (19/11/2026)
+### Pedidos de GitHub #32 y #37 (19/11/2026): lo que queda
 
-Claude los probó de madrugada con el programa abierto (copia de la biblioteca; la real no se tocó).
-**Anduvo:** con el orden trabado, arrastrar no mueve ni proyecta y la barra dice cómo destrabarlo;
-destrabado (amarillo) se mueve; Ctrl+Z / Ctrl+Y deshacen y rehacen mover, agregar y el diseño;
-«zarza» marcó las 2 diapositivas, ↓ pasó a la otra y Enter la proyectó, Esc borró sin apagar la
-salida; «➕ Diapositiva» y «➕ Nueva diapositiva» del diseño agregan donde corresponde; el fondo
-propio se puso solo al volver a la canción y el clic derecho en un medio lo cambia al instante; la
-placa salió en el proyector, en el EN VIVO y en la página de OBS, se fue sola a los 10 s, quedó en la
-lista y se acordó al reabrir.
+- [ ] **Contador de uso, al sacar la 1.5.0:**
+  1. Subir el `worker.js` nuevo y borrar lo contado (pasos en `servicios/api/LEEME.md`, «Empezar de cero»).
+  2. Con la 1.5.0 **instalada**, proyectar algo y mirar a los minutos el resumen: tiene que
+     aparecer esa instalación con la versión 1.5.0.
+  3. Un instalador de prueba (`1.5.0-prueba.N`) no tiene que aparecer.
+- [ ] **Placas con YouTube de fondo:** con un video de YouTube a pantalla completa, lo más probable
+  es que la placa (como el aviso al pie) no se vea en el proyector, porque el video es una ventana
+  aparte; en OBS sí. Ver si hace falta.
 
-Falta probar a mano:
+### Ya probado (19/11/2026)
 
-- [ ] **Contador de uso, al sacar la 1.5.0:** subir el `worker.js` nuevo y borrar lo contado
-  (pasos en `servicios/api/LEEME.md`, «Empezar de cero»). Después, con la 1.5.0 **instalada**,
-  proyectar algo y mirar a los minutos el resumen: tiene que aparecer esa instalación con la
-  versión 1.5.0. Un instalador de prueba (`1.5.0-prueba.N`) no tiene que aparecer.
-- [x] **Placas con imagen o video:** probado por Claude el 19/11 al mediodía con el programa abierto.
-  Anduvo: «Elegir…» con un logo y con un archivo, la placa guardada recuerda imagen, lado y
-  entrada, el video se mueve en bucle en el proyector, «subir» y «persiana» entran bien, y en OBS
-  se ven la imagen y el video H.264. Se corrigió: un logo apaisado quedaba chiquito (ahora la
-  imagen toma el alto de la tarjeta y el ancho que pida), la lista del lado cortaba el texto, y
-  en OBS un video HEVC (el de iPhone, que el navegador no muestra) dejaba un recuadro vacío.
-- [ ] **Placa y letra a la vez:** con una letra larga, la placa tapa un poco el último renglón.
-  Ver si conviene subir la letra mientras hay placa, o dejarlo así (la placa suele ir en la prédica).
-- [ ] **Placas con YouTube de fondo:** con un video de YouTube a pantalla completa, lo más probable es que la placa (como el
-  aviso al pie) no se vea en el proyector, porque el video es una ventana aparte; en OBS sí. Ver si
-  hace falta.
-- [ ] **Placas en una notebook con proyector real:** que el tamaño de la letra se lea bien desde el
-  fondo de la iglesia, y con el aviso al pie puesto (la placa tiene que quedar encima del aviso).
-- [ ] **Fondo propio con «🎲 al azar por canción» prendido:** una canción con fondo propio, otra sin;
-  la que no tiene tiene que sortear uno nuevo, no quedarse con el de la anterior.
-- [ ] **Deshacer después de editar la letra con «Editar como texto plano»** y con «Edición rápida».
-- [ ] **Buscar en la letra con «Líneas por diapositiva» en 2:** que marque los pedazos correctos.
+Lo probó Alexis con la prueba.1 y la prueba.2 y anduvo. Queda anotado acá para no mezclarlo con lo
+que falta:
+
+- **YouTube y descargas:**
+  - el aviso propio cuando YouTube no deja pasar un video por derechos de autor (hay que descargarlo);
+  - la mejor calidad de los descargados.
+- **Salida y volumen:**
+  - un solo volumen;
+  - la salida vertical 9:16.
+- **Canciones:**
+  - el orden trabado, que también traba Ctrl+Z / Ctrl+Y;
+  - «Crear canción desde cero…» en el menú Canciones;
+  - fondo propio de la canción con «🎲 al azar por canción» prendido;
+  - deshacer después de «Editar como texto plano»;
+  - buscar en la letra con «Líneas por diapositiva».
+- **Placas:**
+  - los estilos de placa y «✏ Diseñar…»;
+  - las placas en una notebook con proyector real, con el aviso al pie.
+- **Decidido:** placa y letra a la vez se deja así. Si la placa tapa el último renglón, cada uno
+  lo acomoda con el lugar del estilo («Desde abajo») o con el diseño de la letra.
 
 ### Arreglos del formulario de comentarios y salida en una ventana (18/11/2026)
 

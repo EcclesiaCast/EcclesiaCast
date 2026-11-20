@@ -56,6 +56,12 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Cambiado
 
+- **Los videos de YouTube entran sin sonido.** Un video de YouTube recién agregado sale silenciado,
+  para que nada suene de golpe. «🔇 Sin sonido», debajo del EN VIVO, le da el sonido, y el video lo
+  recuerda.
+- **La pestaña Placas, menos apretada.** Cada dato va en un renglón con su nombre al costado, el
+  lado de la imagen es un botón chico («◧ Izq.» / «Der. ◨») y Mostrar y Quitar van anchos y a la
+  par: queda más lugar para las placas guardadas.
 - **Un solo volumen en el LIVE.** Las dos barras (la del video y la de toda la salida) eran confusas:
   ahora hay una sola, «Volumen», que maneja todo lo que suena en la salida, **YouTube incluido**, y se
   mueve de a 1 % (de a 5 % con la rueda o las flechas grandes). El volumen propio de cada video sigue
@@ -81,6 +87,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Arreglado
 
+- **Volver a descargar un video de YouTube que se había sacado de la biblioteca.** Decía «yt-dlp
+  terminó pero no encontré el archivo descargado» porque el archivo seguía en la carpeta de
+  descargas y yt-dlp no lo bajaba de nuevo; ahora se usa ese archivo.
 - **Un video de YouTube ya no deja atrapado con una sola pantalla.** El video en la salida no toma
   el mouse ni el teclado (tampoco asoman sus controles): el doble clic y la tecla Esc vuelven al
   programa también con YouTube, aunque se haya hecho clic sobre el video; Esc

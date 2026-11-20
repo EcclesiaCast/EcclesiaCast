@@ -2259,12 +2259,36 @@
                             <DockPanel Visibility="{Binding IsChecked, ElementName=TabPlates, Converter={StaticResource BoolToVis}}">
                                 <TextBlock DockPanel.Dock="Top"
                                            Style="{StaticResource LearningHint}"
-                                           Text="Una tarjeta abajo a la izquierda con el nombre de quien habla o canta. Sale en el proyector y en la transmisión, y queda guardada en la lista para la próxima."
+                                           Text="Una tarjeta con el nombre de quien habla o canta. Su estilo dice cómo se ve y dónde sale; queda guardada en la lista para la próxima."
                                            FontSize="11" Foreground="{StaticResource FaintBrush}"
                                            TextWrapping="Wrap" Margin="12,0,12,8"/>
-                                <StackPanel DockPanel.Dock="Top" Margin="12,0,12,0">
-                                    <TextBlock Text="Nombre" Foreground="{StaticResource MutedBrush}" FontSize="11" Margin="0,0,0,4"/>
-                                    <TextBox Text="{Binding NamePlateName, UpdateSourceTrigger=PropertyChanged}"
+                                <!-- 19/11: «queda todo muy apretado». Cada dato en un renglón, con su nombre a
+                                     la izquierda en vez de arriba, y el lado de la imagen en un botón chico:
+                                     cuatro renglones menos y más lugar para las guardadas. -->
+                                <Grid DockPanel.Dock="Top" Margin="12,0,12,0">
+                                    <Grid.Resources>
+                                        <Style x:Key="PlateLabel" TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+                                            <Setter Property="FontSize" Value="11"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="Margin" Value="0,0,8,0"/>
+                                        </Style>
+                                    </Grid.Resources>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Text="Nombre" Style="{StaticResource PlateLabel}"/>
+                                    <TextBox Grid.Column="1" Text="{Binding NamePlateName, UpdateSourceTrigger=PropertyChanged}"
                                              Background="{StaticResource SurfaceAltBrush}" Foreground="White"
                                              BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
                                              Padding="8,5" FontSize="14"
@@ -2274,87 +2298,92 @@
                                             <KeyBinding Key="Enter" Command="{Binding ShowNamePlateCommand}"/>
                                         </TextBox.InputBindings>
                                     </TextBox>
-                                    <TextBlock Text="Cargo o detalle (opcional)" Foreground="{StaticResource MutedBrush}" FontSize="11" Margin="0,8,0,4"/>
-                                    <TextBox Text="{Binding NamePlateRole, UpdateSourceTrigger=PropertyChanged}"
+
+                                    <TextBlock Grid.Row="1" Text="Cargo" Style="{StaticResource PlateLabel}" Margin="0,8,8,0"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Margin="0,8,0,0"
+                                             Text="{Binding NamePlateRole, UpdateSourceTrigger=PropertyChanged}"
                                              Background="{StaticResource SurfaceAltBrush}" Foreground="White"
                                              BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
                                              Padding="8,5" FontSize="13"
                                              AutomationProperties.Name="Cargo de la placa"
-                                             ToolTip="Ej: «Predicación», «Alabanza», «Iglesia invitada» · Enter la muestra">
+                                             ToolTip="Opcional. Ej: «Predicación», «Alabanza», «Iglesia invitada» · Enter la muestra">
                                         <TextBox.InputBindings>
                                             <KeyBinding Key="Enter" Command="{Binding ShowNamePlateCommand}"/>
                                         </TextBox.InputBindings>
                                     </TextBox>
-                                    <!-- Imagen o video al costado del texto, de qué lado, y cómo entra -->
-                                    <TextBlock Text="Imagen o video (opcional)" Foreground="{StaticResource MutedBrush}" FontSize="11" Margin="0,8,0,4"/>
-                                    <DockPanel>
+
+                                    <!-- Imagen o video al costado del texto (opcional), y de qué lado -->
+                                    <TextBlock Grid.Row="2" Text="Imagen" Style="{StaticResource PlateLabel}" Margin="0,8,8,0"/>
+                                    <DockPanel Grid.Row="2" Grid.Column="1" Margin="0,8,0,0">
                                         <Button DockPanel.Dock="Right" Content="✕" FontSize="10" Padding="7,3" Margin="4,0,0,0"
                                                 Style="{StaticResource DarkButton}"
                                                 Command="{Binding ClearNamePlateImageCommand}"
                                                 IsEnabled="{Binding NamePlateHasImage}"
                                                 AutomationProperties.Name="Sacar la imagen de la placa"
                                                 ToolTip="La placa queda sólo con el texto"/>
-                                        <Button DockPanel.Dock="Right" Content="Elegir…" FontSize="11" Padding="9,3" Margin="6,0,0,0"
+                                        <Button DockPanel.Dock="Right" Content="Elegir…" FontSize="11" Padding="9,3" Margin="4,0,0,0"
                                                 Style="{StaticResource DarkButton}"
                                                 Click="ChooseNamePlateImage_Click"
                                                 AutomationProperties.Name="Elegir la imagen de la placa"
-                                                ToolTip="Uno de tus logos, o cualquier imagen o video corto de la computadora (el video va en bucle y sin sonido)"/>
+                                                ToolTip="Opcional: uno de tus logos, o una imagen, un GIF o un video corto de la computadora (el video va en bucle y sin sonido)"/>
+                                        <Button DockPanel.Dock="Right" Content="{Binding NamePlateImageSideLabel}" FontSize="11" Padding="7,3" Margin="6,0,0,0"
+                                                Style="{StaticResource DarkButton}"
+                                                Command="{Binding ToggleNamePlateImageSideCommand}"
+                                                IsEnabled="{Binding NamePlateHasImage}"
+                                                AutomationProperties.Name="Lado de la imagen"
+                                                ToolTip="De qué lado del texto va la imagen: un clic la cambia de lado"/>
                                         <TextBlock Text="{Binding NamePlateImageLabel}" FontSize="12" Foreground="White"
                                                    VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                                     </DockPanel>
-                                    <ComboBox Margin="0,6,0,0" FontSize="11" SelectedIndex="{Binding NamePlateImageSide}"
-                                              IsEnabled="{Binding NamePlateHasImage}"
-                                              AutomationProperties.Name="Lado de la imagen"
-                                              ToolTip="De qué lado del texto va la imagen">
-                                        <ComboBoxItem Content="Imagen a la izquierda"/>
-                                        <ComboBoxItem Content="Imagen a la derecha"/>
-                                    </ComboBox>
+
                                     <!-- El estilo: colores, tamaño, lugar, entrada y salida, y si va sólo a OBS -->
-                                    <TextBlock Text="Estilo" Foreground="{StaticResource MutedBrush}" FontSize="11" Margin="0,8,0,4"/>
-                                    <DockPanel>
+                                    <TextBlock Grid.Row="3" Text="Estilo" Style="{StaticResource PlateLabel}" Margin="0,8,8,0"/>
+                                    <DockPanel Grid.Row="3" Grid.Column="1" Margin="0,8,0,0">
                                         <Button DockPanel.Dock="Right" Content="✏ Diseñar…" FontSize="11" Padding="9,3" Margin="6,0,0,0"
                                                 Style="{StaticResource DarkButton}"
                                                 Command="{Binding DesignNamePlateStylesCommand}"
                                                 AutomationProperties.Name="Diseñar los estilos de placa"
                                                 ToolTip="Colores, tamaño del recuadro, letras, lugar, cómo entra y cómo sale, y si se ve sólo en la transmisión (OBS)"/>
-                                        <ComboBox FontSize="11"
+                                        <ComboBox FontSize="12"
                                                   ItemsSource="{Binding NamePlateStyleNames}"
                                                   SelectedItem="{Binding NamePlateStyleName}"
                                                   AutomationProperties.Name="Estilo de la placa"
-                                                  ToolTip="Cómo se ve la placa. Se diseñan con «✏ Diseñar…»"/>
+                                                  ToolTip="Cómo se ve la placa y dónde sale. Se diseñan con «✏ Diseñar…»"/>
                                     </DockPanel>
-                                    <DockPanel Margin="0,10,0,0">
-                                        <ComboBox DockPanel.Dock="Right" Width="118" FontSize="11" VerticalAlignment="Center"
-                                                  SelectedIndex="{Binding NamePlateAutoHide}"
-                                                  AutomationProperties.Name="Cuánto dura la placa"
-                                                  ToolTip="Cuánto queda la placa en pantalla">
-                                            <ComboBoxItem Content="Hasta quitarla"/>
-                                            <ComboBoxItem Content="Se va a los 5 s"/>
-                                            <ComboBoxItem Content="Se va a los 10 s"/>
-                                            <ComboBoxItem Content="Se va a los 15 s"/>
-                                        </ComboBox>
-                                        <StackPanel Orientation="Horizontal">
-                                            <Button Content="Mostrar" Command="{Binding ShowNamePlateCommand}" Padding="14,7"
-                                                    ToolTip="Pone la placa en pantalla (Enter en el nombre hace lo mismo)">
-                                                <Button.Style>
-                                                    <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding IsNamePlateActive}" Value="True">
-                                                                <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
-                                                                <Setter Property="BorderThickness" Value="0"/>
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Button.Style>
-                                            </Button>
-                                            <Button Content="Quitar" Style="{StaticResource DarkButton}" Padding="14,7" Margin="6,0,0,0"
-                                                    Command="{Binding HideNamePlateCommand}"
-                                                    ToolTip="Saca la placa de la pantalla"/>
-                                        </StackPanel>
-                                    </DockPanel>
-                                    <TextBlock Text="Guardadas · doble clic para mostrar" Foreground="{StaticResource MutedBrush}"
-                                               FontSize="11" Margin="0,12,0,4"/>
-                                </StackPanel>
+
+                                    <TextBlock Grid.Row="4" Text="Dura" Style="{StaticResource PlateLabel}" Margin="0,8,8,0"/>
+                                    <ComboBox Grid.Row="4" Grid.Column="1" Margin="0,8,0,0" FontSize="12"
+                                              SelectedIndex="{Binding NamePlateAutoHide}"
+                                              AutomationProperties.Name="Cuánto dura la placa"
+                                              ToolTip="Cuánto queda la placa en pantalla">
+                                        <ComboBoxItem Content="Hasta quitarla"/>
+                                        <ComboBoxItem Content="Se va sola a los 5 s"/>
+                                        <ComboBoxItem Content="Se va sola a los 10 s"/>
+                                        <ComboBoxItem Content="Se va sola a los 15 s"/>
+                                    </ComboBox>
+
+                                    <!-- Mostrar y Quitar, anchos y a la par -->
+                                    <UniformGrid Grid.Row="5" Grid.ColumnSpan="2" Rows="1" Margin="0,12,0,0">
+                                        <Button Content="Mostrar" Command="{Binding ShowNamePlateCommand}" Padding="14,8" Margin="0,0,4,0"
+                                                ToolTip="Pone la placa en pantalla (Enter en el nombre hace lo mismo)">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsNamePlateActive}" Value="True">
+                                                            <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                                            <Setter Property="BorderThickness" Value="0"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <Button Content="Quitar" Style="{StaticResource DarkButton}" Padding="14,8" Margin="4,0,0,0"
+                                                Command="{Binding HideNamePlateCommand}"
+                                                ToolTip="Saca la placa de la pantalla"/>
+                                    </UniformGrid>
+                                </Grid>
+                                <TextBlock DockPanel.Dock="Top" Text="Guardadas · doble clic para mostrar" Foreground="{StaticResource MutedBrush}"
+                                           FontSize="11" Margin="12,14,12,4"/>
                                 <Grid Margin="12,0,12,12">
                                     <ListBox x:Name="SavedPlatesList" ItemsSource="{Binding SavedNamePlates}"
                                              SelectedItem="{Binding SelectedSavedNamePlate}"

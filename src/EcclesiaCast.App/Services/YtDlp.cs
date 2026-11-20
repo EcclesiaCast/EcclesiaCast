@@ -407,8 +407,15 @@ public static partial class YtDlp
         }
 
         // If the printed path didn't survive the trip (odd characters in a
-        // title), the file is still the newest one in the folder.
-        return downloaded ?? NewestFileSince(targetFolder, startedAt);
+        // title), the file is still the newest one in the folder. And when the
+        // video had been downloaded before (taken out of the library, its file
+        // left in the folder), yt-dlp skips it and prints nothing: that file is
+        // the one (19/11: «yt-dlp terminó pero no encontré el archivo descargado»).
+        return downloaded
+            ?? NewestFileSince(targetFolder, startedAt)
+            ?? YouTubeDownloadFiles.AlreadyDownloaded(
+                new DirectoryInfo(targetFolder).EnumerateFiles().Where(f => f.Length > 0).Select(f => f.FullName),
+                videoId);
     }
 
     /// <summary>The most recently written finished video in <paramref name="folder"/> since <paramref name="since"/>.</summary>
