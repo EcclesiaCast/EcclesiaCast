@@ -5,7 +5,6 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
-
 ### Agregado
 - **Cambiar el PIN del celular.** En «Controlar desde el celular» hay un botón **Cambiar el PIN**
   (con confirmación). El celular se entera solo: al volver a la pestaña, al despertar o cada pocos
