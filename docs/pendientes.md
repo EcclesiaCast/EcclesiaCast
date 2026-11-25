@@ -21,30 +21,11 @@ pasa a **Ya probado**, más abajo.
 
 ### Falta probar
 
-**Nuevo en la prueba.10 (lo que pediste tras la prueba.9)**
+**Pendiente tras probar la prueba.10 (arreglos hechos, sin versión de prueba todavía)**
 
-1. **Biblia: botón de la vista.** Vuelve a ser un solo botón del tamaño de antes que muestra el modo en
-   que estás: «☰ Lista ⇄» o «▦ Grilla ⇄». Al tocarlo pasa al otro; el globito lo aclara. En el
-   tutorial de la Biblia, los pasos de Modo lista y Modo grilla tienen que dejar el botón diciendo lo
-   que corresponde.
-2. **Barra 🔈 de los audios (pestaña Música).** Claude encontró la causa: al llegar a 100 o salir de 100
-   sacaba y ponía el ecualizador y el sonido se reiniciaba un instante; ahora el ecualizador queda
-   siempre puesto. Tiene que seguir el mouse al instante y sin cortes. Claude no pudo oírlo: es lo
-   primero para mirar.
-3. **Celular, «🖼 Fondos y medios».**
-   - El botón queda **azul** mientras el panel está abierto.
-   - Un **desplegable de carpetas** (las mismas pestañas que en la computadora: Fondos, Anuncios…):
-     muestra sólo las miniaturas de la carpeta elegida y se acuerda de la última.
-4. **Fondo fijo para la Biblia.** En el panel de la Biblia, siempre a la vista, está **«🖼 Biblia: sin
-   fondo propio»** (igual que el de las canciones): clic para usar el fondo que está en pantalla o
-   elegir uno de la biblioteca por pestaña (imagen o video). Mirá que se vea en el proyector, EN VIVO,
-   la vista previa y OBS, que se acuerde al cerrar y abrir, y que se pueda quitar. El botón de fondo
-   de las canciones también ofrece «Elegir un fondo de la biblioteca».
-
-**De la prueba.9, todavía sin tu respuesta**
-
-5. **YouTube sin internet:** guardá con 💾, cortá internet y vé que suene.
-6. **Holyrics por archivo** con un lote grande y con un `.txt` de varias canciones.
+1. **Barra 🔈 de los audios:** el cambio tiene que oírse mientras se arrastra.
+2. **Fondo de la Biblia:** sin el botón debajo de las versiones, y «Usar como fondo de la Biblia» con
+   clic derecho en Medios.
 
 ### Al publicar la 1.5.0 (no es para probar antes)
 
@@ -57,6 +38,9 @@ pasa a **Ya probado**, más abajo.
 
 ### Ya probado
 
+- **Prueba.10, probado por Alexis, dado por bueno:** el botón único «Lista ⇄ / Grilla ⇄» de la
+  Biblia; «Fondos y medios» en el celular (botón azul y carpetas); YouTube sin internet (💾) y
+  Holyrics por archivo.
 - **Prueba.9, probado por Alexis el 26/11, dado por bueno:** importar la Biblia de Beblia; submenú de
   Tutoriales a la derecha; los tutoriales arrancan en su pestaña y los pasos de la Biblia; el menú
   clic derecho de AUDIOS; el cambio de PIN y sus avisos.
