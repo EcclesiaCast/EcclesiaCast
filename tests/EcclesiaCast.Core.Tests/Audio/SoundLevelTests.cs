@@ -86,6 +86,17 @@ public class SoundLevelTests
         }
     }
 
+    [Theory]
+    [InlineData(0)]
+    [InlineData(37)]
+    [InlineData(80)]
+    [InlineData(100)]
+    public void What_Windows_gets_is_what_LibVLC_would_have_written_there(int bar)
+    {
+        var fraction = SoundLevel.SessionVolume(bar) / 100.0;
+        Assert.Equal(fraction * fraction * fraction, SoundLevel.SessionScalar(bar), 5);
+    }
+
     [Fact]
     public void Each_step_of_the_bar_changes_the_loudness_by_a_similar_amount()
     {

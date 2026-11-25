@@ -1,5 +1,6 @@
 using EcclesiaCast.Core.Audio;
 using LibVLCSharp.Shared;
+using NAudio.CoreAudioApi;
 using Serilog;
 using MediaPlayer = LibVLCSharp.Shared.MediaPlayer;
 
@@ -12,6 +13,11 @@ namespace EcclesiaCast.App.Services;
 /// unmuted, and the player is turned down with its own equalizer instead. A
 /// silenced video does not get a muted output: it is opened without its sound
 /// (or its sound track is switched off while it plays).
+///
+/// The exception is the music list's player (<see cref="VlcAudioPlayer"/>):
+/// it plays through DirectSound and has a volume of its own. Windows still
+/// turns it down with the shared session, so the general volume is also set
+/// there directly (<see cref="ApplySession"/>).
 /// </summary>
 public static class PlayerSound
 {
@@ -125,6 +131,7 @@ public static class PlayerSound
                 _sessionNow = target;
                 try { SessionChanged?.Invoke(null, EventArgs.Empty); }
                 catch (Exception ex) { Log.Debug(ex, "No se pudo aplicar el volumen"); }
+                ApplySession();
             }
 
             var started = Interlocked.Exchange(ref _requestedAt, 0);
@@ -145,6 +152,31 @@ public static class PlayerSound
         _sessionTarget = SoundLevel.SessionVolume(_master);
         _sessionNow = _sessionTarget;
         SessionChanged?.Invoke(null, EventArgs.Empty);
+        ApplySession();
+    }
+
+    /// <summary>
+    /// Gives the program's Windows audio session the general volume, and lifts
+    /// a mute left on it. Done here, without a player: the video's players only
+    /// write it while they have a sound output open, and the music list's one
+    /// never does. Also called before each song, since the session belongs to
+    /// the output device of the moment and Windows remembers the one it had.
+    /// </summary>
+    public static void ApplySession()
+    {
+        try
+        {
+            using var devices = new MMDeviceEnumerator();
+            using var device = devices.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+            var session = device.AudioSessionManager.SimpleAudioVolume;
+            session.Volume = SoundLevel.SessionScalar(_master);
+            session.Mute = false;
+        }
+        catch (Exception ex)
+        {
+            // No sound output at all, for one.
+            Log.Debug(ex, "No se pudo poner el volumen general en Windows");
+        }
     }
 
     /// <summary>Raised when <see cref="Master"/> changes: each live player applies it.</summary>
@@ -152,29 +184,6 @@ public static class PlayerSound
 
     /// <summary>The player's own volume (0–100).</summary>
     public static int Effective(int volume) => Math.Clamp(volume, 0, 100);
-
-    /// <summary>
-    /// Like <see cref="SetVolume"/> but the equalizer is never taken off, not
-    /// even at 100: putting it in or out of the sound's path restarts that
-    /// path (a cut in the sound), while changing its levels on a path that
-    /// already has it is immediate. For the music list's bar, which moves a lot.
-    /// </summary>
-    public static void SetVolumeSteady(MediaPlayer player, int volume)
-    {
-        try
-        {
-            var (preamp, bands) = SoundLevel.Split(volume) ?? (SoundLevel.PreampUnity, 0);
-            using var equalizer = new Equalizer();
-            equalizer.SetPreamp((float)preamp);
-            for (uint band = 0; band < equalizer.BandCount; band++)
-                equalizer.SetAmp((float)bands, band);
-            player.SetEqualizer(equalizer);
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "No se pudo cambiar el volumen del reproductor");
-        }
-    }
 
     /// <summary>Turns this player alone down to <paramref name="volume"/> (0–100).</summary>
     public static void SetVolume(MediaPlayer player, int volume)
