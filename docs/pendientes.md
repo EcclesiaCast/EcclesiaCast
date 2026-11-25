@@ -21,11 +21,18 @@ pasa a **Ya probado**, más abajo.
 
 ### Falta probar
 
-**Pendiente tras probar la prueba.10 (arreglos hechos, sin versión de prueba todavía)**
+**Nuevo en la prueba.11 (lo que pediste tras la prueba.10)**
 
-1. **Barra 🔈 de los audios:** el cambio tiene que oírse mientras se arrastra.
-2. **Fondo de la Biblia:** sin el botón debajo de las versiones, y «Usar como fondo de la Biblia» con
-   clic derecho en Medios.
+1. **Barra 🔈 de los audios.** Arrastrala sin soltar con un archivo y con música de YouTube: el
+   volumen tiene que cambiar mientras la movés, sin cortes ni golpes al máximo. Probá también pasar
+   de un tema a otro (arranca con el volumen de la barra), pausar y saltar dentro del tema, la barra
+   «Volumen» de abajo de EN VIVO, y cambiar de parlantes en medio de un tema. Los audios ahora salen
+   por otra salida de Windows (DirectSound): fijate que salgan por el equipo correcto. El volumen
+   propio de cada video (Propiedades) conserva la demora.
+2. **Fondo de la Biblia.** Ya no está el botón debajo de las versiones: queda el **🖼** de arriba de
+   las diapositivas (sólo con versículos cargados). Con la pestaña Biblia abierta, clic derecho en un
+   medio: «Usar como fondo de la Biblia» y «Quitar el fondo de la Biblia». En Canciones sigue «Usar
+   como fondo de «canción»». El tutorial de la Biblia tiene un paso nuevo.
 
 ### Al publicar la 1.5.0 (no es para probar antes)
 
