@@ -64,4 +64,37 @@ public class SoundLevelTests
             previous = db;
         }
     }
+
+    [Fact]
+    public void Session_volume_only_reaches_zero_at_the_bottom_of_the_bar()
+    {
+        Assert.Equal(0, SoundLevel.SessionVolume(0));
+        Assert.Equal(100, SoundLevel.SessionVolume(100));
+        for (var bar = 1; bar < 100; bar++)
+            Assert.InRange(SoundLevel.SessionVolume(bar), 1, 99);
+    }
+
+    [Fact]
+    public void Session_volume_never_falls_when_the_bar_goes_up()
+    {
+        var previous = 0;
+        for (var bar = 0; bar <= 100; bar++)
+        {
+            var volume = SoundLevel.SessionVolume(bar);
+            Assert.True(volume >= previous, $"barra {bar}: {volume} < {previous}");
+            previous = volume;
+        }
+    }
+
+    [Fact]
+    public void Each_step_of_the_bar_changes_the_loudness_by_a_similar_amount()
+    {
+        // LibVLC's law is the cube of the number: the loudness in dB of a session volume.
+        static double Db(int volume) => 60 * Math.Log10(volume / 100.0);
+
+        // From 10 % up, no step of the bar is a jump of more than 2 dB.
+        for (var bar = 10; bar < 100; bar++)
+            Assert.True(Db(SoundLevel.SessionVolume(bar + 1)) - Db(SoundLevel.SessionVolume(bar)) <= 2.0,
+                $"salto grande entre {bar} y {bar + 1}");
+    }
 }

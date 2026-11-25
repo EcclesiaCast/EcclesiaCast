@@ -203,7 +203,7 @@ public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
         {
             _listening = true;
             AudioEndpointWatcher.OutputChanged += OnOutputChanged;
-            PlayerSound.MasterChanged += OnMasterChanged;
+            PlayerSound.SessionChanged += OnMasterChanged;
         }
 
         return player;
@@ -226,7 +226,7 @@ public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
     public void Dispose()
     {
         AudioEndpointWatcher.OutputChanged -= OnOutputChanged;
-        PlayerSound.MasterChanged -= OnMasterChanged;
+        PlayerSound.SessionChanged -= OnMasterChanged;
         _listening = false;
         var player = _player;
         _player = null;

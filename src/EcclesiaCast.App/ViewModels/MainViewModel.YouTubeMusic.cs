@@ -120,6 +120,11 @@ public sealed partial class MainViewModel
                 : results.Count > 0
                     ? $"{results.Count} resultado(s) de YouTube para «{query}». ▶ escucha, ➕ suma a la lista, 💾 guarda para usar sin internet."
                     : $"YouTube no encontró nada para «{query}».";
+
+            // While the person reads the titles, the first ones are brought
+            // ahead: pressing ▶ on one of them then plays at once.
+            if (linkedId is null)
+                PrefetchTopResults(results);
         }
         catch (OperationCanceledException)
         {
@@ -335,6 +340,57 @@ public sealed partial class MainViewModel
             var name = item.Name;
             StopAudio();
             StatusText = $"No se pudo reproducir «{name}». {YtDlp.ExplainMusic(ex)}";
+        }
+    }
+
+    /// <summary>How many of the first results are brought ahead, and how many at the same time.</summary>
+    private const int PrefetchResults = 3;
+
+    private const int PrefetchAtOnce = 2;
+
+    private CancellationTokenSource? _prefetch;
+
+    /// <summary>
+    /// Brings to the cache the sound of the first results of a search, two at
+    /// a time. A newer search (or a ▶ that needs the connection at once)
+    /// stops the ones not yet started; the ones running finish and stay cached.
+    /// </summary>
+    private void PrefetchTopResults(IReadOnlyList<YouTubeSearchResult> results)
+    {
+        _prefetch?.Cancel();
+        var cancel = new CancellationTokenSource();
+        _prefetch = cancel;
+        var gate = new SemaphoreSlim(PrefetchAtOnce);
+
+        foreach (var result in results.Where(r => r.Duration is { } length && length <= TimeSpan.FromMinutes(15))
+                     .Take(PrefetchResults))
+            _ = PrefetchAsync(result.VideoId);
+
+        async Task PrefetchAsync(string videoId)
+        {
+            try
+            {
+                await gate.WaitAsync(cancel.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+
+            try
+            {
+                if (!cancel.IsCancellationRequested)
+                    await YtDlp.GetAudioFileAsync(videoId, new Progress<(double, string)>());
+            }
+            catch (Exception ex)
+            {
+                // It is asked again when ▶ is pressed.
+                Log.Debug(ex, "No se pudo adelantar el audio de YouTube {Id}", videoId);
+            }
+            finally
+            {
+                gate.Release();
+            }
         }
     }
 
