@@ -146,7 +146,7 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   Cargo e imagen limpios para escribir la siguiente.
 - **Paneles angostos.** El botón de la Biblia dice «🕘 Hist.» en vez de sólo 🕘, y el título «CANCIONES»
   se recorta con puntos suspensivos (y «➕ Agregar» pasa a «➕») en vez de quedar tapado por los botones.
-- **Fondo propio para la Biblia, y elegirlo más fácil.** Con versículos en la grilla aparece
+- **Fondo propio para la Biblia, y elegirlo más fácil.** En el panel de la Biblia, siempre a la vista, y sobre las diapositivas con versículos en la grilla, está
   **«🖼 Biblia: sin fondo propio»** (igual que el de las canciones): clic para usar el fondo que está en
   pantalla o **elegir uno de la biblioteca** por pestaña. Se pone solo al proyectar un versículo después
   de otra cosa. El botón de fondo de las canciones ahora también ofrece **«Elegir un fondo de la

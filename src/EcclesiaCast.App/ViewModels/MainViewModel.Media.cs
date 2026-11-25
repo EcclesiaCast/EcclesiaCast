@@ -336,6 +336,7 @@ public sealed partial class MainViewModel
     {
         _allMedia.Clear();
         _allMedia.AddRange(_media.GetAll());
+        UpdateBibleBackgroundLabel();
 
         // A poster whose event is over goes to «Eventos pasados» by itself.
         var overdue = _allMedia.Where(m => MediaExpiry.IsDue(m, DateTime.Today)).ToList();
