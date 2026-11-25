@@ -932,12 +932,29 @@ public partial class MainWindow : Window
                     item.Visibility = isWeb ? Visibility.Collapsed : Visibility.Visible;
                     break;
                 case "UseAsSongBackgroundItem":
-                    item.Visibility = count == 1 && vm.SongForBackground is { } song
+                    item.Visibility = !vm.IsBibleTabActive && count == 1 && vm.SongForBackground is not null
                         && media.Type is MediaType.Image or MediaType.Video or MediaType.YouTube
                         ? Visibility.Visible : Visibility.Collapsed;
                     item.Header = vm.SongForBackground is { } open
-                        ? $"Usar como fondo de «{open.Title}»"
+                        ? $"Usar como fondo de «{open.Title.Replace("_", "__")}»"
                         : "Usar como fondo de la canción";
+                    break;
+                case "UseAsBibleBackgroundItem":
+                    // Not on the one that already is: there «Quitar» takes its place.
+                    item.Visibility = vm.IsBibleTabActive && count == 1
+                        && media.Type is MediaType.Image or MediaType.Video or MediaType.YouTube
+                        && vm.BibleBackgroundMedia?.Id != media.Id
+                        ? Visibility.Visible : Visibility.Collapsed;
+                    item.ToolTip = vm.BibleBackgroundMedia is { } previous
+                        ? $"Reemplaza a «{previous.Name}». Se pone solo cada vez que proyectes un versículo después de otra cosa."
+                        : "Se pone solo cada vez que proyectes un versículo después de otra cosa.";
+                    break;
+                case "RemoveBibleBackgroundItem":
+                    item.Visibility = vm.IsBibleTabActive && vm.BibleBackgroundMedia is not null
+                        ? Visibility.Visible : Visibility.Collapsed;
+                    item.Header = vm.BibleBackgroundMedia is { } bible
+                        ? $"Quitar el fondo de la Biblia («{bible.Name.Replace("_", "__")}»)"
+                        : "Quitar el fondo de la Biblia";
                     break;
                 case "UseAsLogoItem":
                     // A page drawn from a PDF or presentation, or the video made

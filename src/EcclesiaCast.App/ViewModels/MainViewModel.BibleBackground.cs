@@ -29,7 +29,8 @@ public sealed partial class MainViewModel
 
     private int? BibleBackgroundId => int.TryParse(_settings.Get(BibleBackgroundKey), out var id) && id > 0 ? id : null;
 
-    private MediaItem? BibleBackgroundMedia =>
+    /// <summary>The Bible's own background, if it has one and it is still in the library.</summary>
+    public MediaItem? BibleBackgroundMedia =>
         BibleBackgroundId is int id ? _allMedia.FirstOrDefault(m => m.Id == id) : null;
 
     private void UpdateBibleBackgroundLabel()
@@ -44,7 +45,7 @@ public sealed partial class MainViewModel
         {
             BibleHasOwnBackground = false;
             BibleBackgroundLabel = "🖼 Biblia: sin fondo propio";
-            BibleBackgroundHint = "La Biblia no tiene un fondo propio: se queda el que esté puesto. Clic para elegir uno de la biblioteca.";
+            BibleBackgroundHint = "La Biblia no tiene un fondo propio: se queda el que esté puesto. Clic para elegir uno de la biblioteca o usar el que está en pantalla (también: con la pestaña Biblia abierta, clic derecho en una imagen o video de Medios → «Usar como fondo de la Biblia»).";
         }
     }
 
@@ -57,7 +58,7 @@ public sealed partial class MainViewModel
             .Select(g => (g.Key, (IReadOnlyList<MediaItem>)g.ToList()))
             .ToList();
 
-    /// <summary>A background picked for the Bible (from the button's menu or a media card's right click).</summary>
+    /// <summary>A background picked for the Bible (from the menu of the button over the verses, or a media card's right click).</summary>
     [RelayCommand]
     private void UseMediaAsBibleBackground(MediaItem? media)
     {
