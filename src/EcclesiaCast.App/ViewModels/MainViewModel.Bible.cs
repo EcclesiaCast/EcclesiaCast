@@ -308,15 +308,7 @@ public sealed partial class MainViewModel
 
     /// <summary>The Bible tab shows books, chapters and verses as grids instead of the list.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsBibleListView))]
     private bool _isBibleGridView;
-
-    /// <summary>The other half of the «Lista | Grilla» selector: the list is on.</summary>
-    public bool IsBibleListView
-    {
-        get => !IsBibleGridView;
-        set { if (value) IsBibleGridView = false; }
-    }
 
     /// <summary>The grid is what is on screen right now (and no text search is covering it).</summary>
     [ObservableProperty]

@@ -988,22 +988,24 @@
                                         Click="BibleHistoryButton_Click"
                                         AutomationProperties.Name="Historial de versículos"
                                         ToolTip="Historial de los versículos que proyectaste: clic carga y marca el versículo, doble clic lo proyecta. También: flecha ↓ en la caja vacía."/>
-                                <!-- «Lista | Grilla»: las dos opciones a la vista, la activa resaltada (antes un
-                                     botón decía el modo contrario al actual y confundía). -->
-                                <Border x:Name="BibleViewToggleButton" DockPanel.Dock="Right" Margin="6,0,0,0"
-                                        Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}"
-                                        BorderThickness="1" CornerRadius="5" Padding="2" VerticalAlignment="Stretch"
-                                        AutomationProperties.Name="Vista de la Biblia"
-                                        ToolTip="Lista: la de siempre. Grilla: los libros como fichas de colores, con los capítulos y versículos al lado. Escribir una cita («jn 3 16») + Enter funciona en las dos.">
-                                    <StackPanel Orientation="Horizontal">
-                                        <RadioButton x:Name="BibleListRadio" GroupName="BibleView" Content="☰ Lista"
-                                                     Style="{StaticResource TabButton}" FontSize="11" Padding="7,3"
-                                                     IsChecked="{Binding IsBibleListView, Mode=TwoWay}"/>
-                                        <RadioButton x:Name="BibleGridRadio" GroupName="BibleView" Content="▦ Grilla"
-                                                     Style="{StaticResource TabButton}" FontSize="11" Padding="7,3"
-                                                     IsChecked="{Binding IsBibleGridView, Mode=TwoWay}"/>
-                                    </StackPanel>
-                                </Border>
+                                <!-- Un solo botón que dice el modo ACTUAL (☰ Lista ⇄ / ▦ Grilla ⇄); al tocarlo pasa al otro. -->
+                                <Button x:Name="BibleViewToggleButton" DockPanel.Dock="Right"
+                                        FontSize="11" Padding="8,6" Margin="6,0,0,0"
+                                        Command="{Binding ToggleBibleViewCommand}"
+                                        AutomationProperties.Name="Cambiar la vista de la Biblia">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
+                                            <Setter Property="Content" Value="☰ Lista ⇄"/>
+                                            <Setter Property="ToolTip" Value="Vista: Lista. Tocá para pasar a Grilla (los libros como fichas de colores). Escribir una cita («jn 3 16») + Enter funciona en las dos."/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsBibleGridView}" Value="True">
+                                                    <Setter Property="Content" Value="▦ Grilla ⇄"/>
+                                                    <Setter Property="ToolTip" Value="Vista: Grilla. Tocá para pasar a Lista. Escribir una cita («jn 3 16») + Enter funciona en las dos."/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
                                 <TextBox x:Name="BibleQueryBox"
                                          Padding="8,6"
                                          PreviewKeyDown="BibleQueryBox_PreviewKeyDown"

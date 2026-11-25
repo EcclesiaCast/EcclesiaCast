@@ -63,8 +63,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   canción con su casilla, para elegir cuáles traer.
   La canción de bienvenida de Holyrics y las archivadas no se traen, y si una canción ya está,
   pregunta qué hacer. (Por su API Server no: crear el token pide el plan de pago Holyrics Advanced.)
-- **Biblia: selector «Lista | Grilla».** El botón que cambiaba de vista mostraba el nombre del modo
-  contrario al actual y confundía; ahora son dos opciones juntas y la activa queda resaltada.
+- **Biblia: el botón de la vista dice el modo actual.** Antes mostraba el nombre del modo contrario y
+  confundía; ahora dice «☰ Lista ⇄» o «▦ Grilla ⇄» y, al tocarlo, pasa al otro. El globito lo aclara.
 - **Submenús siempre hacia la derecha.** Con Windows en menús «para zurdos» (común en tablets y
   notebooks táctiles) el submenú de Tutoriales se abría a la izquierda, cortado y debajo del globito.
   Ahora se abre a la derecha del ítem, y «Tutoriales» ya no lleva globito. Los tutoriales arrancan
