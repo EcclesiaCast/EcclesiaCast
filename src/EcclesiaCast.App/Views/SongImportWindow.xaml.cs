@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using EcclesiaCast.App.Services;
@@ -14,15 +14,12 @@ namespace EcclesiaCast.App.Views;
 /// Holyrics) without asking the operator to hunt for files: the operator picks
 /// the program, the window looks where that one keeps its libraries, lists
 /// what it found with the song count, and imports the ticked ones in one go.
-/// Holyrics encrypts its library, so its songs come through the API Server it
-/// documents: the operator gives the port and a token once, and they are kept.
+/// Holyrics encrypts its library, so its songs come from the .json or .txt
+/// files that Holyrics itself saves (Canción → Exportar), which work on its free plan.
 /// </summary>
 public partial class SongImportWindow : Window
 {
     private enum Source { ProPresenter, EasyWorship, Holyrics }
-
-    private const string HolyricsPortKey = "Import.Holyrics.Port";
-    private const string HolyricsTokenKey = "Import.Holyrics.Token";
 
     /// <summary>One song to bring over; <paramref name="Path"/> is its file, when it has one.</summary>
     private sealed record Item(string Label, string? Path, Func<Song> Load);
@@ -65,13 +62,9 @@ public partial class SongImportWindow : Window
         [Source.Holyrics] = string.Empty,
     };
 
-    /// <summary>Where Holyrics is installed, or null when it is not on this computer.</summary>
-    private string? _holyricsFolder;
-
-    /// <summary>Why the last attempt to reach Holyrics failed; empty when it did not.</summary>
+    /// <summary>Why the last Holyrics file could not be read; empty when it could.</summary>
     private string _holyricsError = string.Empty;
 
-    private bool _connecting;
     private bool _importing;
 
     private Source _source = Source.ProPresenter;
@@ -82,11 +75,6 @@ public partial class SongImportWindow : Window
         InitializeComponent();
         _songSaver = songSaver;
         _settings = settings;
-
-        HolyricsPort.Text = settings.Get(HolyricsPortKey) is { Length: > 0 } port
-            ? port
-            : HolyricsClient.DefaultPort.ToString();
-        HolyricsToken.Text = settings.Get(HolyricsTokenKey) ?? string.Empty;
 
         Loaded += (_, _) => DiscoverAll();
     }
@@ -113,23 +101,13 @@ public partial class SongImportWindow : Window
     {
         DiscoverProPresenter();
         DiscoverEasyWorship();
-        _holyricsFolder = HolyricsLocator.FindInstall(HolyricsLocator.DefaultFolders());
         _discovered = true;
 
         RefreshLabels();
 
         // The program that has songs opens first; with several, ProPresenter as always.
-        // Holyrics can't be counted before connecting, so it opens first only when it
-        // is installed and the other two found nothing.
-        var first = Total(Source.ProPresenter) > 0 ? Source.ProPresenter
-            : Total(Source.EasyWorship) > 0 ? Source.EasyWorship
-            : _holyricsFolder is not null ? Source.Holyrics
-            : Source.ProPresenter;
+        var first = Total(Source.EasyWorship) > 0 && Total(Source.ProPresenter) == 0 ? Source.EasyWorship : Source.ProPresenter;
         Choice(first).IsChecked = true;
-
-        // With a token kept from a previous time, Holyrics is read right away.
-        if (_holyricsFolder is not null && HolyricsToken.Text.Trim().Length > 0)
-            _ = ConnectHolyricsAsync(quiet: true);
     }
 
     private System.Windows.Controls.RadioButton Choice(Source source) => source switch
@@ -272,26 +250,21 @@ public partial class SongImportWindow : Window
         {
             HeaderText.Text = total > 0
                 ? $"Encontré {total} canción(es) en Holyrics. ¿Las importo todas?"
-                : "Me conecté con Holyrics, pero no tiene canciones.";
+                : "Ese archivo no tiene canciones.";
             RootText.Text = _roots[Source.Holyrics];
             ImportButton.IsEnabled = total > 0 && !_importing;
             return;
         }
 
-        HeaderText.Text = _connecting
-            ? "Conectando con Holyrics…"
-            : _holyricsError.Length > 0
-                ? _holyricsError
-                : _holyricsFolder is null
-                    ? "No encontré Holyrics instalado en esta computadora."
-                    : $"Encontré Holyrics en {_holyricsFolder}. Para traer sus canciones hay que conectarse con él.";
+        HeaderText.Text = _holyricsError.Length > 0
+            ? _holyricsError
+            : "Elegí los archivos que guardaste desde Holyrics.";
         RootText.Text =
-            "Holyrics guarda sus canciones cifradas, así que se leen a través de su API Server:\n"
-            + "1. Abrí Holyrics y entrá en Archivo → Configuraciones → API Server.\n"
-            + "2. Activá el servidor local y fijate el puerto (suele ser 8091).\n"
-            + "3. En los permisos, creá un token y habilitale «GetSongs» y «GetLyrics».\n"
-            + "4. Escribí el puerto y el token acá abajo y tocá «Conectar», con Holyrics abierto.\n"
-            + "El token queda guardado: la próxima vez se conecta solo.";
+            "Holyrics guarda sus canciones cifradas, así que se traen desde un archivo que Holyrics mismo guarda:\n"
+            + "1. En Holyrics, entrá en Canción → Exportar → «Exportación en lote…».\n"
+            + "2. Elegí las canciones (la flecha → las pasa a la derecha), tipo JSON, y tocá Guardar.\n"
+            + "3. Acá abajo tocá «Abrir archivos…» y elegí ese archivo.\n"
+            + "También sirven los .json y .txt de una sola canción (Archivo → Guardar → Canción).";
         ImportButton.IsEnabled = false;
     }
 
@@ -349,79 +322,61 @@ public partial class SongImportWindow : Window
         return folders;
     }
 
-    private async void HolyricsConnect_Click(object sender, RoutedEventArgs e) =>
-        await ConnectHolyricsAsync(quiet: false);
-
     /// <summary>
-    /// Reads every song of Holyrics through its API and lists them as one
-    /// library. <paramref name="quiet"/> is the attempt made on opening with a
-    /// kept token: if Holyrics is closed then, the window just shows the steps
-    /// and waits for «Conectar» instead of greeting the operator with an error.
+    /// The way in for the free Holyrics: files saved from its «Guardar» or
+    /// «Exportación en lote» (.json or .txt) are read and listed as one library.
     /// </summary>
-    private async Task ConnectHolyricsAsync(bool quiet)
+    private void HolyricsFiles_Click(object sender, RoutedEventArgs e)
     {
-        if (_connecting || _importing)
+        if (_importing)
             return;
 
-        var token = HolyricsToken.Text.Trim();
-        if (!int.TryParse(HolyricsPort.Text.Trim(), out var port) || port is < 1 or > 65535)
+        var dialog = new Microsoft.Win32.OpenFileDialog
         {
-            _holyricsError = "El puerto tiene que ser un número, como 8091.";
-            ShowSource();
+            Title = "Canciones guardadas desde Holyrics",
+            Filter = "Canciones de Holyrics (*.json;*.txt)|*.json;*.txt",
+            Multiselect = true,
+        };
+        if (dialog.ShowDialog() != true)
             return;
+
+        var songs = new List<Song>();
+        var failed = new List<string>();
+        foreach (var path in dialog.FileNames)
+        {
+            try
+            {
+                songs.AddRange(HolyricsImporter.FromFile(path));
+            }
+            catch (Exception ex) when (ex is HolyricsException or IOException or UnauthorizedAccessException)
+            {
+                Log.Warning(ex, "No se pudo leer {File}", path);
+                failed.Add(Path.GetFileName(path));
+            }
         }
-        if (token.Length == 0)
+
+        _holyricsError = songs.Count == 0
+            ? "No encontré canciones en ese archivo. Tiene que ser un .json o .txt guardado desde Holyrics."
+            : string.Empty;
+
+        if (songs.Count > 0)
         {
-            _holyricsError = "Falta el token: crealo en Holyrics, en Archivo → Configuraciones → API Server.";
-            ShowSource();
-            return;
-        }
+            var detail = dialog.FileNames.Length == 1
+                ? $"Archivo de Holyrics: {Path.GetFileName(dialog.FileName)}"
+                : $"{dialog.FileNames.Length} archivos de Holyrics";
+            if (failed.Count > 0)
+                detail += $"  ·  no se pudo leer: {string.Join(", ", failed)}";
 
-        _connecting = true;
-        _holyricsError = string.Empty;
-        HolyricsConnect.IsEnabled = false;
-        if (_source == Source.Holyrics)
-            ShowSource();
-
-        try
-        {
-            using var http = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromSeconds(quiet ? 5 : 60) };
-            var library = await new HolyricsClient(http, port, token).ReadSongsAsync();
-
-            _settings.Set(HolyricsPortKey, port.ToString());
-            _settings.Set(HolyricsTokenKey, token);
-
-            var detail = $"API Server de Holyrics, puerto {port}";
-            if (library.Archived > 0)
-                detail += $"  ·  {library.Archived} archivada(s) en Holyrics, no se traen";
-            if (library.Unreadable > 0)
-                detail += $"  ·  {library.Unreadable} ilegible(s)";
-
-            var songs = library.Songs;
             _rows[Source.Holyrics].Clear();
             _rows[Source.Holyrics].Add(new Row(
                 "Holyrics", detail, songs.Count, 0,
                 () => songs.Select(song => (object)new Item(song.Title, null, () => song)).ToList()));
             _roots[Source.Holyrics] = detail;
-
-            Log.Information("Holyrics: {Count} canciones leídas, {Archived} archivadas, {Bad} ilegibles",
-                songs.Count, library.Archived, library.Unreadable);
-        }
-        catch (HolyricsException ex)
-        {
-            Log.Warning(ex, "No se pudo leer Holyrics");
-            // On opening, a closed Holyrics is not worth an error: just the steps.
-            _holyricsError = quiet ? string.Empty : ex.Message;
-        }
-        finally
-        {
-            _connecting = false;
-            HolyricsConnect.IsEnabled = !_importing;
+            Log.Information("Holyrics: {Count} canciones leídas de archivos", songs.Count);
         }
 
         RefreshLabels();
-        if (_source == Source.Holyrics)
-            ShowSource();
+        ShowSource();
     }
 
     private void Browse_Click(object sender, RoutedEventArgs e)
@@ -525,7 +480,7 @@ public partial class SongImportWindow : Window
         ProPresenterChoice.IsEnabled = false;
         EasyWorshipChoice.IsEnabled = false;
         HolyricsChoice.IsEnabled = false;
-        HolyricsConnect.IsEnabled = false;
+        HolyricsFiles.IsEnabled = false;
         Progress.Visibility = Visibility.Visible;
         ProgressText.Visibility = Visibility.Visible;
         ProgressText.Text = $"Leyendo las bibliotecas de {SourceName}…";

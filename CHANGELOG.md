@@ -17,12 +17,13 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   siempre.
 - **Traer las canciones de Holyrics.** En **➕ → Traer de otro programa…** hay un tercer botón,
   **Holyrics**, al lado de ProPresenter y EasyWorship. Holyrics guarda sus canciones cifradas, así que
-  se leen por su **API Server**: en Holyrics, Archivo → Configuraciones → API Server, se activa el
-  servidor local y se crea un token con permiso para «GetSongs» y «GetLyrics»; se escriben el puerto y
-  el token en la ventana y **Conectar**. Trae título, autor, derechos y la letra separada en estrofas
-  con sus nombres en español (Verse 1 → Estrofa 1, Chorus o Refrão → Coro, Bridge → Puente…). Las
-  archivadas en Holyrics no se traen, y si una canción ya está, pregunta qué hacer. El token queda
-  guardado: la próxima vez, con Holyrics abierto, se conecta solo.
+  se traen desde un archivo que Holyrics mismo guarda, y eso anda también con el Holyrics gratis: en
+  Holyrics, Canción → Exportar → «Exportación en lote…», se eligen las canciones, tipo JSON, y Guardar;
+  en EcclesiaCast, **Abrir archivos…** con ese archivo. También sirven los .json y .txt de una sola
+  canción (Archivo → Guardar → Canción). Trae título, artista, derechos y la letra separada en
+  estrofas con sus nombres en español (Verse 1 → Estrofa 1, Chorus o Refrão → Coro, Bridge → Puente…).
+  La canción de bienvenida de Holyrics y las archivadas no se traen, y si una canción ya está,
+  pregunta qué hacer. (Por su API Server no: crear el token pide el plan de pago Holyrics Advanced.)
 - **Ayuda → «Tutoriales…».** Una ventana con tarjetas; cada una arranca un recorrido corto (de 5 a 8
   pasos) sobre el programa de verdad, con el foco señalando el botón, igual que el recorrido de
   bienvenida. Vienen 8: crear una canción nueva, armar la lista del domingo, proyectar la Biblia, poner

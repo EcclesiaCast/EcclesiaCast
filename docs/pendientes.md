@@ -40,20 +40,14 @@ pasa a **Ya probado**, más abajo.
 
 **De la 1.5.0, lo último (prueba.3 y prueba.4)**
 
-1. **Traer las canciones de Holyrics.** Es nuevo y **todavía no se probó con un Holyrics de verdad**:
-   las pruebas automáticas usan respuestas armadas según la documentación de Holyrics.
-   - En Holyrics, una sola vez: Archivo → Configuraciones → API Server → activar el servidor
-     local, crear un token y habilitarle «GetSongs» y «GetLyrics».
-   - Cargá antes dos o tres canciones de prueba, con acentos y con estrofas y coro marcados.
-   - Con Holyrics abierto, en EcclesiaCast: ➕ Agregar → **Traer de otro programa…** →
-     **Holyrics**. Escribí el puerto (viene 8091) y el token, y tocá **Conectar**: tiene que decir
-     cuántas canciones encontró.
-   - **Importar**, y mirar título, autor, acentos y los nombres de las estrofas (Estrofa 1, Coro,
-     Puente…).
+1. **Traer las canciones de Holyrics, con archivo (Holyrics gratis).** Nuevo en la prueba.7. Se sacó la
+   opción por API con token (pedía el plan de pago Holyrics Advanced).
+   - En Holyrics: Canción → Exportar → «Exportación en lote…», elegí las canciones, tipo JSON, Guardar.
+   - En EcclesiaCast: ➕ Agregar → Traer de otro programa… → Holyrics → **Abrir archivos…**.
+   - Mirá título, artista, acentos y estrofas; importá y proyectá una. La canción de bienvenida de
+     Holyrics no tiene que aparecer.
    - Importar otra vez: tiene que preguntar qué hacer con las repetidas.
-   - Cerrar y volver a abrir la ventana: se conecta sola.
-   - Con Holyrics cerrado, «Conectar» explica qué falta.
-   - Las canciones archivadas en Holyrics no se traen: la ventana dice cuántas quedaron afuera.
+   - Falta ver el JSON de un lote grande y qué trae el .txt si se exportan varias canciones juntas.
 2. **Un audio guardado, sin internet.** Claude guardó un pad con 💾 (quedó en Música › EcclesiaCast
    y arrancó al instante desde la lista); falta desconectar internet y ver que suene igual.
 3. **La barra «Volumen» con la música de YouTube sonando:** que suba y baje esa música (en el código

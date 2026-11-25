@@ -1,23 +1,20 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace EcclesiaCast.Core.Songs;
 
+/// <summary>A Holyrics file could not be read; <see cref="Exception.Message"/> is meant for the operator.</summary>
+public sealed class HolyricsException(string message, Exception? inner = null) : Exception(message, inner);
+
 /// <summary>
-/// Turns the songs Holyrics hands out through its API Server into
-/// <see cref="Song"/>s. Holyrics keeps its library in a database whose rows
-/// are encrypted, so the only honest way in is the API it documents
-/// (github.com/holyrics/API-Server): each song is a JSON object with
-/// <c>title</c>, <c>artist</c>, <c>author</c>, <c>copyright</c> and a
-/// <c>slides</c> array whose items carry the <c>text</c> and a
-/// <c>slide_description</c> such as «Verse 1» or «Chorus».
+/// Turns the songs Holyrics saves (Canción → Exportar, or Archivo → Guardar) into
+/// <see cref="Song"/>s. Holyrics keeps its library encrypted, but the free plan can
+/// save it as a .json (a list of songs, each with <c>title</c>, <c>artist</c> and
+/// <c>lyrics.paragraphs</c>) or a .txt, and those are what is read here.
 /// </summary>
 public static partial class HolyricsImporter
 {
-    /// <summary>The fields asked for: just what becomes a song here.</summary>
-    public const string Fields = "id,title,artist,author,copyright,archived,slides";
-
     [GeneratedRegex(@"^(?<name>.*?)\s*(?<number>\d+)?$")]
     private static partial Regex NameAndNumber();
 
@@ -61,29 +58,27 @@ public static partial class HolyricsImporter
         ["interludio"] = "Interludio",
     };
 
-    /// <summary>Reads one song object of the API.</summary>
+    /// <summary>Reads one song object of a Holyrics .json.</summary>
     public static Song FromJson(JsonElement song)
     {
         var lyrics = new StringBuilder();
 
-        if (song.TryGetProperty("slides", out var slides) && slides.ValueKind == JsonValueKind.Array)
+        if (song.TryGetProperty("lyrics", out var body) && body.ValueKind == JsonValueKind.Object
+            && body.TryGetProperty("paragraphs", out var paragraphs) && paragraphs.ValueKind == JsonValueKind.Array)
         {
-            foreach (var slide in slides.EnumerateArray())
+            foreach (var paragraph in paragraphs.EnumerateArray())
             {
-                if (slide.ValueKind != JsonValueKind.Object)
+                if (paragraph.ValueKind != JsonValueKind.Object)
                     continue;
 
-                var text = Text(slide, "text").Replace("\r\n", "\n").Replace('\r', '\n').Trim();
+                var text = Text(paragraph, "text").Replace("\r\n", "\n").Replace('\r', '\n').Trim();
                 if (text.Length == 0)
                     continue;
 
                 if (lyrics.Length > 0)
                     lyrics.Append("\n\n");
 
-                // A slide without a description goes on under the previous
-                // one's label, which is what the editor does with a paragraph
-                // that has no [tag] line of its own.
-                var label = Label(Text(slide, "slide_description"));
+                var label = Label(Text(paragraph, "description"));
                 if (label.Length > 0)
                     lyrics.Append('[').Append(label).Append("]\n");
 
@@ -104,9 +99,85 @@ public static partial class HolyricsImporter
         };
     }
 
-    /// <summary>True when the object came with its slides (older Holyrics may leave them out of a list).</summary>
-    public static bool HasSlides(JsonElement song) =>
-        song.TryGetProperty("slides", out var slides) && slides.ValueKind == JsonValueKind.Array;
+    /// <summary>
+    /// Reads a file saved from Holyrics' free «Guardar» / «Exportación en lote»:
+    /// a .json (one song or a list of them) or a .txt («Título:», «Artista:» and
+    /// the words). Holyrics' own welcome song is left out.
+    /// </summary>
+    public static IReadOnlyList<Song> FromFile(string path)
+    {
+        var raw = File.ReadAllText(path, Encoding.UTF8);
+        var songs = new List<Song>();
+
+        if (path.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+        {
+            JsonDocument document;
+            try
+            {
+                document = JsonDocument.Parse(raw, new JsonDocumentOptions { AllowTrailingCommas = true });
+            }
+            catch (JsonException)
+            {
+                throw new HolyricsException($"«{Path.GetFileName(path)}» no es un archivo JSON de Holyrics.");
+            }
+
+            using (document)
+            {
+                var root = document.RootElement;
+                var items = root.ValueKind == JsonValueKind.Array ? root.EnumerateArray().ToList() : [root];
+                foreach (var item in items.Where(i => i.ValueKind == JsonValueKind.Object))
+                {
+                    if (IsWelcomeSong(item) || IsArchived(item))
+                        continue;
+                    songs.Add(FromJson(item));
+                }
+            }
+        }
+        else
+        {
+            songs.Add(FromText(raw, Path.GetFileNameWithoutExtension(path)));
+        }
+
+        return songs.Where(s => s.Sections.Count > 0).ToList();
+    }
+
+    /// <summary>The .txt of Holyrics: «Título: …», «Artista: …», a blank line and the words.</summary>
+    public static Song FromText(string text, string fallbackTitle)
+    {
+        var lines = text.TrimStart('﻿').Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
+        string title = string.Empty, artist = string.Empty;
+        var index = 0;
+
+        for (; index < lines.Length; index++)
+        {
+            var line = lines[index].Trim();
+            if (line.Length == 0)
+                break;
+
+            var colon = line.IndexOf(':');
+            var key = colon > 0 ? line[..colon].Trim().ToLowerInvariant() : string.Empty;
+            var value = colon > 0 ? line[(colon + 1)..].Trim() : string.Empty;
+            if (key is "título" or "titulo" or "title")
+                title = value;
+            else if (key is "artista" or "artist" or "autor" or "author")
+                artist = value;
+            else
+                break; // not a header line: the words start here
+        }
+
+        var body = string.Join("\n", lines.Skip(index)).Trim();
+        return new Song
+        {
+            Title = title.Length > 0 ? title : fallbackTitle,
+            Artist = artist,
+            Sections = LyricsParser.Parse(body),
+        };
+    }
+
+    /// <summary>The song every Holyrics brings to say hello: not the church's.</summary>
+    private static bool IsWelcomeSong(JsonElement song) =>
+        Id(song) == "1611686353330"
+        || (Text(song, "artist") == "Software & App" && Text(song, "title").Equals("Holyrics", StringComparison.OrdinalIgnoreCase));
 
     /// <summary>Archived songs are the ones the church put away in Holyrics; they are not brought over.</summary>
     public static bool IsArchived(JsonElement song) =>
