@@ -23,6 +23,10 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   sin rampa, y se le avisa al motor desde un hilo aparte (si el motor está ocupado con un video, la
   barra ya no se queda esperando). La barra 🔈 de los audios guardaba en la base de datos en cada
   paso, y eso la hacía ir atrasada; ahora guarda recién cuando la soltás.
+- **La barra 🔈 de los audios ya no corta ni se atrasa.** Al llegar a 100 o salir de 100 sacaba y
+  ponía el ecualizador del reproductor, y cada vez que eso pasa el sonido se reinicia un instante;
+  ahora el ecualizador queda siempre puesto y sólo se mueven sus niveles. Además el valor viaja a
+  LibVLC desde un hilo aparte, sólo el último, sin esperar en la interfaz.
 - **Clic derecho en la lista AUDIOS** (pestaña Música): Reproducir ahora, Reproducir en bucle sólo
   este, Guardar para usar sin internet y Copiar el link de YouTube (sólo en los que tienen 🌐),
   Mostrar en la carpeta (los de archivo), Subir, Bajar y Eliminar de la lista.

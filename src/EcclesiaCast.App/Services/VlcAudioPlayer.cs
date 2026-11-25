@@ -57,8 +57,53 @@ public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
         set
         {
             _volume = Math.Clamp(value, 0, 100);
+            if (_player is not null)
+                ApplyVolumeSoon();
+        }
+    }
+
+    private int _pendingVolume = -1;
+
+    private int _applying;
+
+    private long _volumeAskedAt;
+
+    /// <summary>
+    /// Hands the volume to LibVLC from a pool thread, only the latest value:
+    /// the bar never waits for the engine and a quick drag is not a queue.
+    /// </summary>
+    private void ApplyVolumeSoon()
+    {
+        Volatile.Write(ref _pendingVolume, _volume);
+        Interlocked.CompareExchange(ref _volumeAskedAt, System.Diagnostics.Stopwatch.GetTimestamp(), 0);
+        if (Interlocked.Exchange(ref _applying, 1) == 0)
+            ThreadPool.UnsafeQueueUserWorkItem(_ => ApplyPendingVolume(), null);
+    }
+
+    private void ApplyPendingVolume()
+    {
+        while (true)
+        {
+            var volume = Interlocked.Exchange(ref _pendingVolume, -1);
+            if (volume < 0)
+            {
+                Volatile.Write(ref _applying, 0);
+                // A value that arrived between the check and the release.
+                if (Volatile.Read(ref _pendingVolume) >= 0 && Interlocked.Exchange(ref _applying, 1) == 0)
+                    continue;
+                return;
+            }
+
             if (_player is { } player)
-                PlayerSound.SetVolume(player, _volume);
+                PlayerSound.SetVolumeSteady(player, volume);
+
+            var asked = Interlocked.Exchange(ref _volumeAskedAt, 0);
+            if (asked != 0)
+            {
+                var ms = System.Diagnostics.Stopwatch.GetElapsedTime(asked).TotalMilliseconds;
+                if (ms > 50)
+                    Log.Warning("El volumen de los audios tardó {Ms:0} ms en llegar a LibVLC", ms);
+            }
         }
     }
 
@@ -90,7 +135,7 @@ public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
         if (start > TimeSpan.Zero)
             media.AddOption($":start-time={start.TotalSeconds.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)}");
         PlayerSound.KeepSessionFull(player);
-        PlayerSound.SetVolume(player, _volume);
+        PlayerSound.SetVolumeSteady(player, _volume);
         _path = path;
         ReleaseInput();
         player.Play(media);
@@ -120,7 +165,7 @@ public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
         using var media = new Media(libVlc, _input);
         media.AddOption(":no-video");
         PlayerSound.KeepSessionFull(player);
-        PlayerSound.SetVolume(player, _volume);
+        PlayerSound.SetVolumeSteady(player, _volume);
         // A sound that came by the internet is not reopened when the device changes.
         _path = null;
         player.Play(media);

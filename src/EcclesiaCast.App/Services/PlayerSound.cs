@@ -153,6 +153,29 @@ public static class PlayerSound
     /// <summary>The player's own volume (0–100).</summary>
     public static int Effective(int volume) => Math.Clamp(volume, 0, 100);
 
+    /// <summary>
+    /// Like <see cref="SetVolume"/> but the equalizer is never taken off, not
+    /// even at 100: putting it in or out of the sound's path restarts that
+    /// path (a cut in the sound), while changing its levels on a path that
+    /// already has it is immediate. For the music list's bar, which moves a lot.
+    /// </summary>
+    public static void SetVolumeSteady(MediaPlayer player, int volume)
+    {
+        try
+        {
+            var (preamp, bands) = SoundLevel.Split(volume) ?? (SoundLevel.PreampUnity, 0);
+            using var equalizer = new Equalizer();
+            equalizer.SetPreamp((float)preamp);
+            for (uint band = 0; band < equalizer.BandCount; band++)
+                equalizer.SetAmp((float)bands, band);
+            player.SetEqualizer(equalizer);
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "No se pudo cambiar el volumen del reproductor");
+        }
+    }
+
     /// <summary>Turns this player alone down to <paramref name="volume"/> (0–100).</summary>
     public static void SetVolume(MediaPlayer player, int volume)
     {
