@@ -29,6 +29,7 @@ pasa a **Ya probado**, más abajo.
 - **Abrir el programa dos veces dejaba dos copias** (la segunda tomaba el puerto 8082 y OBS miraba la
   vacía). **Arreglado en la prueba.5, falta que lo pruebes:** con el programa abierto, abrirlo de nuevo
   desde el acceso directo tiene que traer al frente el que ya está, sin abrir otro.
+- **Nuevo en la prueba.6, falta probar:** Ayuda → «Tutoriales…» (8 recorridos guiados sobre el programa real; ver `docs/tutoriales.md`). Fijate que cada tarjeta arranque, que el foco señale el botón correcto y que se pueda salir a mitad.
 - **Nuevo en la prueba.5, falta probar:** «Transmisión → Salida para OBS o vMix…» da direcciones con
   `localhost`. Pegala una vez en OBS, reiniciá la PC y mirá que siga funcionando sin tocar nada. Debajo
   muestra la dirección con el nombre de la PC, para OBS en otra computadora.
