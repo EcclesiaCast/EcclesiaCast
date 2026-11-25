@@ -41,3 +41,9 @@ texto: Guarda los versículos que ya proyectaste. Un clic en uno lo carga y lo m
 señalar: SlidesPanel
 titulo: Los versículos, en el recuadro principal
 texto: El pasaje aparece repartido en diapositivas en este recuadro. Un clic pone una en pantalla (la ves en LIVE), y con las flechas ← → pasás de versículo en versículo.
+
+[paso]
+señalar: MediaPanel
+abrir: pestana:biblia
+titulo: Un fondo para la Biblia
+texto: Con la pestaña Biblia abierta, clic derecho en un medio → «Usar como fondo de la Biblia»: se pone solo al proyectar versículos. El botón 🖼 arriba de ellos dice cuál está, y permite cambiarlo o quitarlo.

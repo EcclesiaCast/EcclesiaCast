@@ -88,6 +88,11 @@ desde la primera. Las flechas **←→** navegan en vivo.
 
 En la pestaña **Biblia**:
 
+- **Fondo de la Biblia**: con la pestaña **Biblia** abierta, clic derecho en una imagen o video de
+  Medios → **Usar como fondo de la Biblia**. Se pone solo al proyectar un versículo después de otra
+  cosa. Con versículos en la grilla, el botón **🖼** de arriba dice cuál está puesto y permite usar el
+  fondo que está en pantalla, elegir uno de la biblioteca por pestaña o quitarlo (también: clic
+  derecho en un medio → **Quitar el fondo de la Biblia**).
 - **🕘 Historial**, a la derecha de la caja de la cita, tiene los versículos que proyectaste: un
   clic lo carga y lo marca, doble clic lo proyecta (también se abre con la flecha ↓ en la caja
   vacía). Con el panel angosto el botón es sólo 🕘.

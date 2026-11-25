@@ -152,11 +152,13 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   Cargo e imagen limpios para escribir la siguiente.
 - **Paneles angostos.** El botón de la Biblia dice «🕘 Hist.» en vez de sólo 🕘, y el título «CANCIONES»
   se recorta con puntos suspensivos (y «➕ Agregar» pasa a «➕») en vez de quedar tapado por los botones.
-- **Fondo propio para la Biblia, y elegirlo más fácil.** En el panel de la Biblia, siempre a la vista, y sobre las diapositivas con versículos en la grilla, está
-  **«🖼 Biblia: sin fondo propio»** (igual que el de las canciones): clic para usar el fondo que está en
-  pantalla o **elegir uno de la biblioteca** por pestaña. Se pone solo al proyectar un versículo después
-  de otra cosa. El botón de fondo de las canciones ahora también ofrece **«Elegir un fondo de la
-  biblioteca»**, sin tener que ir a Medios.
+- **Fondo propio para la Biblia, y elegirlo más fácil.** Con la pestaña Biblia abierta, clic derecho
+  en una imagen o video de Medios → **«Usar como fondo de la Biblia»** (y **«Quitar el fondo de la
+  Biblia»**, que dice cuál está puesto). Sobre las diapositivas con versículos en la grilla hay además
+  un botón **🖼** (en el mismo lugar que el de las canciones) que dice cuál es y permite usar el fondo
+  que está en pantalla, **elegir uno de la biblioteca** por pestaña o quitarlo. Se pone solo al
+  proyectar un versículo después de otra cosa. El botón de fondo de las canciones ahora también ofrece
+  **«Elegir un fondo de la biblioteca»**, sin tener que ir a Medios.
 - **«🕘 Historial» en la Biblia, con la palabra.** El historial de los versículos proyectados ya
   existía, pero el botón era sólo el dibujo y alguien lo pidió por el formulario sin encontrarlo.
   Con el panel angosto vuelve a ser sólo 🕘, para que la caja de la cita no quede chica.
