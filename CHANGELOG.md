@@ -51,6 +51,12 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   canción con su casilla, para elegir cuáles traer.
   La canción de bienvenida de Holyrics y las archivadas no se traen, y si una canción ya está,
   pregunta qué hacer. (Por su API Server no: crear el token pide el plan de pago Holyrics Advanced.)
+- **Biblia: selector «Lista | Grilla».** El botón que cambiaba de vista mostraba el nombre del modo
+  contrario al actual y confundía; ahora son dos opciones juntas y la activa queda resaltada.
+- **Submenús siempre hacia la derecha.** Con Windows en menús «para zurdos» (común en tablets y
+  notebooks táctiles) el submenú de Tutoriales se abría a la izquierda, cortado y debajo del globito.
+  Ahora se abre a la derecha del ítem, y «Tutoriales» ya no lleva globito. Los tutoriales arrancan
+  cambiando a la pestaña que corresponde (Canciones o Biblia).
 - **Ayuda → «Tutoriales ▸».** El ítem tiene una flecha y un submenú con un ítem por tutorial: elegir
   uno lo arranca directo, sobre el programa de verdad, con el foco señalando el botón. Cada paso
   ahora **abre lo que nombra**: el menú (Transmisión, Biblias, Fondos, Canciones), el menú ➕ Agregar,

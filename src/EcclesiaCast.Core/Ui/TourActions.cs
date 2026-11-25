@@ -27,6 +27,10 @@ public static class TourActions
     public const string BibleList = "vista:lista";
     public const string BibleGrid = "vista:grilla";
 
+    /// <summary>«pestana:canciones» / «pestana:biblia»: the tab of the library the step needs shown first.</summary>
+    public const string SongsTab = "pestana:canciones";
+    public const string BibleTab = "pestana:biblia";
+
     public const string SongEditor = "editor";
     public const string SongSearch = "buscar";
     public const string SongImport = "importar";
@@ -39,7 +43,7 @@ public static class TourActions
     /// <summary>The drawings a card can carry («dibujo:»): how the phone looks.</summary>
     public static IReadOnlyList<string> Pictures { get; } = ["celular-pin", "celular-control"];
 
-    public static IReadOnlyList<string> Fixed { get; } = [AddMenu, BibleHistory, BibleList, BibleGrid];
+    public static IReadOnlyList<string> Fixed { get; } = [AddMenu, BibleHistory, BibleList, BibleGrid, SongsTab, BibleTab];
 
     /// <summary>The names that point at an element of the main window (menu, tool tab).</summary>
     public static bool TryGetElementName(string action, out string name)

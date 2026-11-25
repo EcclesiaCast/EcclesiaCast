@@ -141,8 +141,10 @@ public partial class MainWindow
     /// <summary>The tab a step needs: Biblia, Canciones, or null for "whichever is open".</summary>
     private static bool? WantsBibleTab(TourStep step)
     {
-        if (step.Open is TourActions.BibleHistory or TourActions.BibleGrid or TourActions.BibleList)
+        if (step.Open is TourActions.BibleHistory or TourActions.BibleGrid or TourActions.BibleList or TourActions.BibleTab)
             return true;
+        if (step.Open is TourActions.SongsTab)
+            return false;
 
         var opensSongWindow = step.Open is { } open && TourActions.TryGetWindow(open, out var window)
             && window is TourActions.SongEditor or TourActions.SongSearch or TourActions.SongImport or TourActions.SongImportHolyrics;

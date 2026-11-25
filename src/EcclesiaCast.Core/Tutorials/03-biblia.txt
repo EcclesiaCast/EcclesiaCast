@@ -18,13 +18,13 @@ texto: En el menú Biblias bajás versiones de internet, importás una propia (J
 señalar: BibleViewToggleButton
 abrir: vista:lista
 titulo: Modo lista
-texto: Los libros van en una lista, y al elegir uno ves sus capítulos y versículos. Es la vista de siempre. Este botón cambia a la otra vista.
+texto: Los libros van en una lista, y al elegir uno ves sus capítulos y versículos. Es la vista de siempre. Con el selector «Lista | Grilla» elegís cómo verlos: ahora está en Lista.
 
 [paso]
 señalar: BibleViewToggleButton
 abrir: vista:grilla
 titulo: Modo grilla
-texto: Los libros se ven como fichas de colores, con los capítulos y versículos al lado: se encuentra todo de un vistazo. Escribir una cita y Enter funciona igual en las dos.
+texto: Ahora el selector está en Grilla: los libros se ven como fichas de colores, con los capítulos y versículos al lado: se encuentra todo de un vistazo. Escribir una cita y Enter funciona igual en las dos.
 
 [paso]
 señalar: VersionsRow
