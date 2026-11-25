@@ -21,6 +21,9 @@ public partial class BroadcastWindow : Window
         _server = server;
         _settings = settings;
         BroadcastBox.Text = server.BroadcastAddress;
+        StableNote.Text =
+            "Esta dirección no cambia al reiniciar la PC: se pega una sola vez en OBS o vMix. " +
+            $"Si OBS está en otra PC de la red, usá esta: {server.NetworkBroadcastAddress}";
     }
 
     /// <summary>Copies the address of the page of one channel of the stream (the button names it).</summary>

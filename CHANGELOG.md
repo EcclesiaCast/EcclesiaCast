@@ -7,6 +7,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **La dirección de OBS y vMix ya no cambia al reiniciar la PC.** «Salida para OBS o vMix…» ahora da
+  una dirección con `localhost`, que sirve siempre para OBS o vMix en la misma PC (antes llevaba la
+  IP de la red, que el router cambia). Para OBS en otra PC se muestra la dirección con el nombre de la
+  PC. Y si el puerto de siempre estaba ocupado, el programa usa otro esta vez pero no se olvida del de
+  siempre.
 - **Música de YouTube, sólo el audio.** En la pestaña **Música**, debajo del reproductor, un buscador
   de YouTube: escribí un artista, una canción o pegá un link, o tocá un tono en **Pads: Do, Do#, Re…**
   para buscar pads. **▶** escucha el resultado ya, **➕** lo suma a la lista y **💾** guarda el audio en

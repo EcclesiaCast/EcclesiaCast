@@ -85,7 +85,13 @@ public sealed partial class MainViewModel
         if (!_remote.Start(port, pin))
             return false;
 
-        _settings.Set(RemotePortKey, _remote.Port.ToString());
+        // Si el puerto elegido estaba ocupado y se usó otro, no se pisa el
+        // guardado: la próxima vez se vuelve a intentar con el de siempre, así
+        // la dirección pegada en OBS no se corre para siempre.
+        if (_remote.Port == port || _settings.Get(RemotePortKey) is null)
+            _settings.Set(RemotePortKey, _remote.Port.ToString());
+        else
+            Log.Warning("El puerto {Wanted} estaba ocupado: se usa el {Used} esta vez", port, _remote.Port);
         _settings.Set(RemoteEnabledKey, "1");
         IsRemoteRunning = true;
         return true;

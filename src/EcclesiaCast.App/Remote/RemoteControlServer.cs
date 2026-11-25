@@ -58,10 +58,20 @@ public sealed class RemoteControlServer : IDisposable
     /// transparency, with the PIN carried along because a browser source has
     /// no way to ask for one.
     /// </summary>
-    public string BroadcastAddress => $"{Address}/salida?pin={Pin}";
+    public string BroadcastAddress => $"{BroadcastBase}/salida?pin={Pin}";
 
     /// <summary>The streaming page of one channel (everything, or only the Bible, the songs or the announcements), with the PIN.</summary>
-    public string BroadcastAddressFor(OutputChannel channel) => $"{Address}{OutputChannels.Path(channel)}?pin={Pin}";
+    public string BroadcastAddressFor(OutputChannel channel) => $"{BroadcastBase}{OutputChannels.Path(channel)}?pin={Pin}";
+
+    /// <summary>
+    /// «localhost» for OBS or vMix on this same PC: unlike the network IP, which
+    /// the router hands out again after a reboot, it never changes, so the
+    /// address pasted into OBS keeps working.
+    /// </summary>
+    private string BroadcastBase => $"http://localhost:{Port}";
+
+    /// <summary>The same stream page for OBS on another PC of the network, by this PC's name (the IP can change).</summary>
+    public string NetworkBroadcastAddress => $"http://{Environment.MachineName}:{Port}/salida?pin={Pin}";
 
     /// <summary>Starts listening. Returns false when no port could be opened.</summary>
     public bool Start(int preferredPort, string pin)
