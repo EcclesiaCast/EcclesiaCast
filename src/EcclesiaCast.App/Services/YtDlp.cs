@@ -286,7 +286,7 @@ public static partial class YtDlp
     /// by the site» before downloading. The visionOS client gives the same m4a
     /// with no wait: measured on 25/11/2026, a song went from 10.7 s to 3.7 s.
     /// </summary>
-    private const string FastAudioClient = "youtube:player_client=visionos";
+    internal const string FastAudioClient = "youtube:player_client=visionos";
 
     /// <summary>
     /// The sound with the quick client first; if YouTube stops offering it

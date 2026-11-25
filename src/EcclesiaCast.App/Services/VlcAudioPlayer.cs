@@ -1,3 +1,4 @@
+using System.IO;
 using System.Windows;
 using LibVLCSharp.Shared;
 using Serilog;
@@ -91,7 +92,45 @@ public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
         PlayerSound.KeepSessionFull(player);
         PlayerSound.SetVolume(player, _volume);
         _path = path;
+        ReleaseInput();
         player.Play(media);
+    }
+
+    /// <summary>The input LibVLC reads the current stream from; it must outlive the media.</summary>
+    private StreamMediaInput? _input;
+
+    public void PlayStream(Stream stream)
+    {
+        if (engine() is not { } libVlc)
+        {
+            stream.Dispose();
+            throw new InvalidOperationException("El motor de audio no está disponible.");
+        }
+
+        if (_player is not null && _audioGeneration != AudioEndpointWatcher.Generation)
+            DiscardPlayer();
+        _audioGeneration = AudioEndpointWatcher.Generation;
+
+        var player = EnsurePlayer(libVlc);
+        player.Stop();
+        Interlocked.Increment(ref _generation);
+        ReleaseInput();
+
+        _input = new StreamMediaInput(stream);
+        using var media = new Media(libVlc, _input);
+        media.AddOption(":no-video");
+        PlayerSound.KeepSessionFull(player);
+        PlayerSound.SetVolume(player, _volume);
+        // A sound that came by the internet is not reopened when the device changes.
+        _path = null;
+        player.Play(media);
+    }
+
+    private void ReleaseInput()
+    {
+        var input = _input;
+        _input = null;
+        try { input?.Dispose(); } catch { /* ya cerrado */ }
     }
 
     public void Pause() => SetPaused(true);
@@ -228,6 +267,7 @@ public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
         AudioEndpointWatcher.OutputChanged -= OnOutputChanged;
         PlayerSound.SessionChanged -= OnMasterChanged;
         _listening = false;
+        ReleaseInput();
         var player = _player;
         _player = null;
         if (player is null)

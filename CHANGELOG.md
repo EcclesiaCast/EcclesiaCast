@@ -10,9 +10,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 - **La música de YouTube arranca mucho antes.** Antes tardaba entre 18 y 25 segundos desde ▶ hasta
   que sonaba: el descargador esperaba 6 segundos «como pide el sitio» (por un anuncio de uno de los
   clientes de YouTube que usa por defecto). Ahora pide el audio por otro cliente que no espera: una
-  canción tarda unos 4 segundos en vez de 11 (medido por línea de comandos, 25/11). Además, al
-  mostrar los resultados de una búsqueda, el programa va trayendo en segundo plano el audio de los
-  primeros 3 (de hasta 15 minutos): al tocar ▶ en uno de ellos suena al instante.
+  canción tarda unos 4 segundos en vez de 11 (medido por línea de comandos, 25/11). Y ahora la música suena
+  directo desde internet, sin esperar a bajar el archivo (se lee a medida que suena, con salto
+  a cualquier parte): al mostrar los resultados el programa pide en segundo plano la dirección del
+  audio de los primeros 5, así que ▶ en uno de ellos empieza en menos de un segundo; en otro, en
+  unos 3 s. El archivo se baja sólo si tocás 💾 (o si el directo falla, como respaldo).
 - **La barra «Volumen» sube y baja sin saltos y sin cortes.** Cada paso de la barra cambia el
   volumen en la misma medida (antes los pasos de abajo eran saltos grandes) y el cambio se hace en
   una rampa de una décima de segundo en vez de a golpes. La música ya no llega a silencio total

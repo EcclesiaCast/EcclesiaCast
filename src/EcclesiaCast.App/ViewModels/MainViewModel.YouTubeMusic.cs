@@ -305,14 +305,20 @@ public sealed partial class MainViewModel
     // ── Reproducir por internet ──────────────────────────────────
 
     /// <summary>
-    /// Brings the song's sound to this computer (or takes it from the cache)
-    /// and plays the file. Takes a few seconds the first time and none after;
-    /// meanwhile the button already shows ⏸ and a newer press replaces this one.
+    /// Plays a YouTube song at once. From a file if its sound is already in the
+    /// cache; otherwise straight from the internet: the address of the sound
+    /// (already asked for while the results were shown, or asked now) is read
+    /// as it plays, with no download first. Only if that fails does it bring
+    /// the file, as before. Meanwhile the button already shows ⏸ and a newer
+    /// press replaces this one.
     /// </summary>
-    private async Task PlayYouTubeTrackAsync(AudioTrackItem item, string videoId, int request)
+    private async Task PlayYouTubeTrackAsync(AudioTrackItem item, string videoId, int request, bool allowStream = true)
     {
+        var clock = System.Diagnostics.Stopwatch.StartNew();
+
         // What was sounding stops now: the click is answered at once.
         _audioPlayer.Stop();
+        _streamingVideoId = null;
         CurrentAudio = item;
         if (!item.IsPreview)
             SelectedAudio = item;
@@ -323,13 +329,51 @@ public sealed partial class MainViewModel
 
         try
         {
+            if (allowStream && YtDlp.CachedAudio(videoId) is null)
+            {
+                try
+                {
+                    var url = await YtDlp.ResolveStreamUrlAsync(videoId);
+                    var resolved = clock.ElapsedMilliseconds;
+                    if (request != _audioPlayRequest)
+                        return;
+
+                    var stream = await Task.Run(() => new RangedHttpStream(url));
+                    if (request != _audioPlayRequest)
+                    {
+                        stream.Dispose();
+                        return;
+                    }
+
+                    if (StartAudio(item, url, AudioOpeningGrace, stream))
+                    {
+                        _streamingVideoId = videoId;
+                        Log.Information("YouTube {Id}: dirección {Resolved} ms, sonando {Total} ms después de ▶",
+                            videoId, resolved, clock.ElapsedMilliseconds);
+                        PrepareNextYouTubeTrack();
+                        return;
+                    }
+                }
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                {
+                    // The file way below still has a chance.
+                    Log.Warning(ex, "No se pudo escuchar {Id} por internet directo; se baja el archivo", videoId);
+                    YtDlp.ForgetStreamUrl(videoId);
+                    if (request != _audioPlayRequest)
+                        return;
+                }
+            }
+
             var file = await YtDlp.GetAudioFileAsync(videoId, new Progress<(double Percent, string Message)>(p =>
                 StatusText = p.Percent >= 0 ? $"Trayendo «{item.Name}» de YouTube… {p.Percent:0}%" : p.Message));
             if (request != _audioPlayRequest)
                 return;
 
             if (StartAudio(item, file, AudioOpeningGrace))
+            {
+                Log.Information("YouTube {Id}: sonando del archivo {Total} ms después de ▶", videoId, clock.ElapsedMilliseconds);
                 PrepareNextYouTubeTrack();
+            }
         }
         catch (Exception ex)
         {
@@ -343,55 +387,27 @@ public sealed partial class MainViewModel
         }
     }
 
-    /// <summary>How many of the first results are brought ahead, and how many at the same time.</summary>
-    private const int PrefetchResults = 3;
+    /// <summary>The video that is sounding straight from the internet (not from a file), or null.</summary>
+    private string? _streamingVideoId;
 
-    private const int PrefetchAtOnce = 2;
+    /// <summary>How many of the first results get their address asked ahead of time.</summary>
+    private const int PrefetchResults = 5;
 
     private CancellationTokenSource? _prefetch;
 
     /// <summary>
-    /// Brings to the cache the sound of the first results of a search, two at
-    /// a time. A newer search (or a ▶ that needs the connection at once)
-    /// stops the ones not yet started; the ones running finish and stay cached.
+    /// Asks, in one yt-dlp and while the person reads the titles, the address
+    /// of the sound of the first results: ▶ on one of them then starts at
+    /// once. A newer search stops it.
     /// </summary>
     private void PrefetchTopResults(IReadOnlyList<YouTubeSearchResult> results)
     {
         _prefetch?.Cancel();
         var cancel = new CancellationTokenSource();
         _prefetch = cancel;
-        var gate = new SemaphoreSlim(PrefetchAtOnce);
 
-        foreach (var result in results.Where(r => r.Duration is { } length && length <= TimeSpan.FromMinutes(15))
-                     .Take(PrefetchResults))
-            _ = PrefetchAsync(result.VideoId);
-
-        async Task PrefetchAsync(string videoId)
-        {
-            try
-            {
-                await gate.WaitAsync(cancel.Token);
-            }
-            catch (OperationCanceledException)
-            {
-                return;
-            }
-
-            try
-            {
-                if (!cancel.IsCancellationRequested)
-                    await YtDlp.GetAudioFileAsync(videoId, new Progress<(double, string)>());
-            }
-            catch (Exception ex)
-            {
-                // It is asked again when ▶ is pressed.
-                Log.Debug(ex, "No se pudo adelantar el audio de YouTube {Id}", videoId);
-            }
-            finally
-            {
-                gate.Release();
-            }
-        }
+        var ids = results.Where(r => r.Duration is not null).Take(PrefetchResults).Select(r => r.VideoId).ToList();
+        _ = YtDlp.PreResolveStreamUrlsAsync(ids, cancel.Token);
     }
 
     /// <summary>

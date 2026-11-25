@@ -290,11 +290,14 @@ public sealed partial class MainViewModel
     }
 
     /// <summary>Hands the player the file to play (for a YouTube song, its sound brought to this computer) and shows it as loaded.</summary>
-    private bool StartAudio(AudioTrackItem item, string source, TimeSpan grace)
+    private bool StartAudio(AudioTrackItem item, string source, TimeSpan grace, Stream? stream = null)
     {
         try
         {
-            _audioPlayer.Play(source);
+            if (stream is not null)
+                _audioPlayer.PlayStream(stream);
+            else
+                _audioPlayer.Play(source);
         }
         catch (Exception ex)
         {
@@ -451,6 +454,16 @@ public sealed partial class MainViewModel
 
         if (current is not null && YouTubeAudio.TrackVideoId(current.Path) is { } videoId)
         {
+            if (_streamingVideoId == videoId)
+            {
+                // Straight from the internet failed (the address expired or was refused):
+                // once more, bringing the file.
+                YtDlp.ForgetStreamUrl(videoId);
+                _streamingVideoId = null;
+                _ = PlayYouTubeTrackAsync(current, videoId, ++_audioPlayRequest, allowStream: false);
+                return;
+            }
+
             // The sound brought from YouTube came damaged (a download cut short):
             // it is thrown away so the next ▶ brings it again.
             YtDlp.ForgetCachedAudio(videoId);
