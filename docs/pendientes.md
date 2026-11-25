@@ -21,38 +21,30 @@ pasa a **Ya probado**, más abajo.
 
 ### Falta probar
 
-**Nuevo en la prueba.9 (lo que pediste tras la prueba.8)**
+**Nuevo en la prueba.10 (lo que pediste tras la prueba.9)**
 
-1. **Biblia de Beblia.** Importá `SpanishPDTBible.xml` (Biblias → 📥): ya no tiene que dar el error
-   «Data at the root level is invalid». Mirá que estén los 66 libros y proyectá Juan 3:16.
-2. **Submenú de Tutoriales.** Se abre hacia la **derecha** del ítem «Tutoriales», sin cortarse y sin
-   globito encima.
-3. **Tutoriales.**
-   - Cada uno arranca cambiando a su pestaña (Crear una canción nueva va a Canciones; Proyectar la
-     Biblia va a Biblia).
-   - En la Biblia, el paso «Modo lista» deja la lista y «Modo grilla» deja la grilla; al terminar o
-     salir vuelve al modo en que lo tenías.
-4. **Biblia: selector «Lista | Grilla».** Ya no es un botón que muestra el modo contrario: son dos
-   opciones juntas y la activa queda resaltada.
-5. **Volumen en tiempo real.** La barra «Volumen» de abajo de EN VIVO y la 🔈 de los audios siguen el
-   mouse al instante (antes tardaban más de un segundo). Probá con música de YouTube y con un video.
-6. **Clic derecho en la lista AUDIOS** (Música): Reproducir ahora, Reproducir en bucle sólo este,
-   Guardar para usar sin internet y Copiar el link (sólo los que tienen 🌐), Mostrar en la carpeta (los
-   de archivo), Subir, Bajar y Eliminar de la lista.
-7. **Celular: «🖼 Fondos y medios».** En la página del celular, un botón con las imágenes y videos de
-   la biblioteca (con miniatura): tocás uno y se pone en pantalla. Probá: «Sin fondo» y después volver
-   a poner un fondo, cambiar un fondo que no querías, y mandar otro anuncio.
-8. **Cambiar el PIN.** Los avisos tienen el formato del programa (no el de Windows). El PIN del celular
-   no toca las direcciones de OBS; el PIN de OBS sí las invalida y lo avisa.
+1. **Biblia: botón de la vista.** Vuelve a ser un solo botón del tamaño de antes que muestra el modo en
+   que estás: «☰ Lista ⇄» o «▦ Grilla ⇄». Al tocarlo pasa al otro; el globito lo aclara. En el
+   tutorial de la Biblia, los pasos de Modo lista y Modo grilla tienen que dejar el botón diciendo lo
+   que corresponde.
+2. **Barra 🔈 de los audios (pestaña Música).** Claude encontró la causa: al llegar a 100 o salir de 100
+   sacaba y ponía el ecualizador y el sonido se reiniciaba un instante; ahora el ecualizador queda
+   siempre puesto. Tiene que seguir el mouse al instante y sin cortes. Claude no pudo oírlo: es lo
+   primero para mirar.
+3. **Celular, «🖼 Fondos y medios».**
+   - El botón queda **azul** mientras el panel está abierto.
+   - Un **desplegable de carpetas** (las mismas pestañas que en la computadora: Fondos, Anuncios…):
+     muestra sólo las miniaturas de la carpeta elegida y se acuerda de la última.
+4. **Fondo fijo para la Biblia.** En el panel de la Biblia, siempre a la vista, está **«🖼 Biblia: sin
+   fondo propio»** (igual que el de las canciones): clic para usar el fondo que está en pantalla o
+   elegir uno de la biblioteca por pestaña (imagen o video). Mirá que se vea en el proyector, EN VIVO,
+   la vista previa y OBS, que se acuerde al cerrar y abrir, y que se pueda quitar. El botón de fondo
+   de las canciones también ofrece «Elegir un fondo de la biblioteca».
 
-**De la prueba.8, todavía sin tu respuesta**
+**De la prueba.9, todavía sin tu respuesta**
 
-9. **Música de YouTube:** ▶ en menos de 1 s en los 5 primeros resultados (y ~3 s en los demás): dijiste
-   «ok la velocidad». Queda por ver 💾 para escuchar **sin internet**.
-10. **Holyrics por archivo,** con un lote grande y con un `.txt` de varias canciones.
-11. **Fondo para una canción o la Biblia que no tienen** (Claude entendió: fondo propio de la Biblia y
-    elegir uno de la biblioteca desde el botón de la canción). Decime si era eso, o si tu pedido era el
-    del celular (ya hecho en el 7).
+5. **YouTube sin internet:** guardá con 💾, cortá internet y vé que suene.
+6. **Holyrics por archivo** con un lote grande y con un `.txt` de varias canciones.
 
 ### Al publicar la 1.5.0 (no es para probar antes)
 
@@ -64,6 +56,10 @@ pasa a **Ya probado**, más abajo.
 - La página `sitio/cargar-canciones.html` dice «botón ➕»: cambiarlo a «➕ Agregar».
 
 ### Ya probado
+
+- **Prueba.9, probado por Alexis el 26/11, dado por bueno:** importar la Biblia de Beblia; submenú de
+  Tutoriales a la derecha; los tutoriales arrancan en su pestaña y los pasos de la Biblia; el menú
+  clic derecho de AUDIOS; el cambio de PIN y sus avisos.
 
 - **Prueba.8, probado por Alexis el 26/11, dado por bueno:** Holyrics abre en `C:\Holyrics` con una casilla
   por canción; Placas (guardar sin mostrar, se limpian los campos); botón «Hist.»; panel Canciones
