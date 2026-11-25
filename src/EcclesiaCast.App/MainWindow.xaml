@@ -2375,7 +2375,7 @@
                                         <ComboBoxItem Content="Se va sola a los 15 s"/>
                                     </ComboBox>
 
-                                    <!-- Mostrar y Quitar, anchos y a la par -->
+                                    <!-- Mostrar, Guardar y Quitar, anchos y a la par -->
                                     <UniformGrid Grid.Row="5" Grid.ColumnSpan="2" Rows="1" Margin="0,12,0,0">
                                         <Button Content="Mostrar" Command="{Binding ShowNamePlateCommand}" Padding="14,8" Margin="0,0,4,0"
                                                 ToolTip="Pone la placa en pantalla (Enter en el nombre hace lo mismo)">
@@ -2390,6 +2390,9 @@
                                                 </Style>
                                             </Button.Style>
                                         </Button>
+                                        <Button Content="Guardar" Style="{StaticResource DarkButton}" Padding="14,8" Margin="4,0,4,0"
+                                                Command="{Binding SaveNamePlateCommand}"
+                                                ToolTip="Guarda la placa en la lista sin mostrarla y deja los campos limpios para la próxima"/>
                                         <Button Content="Quitar" Style="{StaticResource DarkButton}" Padding="14,8" Margin="4,0,0,0"
                                                 Command="{Binding HideNamePlateCommand}"
                                                 ToolTip="Saca la placa de la pantalla"/>
