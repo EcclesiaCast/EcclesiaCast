@@ -73,6 +73,26 @@ public sealed class RemoteControlServer : IDisposable
     /// <summary>The same stream page for OBS on another PC of the network, by this PC's name (the IP can change).</summary>
     public string NetworkBroadcastAddress => $"http://{Environment.MachineName}:{Port}/salida?pin={Pin}";
 
+    /// <summary>The address by this PC's name, for when the network's IP changed since the QR was scanned.</summary>
+    public string NameAddress => $"http://{Environment.MachineName}.local:{Port}";
+
+    /// <summary>
+    /// Hands out a new PIN. Every phone and every OBS address with the old one
+    /// stops working (their next request is answered «pin»), and the wrong-PIN
+    /// counters start over so nobody is left locked out by the old one.
+    /// </summary>
+    public string ChangePin()
+    {
+        lock (_limiterLock)
+        {
+            Pin = RemotePin.Generate(Pin);
+            _limiter.Clear();
+        }
+
+        Log.Information("Control remoto: se cambió el PIN");
+        return Pin;
+    }
+
     /// <summary>Starts listening. Returns false when no port could be opened.</summary>
     public bool Start(int preferredPort, string pin)
     {
@@ -321,6 +341,21 @@ public sealed class RemoteControlServer : IDisposable
             }
 
             await WriteFileAsync(stream, file, range, cancellation);
+            return;
+        }
+
+        // A light «is my PIN still good?» for the phone: no state is built and the
+        // UI thread is not touched, so it can be asked every few minutes.
+        if (path == "/api/pin" && method == "GET")
+        {
+            var check = CheckPin(QueryValue(target, "pin"), caller);
+            if (!check.Ok)
+            {
+                await WriteDeniedAsync(stream, check, cancellation);
+                return;
+            }
+
+            await WriteAsync(stream, 200, "application/json", """{"ok":true}""", cancellation);
             return;
         }
 

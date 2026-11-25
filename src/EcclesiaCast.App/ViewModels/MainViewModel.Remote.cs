@@ -74,9 +74,9 @@ public sealed partial class MainViewModel
             return true;
 
         var pin = _settings.Get(RemotePinKey);
-        if (string.IsNullOrWhiteSpace(pin) || pin.Length != 4)
+        if (!RemotePin.IsValid(pin))
         {
-            pin = Random.Shared.Next(1000, 10000).ToString();
+            pin = RemotePin.Generate();
             _settings.Set(RemotePinKey, pin);
         }
 
@@ -120,7 +120,7 @@ public sealed partial class MainViewModel
             return;
         }
 
-        var window = new Views.RemoteControlWindow(_remote!)
+        var window = new Views.RemoteControlWindow(_remote!, newPin => _settings.Set(RemotePinKey, newPin))
         {
             Owner = Application.Current.MainWindow,
         };

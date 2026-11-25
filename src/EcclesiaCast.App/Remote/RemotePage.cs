@@ -151,6 +151,18 @@ internal static class RemotePage
           document.getElementById('app').className = ok ? '' : 'hide';
         }
 
+        // The PIN is no longer the computer's (it was changed): forget it, stop
+        // asking with it (every miss counts toward a lockout) and ask for the new one.
+        function pinGone(first) {
+          pin = '';
+          localStorage.removeItem('ec-pin');
+          document.getElementById('pinInput').value = '';
+          document.getElementById('pinError').textContent = first
+            ? 'PIN incorrecto.'
+            : 'El PIN cambió. Pedile el nuevo a quien maneja la computadora.';
+          show(false);
+        }
+
         // ── Buscar una canción o un versículo (como Ctrl+K en la computadora) ──
         // Se espera un momento después de la última letra, y una respuesta tardía
         // de una búsqueda vieja no pisa a la más nueva.
@@ -167,7 +179,7 @@ internal static class RemotePage
         function runSearch(text) {
           var mine = ++searchSeq;
           fetch('/api/search?pin=' + encodeURIComponent(pin) + '&q=' + encodeURIComponent(text))
-            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (r) { if (r.status === 403) { pinGone(false); return null; } return r.ok ? r.json() : null; })
             .then(function (list) { if (list && mine === searchSeq) showHits(list, text); })
             .catch(function () {});
         }
@@ -219,7 +231,7 @@ internal static class RemotePage
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({pin: pin, action: action, index: index === undefined ? null : index})
-          }).then(function (r) { return r.ok ? r.json() : null; })
+          }).then(function (r) { if (r.status === 403) { pinGone(false); return null; } return r.ok ? r.json() : null; })
             .then(function (s) { if (s) { render(s); if (done) done(); } })
             .catch(function () {})
             .then(function () { busy = false; });
@@ -240,8 +252,7 @@ internal static class RemotePage
               }).catch(function () { return null; });
             }
             if (r.status === 403) {
-              show(false);
-              if (first) document.getElementById('pinError').textContent = 'PIN incorrecto.';
+              pinGone(first);
               return null;
             }
             return r.ok ? r.json() : null;
@@ -250,7 +261,8 @@ internal static class RemotePage
             show(true);
             render(s);
           }).catch(function () {
-            document.getElementById('status').textContent = 'Sin conexión con la computadora…';
+            document.getElementById('status').textContent =
+              'Sin conexión con la computadora… Si el router le cambió la dirección, volvé a escanear el código.';
           });
         }
 
@@ -360,7 +372,21 @@ internal static class RemotePage
         }
 
         if (pin) { poll(false); } else { show(false); }
-        setInterval(function () { if (pin) poll(false); }, 700);
+        // A hidden tab or a locked phone does not need the live view; it is
+        // brought up to date (and the PIN checked) the moment the page is back.
+        setInterval(function () { if (pin && !document.hidden) poll(false); }, 700);
+
+        // The light check, every few minutes: has the PIN changed on the computer?
+        function checkPin() {
+          if (!pin) return;
+          fetch('/api/pin?pin=' + encodeURIComponent(pin)).then(function (r) {
+            if (r.status === 403) pinGone(false);
+          }).catch(function () {});
+        }
+        setInterval(checkPin, 120000);
+        document.addEventListener('visibilitychange', function () { if (!document.hidden) { checkPin(); if (pin) poll(false); } });
+        window.addEventListener('pageshow', function () { checkPin(); });
+        window.addEventListener('online', function () { checkPin(); });
         document.getElementById('pinInput').addEventListener('keydown', function (e) {
           if (e.key === 'Enter') savePin();
         });
