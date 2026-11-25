@@ -91,6 +91,15 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Cambiado
 
+- **Placas: botón «Guardar».** Guarda la placa en la lista sin tener que mostrarla y deja Nombre,
+  Cargo e imagen limpios para escribir la siguiente.
+- **Paneles angostos.** El botón de la Biblia dice «🕘 Hist.» en vez de sólo 🕘, y el título «CANCIONES»
+  se recorta con puntos suspensivos (y «➕ Agregar» pasa a «➕») en vez de quedar tapado por los botones.
+- **Fondo propio para la Biblia, y elegirlo más fácil.** Con versículos en la grilla aparece
+  **«🖼 Biblia: sin fondo propio»** (igual que el de las canciones): clic para usar el fondo que está en
+  pantalla o **elegir uno de la biblioteca** por pestaña. Se pone solo al proyectar un versículo después
+  de otra cosa. El botón de fondo de las canciones ahora también ofrece **«Elegir un fondo de la
+  biblioteca»**, sin tener que ir a Medios.
 - **«🕘 Historial» en la Biblia, con la palabra.** El historial de los versículos proyectados ya
   existía, pero el botón era sólo el dibujo y alguien lo pidió por el formulario sin encontrarlo.
   Con el panel angosto vuelve a ser sólo 🕘, para que la caja de la cita no quede chica.
@@ -125,6 +134,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Quitado
 
+- **«Agregar paquete de fondos (.zip)…» del menú Fondos.** Para sumar fondos quedan agregar archivos,
+  «Bajar más fondos de internet…» y la búsqueda de Pixabay (que ahora avisa que es lenta y que es un
+  servicio de terceros, no de EcclesiaCast).
 - **«Corregir el texto…» del clic derecho en un versículo.** Se sacó la opción: la Biblia no se
   modifica desde el programa.
 
