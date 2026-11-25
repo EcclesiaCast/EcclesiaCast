@@ -121,6 +121,8 @@ internal static class RemotePage
 
             <div class="card hide" id="mediaCard">
               <div class="label">Tocá uno para ponerlo en pantalla</div>
+              <select id="mediaTab" class="hide" onchange="showMedias()"
+                      style="width:100%;font:inherit;padding:12px;margin:8px 0;background:#232630;color:#fff;border:1px solid #2a2e3a;border-radius:10px"></select>
               <div id="mediaList"></div>
             </div>
 
@@ -235,39 +237,56 @@ internal static class RemotePage
         // que no se quería, o mandar otro anuncio. La lista se trae al abrirla.
         function toggleMedias() {
           var card = document.getElementById('mediaCard');
-          if (card.className === 'card') { card.className = 'card hide'; return; }
+          var button = document.getElementById('bMedias');
+          if (card.className === 'card') { card.className = 'card hide'; button.className = ''; return; }
           card.className = 'card';
+          button.className = 'on';
           var box = document.getElementById('mediaList');
           box.innerHTML = '<div class="none">Cargando…</div>';
           fetch('/api/medias?pin=' + encodeURIComponent(pin)).then(function (r) {
             if (r.status === 403) { pinGone(false); return null; }
             return r.ok ? r.json() : null;
-          }).then(function (list) { if (list) showMedias(list); })
+          }).then(function (list) { if (list) setMedias(list); })
             .catch(function () { box.innerHTML = '<div class="none">No se pudo cargar la lista.</div>'; });
         }
 
-        function showMedias(list) {
+        var allMedias = [];
+
+        // The folders of the library, named as on the computer, in a drop-down;
+        // only the pictures of the chosen one are drawn (and asked for).
+        function setMedias(list) {
+          allMedias = list;
+          var select = document.getElementById('mediaTab');
+          select.innerHTML = '';
+          var tabs = [];
+          list.forEach(function (m) { if (tabs.indexOf(m.tab) < 0) tabs.push(m.tab); });
+          tabs.forEach(function (t) {
+            var o = document.createElement('option');
+            o.value = t;
+            o.textContent = t || 'Sin carpeta';
+            select.appendChild(o);
+          });
+          var saved = localStorage.getItem('ec-media-tab');
+          select.value = tabs.indexOf(saved) >= 0 ? saved : (tabs[0] || '');
+          select.className = tabs.length ? '' : 'hide';
+          showMedias();
+        }
+
+        function showMedias() {
+          var tab = document.getElementById('mediaTab').value;
+          localStorage.setItem('ec-media-tab', tab);
           var box = document.getElementById('mediaList');
           box.innerHTML = '';
-          if (!list.length) { box.innerHTML = '<div class="none">La biblioteca no tiene imágenes ni videos.</div>'; return; }
-          var grid = null, tab = null;
-          list.forEach(function (m) {
-            if (grid === null || m.tab !== tab) {
-              tab = m.tab;
-              if (tab) {
-                var h = document.createElement('div');
-                h.className = 'label';
-                h.style.margin = '10px 0 6px';
-                h.textContent = tab;
-                box.appendChild(h);
-              }
-              grid = document.createElement('div');
-              grid.className = 'grid';
-              box.appendChild(grid);
-            }
+          var items = allMedias.filter(function (m) { return m.tab === tab; });
+          if (!items.length) { box.innerHTML = '<div class="none">La biblioteca no tiene imágenes ni videos.</div>'; return; }
+          var grid = document.createElement('div');
+          grid.className = 'grid';
+          box.appendChild(grid);
+          items.forEach(function (m) {
             var b = document.createElement('button');
             b.className = 'slide';
             var img = document.createElement('img');
+            img.loading = 'lazy';
             img.src = thumbUrl(m.id);
             img.onerror = function () { img.style.display = 'none'; };
             var t = document.createElement('div');

@@ -234,6 +234,8 @@ public sealed partial class MainViewModel
     IReadOnlyList<RemoteMedia> IRemoteHost.GetMediaList() =>
         _allMedia
             .Where(m => m.Type is MediaType.Image or MediaType.Video && !IsPresentationTab(m.Category))
+            // In the order of the folders on the computer, so the drop-down reads the same.
+            .OrderBy(m => MediaTabs.IndexOf(m.Category ?? string.Empty) is var at and >= 0 ? at : int.MaxValue)
             .Take(300)
             .Select(m => new RemoteMedia(m.Id, m.Name, m.Type == MediaType.Video ? "video" : "image", m.Category ?? string.Empty))
             .ToList();
