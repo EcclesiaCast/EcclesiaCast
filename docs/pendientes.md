@@ -621,6 +621,21 @@ iglesia (11:22–12:53): ningún error ni cierre.
 
 ## 4. Para versiones futuras
 
+- **Conectar con Beblia para bajar Biblias** (pedido de Alexis, 25/11/2026). Beblia
+  (https://beblia.com, repositorio `Beblia/Holy-Bible-XML-Format`, «200+ idiomas y 1000+ versiones»)
+  da las Biblias en el XML que ya importamos. Claude lo miró el 25/11:
+  - La web carga con JavaScript y no se pudo leer; la dirección directa que se probó dio 404, así
+    que falta listar el repositorio entero (`git clone` o la API de GitHub) para saber los nombres de
+    archivo y cuántas hay en español.
+  - El README dice «usalas a tu criterio, sin pedir permiso», pero no aclara el derecho de cada
+    versión (la Spanish PDT de Alexis dice «Bible League International»). Por la regla de
+    [Biblias con derechos](../docs/pendientes.md#pedidos-de-permiso-para-biblias-con-derechos-enviados-el-15102026),
+    no se ofrecen para bajar sin ver el permiso.
+  - Camino propuesto: (1) en «Cómo preparar una Biblia para importar…», un enlace a Beblia para que
+    cada persona baje la suya; (2) más adelante, sumar al catálogo sólo las de dominio público.
+  - El error de importar el XML de Beblia (marca BOM al principio del archivo) ya está arreglado
+    (commit `68f6030`).
+
 - **Importar Biblias de e-Sword (.bblx)** (pedido del formulario, 20/11/2026). Que cada iglesia
   pueda traer las Biblias que ya tiene en e-Sword. Ojo: muchas de esas versiones tienen derechos
   de autor, así que **no se ofrecen para bajar** en «Bajar Biblias»; sólo las importa cada uno
