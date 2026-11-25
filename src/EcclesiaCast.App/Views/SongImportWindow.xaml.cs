@@ -25,10 +25,10 @@ public partial class SongImportWindow : Window
     private sealed record Item(string Label, string? Path, Func<Song> Load);
 
     /// <summary>A library with its tick box, bound to the list.</summary>
-    public sealed partial class Row(string title, string detail, int songCount, int cloudOnlyCount, Func<List<object>> items)
+    public sealed partial class Row(string title, string detail, int songCount, int cloudOnlyCount, Func<List<object>> items, bool single = false)
         : ObservableObject
     {
-        public string Name => cloudOnlyCount > 0
+        public string Name => single ? title : cloudOnlyCount > 0
             ? $"{title}  ·  {songCount} canción(es)  ·  ☁ {cloudOnlyCount} sin descargar"
             : $"{title}  ·  {songCount} canción(es)";
 
@@ -208,6 +208,7 @@ public partial class SongImportWindow : Window
         LibrariesList.ItemsSource = Rows;
 
         var holyrics = _source == Source.Holyrics;
+        ListTitle.Text = holyrics ? "CANCIONES ENCONTRADAS" : "BIBLIOTECAS ENCONTRADAS";
         HolyricsPanel.Visibility = holyrics ? Visibility.Visible : Visibility.Collapsed;
         BrowseButton.Visibility = holyrics ? Visibility.Collapsed : Visibility.Visible;
 
@@ -249,7 +250,7 @@ public partial class SongImportWindow : Window
         if (Rows.Count > 0)
         {
             HeaderText.Text = total > 0
-                ? $"Encontré {total} canción(es) en Holyrics. ¿Las importo todas?"
+                ? $"Encontré {total} canción(es) en Holyrics. Marcá las que querés importar."
                 : "Ese archivo no tiene canciones.";
             RootText.Text = _roots[Source.Holyrics];
             ImportButton.IsEnabled = total > 0 && !_importing;
@@ -337,16 +338,22 @@ public partial class SongImportWindow : Window
             Filter = "Canciones de Holyrics (*.json;*.txt)|*.json;*.txt",
             Multiselect = true,
         };
+
+        // Holyrics lives in C:\Holyrics and saves its exports there; if it is not there, Documents.
+        dialog.InitialDirectory = Directory.Exists(@"C:\Holyrics")
+            ? @"C:\Holyrics"
+            : Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         if (dialog.ShowDialog() != true)
             return;
 
-        var songs = new List<Song>();
+        var found = new List<(Song Song, string File)>();
         var failed = new List<string>();
         foreach (var path in dialog.FileNames)
         {
             try
             {
-                songs.AddRange(HolyricsImporter.FromFile(path));
+                foreach (var song in HolyricsImporter.FromFile(path))
+                    found.Add((song, Path.GetFileName(path)));
             }
             catch (Exception ex) when (ex is HolyricsException or IOException or UnauthorizedAccessException)
             {
@@ -355,11 +362,11 @@ public partial class SongImportWindow : Window
             }
         }
 
-        _holyricsError = songs.Count == 0
+        _holyricsError = found.Count == 0
             ? "No encontré canciones en ese archivo. Tiene que ser un .json o .txt guardado desde Holyrics."
             : string.Empty;
 
-        if (songs.Count > 0)
+        if (found.Count > 0)
         {
             var detail = dialog.FileNames.Length == 1
                 ? $"Archivo de Holyrics: {Path.GetFileName(dialog.FileName)}"
@@ -367,12 +374,19 @@ public partial class SongImportWindow : Window
             if (failed.Count > 0)
                 detail += $"  ·  no se pudo leer: {string.Join(", ", failed)}";
 
+            // One row per song, each with its own tick box, so the operator picks which come over.
             _rows[Source.Holyrics].Clear();
-            _rows[Source.Holyrics].Add(new Row(
-                "Holyrics", detail, songs.Count, 0,
-                () => songs.Select(song => (object)new Item(song.Title, null, () => song)).ToList()));
+            foreach (var (song, file) in found)
+            {
+                var one = song;
+                _rows[Source.Holyrics].Add(new Row(
+                    one.Title, file, 1, 0,
+                    () => [new Item(one.Title, null, () => one)],
+                    single: true));
+            }
+
             _roots[Source.Holyrics] = detail;
-            Log.Information("Holyrics: {Count} canciones leídas de archivos", songs.Count);
+            Log.Information("Holyrics: {Count} canciones leídas de archivos", found.Count);
         }
 
         RefreshLabels();
@@ -469,7 +483,7 @@ public partial class SongImportWindow : Window
         var chosen = Rows.Where(r => r.Selected).ToList();
         if (chosen.Count == 0)
         {
-            Notice.Show("Marcá al menos una biblioteca.");
+            Notice.Show(_source == Source.Holyrics ? "Marcá al menos una canción." : "Marcá al menos una biblioteca.");
             return;
         }
 

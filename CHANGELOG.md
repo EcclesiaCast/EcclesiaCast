@@ -22,6 +22,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   en EcclesiaCast, **Abrir archivos…** con ese archivo. También sirven los .json y .txt de una sola
   canción (Archivo → Guardar → Canción). Trae título, artista, derechos y la letra separada en
   estrofas con sus nombres en español (Verse 1 → Estrofa 1, Chorus o Refrão → Coro, Bridge → Puente…).
+  «Abrir archivos…» abre en `C:\Holyrics` (o en Documentos si no existe) y la lista muestra cada
+  canción con su casilla, para elegir cuáles traer.
   La canción de bienvenida de Holyrics y las archivadas no se traen, y si una canción ya está,
   pregunta qué hacer. (Por su API Server no: crear el token pide el plan de pago Holyrics Advanced.)
 - **Ayuda → «Tutoriales…».** Una ventana con tarjetas; cada una arranca un recorrido corto (de 5 a 8

@@ -103,11 +103,11 @@
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                         <Button Content="Todas" FontSize="11" Padding="10,3"
                                 Style="{StaticResource DarkButton}" Click="CheckAll_Click"
-                                ToolTip="Marcar todas las bibliotecas"/>
+                                ToolTip="Marcar todas"/>
                         <Button Content="Ninguna" FontSize="11" Padding="10,3" Margin="4,0,0,0"
                                 Style="{StaticResource DarkButton}" Click="CheckNone_Click"/>
                     </StackPanel>
-                    <TextBlock Text="BIBLIOTECAS ENCONTRADAS" FontSize="10" FontWeight="SemiBold"
+                    <TextBlock x:Name="ListTitle" Text="BIBLIOTECAS ENCONTRADAS" FontSize="10" FontWeight="SemiBold"
                                Foreground="{StaticResource FaintBrush}" VerticalAlignment="Center"/>
                 </DockPanel>
 
