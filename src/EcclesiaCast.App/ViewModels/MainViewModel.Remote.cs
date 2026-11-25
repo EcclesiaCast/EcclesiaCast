@@ -30,6 +30,7 @@ public sealed partial class MainViewModel
     // ── Control desde el celular ─────────────────────────────────
 
     private const string RemotePinKey = "remote.pin";
+    private const string RemoteObsPinKey = "remote.obsPin";
     private const string RemotePortKey = "remote.port";
     private const string RemoteEnabledKey = "remote.enabled";
 
@@ -55,7 +56,7 @@ public sealed partial class MainViewModel
             return;
         }
 
-        new Views.BroadcastWindow(_remote!, _settings) { Owner = Application.Current.MainWindow }.ShowDialog();
+        new Views.BroadcastWindow(_remote!, _settings, newPin => _settings.Set(RemoteObsPinKey, newPin)) { Owner = Application.Current.MainWindow }.ShowDialog();
     }
 
     /// <summary>«Transmisión → Estilos de la transmisión…».</summary>
@@ -82,7 +83,16 @@ public sealed partial class MainViewModel
 
         var port = int.TryParse(_settings.Get(RemotePortKey), out var saved) ? saved : 8080;
 
-        if (!_remote.Start(port, pin))
+        // Whoever had OBS set up before the two PINs were split keeps working: the
+        // OBS PIN starts equal to the phone's until they ask for another.
+        var obsPin = _settings.Get(RemoteObsPinKey);
+        if (!RemotePin.IsValid(obsPin))
+        {
+            obsPin = pin;
+            _settings.Set(RemoteObsPinKey, obsPin);
+        }
+
+        if (!_remote.Start(port, pin, obsPin))
             return false;
 
         // Si el puerto elegido estaba ocupado y se usó otro, no se pisa el

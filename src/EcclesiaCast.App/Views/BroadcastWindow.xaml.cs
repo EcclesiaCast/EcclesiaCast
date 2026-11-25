@@ -15,11 +15,20 @@ public partial class BroadcastWindow : Window
     private readonly RemoteControlServer _server;
     private readonly ISettingsStore _settings;
 
-    public BroadcastWindow(RemoteControlServer server, ISettingsStore settings)
+    private readonly Action<string> _obsPinChanged;
+
+    public BroadcastWindow(RemoteControlServer server, ISettingsStore settings, Action<string> obsPinChanged)
     {
         InitializeComponent();
         _server = server;
         _settings = settings;
+        _obsPinChanged = obsPinChanged;
+        ShowAddresses();
+    }
+
+    private void ShowAddresses()
+    {
+        var server = _server;
         BroadcastBox.Text = server.BroadcastAddress;
         StableNote.Text =
             "Esta dirección no cambia al reiniciar la PC: se pega una sola vez en OBS o vMix. " +
@@ -56,6 +65,25 @@ public partial class BroadcastWindow : Window
             // El portapapeles lo puede tener tomado otro programa.
             Log.Debug(ex, "No se pudo copiar la dirección de transmisión");
         }
+    }
+
+    private void ChangeObsPin_Click(object sender, RoutedEventArgs e)
+    {
+        var ask = MessageBox.Show(
+            this,
+            "Se genera un PIN nuevo para OBS y vMix (el del celular no cambia). " +
+            "Las direcciones que ya pegaste dejan de funcionar hasta que copies las nuevas.\n\n" +
+            "¿Cambiar el PIN de OBS?",
+            "Cambiar el PIN de OBS",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question,
+            MessageBoxResult.No);
+        if (ask != MessageBoxResult.Yes)
+            return;
+
+        _obsPinChanged(_server.ChangeObsPin());
+        ShowAddresses();
+        ChannelCopied.Text = "✓ PIN de OBS cambiado. Copiá las direcciones nuevas.";
     }
 
     private void EditStyles_Click(object sender, RoutedEventArgs e) =>
