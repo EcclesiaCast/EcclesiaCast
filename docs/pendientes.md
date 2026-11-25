@@ -21,6 +21,19 @@ pasa a **Ya probado**, más abajo.
 
 ### Falta probar
 
+**Visto por Claude el 25/11 en la 1.5.0-prueba.4 (no cuenta como probado por Alexis)**
+
+- Anduvo: la ventana flotante («⧉ En una ventana»), una placa en EN VIVO que se va sola a los 10 s,
+  buscar y escuchar en YouTube sólo audio (el proyector no cambia), ➕ a la lista, el menú Transmisión, y
+  la página `/salida` de OBS dibujando una canción y la placa de «Pestaña».
+- **Abrir el programa dos veces no avisa:** quedan dos copias, la segunda toma el puerto siguiente
+  (8082) y las direcciones de OBS de una apuntan a la otra, que está vacía. Es una de las causas de
+  que la dirección «se corra». Falta un aviso o una sola copia abierta a la vez.
+- No se pudo comprobar (sonido, proyector real, otra PC): Pads, 🔂, 💾, volumen, YouTube silenciado,
+  logo/negro frenando el video, y el punto 13 (la PC de prueba tiene dos pantallas).
+- En la lista de Música el 🌐 no se ve cuando el nombre es largo, y el tacho no quitó una pista que
+  estaba sonando.
+
 **De la 1.5.0, lo último (prueba.3)**
 
 1. **YouTube sólo el audio: buscar y escuchar.** Pestaña Música → buscador «BUSCAR EN YOUTUBE (SÓLO
