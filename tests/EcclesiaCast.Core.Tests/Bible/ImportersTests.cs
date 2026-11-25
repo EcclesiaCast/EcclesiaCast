@@ -331,4 +331,18 @@ public class XmlBibleImporterTests
         Assert.Contains("<songs>", error.Message);
         Assert.Contains("OpenSong", error.Message);
     }
+
+    [Fact]
+    public void A_Beblia_file_with_a_byte_order_mark_and_numbered_books_is_read()
+    {
+        var xml = "\uFEFF<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
+            + "<bible translation=\"Spanish PDT\"><testament name=\"Old\"><book number=\"1\"><chapter number=\"1\">"
+            + "<verse number=\"1\">En el principio</verse></chapter></book></testament></bible>";
+
+        var bible = XmlBibleImporter.Parse(xml);
+
+        var book = Assert.Single(bible.Books);
+        Assert.Equal(1, book.Number);
+        Assert.Equal("En el principio", Assert.Single(book.Verses).Text);
+    }
 }
