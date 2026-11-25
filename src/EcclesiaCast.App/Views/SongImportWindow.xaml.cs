@@ -79,6 +79,9 @@ public partial class SongImportWindow : Window
         Loaded += (_, _) => DiscoverAll();
     }
 
+    /// <summary>Opens on the Holyrics choice (the Importar canciones tutorial shows its «Abrir archivos…»).</summary>
+    public void ChooseHolyrics() => HolyricsChoice.IsChecked = true;
+
     /// <summary>How many songs were actually added (0 if cancelled).</summary>
     public int Imported { get; private set; }
 

@@ -26,6 +26,7 @@
                            Margin="0,0,0,4"/>
                 <TextBlock x:Name="TitleText" FontSize="18" FontWeight="SemiBold" Foreground="White"
                            TextWrapping="Wrap"/>
+                <ContentControl x:Name="PictureHost" Margin="0,10,0,0" HorizontalAlignment="Center" Focusable="False" IsTabStop="False"/>
                 <TextBlock x:Name="BodyText" FontSize="13.5" Foreground="#D6DAE3" TextWrapping="Wrap"
                            LineHeight="20" Margin="0,8,0,0"/>
                 <DockPanel Margin="0,18,0,0" LastChildFill="False">

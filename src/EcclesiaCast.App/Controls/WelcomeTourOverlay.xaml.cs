@@ -27,7 +27,8 @@ public partial class WelcomeTourOverlay : UserControl
     private IReadOnlyList<TourStep> _steps = WelcomeTour.Steps;
     private bool _isWelcome = true;
     private Func<string, FrameworkElement?> _find = _ => null;
-    private Action<string?>? _prepare;
+    private Action<TourStep?>? _prepare;
+    private Func<string, bool>? _shown;
     private FrameworkElement? _content;
     private int _index = -1;
 
@@ -62,14 +63,15 @@ public partial class WelcomeTourOverlay : UserControl
     /// lights; <paramref name="prepare"/> is told each step's part before it
     /// is measured, and null when the tour ends.
     /// </summary>
-    public void Start(FrameworkElement content, Func<string, FrameworkElement?> find, Action<string?>? prepare,
-        IReadOnlyList<TourStep>? steps = null)
+    public void Start(FrameworkElement content, Func<string, FrameworkElement?> find, Action<TourStep?>? prepare,
+        IReadOnlyList<TourStep>? steps = null, Func<string, bool>? isShown = null)
     {
         _isWelcome = steps is null;
         _steps = steps ?? WelcomeTour.Steps;
         _content = content;
         _find = find;
         _prepare = prepare;
+        _shown = isShown;
         Visibility = Visibility.Visible;
         UpdateLayout();
         SetUpBlur();
@@ -143,28 +145,58 @@ public partial class WelcomeTourOverlay : UserControl
             Stop();
     }
 
+    /// <summary>
+    /// Something that opens next to the lit part (a menu's drop-down): the lit
+    /// rectangle grows to hold it, in this overlay's coordinates.
+    /// </summary>
+    public Func<TourStep, Rect?>? ExtraSpot { get; set; }
+
+    /// <summary>
+    /// Where another window sits over this one (a window the step opened): the
+    /// card stays out of it, in this overlay's coordinates.
+    /// </summary>
+    public Func<TourStep, Rect?>? KeepClear { get; set; }
+
+    /// <summary>Puts the keyboard back on the card, after a step opened a window that took it.</summary>
+    public void FocusNext() => Keyboard.Focus(NextButton);
+
     private bool IsShown(string target) =>
+        _shown?.Invoke(target)
+        ?? (_find(target) is { IsVisible: true } element && element.ActualWidth > 24 && element.ActualHeight > 24);
+
+    private bool IsMeasurable(string target) =>
         _find(target) is { IsVisible: true } element && element.ActualWidth > 24 && element.ActualHeight > 24;
 
     private void Show(int index, bool animate)
     {
         _index = index;
         var step = _steps[index];
-        if (step.Target is { } target)
-            _prepare?.Invoke(target);
+        _prepare?.Invoke(step);
         UpdateLayout();
 
         var area = new TourBox(0, 0, ActualWidth, ActualHeight);
         var spot = default(TourBox);
-        if (step.Target is { } part && IsShown(part) && _find(part) is { } element)
+        if (step.Target is { } part && IsMeasurable(part) && _find(part) is { } element)
         {
             var bounds = element.TransformToVisual(this).TransformBounds(new Rect(element.RenderSize));
+            if (ExtraSpot?.Invoke(step) is { IsEmpty: false } extra)
+                bounds.Union(extra);
             spot = WelcomeTour.Spot(new TourBox(bounds.X, bounds.Y, bounds.Width, bounds.Height), area, SpotPadding);
+        }
+
+        // The card keeps to the side of the window that another window left free.
+        var cardArea = area;
+        if (KeepClear?.Invoke(step) is { IsEmpty: false } busy)
+        {
+            cardArea = busy.X + busy.Width / 2 > area.Width / 2
+                ? new TourBox(0, 0, Math.Max(Card.Width + 2 * CardGap, busy.X), area.Height)
+                : new TourBox(Math.Min(busy.Right, area.Width - Card.Width - 2 * CardGap), 0,
+                    area.Width - Math.Min(busy.Right, area.Width - Card.Width - 2 * CardGap), area.Height);
         }
 
         FillCard(index, step);
         Card.Measure(new Size(Card.Width, double.PositiveInfinity));
-        var (x, y) = WelcomeTour.PlaceCard(spot, area, Card.Width, Card.DesiredSize.Height, CardGap);
+        var (x, y) = WelcomeTour.PlaceCard(spot, cardArea, Card.Width, Card.DesiredSize.Height, CardGap);
         Canvas.SetLeft(Card, Math.Round(x));
         Canvas.SetTop(Card, Math.Round(y));
         if (animate)
@@ -190,6 +222,7 @@ public partial class WelcomeTourOverlay : UserControl
 
         TitleText.Text = step.Title;
         BodyText.Text = step.Text;
+        PictureHost.Content = step.Picture is { } picture ? TutorialPicture.Create(picture) : null;
         NextButton.Content = _isWelcome && first ? "Empezar el recorrido" : last ? "Terminar" : "Siguiente";
         BackButton.Visibility = first || (_isWelcome && last) ? Visibility.Collapsed : Visibility.Visible;
         SkipButton.Content = _isWelcome && first ? "Ahora no" : _isWelcome ? "Saltar el recorrido" : "Salir del tutorial";

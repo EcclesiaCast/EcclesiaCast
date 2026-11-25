@@ -5,20 +5,32 @@ orden: 5
 
 [paso]
 señalar: MenuBroadcast
+abrir: menu:MenuBroadcast
 titulo: Menú Transmisión
-texto: Todo lo de la transmisión está acá. «Salida para OBS o vMix…» te da la dirección, y «Estilos de la transmisión…» cambia cómo se ve la letra en el video.
+texto: Todo lo de la transmisión está acá. «Salida para OBS o vMix…» te da las direcciones, y «Estilos de la transmisión…» cambia cómo se ve la letra en el video.
 
 [paso]
+abrir: ventana:obs
+resaltar: BroadcastBox
 titulo: Copiá la dirección
-texto: En la ventana «Salida para OBS o vMix…» copiá la dirección que te muestra. Es una página con la letra proyectada, sola y con fondo transparente. No hace falta placa capturadora.
+texto: Esta es la ventana «Salida para OBS o vMix…». Copiá la dirección: es una página con la letra proyectada, sola y con fondo transparente. No hace falta placa capturadora.
 
 [paso]
+abrir: ventana:obs
+resaltar: BroadcastBox
 titulo: En OBS
 texto: En OBS agregá una fuente «Navegador» (Browser Source), pegá la dirección en URL y poné el tamaño de tu transmisión, por ejemplo 1920×1080. La letra queda encima de la cámara.
 
 [paso]
+abrir: ventana:obs
+resaltar: BroadcastBox
 titulo: En vMix
 texto: En vMix tocá Add Input → Web Browser, pegá la dirección y ajustá el tamaño. Si tu programa no maneja la transparencia, agregale &fondo=negro al final de la dirección.
+
+[paso]
+señalar: OutputCombo
+titulo: Sólo para la transmisión
+texto: Si no tenés proyector, en «Salida» elegí «📡 Sólo la transmisión (sin ventana)». No se abre ninguna ventana: la letra va sólo a OBS o vMix, y el botón pasa a «Salir al aire en la transmisión».
 
 [paso]
 señalar: ScreenButtons

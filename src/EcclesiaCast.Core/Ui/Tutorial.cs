@@ -27,7 +27,9 @@ public sealed record Tutorial(string Id, string Title, string Summary, string Ic
 /// goes on with the text above it.
 /// </code>
 /// «señalar» is the x:Name of the element of the main window to light; leave
-/// it out and the card goes in the middle of the window.
+/// it out and the card goes in the middle of the window. «abrir» (optional)
+/// opens something before the card shows (see <see cref="TourActions"/>) and
+/// «resaltar» points at an element of the window that «abrir» opened.
 /// </summary>
 public static class TutorialFile
 {
@@ -64,7 +66,7 @@ public static class TutorialFile
 
             var colon = line.IndexOf(':');
             var key = colon > 0 ? Normalize(line[..colon]) : null;
-            if (key is "titulo" or "resumen" or "icono" or "orden" or "senalar" or "texto")
+            if (key is "titulo" or "resumen" or "icono" or "orden" or "senalar" or "texto" or "abrir" or "resaltar" or "dibujo")
             {
                 current[key] = line[(colon + 1)..].Trim();
                 lastKey = key;
@@ -95,7 +97,18 @@ public static class TutorialFile
                 return Fail($"el texto del paso {i + 1} tiene {body.Length} letras y el máximo es {WelcomeTour.MaxTextLength}.", out error);
 
             b.TryGetValue("senalar", out var target);
-            steps.Add(new TourStep(string.IsNullOrWhiteSpace(target) ? null : target, stepTitle, body));
+            b.TryGetValue("abrir", out var open);
+            if (!string.IsNullOrWhiteSpace(open) && !TourActions.IsKnown(open.Trim()))
+                return Fail($"el paso {i + 1} pide abrir «{open}», que el programa no conoce.", out error);
+            b.TryGetValue("resaltar", out var highlight);
+            b.TryGetValue("dibujo", out var picture);
+            if (!string.IsNullOrWhiteSpace(picture) && !TourActions.Pictures.Contains(picture.Trim()))
+                return Fail($"el paso {i + 1} pide el dibujo «{picture}», que el programa no tiene.", out error);
+            steps.Add(new TourStep(
+                string.IsNullOrWhiteSpace(target) ? null : target, stepTitle, body,
+                string.IsNullOrWhiteSpace(open) ? null : open.Trim(),
+                string.IsNullOrWhiteSpace(highlight) ? null : highlight.Trim(),
+                picture is { Length: > 0 } ? picture.Trim() : null));
         }
 
         tutorial = new Tutorial(id, title, summary ?? string.Empty, string.IsNullOrWhiteSpace(icon) ? "📘" : icon!, order, steps);

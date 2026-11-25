@@ -358,11 +358,13 @@
                           ToolTip="El diseño de cada capa de la transmisión: dónde va la letra, la placa, los colores y el fondo."/>
             </MenuItem>
 
-            <MenuItem Header="A_yuda">
+            <MenuItem x:Name="HelpMenu" Header="A_yuda" SubmenuOpened="HelpMenu_SubmenuOpened">
                 <MenuItem Header="Recorrido del programa" Click="WelcomeTour_Click"
                           ToolTip="Muestra de nuevo, parte por parte, dónde está cada cosa de la ventana."/>
-                <MenuItem Header="Tutoriales…" Click="Tutorials_Click"
-                          ToolTip="Recorridos cortos sobre el programa de verdad: te muestran, paso a paso, dónde tocar."/>
+                <MenuItem x:Name="TutorialsMenu" Header="Tutoriales"
+                          ToolTip="Recorridos cortos sobre el programa de verdad: te muestran, paso a paso, dónde tocar.">
+                    <MenuItem Header="Cargando…" IsEnabled="False"/>
+                </MenuItem>
                 <MenuItem Header="Guía de uso (en internet)" Click="Guide_Click"/>
                 <Separator/>
                 <MenuItem Header="Buscar actualizaciones…" Command="{Binding CheckForUpdatesCommand}"/>
@@ -520,7 +522,7 @@
                 <StackPanel x:Name="OutputControls" DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="Salida:" Foreground="{StaticResource MutedBrush}"
                                FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                    <ComboBox Width="260"
+                    <ComboBox x:Name="OutputCombo" Width="260"
                               ItemsSource="{Binding Displays}"
                               SelectedItem="{Binding SelectedDisplay}"
                               DisplayMemberPath="Label"
@@ -3016,37 +3018,37 @@
                 </Border.Style>
             <DockPanel>
                 <DockPanel DockPanel.Dock="Top">
-                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,6,10,2">
+                    <StackPanel x:Name="MediaButtons" DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,6,10,2">
                         <Button x:Name="MediaAddButton" Content="📥 Agregar" FontSize="11" Padding="8,4"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding ImportMediaCommand}"
                                 ToolTip="Agregar imágenes o videos a la pestaña actual"/>
-                        <Button Content="▶ YouTube" FontSize="11" Padding="8,4" Margin="6,0,0,0"
+                        <Button x:Name="MediaYouTubeButton" Content="▶ YouTube" FontSize="11" Padding="8,4" Margin="6,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding OpenYouTubeCommand}"
                                 ToolTip="Buscar en YouTube e iniciar sesión con tu cuenta (Premium: sin anuncios)"/>
-                        <Button Content="🌐 Web" FontSize="11" Padding="8,4" Margin="6,0,0,0"
+                        <Button x:Name="MediaWebButton" Content="🌐 Web" FontSize="11" Padding="8,4" Margin="6,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding OpenWebCommand}"
                                 ToolTip="Abrir una página web en el cuadro central y proyectarla: como foto o en vivo"/>
-                        <Button Content="🖼 Imágenes" FontSize="11" Padding="8,4" Margin="6,0,0,0"
+                        <Button x:Name="MediaImagesButton" Content="🖼 Imágenes" FontSize="11" Padding="8,4" Margin="6,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding OpenImageSearchCommand}"
                                 ToolTip="Buscar imágenes y GIF en Google Imágenes y agregarlos a la pestaña actual con clic derecho → Agregar a medios"/>
-                        <Button Content="🎞 Fondos" FontSize="11" Padding="8,4" Margin="6,0,0,0"
+                        <Button x:Name="MediaPixabayButton" Content="🎞 Fondos" FontSize="11" Padding="8,4" Margin="6,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Click="Pixabay_Click"
                                 AutomationProperties.Name="Buscar fondos en Pixabay"
                                 ToolTip="Buscar videos y fotos de fondo en Pixabay, que se pueden usar gratis, y bajarlos a una pestaña"/>
-                        <Button Content="🖥 Ventana" FontSize="11" Padding="8,4" Margin="6,0,0,0"
+                        <Button x:Name="MediaWindowButton" Content="🖥 Ventana" FontSize="11" Padding="8,4" Margin="6,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding OpenWindowPickerCommand}"
                                 ToolTip="Proyectar otra ventana de esta computadora (un PowerPoint, un reproductor, un navegador) en vivo, tal como se ve"/>
-                        <Button Content="🔗" FontSize="11" Padding="8,4" Margin="4,0,0,0"
+                        <Button x:Name="MediaLinkButton" Content="🔗" FontSize="11" Padding="8,4" Margin="4,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding AddYouTubeLinkCommand}"
                                 ToolTip="Agregar un video de YouTube pegando el link"/>
-                        <Button Content="🎲" FontSize="12" Padding="8,4" Margin="6,0,0,0"
+                        <Button x:Name="MediaDiceButton" Content="🎲" FontSize="12" Padding="8,4" Margin="6,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding RandomBackgroundCommand}"
                                 ToolTip="Poner un fondo al azar de esta pestaña. No repite ninguno hasta haberlos usado a todos."/>

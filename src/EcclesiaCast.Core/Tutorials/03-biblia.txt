@@ -1,34 +1,43 @@
 titulo: Proyectar la Biblia
-resumen: Buscá un pasaje, elegí la versión y mandalo a pantalla.
+resumen: Buscá un pasaje, usá varias versiones y mandalo a pantalla.
 icono: 📖
 orden: 3
 
 [paso]
-señalar: BibleQueryBox
-titulo: Escribí el pasaje
-texto: En la pestaña Biblia escribí algo como «juan 3:16» o «sal 23» y apretá Enter. No hace falta escribir el nombre completo del libro.
+señalar: BibleQueryRow
+titulo: La pestaña Biblia
+texto: Acá escribís el pasaje, por ejemplo «juan 3:16» o «sal 23», y apretás Enter. No hace falta escribir el nombre completo del libro.
+
+[paso]
+señalar: MenuBibles
+abrir: menu:MenuBibles
+titulo: Importar y bajar Biblias
+texto: En el menú Biblias bajás versiones de internet, importás una propia (JSON o XML) o pasás un paquete de una computadora a otra. Una vez bajadas, funcionan sin internet.
+
+[paso]
+señalar: BibleViewToggleButton
+abrir: vista:lista
+titulo: Modo lista
+texto: Los libros van en una lista, y al elegir uno ves sus capítulos y versículos. Es la vista de siempre. Este botón cambia a la otra vista.
+
+[paso]
+señalar: BibleViewToggleButton
+abrir: vista:grilla
+titulo: Modo grilla
+texto: Los libros se ven como fichas de colores, con los capítulos y versículos al lado: se encuentra todo de un vistazo. Escribir una cita y Enter funciona igual en las dos.
 
 [paso]
 señalar: VersionsRow
-titulo: Elegí la versión
-texto: Un clic en una versión la elige. Con Ctrl+clic sumás una segunda, que sale debajo de la primera: sirve para leer en dos versiones a la vez.
+titulo: Varias versiones a la vez
+texto: Un clic en una versión la elige. Con Ctrl+clic sumás otra, y salen una debajo de la otra en la misma pantalla: sirve para leer dos o tres versiones juntas.
 
 [paso]
-señalar: BibleDownloadButton
-titulo: Bajá más versiones
-texto: Con «📥 Biblias» bajás más versiones de internet. Una vez bajadas, funcionan sin internet. También podés importar una Biblia propia desde el menú Biblias.
+señalar: BibleHistoryButton
+abrir: historial
+titulo: El Historial
+texto: Guarda los versículos que ya proyectaste. Un clic en uno lo carga y lo marca; doble clic lo proyecta de nuevo. También se abre con la flecha ↓ en la caja vacía.
 
 [paso]
 señalar: SlidesPanel
-titulo: Los versículos, en diapositivas
-texto: El pasaje se reparte en diapositivas. Un clic en una la pone en pantalla, y con las flechas ← → pasás de versículo en versículo.
-
-[paso]
-señalar: AddPassageButton
-titulo: Guardalo en la playlist
-texto: Si ya sabés qué se va a leer, tocá «➕ Playlist» y queda en la lista del culto, listo para el momento justo.
-
-[paso]
-señalar: OutputControls
-titulo: A la pantalla
-texto: Elegí la pantalla en «Salida» y tocá «Poner en vivo». Lo que ve la congregación aparece en LIVE. Con Esc se apaga la salida.
+titulo: Los versículos, en el recuadro principal
+texto: El pasaje aparece repartido en diapositivas en este recuadro. Un clic pone una en pantalla (la ves en LIVE), y con las flechas ← → pasás de versículo en versículo.

@@ -61,7 +61,7 @@
         <TextBlock Grid.Row="0" Text="¿De qué programa querés traer las canciones?"
                    FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,8"/>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,14">
+        <StackPanel x:Name="SourceChoices" Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,14">
             <RadioButton x:Name="ProPresenterChoice" Content="ProPresenter" GroupName="Source"
                          Style="{StaticResource SourceChoice}" Checked="Source_Checked"/>
             <RadioButton x:Name="EasyWorshipChoice" Content="EasyWorship" GroupName="Source"
