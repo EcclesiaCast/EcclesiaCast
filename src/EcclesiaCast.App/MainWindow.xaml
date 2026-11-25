@@ -976,6 +976,15 @@
                                     </ScrollViewer>
                                 </Border>
 
+                                <!-- El fondo propio de la Biblia, siempre a la vista en su panel (el mismo
+                                     control que el de las canciones; también aparece sobre las diapositivas) -->
+                                <Button DockPanel.Dock="Top" HorizontalAlignment="Left" Margin="12,0,12,6"
+                                        Content="{Binding BibleBackgroundLabel}" FontSize="11" Padding="8,3" MaxWidth="260"
+                                        Style="{StaticResource DarkButton}"
+                                        Click="BibleBackgroundButton_Click"
+                                        AutomationProperties.Name="Fondo de la Biblia"
+                                        ToolTip="{Binding BibleBackgroundHint}"/>
+
                                 <!-- La caja de búsqueda y, a su derecha, el historial 🕘 de lo proyectado -->
                                 <DockPanel x:Name="BibleQueryRow" DockPanel.Dock="Top" Margin="12,0,12,6"
                                            SizeChanged="BibleQueryRow_SizeChanged">
