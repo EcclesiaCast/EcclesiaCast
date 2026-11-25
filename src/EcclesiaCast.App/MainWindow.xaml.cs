@@ -432,8 +432,15 @@ public partial class MainWindow : Window
     /// </summary>
     private void AddSongMenu_Click(object sender, RoutedEventArgs e)
     {
-        if (DataContext is not MainViewModel vm || sender is not FrameworkElement anchor)
-            return;
+        if (sender is FrameworkElement anchor && BuildAddSongMenu(anchor) is { } menu)
+            menu.IsOpen = true;
+    }
+
+    /// <summary>The ➕ Agregar menu, built but not open (the Nueva canción tutorial opens it too).</summary>
+    private ContextMenu? BuildAddSongMenu(FrameworkElement anchor)
+    {
+        if (DataContext is not MainViewModel vm)
+            return null;
 
         var menu = new ContextMenu
         {
@@ -468,7 +475,7 @@ public partial class MainWindow : Window
             ToolTip = "Elegir archivos sueltos de texto o de ProPresenter",
         });
 
-        menu.IsOpen = true;
+        return menu;
     }
 
     /// <summary>A dimmed, bold row that names the group of entries under it.</summary>

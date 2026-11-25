@@ -24,13 +24,21 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   estrofas con sus nombres en español (Verse 1 → Estrofa 1, Chorus o Refrão → Coro, Bridge → Puente…).
   La canción de bienvenida de Holyrics y las archivadas no se traen, y si una canción ya está,
   pregunta qué hacer. (Por su API Server no: crear el token pide el plan de pago Holyrics Advanced.)
-- **Ayuda → «Tutoriales…».** Una ventana con tarjetas; cada una arranca un recorrido corto (de 5 a 8
-  pasos) sobre el programa de verdad, con el foco señalando el botón, igual que el recorrido de
-  bienvenida. Vienen 8: crear una canción nueva, armar la lista del domingo, proyectar la Biblia, poner
-  fondos y videos, conectar con OBS o vMix, control desde el celular, placas de nombre e importar
-  canciones de otro programa. Cada tutorial es un archivo de texto (pasos y qué elemento señalar):
-  para sumar uno basta dejar un `.txt` en la carpeta «Tutoriales» de los datos del programa, sin tocar
-  código. Cómo escribirlos: `docs/tutoriales.md`.
+- **Ayuda → «Tutoriales ▸».** El ítem tiene una flecha y un submenú con un ítem por tutorial: elegir
+  uno lo arranca directo, sobre el programa de verdad, con el foco señalando el botón. Cada paso
+  ahora **abre lo que nombra**: el menú (Transmisión, Biblias, Fondos, Canciones), el menú ➕ Agregar,
+  la pestaña Biblia o Placas, el historial, y las ventanas reales (el editor de canciones con el cuadro
+  de la letra marcado, la búsqueda en internet, «Traer de otro programa», «Salida para OBS o vMix» y la
+  del código QR del celular), con un marco que señala el cuadro del que habla. Vienen 9: crear una
+  canción (a mano o desde internet), armar la lista del domingo, proyectar la Biblia (pestaña, menú de
+  importar, modo lista y grilla, varias versiones, historial), fondos y videos (silenciar una carpeta,
+  modo continuo y al azar), conectar con OBS o vMix (también sólo para la transmisión, sin proyector),
+  control desde el celular (con un dibujo de cómo se ve en el teléfono), placas de nombre, importar de
+  otro programa (ProPresenter, EasyWorship y Holyrics) y uno nuevo con los botones de abajo a la
+  derecha de la barra de medios (YouTube, link, web, imágenes, fondos, ventana, dado). Cada tutorial es
+  un archivo de texto (pasos, qué elemento señalar y qué abrir): para sumar uno basta dejar un `.txt`
+  en la carpeta «Tutoriales» de los datos del programa, sin tocar código. Cómo escribirlos:
+  `docs/tutoriales.md`.
 - **Música de YouTube, sólo el audio.** En la pestaña **Música**, debajo del reproductor, un buscador
   de YouTube: escribí un artista, una canción o pegá un link, o tocá un tono en **Pads: Do, Do#, Re…**
   para buscar pads. **▶** escucha el resultado ya, **➕** lo suma a la lista y **💾** guarda el audio en

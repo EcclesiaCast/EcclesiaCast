@@ -1,32 +1,56 @@
 # Tutorial: Crear una canción nueva
-# «señalar» es el x:Name del elemento de la ventana principal (ver docs/tutoriales.md).
+# «señalar» es el x:Name de un elemento de la ventana principal; «abrir» abre un menú o una ventana
+# y «resaltar» marca algo de esa ventana (ver docs/tutoriales.md).
 titulo: Crear una canción nueva
-resumen: Pegá la letra, separala en diapositivas y proyectala.
+resumen: Escribila o pegá la letra, o traela de internet, y proyectala.
 icono: 🎵
 orden: 1
 
 [paso]
 señalar: LibraryPanel
 titulo: Empezá por las canciones
-texto: Acá viven todas tus canciones. Si no la ves, tocá la pestaña «Canciones». Antes de crear una, probá buscarla arriba: quizás ya está.
+texto: Acá viven todas tus canciones, en la pestaña «Canciones». Antes de crear una, probá buscarla arriba: quizás ya está.
 
 [paso]
 señalar: SongsAddButton
+abrir: agregar
 titulo: El botón ➕ Agregar
-texto: Ofrece cuatro caminos. Elegí «Crear desde cero» para abrir una canción en blanco. También está en el menú Canciones → «Crear canción desde cero…».
+texto: Abre este menú con cuatro caminos: crear desde cero, buscar en internet, traer de otro programa o importar un archivo. Primero, «Crear desde cero».
 
 [paso]
+abrir: ventana:editor
+resaltar: TitleBox
+titulo: Poné el título
+texto: Se abre el editor de canciones, vacío. Arriba escribís el título; el artista y los derechos son opcionales. Las palabras dudosas se subrayan en rojo.
+
+[paso]
+abrir: ventana:editor
+resaltar: LyricsBox
 titulo: Escribí o pegá la letra
-texto: En la ventana que se abre, ponele el título y pegá la letra. Cada párrafo, separado por una línea en blanco, es una diapositiva. Las palabras dudosas se subrayan en rojo.
+texto: Este es el cuadro de la letra. Pegala acá: cada párrafo, separado por una línea en blanco, es una diapositiva. Con Coro, Estrofa o Puente, arriba, se escribe una línea como [Coro]. No se proyecta.
 
 [paso]
-titulo: Poné nombre a las partes
-texto: Con los botones Coro, Estrofa, Puente y Final, arriba de la letra, se escribe por vos una línea como [Coro]. No se proyecta: sólo ordena la canción. Guardá cuando termines.
+señalar: SongsAddButton
+abrir: agregar
+titulo: O traela de internet
+texto: Si no querés escribirla, «Buscar en internet…» la encuentra por el título, el artista o una frase de la letra, y la trae lista para usar.
+
+[paso]
+abrir: ventana:buscar
+resaltar: QueryBox
+titulo: Buscá por título o por una frase
+texto: Escribí el título, el artista o un pedazo de la letra que te acuerdes, y buscá. La canción que importes queda guardada y funciona sin internet.
+
+[paso]
+abrir: ventana:buscar
+resaltar: ResultsList
+titulo: Elegí y mirá la letra
+texto: Un clic en un resultado muestra su letra a la derecha para revisarla y corregirla. Cuando esté bien, «Importar a la biblioteca» la suma a tu lista.
 
 [paso]
 señalar: SongsList
 titulo: Ya está en tu lista
-texto: La canción nueva aparece en la lista. Un clic la carga; doble clic la proyecta desde la primera diapositiva. Con clic derecho la editás, duplicás o eliminás.
+texto: La canción nueva aparece acá. Un clic la carga; doble clic la proyecta desde la primera diapositiva. Con clic derecho la editás, duplicás o eliminás.
 
 [paso]
 señalar: SlidesPanel

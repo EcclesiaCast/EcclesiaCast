@@ -1,12 +1,12 @@
 titulo: Poner fondos y videos
-resumen: Agregá imágenes y videos, usalos de fondo o solos en pantalla.
+resumen: Imágenes y videos de fondo, carpetas sin sonido, modo continuo y al azar.
 icono: 🖼
 orden: 4
 
 [paso]
 señalar: MediaPanel
 titulo: La barra de medios
-texto: Acá están tus imágenes, videos, PDF y PowerPoint, ordenados en pestañas. Van de fondo detrás de la letra o solos en pantalla.
+texto: Acá están tus imágenes, videos, PDF y PowerPoint, ordenados en pestañas («carpetas»). Van de fondo detrás de la letra o solos en pantalla.
 
 [paso]
 señalar: MediaAddButton
@@ -15,18 +15,34 @@ texto: «📥 Agregar» suma imágenes o videos a la pestaña actual. También p
 
 [paso]
 señalar: MenuBackgrounds
+abrir: menu:MenuBackgrounds
 titulo: Más fondos, gratis
-texto: El menú Fondos baja paquetes de fondos de internet y busca en Pixabay videos y fotos que se pueden usar sin pagar. Una vez bajados, funcionan sin internet.
+texto: El menú Fondos agrega tus archivos, baja paquetes de fondos de internet y busca en Pixabay videos y fotos que se pueden usar sin pagar. Una vez bajados, funcionan sin internet.
+
+[paso]
+señalar: MediaNewTabButton
+titulo: Ordenalos en pestañas
+texto: Con el ＋ creás una pestaña por categoría: fondos de alabanza, avisos, lecturas. Así encontrás cada cosa rápido en medio del culto.
 
 [paso]
 señalar: MediaTabsList
-titulo: Ordenalos en pestañas
-texto: Con el ＋ creás pestañas por categoría: fondos de alabanza, avisos, lecturas. Así encontrás cada cosa rápido en medio del culto.
+titulo: Silenciar una carpeta de fondos
+texto: Si los videos de una carpeta traen sonido, clic derecho sobre su pestaña y «🔇 Silenciar la pestaña»: sus videos pasan mudos y no tapan la música ni la voz. Otro clic y vuelve el sonido.
+
+[paso]
+señalar: MediaContinuousCheck
+titulo: Modo continuo
+texto: Con «▶▶ continua», al terminar un video de la pestaña arranca el siguiente, y al final vuelve al primero. Sirve para dejar un bucle de avisos o fondos antes de la reunión.
+
+[paso]
+señalar: MediaRandomCheck
+titulo: Modo al azar
+texto: Con «🎲 al azar por canción», cada canción que proyectás toma un fondo distinto de esta pestaña, sin repetir hasta usarlos todos. Si elegís uno a mano, se respeta.
 
 [paso]
 señalar: SongsList
-titulo: Un fondo para la canción
-texto: Cargá una canción y, en la barra de medios, hacé clic derecho sobre un fondo y elegí «Usar como fondo de la canción». Queda guardado para ella.
+titulo: Un fondo para una canción
+texto: Cargá una canción y, en la barra de medios, clic derecho sobre un fondo y «Usar como fondo de la canción». Queda guardado para ella.
 
 [paso]
 señalar: ScreenButtons
