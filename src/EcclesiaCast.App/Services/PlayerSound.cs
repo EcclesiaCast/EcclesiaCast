@@ -29,7 +29,7 @@ public static class PlayerSound
             // The shared session carries the general volume of the program
             // (the «Salida» control): Windows moves it smoothly, with no
             // restart of the sound, unlike an equalizer.
-            var master = Math.Clamp(Master, 0, 100);
+            var master = _sessionNow;
             if (player.Volume != master)
                 player.Volume = master;
         }
@@ -56,7 +56,77 @@ public static class PlayerSound
                 return;
             _master = value;
             MasterChanged?.Invoke(null, EventArgs.Empty);
+            GlideSession();
         }
+    }
+
+    /// <summary>The session volume the players have now, on its way to <see cref="_sessionTarget"/>.</summary>
+    private static int _sessionNow = 100;
+
+    private static int _sessionTarget = 100;
+
+    private static System.Windows.Threading.DispatcherTimer? _glide;
+
+    /// <summary>
+    /// Raised while the session volume of the LibVLC players moves toward the
+    /// bar: the bar is followed in short steps (about a tenth of a second) so
+    /// a quick drag is a smooth change and never a staircase of jumps.
+    /// </summary>
+    public static event EventHandler? SessionChanged;
+
+    private static void GlideSession()
+    {
+        _sessionTarget = SoundLevel.SessionVolume(_master);
+        var dispatcher = System.Windows.Application.Current?.Dispatcher;
+        if (dispatcher is null)
+        {
+            // No window (tests): straight to the target.
+            _sessionNow = _sessionTarget;
+            SessionChanged?.Invoke(null, EventArgs.Empty);
+            return;
+        }
+
+        if (!dispatcher.CheckAccess())
+        {
+            dispatcher.BeginInvoke(GlideSession);
+            return;
+        }
+
+        _glide ??= NewGlideTimer(dispatcher);
+        if (!_glide.IsEnabled)
+            _glide.Start();
+    }
+
+    private static System.Windows.Threading.DispatcherTimer NewGlideTimer(System.Windows.Threading.Dispatcher dispatcher)
+    {
+        var timer = new System.Windows.Threading.DispatcherTimer(
+            System.Windows.Threading.DispatcherPriority.Send, dispatcher)
+        {
+            Interval = TimeSpan.FromMilliseconds(16),
+        };
+        timer.Tick += (_, _) =>
+        {
+            var gap = _sessionTarget - _sessionNow;
+            if (gap == 0)
+            {
+                timer.Stop();
+                return;
+            }
+
+            // A quarter of what is left each step (at least 1): about 100 ms to arrive.
+            var step = Math.Max(1, Math.Abs(gap) / 4);
+            _sessionNow += Math.Sign(gap) * Math.Min(step, Math.Abs(gap));
+            SessionChanged?.Invoke(null, EventArgs.Empty);
+        };
+        return timer;
+    }
+
+    /// <summary>The first volume of a program that starts with the bar somewhere other than 100.</summary>
+    public static void SnapSession()
+    {
+        _sessionTarget = SoundLevel.SessionVolume(_master);
+        _sessionNow = _sessionTarget;
+        SessionChanged?.Invoke(null, EventArgs.Empty);
     }
 
     /// <summary>Raised when <see cref="Master"/> changes: each live player applies it.</summary>
