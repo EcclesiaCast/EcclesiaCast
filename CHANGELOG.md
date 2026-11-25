@@ -6,6 +6,16 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 ## [Sin publicar]
 
 ### Agregado
+- **Cambiar el PIN del celular.** En «Controlar desde el celular» hay un botón **Cambiar el PIN**
+  (con confirmación). El celular se entera solo: al volver a la pestaña, al despertar o cada pocos
+  minutos revisa que el PIN siga siendo el mismo, y si cambió olvida el viejo y pide el nuevo. Antes
+  un PIN equivocado hacía que la página siguiera insistiendo y terminara bloqueando al celular unos
+  minutos. La ventana también muestra la dirección con el nombre de la PC (`NOMBRE.local`) por si el
+  router le cambia la IP, y la página avisa que se vuelva a escanear el código cuando pierde la conexión.
+- **PIN de OBS distinto del del celular.** Las direcciones de «Salida para OBS o vMix…» llevan un PIN
+  propio, que sólo abre las páginas de salida: no sirve para manejar la proyección desde el celular.
+  Hay un botón para cambiarlo, aparte del del celular. Quien ya tenía OBS armado no pierde nada: el PIN
+  de OBS arranca igual al que ya tenía, hasta que lo cambie.
 
 - **Una sola copia del programa abierta.** Si lo abrís de nuevo (por ejemplo, un acceso directo
   más), en vez de abrirse otra copia trae al frente la que ya está. Antes la segunda copia tomaba

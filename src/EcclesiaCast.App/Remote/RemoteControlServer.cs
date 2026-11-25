@@ -50,6 +50,13 @@ public sealed class RemoteControlServer : IDisposable
     /// <summary>Four digits the phone has to send with every request.</summary>
     public string Pin { get; private set; } = string.Empty;
 
+    /// <summary>
+    /// The PIN carried in the OBS / vMix addresses. It is not the phone's: it
+    /// only opens the streaming pages, so whoever sets up OBS (or sees its
+    /// address) cannot drive the projection from a phone.
+    /// </summary>
+    public string ObsPin { get; private set; } = string.Empty;
+
     /// <summary>The address to type into the phone, e.g. http://192.168.1.40:8080.</summary>
     public string Address => $"http://{LocalAddress()}:{Port}";
 
@@ -58,10 +65,10 @@ public sealed class RemoteControlServer : IDisposable
     /// transparency, with the PIN carried along because a browser source has
     /// no way to ask for one.
     /// </summary>
-    public string BroadcastAddress => $"{BroadcastBase}/salida?pin={Pin}";
+    public string BroadcastAddress => $"{BroadcastBase}/salida?pin={ObsPin}";
 
     /// <summary>The streaming page of one channel (everything, or only the Bible, the songs or the announcements), with the PIN.</summary>
-    public string BroadcastAddressFor(OutputChannel channel) => $"{BroadcastBase}{OutputChannels.Path(channel)}?pin={Pin}";
+    public string BroadcastAddressFor(OutputChannel channel) => $"{BroadcastBase}{OutputChannels.Path(channel)}?pin={ObsPin}";
 
     /// <summary>
     /// «localhost» for OBS or vMix on this same PC: unlike the network IP, which
@@ -71,15 +78,52 @@ public sealed class RemoteControlServer : IDisposable
     private string BroadcastBase => $"http://localhost:{Port}";
 
     /// <summary>The same stream page for OBS on another PC of the network, by this PC's name (the IP can change).</summary>
-    public string NetworkBroadcastAddress => $"http://{Environment.MachineName}:{Port}/salida?pin={Pin}";
+    public string NetworkBroadcastAddress => $"http://{Environment.MachineName}:{Port}/salida?pin={ObsPin}";
+
+    /// <summary>The address by this PC's name, for when the network's IP changed since the QR was scanned.</summary>
+    public string NameAddress => $"http://{Environment.MachineName}.local:{Port}";
+
+    /// <summary>
+    /// Hands out a new PIN. Every phone and every OBS address with the old one
+    /// stops working (their next request is answered «pin»), and the wrong-PIN
+    /// counters start over so nobody is left locked out by the old one.
+    /// </summary>
+    public string ChangePin()
+    {
+        lock (_limiterLock)
+        {
+            do { Pin = RemotePin.Generate(Pin); } while (Pin == ObsPin);
+            _limiter.Clear();
+        }
+
+        Log.Information("Control remoto: se cambió el PIN");
+        return Pin;
+    }
+
+    /// <summary>A new PIN for the OBS / vMix addresses only; the phone's is left as it is.</summary>
+    public string ChangeObsPin()
+    {
+        lock (_limiterLock)
+        {
+            do { ObsPin = RemotePin.Generate(ObsPin); } while (ObsPin == Pin);
+            _limiter.Clear();
+        }
+
+        Log.Information("Control remoto: se cambió el PIN de OBS");
+        return ObsPin;
+    }
+
+    private static bool Matches(string? candidate, string pin) =>
+        !string.IsNullOrEmpty(pin) && string.Equals(candidate, pin, StringComparison.Ordinal);
 
     /// <summary>Starts listening. Returns false when no port could be opened.</summary>
-    public bool Start(int preferredPort, string pin)
+    public bool Start(int preferredPort, string pin, string obsPin)
     {
         if (IsRunning)
             return true;
 
         Pin = pin;
+        ObsPin = obsPin;
 
         // Turning the remote off and on again is the way out for a volunteer
         // who locked their own phone out: it hands out a new PIN anyway.
@@ -236,7 +280,7 @@ public sealed class RemoteControlServer : IDisposable
 
         if (path == "/api/output" && method == "GET")
         {
-            var check = CheckPin(QueryValue(target, "pin"), caller);
+            var check = CheckPin(QueryValue(target, "pin"), caller, stream: true);
             if (!check.Ok)
             {
                 await WriteDeniedAsync(stream, check, cancellation);
@@ -255,7 +299,7 @@ public sealed class RemoteControlServer : IDisposable
         // images and videos of the library can be fetched.
         if (path == "/api/media" && method == "GET")
         {
-            var check = CheckPin(QueryValue(target, "pin"), caller);
+            var check = CheckPin(QueryValue(target, "pin"), caller, stream: true);
             if (!check.Ok)
             {
                 await WriteDeniedAsync(stream, check, cancellation);
@@ -283,7 +327,7 @@ public sealed class RemoteControlServer : IDisposable
         // that layer's style can be fetched: the request names a layer, never a path.
         if (path == "/api/fondo" && method == "GET")
         {
-            var check = CheckPin(QueryValue(target, "pin"), caller);
+            var check = CheckPin(QueryValue(target, "pin"), caller, stream: true);
             if (!check.Ok)
             {
                 await WriteDeniedAsync(stream, check, cancellation);
@@ -306,7 +350,7 @@ public sealed class RemoteControlServer : IDisposable
         // names nothing: only the current plate's own file can come out.
         if (path == "/api/placa" && method == "GET")
         {
-            var check = CheckPin(QueryValue(target, "pin"), caller);
+            var check = CheckPin(QueryValue(target, "pin"), caller, stream: true);
             if (!check.Ok)
             {
                 await WriteDeniedAsync(stream, check, cancellation);
@@ -321,6 +365,21 @@ public sealed class RemoteControlServer : IDisposable
             }
 
             await WriteFileAsync(stream, file, range, cancellation);
+            return;
+        }
+
+        // A light «is my PIN still good?» for the phone: no state is built and the
+        // UI thread is not touched, so it can be asked every few minutes.
+        if (path == "/api/pin" && method == "GET")
+        {
+            var check = CheckPin(QueryValue(target, "pin"), caller);
+            if (!check.Ok)
+            {
+                await WriteDeniedAsync(stream, check, cancellation);
+                return;
+            }
+
+            await WriteAsync(stream, 200, "application/json", """{"ok":true}""", cancellation);
             return;
         }
 
@@ -442,7 +501,7 @@ public sealed class RemoteControlServer : IDisposable
     /// away for a few minutes, which is what stops someone on the church wifi
     /// from walking through all ten thousand combinations.
     /// </summary>
-    private PinCheck CheckPin(string? candidate, string caller)
+    private PinCheck CheckPin(string? candidate, string caller, bool stream = false)
     {
         var now = DateTimeOffset.UtcNow;
 
@@ -452,7 +511,7 @@ public sealed class RemoteControlServer : IDisposable
                 return new PinCheck(false, (int)Math.Ceiling(wait.TotalSeconds));
 
             // Constant-time-ish comparison; the PIN is short and the network is local.
-            var ok = !string.IsNullOrEmpty(Pin) && string.Equals(candidate, Pin, StringComparison.Ordinal);
+            var ok = Matches(candidate, Pin) || (stream && Matches(candidate, ObsPin));
             if (ok)
             {
                 _limiter.RecordSuccess(caller);

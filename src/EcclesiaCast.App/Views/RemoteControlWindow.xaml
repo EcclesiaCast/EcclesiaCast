@@ -44,8 +44,15 @@
                 <TextBlock Text="Se pide una sola vez en cada celular."
                            FontSize="11" Foreground="{StaticResource FaintBrush}"
                            HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                <Button Content="Cambiar el PIN" Style="{StaticResource DarkButton}"
+                        Padding="12,5" Margin="0,8,0,0" HorizontalAlignment="Center"
+                        Click="ChangePin_Click"
+                        ToolTip="Genera un PIN nuevo: los celulares que tenían el anterior tienen que escribir el nuevo"/>
             </StackPanel>
         </Border>
+
+        <TextBlock x:Name="NameNote" FontSize="11" Foreground="{StaticResource FaintBrush}"
+                   TextWrapping="Wrap" Margin="0,14,0,0"/>
 
         <TextBlock FontSize="11" Foreground="{StaticResource FaintBrush}"
                    TextWrapping="Wrap" Margin="0,14,0,0">
