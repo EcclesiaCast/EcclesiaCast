@@ -42,7 +42,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   propio, que sólo abre las páginas de salida: no sirve para manejar la proyección desde el celular.
   Hay un botón para cambiarlo, aparte del del celular. Quien ya tenía OBS armado no pierde nada: el PIN
 - **Fondos y medios desde el celular.** La página del celular tiene un botón **🖼 Fondos y medios** con
-  las imágenes y videos de la biblioteca (con miniatura): tocás uno y se pone en pantalla. Sirve para
+  las imágenes y videos de la biblioteca (con miniatura), con un desplegable de carpetas (las mismas
+  pestañas que en la computadora; recuerda la última) y el botón queda azul mientras está abierto: tocás
+  uno y se pone en pantalla. Sirve para
   volver a poner un fondo después de «Sin fondo», cambiar uno que no se quería o mandar otro anuncio.
 - Los avisos de «Cambiar el PIN» ahora usan las ventanas propias del programa y dicen lo cierto: el PIN
   del celular no toca las direcciones de OBS; el de OBS sí las invalida.
