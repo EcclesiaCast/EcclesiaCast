@@ -2,12 +2,15 @@ namespace EcclesiaCast.Core.Audio;
 
 /// <summary>
 /// How loud a player sounds, worked out by the program instead of by the
-/// sound output of LibVLC. That output keeps ONE volume and ONE mute for the
-/// whole program (a Windows audio session shared by every player), so muting
-/// the blurred copy that fills the edges silenced the video itself, and the
-/// music list's volume changed the video's. Each player now stays at full
-/// volume on that shared session and is turned down on its own, with the
-/// pre-amplifier and bands of its equalizer (which belong to that player only).
+/// sound output of LibVLC. The usual output keeps ONE volume and ONE mute for
+/// the whole program (a Windows audio session shared by every player), so
+/// muting the blurred copy that fills the edges silenced the video itself.
+/// That shared volume carries the general «Volumen» bar. A video's own volume
+/// is turned down with the pre-amplifier and bands of its equalizer (which
+/// belong to that player only), and is heard about 1.2 s later: the equalizer
+/// works on sound that LibVLC prepares that far ahead. That is why the music
+/// list, whose bar moves while it sounds, does not use it: it plays through
+/// DirectSound, where each player has a volume of its own that acts at once.
 /// </summary>
 public static class SoundLevel
 {
@@ -74,6 +77,13 @@ public static class SoundLevel
             volume *= fraction / MasterFadeFraction;
         return Math.Clamp((int)Math.Round(volume), 1, 100);
     }
+
+    /// <summary>
+    /// The same general volume as Windows counts it for the program's audio
+    /// session (0 to 1): the cube of <see cref="SessionVolume"/>, which is
+    /// what LibVLC writes there when that number is given to one of its players.
+    /// </summary>
+    public static float SessionScalar(int master) => (float)Math.Pow(SessionVolume(master) / 100.0, 3);
 
     /// <summary>
     /// The level split in what the pre-amplifier takes away and what every band

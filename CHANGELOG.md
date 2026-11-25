@@ -16,17 +16,17 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   audio de los primeros 5, así que ▶ en uno de ellos empieza en menos de un segundo; en otro, en
   unos 3 s. El archivo se baja sólo si tocás 💾 (o si el directo falla, como respaldo).
 - **La barra «Volumen» sube y baja sin saltos y sin cortes.** Cada paso de la barra cambia el
-  volumen en la misma medida (antes los pasos de abajo eran saltos grandes) y el cambio se hace en
-  una rampa de una décima de segundo en vez de a golpes. La música ya no llega a silencio total
-  hasta el extremo izquierdo de la barra: al subir de nuevo vuelve a sonar enseguida.
-- **Los volúmenes responden al instante mientras se arrastran.** El volumen general sigue a la mano
-  sin rampa, y se le avisa al motor desde un hilo aparte (si el motor está ocupado con un video, la
-  barra ya no se queda esperando). La barra 🔈 de los audios guardaba en la base de datos en cada
-  paso, y eso la hacía ir atrasada; ahora guarda recién cuando la soltás.
-- **La barra 🔈 de los audios ya no corta ni se atrasa.** Al llegar a 100 o salir de 100 sacaba y
-  ponía el ecualizador del reproductor, y cada vez que eso pasa el sonido se reinicia un instante;
-  ahora el ecualizador queda siempre puesto y sólo se mueven sus niveles. Además el valor viaja a
-  LibVLC desde un hilo aparte, sólo el último, sin esperar en la interfaz.
+  volumen en la misma medida (antes los pasos de abajo eran saltos grandes) y sigue a la mano.
+  La música ya no llega a silencio total hasta el extremo izquierdo de la barra: al subir de nuevo
+  vuelve a sonar enseguida.
+- **La barra 🔈 de los audios cambia el volumen mientras la arrastrás.** Antes el cambio se oía
+  entre 1,2 y 1,3 segundos tarde (parecía que recién cambiaba al soltar): el volumen se hacía con
+  el ecualizador, y LibVLC pasa el sonido por el ecualizador con más de un segundo de
+  adelanto. Ahora los audios (archivos y música de YouTube) salen por DirectSound, donde cada
+  reproductor tiene un volumen propio que actúa enseguida (medido en la salida de Windows: menos
+  de 0,2 s contando lo que tarda el medidor). Cada tema arranca ya con el volumen de la barra, la
+  barra «Volumen» general lo sigue manejando, y no toca el volumen de los videos. Además ya no
+  guarda en la base de datos en cada paso: guarda cuando la barra queda quieta.
 - **Clic derecho en la lista AUDIOS** (pestaña Música): Reproducir ahora, Reproducir en bucle sólo
   este, Guardar para usar sin internet y Copiar el link de YouTube (sólo en los que tienen 🌐),
   Mostrar en la carpeta (los de archivo), Subir, Bajar y Eliminar de la lista.
