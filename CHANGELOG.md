@@ -19,6 +19,13 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   volumen en la misma medida (antes los pasos de abajo eran saltos grandes) y el cambio se hace en
   una rampa de una décima de segundo en vez de a golpes. La música ya no llega a silencio total
   hasta el extremo izquierdo de la barra: al subir de nuevo vuelve a sonar enseguida.
+- **Los volúmenes responden al instante mientras se arrastran.** El volumen general sigue a la mano
+  sin rampa, y se le avisa al motor desde un hilo aparte (si el motor está ocupado con un video, la
+  barra ya no se queda esperando). La barra 🔈 de los audios guardaba en la base de datos en cada
+  paso, y eso la hacía ir atrasada; ahora guarda recién cuando la soltás.
+- **Clic derecho en la lista AUDIOS** (pestaña Música): Reproducir ahora, Reproducir en bucle sólo
+  este, Guardar para usar sin internet y Copiar el link de YouTube (sólo en los que tienen 🌐),
+  Mostrar en la carpeta (los de archivo), Subir, Bajar y Eliminar de la lista.
 
 ### Agregado
 - **Cambiar el PIN del celular.** En «Controlar desde el celular» hay un botón **Cambiar el PIN**

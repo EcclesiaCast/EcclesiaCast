@@ -84,9 +84,15 @@ public sealed partial class MainViewModel
 
     partial void OnAudioVolumeChanged(int value)
     {
+        // Heard at once; the database is written when the bar rests (a write
+        // on every step made the bar lag behind the hand).
         _audioPlayer.Volume = value;
-        _settings.Set(AudioVolumeKey, value.ToString());
+        _audioVolumeSave ??= NewRestTimer(TimeSpan.FromMilliseconds(500), () =>
+            _settings.Set(AudioVolumeKey, AudioVolume.ToString()));
+        Restart(_audioVolumeSave);
     }
+
+    private System.Windows.Threading.DispatcherTimer? _audioVolumeSave;
 
     partial void OnAudioPositionSecondsChanged(double value)
     {
@@ -253,6 +259,89 @@ public sealed partial class MainViewModel
         SelectedAudio = selected;
         SaveAudioOrder();
         StatusText = "Audios ordenados por nombre.";
+    }
+
+    // ── Clic derecho en un audio de la lista ─────────────────────
+
+    /// <summary>Right click → «Reproducir en bucle sólo este»: starts it and repeats it until the repeat is changed.</summary>
+    [RelayCommand]
+    private void PlayAudioLooping(AudioTrackItem? item)
+    {
+        if (item is null)
+            return;
+
+        AudioRepeat = AudioRepeatMode.One;
+        PlayAudio(item);
+        StatusText = $"«{item.Name}» suena en bucle. Con 🔂 se vuelve a cambiar.";
+    }
+
+    /// <summary>Right click → «Guardar para usar sin internet»: the same as 💾, on the row that was clicked.</summary>
+    [RelayCommand(AllowConcurrentExecutions = true)]
+    private Task SaveAudioItemAsync(AudioTrackItem? item)
+    {
+        if (item is null || YouTubeAudio.TrackVideoId(item.Path) is not { } videoId)
+            return Task.CompletedTask;
+
+        return SaveYouTubeSoundAsync(videoId, item.Name);
+    }
+
+    [RelayCommand]
+    private void RemoveAudioItem(AudioTrackItem? item)
+    {
+        if (item is null)
+            return;
+
+        SelectedAudio = item;
+        RemoveAudio();
+    }
+
+    [RelayCommand]
+    private void MoveAudioItemUp(AudioTrackItem? item)
+    {
+        SelectedAudio = item;
+        MoveSelectedAudio(-1);
+    }
+
+    [RelayCommand]
+    private void MoveAudioItemDown(AudioTrackItem? item)
+    {
+        SelectedAudio = item;
+        MoveSelectedAudio(+1);
+    }
+
+    [RelayCommand]
+    private void ShowAudioInFolder(AudioTrackItem? item)
+    {
+        if (item is null || !File.Exists(item.Path))
+        {
+            StatusText = "No se encuentra el archivo.";
+            return;
+        }
+
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = "explorer.exe",
+            Arguments = $"/select,\"{item.Path}\"",
+            UseShellExecute = true,
+        });
+    }
+
+    [RelayCommand]
+    private void CopyAudioLink(AudioTrackItem? item)
+    {
+        if (item is null || YouTubeAudio.TrackVideoId(item.Path) is not { } videoId)
+            return;
+
+        try
+        {
+            System.Windows.Clipboard.SetText($"https://www.youtube.com/watch?v={videoId}");
+            StatusText = "El link de YouTube quedó copiado.";
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "No se pudo copiar el link");
+            StatusText = "No se pudo copiar el link: el portapapeles está ocupado.";
+        }
     }
 
     private void SaveAudioOrder() => _audios.SaveOrder(AudioTracks.Select(t => t.Id).ToList());

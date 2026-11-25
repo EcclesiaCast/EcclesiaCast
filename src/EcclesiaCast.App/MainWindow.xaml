@@ -2530,6 +2530,45 @@
                                                      ToolTip="Doble clic o Enter: reproducir · Supr: quitar de la lista">
                                                 <ListBox.ItemContainerStyle>
                                                     <Style TargetType="ListBoxItem">
+                                                        <Setter Property="Tag"
+                                                                Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+                                                        <Setter Property="ContextMenu">
+                                                            <Setter.Value>
+                                                                <ContextMenu>
+                                                                    <MenuItem Header="Reproducir ahora"
+                                                                              Command="{Binding PlacementTarget.Tag.PlayAudioCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                                    <MenuItem Header="Reproducir en bucle sólo este"
+                                                                              Command="{Binding PlacementTarget.Tag.PlayAudioLoopingCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                                    <Separator Visibility="{Binding PlacementTarget.DataContext.IsYouTube, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVis}}"/>
+                                                                    <MenuItem Header="Guardar para usar sin internet"
+                                                                              Visibility="{Binding PlacementTarget.DataContext.IsYouTube, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVis}}"
+                                                                              Command="{Binding PlacementTarget.Tag.SaveAudioItemCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                              ToolTip="Baja el audio a la computadora: queda en su mismo lugar de la lista y funciona sin internet."/>
+                                                                    <MenuItem Header="Copiar el link de YouTube"
+                                                                              Visibility="{Binding PlacementTarget.DataContext.IsYouTube, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVis}}"
+                                                                              Command="{Binding PlacementTarget.Tag.CopyAudioLinkCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                                    <MenuItem Header="Mostrar en la carpeta"
+                                                                              Visibility="{Binding PlacementTarget.DataContext.IsYouTube, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource InverseBoolToVis}}"
+                                                                              Command="{Binding PlacementTarget.Tag.ShowAudioInFolderCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                                    <Separator/>
+                                                                    <MenuItem Header="Subir"
+                                                                              Command="{Binding PlacementTarget.Tag.MoveAudioItemUpCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                                    <MenuItem Header="Bajar"
+                                                                              Command="{Binding PlacementTarget.Tag.MoveAudioItemDownCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                                    <Separator/>
+                                                                    <MenuItem Header="Eliminar de la lista"
+                                                                              Command="{Binding PlacementTarget.Tag.RemoveAudioItemCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                                </ContextMenu>
+                                                            </Setter.Value>
+                                                        </Setter>
                                                         <Setter Property="Template">
                                                             <Setter.Value>
                                                                 <ControlTemplate TargetType="ListBoxItem">
