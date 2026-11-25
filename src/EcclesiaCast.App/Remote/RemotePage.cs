@@ -115,6 +115,15 @@ internal static class RemotePage
               <button id="bOutput" onclick="cmd('output')">Salida</button>
             </div>
 
+            <div class="row" style="margin-bottom:12px">
+              <button id="bMedias" onclick="toggleMedias()">🖼 Fondos y medios</button>
+            </div>
+
+            <div class="card hide" id="mediaCard">
+              <div class="label">Tocá uno para ponerlo en pantalla</div>
+              <div id="mediaList"></div>
+            </div>
+
             <div class="card hide" id="presCard">
               <div class="label">Presentaciones</div>
               <div id="presList"></div>
@@ -218,6 +227,57 @@ internal static class RemotePage
             searchSeq++;
             showHits([], '');
             document.getElementById('slides').scrollIntoView({behavior: 'smooth', block: 'start'});
+          });
+        }
+
+        // ── Fondos y medios: elegir otra imagen o video de la biblioteca ──
+        // Sirve para volver a poner un fondo después de «Sin fondo», cambiar uno
+        // que no se quería, o mandar otro anuncio. La lista se trae al abrirla.
+        function toggleMedias() {
+          var card = document.getElementById('mediaCard');
+          if (card.className === 'card') { card.className = 'card hide'; return; }
+          card.className = 'card';
+          var box = document.getElementById('mediaList');
+          box.innerHTML = '<div class="none">Cargando…</div>';
+          fetch('/api/medias?pin=' + encodeURIComponent(pin)).then(function (r) {
+            if (r.status === 403) { pinGone(false); return null; }
+            return r.ok ? r.json() : null;
+          }).then(function (list) { if (list) showMedias(list); })
+            .catch(function () { box.innerHTML = '<div class="none">No se pudo cargar la lista.</div>'; });
+        }
+
+        function showMedias(list) {
+          var box = document.getElementById('mediaList');
+          box.innerHTML = '';
+          if (!list.length) { box.innerHTML = '<div class="none">La biblioteca no tiene imágenes ni videos.</div>'; return; }
+          var grid = null, tab = null;
+          list.forEach(function (m) {
+            if (grid === null || m.tab !== tab) {
+              tab = m.tab;
+              if (tab) {
+                var h = document.createElement('div');
+                h.className = 'label';
+                h.style.margin = '10px 0 6px';
+                h.textContent = tab;
+                box.appendChild(h);
+              }
+              grid = document.createElement('div');
+              grid.className = 'grid';
+              box.appendChild(grid);
+            }
+            var b = document.createElement('button');
+            b.className = 'slide';
+            var img = document.createElement('img');
+            img.src = thumbUrl(m.id);
+            img.onerror = function () { img.style.display = 'none'; };
+            var t = document.createElement('div');
+            t.className = 't';
+            t.style.marginTop = '4px';
+            t.textContent = (m.kind === 'video' ? '▶ ' : '') + m.name;
+            b.appendChild(img);
+            b.appendChild(t);
+            b.onclick = function () { cmd('media', m.id); };
+            grid.appendChild(b);
           });
         }
 

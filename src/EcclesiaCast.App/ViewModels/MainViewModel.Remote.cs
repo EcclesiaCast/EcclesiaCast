@@ -231,6 +231,13 @@ public sealed partial class MainViewModel
             .Where(p => p.Pages > 0)
             .ToList();
 
+    IReadOnlyList<RemoteMedia> IRemoteHost.GetMediaList() =>
+        _allMedia
+            .Where(m => m.Type is MediaType.Image or MediaType.Video && !IsPresentationTab(m.Category))
+            .Take(300)
+            .Select(m => new RemoteMedia(m.Id, m.Name, m.Type == MediaType.Video ? "video" : "image", m.Category ?? string.Empty))
+            .ToList();
+
     string? IRemoteHost.GetThumbnailPath(int mediaId)
     {
         var poster = _allMedia.FirstOrDefault(m => m.Id == mediaId)?.ThumbnailPath;
@@ -419,6 +426,12 @@ public sealed partial class MainViewModel
             case "logo": ToggleLogo(); break;
             case "output": ToggleOutput(); break;
             case "nobackground": ClearBackground(); break;
+            case "media" when index is int mediaId
+                              && _allMedia.FirstOrDefault(m => m.Id == mediaId) is { Type: MediaType.Image or MediaType.Video } chosen
+                              && !IsPresentationTab(chosen.Category):
+                // A background or an announcement picked on the phone goes on screen like a click on its card.
+                ProjectMedia(chosen);
+                break;
             case "slide" when index is int slide: GoLiveSlide(slide); break;
             case "presentation" when index is int shown:
                 // The phone opens it on the computer: the pages come back with the next poll.

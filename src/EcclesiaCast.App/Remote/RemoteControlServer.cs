@@ -398,6 +398,24 @@ public sealed class RemoteControlServer : IDisposable
             return;
         }
 
+        // The pictures and videos of the library, to choose a background or an
+        // announcement from the phone. Names and ids only: the posters come one by
+        // one from /api/thumb.
+        if (path == "/api/medias" && method == "GET")
+        {
+            var check = CheckPin(QueryValue(target, "pin"), caller);
+            if (!check.Ok)
+            {
+                await WriteDeniedAsync(stream, check, cancellation);
+                return;
+            }
+
+            var list = await OnUiThread(() => _host.GetMediaList());
+            await WriteAsync(stream, 200, "application/json; charset=utf-8",
+                JsonSerializer.Serialize(list, Json), cancellation);
+            return;
+        }
+
         if (path == "/api/search" && method == "GET")
         {
             var check = CheckPin(QueryValue(target, "pin"), caller);

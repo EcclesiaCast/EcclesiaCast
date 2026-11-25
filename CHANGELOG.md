@@ -37,6 +37,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 - **PIN de OBS distinto del del celular.** Las direcciones de «Salida para OBS o vMix…» llevan un PIN
   propio, que sólo abre las páginas de salida: no sirve para manejar la proyección desde el celular.
   Hay un botón para cambiarlo, aparte del del celular. Quien ya tenía OBS armado no pierde nada: el PIN
+- **Fondos y medios desde el celular.** La página del celular tiene un botón **🖼 Fondos y medios** con
+  las imágenes y videos de la biblioteca (con miniatura): tocás uno y se pone en pantalla. Sirve para
+  volver a poner un fondo después de «Sin fondo», cambiar uno que no se quería o mandar otro anuncio.
+- Los avisos de «Cambiar el PIN» ahora usan las ventanas propias del programa y dicen lo cierto: el PIN
+  del celular no toca las direcciones de OBS; el de OBS sí las invalida.
   de OBS arranca igual al que ya tenía, hasta que lo cambie.
 
 - **Una sola copia del programa abierta.** Si lo abrís de nuevo (por ejemplo, un acceso directo
