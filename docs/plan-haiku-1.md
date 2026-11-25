@@ -36,7 +36,7 @@ arrastrar.
     su último versículo»; si no, «Clic: abre el capítulo siguiente en su
     primer versículo».
   - `Verses != null` (versículo): «Clic: proyectar · Clic derecho: agregar a la
-    playlist o corregir el texto».
+    playlist».
   - `SectionId != 0` (canción): el texto actual.
   - Cualquier otro caso: «Clic: proyectar».
 - En el XAML: `ToolTip="{Binding CardToolTip}"`.

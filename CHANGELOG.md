@@ -123,6 +123,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 - **Los comentarios necesitan texto.** «Enviar» queda apagado hasta que se escribe algo, y la ventana
   explica por qué: seis envíos llegaron sólo con el resumen de uso y no se podían entender ni contestar.
 
+### Quitado
+
+- **«Corregir el texto…» del clic derecho en un versículo.** Se sacó la opción: la Biblia no se
+  modifica desde el programa.
+
 ### Arreglado
 
 - **Los títulos de YouTube con acentos salían mal** («Hillsong en Espa?ol») en la música de

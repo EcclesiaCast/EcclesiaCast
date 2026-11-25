@@ -57,16 +57,6 @@ las diapositivas (`LoadBiblePassage` / `VerseGrouping`), los resultados de
 búsqueda (Ctrl+K y el `?` del buscador de la Biblia), la cajita de «➕ Playlist»,
 el escenario, el control remoto y la salida web.
 
-## 2. «Corregir este versículo»
-
-Clic derecho sobre una diapositiva de la Biblia → **«Corregir el texto…»**.
-Abre una ventanita con el texto **guardado** de ese versículo en la versión
-principal, se edita y se guarda en la base para esa versión. Si la diapositiva
-es un grupo de versículos que la versión cuenta juntos (TLA, `VerseGroup`), la
-corrección se guarda en todos los versículos del grupo. Después se rearma la
-grilla manteniendo lo que está en vivo (`RebuildSlidesPreservingLive`). Con
-dos versiones activas, se corrige la principal (que lo diga la ventanita).
-
 ## 3. «Selah» y títulos de los Salmos
 
 Ninguna Biblia de Alexis los tiene hoy, pero otros archivos sí. En el tema de

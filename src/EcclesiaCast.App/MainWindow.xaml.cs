@@ -1825,14 +1825,6 @@ public partial class MainWindow : Window
             });
         }
 
-        menu.Items.Add(new Separator());
-        menu.Items.Add(new MenuItem
-        {
-            Header = "Corregir el texto…",
-            Command = vm.CorrectVerseTextCommand,
-            CommandParameter = slide,
-        });
-
         menu.IsOpen = true;
     }
 
