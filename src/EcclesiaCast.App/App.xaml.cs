@@ -20,6 +20,7 @@ public partial class App : Application
     private ServiceProvider? _services;
     private UiWatchdog? _watchdog;
     private CrashMarker? _crashMarker;
+    private bool _isDuplicate;
     private readonly EcclesiaCast.Core.Diagnostics.ErrorNoticeGate _errorGate = new(TimeSpan.FromSeconds(30));
 
     /// <summary>Set once the "Acerca de" of the very first start has been shown.</summary>
@@ -43,6 +44,18 @@ public partial class App : Application
         // ECCLESIACAST_DATA_DIR points a test build at a copy of a library,
         // so it can run next to the real one without touching it.
         var appDataDir = DataDir;
+
+        // Una sola copia abierta: la segunda trae al frente la primera y se va.
+        if (!SingleInstance.TryAcquire(appDataDir, TimeSpan.FromSeconds(1.5)))
+        {
+            _isDuplicate = true;
+            if (!SingleInstance.FocusExisting())
+                MessageBox.Show(
+                    "EcclesiaCast ya está abierto. Buscalo en la barra de tareas.",
+                    "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Information);
+            Shutdown(0);
+            return;
+        }
 
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
@@ -265,6 +278,13 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        // La segunda copia no arrancó nada: no tiene que tocar las marcas de cierre de la primera.
+        if (_isDuplicate)
+        {
+            base.OnExit(e);
+            return;
+        }
+
         Log.Information("EcclesiaCast exiting");
         FeedbackCoordinator.RecordEnd();
         _crashMarker?.End();

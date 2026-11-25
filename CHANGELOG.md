@@ -7,6 +7,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Una sola copia del programa abierta.** Si lo abrís de nuevo (por ejemplo, un acceso directo
+  más), en vez de abrirse otra copia trae al frente la que ya está. Antes la segunda copia tomaba
+  el puerto siguiente y las direcciones de OBS y del celular dejaban de coincidir.
 - **La dirección de OBS y vMix ya no cambia al reiniciar la PC.** «Salida para OBS o vMix…» ahora da
   una dirección con `localhost`, que sirve siempre para OBS o vMix en la misma PC (antes llevaba la
   IP de la red, que el router cambia). Para OBS en otra PC se muestra la dirección con el nombre de la
