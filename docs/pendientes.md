@@ -21,45 +21,38 @@ pasa a **Ya probado**, más abajo.
 
 ### Falta probar
 
-**Nuevo en la prueba.8 (lo que pediste tras la prueba.7)**
+**Nuevo en la prueba.9 (lo que pediste tras la prueba.8)**
 
-1. **Ayuda → «Tutoriales ▸»** es un submenú (ya no abre una ventana grande). Elegí cada uno:
-   - *Nueva canción*: tiene que abrir de verdad el editor donde se pega la letra, y mostrar cómo crear una canción **desde internet** (título o una frase).
-   - *Proyectar la Biblia*: pestaña Biblia → importar Biblias → lista y grilla → varias versiones a la vez → Historial → los versículos en el recuadro principal.
-   - *Fondos y videos*: silenciar la carpeta de fondos, aleatorio, continuo, y el resto de lo que se puede proyectar (YouTube, web, imágenes, ventana, link, dado). Y el tutorial de la zona de abajo a la derecha.
-   - *OBS o vMix*: abre el menú Transmisión y la pantalla de salida, y cuenta que se puede poner la salida sólo para la transmisión.
-   - *Celular*: muestra la pantalla del QR y un dibujo de cómo se ve en el celular.
-   - *Placas*: cambia a la pestaña Placas.
-   - *Traer de otro programa*: abre la ventana de importar y señala los botones.
-   - *Armar la lista*: que siga igual.
-   - En todos: que cada paso abra lo que nombra y que se pueda salir a mitad.
-2. **Música de YouTube sólo audio, mucho más rápida.** ▶ tiene que sonar en menos de 1 s en los
-   primeros resultados de la búsqueda y en unos 3 s en cualquier otro (Claude lo midió por línea de
-   comandos, no lo oyó). Mirá además:
-   - la barra «Volumen»: ya no pega saltos, y si la bajás y la subís, el sonido vuelve enseguida;
-   - 💾 para guardar y que suene **sin internet**.
-3. **Celular.**
-   - La dirección para el celular sigue funcionando aunque cambie la IP de la PC (ahora también por
-     el nombre de la PC).
-   - **Reiniciar el PIN** desde la ventana del celular: el celular se entera y pide el PIN nuevo sin
-     tener que recargar a mano.
-   - El **PIN de OBS** es distinto del del celular y se cambia desde la ventana de OBS.
-4. **Holyrics.** «Abrir archivos…» abre en `C:\Holyrics`, y la lista muestra **cada canción con su
-   casilla** para elegir cuáles importar.
-5. **Placas.** Guardar una placa **sin mostrarla**, y después de guardar se limpian los campos de arriba.
-6. **Biblia, historial.** Con el panel angosto el botón dice «Hist.» (antes sólo 🕘).
-7. **Panel Canciones angosto.** El título «CANCIONES» ya no queda tapado por los botones.
-8. **Sin «Corregir el texto…»:** clic derecho en un versículo ya no ofrece editar la Biblia.
-9. **Fondos.** Ya no está «Agregar paquete de fondos (.zip)…» en Archivo. La búsqueda de Pixabay avisa
-   que es lenta y que es un servicio de terceros.
-10. **Fondo para una canción o la Biblia que no tienen.** Claude entendió tu comentario así: la Biblia
-    puede tener su fondo propio, y desde el botón de fondo de la canción se elige uno de la
-    biblioteca. Decime si era eso.
+1. **Biblia de Beblia.** Importá `SpanishPDTBible.xml` (Biblias → 📥): ya no tiene que dar el error
+   «Data at the root level is invalid». Mirá que estén los 66 libros y proyectá Juan 3:16.
+2. **Submenú de Tutoriales.** Se abre hacia la **derecha** del ítem «Tutoriales», sin cortarse y sin
+   globito encima.
+3. **Tutoriales.**
+   - Cada uno arranca cambiando a su pestaña (Crear una canción nueva va a Canciones; Proyectar la
+     Biblia va a Biblia).
+   - En la Biblia, el paso «Modo lista» deja la lista y «Modo grilla» deja la grilla; al terminar o
+     salir vuelve al modo en que lo tenías.
+4. **Biblia: selector «Lista | Grilla».** Ya no es un botón que muestra el modo contrario: son dos
+   opciones juntas y la activa queda resaltada.
+5. **Volumen en tiempo real.** La barra «Volumen» de abajo de EN VIVO y la 🔈 de los audios siguen el
+   mouse al instante (antes tardaban más de un segundo). Probá con música de YouTube y con un video.
+6. **Clic derecho en la lista AUDIOS** (Música): Reproducir ahora, Reproducir en bucle sólo este,
+   Guardar para usar sin internet y Copiar el link (sólo los que tienen 🌐), Mostrar en la carpeta (los
+   de archivo), Subir, Bajar y Eliminar de la lista.
+7. **Celular: «🖼 Fondos y medios».** En la página del celular, un botón con las imágenes y videos de
+   la biblioteca (con miniatura): tocás uno y se pone en pantalla. Probá: «Sin fondo» y después volver
+   a poner un fondo, cambiar un fondo que no querías, y mandar otro anuncio.
+8. **Cambiar el PIN.** Los avisos tienen el formato del programa (no el de Windows). El PIN del celular
+   no toca las direcciones de OBS; el PIN de OBS sí las invalida y lo avisa.
 
-**De antes, sin tu respuesta**
+**De la prueba.8, todavía sin tu respuesta**
 
-11. **Una Biblia XML real** de OpenSong o de Beblia. La conseguís exportándola desde Holyrics o FreeShow
-    (o bajando una de Beblia). Si el archivo trae los libros en inglés, así se muestran («John 3:16»).
+9. **Música de YouTube:** ▶ en menos de 1 s en los 5 primeros resultados (y ~3 s en los demás): dijiste
+   «ok la velocidad». Queda por ver 💾 para escuchar **sin internet**.
+10. **Holyrics por archivo,** con un lote grande y con un `.txt` de varias canciones.
+11. **Fondo para una canción o la Biblia que no tienen** (Claude entendió: fondo propio de la Biblia y
+    elegir uno de la biblioteca desde el botón de la canción). Decime si era eso, o si tu pedido era el
+    del celular (ya hecho en el 7).
 
 ### Al publicar la 1.5.0 (no es para probar antes)
 
@@ -71,6 +64,12 @@ pasa a **Ya probado**, más abajo.
 - La página `sitio/cargar-canciones.html` dice «botón ➕»: cambiarlo a «➕ Agregar».
 
 ### Ya probado
+
+- **Prueba.8, probado por Alexis el 26/11, dado por bueno:** Holyrics abre en `C:\Holyrics` con una casilla
+  por canción; Placas (guardar sin mostrar, se limpian los campos); botón «Hist.»; panel Canciones
+  angosto; sin «Corregir el texto…»; sin el .zip de fondos y aviso de Pixabay; tutoriales de armar la
+  lista, proyectar la Biblia (pasos), fondos y videos, OBS o vMix, celular, placas, importar y
+  proyectar YouTube/web; celular (dirección y reiniciar el PIN); velocidad de ▶ en YouTube.
 
 - **1.5.0, probado por Alexis el 25/11 (prueba.7), dado por bueno:** una sola copia del programa; el
   aviso de la lista de Música; YouTube en Windows 10; la ventana flotante (Discord, dos monitores) y la
