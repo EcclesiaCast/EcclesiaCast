@@ -430,8 +430,12 @@
                         </Button.Style>
                     </Button>
                     <!-- Logo: el botón lo prende/apaga, la flecha elige cuál -->
-                    <Button Content="Logo" controls:ShortcutHint.Text="F3" Command="{Binding ToggleLogoCommand}" Margin="6,0,0,0"
-                            ToolTip="{Binding ActiveLogoName, StringFormat='Muestra el logo a pantalla completa (tecla F3). Ahora está elegido: {0}'}">
+                    <Button Content="Logo" controls:ShortcutHint.Text="F3" Command="{Binding ToggleLogoCommand}" Margin="6,0,0,0">
+                        <!-- StringFormat sólo vale para un texto: puesto directo en ToolTip (que es un objeto)
+                             se ignoraba, y el globito decía sólo el nombre del logo (19/11). -->
+                        <Button.ToolTip>
+                            <TextBlock Text="{Binding ActiveLogoName, StringFormat='Muestra el logo a pantalla completa (tecla F3). Ahora está elegido: {0}'}"/>
+                        </Button.ToolTip>
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
                                 <Style.Triggers>
@@ -908,8 +912,11 @@
                                                     CommandParameter="{Binding}"
                                                     Tag="{Binding Tag, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                     AutomationProperties.Name="{Binding Info.Name}"
-                                                    ToolTip="{Binding Info.Name, StringFormat='{}{0}&#10;Clic: usar sólo esta · Ctrl+clic: sumarla como segunda versión'}"
-                                                    ContextMenu="{StaticResource VersionMenu}"/>
+                                                    ContextMenu="{StaticResource VersionMenu}">
+                                                <Button.ToolTip>
+                                                    <TextBlock Text="{Binding Info.Name, StringFormat='{}{0}&#10;Clic: usar sólo esta · Ctrl+clic: sumarla como segunda versión'}"/>
+                                                </Button.ToolTip>
+                                            </Button>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
@@ -966,9 +973,13 @@
                                 </Border>
 
                                 <!-- La caja de búsqueda y, a su derecha, el historial 🕘 de lo proyectado -->
-                                <DockPanel x:Name="BibleQueryRow" DockPanel.Dock="Top" Margin="12,0,12,6">
+                                <DockPanel x:Name="BibleQueryRow" DockPanel.Dock="Top" Margin="12,0,12,6"
+                                           SizeChanged="BibleQueryRow_SizeChanged">
+                                <!-- «🕘 Historial» con la palabra (20/11: alguien pidió un historial que ya
+                                     existía; el dibujo solo no se encontraba). Con el panel angosto vuelve a
+                                     ser sólo 🕘, para que la caja de la cita no quede chica. -->
                                 <Button x:Name="BibleHistoryButton" DockPanel.Dock="Right"
-                                        Content="🕘" FontSize="13" Padding="8,5" Margin="6,0,0,0"
+                                        Content="🕘 Historial" FontSize="12" Padding="8,5" Margin="6,0,0,0"
                                         Style="{StaticResource DarkButton}"
                                         Click="BibleHistoryButton_Click"
                                         AutomationProperties.Name="Historial de versículos"

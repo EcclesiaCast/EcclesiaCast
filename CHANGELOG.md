@@ -15,6 +15,14 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   IP de la red, que el router cambia). Para OBS en otra PC se muestra la dirección con el nombre de la
   PC. Y si el puerto de siempre estaba ocupado, el programa usa otro esta vez pero no se olvida del de
   siempre.
+- **Traer las canciones de Holyrics.** En **➕ → Traer de otro programa…** hay un tercer botón,
+  **Holyrics**, al lado de ProPresenter y EasyWorship. Holyrics guarda sus canciones cifradas, así que
+  se leen por su **API Server**: en Holyrics, Archivo → Configuraciones → API Server, se activa el
+  servidor local y se crea un token con permiso para «GetSongs» y «GetLyrics»; se escriben el puerto y
+  el token en la ventana y **Conectar**. Trae título, autor, derechos y la letra separada en estrofas
+  con sus nombres en español (Verse 1 → Estrofa 1, Chorus o Refrão → Coro, Bridge → Puente…). Las
+  archivadas en Holyrics no se traen, y si una canción ya está, pregunta qué hacer. El token queda
+  guardado: la próxima vez, con Holyrics abierto, se conecta solo.
 - **Música de YouTube, sólo el audio.** En la pestaña **Música**, debajo del reproductor, un buscador
   de YouTube: escribí un artista, una canción o pegá un link, o tocá un tono en **Pads: Do, Do#, Re…**
   para buscar pads. **▶** escucha el resultado ya, **➕** lo suma a la lista y **💾** guarda el audio en
@@ -73,6 +81,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Cambiado
 
+- **«🕘 Historial» en la Biblia, con la palabra.** El historial de los versículos proyectados ya
+  existía, pero el botón era sólo el dibujo y alguien lo pidió por el formulario sin encontrarlo.
+  Con el panel angosto vuelve a ser sólo 🕘, para que la caja de la cita no quede chica.
 - **Los videos de YouTube entran sin sonido.** Un video de YouTube recién agregado sale silenciado,
   para que nada suene de golpe. «🔇 Sin sonido», debajo del EN VIVO, le da el sonido, y el video lo
   recuerda.
@@ -104,6 +115,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Arreglado
 
+- **Los títulos de YouTube con acentos salían mal** («Hillsong en Espa?ol») en la música de
+  YouTube y en las descargas: el descargador ahora escribe en UTF-8.
+- **El globito del botón Logo decía sólo el nombre del logo**, sin «Muestra el logo a pantalla
+  completa (tecla F3)». Lo mismo con los botones de versión de la Biblia, que no explicaban el
+  Ctrl+clic.
 - **Volver a descargar un video de YouTube que se había sacado de la biblioteca.** Decía «yt-dlp
   terminó pero no encontré el archivo descargado» porque el archivo seguía en la carpeta de
   descargas y yt-dlp no lo bajaba de nuevo; ahora se usa ese archivo.

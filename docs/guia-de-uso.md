@@ -38,6 +38,9 @@ En la pestaña **Canciones**:
   canciones tiene cada una y las importa. Si una canción ya está, pregunta qué
   hacer. Si están en otro lado (un disco externo, una copia de otra máquina), usá
   **Elegir carpeta…**: en EasyWorship es la que tiene `Songs.db` y `SongWords.db`.
+  **Holyrics** se lee con Holyrics abierto, por su API Server: en Holyrics, Archivo →
+  Configuraciones → API Server, activá el servidor local y creá un token con permiso para
+  «GetSongs» y «GetLyrics»; escribí el puerto y el token en la ventana y tocá **Conectar**.
 - **➕ → Buscar en internet…** (también en el menú **Canciones**) trae una canción
   nueva sin copiar y pegar: escribí el **nombre**, el **artista** o **una frase
   de la letra** y apretá Enter. Busca en musica.com y, si no está ahí, en
@@ -85,6 +88,9 @@ desde la primera. Las flechas **←→** navegan en vivo.
 
 En la pestaña **Biblia**:
 
+- **🕘 Historial**, a la derecha de la caja de la cita, tiene los versículos que proyectaste: un
+  clic lo carga y lo marca, doble clic lo proyecta (también se abre con la flecha ↓ en la caja
+  vacía). Con el panel angosto el botón es sólo 🕘.
 - **📥** importa una Biblia en **JSON** o en **XML** (Zefania, o el de OpenSong que usan ProPresenter, Holyrics y FreeShow). Si la tuya está en otro formato (Word, PDF, texto), **Biblias → Cómo preparar una Biblia para importar…** trae un ejemplo de cada formato y unas instrucciones para pedirle a una IA que la convierta.
 - El instalador te deja elegir qué **Biblias libres** instalar (Reina-Valera
   1909, Biblia libre para el mundo y Versión Biblia Libre); aparecen solas la
