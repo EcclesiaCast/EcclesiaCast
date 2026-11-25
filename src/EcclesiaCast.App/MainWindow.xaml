@@ -361,8 +361,8 @@
             <MenuItem x:Name="HelpMenu" Header="A_yuda" SubmenuOpened="HelpMenu_SubmenuOpened">
                 <MenuItem Header="Recorrido del programa" Click="WelcomeTour_Click"
                           ToolTip="Muestra de nuevo, parte por parte, dónde está cada cosa de la ventana."/>
-                <MenuItem x:Name="TutorialsMenu" Header="Tutoriales"
-                          ToolTip="Recorridos cortos sobre el programa de verdad: te muestran, paso a paso, dónde tocar.">
+                <!-- Sin ToolTip: con el submenú abierto se pisaban. Cada tutorial lleva el suyo. -->
+                <MenuItem x:Name="TutorialsMenu" Header="Tutoriales">
                     <MenuItem Header="Cargando…" IsEnabled="False"/>
                 </MenuItem>
                 <MenuItem Header="Guía de uso (en internet)" Click="Guide_Click"/>
@@ -988,22 +988,22 @@
                                         Click="BibleHistoryButton_Click"
                                         AutomationProperties.Name="Historial de versículos"
                                         ToolTip="Historial de los versículos que proyectaste: clic carga y marca el versículo, doble clic lo proyecta. También: flecha ↓ en la caja vacía."/>
-                                <Button x:Name="BibleViewToggleButton" DockPanel.Dock="Right"
-                                        FontSize="11" Padding="8,6" Margin="6,0,0,0"
-                                        Command="{Binding ToggleBibleViewCommand}"
-                                        AutomationProperties.Name="Cambiar la vista de la Biblia"
-                                        ToolTip="Vista en grilla: los libros como fichas de colores, con los capítulos y versículos al lado. Vista en lista: la de siempre. Escribir una cita («jn 3 16») + Enter funciona en las dos.">
-                                    <Button.Style>
-                                        <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
-                                            <Setter Property="Content" Value="▦ Grilla"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsBibleGridView}" Value="True">
-                                                    <Setter Property="Content" Value="☰ Lista"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Button.Style>
-                                </Button>
+                                <!-- «Lista | Grilla»: las dos opciones a la vista, la activa resaltada (antes un
+                                     botón decía el modo contrario al actual y confundía). -->
+                                <Border x:Name="BibleViewToggleButton" DockPanel.Dock="Right" Margin="6,0,0,0"
+                                        Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}"
+                                        BorderThickness="1" CornerRadius="5" Padding="2" VerticalAlignment="Stretch"
+                                        AutomationProperties.Name="Vista de la Biblia"
+                                        ToolTip="Lista: la de siempre. Grilla: los libros como fichas de colores, con los capítulos y versículos al lado. Escribir una cita («jn 3 16») + Enter funciona en las dos.">
+                                    <StackPanel Orientation="Horizontal">
+                                        <RadioButton x:Name="BibleListRadio" GroupName="BibleView" Content="☰ Lista"
+                                                     Style="{StaticResource TabButton}" FontSize="11" Padding="7,3"
+                                                     IsChecked="{Binding IsBibleListView, Mode=TwoWay}"/>
+                                        <RadioButton x:Name="BibleGridRadio" GroupName="BibleView" Content="▦ Grilla"
+                                                     Style="{StaticResource TabButton}" FontSize="11" Padding="7,3"
+                                                     IsChecked="{Binding IsBibleGridView, Mode=TwoWay}"/>
+                                    </StackPanel>
+                                </Border>
                                 <TextBox x:Name="BibleQueryBox"
                                          Padding="8,6"
                                          PreviewKeyDown="BibleQueryBox_PreviewKeyDown"

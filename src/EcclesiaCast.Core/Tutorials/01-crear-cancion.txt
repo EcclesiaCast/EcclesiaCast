@@ -8,6 +8,7 @@ orden: 1
 
 [paso]
 señalar: LibraryPanel
+abrir: pestana:canciones
 titulo: Empezá por las canciones
 texto: Acá viven todas tus canciones, en la pestaña «Canciones». Antes de crear una, probá buscarla arriba: quizás ya está.
 
