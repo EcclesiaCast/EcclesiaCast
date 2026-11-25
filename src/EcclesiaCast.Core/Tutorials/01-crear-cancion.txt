@@ -1,0 +1,34 @@
+# Tutorial: Crear una canción nueva
+# «señalar» es el x:Name del elemento de la ventana principal (ver docs/tutoriales.md).
+titulo: Crear una canción nueva
+resumen: Pegá la letra, separala en diapositivas y proyectala.
+icono: 🎵
+orden: 1
+
+[paso]
+señalar: LibraryPanel
+titulo: Empezá por las canciones
+texto: Acá viven todas tus canciones. Si no la ves, tocá la pestaña «Canciones». Antes de crear una, probá buscarla arriba: quizás ya está.
+
+[paso]
+señalar: SongsAddButton
+titulo: El botón ➕ Agregar
+texto: Ofrece cuatro caminos. Elegí «Crear desde cero» para abrir una canción en blanco. También está en el menú Canciones → «Crear canción desde cero…».
+
+[paso]
+titulo: Escribí o pegá la letra
+texto: En la ventana que se abre, ponele el título y pegá la letra. Cada párrafo, separado por una línea en blanco, es una diapositiva. Las palabras dudosas se subrayan en rojo.
+
+[paso]
+titulo: Poné nombre a las partes
+texto: Con los botones Coro, Estrofa, Puente y Final, arriba de la letra, se escribe por vos una línea como [Coro]. No se proyecta: sólo ordena la canción. Guardá cuando termines.
+
+[paso]
+señalar: SongsList
+titulo: Ya está en tu lista
+texto: La canción nueva aparece en la lista. Un clic la carga; doble clic la proyecta desde la primera diapositiva. Con clic derecho la editás, duplicás o eliminás.
+
+[paso]
+señalar: SlidesPanel
+titulo: Mirá las diapositivas
+texto: Acá se ven las partes de la canción. Un clic pone una en pantalla, y con las flechas ← → avanzás y retrocedés en vivo.

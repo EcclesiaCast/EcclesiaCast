@@ -7,6 +7,13 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Ayuda → «Tutoriales…».** Una ventana con tarjetas; cada una arranca un recorrido corto (de 5 a 8
+  pasos) sobre el programa de verdad, con el foco señalando el botón, igual que el recorrido de
+  bienvenida. Vienen 8: crear una canción nueva, armar la lista del domingo, proyectar la Biblia, poner
+  fondos y videos, conectar con OBS o vMix, control desde el celular, placas de nombre e importar
+  canciones de otro programa. Cada tutorial es un archivo de texto (pasos y qué elemento señalar):
+  para sumar uno basta dejar un `.txt` en la carpeta «Tutoriales» de los datos del programa, sin tocar
+  código. Cómo escribirlos: `docs/tutoriales.md`.
 - **Música de YouTube, sólo el audio.** En la pestaña **Música**, debajo del reproductor, un buscador
   de YouTube: escribí un artista, una canción o pegá un link, o tocá un tono en **Pads: Do, Do#, Re…**
   para buscar pads. **▶** escucha el resultado ya, **➕** lo suma a la lista y **💾** guarda el audio en

@@ -1,0 +1,31 @@
+titulo: Conectar con OBS o vMix
+resumen: Mandá la letra a tu transmisión, con fondo transparente.
+icono: 📡
+orden: 5
+
+[paso]
+señalar: MenuBroadcast
+titulo: Menú Transmisión
+texto: Todo lo de la transmisión está acá. «Salida para OBS o vMix…» te da la dirección, y «Estilos de la transmisión…» cambia cómo se ve la letra en el video.
+
+[paso]
+titulo: Copiá la dirección
+texto: En la ventana «Salida para OBS o vMix…» copiá la dirección que te muestra. Es una página con la letra proyectada, sola y con fondo transparente. No hace falta placa capturadora.
+
+[paso]
+titulo: En OBS
+texto: En OBS agregá una fuente «Navegador» (Browser Source), pegá la dirección en URL y poné el tamaño de tu transmisión, por ejemplo 1920×1080. La letra queda encima de la cámara.
+
+[paso]
+titulo: En vMix
+texto: En vMix tocá Add Input → Web Browser, pegá la dirección y ajustá el tamaño. Si tu programa no maneja la transparencia, agregale &fondo=negro al final de la dirección.
+
+[paso]
+señalar: ScreenButtons
+titulo: Black, Clear y Logo
+texto: La transmisión sigue lo que proyectás: con Clear, Black o Logo la letra desaparece del video igual que en el proyector. El aviso al pie y la cuenta regresiva también salen.
+
+[paso]
+señalar: LivePanel
+titulo: Probalo antes del culto
+texto: Proyectá una canción y mirá en OBS o vMix que aparezca la letra. Lo que ves acá, en LIVE, es lo que va a salir en la transmisión.
