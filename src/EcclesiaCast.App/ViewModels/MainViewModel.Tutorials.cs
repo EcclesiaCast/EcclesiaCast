@@ -27,9 +27,9 @@ public sealed partial class MainViewModel
                 import.Loaded += (_, _) => import.ChooseHolyrics();
                 return import;
             case TourActions.Broadcast when StartRemote():
-                return new Views.BroadcastWindow(_remote!, _settings) { Owner = owner };
+                return new Views.BroadcastWindow(_remote!, _settings, newPin => _settings.Set(RemoteObsPinKey, newPin)) { Owner = owner };
             case TourActions.Remote when StartRemote():
-                return new Views.RemoteControlWindow(_remote!) { Owner = owner };
+                return new Views.RemoteControlWindow(_remote!, newPin => _settings.Set(RemotePinKey, newPin)) { Owner = owner };
             default:
                 return null;
         }
