@@ -2,6 +2,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using EcclesiaCast.App.Remote;
+using EcclesiaCast.App.Services;
 using QRCoder;
 using Serilog;
 
@@ -66,16 +67,12 @@ public partial class RemoteControlWindow : Window
 
     private void ChangePin_Click(object sender, RoutedEventArgs e)
     {
-        var ask = MessageBox.Show(
-            this,
-            "Se genera un PIN nuevo. Los celulares que ya estaban conectados van a pedir el PIN nuevo, " +
-            "y las direcciones de OBS o vMix que ya pegaste dejan de funcionar hasta que las copies de nuevo desde Transmisión.\n\n" +
-            "¿Cambiar el PIN?",
-            "Cambiar el PIN",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Question,
-            MessageBoxResult.No);
-        if (ask != MessageBoxResult.Yes)
+        var confirmed = Notice.Confirm(
+            "Se genera un PIN nuevo. Los celulares que ya estaban conectados van a pedir el PIN nuevo.\n\n" +
+            "Las direcciones de OBS y vMix no se tocan: tienen su propio PIN.",
+            yes: "Cambiar el PIN",
+            title: "Cambiar el PIN del celular");
+        if (!confirmed)
             return;
 
         var pin = _server.ChangePin();

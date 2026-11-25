@@ -1,5 +1,6 @@
 using System.Windows;
 using EcclesiaCast.App.Remote;
+using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Remote;
 using Serilog;
@@ -69,16 +70,12 @@ public partial class BroadcastWindow : Window
 
     private void ChangeObsPin_Click(object sender, RoutedEventArgs e)
     {
-        var ask = MessageBox.Show(
-            this,
-            "Se genera un PIN nuevo para OBS y vMix (el del celular no cambia). " +
-            "Las direcciones que ya pegaste dejan de funcionar hasta que copies las nuevas.\n\n" +
-            "¿Cambiar el PIN de OBS?",
-            "Cambiar el PIN de OBS",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Question,
-            MessageBoxResult.No);
-        if (ask != MessageBoxResult.Yes)
+        var confirmed = Notice.Confirm(
+            "Se genera un PIN nuevo para OBS y vMix. Las direcciones que ya pegaste dejan de funcionar " +
+            "hasta que copies las nuevas.\n\nEl PIN del celular no cambia.",
+            yes: "Cambiar el PIN de OBS",
+            title: "Cambiar el PIN de OBS");
+        if (!confirmed)
             return;
 
         _obsPinChanged(_server.ChangeObsPin());
