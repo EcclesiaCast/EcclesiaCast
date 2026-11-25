@@ -1,0 +1,34 @@
+titulo: Proyectar la Biblia
+resumen: Buscá un pasaje, elegí la versión y mandalo a pantalla.
+icono: 📖
+orden: 3
+
+[paso]
+señalar: BibleQueryBox
+titulo: Escribí el pasaje
+texto: En la pestaña Biblia escribí algo como «juan 3:16» o «sal 23» y apretá Enter. No hace falta escribir el nombre completo del libro.
+
+[paso]
+señalar: VersionsRow
+titulo: Elegí la versión
+texto: Un clic en una versión la elige. Con Ctrl+clic sumás una segunda, que sale debajo de la primera: sirve para leer en dos versiones a la vez.
+
+[paso]
+señalar: BibleDownloadButton
+titulo: Bajá más versiones
+texto: Con «📥 Biblias» bajás más versiones de internet. Una vez bajadas, funcionan sin internet. También podés importar una Biblia propia desde el menú Biblias.
+
+[paso]
+señalar: SlidesPanel
+titulo: Los versículos, en diapositivas
+texto: El pasaje se reparte en diapositivas. Un clic en una la pone en pantalla, y con las flechas ← → pasás de versículo en versículo.
+
+[paso]
+señalar: AddPassageButton
+titulo: Guardalo en la playlist
+texto: Si ya sabés qué se va a leer, tocá «➕ Playlist» y queda en la lista del culto, listo para el momento justo.
+
+[paso]
+señalar: OutputControls
+titulo: A la pantalla
+texto: Elegí la pantalla en «Salida» y tocá «Poner en vivo». Lo que ve la congregación aparece en LIVE. Con Esc se apaga la salida.

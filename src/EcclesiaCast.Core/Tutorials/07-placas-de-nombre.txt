@@ -1,0 +1,34 @@
+titulo: Placas de nombre
+resumen: Mostrá quién predica o canta, en una tarjeta al pie.
+icono: 🏷
+orden: 7
+
+[paso]
+señalar: ToolsTabs
+titulo: Las herramientas de texto
+texto: Abajo a la derecha están las herramientas para escribir en pantalla: texto rápido, aviso al pie, placas, resaltar, notas, música y tiempos.
+
+[paso]
+señalar: TabPlates
+titulo: La pestaña Placas
+texto: Una placa («lower third») es una tarjeta con el nombre de quien habla o canta, abajo a la izquierda. Sale en el proyector y también en la transmisión.
+
+[paso]
+señalar: ToolsPanel
+titulo: Nombre y cargo
+texto: Escribí el nombre, por ejemplo «Pastor Juan Pérez», y si querés un cargo: «Predicación», «Alabanza». Podés sumar un logo o una imagen con «Elegir…».
+
+[paso]
+señalar: ToolsPanel
+titulo: Diseñá su estilo
+texto: «✏ Diseñar…» cambia colores, tamaño, letras, lugar y cómo entra y sale. Hay una opción para que se vea sólo en la transmisión (OBS), no en el proyector.
+
+[paso]
+señalar: ToolsPanel
+titulo: Cuánto dura
+texto: En «Dura» elegís si queda hasta quitarla o se va sola a los 5, 10 o 15 segundos. Con «Mostrar» (o Enter en el nombre) sale; con «Quitar» se va.
+
+[paso]
+señalar: ToolsPanel
+titulo: Guardadas para la próxima
+texto: Cada placa que mostrás queda en la lista «Guardadas». La próxima vez, doble clic y sale al instante. Con 🗑 borrás las que ya no uses.

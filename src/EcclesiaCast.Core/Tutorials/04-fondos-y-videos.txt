@@ -1,0 +1,34 @@
+titulo: Poner fondos y videos
+resumen: Agregá imágenes y videos, usalos de fondo o solos en pantalla.
+icono: 🖼
+orden: 4
+
+[paso]
+señalar: MediaPanel
+titulo: La barra de medios
+texto: Acá están tus imágenes, videos, PDF y PowerPoint, ordenados en pestañas. Van de fondo detrás de la letra o solos en pantalla.
+
+[paso]
+señalar: MediaAddButton
+titulo: Agregá tus archivos
+texto: «📥 Agregar» suma imágenes o videos a la pestaña actual. También podés arrastrar los archivos desde el Explorador hasta esta barra y soltarlos.
+
+[paso]
+señalar: MenuBackgrounds
+titulo: Más fondos, gratis
+texto: El menú Fondos baja paquetes de fondos de internet y busca en Pixabay videos y fotos que se pueden usar sin pagar. Una vez bajados, funcionan sin internet.
+
+[paso]
+señalar: MediaTabsList
+titulo: Ordenalos en pestañas
+texto: Con el ＋ creás pestañas por categoría: fondos de alabanza, avisos, lecturas. Así encontrás cada cosa rápido en medio del culto.
+
+[paso]
+señalar: SongsList
+titulo: Un fondo para la canción
+texto: Cargá una canción y, en la barra de medios, hacé clic derecho sobre un fondo y elegí «Usar como fondo de la canción». Queda guardado para ella.
+
+[paso]
+señalar: ScreenButtons
+titulo: Sacarlo cuando haga falta
+texto: «Sin fondo» (F4) saca el fondo. Clear saca la letra y deja el fondo; Black tapa todo; Logo muestra el logo. Se manejan en vivo con F1, F2 y F3.

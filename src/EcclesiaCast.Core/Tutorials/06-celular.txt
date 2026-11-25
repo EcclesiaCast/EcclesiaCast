@@ -1,0 +1,31 @@
+titulo: Control desde el celular
+resumen: Pasá las diapositivas desde el teléfono, sin cables.
+icono: 📱
+orden: 6
+
+[paso]
+señalar: RemoteButton
+titulo: El botón del celular
+texto: Tocá 📱 en la barra de arriba. Se abre una ventana con un código QR, la dirección y un PIN de cuatro dígitos.
+
+[paso]
+titulo: La misma red wifi
+texto: El celular tiene que estar en la misma red wifi que esta computadora. Funciona sin internet: alcanza con la red de la iglesia.
+
+[paso]
+titulo: Escaneá el QR
+texto: Apuntá la cámara del celular al código QR, o escribí la dirección en el navegador. Poné el PIN una vez, y el celular lo recuerda para la próxima.
+
+[paso]
+titulo: Permiso de Windows
+texto: La primera vez, Windows pregunta si permitís el acceso a la red. Aceptá para «redes privadas». Si la pregunta no aparece, es que ya estaba permitido.
+
+[paso]
+señalar: SlidesPanel
+titulo: Qué podés hacer desde el celular
+texto: Pasar las diapositivas con ◀ ▶, usar Clear, Black y Logo, prender o apagar la salida, y tocar cualquier diapositiva o ítem de la playlist.
+
+[paso]
+señalar: ScreenButtons
+titulo: Queda listo para el próximo culto
+texto: El control por celular queda encendido para la próxima vez. Se apaga desde la misma ventana del 📱, y el PIN protege que nadie más lo use.

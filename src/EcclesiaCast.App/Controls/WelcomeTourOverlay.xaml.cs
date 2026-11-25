@@ -24,7 +24,8 @@ public partial class WelcomeTourOverlay : UserControl
     private const double SpotRadius = 10;
     private static readonly TimeSpan Glide = TimeSpan.FromMilliseconds(320);
 
-    private readonly IReadOnlyList<TourStep> _steps = WelcomeTour.Steps;
+    private IReadOnlyList<TourStep> _steps = WelcomeTour.Steps;
+    private bool _isWelcome = true;
     private Func<string, FrameworkElement?> _find = _ => null;
     private Action<string?>? _prepare;
     private FrameworkElement? _content;
@@ -56,13 +57,16 @@ public partial class WelcomeTourOverlay : UserControl
     public bool IsRunning => _index >= 0;
 
     /// <summary>
-    /// Starts at the greeting. <paramref name="content"/> is what gets
+    /// Starts at the greeting, or at the first step of <paramref name="steps"/> (a tutorial). <paramref name="content"/> is what gets
     /// blurred behind; <paramref name="find"/> gives the element a step
     /// lights; <paramref name="prepare"/> is told each step's part before it
     /// is measured, and null when the tour ends.
     /// </summary>
-    public void Start(FrameworkElement content, Func<string, FrameworkElement?> find, Action<string?>? prepare)
+    public void Start(FrameworkElement content, Func<string, FrameworkElement?> find, Action<string?>? prepare,
+        IReadOnlyList<TourStep>? steps = null)
     {
+        _isWelcome = steps is null;
+        _steps = steps ?? WelcomeTour.Steps;
         _content = content;
         _find = find;
         _prepare = prepare;
@@ -70,7 +74,7 @@ public partial class WelcomeTourOverlay : UserControl
         UpdateLayout();
         SetUpBlur();
         _spot = Rect.Empty;
-        Show(0, animate: false);
+        Show(Math.Max(0, WelcomeTour.Next(_steps, -1, 1, IsShown)), animate: false);
         Dispatcher.BeginInvoke(() => Keyboard.Focus(NextButton), DispatcherPriority.Input);
     }
 
@@ -171,22 +175,24 @@ public partial class WelcomeTourOverlay : UserControl
 
     private void FillCard(int index, TourStep step)
     {
-        var first = index == 0;
-        var last = index == _steps.Count - 1;
-
-        // «3 de 9», counting only the parts that are on show in this window.
+        // In a tutorial every step that is on show counts (those with nothing to light too)
+        // and the first and last ones are real steps, not a greeting and a goodbye.
         var parts = Enumerable.Range(0, _steps.Count)
-            .Where(i => _steps[i].Target is { } t && IsShown(t))
+            .Where(i => _steps[i].Target is not { } t ? !_isWelcome : IsShown(t))
             .ToList();
         var position = parts.IndexOf(index);
+        var first = _isWelcome ? index == 0 : position == 0;
+        var last = _isWelcome ? index == _steps.Count - 1 : position == parts.Count - 1;
+
+        // «3 de 9», counting only the parts that are on show in this window.
         StepCount.Text = position >= 0 ? $"{position + 1} de {parts.Count}" : string.Empty;
         StepCount.Visibility = position >= 0 ? Visibility.Visible : Visibility.Collapsed;
 
         TitleText.Text = step.Title;
         BodyText.Text = step.Text;
-        NextButton.Content = first ? "Empezar el recorrido" : last ? "Terminar" : "Siguiente";
-        BackButton.Visibility = first || last ? Visibility.Collapsed : Visibility.Visible;
-        SkipButton.Content = first ? "Ahora no" : "Saltar el recorrido";
+        NextButton.Content = _isWelcome && first ? "Empezar el recorrido" : last ? "Terminar" : "Siguiente";
+        BackButton.Visibility = first || (_isWelcome && last) ? Visibility.Collapsed : Visibility.Visible;
+        SkipButton.Content = _isWelcome && first ? "Ahora no" : _isWelcome ? "Saltar el recorrido" : "Salir del tutorial";
         SkipButton.Visibility = last ? Visibility.Collapsed : Visibility.Visible;
     }
 

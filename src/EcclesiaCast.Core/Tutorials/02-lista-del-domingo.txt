@@ -1,0 +1,34 @@
+titulo: Armar la lista del domingo
+resumen: Canciones, pasajes y medios en el orden de la reunión.
+icono: 📋
+orden: 2
+
+[paso]
+señalar: PlaylistTools
+titulo: Una playlist para el culto
+texto: Con ➕ creás una playlist nueva y le ponés nombre, por ejemplo «Domingo». Con ⧉ duplicás la del domingo pasado y sólo cambiás lo que haga falta.
+
+[paso]
+señalar: SongsList
+titulo: Sumá las canciones
+texto: Clic derecho sobre una canción y «Agregar a la playlist». Repetí con cada una, en el orden en que se van a cantar.
+
+[paso]
+señalar: AddPassageButton
+titulo: Sumá los pasajes de la Biblia
+texto: En la pestaña Biblia, cargá el pasaje y tocá «➕ Playlist». Queda en la lista junto a las canciones, listo para cuando toque la lectura.
+
+[paso]
+señalar: MediaPanel
+titulo: Sumá videos e imágenes
+texto: Clic derecho sobre un video, una imagen, un PDF o un PowerPoint de la barra de medios, y «Agregar a la playlist». Sirve para los avisos o un video de testimonio.
+
+[paso]
+señalar: PlaylistList
+titulo: Ordená la lista
+texto: Con clic derecho sobre un ítem elegís Subir, Bajar o Quitar de la playlist. Un clic carga el ítem; doble clic lo proyecta.
+
+[paso]
+señalar: SlidesPanel
+titulo: En el culto: sólo las flechas
+texto: Con la playlist en uso, la flecha → pasa sola al siguiente ítem cuando termina una canción. No hace falta buscar nada en medio de la reunión. Todo funciona sin internet.

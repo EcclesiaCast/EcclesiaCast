@@ -1,0 +1,31 @@
+titulo: Importar canciones de otro programa
+resumen: Traé toda tu biblioteca de ProPresenter o EasyWorship.
+icono: 📥
+orden: 8
+
+[paso]
+señalar: MenuSongs
+titulo: Menú Canciones
+texto: Abrí el menú Canciones y elegí «Traer canciones de otro programa…». También lo encontrás en el botón «➕ Agregar» de la pestaña Canciones.
+
+[paso]
+señalar: SongsAddButton
+titulo: El botón ➕ Agregar
+texto: Si preferís este botón, ofrece los mismos caminos: crear desde cero, buscar en internet, traer de otro programa o importar un archivo suelto.
+
+[paso]
+titulo: Elegí el programa
+texto: Arriba elegís ProPresenter o EasyWorship. Cada opción dice cuántas canciones encontró, porque la ventana busca sola dónde está instalado. Después las importa todas de una vez.
+
+[paso]
+titulo: Si están en otro lado
+texto: Con «Elegir carpeta…» indicás dónde están: un disco externo o una copia de otra computadora. En EasyWorship es la carpeta que tiene Songs.db y SongWords.db.
+
+[paso]
+titulo: Si una canción ya está
+texto: Si una canción ya existe en tu biblioteca, el programa te pregunta qué hacer, así no se pisan ni se duplican sin que lo decidas.
+
+[paso]
+señalar: SongsList
+titulo: A cantar
+texto: Las canciones importadas aparecen en la lista y funcionan sin internet. Buscá por título, artista o un pedazo de la letra, y doble clic para proyectar.

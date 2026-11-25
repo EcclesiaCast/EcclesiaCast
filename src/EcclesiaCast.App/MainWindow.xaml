@@ -212,7 +212,7 @@
              Todo lo que se hace de vez en cuando (importar, copias de
              seguridad, el diseño de la ventana) vive acá; los botones quedan
              para lo que se usa en medio del servicio. -->
-        <Menu Grid.Row="0" Padding="6,2" FontSize="12">
+        <Menu x:Name="MainMenu" Grid.Row="0" Padding="6,2" FontSize="12">
 
             <!-- Archivo quedó sólo con la biblioteca entera, Ajustes y Salir; lo
                  de canciones, Biblias y fondos tiene su propio menú (pedido de
@@ -240,7 +240,7 @@
                 <MenuItem Header="Buscar en todo" InputGestureText="Ctrl+K" Command="{Binding SearchEverythingCommand}"/>
             </MenuItem>
 
-            <MenuItem Header="_Canciones">
+            <MenuItem x:Name="MenuSongs" Header="_Canciones">
                 <MenuItem Header="Crear canción desde cero…" Command="{Binding NewSongCommand}"
                           ToolTip="Una canción nueva en blanco, para escribir o pegar la letra"/>
                 <Separator/>
@@ -249,7 +249,7 @@
                 <MenuItem Header="Importar canciones (.txt, .pro)…" Command="{Binding ImportSongsCommand}"/>
             </MenuItem>
 
-            <MenuItem Header="_Biblias">
+            <MenuItem x:Name="MenuBibles" Header="_Biblias">
                 <MenuItem Header="Bajar Biblias de internet…" Command="{Binding DownloadBiblePackCommand}"
                           ToolTip="Baja el paquete de Biblias sólo a esta computadora y elegís cuáles agregar."/>
                 <Separator/>
@@ -262,7 +262,7 @@
                 <MenuItem Header="Importar paquete de Biblias…" Command="{Binding ImportBiblePackageCommand}"/>
             </MenuItem>
 
-            <MenuItem Header="_Fondos">
+            <MenuItem x:Name="MenuBackgrounds" Header="_Fondos">
                 <MenuItem Header="Agregar imágenes, videos, PDF o PowerPoint…" Command="{Binding ImportMediaCommand}"/>
                 <MenuItem Header="Agregar paquete de fondos (.zip)…" Command="{Binding ImportBackgroundPackCommand}"/>
                 <Separator/>
@@ -317,7 +317,7 @@
                 <MenuItem Header="Volver al diseño original" Click="ResetLayout_Click"/>
             </MenuItem>
 
-            <MenuItem Header="_Proyección">
+            <MenuItem x:Name="MenuProjection" Header="_Proyección">
                 <MenuItem Header="Poner en vivo / apagar la salida" Command="{Binding ToggleOutputCommand}"/>
                 <Separator/>
                 <MenuItem Header="Black" InputGestureText="F1" Command="{Binding ToggleBlackCommand}"/>
@@ -352,7 +352,7 @@
                 <MenuItem Header="Actualizar la lista de pantallas" Command="{Binding RefreshDisplaysCommand}"/>
             </MenuItem>
 
-            <MenuItem Header="_Transmisión">
+            <MenuItem x:Name="MenuBroadcast" Header="_Transmisión">
                 <MenuItem Header="Salida para OBS o vMix…" Command="{Binding OpenBroadcastCommand}"
                           ToolTip="Las direcciones para pegar en OBS o vMix: la Biblia, las canciones y los anuncios, cada uno en su capa."/>
                 <MenuItem Header="Estilos de la transmisión…" Command="{Binding OpenBroadcastStylesCommand}"
@@ -362,6 +362,8 @@
             <MenuItem Header="A_yuda">
                 <MenuItem Header="Recorrido del programa" Click="WelcomeTour_Click"
                           ToolTip="Muestra de nuevo, parte por parte, dónde está cada cosa de la ventana."/>
+                <MenuItem Header="Tutoriales…" Click="Tutorials_Click"
+                          ToolTip="Recorridos cortos sobre el programa de verdad: te muestran, paso a paso, dónde tocar."/>
                 <MenuItem Header="Guía de uso (en internet)" Click="Guide_Click"/>
                 <Separator/>
                 <MenuItem Header="Buscar actualizaciones…" Command="{Binding CheckForUpdatesCommand}"/>
@@ -465,13 +467,13 @@
                             Command="{Binding ClearBackgroundCommand}"
                             IsEnabled="{Binding HasBackground}"
                             ToolTip="Quita la imagen o el video de fondo y deja la letra sola sobre el fondo del tema (tecla F4)"/>
-                    <Button Content="🎨 Temas" Margin="14,0,0,0"
+                    <Button x:Name="ThemesButton" Content="🎨 Temas" Margin="14,0,0,0"
                             Style="{StaticResource DarkButton}"
                             Command="{Binding OpenThemesCommand}"
                             ToolTip="Tipografía, colores, márgenes y fondos"/>
 
                     <!-- Escenario: la pantalla que miran los músicos -->
-                    <Button Content="🎭 Escenario" Margin="14,0,0,0"
+                    <Button x:Name="StageButton" Content="🎭 Escenario" Margin="14,0,0,0"
                             Command="{Binding ToggleStageCommand}"
                             ToolTip="Prende la pantalla de escenario para los músicos y quien predica, con el escenario elegido en el ▾">
                         <Button.Style>
@@ -492,7 +494,7 @@
                             ToolTip="Cambiar de escenario (cantantes, predicador…), editarlos y elegir en qué pantalla va"/>
 
                     <!-- Celular: control remoto por la red de la iglesia -->
-                    <Button Content="📱" Padding="9,7" Margin="8,0,0,0"
+                    <Button x:Name="RemoteButton" Content="📱" Padding="9,7" Margin="8,0,0,0"
                             AutomationProperties.Name="Controlar desde el celular"
                             Command="{Binding OpenRemoteCommand}"
                             ToolTip="Controlar la proyección desde el celular, por la red de la iglesia">
@@ -643,7 +645,7 @@
                                                 VerticalAlignment="Center" Margin="0,0,10,8">
                                         <!-- Con la palabra, como «➕ Playlist» en Biblia: el ➕ solo no se
                                              encontraba («quiero agregar una canción desde cero y no me da opción») -->
-                                        <Button Content="➕ Agregar" FontSize="11" Padding="7,4"
+                                        <Button x:Name="SongsAddButton" Content="➕ Agregar" FontSize="11" Padding="7,4"
                                                 Style="{StaticResource DarkButton}"
                                                 AutomationProperties.Name="Agregar canciones"
                                                 Click="AddSongMenu_Click"
@@ -802,7 +804,7 @@
                                                 AutomationProperties.Name="Agregar a la playlist"
                                                 ToolTip="Abre una cajita para agregar un pasaje a la playlist: ya trae el tramo escrito en el buscador, o el versículo que está en pantalla, o el capítulo; se puede escribir otro («juan 8 del 5 al 10»). También: clic derecho sobre un versículo."/>
                                         <!-- Agregar Biblias: bajarlas, un paquete o un archivo suelto -->
-                                        <Button Content="📥 Biblias" FontSize="11" Padding="7,4"
+                                        <Button x:Name="BibleDownloadButton" Content="📥 Biblias" FontSize="11" Padding="7,4"
                                                 Style="{StaticResource DarkButton}"
                                                 Click="AddBiblesMenu_Click"
                                                 AutomationProperties.Name="Agregar Biblias"
@@ -3004,7 +3006,7 @@
             <DockPanel>
                 <DockPanel DockPanel.Dock="Top">
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,6,10,2">
-                        <Button Content="📥 Agregar" FontSize="11" Padding="8,4"
+                        <Button x:Name="MediaAddButton" Content="📥 Agregar" FontSize="11" Padding="8,4"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding ImportMediaCommand}"
                                 ToolTip="Agregar imágenes o videos a la pestaña actual"/>
