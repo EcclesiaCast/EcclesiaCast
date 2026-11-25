@@ -90,6 +90,10 @@
             </Grid>
         </DockPanel>
 
+        <TextBlock DockPanel.Dock="Top" Margin="0,8,0,0" FontSize="11" TextWrapping="Wrap"
+                   Foreground="{StaticResource FaintBrush}"
+                   Text="Ojo: esta búsqueda es lenta (puede tardar unos segundos) y es un servicio de terceros: Pixabay es de ellos, no de EcclesiaCast."/>
+
         <!-- Abajo: a qué pestaña, bajar, estado y crédito -->
         <DockPanel DockPanel.Dock="Bottom" Margin="0,12,0,0">
             <TextBlock DockPanel.Dock="Left" VerticalAlignment="Center" FontSize="12">
