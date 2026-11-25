@@ -264,7 +264,6 @@
 
             <MenuItem x:Name="MenuBackgrounds" Header="_Fondos">
                 <MenuItem Header="Agregar imágenes, videos, PDF o PowerPoint…" Command="{Binding ImportMediaCommand}"/>
-                <MenuItem Header="Agregar paquete de fondos (.zip)…" Command="{Binding ImportBackgroundPackCommand}"/>
                 <Separator/>
                 <MenuItem Header="Bajar más fondos de internet…" Command="{Binding DownloadBackgroundPackCommand}"/>
                 <MenuItem Header="Buscar fondos en Pixabay…" Click="Pixabay_Click"
@@ -1711,6 +1710,14 @@
                                 Visibility="{Binding IsSongOpen, Converter={StaticResource BoolToVis}}"
                                 AutomationProperties.Name="Fondo de esta canción"
                                 ToolTip="{Binding SongBackgroundHint}"/>
+                        <!-- Sólo con versículos en la grilla: el fondo propio de la Biblia -->
+                        <Button DockPanel.Dock="Right" Content="{Binding BibleBackgroundLabel}" FontSize="11" Padding="8,3" Margin="10,0,0,0"
+                                MaxWidth="200"
+                                Style="{StaticResource DarkButton}"
+                                Click="BibleBackgroundButton_Click"
+                                Visibility="{Binding IsBibleOpen, Converter={StaticResource BoolToVis}}"
+                                AutomationProperties.Name="Fondo de la Biblia"
+                                ToolTip="{Binding BibleBackgroundHint}"/>
                         <!-- Sólo con una presentación en la grilla -->
                         <Button DockPanel.Dock="Right" Content="➕ Playlist" FontSize="11" Padding="8,3" Margin="10,0,0,0"
                                 Style="{StaticResource DarkButton}"

@@ -1590,12 +1590,65 @@ public partial class MainWindow : Window
             IsEnabled = vm.SongHasOwnBackground,
         });
         menu.Items.Add(new Separator());
+        AddBackgroundChoices(menu, vm, vm.UseMediaAsSongBackgroundCommand);
+        menu.IsOpen = true;
+    }
+
+    /// <summary>The button «🖼 Biblia: …» over the slides: the Bible's own background.</summary>
+    private void BibleBackgroundButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm || sender is not FrameworkElement anchor)
+            return;
+
+        var menu = new ContextMenu
+        {
+            PlacementTarget = anchor,
+            Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom,
+        };
         menu.Items.Add(new MenuItem
         {
-            Header = "Otro: clic derecho en una imagen o video de Medios → «Usar como fondo de…»",
-            IsEnabled = false,
+            Header = "Usar el fondo que está en pantalla",
+            Command = vm.UseCurrentBackgroundForBibleCommand,
+            ToolTip = "La imagen o el video que se ve ahora pasa a ser el fondo de la Biblia",
         });
+        menu.Items.Add(new MenuItem
+        {
+            Header = "Quitar el fondo propio",
+            Command = vm.RemoveBibleBackgroundCommand,
+            IsEnabled = vm.BibleHasOwnBackground,
+        });
+        menu.Items.Add(new Separator());
+        AddBackgroundChoices(menu, vm, vm.UseMediaAsBibleBackgroundCommand);
         menu.IsOpen = true;
+    }
+
+    /// <summary>«Elegir un fondo de la biblioteca»: a submenu per tab with its backgrounds, each one picks it.</summary>
+    private static void AddBackgroundChoices(ContextMenu menu, MainViewModel vm, System.Windows.Input.ICommand pick)
+    {
+        var choose = new MenuItem { Header = "Elegir un fondo de la biblioteca" };
+        foreach (var (tab, items) in vm.BackgroundChoicesByTab())
+        {
+            var tabItem = new MenuItem { Header = tab.Replace("_", "__") };
+            foreach (var media in items.Take(60))
+            {
+                tabItem.Items.Add(new MenuItem
+                {
+                    Header = media.Name.Replace("_", "__"),
+                    Command = pick,
+                    CommandParameter = media,
+                });
+            }
+
+            choose.Items.Add(tabItem);
+        }
+
+        if (choose.Items.Count == 0)
+        {
+            choose.Header = "No hay fondos en la biblioteca todavía (Fondos → Bajar más fondos…)";
+            choose.IsEnabled = false;
+        }
+
+        menu.Items.Add(choose);
     }
 
     /// <summary>

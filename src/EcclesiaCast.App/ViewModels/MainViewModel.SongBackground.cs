@@ -43,7 +43,7 @@ public sealed partial class MainViewModel
         {
             SongHasOwnBackground = false;
             SongBackgroundLabel = "🖼 Sin fondo propio";
-            SongBackgroundHint = "Esta canción no tiene un fondo propio: se queda el que esté puesto. Clic para usar el fondo que está en pantalla, o clic derecho en una imagen o video de Medios → «Usar como fondo de…».";
+            SongBackgroundHint = "Esta canción no tiene un fondo propio: se queda el que esté puesto. Clic para elegir uno de la biblioteca o usar el que está en pantalla (también: clic derecho en una imagen o video de Medios → «Usar como fondo de…»).";
         }
     }
 
