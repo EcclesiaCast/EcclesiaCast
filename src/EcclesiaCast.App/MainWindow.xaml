@@ -640,7 +640,7 @@
                         <Grid x:Name="LibraryBody">
                             <!-- ── Pestaña Canciones ── -->
                             <DockPanel Visibility="{Binding IsBibleTabActive, Converter={StaticResource InverseBoolToVis}}">
-                                <DockPanel DockPanel.Dock="Top">
+                                <DockPanel x:Name="SongsHeaderRow" DockPanel.Dock="Top" SizeChanged="SongsHeaderRow_SizeChanged">
                                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
                                                 VerticalAlignment="Center" Margin="0,0,10,8">
                                         <!-- Con la palabra, como «➕ Playlist» en Biblia: el ➕ solo no se
@@ -661,7 +661,8 @@
                                                 AutomationProperties.Name="Eliminar canción"
                                                 ToolTip="Eliminar canción"/>
                                     </StackPanel>
-                                    <TextBlock Text="CANCIONES" Style="{StaticResource PanelTitle}" Margin="12,0,12,0"
+                                    <TextBlock Text="CANCIONES" Style="{StaticResource PanelTitle}" Margin="12,0,6,0"
+                                               TextTrimming="CharacterEllipsis"
                                                Cursor="Hand" MouseLeftButtonUp="LibraryTitle_MouseLeftButtonUp"
                                                ToolTip="Clic: achicar este panel para darle lugar a la playlist"/>
                                 </DockPanel>
@@ -979,7 +980,7 @@
                                            SizeChanged="BibleQueryRow_SizeChanged">
                                 <!-- «🕘 Historial» con la palabra (20/11: alguien pidió un historial que ya
                                      existía; el dibujo solo no se encontraba). Con el panel angosto vuelve a
-                                     ser sólo 🕘, para que la caja de la cita no quede chica. -->
+                                     ser «🕘 Hist.», para que la caja de la cita no quede chica. -->
                                 <Button x:Name="BibleHistoryButton" DockPanel.Dock="Right"
                                         Content="🕘 Historial" FontSize="12" Padding="8,5" Margin="6,0,0,0"
                                         Style="{StaticResource DarkButton}"

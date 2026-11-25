@@ -1331,7 +1331,16 @@ public partial class MainWindow : Window
         if (!e.WidthChanged)
             return;
 
-        BibleHistoryButton.Content = e.NewSize.Width >= BibleHistoryWordWidth ? "🕘 Historial" : "🕘";
+        BibleHistoryButton.Content = e.NewSize.Width >= BibleHistoryWordWidth ? "🕘 Historial" : "🕘 Hist.";
+    }
+
+    /// <summary>With a narrow panel «➕ Agregar» becomes «➕», so the buttons leave room for the title.</summary>
+    private void SongsHeaderRow_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (!e.WidthChanged)
+            return;
+
+        SongsAddButton.Content = e.NewSize.Width >= 260 ? "➕ Agregar" : "➕";
     }
 
     private void BibleHistoryButton_Click(object sender, RoutedEventArgs e)
