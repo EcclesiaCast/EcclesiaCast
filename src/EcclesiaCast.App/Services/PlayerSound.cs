@@ -60,25 +60,34 @@ public static class PlayerSound
         }
     }
 
-    /// <summary>The session volume the players have now, on its way to <see cref="_sessionTarget"/>.</summary>
-    private static int _sessionNow = 100;
+    /// <summary>The session volume the players have now.</summary>
+    private static volatile int _sessionNow = 100;
 
-    private static int _sessionTarget = 100;
+    private static volatile int _sessionTarget = 100;
 
-    private static System.Windows.Threading.DispatcherTimer? _glide;
+    private static long _requestedAt;
+
+    private static readonly AutoResetEvent Wake = new(false);
+
+    private static Thread? _worker;
+
+    private static readonly object WorkerLock = new();
 
     /// <summary>
-    /// Raised while the session volume of the LibVLC players moves toward the
-    /// bar: the bar is followed in short steps (about a tenth of a second) so
-    /// a quick drag is a smooth change and never a staircase of jumps.
+    /// Raised when the session volume of the LibVLC players changes (on a
+    /// worker thread, never the interface's): each player follows the bar at
+    /// once, with no ramp. LibVLC can hold a player's lock while it decodes a
+    /// video, so asking it from the interface thread could freeze the slider.
     /// </summary>
     public static event EventHandler? SessionChanged;
+
+    /// <summary>The slowest time, in ms, from the bar moving to the players having the volume (for the log).</summary>
+    public static double WorstLatencyMs { get; private set; }
 
     private static void GlideSession()
     {
         _sessionTarget = SoundLevel.SessionVolume(_master);
-        var dispatcher = System.Windows.Application.Current?.Dispatcher;
-        if (dispatcher is null)
+        if (System.Windows.Application.Current is null)
         {
             // No window (tests): straight to the target.
             _sessionNow = _sessionTarget;
@@ -86,39 +95,48 @@ public static class PlayerSound
             return;
         }
 
-        if (!dispatcher.CheckAccess())
-        {
-            dispatcher.BeginInvoke(GlideSession);
-            return;
-        }
-
-        _glide ??= NewGlideTimer(dispatcher);
-        if (!_glide.IsEnabled)
-            _glide.Start();
+        Interlocked.CompareExchange(ref _requestedAt, System.Diagnostics.Stopwatch.GetTimestamp(), 0);
+        EnsureWorker();
+        Wake.Set();
     }
 
-    private static System.Windows.Threading.DispatcherTimer NewGlideTimer(System.Windows.Threading.Dispatcher dispatcher)
+    private static void EnsureWorker()
     {
-        var timer = new System.Windows.Threading.DispatcherTimer(
-            System.Windows.Threading.DispatcherPriority.Send, dispatcher)
+        lock (WorkerLock)
         {
-            Interval = TimeSpan.FromMilliseconds(16),
-        };
-        timer.Tick += (_, _) =>
-        {
-            var gap = _sessionTarget - _sessionNow;
-            if (gap == 0)
-            {
-                timer.Stop();
+            if (_worker is not null)
                 return;
+
+            _worker = new Thread(ApplyLoop) { IsBackground = true, Name = "Volumen de EcclesiaCast" };
+            _worker.Start();
+        }
+    }
+
+    private static void ApplyLoop()
+    {
+        while (true)
+        {
+            Wake.WaitOne();
+            // Only the latest value counts: moves that came while the players
+            // were busy are skipped, never queued.
+            var target = _sessionTarget;
+            if (target != _sessionNow)
+            {
+                _sessionNow = target;
+                try { SessionChanged?.Invoke(null, EventArgs.Empty); }
+                catch (Exception ex) { Log.Debug(ex, "No se pudo aplicar el volumen"); }
             }
 
-            // A quarter of what is left each step (at least 1): about 100 ms to arrive.
-            var step = Math.Max(1, Math.Abs(gap) / 4);
-            _sessionNow += Math.Sign(gap) * Math.Min(step, Math.Abs(gap));
-            SessionChanged?.Invoke(null, EventArgs.Empty);
-        };
-        return timer;
+            var started = Interlocked.Exchange(ref _requestedAt, 0);
+            if (started != 0)
+            {
+                var ms = System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+                if (ms > WorstLatencyMs)
+                    WorstLatencyMs = ms;
+                if (ms > 50)
+                    Log.Warning("El volumen tardó {Ms:0} ms en llegar a los reproductores", ms);
+            }
+        }
     }
 
     /// <summary>The first volume of a program that starts with the bar somewhere other than 100.</summary>
