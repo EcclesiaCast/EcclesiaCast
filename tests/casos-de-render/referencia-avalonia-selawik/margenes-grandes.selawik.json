@@ -1,0 +1,43 @@
+{
+  "Case": "margenes-grandes",
+  "Theme": "selawik",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 62,
+      "FontUsed": "Selawik Semibold",
+      "Lines": [
+        "Sublime es tu gracia que me alcanzó en el",
+        "camino cuando yo andaba perdido",
+        "Tu mano me levantó y me puso sobre la roca",
+        "firme donde ya no caeré",
+        "Hoy canto con todo mi corazón porque tu",
+        "misericordia nunca se acaba",
+        "Por siempre y para siempre te alabaré, Señor,",
+        "mi fortaleza y mi canción"
+      ],
+      "Rect": {
+        "X": 312.86,
+        "Y": 208,
+        "Width": 1293.28,
+        "Height": 596
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Selawik",
+      "Lines": [
+        "Márgenes"
+      ],
+      "Rect": {
+        "X": 1444,
+        "Y": 931,
+        "Width": 175.18,
+        "Height": 49
+      }
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "Case": "biblia-versiculo-corto",
+  "Theme": "selawik",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Selawik Semibold",
+      "Lines": [
+        "Jesús lloró."
+      ],
+      "Rect": {
+        "X": 726.4,
+        "Y": 450,
+        "Width": 466.2,
+        "Height": 111
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Selawik",
+      "Lines": [
+        "Juan 11:35 · PRUEBA"
+      ],
+      "Rect": {
+        "X": 1450,
+        "Y": 991,
+        "Width": 359.14,
+        "Height": 49
+      }
+    }
+  ]
+}

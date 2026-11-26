@@ -81,6 +81,38 @@ public sealed class ComparisonTests : IDisposable
     }
 
     [Fact]
+    public void With_one_typeface_only_its_texts_are_compared()
+    {
+        // The countdown is Segoe UI on Windows and Selawik on a Mac: not compared, but told.
+        var clock = Text(260, 100, "10:00");
+        clock.FontUsed = "Segoe UI Semibold";
+        var macClock = Text(250, 120, "10:00");
+        var c = Comparison.Run(new Comparison
+        {
+            Title = "t", LeftName = "A", RightName = "B",
+            LeftFolder = Save("a", clock), RightFolder = Save("b", macClock),
+            Criteria = Criteria.Exact,
+            OnlyFont = "Selawik",
+        });
+
+        Assert.True(c.Results.Single().Passes);
+        Assert.Equal(["uno.cancion: main"], c.Skipped);
+        Assert.Contains("No se comparan", Report.Summary([c]));
+
+        var main = Text(90, 100, "a");
+        main.FontUsed = "Selawik Semibold";
+        var moved = Text(90, 101, "a");
+        var d = Comparison.Run(new Comparison
+        {
+            Title = "t", LeftName = "A", RightName = "B",
+            LeftFolder = Save("c", main), RightFolder = Save("d", moved),
+            Criteria = Criteria.Exact,
+            OnlyFont = "Selawik",
+        });
+        Assert.False(d.Results.Single().Passes);
+    }
+
+    [Fact]
     public void A_missing_folder_says_so_instead_of_failing()
     {
         var c = Comparison.Run(new Comparison

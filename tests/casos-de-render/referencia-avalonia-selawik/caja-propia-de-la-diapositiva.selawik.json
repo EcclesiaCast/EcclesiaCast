@@ -1,0 +1,44 @@
+{
+  "Case": "caja-propia-de-la-diapositiva",
+  "Theme": "selawik",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 50,
+      "FontUsed": "Selawik Semibold",
+      "Lines": [
+        "Sublime es tu gracia que me alcanzó",
+        "en el camino cuando yo andaba",
+        "perdido",
+        "Tu mano me levantó y me puso sobre",
+        "la roca firme donde ya no caeré",
+        "Hoy canto con todo mi corazón",
+        "porque tu misericordia nunca se acaba",
+        "Por siempre y para siempre te alabaré,",
+        "Señor, mi fortaleza y mi canción"
+      ],
+      "Rect": {
+        "X": 960,
+        "Y": 180,
+        "Width": 887.08,
+        "Height": 541
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Selawik",
+      "Lines": [
+        "Caja"
+      ],
+      "Rect": {
+        "X": 1734,
+        "Y": 991,
+        "Width": 75.16,
+        "Height": 49
+      }
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "Case": "cancion-titulo-tema",
+  "Theme": "selawik",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Selawik Semibold",
+      "Lines": [
+        "Cuán Grande Es Él, Cuán Grande Es Él",
+        "Canta Mi Alma A Ti, Señor",
+        "Cuán Grande Es Él, Cuán Grande Es Él",
+        "Tu Nombre Alabaré"
+      ],
+      "Rect": {
+        "X": 176.25,
+        "Y": 285,
+        "Width": 1568.49,
+        "Height": 442
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Selawik",
+      "Lines": [
+        "Cuán grande es Él"
+      ],
+      "Rect": {
+        "X": 1494,
+        "Y": 991,
+        "Width": 316,
+        "Height": 49
+      }
+    }
+  ]
+}

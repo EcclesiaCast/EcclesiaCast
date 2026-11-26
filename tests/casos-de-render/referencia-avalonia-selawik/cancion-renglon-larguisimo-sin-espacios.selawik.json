@@ -1,0 +1,38 @@
+{
+  "Case": "cancion-renglon-larguisimo-sin-espacios",
+  "Theme": "selawik",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Selawik Semibold",
+      "Lines": [
+        "Aleluyaaleluyaaleluyaaleluyaaleluyaalel",
+        "uyaaleluyaaleluyaaleluyaaleluyaaleluyaa",
+        "leluyaaleluyaaleluya"
+      ],
+      "Rect": {
+        "X": 114.21,
+        "Y": 340,
+        "Width": 1691.58,
+        "Height": 332
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Selawik",
+      "Lines": [
+        "Aleluya"
+      ],
+      "Rect": {
+        "X": 1681,
+        "Y": 991,
+        "Width": 128.44,
+        "Height": 49
+      }
+    }
+  ]
+}

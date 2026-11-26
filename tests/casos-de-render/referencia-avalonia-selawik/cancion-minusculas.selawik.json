@@ -1,0 +1,39 @@
+{
+  "Case": "cancion-minusculas",
+  "Theme": "selawik",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Selawik Semibold",
+      "Lines": [
+        "cuán grande es él, cuán grande es él",
+        "canta mi alma a ti, señor",
+        "cuán grande es él, cuán grande es él",
+        "tu nombre alabaré"
+      ],
+      "Rect": {
+        "X": 196.38,
+        "Y": 285,
+        "Width": 1528.24,
+        "Height": 442
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Selawik",
+      "Lines": [
+        "Cuán grande es Él"
+      ],
+      "Rect": {
+        "X": 1494,
+        "Y": 991,
+        "Width": 316,
+        "Height": 49
+      }
+    }
+  ]
+}

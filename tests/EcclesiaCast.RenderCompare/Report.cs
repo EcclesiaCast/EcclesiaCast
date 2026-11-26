@@ -38,6 +38,8 @@ public static class Report
             text.AppendLine($"Pasan en todo:       {c.Results.Count(r => r.Passes)} de {total}");
             if (c.Unpaired.Count > 0)
                 text.AppendLine($"Sin pareja ({c.Unpaired.Count}): {string.Join(", ", c.Unpaired)}");
+            if (c.Skipped.Count > 0)
+                text.AppendLine($"No se comparan, porque no van en {c.OnlyFont} ({c.Skipped.Count}): {string.Join(", ", c.Skipped)}");
 
             foreach (var group in c.Results.Where(r => !r.Passes)
                          .SelectMany(r => r.Differences.Select(d => (r, d.Reason)).Distinct())

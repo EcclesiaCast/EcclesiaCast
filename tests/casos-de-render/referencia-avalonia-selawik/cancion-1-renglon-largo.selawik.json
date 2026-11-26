@@ -1,0 +1,39 @@
+{
+  "Case": "cancion-1-renglon-largo",
+  "Theme": "selawik",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Selawik Semibold",
+      "Lines": [
+        "Digno es el Cordero que fue inmolado",
+        "de recibir el poder, las riquezas, la",
+        "sabiduría, la fortaleza, la honra, la gloria",
+        "y la alabanza"
+      ],
+      "Rect": {
+        "X": 112.05,
+        "Y": 285,
+        "Width": 1695.89,
+        "Height": 442
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Selawik",
+      "Lines": [
+        "Digno es el Cordero"
+      ],
+      "Rect": {
+        "X": 1457,
+        "Y": 991,
+        "Width": 352.66,
+        "Height": 49
+      }
+    }
+  ]
+}

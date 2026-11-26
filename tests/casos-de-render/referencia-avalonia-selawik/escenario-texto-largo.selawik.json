@@ -1,0 +1,27 @@
+{
+  "Case": "escenario-texto-largo",
+  "Theme": "selawik",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "stage",
+      "FontSize": 40.485,
+      "FontUsed": "Selawik Semibold",
+      "Lines": [
+        "Digno es el Cordero",
+        "que fue inmolado de",
+        "recibir el poder, las",
+        "riquezas, la sabiduría, la",
+        "fortaleza, la honra, la",
+        "gloria y la alabanza"
+      ],
+      "Rect": {
+        "X": 327.59,
+        "Y": 104,
+        "Width": 444.19,
+        "Height": 292
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "Case": "logo-texto-corto",
+  "Theme": "selawik",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "logo",
+      "FontSize": 120,
+      "FontUsed": "Selawik Semibold",
+      "Lines": [
+        "Iglesia Nueva Vida"
+      ],
+      "Rect": {
+        "X": 449.47,
+        "Y": 468,
+        "Width": 1021.05,
+        "Height": 145
+      }
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "Case": "logo-texto-largo",
+  "Theme": "selawik",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "logo",
+      "FontSize": 110,
+      "FontUsed": "Selawik Semibold",
+      "Lines": [
+        "Iglesia Evangélica Bautista Nueva",
+        "Vida de Villa Mercedes"
+      ],
+      "Rect": {
+        "X": 118.89,
+        "Y": 408,
+        "Width": 1682.23,
+        "Height": 265
+      }
+    }
+  ]
+}

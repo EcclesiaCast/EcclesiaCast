@@ -1,0 +1,22 @@
+{
+  "Case": "escenario-cuenta-regresiva",
+  "Theme": "selawik",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "stage",
+      "FontSize": 220,
+      "FontUsed": "Selawik Semibold",
+      "Lines": [
+        "5:00"
+      ],
+      "Rect": {
+        "X": 746.39,
+        "Y": 368,
+        "Width": 427.22,
+        "Height": 265
+      }
+    }
+  ]
+}

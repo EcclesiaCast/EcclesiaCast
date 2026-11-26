@@ -84,6 +84,16 @@ public sealed class Comparison
     /// <summary>Which themes are compared; null for all of them.</summary>
     public string[]? Themes { get; init; }
 
+    /// <summary>
+    /// When set, only the texts drawn with this typeface on the left side are
+    /// compared (Windows against Mac: the countdown is always Segoe UI, which
+    /// a Mac does not have). The others are counted in <see cref="Skipped"/>.
+    /// </summary>
+    public string? OnlyFont { get; init; }
+
+    /// <summary>The texts left out by <see cref="OnlyFont"/>, as «case.theme: text».</summary>
+    public List<string> Skipped { get; } = [];
+
     /// <summary>Why nothing was compared (a folder is missing), or null.</summary>
     public string? NotRun { get; set; }
 
@@ -130,7 +140,13 @@ public sealed class Comparison
     private static void CompareOne(RenderResult left, RenderResult right, Comparison setup, CaseResult result)
     {
         var criteria = setup.Criteria;
-        foreach (var a in left.Texts)
+        var skipped = left.Texts
+            .Where(a => setup.OnlyFont is { } font && !a.FontUsed.StartsWith(font, StringComparison.OrdinalIgnoreCase))
+            .Select(a => a.Name)
+            .ToHashSet();
+        setup.Skipped.AddRange(skipped.Select(name => $"{result.Key}: {name}"));
+
+        foreach (var a in left.Texts.Where(t => !skipped.Contains(t.Name)))
         {
             var b = right.Texts.FirstOrDefault(t => t.Name == a.Name);
             if (b is null)
@@ -158,7 +174,7 @@ public sealed class Comparison
             }
         }
 
-        foreach (var b in right.Texts.Where(t => left.Texts.All(a => a.Name != t.Name)))
+        foreach (var b in right.Texts.Where(t => left.Texts.All(a => a.Name != t.Name) && !skipped.Contains(t.Name)))
         {
             result.Differences.Add(new Difference(Reason.MissingText, b.Name,
                 $"«{b.Name}» sólo se dibuja en {setup.RightName}."));

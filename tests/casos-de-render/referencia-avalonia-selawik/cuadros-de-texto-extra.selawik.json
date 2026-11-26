@@ -1,0 +1,65 @@
+{
+  "Case": "cuadros-de-texto-extra",
+  "Theme": "selawik",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Selawik Semibold",
+      "Lines": [
+        "Santo, santo, santo, Señor omnipotente",
+        "Siempre el labio mío loores te dará"
+      ],
+      "Rect": {
+        "X": 122.25,
+        "Y": 396,
+        "Width": 1675.5,
+        "Height": 221
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Selawik",
+      "Lines": [
+        "Extra"
+      ],
+      "Rect": {
+        "X": 1723,
+        "Y": 991,
+        "Width": 86.41,
+        "Height": 49
+      }
+    },
+    {
+      "Name": "extra1",
+      "FontSize": 44,
+      "FontUsed": "Selawik",
+      "Lines": [
+        "Serie: El Padre nuestro"
+      ],
+      "Rect": {
+        "X": 60,
+        "Y": 94,
+        "Width": 700,
+        "Height": 53
+      }
+    },
+    {
+      "Name": "extra2",
+      "FontSize": 40,
+      "FontUsed": "Selawik",
+      "Lines": [
+        "Domingo 18 de noviembre"
+      ],
+      "Rect": {
+        "X": 1160,
+        "Y": 916,
+        "Width": 700,
+        "Height": 49
+      }
+    }
+  ]
+}

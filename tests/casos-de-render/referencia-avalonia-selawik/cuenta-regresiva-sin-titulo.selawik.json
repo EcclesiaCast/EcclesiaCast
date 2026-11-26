@@ -1,0 +1,22 @@
+{
+  "Case": "cuenta-regresiva-sin-titulo",
+  "Theme": "selawik",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "countdown-clock",
+      "FontSize": 260,
+      "FontUsed": "Segoe UI Semibold",
+      "Lines": [
+        "12:30"
+      ],
+      "Rect": {
+        "X": 660.32,
+        "Y": 372,
+        "Width": 600.36,
+        "Height": 346
+      }
+    }
+  ]
+}

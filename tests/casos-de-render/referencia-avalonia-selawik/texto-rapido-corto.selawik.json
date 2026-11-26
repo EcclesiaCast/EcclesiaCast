@@ -1,0 +1,22 @@
+{
+  "Case": "texto-rapido-corto",
+  "Theme": "selawik",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Selawik Semibold",
+      "Lines": [
+        "Bienvenidos a todos"
+      ],
+      "Rect": {
+        "X": 533.06,
+        "Y": 484,
+        "Width": 853.88,
+        "Height": 111
+      }
+    }
+  ]
+}

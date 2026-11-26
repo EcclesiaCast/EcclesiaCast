@@ -1,0 +1,39 @@
+{
+  "Case": "cancion-renglones-cortos",
+  "Theme": "selawik",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Selawik Semibold",
+      "Lines": [
+        "Gloria",
+        "Aleluya",
+        "Amén",
+        "Cristo vive"
+      ],
+      "Rect": {
+        "X": 738.39,
+        "Y": 285,
+        "Width": 442.21,
+        "Height": 442
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Selawik",
+      "Lines": [
+        "Coros"
+      ],
+      "Rect": {
+        "X": 1707,
+        "Y": 991,
+        "Width": 102.52,
+        "Height": 49
+      }
+    }
+  ]
+}

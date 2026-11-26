@@ -45,25 +45,32 @@ public sealed class RenderBenchTests
     }
 
     /// <summary>
+    /// The measures of Avalonia on Windows in the selawik theme, saved in the
+    /// repository (like the WPF ones) so a Mac can compare itself with Windows
+    /// without a Windows run next to it. When the drawing changes on purpose,
+    /// copy artifacts/render/avalonia/windows/*.selawik.json here again.
+    /// </summary>
+    public static string SelawikReference => Path.Combine(RenderCases.Folder, "referencia-avalonia-selawik");
+
+    /// <summary>
     /// The comparator reads what the bench left and writes informe.html and
-    /// resumen.txt in artifacts/render/comparacion/: WPF against Avalonia on
-    /// Windows, and, when the results of a Mac are there, Windows against Mac in
-    /// the selawik theme. It never fails over a difference: it reports them.
+    /// resumen.txt in artifacts/render/comparacion/: on Windows, WPF against
+    /// Avalonia; on any system, Windows (the saved reference) against the Mac in
+    /// the selawik theme, when a Mac's results are there (on a Mac they always
+    /// are). It never fails over a difference: it reports them.
     /// </summary>
     [AvaloniaFact]
     public void The_comparator_writes_its_report()
     {
-        // It needs the WPF reference and the Avalonia bench of Windows.
-        if (!OperatingSystem.IsWindows())
-            Assert.Skip("El comparador corre en Windows: necesita la referencia de WPF y el banco de Avalonia en Windows.");
-
         RunBench();
         var root = Path.GetDirectoryName(RenderCases.OutputFolder("avalonia"))!;
         var avalonia = Path.Combine(root, "avalonia");
 
-        var comparisons = new List<Comparison>
+        var comparisons = new List<Comparison>();
+        // The WPF reference is Segoe UI, which only Windows has.
+        if (OperatingSystem.IsWindows())
         {
-            Comparison.Run(new Comparison
+            comparisons.Add(Comparison.Run(new Comparison
             {
                 Title = "WPF contra Avalonia en Windows (canciones, Biblia e impacto)",
                 LeftName = "WPF",
@@ -74,26 +81,65 @@ public sealed class RenderBenchTests
                 RightFolder = Path.Combine(avalonia, "windows"),
                 Criteria = Criteria.Loose,
                 Themes = ["cancion", "biblia", "impact"],
-            }),
-            Comparison.Run(new Comparison
-            {
-                Title = "Avalonia en Windows contra Avalonia en Mac (tema selawik, tiene que ser idéntico)",
-                LeftName = "Windows",
-                RightName = "Mac",
-                LeftFolder = Path.Combine(avalonia, "windows"),
-                RightFolder = Path.Combine(avalonia, "mac"),
-                Criteria = Criteria.Exact,
-                Themes = [SelawikKey],
-            }),
-        };
+            }));
+        }
+
+        var macSide = Comparison.Run(new Comparison
+        {
+            Title = "Avalonia en Windows contra Avalonia en Mac (tema selawik, tiene que ser idéntico)",
+            LeftName = "Windows",
+            RightName = "Mac",
+            LeftFolder = SelawikReference,
+            LeftImages = Path.Combine(avalonia, "windows"),
+            LeftImageHint = "La imagen de Windows está en el banco de Avalonia corrido en Windows.",
+            RightFolder = Path.Combine(avalonia, "mac"),
+            Criteria = Criteria.Exact,
+            Themes = [SelawikKey],
+            // The countdown is Segoe UI by design, which a Mac does not have.
+            OnlyFont = "Selawik",
+        });
+        comparisons.Add(macSide);
 
         var output = Path.Combine(root, "comparacion");
         Report.Write(output, comparisons);
 
         Assert.True(File.Exists(Path.Combine(output, "informe.html")));
         Assert.True(File.Exists(Path.Combine(output, "resumen.txt")));
-        Assert.True(comparisons[0].NotRun is null, comparisons[0].NotRun);
-        Assert.NotEmpty(comparisons[0].Results);
+        var mustRun = OperatingSystem.IsWindows() ? comparisons[0] : OperatingSystem.IsMacOS() ? macSide : null;
+        if (mustRun is not null)
+        {
+            Assert.True(mustRun.NotRun is null, mustRun.NotRun);
+            Assert.NotEmpty(mustRun.Results);
+        }
+    }
+
+    /// <summary>
+    /// On Windows, the selawik theme is still drawn as the saved reference says,
+    /// so the Mac is compared with what Windows really draws today.
+    /// </summary>
+    [AvaloniaFact]
+    public void On_windows_the_selawik_theme_is_drawn_as_the_saved_reference()
+    {
+        if (!OperatingSystem.IsWindows())
+            Assert.Skip("La referencia de selawik se hizo en Windows; la Mac se compara con ella en el informe.");
+
+        RunBench();
+        var root = Path.GetDirectoryName(RenderCases.OutputFolder("avalonia"))!;
+        var today = Comparison.Run(new Comparison
+        {
+            Title = "Referencia guardada contra Avalonia en Windows hoy (tema selawik)",
+            LeftName = "Referencia",
+            RightName = "Hoy",
+            LeftFolder = SelawikReference,
+            RightFolder = Path.Combine(root, "avalonia", "windows"),
+            Criteria = Criteria.Exact,
+            Themes = [SelawikKey],
+            OnlyFont = "Selawik",
+        });
+
+        Assert.True(today.NotRun is null, today.NotRun);
+        Assert.Empty(today.Unpaired);
+        Assert.True(today.Results.All(r => r.Passes), Report.Summary([today]));
     }
 
     private static (int Cases, List<string> Failures) RunBench()

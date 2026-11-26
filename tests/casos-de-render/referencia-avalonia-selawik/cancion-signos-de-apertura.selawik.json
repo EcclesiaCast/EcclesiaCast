@@ -1,0 +1,39 @@
+{
+  "Case": "cancion-signos-de-apertura",
+  "Theme": "selawik",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Selawik Semibold",
+      "Lines": [
+        "¿Quién es como tú, oh Jehová?",
+        "¡Aleluya, aleluya!",
+        "¡¿Cómo no alabarte?!",
+        "¿Dónde iré de tu Espíritu?"
+      ],
+      "Rect": {
+        "X": 308.29,
+        "Y": 285,
+        "Width": 1302.42,
+        "Height": 442
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Selawik",
+      "Lines": [
+        "Signos"
+      ],
+      "Rect": {
+        "X": 1692,
+        "Y": 991,
+        "Width": 117.54,
+        "Height": 49
+      }
+    }
+  ]
+}

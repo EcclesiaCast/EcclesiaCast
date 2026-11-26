@@ -1,0 +1,25 @@
+{
+  "Case": "texto-rapido-largo",
+  "Theme": "selawik",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Selawik Semibold",
+      "Lines": [
+        "Les pedimos que apaguen sus teléfonos",
+        "y que los padres de los niños de la",
+        "escuela dominical pasen a recogerlos al",
+        "terminar el culto de hoy"
+      ],
+      "Rect": {
+        "X": 118.25,
+        "Y": 319,
+        "Width": 1683.49,
+        "Height": 442
+      }
+    }
+  ]
+}

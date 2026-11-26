@@ -1,0 +1,51 @@
+{
+  "Case": "anuncio-corto",
+  "Theme": "selawik",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Selawik Semibold",
+      "Lines": [
+        "Santo, santo, santo, Señor omnipotente",
+        "Siempre el labio mío loores te dará"
+      ],
+      "Rect": {
+        "X": 122.25,
+        "Y": 396,
+        "Width": 1675.5,
+        "Height": 221
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Selawik",
+      "Lines": [
+        "Aviso"
+      ],
+      "Rect": {
+        "X": 1714,
+        "Y": 991,
+        "Width": 95.06,
+        "Height": 49
+      }
+    },
+    {
+      "Name": "overlay",
+      "FontSize": 54,
+      "FontUsed": "Selawik Semibold",
+      "Lines": [
+        "Hoy después del culto: almuerzo en el salón"
+      ],
+      "Rect": {
+        "X": 416.08,
+        "Y": 985,
+        "Width": 1088.83,
+        "Height": 65
+      }
+    }
+  ]
+}

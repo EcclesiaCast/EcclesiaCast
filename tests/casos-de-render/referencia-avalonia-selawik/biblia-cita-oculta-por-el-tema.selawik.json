@@ -1,0 +1,26 @@
+{
+  "Case": "biblia-cita-oculta-por-el-tema",
+  "Theme": "selawik",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Selawik Semibold",
+      "Lines": [
+        "Porque de tal manera amó Dios al",
+        "mundo, que ha dado a su Hijo",
+        "unigénito, para que todo aquel que en",
+        "él cree, no se pierda, mas tenga vida",
+        "eterna."
+      ],
+      "Rect": {
+        "X": 144.93,
+        "Y": 264,
+        "Width": 1629.14,
+        "Height": 553
+      }
+    }
+  ]
+}

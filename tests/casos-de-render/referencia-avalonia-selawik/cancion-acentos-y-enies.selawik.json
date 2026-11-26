@@ -1,0 +1,39 @@
+{
+  "Case": "cancion-acentos-y-enies",
+  "Theme": "selawik",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Selawik Semibold",
+      "Lines": [
+        "Mañana será un día de gozo, ¡Señor!",
+        "Ñandú, cigüeña, camión y corazón",
+        "Ángeles, árbol, éxodo, íntimo, óleo,",
+        "único"
+      ],
+      "Rect": {
+        "X": 187.25,
+        "Y": 285,
+        "Width": 1545.49,
+        "Height": 442
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Selawik",
+      "Lines": [
+        "Acentos"
+      ],
+      "Rect": {
+        "X": 1668,
+        "Y": 991,
+        "Width": 141.8,
+        "Height": 49
+      }
+    }
+  ]
+}

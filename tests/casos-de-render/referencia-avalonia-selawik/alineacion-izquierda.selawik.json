@@ -1,0 +1,39 @@
+{
+  "Case": "alineacion-izquierda",
+  "Theme": "selawik",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Selawik Semibold",
+      "Lines": [
+        "Cuán grande es Él, cuán grande es Él",
+        "Canta mi alma a Ti, Señor",
+        "Cuán grande es Él, cuán grande es Él",
+        "Tu nombre alabaré"
+      ],
+      "Rect": {
+        "X": 110,
+        "Y": 285,
+        "Width": 1539.74,
+        "Height": 442
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Selawik",
+      "Lines": [
+        "Alineación"
+      ],
+      "Rect": {
+        "X": 1626,
+        "Y": 991,
+        "Width": 183.32,
+        "Height": 49
+      }
+    }
+  ]
+}

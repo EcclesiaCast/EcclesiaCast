@@ -50,5 +50,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: render-avalonia-mac
-          path: artifacts/render/avalonia/
+          path: |
+            artifacts/render/avalonia/
+            artifacts/render/comparacion/
           if-no-files-found: warn

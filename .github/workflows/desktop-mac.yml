@@ -32,6 +32,19 @@ jobs:
       - name: Test the Avalonia program
         run: dotnet test tests/EcclesiaCast.Desktop.Tests --configuration Release --verbosity normal
 
+      # What the render bench drew on this Mac (pictures and measures) and the
+      # comparator's report against the Windows reference in the selawik
+      # theme (comparacion/resumen.txt). Kept even when a test failed.
+      - name: Keep the Avalonia render of the Mac
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: render-avalonia-mac
+          path: |
+            artifacts/render/avalonia/mac/
+            artifacts/render/comparacion/
+          if-no-files-found: warn
+
       - name: Publish for Apple chips
         run: >
           dotnet publish src/EcclesiaCast.Desktop/EcclesiaCast.Desktop.csproj

@@ -1,0 +1,36 @@
+{
+  "Case": "ajuste-ancho-prendido-larguisimo",
+  "Theme": "selawik",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 36,
+      "FontUsed": "Selawik Semibold",
+      "Lines": [
+        "Aleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluyaaleluya"
+      ],
+      "Rect": {
+        "X": 140.3,
+        "Y": 484,
+        "Width": 1640.39,
+        "Height": 44
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Selawik",
+      "Lines": [
+        "Ajuste"
+      ],
+      "Rect": {
+        "X": 1700,
+        "Y": 991,
+        "Width": 109.57,
+        "Height": 49
+      }
+    }
+  ]
+}

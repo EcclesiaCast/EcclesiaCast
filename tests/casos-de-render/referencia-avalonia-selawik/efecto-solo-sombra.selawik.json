@@ -1,0 +1,37 @@
+{
+  "Case": "efecto-solo-sombra",
+  "Theme": "selawik",
+  "Width": 1920,
+  "Height": 1080,
+  "Texts": [
+    {
+      "Name": "main",
+      "FontSize": 92,
+      "FontUsed": "Selawik Semibold",
+      "Lines": [
+        "Santo, santo, santo, Señor omnipotente",
+        "Siempre el labio mío loores te dará"
+      ],
+      "Rect": {
+        "X": 122.25,
+        "Y": 396,
+        "Width": 1675.5,
+        "Height": 221
+      }
+    },
+    {
+      "Name": "caption",
+      "FontSize": 40,
+      "FontUsed": "Selawik",
+      "Lines": [
+        "Efectos"
+      ],
+      "Rect": {
+        "X": 1683,
+        "Y": 991,
+        "Width": 126.11,
+        "Height": 49
+      }
+    }
+  ]
+}
