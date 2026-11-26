@@ -35,6 +35,12 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   cuentas del video y del encuadre que usan las dos versiones pasaron a la parte común.
 - Por dentro, sin cambios para quien usa el programa: la versión de Mac dibuja las mismas 65
   diapositivas de prueba y un comparador dice caso por caso si la letra se ve igual que en Windows.
+- Por dentro, sin cambios para quien usa el programa: lo que ponen a pantalla completa la salida
+  y el escenario sin quitarle el teclado al operador, y lo que evita que la computadora frene el
+  programa, pasó a una pieza común. La versión de Mac ya tiene sus ventanas de salida y de
+  escenario (por encima de la barra de menú, en todos los escritorios, sin que la Mac se duerma)
+  y un programa de prueba para llevar a una Mac con proyector; si se desenchufa el proyector, la
+  salida se apaga y avisa.
 
 ## [1.4.0] - 2026-11-17
 
