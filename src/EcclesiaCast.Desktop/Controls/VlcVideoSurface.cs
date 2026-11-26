@@ -180,6 +180,14 @@ public sealed class VlcVideoSurface : Panel
     /// <summary>How many frames were drawn since the surface was made (for the tests and the log).</summary>
     public long FramesDrawn { get; private set; }
 
+    private long _framesDropped;
+
+    /// <summary>
+    /// How many frames VLC handed over while the one before was still being
+    /// drawn, and were let go (for the log: the Mac's «less than 1 % lost»).
+    /// </summary>
+    public long FramesDropped => Interlocked.Read(ref _framesDropped);
+
     /// <summary>Shows/loops the given video, or stops if it's not a video.</summary>
     public void Show(MediaItem? media)
     {
@@ -1044,7 +1052,10 @@ public sealed class VlcVideoSurface : Panel
         // Backpressure: drop frames instead of queueing them when the UI is
         // busy — a growing queue is what makes playback stutter.
         if (Interlocked.CompareExchange(ref _framePending, 1, 0) != 0)
+        {
+            Interlocked.Increment(ref _framesDropped);
             return;
+        }
 
         var generation = Volatile.Read(ref _generation);
 

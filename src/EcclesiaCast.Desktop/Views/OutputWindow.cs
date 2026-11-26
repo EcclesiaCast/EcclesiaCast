@@ -69,12 +69,27 @@ public sealed class OutputWindow : FullScreenWindow
             e.Handled = true;
             TurnOffRequested?.Invoke(this, EventArgs.Empty);
         };
+        // The frames per second and the memory, in the log while it is on.
+        _report = new VideoReport(() => Projected.Video);
+        PropertyChanged += (_, e) =>
+        {
+            if (e.Property != IsVisibleProperty)
+                return;
+            if (IsVisible)
+                _report.Start();
+            else
+                _report.Stop();
+        };
+
         Closed += (_, _) =>
         {
+            _report.Stop();
             _vm.PropertyChanged -= OnProjectionChanged;
             Projected.StopVideos();
         };
     }
+
+    private readonly VideoReport _report;
 
     /// <summary>The projected picture, with its players.</summary>
     public ProjectedView Projected { get; }
