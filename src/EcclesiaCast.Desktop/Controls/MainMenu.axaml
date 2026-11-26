@@ -1,0 +1,184 @@
+<!--
+  The menu of the operator's window: the same menus, texts, shortcuts and
+  tooltips as the Menu in App/MainWindow.xaml (batch 14). What is a command
+  of MainViewModel is bound to it; what the WPF window does in its own code
+  (Settings_Click, Exit_Click…) is raised as Requested, for the real window
+  (batch 19 on) to handle. On a Mac the program's menu also goes to the
+  system's bar (batch 22).
+-->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:EcclesiaCast.Presentation.ViewModels"
+             xmlns:local="using:EcclesiaCast.Desktop.Controls"
+             x:Class="EcclesiaCast.Desktop.Controls.MainMenu"
+             x:DataType="vm:MainViewModel">
+
+    <Menu Name="Bar" Padding="6,2" FontSize="12">
+
+        <MenuItem Header="_Archivo">
+            <MenuItem Header="Guardar una copia de la biblioteca…" Command="{Binding SaveBackupCommand}"/>
+            <MenuItem Header="Restaurar desde una copia…" Command="{Binding RestoreBackupCommand}"/>
+            <Separator/>
+            <MenuItem Header="Ajustes…" InputGesture="{OnPlatform Ctrl+OemComma, macOS=Meta+OemComma}"
+                      Tag="{x:Static local:MenuRequest.Settings}"
+                      ToolTip.Tip="Pantallas, sonido, transiciones, celular, rendimiento, actualizaciones y aspecto, todo en una ventana."/>
+            <Separator/>
+            <MenuItem Header="Salir" Tag="{x:Static local:MenuRequest.Exit}"/>
+        </MenuItem>
+
+        <MenuItem Header="_Edición">
+            <MenuItem Header="Nueva canción" Command="{Binding NewSongCommand}"/>
+            <MenuItem Header="Editar la canción elegida" Command="{Binding EditSongCommand}"/>
+            <Separator/>
+            <MenuItem Header="Nueva playlist" Command="{Binding NewPlaylistCommand}"/>
+            <Separator/>
+            <MenuItem Header="Temas…" Command="{Binding OpenThemesCommand}"/>
+            <MenuItem Header="Logos…" Command="{Binding OpenLogosCommand}"/>
+            <MenuItem Header="Papelera…" Command="{Binding OpenTrashCommand}"/>
+            <Separator/>
+            <MenuItem Header="Buscar en todo" InputGesture="{OnPlatform Ctrl+K, macOS=Meta+K}"
+                      Command="{Binding SearchEverythingCommand}"/>
+        </MenuItem>
+
+        <MenuItem Header="_Canciones">
+            <MenuItem Header="Crear canción desde cero…" Command="{Binding NewSongCommand}"
+                      ToolTip.Tip="Una canción nueva en blanco, para escribir o pegar la letra"/>
+            <Separator/>
+            <MenuItem Header="Buscar canciones en internet…" Command="{Binding SearchSongsOnlineCommand}"/>
+            <MenuItem Header="Traer canciones de otro programa…" Command="{Binding ImportFromOtherProgramCommand}"/>
+            <MenuItem Header="Importar canciones (.txt, .pro)…" Command="{Binding ImportSongsCommand}"/>
+        </MenuItem>
+
+        <MenuItem Header="_Biblias">
+            <MenuItem Header="Bajar Biblias de internet…" Command="{Binding DownloadBiblePackCommand}"
+                      ToolTip.Tip="Baja el paquete de Biblias sólo a esta computadora y elegís cuáles agregar."/>
+            <Separator/>
+            <MenuItem Header="Importar una Biblia (JSON o XML)…" Command="{Binding ImportBibleCommand}"/>
+            <MenuItem Header="Cómo preparar una Biblia para importar…" Command="{Binding ShowBibleFormatHelpCommand}"
+                      ToolTip.Tip="Los formatos que se leen, un ejemplo de cada uno y unas instrucciones para pedirle a una IA que convierta tu archivo."/>
+            <Separator/>
+            <MenuItem Header="Exportar paquete de Biblias…" Command="{Binding ExportBiblePackageCommand}"
+                      ToolTip.Tip="Guarda varias versiones en un solo archivo (.ecbiblias) para llevarlas a otra computadora tuya."/>
+            <MenuItem Header="Importar paquete de Biblias…" Command="{Binding ImportBiblePackageCommand}"/>
+        </MenuItem>
+
+        <MenuItem Header="_Fondos">
+            <MenuItem Header="Agregar imágenes, videos, PDF o PowerPoint…" Command="{Binding ImportMediaCommand}"/>
+            <Separator/>
+            <MenuItem Header="Bajar más fondos de internet…" Command="{Binding DownloadBackgroundPackCommand}"/>
+            <MenuItem Header="Buscar fondos en Pixabay…" Tag="{x:Static local:MenuRequest.Pixabay}"
+                      ToolTip.Tip="Videos y fotos de fondo que se pueden usar gratis, para bajar a una pestaña de medios"/>
+        </MenuItem>
+
+        <!-- The ticks of the layout are the window's: it sets them with
+             SetChecked when this menu opens (MenuRequest.ViewMenuOpening). -->
+        <MenuItem Name="ViewMenu" Header="_Ver">
+            <MenuItem Header="Canciones y playlist a la derecha" ToggleType="CheckBox"
+                      Tag="{x:Static local:MenuRequest.LibraryRight}"/>
+            <MenuItem Header="Playlist arriba de las canciones" ToggleType="CheckBox"
+                      Tag="{x:Static local:MenuRequest.PlaylistTop}"/>
+            <MenuItem Header="Medios arriba de las diapositivas" ToggleType="CheckBox"
+                      Tag="{x:Static local:MenuRequest.MediaTop}"/>
+            <MenuItem Header="Separar el PREVIEW del LIVE" ToggleType="CheckBox"
+                      Tag="{x:Static local:MenuRequest.SplitOutput}"
+                      ToolTip.Tip="Por defecto, LIVE, PREVIEW y ESCENARIO son pestañas de un solo recuadro. Tildado, vuelven a ser dos recuadros, uno arriba del otro."/>
+            <MenuItem Header="Preview arriba del Live" ToggleType="CheckBox"
+                      Tag="{x:Static local:MenuRequest.LiveBottom}"/>
+            <Separator/>
+            <MenuItem Header="Achicar canciones y Biblia" ToggleType="CheckBox"
+                      Tag="{x:Static local:MenuRequest.LibraryCollapsed}"/>
+            <MenuItem Header="Achicar la playlist" ToggleType="CheckBox"
+                      Tag="{x:Static local:MenuRequest.PlaylistCollapsed}"/>
+            <MenuItem Header="Achicar la barra de medios" ToggleType="CheckBox"
+                      Tag="{x:Static local:MenuRequest.MediaCollapsed}"
+                      ToolTip.Tip="Deja sólo la cabecera de la barra de medios (con sus botones) y le da el lugar a las diapositivas."/>
+            <MenuItem Header="Achicar las herramientas de texto" ToggleType="CheckBox"
+                      Tag="{x:Static local:MenuRequest.ToolsCollapsed}"
+                      ToolTip.Tip="Texto rápido, aviso al pie, resaltar, notas, música y tiempos quedan como una tira de íconos."/>
+            <MenuItem Header="Achicar la lista de audios" ToggleType="CheckBox"
+                      Tag="{x:Static local:MenuRequest.AudioListCollapsed}"
+                      ToolTip.Tip="En la pestaña Música, esconde la lista de audios y su reproductor (la música sigue sonando)."/>
+            <MenuItem Header="Canciones y playlist como íconos" ToggleType="CheckBox"
+                      Tag="{x:Static local:MenuRequest.LeftRail}"
+                      ToolTip.Tip="Achica canciones, Biblia y playlist a una columna angosta de íconos."/>
+            <Separator/>
+            <MenuItem Header="Modo PC de bajo rendimiento" ToggleType="CheckBox"
+                      IsChecked="{Binding IsLowPerformance, Mode=TwoWay}"
+                      ToolTip.Tip="Para computadoras viejas o sin placa de video: las transiciones cortan, el panel LIVE muestra la imagen fija del video y las vistas previas se dibujan sin sombra ni contorno. Lo que ve la congregación conserva su diseño."/>
+            <MenuItem Header="Reiniciar el sonido" Tag="{x:Static local:MenuRequest.RestartSound}"
+                      ToolTip.Tip="Si no suena nada después de cambiar la salida de audio de Windows (parlantes, auriculares, Bluetooth): vuelve a abrir el sonido de la música y de los videos, en el mismo lugar. Los videos de YouTube siguen solos la salida de Windows."/>
+            <Separator/>
+            <!-- With the shortcuts in sight (F1, Esc…) or without them and with
+                 less text. It only changes what is read: the shortcuts work in both. -->
+            <MenuItem Header="Diseño de aprendizaje (con atajos a la vista)" ToggleType="CheckBox"
+                      Tag="{x:Static local:MenuRequest.LearningMode}"/>
+            <MenuItem Header="Diseño avanzado (menos texto, sin atajos)" ToggleType="CheckBox"
+                      Tag="{x:Static local:MenuRequest.AdvancedMode}"/>
+            <Separator/>
+            <MenuItem Header="Volver al diseño original" Tag="{x:Static local:MenuRequest.ResetLayout}"/>
+        </MenuItem>
+
+        <MenuItem Header="_Proyección">
+            <MenuItem Header="Poner en vivo / apagar la salida" Command="{Binding ToggleOutputCommand}"/>
+            <Separator/>
+            <MenuItem Header="Black" InputGesture="F1" Command="{Binding ToggleBlackCommand}"/>
+            <MenuItem Header="Clear" InputGesture="F2" Command="{Binding ToggleClearCommand}"/>
+            <MenuItem Header="Logo" InputGesture="F3" Command="{Binding ToggleLogoCommand}"/>
+            <MenuItem Header="Sin fondo" InputGesture="F4" Command="{Binding ClearBackgroundCommand}"/>
+            <Separator/>
+            <MenuItem Header="Pantalla de escenario" Command="{Binding ToggleStageCommand}"/>
+            <MenuItem Header="Editar los escenarios…" Command="{Binding EditStageCommand}"/>
+            <MenuItem Header="Poner el cronómetro del escenario en cero" Command="{Binding ResetStageTimerCommand}"/>
+            <!-- WPF changes the text with a DataTrigger; here the class
+                 "running" follows IsCountdownRunning and a style picks the text. -->
+            <MenuItem Classes="countdown" Classes.running="{Binding IsCountdownRunning}"
+                      Command="{Binding OpenCountdownCommand}">
+                <MenuItem.Styles>
+                    <Style Selector="MenuItem.countdown">
+                        <Setter Property="Header" Value="Cuenta regresiva…"/>
+                    </Style>
+                    <Style Selector="MenuItem.countdown.running">
+                        <Setter Property="Header" Value="✔ Cuenta regresiva en marcha… (detener o cambiar)"/>
+                    </Style>
+                </MenuItem.Styles>
+            </MenuItem>
+            <MenuItem Header="Transiciones…" Tag="{x:Static local:MenuRequest.Transitions}"
+                      ToolTip.Tip="Cuántos segundos tardan en aparecer y desaparecer el logo, los cambios de imagen o video, la pantalla negra y el apagado de la salida."/>
+            <MenuItem Header="Controlar desde el celular…" Command="{Binding OpenRemoteCommand}"/>
+            <MenuItem Header="Seguir la canción por lo que se escucha (beta)…" Tag="{x:Static local:MenuRequest.Listening}"
+                      IsVisible="{Binding IsListeningAvailable}"
+                      ToolTip.Tip="El programa escucha el micrófono o la entrada de línea y sugiere o pasa las diapositivas de la canción abierta. Está en prueba."/>
+            <Separator/>
+            <MenuItem Header="Actualizar la lista de pantallas" Command="{Binding RefreshDisplaysCommand}"/>
+        </MenuItem>
+
+        <MenuItem Header="_Transmisión">
+            <MenuItem Header="Salida para OBS o vMix…" Command="{Binding OpenBroadcastCommand}"
+                      ToolTip.Tip="Las direcciones para pegar en OBS o vMix: la Biblia, las canciones y los anuncios, cada uno en su capa."/>
+            <MenuItem Header="Estilos de la transmisión…" Command="{Binding OpenBroadcastStylesCommand}"
+                      ToolTip.Tip="El diseño de cada capa de la transmisión: dónde va la letra, la placa, los colores y el fondo."/>
+        </MenuItem>
+
+        <MenuItem Name="HelpMenu" Header="A_yuda">
+            <MenuItem Header="Recorrido del programa" Tag="{x:Static local:MenuRequest.WelcomeTour}"
+                      ToolTip.Tip="Muestra de nuevo, parte por parte, dónde está cada cosa de la ventana."/>
+            <!-- No tooltip: with the submenu open they overlapped. Each
+                 tutorial brings its own. The window fills it (batch 21). -->
+            <MenuItem Name="TutorialsMenu" Header="Tutoriales">
+                <MenuItem Header="Cargando…" IsEnabled="False"/>
+            </MenuItem>
+            <MenuItem Header="Guía de uso (en internet)" Tag="{x:Static local:MenuRequest.Guide}"/>
+            <Separator/>
+            <MenuItem Header="Buscar actualizaciones…" Command="{Binding CheckForUpdatesCommand}"/>
+            <MenuItem Header="Buscar actualizaciones al abrir" ToggleType="CheckBox"
+                      IsChecked="{Binding CheckForUpdatesOnStartup, Mode=TwoWay}"
+                      ToolTip.Tip="Una vez por día, a los pocos segundos de abrir el programa, mira en GitHub si hay una versión nueva. No manda nada tuyo. Nunca interrumpe mientras se proyecta."/>
+            <Separator/>
+            <MenuItem Name="DonateMenuItem" Header="Colaborar con EcclesiaCast…" IsVisible="False"
+                      Tag="{x:Static local:MenuRequest.Donate}"/>
+            <MenuItem Header="Enviar comentarios…" Tag="{x:Static local:MenuRequest.Feedback}"
+                      ToolTip.Tip="Contanos qué anduvo bien, qué falló o qué te faltó. No se manda nada hasta que apretás «Enviar»."/>
+            <MenuItem Header="Acerca de EcclesiaCast" Tag="{x:Static local:MenuRequest.About}"/>
+        </MenuItem>
+    </Menu>
+</UserControl>
