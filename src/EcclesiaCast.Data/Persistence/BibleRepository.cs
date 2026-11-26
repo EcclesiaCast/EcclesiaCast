@@ -1,6 +1,7 @@
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Bible;
 using EcclesiaCast.Core.Search;
+using EcclesiaCast.Core.Songs;
 using Microsoft.EntityFrameworkCore;
 
 namespace EcclesiaCast.Data.Persistence;
@@ -183,22 +184,19 @@ public sealed class BibleRepository(string dbPath) : IBibleRepository
     public IReadOnlyList<BibleVerseResult> SearchText(int versionId, string query, int limit = 60)
     {
         using var db = new AppDbContext(dbPath);
-        if (TextMatching.ContainsPattern(query) is not { } pattern)
+        var wanted = LyricsSearch.Normalize(query);
+        if (wanted.Length == 0)
             return [];
 
-        // Some files keep the line breaks of the printed page; flatten them
-        // the way the query was flattened so a phrase still matches across them.
+        // The verses are read one by one until enough match: LIKE would tell
+        // «dio» from «dió», and capitals with accents from lowercase ones.
+        // Only the start of a word counts («echa» is not in «derecha»).
         return db.BibleVerses.AsNoTracking()
-            .Where(v => v.Book.VersionId == versionId && EF.Functions.Like(
-                v.Text.Replace("\r", " ").Replace("\n", " ").Replace("\t", " ")
-                    .Replace("  ", " ").Replace("  ", " ").Replace("  ", " "),
-                pattern))
+            .Where(v => v.Book.VersionId == versionId)
             .OrderBy(v => v.Book.Number).ThenBy(v => v.Chapter).ThenBy(v => v.Verse)
             .Select(v => new BibleVerseResult(v.Book.Number, v.Book.Name, v.Chapter, v.Verse, v.Text))
             .AsEnumerable()
-            // LIKE also matches inside a word («echa» in «derecha»); the rows
-            // are read one by one until enough start at a word.
-            .Where(v => TextMatching.StartsAtWord(v.Text, query))
+            .Where(v => LyricsSearch.StartsAtWord(v.Text, wanted))
             .Take(limit)
             .ToList();
     }

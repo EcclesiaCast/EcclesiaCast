@@ -1706,7 +1706,7 @@
                                           AutomationProperties.Name="Dividir versículos largos"
                                           ToolTip="Dividir versículos largos: un versículo que pasa el máximo de caracteres sale en varias diapositivas. Queda guardado en el tema de la Biblia (🎨 Temas → Biblia)."/>
                                 <controls:NumericField x:Name="BibleSplitBox" Minimum="50" Maximum="500" Step="10"
-                                                       Width="92" Margin="6,0,0,0" VerticalAlignment="Center"
+                                                       Width="112" Margin="6,0,0,0" VerticalAlignment="Center"
                                                        Value="{Binding BibleSplitChars}"
                                                        IsEnabled="{Binding BibleSplitOn}"
                                                        AutomationProperties.Name="Máximo de caracteres por diapositiva"

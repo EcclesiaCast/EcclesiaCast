@@ -5,6 +5,15 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+### Mejorado
+
+- **Buscar sin fijarse en tildes ni mayúsculas.** En la búsqueda de la computadora y del celular,
+  «senor tu estas» encuentra «Señor, tú estás», en canciones y en la Biblia; tampoco cuentan las
+  comas ni los puntos.
+- **Aviso sobre los anuncios de YouTube** en la ventana de YouTube, el tutorial y la guía: un video
+  pasado por internet puede mostrarlos en la pantalla; la copia descargada, no.
+- El número de **«Dividir»** en la barra de la Biblia ya no se ve cortado.
+
 ### Agregado
 
 - **«Dividir» en la barra de la Biblia y en el celular.** Con versículos abiertos, al lado del botón

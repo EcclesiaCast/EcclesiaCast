@@ -11,7 +11,7 @@ texto: A la derecha de la barra de medios hay botones para proyectar lo que no e
 [paso]
 señalar: MediaYouTubeButton
 titulo: ▶ YouTube
-texto: Buscá videos en YouTube dentro del programa (con tu cuenta Premium, sin anuncios). Al sumar uno elegís «Reproducir por internet» o «Descargar para usar sin internet».
+texto: Buscá videos (no hace falta cuenta). Por internet pueden salir anuncios en pantalla, salvo con Premium: para el culto elegí «Descargar para usar sin internet».
 
 [paso]
 señalar: MediaLinkButton

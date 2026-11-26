@@ -205,7 +205,9 @@ En la barra **MEDIOS**, abajo:
   tocá **🔇 Sin sonido** debajo del EN VIVO para que suene (el video lo recuerda).
 - **Videos de YouTube.** Con **▶ YouTube** los buscás dentro del programa, y con **🔗**
   pegás el link de uno. Al sumarlos elegís **🌐 Reproducir por internet** o
-  **💾 Descargar para usar sin internet**. Uno que quedó por internet se baja después con
+  **💾 Descargar para usar sin internet**. Ojo: un video pasado por internet **puede mostrar
+  anuncios en la pantalla** (con cuenta Premium, no); la copia descargada no los tiene. Para
+  buscar no hace falta cuenta. Uno que quedó por internet se baja después con
   **clic derecho → Descargar para uso local**: así no dependés de internet durante el
   servicio. La copia queda en la pestaña que tengas abierta. La primera vez, EcclesiaCast
   baja solo lo que necesita para descargar (no hay que instalar nada). Con
