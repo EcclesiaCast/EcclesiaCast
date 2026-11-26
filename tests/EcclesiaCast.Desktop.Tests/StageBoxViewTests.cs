@@ -21,6 +21,10 @@ public sealed class StageBoxViewTests
     [InlineData("escenario-texto-largo")]
     public void A_stage_box_is_cut_in_the_lines_of_wpf_and_shrunk_like_it(string id)
     {
+        // The WPF reference is drawn with Segoe UI, which a Mac does not have.
+        if (!OperatingSystem.IsWindows())
+            Assert.Skip("La referencia de WPF usa Segoe UI, que la Mac no tiene: esta comparación corre en Windows.");
+
         var c = RenderCases.Load(id);
         var theme = c.Themes.Single(t => t.Key == "cancion");
         var wpf = RenderCases.Wpf(id, "cancion").Texts.Single(t => t.Name == "stage");

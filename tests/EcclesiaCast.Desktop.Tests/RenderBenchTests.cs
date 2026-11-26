@@ -53,6 +53,10 @@ public sealed class RenderBenchTests
     [AvaloniaFact]
     public void The_comparator_writes_its_report()
     {
+        // It needs the WPF reference and the Avalonia bench of Windows.
+        if (!OperatingSystem.IsWindows())
+            Assert.Skip("El comparador corre en Windows: necesita la referencia de WPF y el banco de Avalonia en Windows.");
+
         RunBench();
         var root = Path.GetDirectoryName(RenderCases.OutputFolder("avalonia"))!;
         var avalonia = Path.Combine(root, "avalonia");
