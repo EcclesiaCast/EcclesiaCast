@@ -1646,6 +1646,41 @@ public partial class MainWindow : Window
         menu.IsOpen = true;
     }
 
+    /// <summary>Room the title and the «EN VIVO» badge keep beside the Bible's controls.</summary>
+    private const double GridTitleRoom = 340;
+
+    private void GridHeader_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (e.WidthChanged)
+            PlaceBibleGridTools();
+    }
+
+    private void BibleGridTools_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) =>
+        Dispatcher.BeginInvoke(PlaceBibleGridTools, System.Windows.Threading.DispatcherPriority.Loaded);
+
+    /// <summary>
+    /// The Bible's controls sit at the right of the bar over the slides; when
+    /// they would crowd the title out, they take a row of their own under it.
+    /// </summary>
+    private void PlaceBibleGridTools()
+    {
+        if (!BibleGridTools.IsVisible)
+            return;
+
+        // What they would take in one line.
+        var wanted = BibleGridTools.Children.OfType<FrameworkElement>().Sum(child =>
+        {
+            child.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            return child.DesiredSize.Width;
+        });
+        var dock = GridHeader.ActualWidth < wanted + GridTitleRoom ? Dock.Bottom : Dock.Right;
+        if (DockPanel.GetDock(BibleGridTools) == dock)
+            return;
+
+        DockPanel.SetDock(BibleGridTools, dock);
+        BibleGridTools.Margin = new Thickness(0, dock == Dock.Bottom ? 6 : 0, 0, 0);
+    }
+
     /// <summary>«Elegir un fondo de la biblioteca»: a submenu per tab with its backgrounds, each one picks it.</summary>
     private static void AddBackgroundChoices(ContextMenu menu, MainViewModel vm, System.Windows.Input.ICommand pick)
     {

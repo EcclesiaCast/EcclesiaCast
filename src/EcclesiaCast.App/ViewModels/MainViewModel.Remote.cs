@@ -196,7 +196,10 @@ public sealed partial class MainViewModel
             // A page (or a media) on the air shows as its poster on the phone,
             // not as the words that were up before it.
             LiveMediaId: OnAir is OnAirSource.Presentation or OnAirSource.Media && LiveMediaId > 0 ? LiveMediaId : null,
-            NextMediaId: IsPresentationOpen ? PreviewPageMedia?.Id : null);
+            NextMediaId: IsPresentationOpen ? PreviewPageMedia?.Id : null,
+            BibleSplit: IsBibleOpen && CanSplitBibleVerses
+                ? new RemoteBibleSplit(BibleSplitOn, (int)BibleSplitChars)
+                : null);
     }
 
     /// <summary>What the last phone search found, so a result can be opened by its place in the list.</summary>
@@ -429,6 +432,7 @@ public sealed partial class MainViewModel
             case "logo": ToggleLogo(); break;
             case "output": ToggleOutput(); break;
             case "nobackground": ClearBackground(); break;
+            case "versesplit" when index is int split: SetBibleSplitFromRemote(split); break;
             case "media" when index is int mediaId
                               && _allMedia.FirstOrDefault(m => m.Id == mediaId) is { Type: MediaType.Image or MediaType.Video } chosen
                               && !IsPresentationTab(chosen.Category):

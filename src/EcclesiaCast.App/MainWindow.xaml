@@ -1689,8 +1689,38 @@
 
                     <StackPanel Grid.Row="0">
                     <!-- Qué hay en la grilla y, si es otra cosa, qué está en pantalla -->
-                    <DockPanel Margin="12,8,12,8" LastChildFill="False"
+                    <DockPanel x:Name="GridHeader" Margin="12,8,12,8" LastChildFill="False"
+                               SizeChanged="GridHeader_SizeChanged"
                                Visibility="{Binding HasGridTitle, Converter={StaticResource BoolToVis}}">
+                        <!-- Sólo con versículos en la grilla. Va primero para que, con la ventana
+                             angosta, el código lo pueda bajar a un renglón propio sin tapar nada -->
+                        <WrapPanel x:Name="BibleGridTools" DockPanel.Dock="Right" HorizontalAlignment="Right"
+                                   Visibility="{Binding IsBibleOpen, Converter={StaticResource BoolToVis}}"
+                                   IsVisibleChanged="BibleGridTools_IsVisibleChanged">
+                            <!-- «Dividir versículos largos» del tema de la Biblia en uso, sin abrir el editor -->
+                            <StackPanel Orientation="Horizontal" Margin="10,0,0,0" VerticalAlignment="Center"
+                                        IsEnabled="{Binding CanSplitBibleVerses}">
+                                <CheckBox x:Name="BibleSplitCheck" Content="Dividir" FontSize="11"
+                                          Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center"
+                                          IsChecked="{Binding BibleSplitOn}"
+                                          AutomationProperties.Name="Dividir versículos largos"
+                                          ToolTip="Dividir versículos largos: un versículo que pasa el máximo de caracteres sale en varias diapositivas. Queda guardado en el tema de la Biblia (🎨 Temas → Biblia)."/>
+                                <controls:NumericField x:Name="BibleSplitBox" Minimum="50" Maximum="500" Step="10"
+                                                       Width="92" Margin="6,0,0,0" VerticalAlignment="Center"
+                                                       Value="{Binding BibleSplitChars}"
+                                                       IsEnabled="{Binding BibleSplitOn}"
+                                                       AutomationProperties.Name="Máximo de caracteres por diapositiva"
+                                                       ToolTip="Máximo de caracteres por diapositiva, de 50 a 500"/>
+                            </StackPanel>
+                            <!-- El fondo propio de la Biblia, en el mismo lugar que el de las canciones
+                                 (también: clic derecho en un medio) -->
+                            <Button Content="{Binding BibleBackgroundLabel}" FontSize="11" Padding="8,3" Margin="10,0,0,0"
+                                    MaxWidth="200"
+                                    Style="{StaticResource DarkButton}"
+                                    Click="BibleBackgroundButton_Click"
+                                    AutomationProperties.Name="Fondo de la Biblia"
+                                    ToolTip="{Binding BibleBackgroundHint}"/>
+                        </WrapPanel>
                         <!-- Sólo con una canción en la grilla: cuántas líneas lleva cada diapositiva -->
                         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0"
                                     Visibility="{Binding IsSongOpen, Converter={StaticResource BoolToVis}}"
@@ -1722,15 +1752,6 @@
                                 Visibility="{Binding IsSongOpen, Converter={StaticResource BoolToVis}}"
                                 AutomationProperties.Name="Fondo de esta canción"
                                 ToolTip="{Binding SongBackgroundHint}"/>
-                        <!-- Sólo con versículos en la grilla: el fondo propio de la Biblia, en el mismo
-                             lugar que el de las canciones (también: clic derecho en un medio) -->
-                        <Button DockPanel.Dock="Right" Content="{Binding BibleBackgroundLabel}" FontSize="11" Padding="8,3" Margin="10,0,0,0"
-                                MaxWidth="200"
-                                Style="{StaticResource DarkButton}"
-                                Click="BibleBackgroundButton_Click"
-                                Visibility="{Binding IsBibleOpen, Converter={StaticResource BoolToVis}}"
-                                AutomationProperties.Name="Fondo de la Biblia"
-                                ToolTip="{Binding BibleBackgroundHint}"/>
                         <!-- Sólo con una presentación en la grilla -->
                         <Button DockPanel.Dock="Right" Content="➕ Playlist" FontSize="11" Padding="8,3" Margin="10,0,0,0"
                                 Style="{StaticResource DarkButton}"

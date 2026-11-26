@@ -60,6 +60,13 @@ internal static class RemotePage
                      background:#232630;border:1px solid #2a2e3a;border-radius:10px;color:#fff}
           .err{color:#e08a8a;font-size:14px;min-height:1.3em;margin-top:10px}
           .hide{display:none}
+          .split{display:flex;align-items:center;gap:10px;font-size:15px;padding:6px 0}
+          .split input{width:22px;height:22px;margin:0}
+          .splitrow{display:flex;gap:8px;margin:6px 0}
+          .splitrow button{padding:10px 18px}
+          .splitrow input{flex:1;min-width:0;font:inherit;text-align:center;background:#232630;color:#fff;
+                          border:1px solid #2a2e3a;border-radius:10px}
+          .splitrow input:disabled,.splitrow button:disabled{opacity:.4}
           .folders{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
           .folders button{padding:10px 12px;font-size:14px}
           .ontop{width:12px;height:12px;fill:#f4b942;vertical-align:-1px;margin-left:6px}
@@ -141,6 +148,18 @@ internal static class RemotePage
             <div class="card hide" id="presCard">
               <div class="label">Presentaciones</div>
               <div id="presList"></div>
+            </div>
+
+            <div class="card hide" id="splitCard">
+              <div class="label">Biblia</div>
+              <label class="split"><input type="checkbox" id="splitOn" onchange="splitToggled()"> Dividir versículos largos</label>
+              <div class="splitrow">
+                <button onclick="splitStep(-10)" aria-label="Menos caracteres">−</button>
+                <input type="number" id="splitChars" min="50" max="500" step="10" inputmode="numeric"
+                       onchange="splitTyped()" aria-label="Máximo de caracteres por diapositiva">
+                <button onclick="splitStep(10)" aria-label="Más caracteres">+</button>
+              </div>
+              <div class="none">Máximo de caracteres por diapositiva. Es la misma opción del tema de la Biblia.</div>
             </div>
 
             <div class="card">
@@ -445,6 +464,40 @@ internal static class RemotePage
           });
         }
 
+        // ── Dividir versículos largos: lo mismo que la casilla «Dividir» de la computadora ──
+        function splitToggled() {
+          cmd('versesplit', document.getElementById('splitOn').checked ? -1 : 0);
+        }
+
+        function splitSend(value) {
+          if (!document.getElementById('splitOn').checked) return;
+          value = Math.min(500, Math.max(50, Math.round(value)));
+          document.getElementById('splitChars').value = value;
+          cmd('versesplit', value);
+        }
+
+        function splitTyped() {
+          var value = parseInt(document.getElementById('splitChars').value, 10);
+          if (!isNaN(value)) splitSend(value);
+        }
+
+        function splitStep(by) {
+          var value = parseInt(document.getElementById('splitChars').value, 10);
+          splitSend((isNaN(value) ? 150 : value) + by);
+        }
+
+        function renderSplit(split) {
+          var card = document.getElementById('splitCard');
+          card.className = split ? 'card' : 'card hide';
+          if (!split) return;
+          document.getElementById('splitOn').checked = split.on;
+          var box = document.getElementById('splitChars');
+          // Not while it is being typed: the next poll would write over it.
+          if (document.activeElement !== box) box.value = split.chars;
+          Array.prototype.forEach.call(card.querySelectorAll('.splitrow button, .splitrow input'),
+            function (e) { e.disabled = !split.on; });
+        }
+
         function render(s) {
           document.getElementById('song').textContent = s.songTitle || 'EcclesiaCast';
           document.getElementById('live').textContent = s.liveText || '';
@@ -465,6 +518,7 @@ internal static class RemotePage
           document.getElementById('live').style.display = s.liveMediaId ? 'none' : '';
           document.getElementById('next').style.display = s.nextMediaId ? 'none' : '';
 
+          renderSplit(s.bibleSplit);
           renderPresentations(s.presentations || []);
           renderSlides(s.slides || []);
 

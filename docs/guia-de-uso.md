@@ -92,7 +92,12 @@ En la pestaña **Biblia**:
   Medios → **Usar como fondo de la Biblia**. Se pone solo al proyectar un versículo después de otra
   cosa. Con versículos en la grilla, el botón **🖼** de arriba dice cuál está puesto y permite usar el
   fondo que está en pantalla, elegir uno de la biblioteca por pestaña o quitarlo (también: clic
-  derecho en un medio → **Quitar el fondo de la Biblia**).
+  derecho en un medio → **Quitar el fondo de la Biblia**). Las carpetas de medios que van encima de
+  todo llevan un ícono de dos cuadros superpuestos, en amarillo: lo que hay ahí no sirve de fondo.
+- **Dividir**: al lado del botón **🖼**, la casilla **Dividir** y su número (máximo de caracteres por
+  diapositiva) parten los versículos largos en varias diapositivas, sin abrir el editor de temas. Es
+  la misma opción del tema de la Biblia (ver **Temas**): queda guardada ahí, y el pasaje abierto se
+  rearma sin salir del versículo que está en pantalla. También está en el celular.
 - **🕘 Historial**, a la derecha de la caja de la cita, tiene los versículos que proyectaste: un
   clic lo carga y lo marca, doble clic lo proyecta (también se abre con la flecha ↓ en la caja
   vacía). Con el panel angosto el botón es sólo 🕘.
@@ -530,6 +535,9 @@ dirección y un **PIN de cuatro dígitos**.
   **Sin fondo**, prender y apagar la **salida**, tocar cualquier **diapositiva**
   y cualquier ítem de la **playlist**. Arriba se ve la letra en vivo y la que
   sigue.
+- Con versículos abiertos aparece **Dividir versículos largos**, con su máximo de
+  caracteres (**−** y **+**). Es lo mismo que la casilla **Dividir** de la
+  computadora: lo que cambiás en un lado se ve en el otro.
 - La primera vez, **Windows pregunta si permitís el acceso a la red**: aceptá
   para *redes privadas*.
 - Queda encendido para el próximo servicio. Se apaga desde la misma ventana.

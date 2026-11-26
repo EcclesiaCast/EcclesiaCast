@@ -25,6 +25,9 @@ public sealed record RemoteHit(int Index, string Kind, string Title, string Deta
 /// <summary>An image or video of the library the phone can put on the screen: <paramref name="Id"/> is all it sends back.</summary>
 public sealed record RemoteMedia(int Id, string Name, string Kind, string Tab, bool TabOnTop = false);
 
+/// <summary>«Dividir versículos largos» of the Bible theme in use; sent only while verses are open.</summary>
+public sealed record RemoteBibleSplit(bool On, int Chars);
+
 /// <summary>
 /// Everything the phone needs to draw itself. Sent as JSON on every poll, so
 /// it stays small: slide previews are trimmed and nothing binary travels.
@@ -41,7 +44,8 @@ public sealed record RemoteState(
     string SongTitle,
     IReadOnlyList<RemotePresentation>? Presentations = null,
     int? LiveMediaId = null,
-    int? NextMediaId = null);
+    int? NextMediaId = null,
+    RemoteBibleSplit? BibleSplit = null);
 
 /// <summary>
 /// What the phone is allowed to do. Implemented by the operator's view model;

@@ -104,6 +104,8 @@ public sealed partial class MainViewModel
         if (!_themeManager.Show())
             return;
 
+        SyncBibleSplit();
+
         // Re-render whatever is on the grid with the fresh themes, keeping
         // the live slide projected.
         RebuildSlidesPreservingLive(() =>

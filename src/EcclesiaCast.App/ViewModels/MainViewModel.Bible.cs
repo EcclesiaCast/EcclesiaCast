@@ -565,6 +565,7 @@ public sealed partial class MainViewModel
             _currentPlaylistIndex = -1;
 
         var theme = DefaultBibleTheme;
+        SyncBibleSplit();
 
         // Opening card: jump back to the previous chapter (crossing into the
         // previous book's last chapter when needed). Never projected as-is.

@@ -7,6 +7,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **«Dividir» en la barra de la Biblia y en el celular.** Con versículos abiertos, al lado del botón
+  🖼 hay una casilla «Dividir» con el máximo de caracteres por diapositiva, y la misma opción aparece
+  en el control desde el celular. Es la del tema de la Biblia en uso (queda guardada ahí), y el
+  pasaje abierto se rearma al instante sin perder el versículo en pantalla. Con la ventana angosta
+  pasa a un renglón propio.
 - **Ícono de las carpetas que van encima de todo.** Las pestañas de medios configuradas como
   «Todo va en primer plano» (y las presentaciones) muestran al lado del nombre dos cuadros
   superpuestos, en amarillo, con un globito que lo explica. El mismo ícono aparece en el aviso
