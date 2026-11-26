@@ -67,6 +67,8 @@ public sealed class StageBoxView : Border
         _text = new TextBlock
         {
             FontSize = Box.FontSize,
+            // As in WPF, letters that go past the frame are not cut.
+            ClipToBounds = false,
             Foreground = ParseBrush(Box.Color),
             TextAlignment = Box.Align switch
             {

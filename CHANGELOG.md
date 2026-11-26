@@ -36,7 +36,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   En la versión de Mac, el aviso al pie sale en seminegrita como en Windows (antes a veces salía
   fino, según qué letra se hubiera dibujado antes) y una letra sin negrita propia, como Impact,
   se engrosa y se ensancha igual que en Windows. En la Mac, el celular ya ve las miniaturas de
-  los medios (antes la Mac nunca las encontraba dentro de su carpeta). La diapositiva de Windows
+  los medios (antes la Mac nunca las encontraba dentro de su carpeta). Con interlineado propio, la
+  versión de Mac ya no corta la parte de abajo del último renglón y pone la letra a la misma altura
+  que Windows. La diapositiva de Windows
   lee el estilo (tema más los cambios de cada diapositiva) de la misma pieza común que la de Mac.
   Las medidas de la letra de la versión nueva en Windows quedan guardadas, para que la Mac se
   compare sola con Windows cada vez que GitHub arma el programa de prueba.

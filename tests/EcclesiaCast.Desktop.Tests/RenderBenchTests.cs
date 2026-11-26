@@ -261,7 +261,12 @@ public sealed class RenderBenchTests
         if (empty || !text.IsEffectivelyVisible)
             return;
 
-        var matrix = text.TransformToVisual(host) ?? Matrix.Identity;
+        // The frame where the layout put the text, as WPF measures it: without
+        // the text's own render transform (the main text's letters are moved
+        // to WPF's baseline when the line spacing is forced; its frame is not).
+        var matrix = text.GetVisualParent() is Visual parent
+            ? Matrix.CreateTranslation(text.Bounds.Position) * (parent.TransformToVisual(host) ?? Matrix.Identity)
+            : text.TransformToVisual(host) ?? Matrix.Identity;
         // The frame of an Avalonia TextBlock that wraps is as wide as the room
         // it was given, or as its widest line *with* the space that line ends
         // in; WPF's is the widest line without it, and nothing of that is

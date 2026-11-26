@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Headless.XUnit;
@@ -111,5 +112,37 @@ public sealed class SlideViewTests
         var back = Fades.Fade(border, 0, TimeSpan.Zero);
         Assert.True(back.IsCompleted);
         Assert.Equal(0, border.Opacity);
+    }
+
+    [AvaloniaFact]
+    public void With_tight_line_spacing_the_last_line_is_not_cut()
+    {
+        // At 0,85 the letters of the last line go past the text's frame; WPF
+        // draws them whole, and an Avalonia TextBlock used to cut them there.
+        var c = RenderCases.Load("interlineado-chico");
+        var view = SlideDrawing.Slide(c, c.Themes.Single(t => t.Key == "cancion"));
+        using var drawing = new SlideDrawing(view);
+        var text = Named<TextBlock>(view, "MainText");
+        var frame = text.TransformToVisual(drawing.Host)!.Value;
+        var bottom = (int)Math.Ceiling(new Avalonia.Point(0, text.Bounds.Height).Transform(frame).Y);
+        var left = (int)new Avalonia.Point(0, 0).Transform(frame).X;
+        var right = (int)new Avalonia.Point(text.Bounds.Width, 0).Transform(frame).X;
+
+        using var picture = drawing.Capture();
+        using var pixels = picture.Lock();
+        var white = 0;
+        for (var y = bottom + 2; y < bottom + 20; y++)
+        {
+            for (var x = left; x < right; x++)
+            {
+                var at = pixels.Address + y * pixels.RowBytes + x * 4;
+                if (System.Runtime.InteropServices.Marshal.ReadByte(at) > 200
+                    && System.Runtime.InteropServices.Marshal.ReadByte(at, 1) > 200
+                    && System.Runtime.InteropServices.Marshal.ReadByte(at, 2) > 200)
+                    white++;
+            }
+        }
+
+        Assert.True(white > 200, $"Debajo del renglón hay {white} puntos de letra: lo cortó.");
     }
 }

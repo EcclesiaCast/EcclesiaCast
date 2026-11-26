@@ -98,8 +98,13 @@ public partial class SlideView : UserControl
         // The XAML of WPF says «Segoe UI» on every text; here the font really
         // drawn for it (Selawik where it is missing), in the face WPF draws
         // for the weight the XAML asks (the notice's Medium is Semibold).
+        // An Avalonia TextBlock cuts what goes past its frame; WPF's does not,
+        // and with tight line spacing the last line's letters go past it.
         foreach (var text in new[] { MainText, SecondaryText, CaptionText, LogoText, CountdownHeading, CountdownClock, OverlayText })
+        {
             Face(text, "Segoe UI", text.FontWeight, text.FontStyle != FontStyle.Normal);
+            text.ClipToBounds = false;
+        }
 
         MainText.SizeChanged += (_, _) => UpdateBands();
         SecondaryText.SizeChanged += (_, _) => UpdateBands();
@@ -259,6 +264,7 @@ public partial class SlideView : UserControl
             {
                 Text = Transform(box.Text) ?? string.Empty,
                 FontSize = Math.Max(8, box.FontSize),
+                ClipToBounds = false,
                 Foreground = BrushFrom(box.Color, Brushes.White),
                 TextWrapping = TextWrapping.Wrap,
                 TextAlignment = Alignment(box.AlignH),
@@ -462,6 +468,10 @@ public partial class SlideView : UserControl
         MainText.LineHeight = style.LineSpacing is double spacing && spacing > 0
             ? fit.FontSize * spacing
             : double.NaN;
+        // With its own line spacing, the letters sit in each line where WPF puts them.
+        var shift = Fonts.Face(style.FontFamily, style.Weight, style.Italic)
+            .WpfBaselineShift(fit.FontSize, MainText.LineHeight);
+        MainText.RenderTransform = shift == 0 ? null : new TranslateTransform(0, shift);
 
         RenderWithHighlight(MainText, main, isMain: true);
         RenderWithHighlight(SecondaryText, secondary, isMain: false);
