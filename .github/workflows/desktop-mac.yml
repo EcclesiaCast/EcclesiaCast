@@ -1,0 +1,90 @@
+name: desktop-mac
+
+# The test program for the Mac (docs/plan-mac-11.md): builds EcclesiaCast.app
+# for Apple chips, unsigned by Apple (ad-hoc signature only), and leaves it as
+# a .zip attached to the run. It publishes nothing: no release, no tag, no
+# page. Runs by hand or on pushes to prueba-mac/** branches; the program's
+# own build is build.yml. Copied from proto-mac.yml (batch 1).
+on:
+  workflow_dispatch:
+  push:
+    branches: ['prueba-mac/**']
+
+permissions:
+  contents: read
+
+jobs:
+  mac:
+    # macos-15 runs on an Apple chip, like the Mac the test program is for.
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - name: Machine
+        run: |
+          sw_vers
+          uname -m
+
+      # The Avalonia tests (the render bench, the windows, the program put
+      # together without a screen) on this Mac before packing anything.
+      - name: Test the Avalonia program
+        run: dotnet test tests/EcclesiaCast.Desktop.Tests --configuration Release --verbosity normal
+
+      - name: Publish for Apple chips
+        run: >
+          dotnet publish src/EcclesiaCast.Desktop/EcclesiaCast.Desktop.csproj
+          --configuration Release --runtime osx-arm64 --self-contained
+          -p:Version=0.0.0-mac.${{ github.run_number }}
+          --output "$RUNNER_TEMP/publish"
+
+      - name: Make, sign and zip the app
+        run: |
+          chmod +x src/EcclesiaCast.Desktop/mac/bundle.sh
+          src/EcclesiaCast.Desktop/mac/bundle.sh "$RUNNER_TEMP/publish" "$RUNNER_TEMP/out" "0.0.0-mac.${{ github.run_number }}"
+
+      # The zip is already made with ditto (it keeps the execute permission
+      # and the signatures); the artifact only carries it.
+      - name: Upload the app
+        uses: actions/upload-artifact@v7
+        with:
+          name: EcclesiaCast-mac-prueba
+          path: ${{ runner.temp }}/out/EcclesiaCast-mac-prueba.zip
+          compression-level: 0
+          if-no-files-found: error
+
+      # What Alexis will get: unzip the zip the same way the Mac does and
+      # check the signature there.
+      - name: Check the zipped app
+        run: |
+          mkdir -p "$RUNNER_TEMP/check"
+          ditto -x -k "$RUNNER_TEMP/out/EcclesiaCast-mac-prueba.zip" "$RUNNER_TEMP/check"
+          APP="$RUNNER_TEMP/check/EcclesiaCast.app"
+          codesign --verify --deep --strict --verbose=2 "$APP"
+          ls -l "$APP/Contents/MacOS/EcclesiaCast.Desktop"
+          ls "$APP/Contents/Resources/bibles" "$APP/Contents/Resources/fondos"
+          spctl --assess --type execute --verbose "$APP" || echo "Gatekeeper no lo acepta sin «Abrir igualmente» (esperado: no tiene firma de Apple)"
+
+      # GitHub's Macs have a desktop session: open the unzipped app for 30
+      # seconds with a library of its own and read its log. Shows, before the
+      # real Mac, whether the library is created, the Bibles imported and
+      # LibVLC loaded. It does not fail the run (a runner without a screen
+      # would be a false alarm).
+      - name: Start the app for a moment
+        continue-on-error: true
+        run: |
+          APP="$RUNNER_TEMP/check/EcclesiaCast.app"
+          export ECCLESIACAST_DATA_DIR="$RUNNER_TEMP/biblioteca"
+          "$APP/Contents/MacOS/EcclesiaCast.Desktop" &
+          PID=$!
+          sleep 30
+          kill "$PID" 2>/dev/null || true
+          sleep 2
+          LOGS="$ECCLESIACAST_DATA_DIR/logs"
+          ls -la "$LOGS"
+          cat "$LOGS"/*.log
+          grep -q "LibVLC .* listo" "$LOGS"/*.log
+          grep -q "Biblias del instalador traídas" "$LOGS"/*.log
+          grep -q "Ventana del operador lista" "$LOGS"/*.log
+          ! grep -E "\[(ERR|FTL)\]" "$LOGS"/*.log
