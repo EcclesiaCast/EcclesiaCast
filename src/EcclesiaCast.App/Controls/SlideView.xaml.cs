@@ -227,24 +227,26 @@ public partial class SlideView : UserControl
     private SlideTheme CurrentTheme => Slide?.Theme ?? SlideTheme.Fallback;
 
     // ── Estilo efectivo: tema + overrides del slide ──────────────
+    // Read from SlideStyle, the same reading the Avalonia slide view does.
 
-    private string EffectiveFontFamily => Slide?.Override?.FontFamily ?? CurrentTheme.FontFamily;
-    private bool EffectiveBold => Slide?.Override?.Bold ?? CurrentTheme.Bold;
-    private bool EffectiveItalic => Slide?.Override?.Italic ?? CurrentTheme.Italic;
-    private bool EffectiveUnderline => Slide?.Override?.Underline ?? false;
-    private bool EffectiveStrikethrough => Slide?.Override?.Strikethrough ?? false;
-    private bool EffectiveShadow => Slide?.Override?.Shadow ?? CurrentTheme.Shadow;
-    private double EffectiveShadowOpacity => Slide?.Override?.ShadowOpacity ?? CurrentTheme.ShadowOpacity;
-    private double EffectiveOutlineWidth => Slide?.Override?.OutlineWidth ?? CurrentTheme.OutlineWidth;
-    private string EffectiveOutlineColor => Slide?.Override?.OutlineColor ?? CurrentTheme.OutlineColor;
-    private string EffectiveTextColor => Slide?.Override?.TextColor ?? CurrentTheme.TextColor;
-    private HAlign EffectiveAlignH => Slide?.Override?.AlignH ?? CurrentTheme.AlignH;
-    private VAlign EffectiveAlignV => Slide?.Override?.AlignV ?? CurrentTheme.AlignV;
-    private double? EffectiveLineSpacing => Slide?.Override?.LineSpacing;
-    private bool EffectiveFitToWidth => Slide?.Override?.FitToWidth ?? CurrentTheme.FitToWidth;
+    private SlideStyle Look => new(Slide);
 
-    private TextCase EffectiveCase =>
-        Slide?.Override?.Case ?? CurrentTheme.TextCase;
+    private string EffectiveFontFamily => Look.FontFamily;
+    private bool EffectiveBold => Look.Bold;
+    private bool EffectiveItalic => Look.Italic;
+    private bool EffectiveUnderline => Look.Underline;
+    private bool EffectiveStrikethrough => Look.Strikethrough;
+    private bool EffectiveShadow => Look.Shadow;
+    private double EffectiveShadowOpacity => Look.ShadowOpacity;
+    private double EffectiveOutlineWidth => Look.OutlineWidth;
+    private string EffectiveOutlineColor => Look.OutlineColor;
+    private string EffectiveTextColor => Look.TextColor;
+    private HAlign EffectiveAlignH => Look.AlignH;
+    private VAlign EffectiveAlignV => Look.AlignV;
+    private double? EffectiveLineSpacing => Look.LineSpacing;
+    private bool EffectiveFitToWidth => Look.FitToWidth;
+
+    private TextCase EffectiveCase => Look.Case;
 
     /// <summary>
     /// Draws the slide's extra text boxes. They are part of the slide's own
