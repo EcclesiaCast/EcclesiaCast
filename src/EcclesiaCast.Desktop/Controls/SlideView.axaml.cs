@@ -82,6 +82,10 @@ public partial class SlideView : UserControl
 
     private static AvaloniaFontCatalog Fonts => AvaloniaFontCatalog.Current;
 
+    /// <summary>Gives a text the face WPF would draw (<see cref="AvaloniaFontCatalog.Face"/>).</summary>
+    private static void Face(TextBlock text, string? family, FontWeight weight, bool italic = false) =>
+        Fonts.Face(family, (int)weight, italic).ApplyTo(text);
+
     private string? _lastBackgroundImagePath;
     private DispatcherTimer? _countdownTicker;
     private bool _lowDetail;
@@ -92,10 +96,10 @@ public partial class SlideView : UserControl
         InitializeComponent();
 
         // The XAML of WPF says «Segoe UI» on every text; here the font really
-        // drawn for it (Selawik where it is missing).
-        var segoe = Fonts.Resolve("Segoe UI");
+        // drawn for it (Selawik where it is missing), in the face WPF draws
+        // for the weight the XAML asks (the notice's Medium is Semibold).
         foreach (var text in new[] { MainText, SecondaryText, CaptionText, LogoText, CountdownHeading, CountdownClock, OverlayText })
-            text.FontFamily = segoe;
+            Face(text, "Segoe UI", text.FontWeight, text.FontStyle != FontStyle.Normal);
 
         MainText.SizeChanged += (_, _) => UpdateBands();
         SecondaryText.SizeChanged += (_, _) => UpdateBands();
@@ -233,7 +237,7 @@ public partial class SlideView : UserControl
 
     private void ApplyOverlayFont()
     {
-        OverlayText.FontFamily = Fonts.Resolve(OverlayStyle.FontOrDefault(OverlayFontFamily));
+        Face(OverlayText, OverlayStyle.FontOrDefault(OverlayFontFamily), FontWeight.Medium);
         OverlayText.FontSize = OverlayStyle.ClampSize(OverlayFontSize);
     }
 
@@ -254,10 +258,7 @@ public partial class SlideView : UserControl
             var text = new TextBlock
             {
                 Text = Transform(box.Text) ?? string.Empty,
-                FontFamily = Fonts.Resolve(string.IsNullOrWhiteSpace(box.FontFamily) ? style.FontFamily : box.FontFamily),
                 FontSize = Math.Max(8, box.FontSize),
-                FontWeight = box.Bold ? FontWeight.Bold : FontWeight.Normal,
-                FontStyle = box.Italic ? FontStyle.Italic : FontStyle.Normal,
                 Foreground = BrushFrom(box.Color, Brushes.White),
                 TextWrapping = TextWrapping.Wrap,
                 TextAlignment = Alignment(box.AlignH),
@@ -271,6 +272,8 @@ public partial class SlideView : UserControl
                     _ => VerticalAlignment.Center,
                 },
             };
+            Face(text, string.IsNullOrWhiteSpace(box.FontFamily) ? style.FontFamily : box.FontFamily,
+                box.Bold ? FontWeight.Bold : FontWeight.Normal, box.Italic);
 
             var holder = new Grid { Width = Math.Max(20, box.Width), Height = Math.Max(20, box.Height) };
             holder.Children.Add(text);
@@ -325,13 +328,10 @@ public partial class SlideView : UserControl
             _ => VerticalAlignment.Center,
         };
 
-        var fontFamily = Fonts.Resolve(style.FontFamily);
         var alignment = Alignment(style.AlignH);
         var foreground = BrushFromHex(style.TextColor, "#FFFFFF");
 
-        MainText.FontFamily = fontFamily;
-        MainText.FontWeight = style.Bold ? FontWeight.SemiBold : FontWeight.Normal;
-        MainText.FontStyle = style.Italic ? FontStyle.Italic : FontStyle.Normal;
+        Face(MainText, style.FontFamily, style.Bold ? FontWeight.SemiBold : FontWeight.Normal, style.Italic);
         MainText.Foreground = foreground;
         MainText.TextAlignment = alignment;
         MainText.TextDecorations = BuildDecorations(style);
@@ -340,9 +340,8 @@ public partial class SlideView : UserControl
 
         // La 2ª versión bíblica: mismo estilo que la principal, o el suyo.
         var matches = theme.SecondaryMatchesPrimary;
-        SecondaryText.FontFamily = fontFamily;
-        SecondaryText.FontWeight = matches && style.Bold ? FontWeight.SemiBold : FontWeight.Normal;
-        SecondaryText.FontStyle = (matches ? style.Italic : theme.SecondaryItalic) ? FontStyle.Italic : FontStyle.Normal;
+        Face(SecondaryText, style.FontFamily, matches && style.Bold ? FontWeight.SemiBold : FontWeight.Normal,
+            matches ? style.Italic : theme.SecondaryItalic);
         SecondaryText.Foreground = matches ? foreground : BrushFromHex(theme.SecondaryColor, "#C9D4E8");
         SecondaryText.TextAlignment = alignment;
         SecondaryText.Effect = BuildOutline(style);
@@ -351,7 +350,7 @@ public partial class SlideView : UserControl
 
         CaptionLayer.Margin = new Thickness(theme.MarginHorizontal, theme.MarginVertical * 0.5,
             theme.MarginHorizontal, theme.MarginVertical * 0.5);
-        CaptionText.FontFamily = Fonts.Resolve(theme.CaptionFontFamily ?? theme.FontFamily);
+        Face(CaptionText, theme.CaptionFontFamily ?? theme.FontFamily, FontWeight.Normal);
         CaptionText.Foreground = BrushFromHex(theme.CaptionColor, "#B9C6DE");
         CaptionText.FontSize = theme.CaptionFontSize;
         CaptionText.HorizontalAlignment = theme.CaptionPosition switch
@@ -616,9 +615,8 @@ public partial class SlideView : UserControl
             MediaFraming.Apply(LogoImage, null, CanvasWidth, CanvasHeight);
             RenderLogoFill(null);
             LogoText.Text = "EcclesiaCast";
-            LogoText.FontFamily = Fonts.Resolve("Segoe UI");
+            Face(LogoText, "Segoe UI", FontWeight.SemiBold);
             LogoText.FontSize = 120;
-            LogoText.FontWeight = FontWeight.SemiBold;
             LogoText.Foreground = Brushes.White;
             LogoText.IsVisible = true;
             return;
@@ -630,9 +628,9 @@ public partial class SlideView : UserControl
         if (logo.Kind == LogoKind.Text)
         {
             LogoText.Text = logo.Text;
-            LogoText.FontFamily = Fonts.Resolve(string.IsNullOrWhiteSpace(logo.FontFamily) ? "Segoe UI" : logo.FontFamily);
+            Face(LogoText, string.IsNullOrWhiteSpace(logo.FontFamily) ? "Segoe UI" : logo.FontFamily,
+                logo.Bold ? FontWeight.SemiBold : FontWeight.Normal);
             LogoText.FontSize = Math.Clamp(logo.FontSize, 10, 400);
-            LogoText.FontWeight = logo.Bold ? FontWeight.SemiBold : FontWeight.Normal;
             LogoText.Foreground = BrushFromHex(logo.TextColor, "#FFFFFF");
         }
 

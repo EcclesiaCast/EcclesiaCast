@@ -39,13 +39,17 @@ public sealed class AvaloniaTextMetrics(AvaloniaFontCatalog fonts) : ITextMetric
     }
 
     private TextLayout Layout(string text, string fontFamily, int weight, bool italic, double fontSize,
-        double maxWidth, double? lineHeight) =>
-        new(
+        double maxWidth, double? lineHeight)
+    {
+        var face = fonts.Face(fontFamily, weight, italic);
+        return new(
             text,
-            new Typeface(fonts.Resolve(fontFamily), italic ? FontStyle.Italic : FontStyle.Normal, (FontWeight)weight),
+            face.Typeface,
             fontSize,
             Brushes.White,
             textWrapping: double.IsPositiveInfinity(maxWidth) ? TextWrapping.NoWrap : TextWrapping.Wrap,
             maxWidth: maxWidth,
-            lineHeight: lineHeight ?? double.NaN);
+            lineHeight: lineHeight ?? double.NaN,
+            letterSpacing: face.LetterSpacing(fontSize));
+    }
 }

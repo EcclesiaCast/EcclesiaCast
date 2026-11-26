@@ -33,6 +33,9 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   que va debajo y encima de la letra: el video de fondo en bucle sin cuadro negro, la imagen
   de fondo, el relleno, el logo (también en video) y el fundido entre un medio y otro. Las
   cuentas del video y del encuadre que usan las dos versiones pasaron a la parte común.
+  En la versión de Mac, el aviso al pie sale en seminegrita como en Windows (antes a veces salía
+  fino, según qué letra se hubiera dibujado antes) y una letra sin negrita propia, como Impact,
+  se engrosa y se ensancha igual que en Windows.
 - Por dentro, sin cambios para quien usa el programa: la versión de Mac dibuja las mismas 65
   diapositivas de prueba y un comparador dice caso por caso si la letra se ve igual que en Windows.
 - Por dentro, sin cambios para quien usa el programa: lo que ponen a pantalla completa la salida

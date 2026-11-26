@@ -66,10 +66,7 @@ public sealed class StageBoxView : Border
 
         _text = new TextBlock
         {
-            // Without a typeface of its own the text has the one WPF inherits: Segoe UI.
-            FontFamily = AvaloniaFontCatalog.Current.Resolve(string.IsNullOrWhiteSpace(Box.FontFamily) ? "Segoe UI" : Box.FontFamily),
             FontSize = Box.FontSize,
-            FontWeight = Box.Bold ? FontWeight.SemiBold : FontWeight.Normal,
             Foreground = ParseBrush(Box.Color),
             TextAlignment = Box.Align switch
             {
@@ -82,6 +79,11 @@ public sealed class StageBoxView : Border
             // width of the box and shrinks only when it gets too tall.
             TextWrapping = single ? TextWrapping.NoWrap : TextWrapping.Wrap,
         };
+        // Without a typeface of its own the text has the one WPF inherits: Segoe UI.
+        AvaloniaFontCatalog.Current
+            .Face(string.IsNullOrWhiteSpace(Box.FontFamily) ? "Segoe UI" : Box.FontFamily,
+                Box.Bold ? SlideTextFit.BoldWeight : SlideTextFit.NormalWeight, false)
+            .ApplyTo(_text);
         if (!single)
             _text.MaxWidth = Math.Max(20, Box.Width - Padding.Left - Padding.Right);
 
