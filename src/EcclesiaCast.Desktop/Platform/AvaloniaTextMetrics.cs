@@ -38,6 +38,33 @@ public sealed class AvaloniaTextMetrics(AvaloniaFontCatalog fonts) : ITextMetric
             .ToList();
     }
 
+    /// <summary>
+    /// The text with the space where each line wraps turned into a line break,
+    /// so the lines stay the same and none ends in a space. WPF leaves that
+    /// space out when it aligns a line to the right or the centre; Avalonia
+    /// counts it, and a right-aligned line came out a space short of the edge.
+    /// The text keeps its length (the highlighted words keep their places).
+    /// </summary>
+    public string BreakWhereWrapped(string text, string fontFamily, int weight, bool italic, double fontSize,
+        double maxWidth, double? lineHeight)
+    {
+        if (string.IsNullOrEmpty(text) || double.IsPositiveInfinity(maxWidth))
+            return text;
+
+        using var layout = Layout(text, fontFamily, weight, italic, fontSize, maxWidth, lineHeight);
+        char[]? chars = null;
+        foreach (var line in layout.TextLines.Take(layout.TextLines.Count - 1))
+        {
+            var last = line.FirstTextSourceIndex + line.Length - 1;
+            if (last >= 0 && last < text.Length && text[last] == ' ')
+            {
+                chars ??= text.ToCharArray();
+                chars[last] = '\n';
+            }
+        }
+        return chars is null ? text : new string(chars);
+    }
+
     private TextLayout Layout(string text, string fontFamily, int weight, bool italic, double fontSize,
         double maxWidth, double? lineHeight)
     {

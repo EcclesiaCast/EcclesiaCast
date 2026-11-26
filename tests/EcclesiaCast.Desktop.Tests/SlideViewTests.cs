@@ -115,6 +115,22 @@ public sealed class SlideViewTests
     }
 
     [AvaloniaFact]
+    public void A_right_aligned_line_that_wraps_ends_at_the_edge_as_in_wpf()
+    {
+        // «el labio mío loores te » used to be a space short of the edge:
+        // Avalonia aligned it with the space it wrapped at, WPF without it.
+        var c = RenderCases.Load("alineacion-abajo-derecha");
+        var view = SlideDrawing.Slide(c, c.Themes.Single(t => t.Key == "biblia"));
+        using var drawing = new SlideDrawing(view);
+        var text = Named<TextBlock>(view, "MainText");
+        var wpf = RenderCases.Wpf(c.Id, "biblia").Texts.Single(t => t.Name == "main");
+
+        Assert.Equal(wpf.Lines, SlideView.LinesOf(text));
+        foreach (var line in text.TextLayout.TextLines)
+            Assert.Equal(line.Width, line.WidthIncludingTrailingWhitespace, 3);
+    }
+
+    [AvaloniaFact]
     public void With_tight_line_spacing_the_last_line_is_not_cut()
     {
         // At 0,85 the letters of the last line go past the text's frame; WPF

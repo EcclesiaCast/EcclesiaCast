@@ -473,6 +473,22 @@ public partial class SlideView : UserControl
             .WpfBaselineShift(fit.FontSize, MainText.LineHeight);
         MainText.RenderTransform = shift == 0 ? null : new TranslateTransform(0, shift);
 
+        // Right or centred, a wrapped line must not end in its space (WPF
+        // leaves it out when aligning; Avalonia counts it).
+        if (wrapping == TextWrapping.Wrap && style.AlignH != HAlign.Left)
+        {
+            var metrics = AvaloniaTextMetrics.Current;
+            var matches = CurrentTheme.SecondaryMatchesPrimary;
+            if (main is not null)
+                main = metrics.BreakWhereWrapped(main, style.FontFamily, style.Weight, style.Italic,
+                    fit.FontSize, fit.Width, double.IsNaN(MainText.LineHeight) ? null : MainText.LineHeight);
+            if (secondary is not null)
+                secondary = metrics.BreakWhereWrapped(secondary, style.FontFamily,
+                    matches ? style.Weight : SlideTextFit.NormalWeight,
+                    matches ? style.Italic : CurrentTheme.SecondaryItalic,
+                    SecondaryText.FontSize, fit.Width, null);
+        }
+
         RenderWithHighlight(MainText, main, isMain: true);
         RenderWithHighlight(SecondaryText, secondary, isMain: false);
 
