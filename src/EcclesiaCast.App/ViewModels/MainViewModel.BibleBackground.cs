@@ -53,14 +53,18 @@ public sealed partial class MainViewModel
     /// <remarks>
     /// The ones shown on top of everything are listed too, marked: hiding them
     /// looked like the program had lost them. Picking one says why it can't be.
+    /// A tab that goes on top is marked itself; in the others, each media that
+    /// goes on top on its own is.
     /// </remarks>
-    public IReadOnlyList<(string Tab, bool AllOnTop, IReadOnlyList<MediaItem> Items)> BackgroundChoicesByTab() =>
+    public IReadOnlyList<(string Tab, bool TabOnTop, IReadOnlyList<(MediaItem Media, bool OnTop)> Items)> BackgroundChoicesByTab() =>
         _allMedia
             .Where(m => m.Type is MediaType.Image or MediaType.Video)
             .GroupBy(m => m.Category, StringComparer.OrdinalIgnoreCase)
             .Select(g => (g.Key,
-                g.All(m => Playable(m).Behavior == MediaBehavior.Foreground),
-                (IReadOnlyList<MediaItem>)g.ToList()))
+                IsOnTopMediaTab(g.Key),
+                (IReadOnlyList<(MediaItem, bool)>)g
+                    .Select(m => (m, Playable(m).Behavior == MediaBehavior.Foreground))
+                    .ToList()))
             .ToList();
 
     /// <summary>
@@ -69,16 +73,20 @@ public sealed partial class MainViewModel
     /// </summary>
     private void ExplainWhyNotABackground(MediaItem media, string covered)
     {
-        var fix = TabRule(media.Category).Mode == MediaTabMode.Foreground
-            ? $"La pestaña «{media.Category}» está configurada como «Todo va en primer plano», o sea encima de todo.\n\n"
-              + "Para usarlo de fondo: movelo a otra pestaña (clic derecho → «Mover a la pestaña…»), "
-              + "o cambiá la pestaña (clic derecho en su nombre → «Configurar…»)."
-            : "En sus Propiedades está puesto como «primer plano», o sea encima de todo.\n\n"
-              + "Para usarlo de fondo: clic derecho → «Propiedades» y cambialo a «Fondo».";
+        const string move = "Para usarlo de fondo: movelo a otra pestaña (clic derecho → «Mover a la pestaña…»)";
+        var fix = IsPresentationTab(media.Category)
+            ? $"La pestaña «{media.Category}» es una presentación: sus páginas van encima de todo.\n\n{move}."
+            : TabRule(media.Category).Mode == MediaTabMode.Foreground
+                ? $"La pestaña «{media.Category}» está configurada como «Todo va en primer plano», o sea encima de todo.\n\n"
+                  + $"{move}, o cambiá la pestaña (clic derecho en su nombre → «Configurar…»)."
+                : "En sus Propiedades está puesto como «primer plano», o sea encima de todo.\n\n"
+                  + "Para usarlo de fondo: clic derecho → «Propiedades» y cambialo a «Fondo».";
 
         StatusText = $"«{media.Name}» no se puede usar de fondo: va encima de todo y taparía {covered}.";
         Services.Notice.Show(
-            $"«{media.Name}» taparía {covered}, por eso no se puede usar de fondo.\n\n{fix}",
+            $"«{media.Name}» taparía {covered}, por eso no se puede usar de fondo.\n\n{fix}\n\n"
+            + $"Las carpetas que tienen {Services.Notice.OnTopIconMark} al lado del nombre van encima de todo: "
+            + "así las reconocés de un vistazo.",
             "No se puede usar de fondo", Services.NoticeKind.Warning);
     }
 

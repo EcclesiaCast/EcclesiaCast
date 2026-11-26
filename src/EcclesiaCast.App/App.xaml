@@ -35,6 +35,8 @@
         <SolidColorBrush x:Key="FaintBrush" Color="#5B6070"/>
         <SolidColorBrush x:Key="AccentBrush" Color="#2F63C9"/>
         <SolidColorBrush x:Key="LiveBrush" Color="#C43B3B"/>
+        <!-- El ícono de «va encima de todo» (Controls/OnTopMark) -->
+        <SolidColorBrush x:Key="OnTopBrush" Color="#F4B942"/>
 
         <!-- The program's logo (a screen with a flame in it, on a navy rounded
              square), drawn as vectors so it stays sharp at any size. It is the

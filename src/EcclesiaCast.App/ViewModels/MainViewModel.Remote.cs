@@ -237,7 +237,8 @@ public sealed partial class MainViewModel
             // In the order of the folders on the computer, so the drop-down reads the same.
             .OrderBy(m => MediaTabs.IndexOf(m.Category ?? string.Empty) is var at and >= 0 ? at : int.MaxValue)
             .Take(300)
-            .Select(m => new RemoteMedia(m.Id, m.Name, m.Type == MediaType.Video ? "video" : "image", m.Category ?? string.Empty))
+            .Select(m => new RemoteMedia(m.Id, m.Name, m.Type == MediaType.Video ? "video" : "image", m.Category ?? string.Empty,
+                IsOnTopMediaTab(m.Category)))
             .ToList();
 
     string? IRemoteHost.GetThumbnailPath(int mediaId)

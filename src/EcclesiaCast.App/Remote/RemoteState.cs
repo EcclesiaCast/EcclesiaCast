@@ -23,7 +23,7 @@ public sealed record RemotePlaylistItem(int Index, string Caption, string Kind);
 public sealed record RemoteHit(int Index, string Kind, string Title, string Detail);
 
 /// <summary>An image or video of the library the phone can put on the screen: <paramref name="Id"/> is all it sends back.</summary>
-public sealed record RemoteMedia(int Id, string Name, string Kind, string Tab);
+public sealed record RemoteMedia(int Id, string Name, string Kind, string Tab, bool TabOnTop = false);
 
 /// <summary>
 /// Everything the phone needs to draw itself. Sent as JSON on every poll, so

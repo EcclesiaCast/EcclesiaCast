@@ -1,3 +1,5 @@
+using EcclesiaCast.Core.Media;
+
 namespace EcclesiaCast.App.Remote;
 
 /// <summary>
@@ -8,7 +10,12 @@ namespace EcclesiaCast.App.Remote;
 /// </summary>
 internal static class RemotePage
 {
-    internal const string Html = """
+    private const string OnTopSvg =
+        "<svg class=\"ontop\" viewBox=\"0 0 16 16\" aria-label=\"Va encima de todo\"><path d=\"" + OnTopIcon.PathData + "\"/></svg>";
+
+    internal static readonly string Html = Template.Replace("__ONTOP__", OnTopSvg);
+
+    private const string Template = """
         <!doctype html>
         <html lang="es">
         <head>
@@ -53,6 +60,11 @@ internal static class RemotePage
                      background:#232630;border:1px solid #2a2e3a;border-radius:10px;color:#fff}
           .err{color:#e08a8a;font-size:14px;min-height:1.3em;margin-top:10px}
           .hide{display:none}
+          .folders{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+          .folders button{padding:10px 12px;font-size:14px}
+          .ontop{width:12px;height:12px;fill:#f4b942;vertical-align:-1px;margin-left:6px}
+          #onTopHint .ontop{margin:0 4px 0 0}
+          #onTopHint.hide{display:none}
           .search input{width:100%;font:inherit;padding:12px 14px;background:#232630;border:1px solid #2a2e3a;
                         border-radius:10px;color:#fff}
           .hits{margin-top:8px;max-height:46vh;overflow-y:auto}
@@ -121,8 +133,8 @@ internal static class RemotePage
 
             <div class="card hide" id="mediaCard">
               <div class="label">Tocá uno para ponerlo en pantalla</div>
-              <select id="mediaTab" class="hide" onchange="showMedias()"
-                      style="width:100%;font:inherit;padding:12px;margin:8px 0;background:#232630;color:#fff;border:1px solid #2a2e3a;border-radius:10px"></select>
+              <div class="folders hide" id="mediaTabs"></div>
+              <div class="none hide" id="onTopHint">__ONTOP__ Las carpetas con este ícono van encima de todo.</div>
               <div id="mediaList"></div>
             </div>
 
@@ -251,30 +263,47 @@ internal static class RemotePage
         }
 
         var allMedias = [];
+        var onTopSvg = '__ONTOP__';
 
-        // The folders of the library, named as on the computer, in a drop-down;
-        // only the pictures of the chosen one are drawn (and asked for).
+        // The folders of the library, named as on the computer, one button each
+        // (a drop-down can't draw the icon of the ones that go on top); only the
+        // pictures of the chosen one are drawn (and asked for).
+        var mediaFolder = '';
+
         function setMedias(list) {
           allMedias = list;
-          var select = document.getElementById('mediaTab');
-          select.innerHTML = '';
           var tabs = [];
-          list.forEach(function (m) { if (tabs.indexOf(m.tab) < 0) tabs.push(m.tab); });
-          tabs.forEach(function (t) {
-            var o = document.createElement('option');
-            o.value = t;
-            o.textContent = t || 'Sin carpeta';
-            select.appendChild(o);
+          var onTop = [];
+          list.forEach(function (m) {
+            if (tabs.indexOf(m.tab) < 0) tabs.push(m.tab);
+            if (m.tabOnTop && onTop.indexOf(m.tab) < 0) onTop.push(m.tab);
           });
           var saved = localStorage.getItem('ec-media-tab');
-          select.value = tabs.indexOf(saved) >= 0 ? saved : (tabs[0] || '');
-          select.className = tabs.length ? '' : 'hide';
+          mediaFolder = tabs.indexOf(saved) >= 0 ? saved : (tabs[0] || '');
+          var box = document.getElementById('mediaTabs');
+          box.innerHTML = '';
+          tabs.forEach(function (t) {
+            var b = document.createElement('button');
+            b.textContent = t || 'Sin carpeta';
+            if (onTop.indexOf(t) >= 0) {
+              b.insertAdjacentHTML('beforeend', onTopSvg);
+              b.title = 'Va encima de todo';
+            }
+            b.setAttribute('data-tab', t);
+            b.onclick = function () { mediaFolder = t; showMedias(); };
+            box.appendChild(b);
+          });
+          box.className = tabs.length ? 'folders' : 'folders hide';
+          document.getElementById('onTopHint').className = onTop.length ? 'none' : 'none hide';
           showMedias();
         }
 
         function showMedias() {
-          var tab = document.getElementById('mediaTab').value;
+          var tab = mediaFolder;
           localStorage.setItem('ec-media-tab', tab);
+          Array.prototype.forEach.call(document.getElementById('mediaTabs').children, function (b) {
+            b.className = b.getAttribute('data-tab') === tab ? 'on' : '';
+          });
           var box = document.getElementById('mediaList');
           box.innerHTML = '';
           var items = allMedias.filter(function (m) { return m.tab === tab; });

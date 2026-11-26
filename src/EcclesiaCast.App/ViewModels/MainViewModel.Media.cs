@@ -79,6 +79,23 @@ public sealed partial class MainViewModel
         MutedMediaTabs = new HashSet<string>(
             MediaTabs.Where(t => TabRule(t).Muted), StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Names of the tabs whose media go on top of everything («Todo va en
+    /// primer plano», and the presentations): the list of tabs marks them.
+    /// Replaced, never edited, like <see cref="MutedMediaTabs"/>.
+    /// </summary>
+    [ObservableProperty]
+    private HashSet<string> _onTopMediaTabs = new(StringComparer.OrdinalIgnoreCase);
+
+    private void RefreshOnTopMediaTabs() =>
+        OnTopMediaTabs = new HashSet<string>(
+            MediaTabs.Where(t => IsPresentationTab(t) || TabRule(t).Mode == MediaTabMode.Foreground),
+            StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>True when everything in the tab goes on top of everything.</summary>
+    public bool IsOnTopMediaTab(string? tab) =>
+        !string.IsNullOrWhiteSpace(tab) && OnTopMediaTabs.Contains(tab);
+
     /// <summary>True when the tab is silenced; the menu of the tab asks it to word its entry.</summary>
     public bool IsMediaTabMuted(string? tab) =>
         !string.IsNullOrWhiteSpace(tab) && TabRule(tab).Muted;
@@ -94,6 +111,7 @@ public sealed partial class MainViewModel
         var soundChanged = TabRule(tab).Muted != rule.Muted;
         _settings.Set(RuleKey(tab), rule.ToSetting());
         RefreshMutedMediaTabs();
+        RefreshOnTopMediaTabs();
 
         if (soundChanged
             && _presentation.Background is { } onScreen
@@ -383,6 +401,7 @@ public sealed partial class MainViewModel
 
         // A presentation open in the grid follows what the tab holds now.
         RefreshPresentationTabs();
+        RefreshOnTopMediaTabs();
         RefreshOpenPresentation();
     }
 

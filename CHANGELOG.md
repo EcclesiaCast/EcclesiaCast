@@ -7,6 +7,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Agregado
 
+- **Ícono de las carpetas que van encima de todo.** Las pestañas de medios configuradas como
+  «Todo va en primer plano» (y las presentaciones) muestran al lado del nombre dos cuadros
+  superpuestos, en amarillo, con un globito que lo explica. El mismo ícono aparece en el aviso
+  «No se puede usar de fondo», en «Elegir un fondo de la biblioteca» y en las carpetas de
+  «Fondos y medios» del celular, que ahora son botones en vez de una lista desplegable.
 - **Dividir versículos largos.** Nueva opción en los temas de Biblia (editor de temas, sección
   «Biblia»), apagada por defecto: con un máximo de caracteres por diapositiva (150 al activarla),
   un versículo largo pasa en varias de largo parecido, con la cita «Juan 3:16 (1/2)». Corta de
@@ -30,7 +35,7 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 - **Fondos que van encima de todo.** Al elegir como fondo (de la Biblia o de una canción) un medio
   que se muestra encima de todo, ahora aparece un aviso que explica por qué no se puede y cómo
   arreglarlo; antes sólo lo decía la barra de estado y parecía roto. En «Elegir un fondo de la
-  biblioteca» esas pestañas se ven marcadas «(va encima de todo)».
+  biblioteca» esas pestañas se ven marcadas con el ícono de «va encima de todo».
 - **Repetir un solo audio** se distingue de repetir la lista: el botón muestra «🔁 1».
 
 ### Mejorado

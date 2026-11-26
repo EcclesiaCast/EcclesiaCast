@@ -1650,14 +1650,26 @@ public partial class MainWindow : Window
     private static void AddBackgroundChoices(ContextMenu menu, MainViewModel vm, System.Windows.Input.ICommand pick)
     {
         var choose = new MenuItem { Header = "Elegir un fondo de la biblioteca" };
-        foreach (var (tab, allOnTop, items) in vm.BackgroundChoicesByTab())
+        // What goes on top of everything carries the same icon as its tab.
+        static object Marked(string name, bool onTop)
         {
-            var tabItem = new MenuItem { Header = tab.Replace("_", "__") + (allOnTop ? " (va encima de todo)" : "") };
-            foreach (var media in items.Take(60))
+            if (!onTop)
+                return name.Replace("_", "__");
+
+            var row = new StackPanel { Orientation = Orientation.Horizontal, ToolTip = Core.Media.OnTopIcon.Explanation };
+            row.Children.Add(new TextBlock { Text = name, Margin = new Thickness(0, 0, 6, 0) });
+            row.Children.Add(Controls.OnTopMark.Create(11));
+            return row;
+        }
+
+        foreach (var (tab, tabOnTop, items) in vm.BackgroundChoicesByTab())
+        {
+            var tabItem = new MenuItem { Header = Marked(tab, tabOnTop) };
+            foreach (var (media, onTop) in items.Take(60))
             {
                 tabItem.Items.Add(new MenuItem
                 {
-                    Header = media.Name.Replace("_", "__"),
+                    Header = Marked(media.Name, onTop && !tabOnTop),
                     Command = pick,
                     CommandParameter = media,
                 });
