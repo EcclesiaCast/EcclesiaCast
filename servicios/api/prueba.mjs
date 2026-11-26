@@ -293,6 +293,14 @@ fallas = { github: 403, goatcounter: 401 };
   assert.ok(pagina.includes("<strong>—</strong>"));
 }
 fallas = {};
+// Un error que no se esperaba dice qué se pidió y qué contestó, sin la clave.
+fallas = { goatcounter: 404 };
+{
+  const pagina = await (await verPanel(basic("secreto"))).text();
+  assert.ok(pagina.includes("(404) al pedir /stats/hits. Dijo: error"));
+  assert.ok(!pagina.includes("clave-goat"));
+}
+fallas = {};
 assert.ok((await (await verPanel(basic("secreto"), env)).text()).includes("Falta la clave GOATCOUNTER_TOKEN"));
 // Sin la tabla nueva (todavía no se ejecutó el SQL), el panel abre igual.
 sqlite.exec("DROP TABLE descargas");

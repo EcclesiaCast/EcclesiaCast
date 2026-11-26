@@ -396,7 +396,12 @@ async function pedirGoatcounter(env, ruta, parametros) {
     throw new Aviso("GoatCounter no aceptó la clave. Revisá GOATCOUNTER_TOKEN y que tenga el permiso «Read statistics».");
   if (respuesta.status === 429)
     throw new Aviso("GoatCounter pidió esperar (demasiados pedidos). Probá en un minuto.");
-  if (!respuesta.ok) throw new Aviso(`GoatCounter respondió con un error (${respuesta.status}).`);
+  if (!respuesta.ok) {
+    // Qué se pidió y qué contestó, para poder arreglarlo; por las dudas, sin la clave.
+    const detalle = (await respuesta.text().catch(() => ""))
+      .replaceAll(env.GOATCOUNTER_TOKEN, "…").replace(/\s+/g, " ").trim().slice(0, 200);
+    throw new Aviso(`GoatCounter respondió con un error (${respuesta.status}) al pedir ${ruta}. Dijo: ${detalle || "nada"}`);
+  }
   return respuesta.json();
 }
 
