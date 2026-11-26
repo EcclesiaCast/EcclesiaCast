@@ -29,7 +29,10 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 - Por dentro, sin cambios para quien usa el programa: la cuenta que elige el tamaño de la
   letra y dónde corta cada renglón pasó a la parte común, y la versión de Mac ya dibuja la
   diapositiva y los recuadros del escenario con esa misma cuenta, con tres fuentes libres
-  incluidas (Selawik, Carlito y Anton) para cuando falta la del tema.
+  incluidas (Selawik, Carlito y Anton) para cuando falta la del tema. También arma todo lo
+  que va debajo y encima de la letra: el video de fondo en bucle sin cuadro negro, la imagen
+  de fondo, el relleno, el logo (también en video) y el fundido entre un medio y otro. Las
+  cuentas del video y del encuadre que usan las dos versiones pasaron a la parte común.
 - Por dentro, sin cambios para quien usa el programa: la versión de Mac dibuja las mismas 65
   diapositivas de prueba y un comparador dice caso por caso si la letra se ve igual que en Windows.
 
