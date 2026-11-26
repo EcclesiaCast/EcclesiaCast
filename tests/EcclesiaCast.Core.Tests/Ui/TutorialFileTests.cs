@@ -65,14 +65,14 @@ public class TutorialFileTests
     }
 
     [Fact]
-    public void Ships_the_nine_tutorials_in_order()
+    public void Ships_the_eleven_tutorials_in_order()
     {
         var all = TutorialFile.LoadBuiltIn();
 
         Assert.Equal(
             ["Crear una canción nueva", "Armar la lista del domingo", "Proyectar la Biblia", "Poner fondos y videos",
              "Conectar con OBS o vMix", "Control desde el celular", "Placas de nombre", "Importar canciones de otro programa",
-             "Proyectar YouTube, web, ventanas y más"],
+             "Proyectar YouTube, web, ventanas y más", "Mensajes en pantalla", "Durante la reunión"],
             all.Select(t => t.Title));
         Assert.Equal(all.Count, all.Select(t => t.Id).Distinct().Count());
     }
@@ -190,7 +190,7 @@ public class TutorialFileTests
 
             var all = TutorialFile.LoadAll(folder);
 
-            Assert.Equal(10, all.Count);
+            Assert.Equal(12, all.Count);
             Assert.Equal("Uno", all[^1].Title);
             Assert.Contains(all, t => t.Title == "OBS de la iglesia");
             Assert.DoesNotContain(all, t => t.Title == "Conectar con OBS o vMix");

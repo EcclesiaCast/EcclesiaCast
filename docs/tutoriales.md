@@ -1,7 +1,7 @@
 # Tutoriales (Ayuda → «Tutoriales ▸»)
 
 En el menú Ayuda, «Tutoriales» tiene una flecha ▸ y un submenú con un ítem por tutorial: elegir uno lo
-arranca. Cada tutorial es un archivo de texto (UTF-8). Los 9 que vienen con el programa están en
+arranca. Cada tutorial es un archivo de texto (UTF-8). Los 11 que vienen con el programa están en
 `src/EcclesiaCast.Core/Tutorials/*.txt` (se incluyen solos al compilar). Para sumar uno propio, o
 reemplazar uno que viene, dejá un `.txt` en la carpeta **Tutoriales** de los datos del programa
 (`%APPDATA%\EcclesiaCast\Tutoriales`): si se llama igual que uno que viene, lo reemplaza. Un archivo

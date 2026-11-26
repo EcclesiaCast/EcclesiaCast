@@ -2194,7 +2194,7 @@
                         <Grid x:Name="ToolsBody">
                             <!-- ── Texto rápido ── -->
                             <DockPanel Visibility="{Binding IsChecked, ElementName=TabQuick, Converter={StaticResource BoolToVis}}">
-                                <Button DockPanel.Dock="Bottom"
+                                <Button x:Name="QuickTextButton" DockPanel.Dock="Bottom"
                                         Content="Proyectar ▶" controls:ShortcutHint.Text="Ctrl+Enter"
                                         Style="{StaticResource AccentButton}"
                                         Command="{Binding GoLiveCommand}"
@@ -2203,12 +2203,12 @@
                                 <StackPanel DockPanel.Dock="Top" Margin="12,0,12,10">
                                     <TextBlock Text="Tipografía" Foreground="{StaticResource MutedBrush}"
                                                FontSize="11" Margin="0,0,0,4"/>
-                                    <ComboBox IsEditable="True" FontSize="12"
+                                    <ComboBox x:Name="QuickTextFontBox" IsEditable="True" FontSize="12"
                                               ItemsSource="{Binding SystemFonts}"
                                               Text="{Binding QuickTextFont, UpdateSourceTrigger=PropertyChanged}"
                                               ToolTip="Letra del texto rápido. Vacía: la del tema de las canciones."/>
                                 </StackPanel>
-                                <TextBox AcceptsReturn="True" TextWrapping="Wrap"
+                                <TextBox x:Name="QuickTextBox" AcceptsReturn="True" TextWrapping="Wrap"
                                          VerticalScrollBarVisibility="Auto"
                                          Text="{Binding QuickText, UpdateSourceTrigger=PropertyChanged}"
                                          Background="{StaticResource SurfaceAltBrush}"
@@ -2232,7 +2232,7 @@
                                            Text="Aparece en una franja abajo, por encima de todo — incluso con Black puesto."
                                            FontSize="11" Foreground="{StaticResource FaintBrush}"
                                            TextWrapping="Wrap" Margin="12,0,12,8"/>
-                                <Grid DockPanel.Dock="Top" Margin="12,0,12,8">
+                                <Grid x:Name="OverlayStyleRow" DockPanel.Dock="Top" Margin="12,0,12,8">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
@@ -2253,7 +2253,7 @@
                                                                ToolTip="Tamaño de la letra del aviso, de 20 a 160. El de siempre es 54."/>
                                     </StackPanel>
                                 </Grid>
-                                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="12,8,12,12">
+                                <StackPanel x:Name="OverlayButtons" DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="12,8,12,12">
                                     <Button Content="Mostrar" Command="{Binding ShowOverlayCommand}" Padding="16,8"
                                             ToolTip="Pone la franja en pantalla">
                                         <Button.Style>
@@ -2271,7 +2271,7 @@
                                             Command="{Binding HideOverlayCommand}"
                                             ToolTip="Saca la franja del aviso"/>
                                 </StackPanel>
-                                <TextBox AcceptsReturn="True" TextWrapping="Wrap"
+                                <TextBox x:Name="OverlayTextBox" AcceptsReturn="True" TextWrapping="Wrap"
                                          VerticalScrollBarVisibility="Auto"
                                          Text="{Binding OverlayText, UpdateSourceTrigger=PropertyChanged}"
                                          Background="{StaticResource SurfaceAltBrush}"
@@ -2469,7 +2469,7 @@
                                            Text="Escribí una o varias palabras o frases separadas por ; («gracia; fe») y se pintan al instante en todas las veces que aparecen. También podés marcar con el mouse sobre el LIVE: ahí se resalta sólo esa vez, y con Shift se suman más."
                                            FontSize="11" Foreground="{StaticResource FaintBrush}"
                                            TextWrapping="Wrap" Margin="12,0,12,8"/>
-                                <TextBox DockPanel.Dock="Top"
+                                <TextBox x:Name="HighlightBox" DockPanel.Dock="Top"
                                          Text="{Binding HighlightText, UpdateSourceTrigger=PropertyChanged}"
                                          Background="{StaticResource SurfaceAltBrush}"
                                          Foreground="White"
@@ -2478,7 +2478,7 @@
                                          Margin="12,0,12,0"
                                          Padding="8,6" FontSize="14"
                                          VerticalContentAlignment="Center"/>
-                                <Button DockPanel.Dock="Top" Content="Quitar el resaltado"
+                                <Button x:Name="HighlightClearButton" DockPanel.Dock="Top" Content="Quitar el resaltado"
                                         Style="{StaticResource DarkButton}"
                                         Command="{Binding ClearHighlightCommand}"
                                         HorizontalAlignment="Left"
@@ -2891,7 +2891,7 @@
                                             </Style>
                                         </TextBlock.Style>
                                     </TextBlock>
-                                    <WrapPanel Margin="0,4,0,0">
+                                    <WrapPanel x:Name="SectionTimerButtons" Margin="0,4,0,0">
                                         <Button Padding="12,6" Margin="0,0,4,4" MinWidth="86"
                                                 Command="{Binding ToggleSectionTimerCommand}">
                                             <Button.Style>
@@ -2977,7 +2977,7 @@
                                     <TextBlock Text="CRONÓMETRO" FontSize="10" FontWeight="SemiBold"
                                                Foreground="{StaticResource FaintBrush}" Margin="0,14,0,2"
                                                ToolTip="Cuánto lleva el servicio. Es el mismo que muestra el recuadro «Cronómetro» del escenario."/>
-                                    <DockPanel>
+                                    <DockPanel x:Name="StopwatchRow">
                                         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
                                             <Button Padding="10,5" MinWidth="82" Margin="0,0,4,0"
                                                     Command="{Binding ToggleStopwatchCommand}">
@@ -3010,7 +3010,7 @@
                                            Text="Sólo se ven en la pantalla de escenario: el guion del predicador, un aviso para la banda. La congregación nunca las ve."
                                            FontSize="11" Foreground="{StaticResource FaintBrush}"
                                            TextWrapping="Wrap" Margin="12,0,12,8"/>
-                                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="12,8,12,12">
+                                <StackPanel x:Name="StageNotesButtons" DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="12,8,12,12">
                                     <Button Content="Mostrar" Command="{Binding ShowStageNotesCommand}" Padding="16,8"
                                             ToolTip="Manda las notas a la pantalla de escenario">
                                         <Button.Style>
@@ -3028,7 +3028,7 @@
                                             Command="{Binding HideStageNotesCommand}"
                                             ToolTip="Saca las notas del escenario"/>
                                 </StackPanel>
-                                <TextBox AcceptsReturn="True" TextWrapping="Wrap"
+                                <TextBox x:Name="StageNotesBox" AcceptsReturn="True" TextWrapping="Wrap"
                                          VerticalScrollBarVisibility="Auto"
                                          Text="{Binding StageNotesText, UpdateSourceTrigger=PropertyChanged}"
                                          Background="{StaticResource SurfaceAltBrush}"

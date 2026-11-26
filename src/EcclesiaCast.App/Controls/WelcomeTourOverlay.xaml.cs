@@ -174,6 +174,14 @@ public partial class WelcomeTourOverlay : UserControl
         _prepare?.Invoke(step);
         UpdateLayout();
 
+        // A part inside a list with a scroll bar (the bottom of «Tiempos»)
+        // is brought into view before it is measured.
+        if (step.Target is { } inside && _find(inside) is { IsVisible: true } scrolled)
+        {
+            scrolled.BringIntoView();
+            UpdateLayout();
+        }
+
         var area = new TourBox(0, 0, ActualWidth, ActualHeight);
         var spot = default(TourBox);
         if (step.Target is { } part && IsMeasurable(part) && _find(part) is { } element)
