@@ -90,9 +90,9 @@ public static class MediaFraming
             picture.VerticalAlignment = VerticalAlignment.Stretch;
         }
 
-        var zoom = Math.Clamp(media.Zoom <= 0 ? 1 : media.Zoom, 0.1, 4);
-        var offsetX = Math.Clamp(media.OffsetX, -MaxOffset, MaxOffset) * containerWidth;
-        var offsetY = Math.Clamp(media.OffsetY, -MaxOffset, MaxOffset) * containerHeight;
+        // The limits are shared with the Avalonia framing (Presentation).
+        var zoom = EcclesiaCast.Presentation.Rendering.FramingNumbers.Zoom(media);
+        var (offsetX, offsetY) = EcclesiaCast.Presentation.Rendering.FramingNumbers.Offset(media, containerWidth, containerHeight);
 
         if (media.Scaling == MediaScaling.Fill
             && PictureSize(picture, state) is { } size

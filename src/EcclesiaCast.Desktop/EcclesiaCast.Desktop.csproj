@@ -10,6 +10,8 @@
     <Nullable>enable</Nullable>
     <RootNamespace>EcclesiaCast.Desktop</RootNamespace>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <!-- The video frames are copied from VLC's buffer into the bitmaps. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>

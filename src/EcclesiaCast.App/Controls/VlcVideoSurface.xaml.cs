@@ -8,6 +8,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Media;
+using EcclesiaCast.Presentation.Rendering;
 using LibVLCSharp.Shared;
 using Serilog;
 using MediaPlayer = LibVLCSharp.Shared.MediaPlayer;
@@ -61,11 +62,12 @@ public partial class VlcVideoSurface : UserControl
     // graphics card on every frame just to throw most of it away; on a
     // modest PC on the balanced power plan that was what made it stutter.
     // It now gets its own small copy, a few times a second.
-    private const int PreviewTargetWidth = 480;
-    private static readonly long PreviewInterval = System.Diagnostics.Stopwatch.Frequency / 15;
+    // The size and the shrinking are in Presentation (VideoPreviewFrame),
+    // shared with the Avalonia surface.
+    private static readonly long PreviewInterval = System.Diagnostics.Stopwatch.Frequency / VideoPreviewFrame.PerSecond;
     private readonly System.Diagnostics.Stopwatch _previewClock = System.Diagnostics.Stopwatch.StartNew();
     private long _lastPreviewTicks = long.MinValue / 2;
-    private int[]? _previewPixels;
+    private uint[]? _previewPixels;
     private int _previewWidth, _previewHeight;
     private bool _previewReady;
     private WriteableBitmap? _previewBitmap;
@@ -574,14 +576,10 @@ public partial class VlcVideoSurface : UserControl
         // The fail-safe has to outlast the fade of whatever replaces this
         // picture: with a longer fade configured, letting go at two seconds
         // would show what is underneath before the new one is fully drawn.
-        _holdTimer.Interval = HoldTimeout(HoldFade);
+        _holdTimer.Interval = VideoHold.Timeout(HoldFade);
         _holdTimer.Stop();
         _holdTimer.Start();
     }
-
-    /// <summary>How long a held picture waits for its replacement: two seconds, or the fade and a margin if that is longer.</summary>
-    internal static TimeSpan HoldTimeout(TimeSpan fade) =>
-        TimeSpan.FromSeconds(Math.Max(2, fade.TotalSeconds + 1));
 
     // ── Transporte (barra de reproducción del operador) ──────────
 
@@ -1151,7 +1149,7 @@ public partial class VlcVideoSurface : UserControl
 
     /// <summary>
     /// Copies the current frame into the preview's small buffer, averaging
-    /// each 2×2 block at a step that lands near <see cref="PreviewTargetWidth"/>.
+    /// each 2×2 block at a step that lands near <see cref="VideoPreviewFrame.TargetWidth"/>.
     /// Call with <see cref="_sync"/> held.
     /// </summary>
     private unsafe void ShrinkForPreview()
@@ -1159,43 +1157,14 @@ public partial class VlcVideoSurface : UserControl
         if (_buffer == IntPtr.Zero || _width <= 0 || _height <= 0)
             return;
 
-        var step = Math.Max(1, (int)Math.Round(_width / (double)PreviewTargetWidth));
-        var pw = Math.Max(1, _width / step);
-        var ph = Math.Max(1, _height / step);
-
+        var (step, pw, ph) = VideoPreviewFrame.SizeFor(_width, _height);
         if (_previewPixels is null || _previewPixels.Length != pw * ph)
-            _previewPixels = new int[pw * ph];
+            _previewPixels = new uint[pw * ph];
         _previewWidth = pw;
         _previewHeight = ph;
 
-        // The second sample of each pair; 0 when the frame is so small it is
-        // copied pixel for pixel.
-        var dx = step > 1 ? 1 : 0;
-        var dy = step > 1 ? _stride : 0;
-
-        var src = (byte*)_buffer;
-        fixed (int* dst = _previewPixels)
-        {
-            for (var y = 0; y < ph; y++)
-            {
-                var row = src + (long)y * step * _stride;
-                var outRow = (uint*)dst + y * pw;
-                for (var x = 0; x < pw; x++)
-                {
-                    var p = (uint*)(row + x * step * 4);
-                    var a = p[0];
-                    var b = p[dx];
-                    var c = *(uint*)((byte*)p + dy);
-                    var d = *(uint*)((byte*)p + dy + dx * 4);
-
-                    // Average the four pixels channel by channel (B, G, R).
-                    var lo = ((a & 0x00FF00FF) + (b & 0x00FF00FF) + (c & 0x00FF00FF) + (d & 0x00FF00FF)) >> 2;
-                    var mid = ((a & 0x0000FF00) + (b & 0x0000FF00) + (c & 0x0000FF00) + (d & 0x0000FF00)) >> 2;
-                    outRow[x] = (lo & 0x00FF00FF) | (mid & 0x0000FF00);
-                }
-            }
-        }
-
+        var frame = new ReadOnlySpan<byte>((void*)_buffer, _stride * _height);
+        VideoPreviewFrame.Shrink(frame, _stride, step, _previewPixels, pw, ph);
         _previewReady = true;
     }
 }

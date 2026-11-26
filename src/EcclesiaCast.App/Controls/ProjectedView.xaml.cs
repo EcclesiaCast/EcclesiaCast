@@ -676,7 +676,7 @@ public partial class ProjectedView : UserControl
 
     /// <summary>
     /// If the video never draws anything, the image is let go after two seconds
-    /// (longer when the media fade is: see <see cref="VlcVideoSurface.HoldTimeout"/>).
+    /// (longer when the media fade is: see <see cref="EcclesiaCast.Presentation.Rendering.VideoHold.Timeout"/>).
     /// </summary>
     private void StartHeldImageTimer()
     {
@@ -686,7 +686,7 @@ public partial class ProjectedView : UserControl
             _heldImageTimer.Tick += (_, _) => ReleaseHeldImage(TimeSpan.FromMilliseconds(250));
         }
 
-        _heldImageTimer.Interval = VlcVideoSurface.HoldTimeout(TransitionSettings.Current.Media);
+        _heldImageTimer.Interval = EcclesiaCast.Presentation.Rendering.VideoHold.Timeout(TransitionSettings.Current.Media);
         _heldImageTimer.Stop();
         _heldImageTimer.Start();
     }
