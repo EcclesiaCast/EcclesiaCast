@@ -62,6 +62,15 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   mouse y barras de desplazamiento) y el menú de la ventana principal con los mismos textos y
   atajos (con ⌘ en la Mac). El programa de prueba de la Mac se ve oscuro. Un banco nuevo dibuja
   cada pantalla de Windows y de Mac sin mostrar nada, para compararlas una al lado de la otra.
+- En la versión de Mac ya funcionan las ventanas chicas, con el mismo aspecto que en Windows:
+  abrir y guardar archivos, las preguntas y los avisos, la edición rápida, la cuenta regresiva,
+  la copia liviana de un video y la descarga de un video de YouTube. Quedan hechas, y se van a
+  poder abrir desde el menú cuando esté la ventana principal de Mac, las de «Acerca de»,
+  transiciones de la pantalla y enviar comentarios. Las cajas de texto de Mac todavía no marcan
+  las faltas de ortografía.
+- Por dentro, sin cambios para quien usa el programa en Windows: lo que deciden las ventanas de
+  comentarios, cuenta regresiva, copia liviana y descarga de YouTube, y cómo se leen los números
+  de los campos con − y +, pasó a la parte común (con pruebas).
 
 ## [1.5.0] - 2026-11-26
 
