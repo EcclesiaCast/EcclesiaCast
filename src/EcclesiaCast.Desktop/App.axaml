@@ -1,9 +1,13 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:styles="using:EcclesiaCast.Desktop.Styles"
              x:Class="EcclesiaCast.Desktop.App"
              Name="EcclesiaCast"
-             RequestedThemeVariant="Light">
+             RequestedThemeVariant="Dark">
+    <!-- Fluent, dark, for the controls the program does not draw itself;
+         then the program's own look (Styles/EcclesiaCastTheme.axaml). -->
     <Application.Styles>
         <FluentTheme />
+        <styles:EcclesiaCastTheme />
     </Application.Styles>
 </Application>
