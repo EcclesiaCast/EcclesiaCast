@@ -1,9 +1,13 @@
-# Servicio de EcclesiaCast (contador y fondos de Pixabay). Pasos en LEEME.md.
+# Servicio de EcclesiaCast (contador, fondos de Pixabay y panel). Pasos en LEEME.md.
 name = "ecclesiacast-api"
 main = "worker.js"
 compatibility_date = "2026-11-01"
 
 routes = [{ pattern = "api.ecclesiacast.org", custom_domain = true }]
+
+# La foto diaria de las descargas, a las 23:55 UTC (20:55 en Argentina).
+[triggers]
+crons = ["55 23 * * *"]
 
 [[d1_databases]]
 binding = "DB"

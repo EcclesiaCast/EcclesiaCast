@@ -1,6 +1,6 @@
 # Servicio de EcclesiaCast (api.ecclesiacast.org)
 
-Un solo servicio en Cloudflare, en un solo archivo (`worker.js`), con dos
+Un solo servicio en Cloudflare, en un solo archivo (`worker.js`), con tres
 trabajos:
 
 - **Contador anónimo de uso.** El programa avisa una vez por día, la primera
@@ -13,6 +13,8 @@ trabajos:
   estar en el programa porque el código es público. Cada búsqueda se recuerda
   un día (Pixabay lo pide, y así no se pasa de sus 100 búsquedas por minuto).
   Los videos y fotos se bajan directo de Pixabay, no pasan por acá.
+- **Panel privado** (`/panel`). Junta en una página el uso del programa, las
+  descargas de GitHub y las visitas a la web. Ver [El panel](#el-panel).
 
 Mientras el servicio no esté publicado, el programa no se queja: el uso no se
 cuenta y «Buscar fondos en Pixabay» dice que no está disponible.
@@ -52,7 +54,78 @@ Para probarlo, en el navegador:
 - `https://api.ecclesiacast.org/v1/resumen?clave=TU-CLAVE` tiene que mostrar
   la tabla del contador (vacía al principio).
 
+## El panel
+
+`https://api.ecclesiacast.org/panel` muestra en una sola página:
+
+- **Arriba:** instalaciones que proyectaron algo el último fin de semana que ya
+  terminó, las nuevas de esa semana, las descargas del instalador y las visitas
+  a la web de los últimos 28 días.
+- **Uso del programa:** lo mismo que el resumen (ver más abajo), con un gráfico
+  de las últimas 12 semanas.
+- **Descargas:** el total de cada versión, lo que se bajó de otros archivos y las
+  descargas nuevas por semana. **Incluyen las actualizaciones**: el programa baja
+  de GitHub el instalador nuevo, así que no son todas instalaciones nuevas. El
+  total de arriba no cuenta las versiones de prueba.
+- **Web:** visitas por día, los botones (Descargar, mandarse el enlace desde el
+  celular, Donar), las páginas más vistas y de dónde llegan. GoatCounter cuenta
+  visitantes y no recargas; quien abre dos páginas suma una en cada una.
+
+Para entrar, el navegador pide usuario y clave: en **usuario** poné cualquier
+cosa (no importa) y en **contraseña**, la `RESUMEN_CLAVE`. La clave no va en la
+dirección y el panel no usa cookies ni scripts. El navegador la recuerda hasta
+que lo cerrás; si querés, guardala en el navegador de **tu** PC.
+
+Si GitHub o GoatCounter fallan, esa parte muestra un aviso y el resto se ve
+igual. Para no consultarlos en cada visita, las descargas pueden tener hasta una
+hora de atraso y las visitas hasta diez minutos.
+
+El panel no junta nada nuevo de las iglesias ni suma servicios: sólo lee lo que
+ya había. Instagram y TikTok no están.
+
+### Publicar el panel (una sola vez)
+
+Con el servicio ya publicado (si no lo está, hacé primero
+[Publicarlo](#publicarlo-una-sola-vez-desde-el-panel-de-cloudflare)). Las claves
+se pegan **sólo** en Cloudflare: nunca en un archivo del programa ni en un chat.
+
+1. **La tabla de descargas.** En Cloudflare (<https://dash.cloudflare.com>),
+   *Storage & Databases → D1* → base `ecclesiacast-api` → pestaña *Console*.
+   Pegá esto y tocá *Execute* (no toca la tabla del contador):
+
+   ```sql
+   CREATE TABLE IF NOT EXISTS descargas (dia TEXT NOT NULL, version TEXT NOT NULL, total INTEGER NOT NULL, PRIMARY KEY (dia, version));
+   ```
+
+2. **La clave de GoatCounter.** Entrá a <https://ecclesiacast.goatcounter.com>,
+   tocá tu usuario (arriba) → *API*, y creá una clave nueva marcando **sólo**
+   el permiso *Read statistics*. Copiala.
+3. **Guardarla.** En el Worker `ecclesiacast-api`: *Settings → Variables and
+   Secrets → Add*, tipo *Secret*, nombre `GOATCOUNTER_TOKEN`, y pegá la clave.
+4. **El código nuevo.** *Edit code*: borrá todo, pegá **todo** el `worker.js`
+   y tocá *Deploy*.
+5. **La tarea diaria.** En el Worker: *Settings → Trigger Events → Add → Cron
+   Triggers*, y escribí la expresión `55 23 * * *` (todos los días a las 23:55
+   UTC, las 20:55 en Argentina). Sin esto el panel funciona, pero no hay
+   descargas por semana.
+6. **Probarlo.** Abrí `https://api.ecclesiacast.org/panel`.
+
+**Qué esperar del historial:** GitHub sólo informa el total acumulado, así que
+el historial empieza con la primera foto de la tarea diaria; no se puede
+reconstruir lo anterior. Esa primera foto es el punto de partida, y las
+descargas por semana aparecen desde la del día siguiente. Si algún día la tarea
+falla, esas descargas se suman en la foto siguiente.
+
+**Sólo si el panel avisa que GitHub rechazó la consulta** (GitHub limita los
+pedidos sin clave, y los de Cloudflare salen de direcciones compartidas): en
+GitHub, tu foto → *Settings → Developer settings → Personal access tokens →
+Fine-grained tokens → Generate new token*, con *Repository access: Public
+repositories* y **sin agregar ningún permiso**. Guardala en el Worker como el
+secreto `GITHUB_TOKEN`. Cuando venza, hay que crear otra.
+
 ## Mirar los números de uso
+
+Se ven en el [panel](#el-panel). La dirección de antes sigue funcionando:
 
 `https://api.ecclesiacast.org/v1/resumen?clave=TU-CLAVE` muestra, por semana
 (de lunes a domingo):
@@ -121,9 +194,11 @@ a pixabay.com).
 ## Costo
 
 Entra en el plan gratis de Cloudflare: 100.000 pedidos por día para Workers
-y 100.000 escrituras por día para D1.
+y 100.000 escrituras por día para D1. El panel y su tarea diaria suman muy poco.
 
 ## Probar sin Cloudflare
 
 `node servicios/api/prueba.mjs` prueba el contador contra el SQLite que trae
-Node y la parte de Pixabay sin salir a internet. No instala nada.
+Node, la parte de Pixabay y el panel, sin salir a internet: GitHub y
+GoatCounter se imitan con los datos inventados de `ejemplos.mjs`. No instala
+nada.
