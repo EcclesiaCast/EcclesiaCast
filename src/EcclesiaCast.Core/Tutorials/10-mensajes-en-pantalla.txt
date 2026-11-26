@@ -6,7 +6,7 @@ orden: 10
 [paso]
 señalar: ToolsTabs
 titulo: Dos maneras de avisar
-texto: «Texto rápido» llena la pantalla con tu mensaje. «Aviso al pie» pone una franja abajo sin sacar lo que se está proyectando. Son dos pestañas de abajo a la derecha.
+texto: «Texto rápido» y «Aviso al pie», dos pestañas de abajo a la derecha, funcionan parecido: escribís y lo mandás. Lo que cambia es cómo se ve en la pantalla principal. Vemos primero uno y después el otro.
 
 [paso]
 señalar: QuickTextBox
@@ -30,7 +30,7 @@ texto: Con «Proyectar ▶» (o Ctrl+Enter) va a la pantalla en lugar de la letr
 señalar: OverlayTextBox
 abrir: herramienta:TabOverlay
 titulo: Aviso al pie: escribilo
-texto: Es una franja abajo, por encima de todo, incluso con Black puesto. Sirve para «el auto ABC 123 tiene las luces prendidas».
+texto: Se usa parecido: escribís acá y lo mandás. Pero sale como una franja abajo y no reemplaza lo que se ve. Sirve para «el auto ABC 123 tiene las luces prendidas».
 
 [paso]
 señalar: OverlayStyleRow
@@ -43,6 +43,12 @@ señalar: OverlayButtons
 abrir: herramienta:TabOverlay
 titulo: Mostrar y Quitar
 texto: «Mostrar» (o Ctrl+Enter) pone la franja y se queda hasta que toques «Quitar». Si después cambiás el texto, tocá «Mostrar» otra vez.
+
+[paso]
+señalar: LiveView
+abrir: herramienta:TabOverlay
+titulo: En qué se diferencian
+texto: El texto rápido ocupa la pantalla, con el tema de las canciones, y se va con Clear. El aviso va encima de todo, incluso con Black, con su letra y tamaño; Clear no lo saca: tocá «Quitar».
 
 [paso]
 señalar: LiveView

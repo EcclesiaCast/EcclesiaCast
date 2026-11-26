@@ -2729,7 +2729,7 @@
                                     <!-- YouTube, sólo el sonido: buscar, escuchar, sumar a la lista, guardar -->
                                     <Rectangle Height="1" Fill="{StaticResource LineBrush}" Margin="0,14,0,0"/>
                                     <TextBlock Text="BUSCAR EN YOUTUBE (SÓLO EL AUDIO)" Style="{StaticResource PanelTitle}" Margin="0,10,0,6"/>
-                                    <DockPanel>
+                                    <DockPanel x:Name="YouTubeMusicSearch">
                                         <Button DockPanel.Dock="Right" Content="🔍" FontSize="12" Padding="9,4" Margin="4,0,0,0"
                                                 Style="{StaticResource AccentButton}"
                                                 Command="{Binding SearchYouTubeMusicCommand}"

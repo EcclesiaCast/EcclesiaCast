@@ -198,11 +198,15 @@ En la barra **MEDIOS**, abajo:
 > marcados como *Fondo*: los de *Primer plano* taparían la letra.
 - Un video de **YouTube** recién agregado **entra sin sonido**, para que nada suene de golpe:
   tocá **🔇 Sin sonido** debajo del EN VIVO para que suene (el video lo recuerda).
-- **Clic derecho → Descargar para uso local** guarda un video de YouTube en la
-  computadora, para no depender de internet durante el servicio. Queda en la
-  pestaña **Descargados**. Necesita [yt-dlp](https://github.com/yt-dlp/yt-dlp)
-  instalado aparte (`winget install yt-dlp`); con ffmpeg además se baja hasta
-  1080p (en H.264, que se ve nítido en cualquier computadora). Descargá solo videos
+- **Videos de YouTube.** Con **▶ YouTube** los buscás dentro del programa, y con **🔗**
+  pegás el link de uno. Al sumarlos elegís **🌐 Reproducir por internet** o
+  **💾 Descargar para usar sin internet**. Uno que quedó por internet se baja después con
+  **clic derecho → Descargar para uso local**: así no dependés de internet durante el
+  servicio. La copia queda en la pestaña que tengas abierta. La primera vez, EcclesiaCast
+  baja solo lo que necesita para descargar (no hay que instalar nada). Con
+  ffmpeg (`winget install ffmpeg`) se baja hasta 1080p (en H.264, que se ve nítido en
+  cualquier computadora). Se descargan videos de a uno, no listas de reproducción enteras.
+  Descargá solo videos
   propios o con licencia que lo permita.
 - Si YouTube **no deja pasar un video** fuera de su página (pasa con muchos videos
   con derechos de autor), la pantalla queda en negro y el programa avisa que ese
@@ -425,6 +429,13 @@ programa recuerda lo que elijas.
 - **Texto rápido**: escribí un anuncio y proyectalo al momento.
 - **Aviso al pie**: un mensaje que aparece sobre todo lo demás (ideal para
   "el auto ABC 123 está mal estacionado"). Se quita con **Quitar**.
+
+  Texto rápido y Aviso al pie se usan parecido (escribís y mandás, con **Ctrl+Enter**);
+  lo que cambia es la pantalla principal. El texto rápido la ocupa entera, con el tema de
+  las canciones, en lugar de la letra o el versículo, se ve antes en PREVIEW y se saca con
+  **Clear** o proyectando otra cosa. El aviso es una franja abajo que no reemplaza nada,
+  sale incluso con **Black** puesto, tiene su propia letra y tamaño, y sólo se va con
+  **Quitar** (Clear no lo saca).
 - **Placas de nombre** («lower third»): escribí el **nombre** y, si querés, el
   **cargo** («Pastor Juan Pérez» / «Predicación») y tocá **Mostrar** (o Enter).
   Aparece una tarjeta por encima de todo, en el proyector y en la transmisión

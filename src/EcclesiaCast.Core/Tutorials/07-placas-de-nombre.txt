@@ -16,20 +16,24 @@ texto: Ahora estamos en Placas. Una placa («lower third») es una tarjeta con e
 
 [paso]
 señalar: ToolsPanel
+abrir: herramienta:TabPlates
 titulo: Nombre y cargo
 texto: Escribí el nombre, por ejemplo «Pastor Juan Pérez», y si querés un cargo: «Predicación», «Alabanza». Podés sumar un logo o una imagen con «Elegir…».
 
 [paso]
 señalar: ToolsPanel
+abrir: herramienta:TabPlates
 titulo: Diseñá su estilo
 texto: «✏ Diseñar…» cambia colores, tamaño, letras, lugar y cómo entra y sale. Hay una opción para que se vea sólo en la transmisión (OBS), no en el proyector.
 
 [paso]
 señalar: ToolsPanel
+abrir: herramienta:TabPlates
 titulo: Cuánto dura
 texto: En «Dura» elegís si queda hasta quitarla o se va sola a los 5, 10 o 15 segundos. Con «Mostrar» (o Enter en el nombre) sale; con «Quitar» se va.
 
 [paso]
 señalar: ToolsPanel
+abrir: herramienta:TabPlates
 titulo: Guardadas para la próxima
 texto: Cada placa que mostrás queda en la lista «Guardadas». La próxima vez, doble clic y sale al instante. Con 🗑 borrás las que ya no uses.

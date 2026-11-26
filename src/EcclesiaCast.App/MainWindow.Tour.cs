@@ -34,6 +34,11 @@ public partial class MainWindow
     // What the tour changed for good, put back when it ends.
     private RadioButton? _toolsTabBefore;
     private bool? _gridViewBefore;
+    private TourViewBefore? _viewBefore;
+
+    /// <summary>How the window was folded before a tutorial opened what its steps talk about.</summary>
+    private sealed record TourViewBefore(
+        bool Tools, bool Library, bool Playlist, bool PlaylistByGrid, bool Media, bool Rail, int MergedTab);
 
     private static readonly HashSet<string> SongsTabParts =
         ["SongsAddButton", "SongsList", "LyricsSearchBox"];
@@ -57,11 +62,15 @@ public partial class MainWindow
             return;
 
         _tourWasOnBible = (DataContext as MainViewModel)?.IsBibleTabActive;
+        _viewBefore = DataContext is MainViewModel before
+            ? new(_toolsCollapsed, _libraryCollapsed, _playlistCollapsed, _playlistFoldedByGrid,
+                _mediaCollapsed, _leftRail, before.MergedTab)
+            : null;
         PreviewKeyDown += TourKeys;
         Tour.Finished += TourFinished;
         Tour.ExtraSpot = TourExtraSpot;
         Tour.KeepClear = TourKeepClear;
-        Tour.Start(WindowContent, FindTourPart, PrepareTourStep, steps, TourPartShown);
+        Tour.Start(WindowContent, FindTourPart, PrepareTourStep, steps);
     }
 
     // A tutorial names the element it lights by its x:Name in this window.
@@ -78,16 +87,6 @@ public partial class MainWindow
         _ => FindName(part) as FrameworkElement,
     };
 
-    /// <summary>
-    /// Whether a step's part is (or will be, once its tab is opened) on show:
-    /// the Biblia parts are hidden while Canciones is open, and the other way
-    /// round, so asking the element itself would skip every step of the other tab.
-    /// </summary>
-    private bool TourPartShown(string part)
-    {
-        var element = SongsTabParts.Contains(part) || BibleTabParts.Contains(part) ? LibraryBody : FindTourPart(part);
-        return element is { IsVisible: true, ActualWidth: > 24, ActualHeight: > 24 };
-    }
 
     /// <summary>
     /// What a step needs before its card shows: the tab of Canciones or Biblia, and
@@ -110,6 +109,7 @@ public partial class MainWindow
             if (_toolsTabBefore is { } tab)
                 tab.IsChecked = true;
             _toolsTabBefore = null;
+            RestoreViewAfterTour(vm);
             return;
         }
 
@@ -121,6 +121,7 @@ public partial class MainWindow
         }
 
         ShowLibraryTab(vm, WantsBibleTab(step));
+        RevealTourPart(vm, step);
         if (changed && step.Open is { } action)
             RunTourAction(vm, action);
 
@@ -136,6 +137,84 @@ public partial class MainWindow
                     _tourPulse = TourPulse.Show(element);
             });
         }
+    }
+
+    /// <summary>
+    /// Opens whatever is folded away around what the step talks about: the
+    /// tools shrunk to icons, the library or the playlist (or the rail that
+    /// stands for both), the media bar, and the LIVE tab of the box it shares
+    /// with PREVIEW. It all goes back when the tour ends.
+    /// </summary>
+    private void RevealTourPart(MainViewModel vm, TourStep step)
+    {
+        var parts = new List<DependencyObject>();
+        if (step.Target is { } target && FindName(target) is DependencyObject lit)
+            parts.Add(lit);
+        if (step.Open is { } open && TourActions.TryGetElementName(open, out var name)
+            && FindName(name) is DependencyObject opened)
+            parts.Add(opened);
+        if (step.Open is TourActions.AddMenu)
+            parts.Add(SongsAddButton);
+        if (step.Open is TourActions.BibleHistory)
+            parts.Add(BibleHistoryButton);
+
+        bool Needs(params DependencyObject[] sections) =>
+            parts.Any(part => sections.Any(section => IsInside(part, section)));
+
+        var tools = _toolsCollapsed && Needs(ToolsPanel);
+        var rail = _leftRail && Needs(LibraryPanel, PlaylistPanel);
+        var library = _libraryCollapsed && (Needs(LibraryBody) || parts.Contains(LibraryPanel));
+        var playlist = _playlistCollapsed && Needs(PlaylistPanel);
+        var media = _mediaCollapsed && Needs(MediaPanel);
+
+        if (tools || rail || library || playlist || media)
+        {
+            CaptureSizes();
+            if (tools)
+                _toolsCollapsed = false;
+            if (rail)
+                _leftRail = false;
+            if (library)
+                _libraryCollapsed = false;
+            if (playlist)
+                _playlistCollapsed = _playlistFoldedByGrid = false;
+            if (media)
+                _mediaCollapsed = false;
+            ApplyLayout();
+        }
+
+        if (Needs(LivePanel) && vm.IsOutputMerged)
+            vm.MergedTab = 0;
+    }
+
+    private static bool IsInside(DependencyObject part, DependencyObject section)
+    {
+        for (DependencyObject? at = part; at is not null; at = LogicalTreeHelper.GetParent(at))
+        {
+            if (ReferenceEquals(at, section))
+                return true;
+        }
+
+        return false;
+    }
+
+    private void RestoreViewAfterTour(MainViewModel vm)
+    {
+        if (_viewBefore is not { } before)
+            return;
+        _viewBefore = null;
+
+        CaptureSizes();
+        _toolsCollapsed = before.Tools;
+        _libraryCollapsed = before.Library;
+        _playlistCollapsed = before.Playlist;
+        _playlistFoldedByGrid = before.PlaylistByGrid;
+        _mediaCollapsed = before.Media;
+        _leftRail = before.Rail;
+        ApplyLayout();
+        // The Bible grid, shown by a step, may have saved the layout opened up.
+        SaveLayoutOptions();
+        vm.MergedTab = before.MergedTab;
     }
 
     /// <summary>The tab a step needs: Biblia, Canciones, or null for "whichever is open".</summary>

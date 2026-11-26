@@ -68,27 +68,6 @@ public static class WelcomeTour
             "Lo podés volver a ver cuando quieras en Ayuda → «Recorrido del programa». ¡Que sea de bendición!"),
     ];
 
-    /// <summary>
-    /// The step after (<paramref name="direction"/> 1) or before (−1)
-    /// <paramref name="from"/>, skipping the ones whose part of the window is
-    /// not on show (a panel shrunk to icons, for instance). −1 when there is
-    /// none: past the end the tour is over, before the start it stays put.
-    /// </summary>
-    public static int Next(IReadOnlyList<TourStep> steps, int from, int direction, Func<string, bool> isShown)
-    {
-        ArgumentNullException.ThrowIfNull(steps);
-        ArgumentNullException.ThrowIfNull(isShown);
-        if (direction == 0)
-            throw new ArgumentOutOfRangeException(nameof(direction));
-
-        for (var i = from + Math.Sign(direction); i >= 0 && i < steps.Count; i += Math.Sign(direction))
-        {
-            if (steps[i].Target is not { } target || isShown(target))
-                return i;
-        }
-
-        return -1;
-    }
 
     /// <summary>
     /// The lit rectangle: the part of the window with a little room around

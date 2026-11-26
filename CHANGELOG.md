@@ -18,6 +18,15 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ### Corregido
 
+- **Los tutoriales ya no se saltean pasos.** Si un paso hablaba de una pestaña que estaba
+  cerrada, se descartaba antes de abrirla: «Mensajes en pantalla» pasaba del paso 1 al 5, y
+  «Durante la reunión» de «1 de 3» a «3 de 5», sin explicar Notas ni Tiempos. Ahora cada
+  tutorial muestra todos sus pasos y el total no cambia. Además abre lo que esté achicado
+  (herramientas, biblioteca, playlist, barra de medios) y, si hace falta, la pestaña LIVE; al
+  terminar deja todo como estaba.
+- **Tutoriales más claros.** «Mensajes en pantalla» explica Texto rápido y Aviso al pie, y en
+  qué se diferencian. El de YouTube aclara que se puede buscar y guardar para usar sin
+  internet, y suma un paso sobre la música de YouTube en la pestaña «Música».
 - **Fondos que van encima de todo.** Al elegir como fondo (de la Biblia o de una canción) un medio
   que se muestra encima de todo, ahora aparece un aviso que explica por qué no se puede y cómo
   arreglarlo; antes sólo lo decía la barra de estado y parecía roto. En «Elegir un fondo de la

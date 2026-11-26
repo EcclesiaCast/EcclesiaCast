@@ -11,12 +11,18 @@ texto: A la derecha de la barra de medios hay botones para proyectar lo que no e
 [paso]
 señalar: MediaYouTubeButton
 titulo: ▶ YouTube
-texto: Busca videos en YouTube dentro del programa. Podés iniciar sesión con tu cuenta (con Premium, sin anuncios) y proyectar el video en la pantalla. Necesita internet.
+texto: Buscá videos en YouTube dentro del programa (con tu cuenta Premium, sin anuncios). Al sumar uno elegís «Reproducir por internet» o «Descargar para usar sin internet».
 
 [paso]
 señalar: MediaLinkButton
 titulo: 🔗 Pegar un link de YouTube
-texto: Si ya tenés la dirección del video, tocá 🔗 y pegala: el video se agrega a la pestaña actual, listo para proyectar cuando toque.
+texto: Si ya tenés el link, tocá 🔗 y pegalo: también elegís si va por internet o se descarga. El que quedó por internet se baja después con clic derecho → «Descargar para uso local».
+
+[paso]
+señalar: YouTubeMusicSearch
+abrir: herramienta:TabMusic
+titulo: 🎵 Sólo la música de YouTube
+texto: En «Música» podés buscar en YouTube y suena sólo el audio: la pantalla no cambia. ▶ escucha, ➕ suma a la lista y 💾 lo guarda para usarlo sin internet.
 
 [paso]
 señalar: MediaWebButton

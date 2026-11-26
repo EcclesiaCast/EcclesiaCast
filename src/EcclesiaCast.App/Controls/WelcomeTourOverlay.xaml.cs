@@ -28,7 +28,7 @@ public partial class WelcomeTourOverlay : UserControl
     private bool _isWelcome = true;
     private Func<string, FrameworkElement?> _find = _ => null;
     private Action<TourStep?>? _prepare;
-    private Func<string, bool>? _shown;
+    private TourRun _run = TourRun.ForTutorial([]);
     private FrameworkElement? _content;
     private int _index = -1;
 
@@ -60,23 +60,26 @@ public partial class WelcomeTourOverlay : UserControl
     /// <summary>
     /// Starts at the greeting, or at the first step of <paramref name="steps"/> (a tutorial). <paramref name="content"/> is what gets
     /// blurred behind; <paramref name="find"/> gives the element a step
-    /// lights; <paramref name="prepare"/> is told each step's part before it
-    /// is measured, and null when the tour ends.
+    /// lights; <paramref name="prepare"/> is told each step before it is
+    /// measured (it opens what the step talks about), and null when the tour ends.
+    /// Which steps there are is decided here, once (see <see cref="TourRun"/>).
     /// </summary>
     public void Start(FrameworkElement content, Func<string, FrameworkElement?> find, Action<TourStep?>? prepare,
-        IReadOnlyList<TourStep>? steps = null, Func<string, bool>? isShown = null)
+        IReadOnlyList<TourStep>? steps = null)
     {
         _isWelcome = steps is null;
         _steps = steps ?? WelcomeTour.Steps;
         _content = content;
         _find = find;
         _prepare = prepare;
-        _shown = isShown;
         Visibility = Visibility.Visible;
         UpdateLayout();
         SetUpBlur();
         _spot = Rect.Empty;
-        Show(Math.Max(0, WelcomeTour.Next(_steps, -1, 1, IsShown)), animate: false);
+        _run = _isWelcome
+            ? TourRun.ForWelcome(_steps, IsOnShow)
+            : TourRun.ForTutorial(_steps);
+        Show(Math.Max(0, _run.First), animate: false);
         Dispatcher.BeginInvoke(() => Keyboard.Focus(NextButton), DispatcherPriority.Input);
     }
 
@@ -138,7 +141,7 @@ public partial class WelcomeTourOverlay : UserControl
 
     private void Move(int direction)
     {
-        var next = WelcomeTour.Next(_steps, _index, direction, IsShown);
+        var next = _run.Next(_index, direction);
         if (next >= 0)
             Show(next, animate: true);
         else if (direction > 0)
@@ -160,18 +163,34 @@ public partial class WelcomeTourOverlay : UserControl
     /// <summary>Puts the keyboard back on the card, after a step opened a window that took it.</summary>
     public void FocusNext() => Keyboard.Focus(NextButton);
 
-    private bool IsShown(string target) =>
-        _shown?.Invoke(target)
-        ?? (_find(target) is { IsVisible: true } element && element.ActualWidth > 24 && element.ActualHeight > 24);
-
-    private bool IsMeasurable(string target) =>
+    // The welcome tour opens nothing: a part shrunk to icons is left out.
+    private bool IsOnShow(string target) =>
         _find(target) is { IsVisible: true } element && element.ActualWidth > 24 && element.ActualHeight > 24;
+
+    // Small on purpose: a one-line box or a row of buttons is barely 24 tall.
+    private bool IsMeasurable(string target) =>
+        _find(target) is { IsVisible: true } element && element.ActualWidth > 4 && element.ActualHeight > 4;
 
     private void Show(int index, bool animate)
     {
         _index = index;
         var step = _steps[index];
         _prepare?.Invoke(step);
+        Place(index, animate);
+
+        // What the step has just opened may finish laying itself out after
+        // this (a list filling up, a column changing width): look again.
+        Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () =>
+        {
+            if (_index == index)
+                Place(index, animate: false, onlyIfMoved: true);
+        });
+    }
+
+    /// <summary>Measures the step's part, and puts the light and the card where they go.</summary>
+    private void Place(int index, bool animate, bool onlyIfMoved = false)
+    {
+        var step = _steps[index];
         UpdateLayout();
 
         // A part inside a list with a scroll bar (the bottom of «Tiempos»)
@@ -202,6 +221,10 @@ public partial class WelcomeTourOverlay : UserControl
                     area.Width - Math.Min(busy.Right, area.Width - Card.Width - 2 * CardGap), area.Height);
         }
 
+        var target = spot.IsEmpty ? Rect.Empty : new Rect(spot.X, spot.Y, spot.Width, spot.Height);
+        if (onlyIfMoved && target == (_gliding ? _glideTo : _spot))
+            return;
+
         FillCard(index, step);
         Card.Measure(new Size(Card.Width, double.PositiveInfinity));
         var (x, y) = WelcomeTour.PlaceCard(spot, cardArea, Card.Width, Card.DesiredSize.Height, CardGap);
@@ -210,23 +233,18 @@ public partial class WelcomeTourOverlay : UserControl
         if (animate)
             Card.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(220)));
 
-        GlideTo(spot.IsEmpty ? Rect.Empty : new Rect(spot.X, spot.Y, spot.Width, spot.Height), animate);
+        GlideTo(target, animate || (onlyIfMoved && _gliding));
     }
 
     private void FillCard(int index, TourStep step)
     {
-        // In a tutorial every step that is on show counts (those with nothing to light too)
-        // and the first and last ones are real steps, not a greeting and a goodbye.
-        var parts = Enumerable.Range(0, _steps.Count)
-            .Where(i => _steps[i].Target is not { } t ? !_isWelcome : IsShown(t))
-            .ToList();
-        var position = parts.IndexOf(index);
-        var first = _isWelcome ? index == 0 : position == 0;
-        var last = _isWelcome ? index == _steps.Count - 1 : position == parts.Count - 1;
+        var first = _run.IsFirst(index);
+        var last = _run.IsLast(index);
 
-        // «3 de 9», counting only the parts that are on show in this window.
-        StepCount.Text = position >= 0 ? $"{position + 1} de {parts.Count}" : string.Empty;
-        StepCount.Visibility = position >= 0 ? Visibility.Visible : Visibility.Collapsed;
+        // «3 de 9», with the total fixed since the tour started.
+        var count = _run.Count(_steps, index);
+        StepCount.Text = count is { } c ? $"{c.Number} de {c.Total}" : string.Empty;
+        StepCount.Visibility = count is null ? Visibility.Collapsed : Visibility.Visible;
 
         TitleText.Text = step.Title;
         BodyText.Text = step.Text;
