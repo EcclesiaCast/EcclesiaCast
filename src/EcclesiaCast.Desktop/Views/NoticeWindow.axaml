@@ -1,0 +1,29 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="EcclesiaCast.Desktop.Views.NoticeWindow"
+        Title="EcclesiaCast"
+        Width="460" SizeToContent="Height"
+        CanResize="False" ShowInTaskbar="False">
+    <StackPanel Margin="20">
+        <Grid ColumnDefinitions="Auto,*">
+            <!-- The sign that says what kind of notice this is -->
+            <Border Name="SignCircle" Width="40" Height="40" CornerRadius="20"
+                    VerticalAlignment="Top" Margin="0,2,16,0"
+                    Background="{StaticResource AccentBrush}">
+                <TextBlock Name="SignText" Foreground="White" FontSize="22" FontWeight="SemiBold"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+
+            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <TextBlock Name="TitleText" Foreground="White" FontSize="16" FontWeight="Bold"
+                           TextWrapping="Wrap" Margin="0,0,0,6" IsVisible="False"/>
+                <TextBlock Name="MessageText" Foreground="{StaticResource MutedBrush}" FontSize="13"
+                           TextWrapping="Wrap"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Buttons are added from the code, one per answer -->
+        <StackPanel Name="ButtonsPanel" Orientation="Horizontal" HorizontalAlignment="Right"
+                    Margin="0,22,0,0"/>
+    </StackPanel>
+</Window>

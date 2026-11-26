@@ -4,6 +4,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using EcclesiaCast.Desktop.Platform;
+using EcclesiaCast.Desktop.Services;
 using EcclesiaCast.Desktop.Views;
 using EcclesiaCast.Presentation.ViewModels;
 using Microsoft.Extensions.DependencyInjection;

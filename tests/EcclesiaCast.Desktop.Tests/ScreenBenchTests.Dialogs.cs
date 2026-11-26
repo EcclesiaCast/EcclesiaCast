@@ -2,6 +2,8 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using EcclesiaCast.Desktop.Views;
+using EcclesiaCast.Presentation.Platform;
+using EcclesiaCast.Presentation.Services;
 
 namespace EcclesiaCast.Desktop.Tests;
 
@@ -36,6 +38,31 @@ public sealed partial class ScreenBenchTests
 
         DrawWindow(window, "texto-pedir-dos");
     }
+
+    [AvaloniaFact]
+    public void A_question_is_drawn() =>
+        DrawWindow(new NoticeWindow(
+            "La canción va a la papelera y se puede recuperar durante 30 días.",
+            "¿Eliminar «Cuán grande es Él»?", NoticeKind.Question, ["Cancelar", "Eliminar"], 1, 0), "aviso-pregunta");
+
+    [AvaloniaFact]
+    public void A_destructive_question_is_drawn() =>
+        DrawWindow(new NoticeWindow(
+            "Se borra para siempre. No hay forma de recuperarla.",
+            "¿Vaciar la papelera?", NoticeKind.Warning, ["Cancelar", "Vaciar"], 1, 0, destructive: true),
+            "aviso-destructivo");
+
+    [AvaloniaFact]
+    public void A_notice_with_the_on_top_icon_is_drawn() =>
+        DrawWindow(new NoticeWindow(
+            $"Las imágenes marcadas con {Notice.OnTopIconMark} van encima de todo, también de la letra.",
+            "Va encima de todo", NoticeKind.Info, ["Entendido"], 0, 0), "aviso-con-icono");
+
+    [AvaloniaFact]
+    public void An_error_without_a_title_is_drawn() =>
+        DrawWindow(new NoticeWindow(
+            "No se pudo abrir el archivo. Puede que esté dañado o que lo esté usando otro programa.",
+            null, NoticeKind.Error, ["Cancelar", "No guardar", "Guardar"], 2, 0), "aviso-error-sin-titulo");
 
     /// <summary>
     /// A whole dialog in memory, at its own width. <paramref name="height"/>

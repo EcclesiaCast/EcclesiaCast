@@ -1,8 +1,12 @@
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
+using Avalonia.Media;
 using EcclesiaCast.Desktop.Views;
+using EcclesiaCast.Presentation.Platform;
+using EcclesiaCast.Presentation.Services;
 
 namespace EcclesiaCast.Desktop.Tests;
 
@@ -61,6 +65,50 @@ public sealed class DialogWindowTests
         Assert.True(window.Accepted);
         Assert.Equal("hola", window.Value);
         Assert.Equal("chau", window.SecondValue);
+    }
+
+    [AvaloniaFact]
+    public void A_notice_answers_with_the_button_pressed_and_closed_it_cancels()
+    {
+        NoticeWindow Question() => new("M", "T", NoticeKind.Question, ["Cancelar", "No", "Sí"], 2, 0);
+
+        var pressed = Question();
+        Assert.True(Closes(pressed, () => Press(pressed, "No")));
+        Assert.Equal(1, pressed.Chosen);
+
+        var closed = Question();
+        Assert.True(Closes(closed, closed.Close));
+        Assert.Equal(0, closed.Chosen);
+    }
+
+    [AvaloniaFact]
+    public void The_mark_in_a_message_becomes_the_icon()
+    {
+        var window = new NoticeWindow($"Antes {Notice.OnTopIconMark} después", null, NoticeKind.Info, ["Ok"], 0, 0);
+
+        var inlines = window.FindControl<TextBlock>("MessageText")!.Inlines!;
+
+        Assert.Equal(3, inlines.Count);
+        Assert.IsType<InlineUIContainer>(inlines[1]);
+        Assert.DoesNotContain(inlines.OfType<Run>(), r => r.Text!.Contains('{'));
+    }
+
+    [AvaloniaFact]
+    public void Only_a_destructive_question_paints_its_button_red()
+    {
+        var red = new NoticeWindow("M", null, NoticeKind.Warning, ["Cancelar", "Borrar"], 1, 0, destructive: true);
+        var usual = new NoticeWindow("M", null, NoticeKind.Question, ["Cancelar", "Borrar"], 1, 0);
+
+        IBrush? Background(NoticeWindow window)
+        {
+            window.Show();
+            var brush = window.GetLogicalDescendants().OfType<Button>().Single(b => Equals(b.Content, "Borrar")).Background;
+            window.Close();
+            return brush;
+        }
+
+        Assert.Equal(Color.Parse("#C43B3B"), ((ISolidColorBrush)Background(red)!).Color);
+        Assert.Equal(Color.Parse("#2F63C9"), ((ISolidColorBrush)Background(usual)!).Color);
     }
 
     [AvaloniaFact]
