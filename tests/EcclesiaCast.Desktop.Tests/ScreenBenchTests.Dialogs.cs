@@ -1,7 +1,9 @@
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Desktop.Views;
+using EcclesiaCast.Presentation.ViewModels;
 using EcclesiaCast.Presentation.Platform;
 using EcclesiaCast.Presentation.Services;
 
@@ -88,6 +90,33 @@ public sealed partial class ScreenBenchTests
 
         DrawWindow(new FeedbackWindow(session.CreateForm(reason)), name);
     }
+
+    [AvaloniaFact]
+    public void The_quick_text_editor_is_drawn() =>
+        DrawWindow(new QuickTextWindow("Cuán grande es Él,\nmi corazón entona la canción"), "texto-rapido", 326);
+
+    [AvaloniaFact]
+    public void The_countdown_is_drawn() =>
+        DrawWindow(new CountdownWindow(new CountdownViewModel(CountdownSettings.Default, false)), "cuenta-regresiva");
+
+    [AvaloniaFact]
+    public void A_running_countdown_is_drawn() =>
+        DrawWindow(new CountdownWindow(new CountdownViewModel(
+            new CountdownSettings(10, "19:00", "La reunión empieza en", "¡Bienvenidos!"), true)),
+            "cuenta-regresiva-en-marcha");
+
+    // Work that never ends: showing the window starts it, and the picture is
+    // of the start. Nothing is copied or downloaded.
+    [AvaloniaFact]
+    public void The_light_copy_is_drawn() =>
+        DrawWindow(new LightCopyWindow(new LightCopyViewModel(
+            "Fondo de olas 4K", (_, _) => new TaskCompletionSource<bool>().Task)), "copia-liviana");
+
+    [AvaloniaFact]
+    public void The_youtube_download_is_drawn() =>
+        DrawWindow(new YouTubeDownloadWindow(new YouTubeDownloadViewModel(
+            "abcdefghijk", "Alabanza en vivo", hasFfmpeg: true,
+            (_, _) => new TaskCompletionSource<string?>().Task)), "descargar-youtube");
 
     /// <summary>
     /// A whole dialog in memory, at its own width. <paramref name="height"/>

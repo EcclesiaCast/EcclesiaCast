@@ -170,7 +170,7 @@ public static class Composition
         services.AddSingleton<ITextPrompt, AvaloniaTextPrompt>();
         services.AddSingleton(_ => NotOnMacYet.For<IThemeManagerDialog>());
         services.AddSingleton(_ => NotOnMacYet.For<ISongDesigner>());
-        services.AddSingleton(_ => NotOnMacYet.For<IQuickTextEditor>());
+        services.AddSingleton<IQuickTextEditor, AvaloniaQuickTextEditor>();
         services.AddSingleton(_ => NotOnMacYet.For<IMediaInspector>());
         services.AddSingleton(_ => NotOnMacYet.For<IYouTubeBrowser>());
         services.AddSingleton(_ => NotOnMacYet.For<ILogoManagerDialog>());
@@ -178,8 +178,8 @@ public static class Composition
         services.AddSingleton(_ => NotOnMacYet.For<IWebSongSearchDialog>());
         services.AddSingleton(_ => NotOnMacYet.For<IStageDesigner>());
         services.AddSingleton(_ => NotOnMacYet.For<IBackupDialog>());
-        services.AddSingleton(_ => NotOnMacYet.For<ICountdownDialog>());
-        services.AddSingleton(_ => NotOnMacYet.For<ILightCopyDialog>());
+        services.AddSingleton<ICountdownDialog, AvaloniaCountdownDialog>();
+        services.AddSingleton<ILightCopyDialog, AvaloniaLightCopyDialog>();
         services.AddSingleton(_ => NotOnMacYet.For<IColorPicker>());
         services.AddSingleton(_ => NotOnMacYet.For<IBibleFormatHelpDialog>());
         services.AddSingleton(_ => NotOnMacYet.For<INamePlateDesigner>());
@@ -187,7 +187,7 @@ public static class Composition
         services.AddSingleton<IYouTubeSession, NoYouTubeSession>();
         services.AddSingleton(_ => NotOnMacYet.For<IBiblePackageDialog>());
         services.AddSingleton(_ => NotOnMacYet.For<IWindowPickerDialog>());
-        services.AddSingleton(_ => NotOnMacYet.For<IYouTubeDownloadDialog>());
+        services.AddSingleton<IYouTubeDownloadDialog, AvaloniaYouTubeDownloadDialog>();
         services.AddSingleton(_ => NotOnMacYet.For<ITrashDialog>());
         services.AddSingleton(_ => NotOnMacYet.For<IBroadcastDialog>());
         services.AddSingleton(_ => NotOnMacYet.For<IGlobalSearchDialog>());

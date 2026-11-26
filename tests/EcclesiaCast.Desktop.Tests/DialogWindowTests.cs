@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Controls.Primitives;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
@@ -218,6 +219,148 @@ public sealed class DialogWindowTests
         Assert.Equal(["Anda bien"], sent);
         Assert.True(closed);
         Assert.True(form.IsSummaryVisible);
+    }
+
+    [AvaloniaFact]
+    public void The_quick_editor_gives_the_text_only_when_saved()
+    {
+        var saved = new QuickTextWindow("hola");
+        Assert.True(Closes(saved, () =>
+        {
+            saved.FindControl<TextBox>("Editor")!.Text = "  chau \n";
+            Press(saved, "Guardar");
+        }));
+        Assert.Equal("chau", saved.Result);
+
+        var cancelled = new QuickTextWindow("hola", "Versículo", "Corregí el versículo.");
+        Assert.True(Closes(cancelled, () => Press(cancelled, "Cancelar")));
+        Assert.Null(cancelled.Result);
+        Assert.Equal("Versículo", cancelled.Title);
+        Assert.Equal("Corregí el versículo.", cancelled.FindControl<TextBlock>("MessageText")!.Text);
+    }
+
+    [AvaloniaFact]
+    public void The_countdown_starts_with_a_preset_or_stays_with_the_error()
+    {
+        var countdown = new CountdownViewModel(CountdownSettings.Default, false);
+        var window = new CountdownWindow(countdown);
+        var closed = false;
+        window.Closed += (_, _) => closed = true;
+        window.Show();
+        var byMinutes = window.FindControl<RadioButton>("ByMinutesChoice")!;
+        var byClock = window.FindControl<RadioButton>("ByClockChoice")!;
+
+        window.FindControl<TextBox>("MinutesBox")!.Text = "0";
+        Dispatcher.UIThread.RunJobs();
+        Press(window, "Proyectar");
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(closed);
+        Assert.True(window.FindControl<TextBlock>("ErrorText")!.IsVisible);
+
+        // Writing in the box of the clock picks it
+        window.FindControl<TextBox>("ClockBox")!.Focus();
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(byClock.IsChecked);
+        Assert.False(byMinutes.IsChecked);
+
+        Press(window, "15");
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(byMinutes.IsChecked);
+        Assert.False(byClock.IsChecked);
+
+        Press(window, "Proyectar");
+
+        Assert.True(closed);
+        Assert.True(window.Accepted);
+        Assert.Equal(15, countdown.Choice!.Settings.Minutes);
+    }
+
+    [AvaloniaFact]
+    public void The_minutes_take_only_digits()
+    {
+        var window = new CountdownWindow(new CountdownViewModel(CountdownSettings.Default, false));
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        window.KeyTextInput("a");
+        window.KeyTextInput("7");
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal("7", window.FindControl<TextBox>("MinutesBox")!.Text);
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void Stopping_and_cancelling_the_countdown_are_told_apart()
+    {
+        var countdown = new CountdownViewModel(CountdownSettings.Default, true);
+        var stop = new CountdownWindow(countdown);
+        Assert.True(Closes(stop, () => Press(stop, "Detener la que corre")));
+        Assert.True(stop.Accepted);
+        Assert.True(countdown.Choice!.Stop);
+
+        var cancel = new CountdownWindow(new CountdownViewModel(CountdownSettings.Default, true));
+        Assert.True(Closes(cancel, () => Press(cancel, "Cancelar")));
+        Assert.False(cancel.Accepted);
+    }
+
+    [AvaloniaFact]
+    public void The_light_copy_closes_by_itself_when_it_is_ready()
+    {
+        var work = new TaskCompletionSource<bool>();
+        var copy = new LightCopyViewModel("Olas", (_, _) => work.Task);
+        var window = new LightCopyWindow(copy);
+
+        Assert.True(Closes(window, () =>
+        {
+            Dispatcher.UIThread.RunJobs();
+            work.SetResult(true);
+            Dispatcher.UIThread.RunJobs();
+        }));
+
+        Assert.Equal(LightCopyResult.Done, copy.Result);
+    }
+
+    [AvaloniaFact]
+    public void Cancelling_the_light_copy_stops_the_work_and_closes()
+    {
+        var copy = new LightCopyViewModel("Olas", async (_, cancellation) =>
+        {
+            await Task.Delay(Timeout.Infinite, cancellation);
+            return true;
+        });
+        var window = new LightCopyWindow(copy);
+
+        Assert.True(Closes(window, () =>
+        {
+            Dispatcher.UIThread.RunJobs();
+            Press(window, "Cancelar");
+            Dispatcher.UIThread.RunJobs();
+        }));
+
+        Assert.Equal(LightCopyResult.Cancelled, copy.Result);
+    }
+
+    [AvaloniaFact]
+    public void A_download_that_fails_stays_open_until_closed()
+    {
+        var download = new YouTubeDownloadViewModel(
+            "abcdefghijk", "Alabanza", true,
+            (_, _) => Task.FromException<string?>(new InvalidOperationException("no")),
+            _ => "No se pudo.");
+        var window = new YouTubeDownloadWindow(download);
+        var closed = false;
+        window.Closed += (_, _) => closed = true;
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.False(closed);
+        Assert.Equal("No se pudo.", window.FindControl<TextBlock>("StatusText")!.Text);
+
+        window.FindControl<Button>("CloseButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+
+        Assert.True(closed);
+        Assert.Null(download.DownloadedPath);
     }
 
     [AvaloniaFact]
