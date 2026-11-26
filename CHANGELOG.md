@@ -35,7 +35,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   cuentas del video y del encuadre que usan las dos versiones pasaron a la parte común.
   En la versión de Mac, el aviso al pie sale en seminegrita como en Windows (antes a veces salía
   fino, según qué letra se hubiera dibujado antes) y una letra sin negrita propia, como Impact,
-  se engrosa y se ensancha igual que en Windows. En la Mac, el celular ya ve las miniaturas de
+  se engrosa y se ensancha igual que en Windows (también la Impact que trae la Mac, que la Mac
+  toma por negrita y antes no engrosaba). En la Mac, el celular ya ve las miniaturas de
   los medios (antes la Mac nunca las encontraba dentro de su carpeta). Con interlineado propio, la
   versión de Mac ya no corta la parte de abajo del último renglón y pone la letra a la misma altura
   que Windows. Con la letra alineada a la derecha, los renglones largos llegan hasta el borde como
