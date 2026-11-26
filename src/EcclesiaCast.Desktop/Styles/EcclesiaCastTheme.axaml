@@ -818,6 +818,21 @@
         <Setter Property="CornerRadius" Value="0"/>
     </Style>
 
+    <!-- WPF's Hyperlink inside a sentence -->
+    <Style Selector="HyperlinkButton.inline">
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="MinHeight" Value="0"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <TextBlock Text="{Binding $parent[HyperlinkButton].Content}" TextDecorations="Underline"
+                           Background="Transparent"/>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
     <!-- Every window: the dark background, white letters and the program's
          font, at WPF's size (12). A window that needs another background
          (the outputs, black) sets its own. -->

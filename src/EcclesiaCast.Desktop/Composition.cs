@@ -157,6 +157,12 @@ public static class Composition
         services.AddSingleton<IRemoteControlDialog, RemoteControlDialog>();
         services.AddSingleton<IDialogs, AvaloniaDialogs>();
         services.AddSingleton<MenuDialogs>();
+        // Making the session counts one opening of the program: the operator's
+        // window has to ask for FeedbackDialogs as it starts (batch 19).
+        services.AddSingleton(sp => new FeedbackSession(
+            sp.GetRequiredService<ISettingsStore>(), platform.Paths.DataFolder,
+            OperatingSystem.IsMacOS() ? "Mac" : "Windows"));
+        services.AddSingleton<FeedbackDialogs>();
 
         // Every other dialog: «Esto todavía no está en la versión de Mac».
         services.AddSingleton(_ => NotOnMacYet.For<ISongEditor>());

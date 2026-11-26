@@ -11,6 +11,7 @@ using EcclesiaCast.Desktop.Controls;
 using EcclesiaCast.Desktop.Views;
 using EcclesiaCast.Presentation.Platform;
 using EcclesiaCast.Presentation.Services;
+using EcclesiaCast.Presentation.ViewModels;
 
 namespace EcclesiaCast.Desktop.Tests;
 
@@ -183,6 +184,40 @@ public sealed class DialogWindowTests
         {
             TransitionSettings.Set(before, new MemorySettings());
         }
+    }
+
+    [AvaloniaFact]
+    public async Task The_comments_wait_for_a_text_then_send_and_close()
+    {
+        var sent = new List<string>();
+        var form = new FeedbackViewModel(
+            new MemorySettings(), FeedbackReason.Menu, "resumen",
+            message =>
+            {
+                sent.Add(message.Comment);
+                return Task.FromResult(true);
+            })
+        { ThanksPause = TimeSpan.Zero };
+        var window = new FeedbackWindow(form);
+        var closed = false;
+        window.Closed += (_, _) => closed = true;
+        window.Show();
+        var send = window.GetLogicalDescendants().OfType<Button>().Single(b => Equals(b.Content, "Enviar"));
+        Assert.False(send.IsEffectivelyEnabled);
+
+        window.FindControl<TextBox>("CommentBox")!.Text = "Anda bien";
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(send.IsEffectivelyEnabled);
+        Assert.False(window.FindControl<TextBlock>("CommentHint")!.IsVisible);
+
+        Press(window, "Ver qué se envía");
+        Press(window, "Enviar");
+        await Task.Delay(50);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(["Anda bien"], sent);
+        Assert.True(closed);
+        Assert.True(form.IsSummaryVisible);
     }
 
     [AvaloniaFact]

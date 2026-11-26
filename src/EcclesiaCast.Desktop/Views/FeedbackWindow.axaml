@@ -1,0 +1,77 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:EcclesiaCast.Presentation.ViewModels"
+        x:Class="EcclesiaCast.Desktop.Views.FeedbackWindow"
+        x:DataType="vm:FeedbackViewModel"
+        Title="Comentarios"
+        Width="520" SizeToContent="Height"
+        CanResize="False" ShowInTaskbar="False">
+    <Window.Styles>
+        <Style Selector="TextBlock.label">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+        <Style Selector="TextBox.field">
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+    </Window.Styles>
+    <StackPanel Margin="26,22,26,20">
+        <TextBlock Text="{Binding Heading}" FontSize="20" FontWeight="SemiBold" Foreground="White" TextWrapping="Wrap"/>
+        <TextBlock Text="{Binding Intro}" FontSize="13" Foreground="{StaticResource MutedBrush}"
+                   TextWrapping="Wrap" Margin="0,6,0,14"/>
+
+        <TextBlock Classes="label" Text="Qué querés contarnos"/>
+        <ComboBox Name="KindBox" ItemsSource="{Binding Kinds}" SelectedItem="{Binding Kind}"
+                  HorizontalAlignment="Stretch" Margin="0,0,0,12"/>
+
+        <TextBlock Classes="label" Text="Tu comentario"/>
+        <TextBox Name="CommentBox" Classes="field" Height="110" AcceptsReturn="True" TextWrapping="Wrap"
+                 Text="{Binding Comment}"/>
+        <!-- Sin texto no se puede enviar: con sólo el resumen de uso no se entiende qué pasó -->
+        <TextBlock Name="CommentHint" FontSize="12" Foreground="{StaticResource FaintBrush}" TextWrapping="Wrap"
+                   Margin="0,4,0,0" IsVisible="{Binding ShowCommentHint}"
+                   Text="Escribí aunque sea una frase para poder enviar: con sólo el resumen de uso no sabemos qué pasó ni cómo contestarte."/>
+
+        <Grid Margin="0,12,0,0" ColumnDefinitions="*,12,*">
+            <StackPanel>
+                <TextBlock Classes="label" Text="Tu iglesia (opcional)"/>
+                <TextBox Classes="field" Text="{Binding Church}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+                <TextBlock Classes="label" Text="Correo para responderte (opcional)"/>
+                <TextBox Classes="field" Text="{Binding Email}"/>
+            </StackPanel>
+        </Grid>
+
+        <CheckBox IsChecked="{Binding Attach}" Foreground="White" FontSize="13" Margin="0,16,0,0"
+                  Content="Adjuntar el resumen de uso"
+                  ToolTip.Tip="Cuántas veces abriste el programa, la versión y los últimos errores. No incluye canciones, nombres ni archivos tuyos."/>
+        <WrapPanel Margin="22,2,0,0">
+            <TextBlock FontSize="12" Foreground="{StaticResource FaintBrush}"
+                       Text="Nos ayuda a entender cuánto y cómo se usa. "/>
+            <HyperlinkButton Classes="inline" Content="Ver qué se envía" Click="Preview_Click"/>
+        </WrapPanel>
+        <TextBox Name="SummaryBox" Text="{Binding Summary, Mode=OneWay}" IsReadOnly="True" Height="140"
+                 Margin="22,8,0,0" IsVisible="{Binding IsSummaryVisible}"
+                 AcceptsReturn="True" TextWrapping="NoWrap"
+                 ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                 FontFamily="Consolas, Menlo, monospace" FontSize="12"
+                 Foreground="{StaticResource MutedBrush}" Padding="8,6"/>
+
+        <CheckBox IsChecked="{Binding Never}" Foreground="{StaticResource MutedBrush}" FontSize="13" Margin="0,16,0,0"
+                  IsVisible="{Binding OffersNeverAgain}"
+                  Content="No volver a mostrar este aviso al cerrar"/>
+
+        <TextBlock Text="{Binding Status}" FontSize="13" Foreground="{StaticResource AccentBrush}"
+                   TextWrapping="Wrap" Margin="0,12,0,0" IsVisible="{Binding HasStatus}"/>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button Content="Ahora no" Theme="{StaticResource DarkButton}" IsCancel="True"
+                    IsEnabled="{Binding CanSkip}" Padding="18,9" Click="Skip_Click"/>
+            <Button Content="Enviar" Theme="{StaticResource AccentButton}" IsDefault="True"
+                    IsEnabled="{Binding CanSend}" Padding="22,9" Margin="10,0,0,0" Click="Send_Click"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

@@ -4,22 +4,6 @@
         Title="Acerca de EcclesiaCast"
         Width="460" SizeToContent="Height"
         CanResize="False" ShowInTaskbar="False">
-    <Window.Styles>
-        <!-- WPF's Hyperlink inside a sentence -->
-        <Style Selector="HyperlinkButton.inline">
-            <Setter Property="Padding" Value="0"/>
-            <Setter Property="MinHeight" Value="0"/>
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <ControlTemplate>
-                    <TextBlock Text="{Binding $parent[HyperlinkButton].Content}" TextDecorations="Underline"
-                               Background="Transparent"/>
-                </ControlTemplate>
-            </Setter>
-        </Style>
-    </Window.Styles>
     <StackPanel Margin="28,24,28,20">
         <StackPanel Orientation="Horizontal">
             <Image Source="{StaticResource AppLogoImage}" Width="64" Height="64"

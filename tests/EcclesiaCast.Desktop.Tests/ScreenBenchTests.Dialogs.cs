@@ -77,6 +77,18 @@ public sealed partial class ScreenBenchTests
     public void The_transitions_are_drawn() =>
         DrawWindow(new TransitionsWindow(new MemorySettings()), "transiciones");
 
+    [AvaloniaTheory]
+    [InlineData("comentarios", FeedbackReason.Menu)]
+    [InlineData("comentarios-al-cerrar", FeedbackReason.Closing)]
+    [InlineData("comentarios-tras-un-cierre", FeedbackReason.AfterCrash)]
+    public void The_comments_are_drawn(string name, FeedbackReason reason)
+    {
+        var folder = Path.Combine(Path.GetTempPath(), "ecclesiacast-banco-sin-registro");
+        var session = new FeedbackSession(new MemorySettings(), folder);
+
+        DrawWindow(new FeedbackWindow(session.CreateForm(reason)), name);
+    }
+
     /// <summary>
     /// A whole dialog in memory, at its own width. <paramref name="height"/>
     /// is for the windows with a fixed one, without the system's title bar.
