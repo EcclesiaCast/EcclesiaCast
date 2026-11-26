@@ -74,8 +74,8 @@ internal static class DialogScreens
         yield return ("comentarios-al-cerrar", () => Take(Feedback(FeedbackReason.Closing)), 520);
         yield return ("comentarios-tras-un-cierre", () => Take(Feedback(FeedbackReason.AfterCrash)), 520);
 
-        yield return ("copia-liviana", () => Take(new LightCopyWindow(
-            Path.Combine(Path.GetTempPath(), "fondo.mp4"), "Fondo de olas 4K")), 480);
+        yield return ("copia-liviana", () => Take(new LightCopyWindow(LightCopyViewModel.For(
+            Path.Combine(Path.GetTempPath(), "fondo.mp4"), "Fondo de olas 4K"))), 480);
 
         yield return ("descargar-youtube", () => Take(new YouTubeDownloadWindow(
             "abcdefghijk", "Alabanza en vivo")), 480);
