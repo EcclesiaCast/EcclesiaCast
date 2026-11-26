@@ -50,13 +50,37 @@ public sealed partial class MainViewModel
     }
 
     /// <summary>The backgrounds of the library (pictures and videos) by tab, for the «choose a background» menus.</summary>
-    public IReadOnlyList<(string Tab, IReadOnlyList<MediaItem> Items)> BackgroundChoicesByTab() =>
+    /// <remarks>
+    /// The ones shown on top of everything are listed too, marked: hiding them
+    /// looked like the program had lost them. Picking one says why it can't be.
+    /// </remarks>
+    public IReadOnlyList<(string Tab, bool AllOnTop, IReadOnlyList<MediaItem> Items)> BackgroundChoicesByTab() =>
         _allMedia
             .Where(m => m.Type is MediaType.Image or MediaType.Video)
-            .Where(m => Playable(m).Behavior == MediaBehavior.Background)
             .GroupBy(m => m.Category, StringComparer.OrdinalIgnoreCase)
-            .Select(g => (g.Key, (IReadOnlyList<MediaItem>)g.ToList()))
+            .Select(g => (g.Key,
+                g.All(m => Playable(m).Behavior == MediaBehavior.Foreground),
+                (IReadOnlyList<MediaItem>)g.ToList()))
             .ToList();
+
+    /// <summary>
+    /// A media that goes on top of everything can't be a background. Said in a
+    /// window: in the status bar alone it looked like the program was broken.
+    /// </summary>
+    private void ExplainWhyNotABackground(MediaItem media, string covered)
+    {
+        var fix = TabRule(media.Category).Mode == MediaTabMode.Foreground
+            ? $"La pestaña «{media.Category}» está configurada como «Todo va en primer plano», o sea encima de todo.\n\n"
+              + "Para usarlo de fondo: movelo a otra pestaña (clic derecho → «Mover a la pestaña…»), "
+              + "o cambiá la pestaña (clic derecho en su nombre → «Configurar…»)."
+            : "En sus Propiedades está puesto como «primer plano», o sea encima de todo.\n\n"
+              + "Para usarlo de fondo: clic derecho → «Propiedades» y cambialo a «Fondo».";
+
+        StatusText = $"«{media.Name}» no se puede usar de fondo: va encima de todo y taparía {covered}.";
+        Services.Notice.Show(
+            $"«{media.Name}» taparía {covered}, por eso no se puede usar de fondo.\n\n{fix}",
+            "No se puede usar de fondo", Services.NoticeKind.Warning);
+    }
 
     /// <summary>A background picked for the Bible (from the menu of the button over the verses, or a media card's right click).</summary>
     [RelayCommand]
@@ -73,7 +97,7 @@ public sealed partial class MainViewModel
 
         if (Playable(media).Behavior == MediaBehavior.Foreground)
         {
-            StatusText = $"«{media.Name}» está como primer plano: taparía el texto. Cambialo a «Fondo» en sus Propiedades.";
+            ExplainWhyNotABackground(media, "el texto");
             return;
         }
 
@@ -94,7 +118,13 @@ public sealed partial class MainViewModel
     {
         var current = _presentation.Background;
         var media = current is { Id: > 0 } ? _allMedia.FirstOrDefault(m => m.Id == current.Id) : null;
-        if (media is null || current!.Behavior == MediaBehavior.Foreground)
+        if (media is not null && current!.Behavior == MediaBehavior.Foreground)
+        {
+            ExplainWhyNotABackground(media, "el texto");
+            return;
+        }
+
+        if (media is null)
         {
             StatusText = "No hay una imagen o un video de fondo en pantalla. Elegí uno de la lista o poné uno de Medios.";
             return;

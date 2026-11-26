@@ -62,7 +62,7 @@ public sealed partial class MainViewModel
 
         if (Playable(media).Behavior == MediaBehavior.Foreground)
         {
-            StatusText = $"«{media.Name}» está como primer plano: taparía la letra. Cambialo a «Fondo» en sus Propiedades.";
+            ExplainWhyNotABackground(media, "la letra");
             return;
         }
 
@@ -78,8 +78,13 @@ public sealed partial class MainViewModel
 
         var current = _presentation.Background;
         var media = current is { Id: > 0 } ? _allMedia.FirstOrDefault(m => m.Id == current.Id) : null;
-        if (media is null || media.Type is not (MediaType.Image or MediaType.Video or MediaType.YouTube)
-            || current!.Behavior == MediaBehavior.Foreground)
+        if (media is not null && current!.Behavior == MediaBehavior.Foreground)
+        {
+            ExplainWhyNotABackground(media, "la letra");
+            return;
+        }
+
+        if (media is null || media.Type is not (MediaType.Image or MediaType.Video or MediaType.YouTube))
         {
             StatusText = "No hay una imagen o un video de fondo en pantalla. Poné uno de Medios y volvé a tocar acá.";
             return;

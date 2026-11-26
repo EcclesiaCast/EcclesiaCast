@@ -1650,9 +1650,9 @@ public partial class MainWindow : Window
     private static void AddBackgroundChoices(ContextMenu menu, MainViewModel vm, System.Windows.Input.ICommand pick)
     {
         var choose = new MenuItem { Header = "Elegir un fondo de la biblioteca" };
-        foreach (var (tab, items) in vm.BackgroundChoicesByTab())
+        foreach (var (tab, allOnTop, items) in vm.BackgroundChoicesByTab())
         {
-            var tabItem = new MenuItem { Header = tab.Replace("_", "__") };
+            var tabItem = new MenuItem { Header = tab.Replace("_", "__") + (allOnTop ? " (va encima de todo)" : "") };
             foreach (var media in items.Take(60))
             {
                 tabItem.Items.Add(new MenuItem

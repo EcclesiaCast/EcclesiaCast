@@ -649,7 +649,7 @@ para la música de antes de la reunión, la ofrenda o lo que haga falta.
   recién ahí pasa al anterior.
 - El botón **🔁** al lado del nombre de lo que suena cambia cómo sigue la
   música: apagado (sin repetir), **🔁 repetir la lista** (después del último
-  vuelve al primero) o **🔂 repetir ésta** (el mismo audio una y otra vez,
+  vuelve al primero) o **🔁 1 repetir ésta** (el mismo audio una y otra vez,
   ideal para un pad debajo de una canción).
 - Los audios suenan por la salida de sonido de la computadora, igual que el
   video. Para que no se pisen con otra cosa, bajales el volumen o pausalos

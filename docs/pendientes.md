@@ -21,18 +21,11 @@ pasa a **Ya probado**, más abajo.
 
 ### Falta probar
 
-**Nuevo en la prueba.11 (lo que pediste tras la prueba.10)**
+**Arreglos tras probar la prueba.11 (todavía sin versión de prueba)**
 
-1. **Barra 🔈 de los audios.** Arrastrala sin soltar con un archivo y con música de YouTube: el
-   volumen tiene que cambiar mientras la movés, sin cortes ni golpes al máximo. Probá también pasar
-   de un tema a otro (arranca con el volumen de la barra), pausar y saltar dentro del tema, la barra
-   «Volumen» de abajo de EN VIVO, y cambiar de parlantes en medio de un tema. Los audios ahora salen
-   por otra salida de Windows (DirectSound): fijate que salgan por el equipo correcto. El volumen
-   propio de cada video (Propiedades) conserva la demora.
-2. **Fondo de la Biblia.** Ya no está el botón debajo de las versiones: queda el **🖼** de arriba de
-   las diapositivas (sólo con versículos cargados). Con la pestaña Biblia abierta, clic derecho en un
-   medio: «Usar como fondo de la Biblia» y «Quitar el fondo de la Biblia». En Canciones sigue «Usar
-   como fondo de «canción»». El tutorial de la Biblia tiene un paso nuevo.
+1. **Repetir un solo audio:** el botón muestra «🔁 1»; repetir la lista, «🔁».
+2. **Fondo con un medio que va encima de todo** (Biblia y canción): aparece un aviso con la forma de
+   arreglarlo. En «Elegir un fondo de la biblioteca» la pestaña dice «(va encima de todo)».
 
 ### Al publicar la 1.5.0 (no es para probar antes)
 
@@ -45,6 +38,8 @@ pasa a **Ya probado**, más abajo.
 
 ### Ya probado
 
+- **Prueba.11, probada por Alexis el 26/11:** barra de volumen de los audios en tiempo real y fondo
+  propio de la Biblia (con los dos detalles de arriba).
 - **Prueba.10, probado por Alexis, dado por bueno:** el botón único «Lista ⇄ / Grilla ⇄» de la
   Biblia; «Fondos y medios» en el celular (botón azul y carpetas); YouTube sin internet (💾) y
   Holyrics por archivo.

@@ -5,6 +5,14 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+### Corregido
+
+- **Fondos que van encima de todo.** Al elegir como fondo (de la Biblia o de una canción) un medio
+  que se muestra encima de todo, ahora aparece un aviso que explica por qué no se puede y cómo
+  arreglarlo; antes sólo lo decía la barra de estado y parecía roto. En «Elegir un fondo de la
+  biblioteca» esas pestañas se ven marcadas «(va encima de todo)».
+- **Repetir un solo audio** se distingue de repetir la lista: el botón muestra «🔁 1».
+
 ### Mejorado
 
 - **La música de YouTube arranca mucho antes.** Antes tardaba entre 18 y 25 segundos desde ▶ hasta

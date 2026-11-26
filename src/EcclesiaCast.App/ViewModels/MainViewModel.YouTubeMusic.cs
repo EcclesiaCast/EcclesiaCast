@@ -45,7 +45,7 @@ public sealed partial class MainViewModel
     [NotifyPropertyChangedFor(nameof(AudioRepeatGlyph), nameof(AudioRepeatTip), nameof(IsAudioRepeatOn))]
     private AudioRepeatMode _audioRepeat;
 
-    public string AudioRepeatGlyph => AudioRepeat == AudioRepeatMode.One ? "🔂" : "🔁";
+    public string AudioRepeatGlyph => AudioRepeat == AudioRepeatMode.One ? "🔁 1" : "🔁";
 
     public bool IsAudioRepeatOn => AudioRepeat != AudioRepeatMode.Off;
 

@@ -272,7 +272,7 @@ public sealed partial class MainViewModel
 
         AudioRepeat = AudioRepeatMode.One;
         PlayAudio(item);
-        StatusText = $"«{item.Name}» suena en bucle. Con 🔂 se vuelve a cambiar.";
+        StatusText = $"«{item.Name}» suena en bucle. Con 🔁 se vuelve a cambiar.";
     }
 
     /// <summary>Right click → «Guardar para usar sin internet»: the same as 💾, on the row that was clicked.</summary>
