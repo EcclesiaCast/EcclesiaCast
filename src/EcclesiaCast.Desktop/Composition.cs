@@ -159,7 +159,7 @@ public static class Composition
         services.AddSingleton<IRemoteControlDialog, RemoteControlDialog>();
 
         // Every other dialog: «Esto todavía no está en la versión de Mac».
-        services.AddSingleton(_ => NotOnMacYet.For<IDialogs>());
+        services.AddSingleton<IDialogs, AvaloniaDialogs>();
         services.AddSingleton(_ => NotOnMacYet.For<ISongEditor>());
         services.AddSingleton(_ => NotOnMacYet.For<IBibleImportDialog>());
         services.AddSingleton(_ => NotOnMacYet.For<ITextPrompt>());
