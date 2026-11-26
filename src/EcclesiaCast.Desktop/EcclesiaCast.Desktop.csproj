@@ -18,6 +18,10 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <!-- The video frames are copied from VLC's buffer into the bitmaps. -->
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- A dialog is made from code with what it shows, so it has no
+         constructor without parameters for Avalonia's runtime loader, which
+         the program never uses. -->
+    <NoWarn>$(NoWarn);AVLN3001</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

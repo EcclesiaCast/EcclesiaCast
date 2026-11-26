@@ -162,7 +162,7 @@ public static class Composition
         services.AddSingleton<IDialogs, AvaloniaDialogs>();
         services.AddSingleton(_ => NotOnMacYet.For<ISongEditor>());
         services.AddSingleton(_ => NotOnMacYet.For<IBibleImportDialog>());
-        services.AddSingleton(_ => NotOnMacYet.For<ITextPrompt>());
+        services.AddSingleton<ITextPrompt, AvaloniaTextPrompt>();
         services.AddSingleton(_ => NotOnMacYet.For<IThemeManagerDialog>());
         services.AddSingleton(_ => NotOnMacYet.For<ISongDesigner>());
         services.AddSingleton(_ => NotOnMacYet.For<IQuickTextEditor>());

@@ -1,0 +1,21 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="EcclesiaCast.Desktop.Views.ChoiceWindow"
+        Width="440" SizeToContent="Height"
+        CanResize="False" ShowInTaskbar="False">
+    <StackPanel Margin="20">
+        <TextBlock Name="MessageText"
+                   FontSize="13" Foreground="{StaticResource MutedBrush}"
+                   TextWrapping="Wrap" Margin="0,0,0,14"/>
+
+        <!-- Una opción por botón, llenados desde el código -->
+        <StackPanel Name="OptionsPanel"/>
+
+        <!-- Sólo cuando la pregunta se repite en una tanda -->
+        <CheckBox Name="RememberBox" IsVisible="False" Margin="0,14,0,0"
+                  Foreground="{StaticResource MutedBrush}"/>
+
+        <Button Content="Cancelar" Theme="{StaticResource DarkButton}" IsCancel="True"
+                Padding="18,9" Margin="0,14,0,0" HorizontalAlignment="Right" Click="Cancel_Click"/>
+    </StackPanel>
+</Window>

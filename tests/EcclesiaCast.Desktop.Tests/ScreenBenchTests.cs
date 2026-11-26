@@ -25,7 +25,7 @@ namespace EcclesiaCast.Desktop.Tests;
 /// at them. The names are the same on both sides. Every batch of phase 3 adds
 /// its screens here and there (docs/guia-wpf-a-avalonia.md).
 /// </summary>
-public sealed class ScreenBenchTests
+public sealed partial class ScreenBenchTests
 {
     /// <summary>The same long tooltip as the WPF bench.</summary>
     private const string TipSample =
