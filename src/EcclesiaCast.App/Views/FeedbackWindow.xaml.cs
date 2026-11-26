@@ -1,174 +1,52 @@
-using System.IO;
-using System.Net.Http;
-using System.Runtime.InteropServices;
 using System.Windows;
-using EcclesiaCast.App.Services;
-using EcclesiaCast.Core.Abstractions;
-using EcclesiaCast.Core.Feedback;
+using EcclesiaCast.Presentation.ViewModels;
 
 namespace EcclesiaCast.App.Views;
 
-/// <summary>Why the comments window is open: it decides the wording and whether it offers to stop asking.</summary>
-public enum FeedbackReason
-{
-    /// <summary>The person chose Ayuda → Enviar comentarios.</summary>
-    Menu,
-
-    /// <summary>The program is closing after a real session.</summary>
-    Closing,
-
-    /// <summary>The last run did not end on its own.</summary>
-    AfterCrash,
-}
-
 /// <summary>
-/// «¿Querés enviarnos algún comentario?» The person writes, picks whether the
-/// usage summary goes along (after reading it) and sends; nothing leaves the
-/// computer before «Enviar», and closing the window sends nothing.
+/// «¿Querés enviarnos algún comentario?» Everything it says and decides is in
+/// <see cref="FeedbackViewModel"/>.
 /// </summary>
 public partial class FeedbackWindow : Window
 {
-    private const string ChurchKey = "feedback.church";
-    private const string EmailKey = "feedback.email";
+    private readonly FeedbackViewModel _form;
+    private bool _closed;
 
-    private static readonly HttpClient Client = CreateClient();
-
-    private readonly ISettingsStore _settings;
-    private readonly FeedbackReason _reason;
-    private readonly string _summary;
-    private bool _sent;
-    private bool _sending;
-
-    public FeedbackWindow(
-        ISettingsStore settings, UsageStats stats, string dataDir, FeedbackReason reason, int sessionMinutes)
+    public FeedbackWindow(FeedbackViewModel form)
     {
         InitializeComponent();
-        _settings = settings;
-        _reason = reason;
-
-        var errors = RecentErrors.Read(
-            Path.Combine(dataDir, "logs"),
-            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
-        _summary = stats.BuildSummary(AppInfo.Version, RuntimeInformation.OSDescription, sessionMinutes, errors);
-        SummaryBox.Text = _summary;
-
-        foreach (var kind in FeedbackForm.Kinds)
-            KindBox.Items.Add(kind);
-        KindBox.SelectedIndex = 0;
-
-        ChurchBox.Text = settings.Get(ChurchKey) ?? "";
-        EmailBox.Text = settings.Get(EmailKey) ?? "";
-
-        switch (reason)
-        {
-            case FeedbackReason.Closing:
-                HeadingText.Text = "¿Querés enviarnos algún comentario?";
-                IntroText.Text = "Antes de cerrar: contanos qué anduvo bien, qué falló o qué te faltó. "
-                    + "Es opcional y no lleva más de un minuto.";
-                KindBox.SelectedItem = "Otra cosa";
-                break;
-            case FeedbackReason.AfterCrash:
-                HeadingText.Text = "El programa se cerró de golpe la última vez";
-                IntroText.Text = "Perdón por eso. Si nos contás qué estabas haciendo, lo podemos arreglar. "
-                    + "Tildá «Adjuntar el resumen de uso» para que veamos los últimos errores.";
-                KindBox.SelectedItem = FeedbackForm.KindProblem;
-                AttachCheck.IsChecked = true;
-                break;
-            default:
-                HeadingText.Text = "Enviar comentarios";
-                IntroText.Text = "Contanos qué anduvo bien, qué falló o qué te faltó. Lo lee una persona, no un programa.";
-                break;
-        }
-
-        if (reason != FeedbackReason.Closing)
-            NeverCheck.Visibility = Visibility.Collapsed;
-
-        UpdateSendState();
+        _form = form;
+        DataContext = form;
     }
 
-    /// <summary>Nothing written means nothing to send: «Enviar» waits for the comment and the hint says why.</summary>
-    private bool HasComment => !string.IsNullOrWhiteSpace(CommentBox.Text);
-
-    private void CommentBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e) =>
-        UpdateSendState();
-
-    private void UpdateSendState()
-    {
-        // Runs from InitializeComponent too, before every named element exists.
-        if (SendButton is null || CommentHint is null || CommentBox is null)
-            return;
-        CommentHint.Visibility = HasComment ? Visibility.Collapsed : Visibility.Visible;
-        if (_sending)
-            return;
-        SendButton.IsEnabled = HasComment;
-    }
-
-    private void Preview_Click(object sender, RoutedEventArgs e) =>
-        SummaryBox.Visibility = SummaryBox.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+    private void Preview_Click(object sender, RoutedEventArgs e) => _form.TogglePreview();
 
     private void Skip_Click(object sender, RoutedEventArgs e) => Finish();
 
     private async void Send_Click(object sender, RoutedEventArgs e)
     {
-        var attach = AttachCheck.IsChecked == true;
-        var message = new FeedbackMessage(
-            KindBox.SelectedItem as string ?? "Otra cosa",
-            CommentBox.Text.Trim(),
-            ChurchBox.Text.Trim(),
-            EmailBox.Text.Trim(),
-            attach ? _summary : "");
-        if (message.IsEmpty)
+        switch (await _form.SendAsync())
         {
-            // The button is off while the box is empty; this is only a second guard.
-            ShowStatus("Escribí qué pasó o qué querés contarnos. Si no querés mandar nada, tocá «Ahora no».");
-            CommentBox.Focus();
-            return;
+            case FeedbackSendResult.Empty:
+                CommentBox.Focus();
+                break;
+            case FeedbackSendResult.Sent:
+                Finish();
+                break;
         }
-
-        _sending = true;
-        SendButton.IsEnabled = false;
-        SkipButton.IsEnabled = false;
-        ShowStatus("Enviando…");
-
-        var ok = await new FeedbackSender(Client).SendAsync(message);
-
-        if (!ok)
-        {
-            _sending = false;
-            ShowStatus("No se pudo enviar. ¿Hay internet? Probá de nuevo, o tocá «Ahora no» para seguir sin enviar.");
-            SkipButton.IsEnabled = true;
-            UpdateSendState();
-            return;
-        }
-
-        _sent = true;
-        _settings.Set(ChurchKey, message.Church);
-        _settings.Set(EmailKey, message.Email);
-        ShowStatus("¡Gracias! Recibimos tu comentario.");
-        await Task.Delay(1100);
-        Finish();
     }
 
-    private void Finish() => DialogResult = _sent;
+    private void Finish()
+    {
+        // Closed with the X while it was sending: nobody is waiting for an answer.
+        if (!_closed)
+            DialogResult = _form.Sent;
+    }
 
-    /// <summary>Also when the window is closed with the X: the tick is the person's answer either way.</summary>
     protected override void OnClosed(EventArgs e)
     {
-        if (_reason == FeedbackReason.Closing && NeverCheck.IsChecked == true)
-            FeedbackPolicy.NeverAgain(_settings);
+        _closed = true;
+        _form.Closed();
         base.OnClosed(e);
-    }
-
-    private void ShowStatus(string text)
-    {
-        StatusText.Text = text;
-        StatusText.Visibility = Visibility.Visible;
-    }
-
-    private static HttpClient CreateClient()
-    {
-        var client = new HttpClient { Timeout = TimeSpan.FromSeconds(20) };
-        client.DefaultRequestHeaders.UserAgent.ParseAdd($"EcclesiaCast/{AppInfo.Version}");
-        return client;
     }
 }

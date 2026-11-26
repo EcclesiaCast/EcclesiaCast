@@ -82,9 +82,8 @@ internal static class DialogScreens
 
     private static FeedbackWindow Feedback(FeedbackReason reason)
     {
-        var settings = new MemorySettings();
         var dataFolder = Path.Combine(Path.GetTempPath(), "ecclesiacast-banco-sin-registro");
-        return new FeedbackWindow(settings, new UsageStats(settings), dataFolder, reason, sessionMinutes: 12);
+        return new FeedbackWindow(new FeedbackSession(new MemorySettings(), dataFolder).CreateForm(reason));
     }
 
     /// <summary>

@@ -39,13 +39,15 @@ public sealed class UsageStats(ISettingsStore settings, Func<DateTime>? now = nu
     }
 
     /// <summary>The text that travels with a comment.</summary>
-    public string BuildSummary(string version, string windows, int sessionMinutes, IReadOnlyList<string> recentErrors)
+    public string BuildSummary(
+        string version, string system, int sessionMinutes, IReadOnlyList<string> recentErrors,
+        string systemLabel = "Windows")
     {
         var text = new StringBuilder();
         text.AppendLine("Resumen de uso de EcclesiaCast");
         text.AppendLine($"Instalación (código al azar): {settings.Get(IdKey) ?? "-"}");
         text.AppendLine($"Versión: {version}");
-        text.AppendLine($"Windows: {windows}");
+        text.AppendLine($"{systemLabel}: {system}");
         text.AppendLine($"Se abrió por primera vez: {settings.Get(FirstKey) ?? "-"}");
         text.AppendLine($"Veces que se abrió: {Opens}");
         text.AppendLine($"Minutos de uso (sin contar esta sesión): {Minutes}");

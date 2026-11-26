@@ -327,11 +327,7 @@ public partial class App : Application
                 }
             }
 
-            // Not on the very first start (the person has not used it yet), and
-            // not past the day the temporary notices stop.
-            if (lastRunCrashed && DateTime.Now <= FeedbackForm.AutoPromptUntil
-                && settings.Get(FeedbackPolicy.NeverKey) != "1" && (FeedbackCoordinator.Opens > 1))
-                FeedbackCoordinator.AskAfterCrash(mainWindow);
+            FeedbackCoordinator.AskAfterCrash(mainWindow, lastRunCrashed);
         };
         mainWindow.Show();
 
