@@ -32,7 +32,7 @@ probarlos.
      de cero»).
   2. Con la 1.5.0 **instalada**, proyectar algo: a los minutos tiene que aparecer en el resumen.
      Un instalador de prueba (`1.5.0-prueba.N`) no aparece.
-- La página `sitio/cargar-canciones.html` dice «botón ➕»: cambiarlo a «➕ Agregar».
+- (Hecho al publicar) La página `sitio/cargar-canciones.html` ya dice «➕ Agregar».
 
 ### Ya probado
 
