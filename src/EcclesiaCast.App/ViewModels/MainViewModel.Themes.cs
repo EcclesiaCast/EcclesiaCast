@@ -104,6 +104,8 @@ public sealed partial class MainViewModel
         if (!_themeManager.Show())
             return;
 
+        SyncBibleSplit();
+
         // Re-render whatever is on the grid with the fresh themes, keeping
         // the live slide projected.
         RebuildSlidesPreservingLive(() =>
@@ -158,13 +160,14 @@ public sealed partial class MainViewModel
 
         // A verse is found by its number, not its label: after a theme change
         // it may take more or fewer slides, and its label changes with it.
+        // With fewer parts than before, the last one is the nearest to what
+        // was being read.
         int index;
         if (live.Verses is { } verses)
         {
             index = FindVerseSlide(verses.Chapter, verses.FirstVerse);
-            if (index >= 0 && part > 0 && index + part < Slides.Count
-                && Slides[index + part].Verses?.FirstVerse == verses.FirstVerse)
-                index += part;
+            if (index >= 0 && part > 0)
+                index = Math.Min(index + part, FindVerseSlide(verses.Chapter, verses.FirstVerse, lastPart: true));
         }
         else
         {

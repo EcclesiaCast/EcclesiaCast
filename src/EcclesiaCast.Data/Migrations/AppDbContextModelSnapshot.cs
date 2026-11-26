@@ -570,6 +570,9 @@ namespace EcclesiaCast.Data.Migrations
                     b.Property<bool>("TransparentBackground")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("VerseSplitMaxChars")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.ToTable("Themes");

@@ -1,5 +1,6 @@
 using EcclesiaCast.Core.Audio;
 using LibVLCSharp.Shared;
+using NAudio.CoreAudioApi;
 using Serilog;
 using MediaPlayer = LibVLCSharp.Shared.MediaPlayer;
 
@@ -12,6 +13,11 @@ namespace EcclesiaCast.App.Services;
 /// unmuted, and the player is turned down with its own equalizer instead. A
 /// silenced video does not get a muted output: it is opened without its sound
 /// (or its sound track is switched off while it plays).
+///
+/// The exception is the music list's player (<see cref="VlcAudioPlayer"/>):
+/// it plays through DirectSound and has a volume of its own. Windows still
+/// turns it down with the shared session, so the general volume is also set
+/// there directly (<see cref="ApplySession"/>).
 /// </summary>
 public static class PlayerSound
 {
@@ -29,7 +35,7 @@ public static class PlayerSound
             // The shared session carries the general volume of the program
             // (the «Salida» control): Windows moves it smoothly, with no
             // restart of the sound, unlike an equalizer.
-            var master = Math.Clamp(Master, 0, 100);
+            var master = _sessionNow;
             if (player.Volume != master)
                 player.Volume = master;
         }
@@ -56,6 +62,120 @@ public static class PlayerSound
                 return;
             _master = value;
             MasterChanged?.Invoke(null, EventArgs.Empty);
+            GlideSession();
+        }
+    }
+
+    /// <summary>The session volume the players have now.</summary>
+    private static volatile int _sessionNow = 100;
+
+    private static volatile int _sessionTarget = 100;
+
+    private static long _requestedAt;
+
+    private static readonly AutoResetEvent Wake = new(false);
+
+    private static Thread? _worker;
+
+    private static readonly object WorkerLock = new();
+
+    /// <summary>
+    /// Raised when the session volume of the LibVLC players changes (on a
+    /// worker thread, never the interface's): each player follows the bar at
+    /// once, with no ramp. LibVLC can hold a player's lock while it decodes a
+    /// video, so asking it from the interface thread could freeze the slider.
+    /// </summary>
+    public static event EventHandler? SessionChanged;
+
+    /// <summary>The slowest time, in ms, from the bar moving to the players having the volume (for the log).</summary>
+    public static double WorstLatencyMs { get; private set; }
+
+    private static void GlideSession()
+    {
+        _sessionTarget = SoundLevel.SessionVolume(_master);
+        if (System.Windows.Application.Current is null)
+        {
+            // No window (tests): straight to the target.
+            _sessionNow = _sessionTarget;
+            SessionChanged?.Invoke(null, EventArgs.Empty);
+            return;
+        }
+
+        Interlocked.CompareExchange(ref _requestedAt, System.Diagnostics.Stopwatch.GetTimestamp(), 0);
+        EnsureWorker();
+        Wake.Set();
+    }
+
+    private static void EnsureWorker()
+    {
+        lock (WorkerLock)
+        {
+            if (_worker is not null)
+                return;
+
+            _worker = new Thread(ApplyLoop) { IsBackground = true, Name = "Volumen de EcclesiaCast" };
+            _worker.Start();
+        }
+    }
+
+    private static void ApplyLoop()
+    {
+        while (true)
+        {
+            Wake.WaitOne();
+            // Only the latest value counts: moves that came while the players
+            // were busy are skipped, never queued.
+            var target = _sessionTarget;
+            if (target != _sessionNow)
+            {
+                _sessionNow = target;
+                try { SessionChanged?.Invoke(null, EventArgs.Empty); }
+                catch (Exception ex) { Log.Debug(ex, "No se pudo aplicar el volumen"); }
+                ApplySession();
+            }
+
+            var started = Interlocked.Exchange(ref _requestedAt, 0);
+            if (started != 0)
+            {
+                var ms = System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+                if (ms > WorstLatencyMs)
+                    WorstLatencyMs = ms;
+                if (ms > 50)
+                    Log.Warning("El volumen tardó {Ms:0} ms en llegar a los reproductores", ms);
+            }
+        }
+    }
+
+    /// <summary>The first volume of a program that starts with the bar somewhere other than 100.</summary>
+    public static void SnapSession()
+    {
+        _sessionTarget = SoundLevel.SessionVolume(_master);
+        _sessionNow = _sessionTarget;
+        SessionChanged?.Invoke(null, EventArgs.Empty);
+        ApplySession();
+    }
+
+    /// <summary>
+    /// Gives the program's Windows audio session the general volume, and lifts
+    /// a mute left on it. Done here, without a player: the video's players only
+    /// write it while they have a sound output open, and the music list's one
+    /// never does. Also called before each song, since the session belongs to
+    /// the output device of the moment and Windows remembers the one it had.
+    /// </summary>
+    public static void ApplySession()
+    {
+        try
+        {
+            using var devices = new MMDeviceEnumerator();
+            using var device = devices.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+            var session = device.AudioSessionManager.SimpleAudioVolume;
+            session.Volume = SoundLevel.SessionScalar(_master);
+            session.Mute = false;
+        }
+        catch (Exception ex)
+        {
+            // No sound output at all, for one.
+            Log.Debug(ex, "No se pudo poner el volumen general en Windows");
         }
     }
 

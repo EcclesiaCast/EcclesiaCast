@@ -1,3 +1,5 @@
+using EcclesiaCast.Core.Media;
+
 namespace EcclesiaCast.App.Remote;
 
 /// <summary>
@@ -8,7 +10,12 @@ namespace EcclesiaCast.App.Remote;
 /// </summary>
 internal static class RemotePage
 {
-    internal const string Html = """
+    private const string OnTopSvg =
+        "<svg class=\"ontop\" viewBox=\"0 0 16 16\" aria-label=\"Va encima de todo\"><path d=\"" + OnTopIcon.PathData + "\"/></svg>";
+
+    internal static readonly string Html = Template.Replace("__ONTOP__", OnTopSvg);
+
+    private const string Template = """
         <!doctype html>
         <html lang="es">
         <head>
@@ -53,6 +60,18 @@ internal static class RemotePage
                      background:#232630;border:1px solid #2a2e3a;border-radius:10px;color:#fff}
           .err{color:#e08a8a;font-size:14px;min-height:1.3em;margin-top:10px}
           .hide{display:none}
+          .split{display:flex;align-items:center;gap:10px;font-size:15px;padding:6px 0}
+          .split input{width:22px;height:22px;margin:0}
+          .splitrow{display:flex;gap:8px;margin:6px 0}
+          .splitrow button{padding:10px 18px}
+          .splitrow input{flex:1;min-width:0;font:inherit;text-align:center;background:#232630;color:#fff;
+                          border:1px solid #2a2e3a;border-radius:10px}
+          .splitrow input:disabled,.splitrow button:disabled{opacity:.4}
+          .folders{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+          .folders button{padding:10px 12px;font-size:14px}
+          .ontop{width:12px;height:12px;fill:#f4b942;vertical-align:-1px;margin-left:6px}
+          #onTopHint .ontop{margin:0 4px 0 0}
+          #onTopHint.hide{display:none}
           .search input{width:100%;font:inherit;padding:12px 14px;background:#232630;border:1px solid #2a2e3a;
                         border-radius:10px;color:#fff}
           .hits{margin-top:8px;max-height:46vh;overflow-y:auto}
@@ -115,9 +134,32 @@ internal static class RemotePage
               <button id="bOutput" onclick="cmd('output')">Salida</button>
             </div>
 
+            <div class="row" style="margin-bottom:12px">
+              <button id="bMedias" onclick="toggleMedias()">🖼 Fondos y medios</button>
+            </div>
+
+            <div class="card hide" id="mediaCard">
+              <div class="label">Tocá uno para ponerlo en pantalla</div>
+              <div class="folders hide" id="mediaTabs"></div>
+              <div class="none hide" id="onTopHint">__ONTOP__ Las carpetas con este ícono van encima de todo.</div>
+              <div id="mediaList"></div>
+            </div>
+
             <div class="card hide" id="presCard">
               <div class="label">Presentaciones</div>
               <div id="presList"></div>
+            </div>
+
+            <div class="card hide" id="splitCard">
+              <div class="label">Biblia</div>
+              <label class="split"><input type="checkbox" id="splitOn" onchange="splitToggled()"> Dividir versículos largos</label>
+              <div class="splitrow">
+                <button onclick="splitStep(-10)" aria-label="Menos caracteres">−</button>
+                <input type="number" id="splitChars" min="50" max="500" step="10" inputmode="numeric"
+                       onchange="splitTyped()" aria-label="Máximo de caracteres por diapositiva">
+                <button onclick="splitStep(10)" aria-label="Más caracteres">+</button>
+              </div>
+              <div class="none">Máximo de caracteres por diapositiva. Es la misma opción del tema de la Biblia.</div>
             </div>
 
             <div class="card">
@@ -151,6 +193,18 @@ internal static class RemotePage
           document.getElementById('app').className = ok ? '' : 'hide';
         }
 
+        // The PIN is no longer the computer's (it was changed): forget it, stop
+        // asking with it (every miss counts toward a lockout) and ask for the new one.
+        function pinGone(first) {
+          pin = '';
+          localStorage.removeItem('ec-pin');
+          document.getElementById('pinInput').value = '';
+          document.getElementById('pinError').textContent = first
+            ? 'PIN incorrecto.'
+            : 'El PIN cambió. Pedile el nuevo a quien maneja la computadora.';
+          show(false);
+        }
+
         // ── Buscar una canción o un versículo (como Ctrl+K en la computadora) ──
         // Se espera un momento después de la última letra, y una respuesta tardía
         // de una búsqueda vieja no pisa a la más nueva.
@@ -167,7 +221,7 @@ internal static class RemotePage
         function runSearch(text) {
           var mine = ++searchSeq;
           fetch('/api/search?pin=' + encodeURIComponent(pin) + '&q=' + encodeURIComponent(text))
-            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (r) { if (r.status === 403) { pinGone(false); return null; } return r.ok ? r.json() : null; })
             .then(function (list) { if (list && mine === searchSeq) showHits(list, text); })
             .catch(function () {});
         }
@@ -209,6 +263,91 @@ internal static class RemotePage
           });
         }
 
+        // ── Fondos y medios: elegir otra imagen o video de la biblioteca ──
+        // Sirve para volver a poner un fondo después de «Sin fondo», cambiar uno
+        // que no se quería, o mandar otro anuncio. La lista se trae al abrirla.
+        function toggleMedias() {
+          var card = document.getElementById('mediaCard');
+          var button = document.getElementById('bMedias');
+          if (card.className === 'card') { card.className = 'card hide'; button.className = ''; return; }
+          card.className = 'card';
+          button.className = 'on';
+          var box = document.getElementById('mediaList');
+          box.innerHTML = '<div class="none">Cargando…</div>';
+          fetch('/api/medias?pin=' + encodeURIComponent(pin)).then(function (r) {
+            if (r.status === 403) { pinGone(false); return null; }
+            return r.ok ? r.json() : null;
+          }).then(function (list) { if (list) setMedias(list); })
+            .catch(function () { box.innerHTML = '<div class="none">No se pudo cargar la lista.</div>'; });
+        }
+
+        var allMedias = [];
+        var onTopSvg = '__ONTOP__';
+
+        // The folders of the library, named as on the computer, one button each
+        // (a drop-down can't draw the icon of the ones that go on top); only the
+        // pictures of the chosen one are drawn (and asked for).
+        var mediaFolder = '';
+
+        function setMedias(list) {
+          allMedias = list;
+          var tabs = [];
+          var onTop = [];
+          list.forEach(function (m) {
+            if (tabs.indexOf(m.tab) < 0) tabs.push(m.tab);
+            if (m.tabOnTop && onTop.indexOf(m.tab) < 0) onTop.push(m.tab);
+          });
+          var saved = localStorage.getItem('ec-media-tab');
+          mediaFolder = tabs.indexOf(saved) >= 0 ? saved : (tabs[0] || '');
+          var box = document.getElementById('mediaTabs');
+          box.innerHTML = '';
+          tabs.forEach(function (t) {
+            var b = document.createElement('button');
+            b.textContent = t || 'Sin carpeta';
+            if (onTop.indexOf(t) >= 0) {
+              b.insertAdjacentHTML('beforeend', onTopSvg);
+              b.title = 'Va encima de todo';
+            }
+            b.setAttribute('data-tab', t);
+            b.onclick = function () { mediaFolder = t; showMedias(); };
+            box.appendChild(b);
+          });
+          box.className = tabs.length ? 'folders' : 'folders hide';
+          document.getElementById('onTopHint').className = onTop.length ? 'none' : 'none hide';
+          showMedias();
+        }
+
+        function showMedias() {
+          var tab = mediaFolder;
+          localStorage.setItem('ec-media-tab', tab);
+          Array.prototype.forEach.call(document.getElementById('mediaTabs').children, function (b) {
+            b.className = b.getAttribute('data-tab') === tab ? 'on' : '';
+          });
+          var box = document.getElementById('mediaList');
+          box.innerHTML = '';
+          var items = allMedias.filter(function (m) { return m.tab === tab; });
+          if (!items.length) { box.innerHTML = '<div class="none">La biblioteca no tiene imágenes ni videos.</div>'; return; }
+          var grid = document.createElement('div');
+          grid.className = 'grid';
+          box.appendChild(grid);
+          items.forEach(function (m) {
+            var b = document.createElement('button');
+            b.className = 'slide';
+            var img = document.createElement('img');
+            img.loading = 'lazy';
+            img.src = thumbUrl(m.id);
+            img.onerror = function () { img.style.display = 'none'; };
+            var t = document.createElement('div');
+            t.className = 't';
+            t.style.marginTop = '4px';
+            t.textContent = (m.kind === 'video' ? '▶ ' : '') + m.name;
+            b.appendChild(img);
+            b.appendChild(t);
+            b.onclick = function () { cmd('media', m.id); };
+            grid.appendChild(b);
+          });
+        }
+
         function cmd(action, index, done) {
           if (busy) return;
           busy = true;
@@ -219,7 +358,7 @@ internal static class RemotePage
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({pin: pin, action: action, index: index === undefined ? null : index})
-          }).then(function (r) { return r.ok ? r.json() : null; })
+          }).then(function (r) { if (r.status === 403) { pinGone(false); return null; } return r.ok ? r.json() : null; })
             .then(function (s) { if (s) { render(s); if (done) done(); } })
             .catch(function () {})
             .then(function () { busy = false; });
@@ -240,8 +379,7 @@ internal static class RemotePage
               }).catch(function () { return null; });
             }
             if (r.status === 403) {
-              show(false);
-              if (first) document.getElementById('pinError').textContent = 'PIN incorrecto.';
+              pinGone(first);
               return null;
             }
             return r.ok ? r.json() : null;
@@ -250,7 +388,8 @@ internal static class RemotePage
             show(true);
             render(s);
           }).catch(function () {
-            document.getElementById('status').textContent = 'Sin conexión con la computadora…';
+            document.getElementById('status').textContent =
+              'Sin conexión con la computadora… Si el router le cambió la dirección, volvé a escanear el código.';
           });
         }
 
@@ -325,6 +464,40 @@ internal static class RemotePage
           });
         }
 
+        // ── Dividir versículos largos: lo mismo que la casilla «Dividir» de la computadora ──
+        function splitToggled() {
+          cmd('versesplit', document.getElementById('splitOn').checked ? -1 : 0);
+        }
+
+        function splitSend(value) {
+          if (!document.getElementById('splitOn').checked) return;
+          value = Math.min(500, Math.max(50, Math.round(value)));
+          document.getElementById('splitChars').value = value;
+          cmd('versesplit', value);
+        }
+
+        function splitTyped() {
+          var value = parseInt(document.getElementById('splitChars').value, 10);
+          if (!isNaN(value)) splitSend(value);
+        }
+
+        function splitStep(by) {
+          var value = parseInt(document.getElementById('splitChars').value, 10);
+          splitSend((isNaN(value) ? 150 : value) + by);
+        }
+
+        function renderSplit(split) {
+          var card = document.getElementById('splitCard');
+          card.className = split ? 'card' : 'card hide';
+          if (!split) return;
+          document.getElementById('splitOn').checked = split.on;
+          var box = document.getElementById('splitChars');
+          // Not while it is being typed: the next poll would write over it.
+          if (document.activeElement !== box) box.value = split.chars;
+          Array.prototype.forEach.call(card.querySelectorAll('.splitrow button, .splitrow input'),
+            function (e) { e.disabled = !split.on; });
+        }
+
         function render(s) {
           document.getElementById('song').textContent = s.songTitle || 'EcclesiaCast';
           document.getElementById('live').textContent = s.liveText || '';
@@ -345,6 +518,7 @@ internal static class RemotePage
           document.getElementById('live').style.display = s.liveMediaId ? 'none' : '';
           document.getElementById('next').style.display = s.nextMediaId ? 'none' : '';
 
+          renderSplit(s.bibleSplit);
           renderPresentations(s.presentations || []);
           renderSlides(s.slides || []);
 
@@ -360,7 +534,21 @@ internal static class RemotePage
         }
 
         if (pin) { poll(false); } else { show(false); }
-        setInterval(function () { if (pin) poll(false); }, 700);
+        // A hidden tab or a locked phone does not need the live view; it is
+        // brought up to date (and the PIN checked) the moment the page is back.
+        setInterval(function () { if (pin && !document.hidden) poll(false); }, 700);
+
+        // The light check, every few minutes: has the PIN changed on the computer?
+        function checkPin() {
+          if (!pin) return;
+          fetch('/api/pin?pin=' + encodeURIComponent(pin)).then(function (r) {
+            if (r.status === 403) pinGone(false);
+          }).catch(function () {});
+        }
+        setInterval(checkPin, 120000);
+        document.addEventListener('visibilitychange', function () { if (!document.hidden) { checkPin(); if (pin) poll(false); } });
+        window.addEventListener('pageshow', function () { checkPin(); });
+        window.addEventListener('online', function () { checkPin(); });
         document.getElementById('pinInput').addEventListener('keydown', function (e) {
           if (e.key === 'Enter') savePin();
         });

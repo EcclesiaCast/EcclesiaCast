@@ -98,41 +98,6 @@ public sealed partial class MainViewModel
     /// <summary>Where the packs are unzipped: the library's own copy, like the sample backgrounds.</summary>
     private static string PackBackgroundsFolder => Path.Combine(App.DataDir, "fondos-agregados");
 
-    /// <summary>
-    /// «Fondos → Agregar paquete de fondos…»: unzips a pack of backgrounds
-    /// into the library's own folder and brings each one into the «Fondos
-    /// agregados» tab, looping and silent, like the sample ones.
-    /// </summary>
-    [RelayCommand]
-    private async Task ImportBackgroundPack()
-    {
-        var dialog = new Microsoft.Win32.OpenFileDialog
-        {
-            Title = "Agregar paquete de fondos",
-            Filter = "Paquete de fondos (.zip)|*.zip",
-        };
-        if (dialog.ShowDialog() != true)
-            return;
-
-        try
-        {
-            StatusText = "Abriendo el paquete de fondos…";
-            var files = await Task.Run(() => BackgroundPack.Extract(dialog.FileName, PackBackgroundsFolder));
-            if (files.Count == 0)
-            {
-                StatusText = "El paquete no tiene videos ni imágenes para usar de fondo.";
-                return;
-            }
-
-            AddPackBackgrounds(files);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException)
-        {
-            Log.Warning(ex, "No se pudo agregar el paquete de fondos");
-            StatusText = "No se pudo abrir el paquete: tiene que ser un .zip de fondos.";
-        }
-    }
-
     /// <summary>Brings unzipped pack files into the library's «Fondos agregados» tab.</summary>
     private void AddPackBackgrounds(IReadOnlyList<string> files)
     {

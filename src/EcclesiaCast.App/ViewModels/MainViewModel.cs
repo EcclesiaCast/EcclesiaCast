@@ -427,6 +427,7 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         LoadSongMaxLines();
         LoadSlidesOrderLock();
         LoadNamePlates();
+        SyncBibleSplit();
         LoadLowPerformance();
         LoadOutputVolume();
         LoadMeetingSections();
@@ -434,6 +435,8 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         {
             HasSlides = Slides.Count > 0;
             IsSongOpen = Slides.Any(s => s.SectionId != 0);
+            IsBibleOpen = Slides.Any(s => s.Verses is not null);
+            UpdateBibleBackgroundLabel();
         };
         UpdateStateFlags();
         RefreshDisplays();

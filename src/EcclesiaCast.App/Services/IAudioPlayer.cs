@@ -1,3 +1,4 @@
+using System.IO;
 namespace EcclesiaCast.App.Services;
 
 public enum AudioPlayerState
@@ -30,6 +31,13 @@ public interface IAudioPlayer : IDisposable
 
     /// <summary>Starts this file from the beginning, replacing whatever was playing.</summary>
     void Play(string path);
+
+    /// <summary>
+    /// Starts this sound from a seekable stream (a song on the internet read
+    /// as it plays), replacing whatever was playing. The player owns the
+    /// stream from now on and closes it.
+    /// </summary>
+    void PlayStream(Stream stream);
 
     void Pause();
 

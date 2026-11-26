@@ -265,6 +265,7 @@ public sealed partial class MainViewModel
             return;
         }
 
+        var cameFromBible = _liveSlideOrigin == SlideOrigin.Bible;
         _liveSlideOrigin = item.Verses is not null ? SlideOrigin.Bible
             : item.SectionId != 0 ? SlideOrigin.Song
             : SlideOrigin.None;
@@ -289,6 +290,10 @@ public sealed partial class MainViewModel
         else
         {
             _songBackgroundRunId = 0;
+
+            // The first verse after something else puts the Bible's own background, if it has one.
+            if (item.Verses is not null && !cameFromBible)
+                ApplyBibleOwnBackground();
         }
 
         LiveSlideIndex = index;

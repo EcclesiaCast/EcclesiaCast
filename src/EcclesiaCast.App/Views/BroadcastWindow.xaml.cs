@@ -1,5 +1,6 @@
 using System.Windows;
 using EcclesiaCast.App.Remote;
+using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Remote;
 using Serilog;
@@ -15,12 +16,24 @@ public partial class BroadcastWindow : Window
     private readonly RemoteControlServer _server;
     private readonly ISettingsStore _settings;
 
-    public BroadcastWindow(RemoteControlServer server, ISettingsStore settings)
+    private readonly Action<string> _obsPinChanged;
+
+    public BroadcastWindow(RemoteControlServer server, ISettingsStore settings, Action<string> obsPinChanged)
     {
         InitializeComponent();
         _server = server;
         _settings = settings;
+        _obsPinChanged = obsPinChanged;
+        ShowAddresses();
+    }
+
+    private void ShowAddresses()
+    {
+        var server = _server;
         BroadcastBox.Text = server.BroadcastAddress;
+        StableNote.Text =
+            "Esta dirección no cambia al reiniciar la PC: se pega una sola vez en OBS o vMix. " +
+            $"Si OBS está en otra PC de la red, usá esta: {server.NetworkBroadcastAddress}";
     }
 
     /// <summary>Copies the address of the page of one channel of the stream (the button names it).</summary>
@@ -53,6 +66,21 @@ public partial class BroadcastWindow : Window
             // El portapapeles lo puede tener tomado otro programa.
             Log.Debug(ex, "No se pudo copiar la dirección de transmisión");
         }
+    }
+
+    private void ChangeObsPin_Click(object sender, RoutedEventArgs e)
+    {
+        var confirmed = Notice.Confirm(
+            "Se genera un PIN nuevo para OBS y vMix. Las direcciones que ya pegaste dejan de funcionar " +
+            "hasta que copies las nuevas.\n\nEl PIN del celular no cambia.",
+            yes: "Cambiar el PIN de OBS",
+            title: "Cambiar el PIN de OBS");
+        if (!confirmed)
+            return;
+
+        _obsPinChanged(_server.ChangeObsPin());
+        ShowAddresses();
+        ChannelCopied.Text = "✓ PIN de OBS cambiado. Copiá las direcciones nuevas.";
     }
 
     private void EditStyles_Click(object sender, RoutedEventArgs e) =>

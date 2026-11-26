@@ -108,6 +108,7 @@ public sealed partial class MainViewModel
             ? Math.Clamp(volume, 0, 100)
             : 100;
         PlayerSound.Master = OutputVolume;
+        PlayerSound.SnapSession();
     }
 
     private void SyncBackgroundVolume()

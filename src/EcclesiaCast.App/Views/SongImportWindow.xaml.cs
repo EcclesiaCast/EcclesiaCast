@@ -1,7 +1,8 @@
-using System.IO;
+﻿using System.IO;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using EcclesiaCast.App.Services;
+using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Songs;
 using EcclesiaCast.Data;
 using Serilog;
@@ -9,23 +10,25 @@ using Serilog;
 namespace EcclesiaCast.App.Views;
 
 /// <summary>
-/// Brings songs over from another program (ProPresenter or EasyWorship) without
-/// asking the operator to hunt for files: the operator picks the program, the
-/// window looks where that one keeps its libraries, lists what it found with
-/// the song count, and imports the ticked ones in one go.
+/// Brings songs over from another program (ProPresenter, EasyWorship or
+/// Holyrics) without asking the operator to hunt for files: the operator picks
+/// the program, the window looks where that one keeps its libraries, lists
+/// what it found with the song count, and imports the ticked ones in one go.
+/// Holyrics encrypts its library, so its songs come from the .json or .txt
+/// files that Holyrics itself saves (Canción → Exportar), which work on its free plan.
 /// </summary>
 public partial class SongImportWindow : Window
 {
-    private enum Source { ProPresenter, EasyWorship }
+    private enum Source { ProPresenter, EasyWorship, Holyrics }
 
     /// <summary>One song to bring over; <paramref name="Path"/> is its file, when it has one.</summary>
     private sealed record Item(string Label, string? Path, Func<Song> Load);
 
     /// <summary>A library with its tick box, bound to the list.</summary>
-    public sealed partial class Row(string title, string detail, int songCount, int cloudOnlyCount, Func<List<object>> items)
+    public sealed partial class Row(string title, string detail, int songCount, int cloudOnlyCount, Func<List<object>> items, bool single = false)
         : ObservableObject
     {
-        public string Name => cloudOnlyCount > 0
+        public string Name => single ? title : cloudOnlyCount > 0
             ? $"{title}  ·  {songCount} canción(es)  ·  ☁ {cloudOnlyCount} sin descargar"
             : $"{title}  ·  {songCount} canción(es)";
 
@@ -45,27 +48,39 @@ public partial class SongImportWindow : Window
     }
 
     private readonly SongSaver _songSaver;
+    private readonly ISettingsStore _settings;
     private readonly Dictionary<Source, List<Row>> _rows = new()
     {
         [Source.ProPresenter] = [],
         [Source.EasyWorship] = [],
+        [Source.Holyrics] = [],
     };
     private readonly Dictionary<Source, string> _roots = new()
     {
         [Source.ProPresenter] = string.Empty,
         [Source.EasyWorship] = string.Empty,
+        [Source.Holyrics] = string.Empty,
     };
+
+    /// <summary>Why the last Holyrics file could not be read; empty when it could.</summary>
+    private string _holyricsError = string.Empty;
+
+    private bool _importing;
 
     private Source _source = Source.ProPresenter;
     private bool _discovered;
 
-    public SongImportWindow(SongSaver songSaver)
+    public SongImportWindow(SongSaver songSaver, ISettingsStore settings)
     {
         InitializeComponent();
         _songSaver = songSaver;
+        _settings = settings;
 
         Loaded += (_, _) => DiscoverAll();
     }
+
+    /// <summary>Opens on the Holyrics choice (the Importar canciones tutorial shows its «Abrir archivos…»).</summary>
+    public void ChooseHolyrics() => HolyricsChoice.IsChecked = true;
 
     /// <summary>How many songs were actually added (0 if cancelled).</summary>
     public int Imported { get; private set; }
@@ -75,7 +90,12 @@ public partial class SongImportWindow : Window
 
     private List<Row> Rows => _rows[_source];
 
-    private string SourceName => _source == Source.ProPresenter ? "ProPresenter" : "EasyWorship";
+    private string SourceName => _source switch
+    {
+        Source.ProPresenter => "ProPresenter",
+        Source.EasyWorship => "EasyWorship",
+        _ => "Holyrics",
+    };
 
     // ── Descubrimiento ───────────────────────────────────────────
 
@@ -86,14 +106,25 @@ public partial class SongImportWindow : Window
         DiscoverEasyWorship();
         _discovered = true;
 
+        RefreshLabels();
+
+        // The program that has songs opens first; with several, ProPresenter as always.
+        var first = Total(Source.EasyWorship) > 0 && Total(Source.ProPresenter) == 0 ? Source.EasyWorship : Source.ProPresenter;
+        Choice(first).IsChecked = true;
+    }
+
+    private System.Windows.Controls.RadioButton Choice(Source source) => source switch
+    {
+        Source.ProPresenter => ProPresenterChoice,
+        Source.EasyWorship => EasyWorshipChoice,
+        _ => HolyricsChoice,
+    };
+
+    private void RefreshLabels()
+    {
         ProPresenterChoice.Content = Label("ProPresenter", Source.ProPresenter);
         EasyWorshipChoice.Content = Label("EasyWorship", Source.EasyWorship);
-
-        // The program that has songs opens first; with both, ProPresenter as always.
-        var first = Total(Source.ProPresenter) == 0 && Total(Source.EasyWorship) > 0
-            ? Source.EasyWorship
-            : Source.ProPresenter;
-        (first == Source.ProPresenter ? ProPresenterChoice : EasyWorshipChoice).IsChecked = true;
+        HolyricsChoice.Content = Label("Holyrics", Source.Holyrics);
     }
 
     private int Total(Source source) => _rows[source].Sum(r => r.SongCount);
@@ -167,7 +198,9 @@ public partial class SongImportWindow : Window
         if (!_discovered)
             return;
 
-        _source = ReferenceEquals(sender, EasyWorshipChoice) ? Source.EasyWorship : Source.ProPresenter;
+        _source = ReferenceEquals(sender, EasyWorshipChoice) ? Source.EasyWorship
+            : ReferenceEquals(sender, HolyricsChoice) ? Source.Holyrics
+            : Source.ProPresenter;
         ShowSource();
     }
 
@@ -177,8 +210,17 @@ public partial class SongImportWindow : Window
         LibrariesList.ItemsSource = null;
         LibrariesList.ItemsSource = Rows;
 
+        var holyrics = _source == Source.Holyrics;
+        ListTitle.Text = holyrics ? "CANCIONES ENCONTRADAS" : "BIBLIOTECAS ENCONTRADAS";
+        HolyricsPanel.Visibility = holyrics ? Visibility.Visible : Visibility.Collapsed;
+        BrowseButton.Visibility = holyrics ? Visibility.Collapsed : Visibility.Visible;
+
         var total = Total(_source);
-        if (Rows.Count == 0)
+        if (holyrics)
+        {
+            ShowHolyrics(total);
+        }
+        else if (Rows.Count == 0)
         {
             HeaderText.Text = $"No encontré {SourceName} en esta computadora.";
             RootText.Text = _source == Source.ProPresenter
@@ -203,6 +245,31 @@ public partial class SongImportWindow : Window
             ? "Si tus canciones están en otro lado (un disco externo, una copia), elegí la carpeta a mano"
             : "Si tus canciones están en otro lado (una copia, otra computadora), elegí la carpeta que tiene Songs.db y SongWords.db";
         ShowCloudWarning();
+    }
+
+    /// <summary>What the window says for Holyrics: the songs read, or how to connect.</summary>
+    private void ShowHolyrics(int total)
+    {
+        if (Rows.Count > 0)
+        {
+            HeaderText.Text = total > 0
+                ? $"Encontré {total} canción(es) en Holyrics. Marcá las que querés importar."
+                : "Ese archivo no tiene canciones.";
+            RootText.Text = _roots[Source.Holyrics];
+            ImportButton.IsEnabled = total > 0 && !_importing;
+            return;
+        }
+
+        HeaderText.Text = _holyricsError.Length > 0
+            ? _holyricsError
+            : "Elegí los archivos que guardaste desde Holyrics.";
+        RootText.Text =
+            "Holyrics guarda sus canciones cifradas, así que se traen desde un archivo que Holyrics mismo guarda:\n"
+            + "1. En Holyrics, entrá en Canción → Exportar → «Exportación en lote…».\n"
+            + "2. Elegí las canciones (la flecha → las pasa a la derecha), tipo JSON, y tocá Guardar.\n"
+            + "3. Acá abajo tocá «Abrir archivos…» y elegí ese archivo.\n"
+            + "También sirven los .json y .txt de una sola canción (Archivo → Guardar → Canción).";
+        ImportButton.IsEnabled = false;
     }
 
     /// <summary>
@@ -259,6 +326,76 @@ public partial class SongImportWindow : Window
         return folders;
     }
 
+    /// <summary>
+    /// The way in for the free Holyrics: files saved from its «Guardar» or
+    /// «Exportación en lote» (.json or .txt) are read and listed as one library.
+    /// </summary>
+    private void HolyricsFiles_Click(object sender, RoutedEventArgs e)
+    {
+        if (_importing)
+            return;
+
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = "Canciones guardadas desde Holyrics",
+            Filter = "Canciones de Holyrics (*.json;*.txt)|*.json;*.txt",
+            Multiselect = true,
+        };
+
+        // Holyrics lives in C:\Holyrics and saves its exports there; if it is not there, Documents.
+        dialog.InitialDirectory = Directory.Exists(@"C:\Holyrics")
+            ? @"C:\Holyrics"
+            : Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        if (dialog.ShowDialog() != true)
+            return;
+
+        var found = new List<(Song Song, string File)>();
+        var failed = new List<string>();
+        foreach (var path in dialog.FileNames)
+        {
+            try
+            {
+                foreach (var song in HolyricsImporter.FromFile(path))
+                    found.Add((song, Path.GetFileName(path)));
+            }
+            catch (Exception ex) when (ex is HolyricsException or IOException or UnauthorizedAccessException)
+            {
+                Log.Warning(ex, "No se pudo leer {File}", path);
+                failed.Add(Path.GetFileName(path));
+            }
+        }
+
+        _holyricsError = found.Count == 0
+            ? "No encontré canciones en ese archivo. Tiene que ser un .json o .txt guardado desde Holyrics."
+            : string.Empty;
+
+        if (found.Count > 0)
+        {
+            var detail = dialog.FileNames.Length == 1
+                ? $"Archivo de Holyrics: {Path.GetFileName(dialog.FileName)}"
+                : $"{dialog.FileNames.Length} archivos de Holyrics";
+            if (failed.Count > 0)
+                detail += $"  ·  no se pudo leer: {string.Join(", ", failed)}";
+
+            // One row per song, each with its own tick box, so the operator picks which come over.
+            _rows[Source.Holyrics].Clear();
+            foreach (var (song, file) in found)
+            {
+                var one = song;
+                _rows[Source.Holyrics].Add(new Row(
+                    one.Title, file, 1, 0,
+                    () => [new Item(one.Title, null, () => one)],
+                    single: true));
+            }
+
+            _roots[Source.Holyrics] = detail;
+            Log.Information("Holyrics: {Count} canciones leídas de archivos", found.Count);
+        }
+
+        RefreshLabels();
+        ShowSource();
+    }
+
     private void Browse_Click(object sender, RoutedEventArgs e)
     {
         var dialog = new Microsoft.Win32.OpenFolderDialog
@@ -275,8 +412,7 @@ public partial class SongImportWindow : Window
         if (!added)
             return;
 
-        ProPresenterChoice.Content = Label("ProPresenter", Source.ProPresenter);
-        EasyWorshipChoice.Content = Label("EasyWorship", Source.EasyWorship);
+        RefreshLabels();
         _roots[_source] = folder;
         ShowSource();
         HeaderText.Text = $"{Total(_source)} canción(es) en {Rows.Count} biblioteca(s). ¿Las importo todas?";
@@ -350,15 +486,18 @@ public partial class SongImportWindow : Window
         var chosen = Rows.Where(r => r.Selected).ToList();
         if (chosen.Count == 0)
         {
-            Notice.Show("Marcá al menos una biblioteca.");
+            Notice.Show(_source == Source.Holyrics ? "Marcá al menos una canción." : "Marcá al menos una biblioteca.");
             return;
         }
 
+        _importing = true;
         ImportButton.IsEnabled = false;
         CancelButton.IsEnabled = false;
         BrowseButton.IsEnabled = false;
         ProPresenterChoice.IsEnabled = false;
         EasyWorshipChoice.IsEnabled = false;
+        HolyricsChoice.IsEnabled = false;
+        HolyricsFiles.IsEnabled = false;
         Progress.Visibility = Visibility.Visible;
         ProgressText.Visibility = Visibility.Visible;
         ProgressText.Text = $"Leyendo las bibliotecas de {SourceName}…";

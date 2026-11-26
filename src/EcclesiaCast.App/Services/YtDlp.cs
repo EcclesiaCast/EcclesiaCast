@@ -257,7 +257,7 @@ public static partial class YtDlp
         {
             try
             {
-                return await RunAsync(videoId, targetFolder, cookies, progress, cancellation, audioOnly);
+                return await RunWithFastClientAsync(videoId, targetFolder, cookies, progress, cancellation, audioOnly);
             }
             catch (InvalidOperationException ex)
                 when (DownloadFailure.Classify(ex.Message) is DownloadFailureKind.Forbidden
@@ -268,7 +268,7 @@ public static partial class YtDlp
                 Log.Warning("YouTube rechazó la descarga; se actualiza yt-dlp y se reintenta: {Error}", ex.Message);
                 await UpdateAsync(progress, cancellation);
                 progress.Report((-1, "Reintentando la descarga…"));
-                return await RunAsync(videoId, targetFolder, cookies, progress, cancellation, audioOnly);
+                return await RunWithFastClientAsync(videoId, targetFolder, cookies, progress, cancellation, audioOnly);
             }
         }
         finally
@@ -280,13 +280,50 @@ public static partial class YtDlp
         }
     }
 
-    private static async Task<string?> RunAsync(
+    /// <summary>
+    /// yt-dlp's default clients for YouTube include one (the Samsung TV) whose
+    /// answer carries an advert, and yt-dlp then waits 6 seconds «as required
+    /// by the site» before downloading. The visionOS client gives the same m4a
+    /// with no wait: measured on 25/11/2026, a song went from 10.7 s to 3.7 s.
+    /// </summary>
+    internal const string FastAudioClient = "youtube:player_client=visionos";
+
+    /// <summary>
+    /// The sound with the quick client first; if YouTube stops offering it
+    /// there (or it fails for any reason), once more the ordinary way, which
+    /// is also what gives the true error to the caller.
+    /// </summary>
+    private static async Task<string?> RunWithFastClientAsync(
         string videoId,
         string targetFolder,
         string? cookieFile,
         IProgress<(double Percent, string Message)> progress,
         CancellationToken cancellation,
         bool audioOnly)
+    {
+        if (audioOnly)
+        {
+            try
+            {
+                return await RunAsync(videoId, targetFolder, cookieFile, progress, cancellation, audioOnly, FastAudioClient);
+            }
+            catch (InvalidOperationException ex)
+            {
+                Log.Information("El cliente rápido de YouTube no sirvió ({Error}); se prueba el normal", ex.Message);
+            }
+        }
+
+        return await RunAsync(videoId, targetFolder, cookieFile, progress, cancellation, audioOnly, null);
+    }
+
+    private static async Task<string?> RunAsync(
+        string videoId,
+        string targetFolder,
+        string? cookieFile,
+        IProgress<(double Percent, string Message)> progress,
+        CancellationToken cancellation,
+        bool audioOnly,
+        string? extractorArgs = null)
     {
         var executable = FindExecutable()
             ?? throw new InvalidOperationException("yt-dlp no está instalado.");
@@ -332,6 +369,12 @@ public static partial class YtDlp
             arguments.Add($"deno:{runtime}");
         }
 
+        if (extractorArgs is not null)
+        {
+            arguments.Add("--extractor-args");
+            arguments.Add(extractorArgs);
+        }
+
         if (cookieFile is not null)
         {
             arguments.Add("--cookies");
@@ -351,6 +394,10 @@ public static partial class YtDlp
         };
         // Python would otherwise print titles in the console's old code page.
         info.Environment["PYTHONUTF8"] = "1";
+        // Not enough for the yt-dlp.exe build: on Windows it still printed paths and
+        // titles in the old code page (19/11). Asked outright, it writes UTF-8.
+        info.ArgumentList.Add("--encoding");
+        info.ArgumentList.Add("utf-8");
         foreach (var argument in arguments)
             info.ArgumentList.Add(argument);
 

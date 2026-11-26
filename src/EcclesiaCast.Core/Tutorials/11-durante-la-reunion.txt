@@ -1,0 +1,63 @@
+titulo: Durante la reunión
+resumen: Resaltar palabras, notas para el escenario y el control de los tiempos.
+icono: ⏱
+orden: 11
+
+[paso]
+señalar: ToolsTabs
+titulo: Tres ayudas para la reunión
+texto: «Resaltar» marca palabras en lo que se proyecta. «Notas» y «Tiempos» ayudan a quienes están al frente. Las tres están abajo a la derecha; las vemos una por una.
+
+[paso]
+señalar: HighlightBox
+abrir: herramienta:TabHighlight
+titulo: Resaltar una palabra
+texto: Con algo ya proyectado, escribí una palabra o frase: se pinta al instante todas las veces que aparece. Para varias, separalas con ; («gracia; fe»).
+
+[paso]
+señalar: LiveView
+abrir: herramienta:TabHighlight
+titulo: O marcá con el mouse
+texto: En el LIVE, tocá una palabra o arrastrá sobre una frase: se resalta sólo esa vez. Con Shift sumás otra marca. Si tocás algo ya marcado, se quita.
+
+[paso]
+señalar: HighlightClearButton
+abrir: herramienta:TabHighlight
+titulo: Sacar el resaltado
+texto: «Quitar el resaltado» borra todas las marcas. También se borran solas cuando pasás a otra diapositiva.
+
+[paso]
+señalar: StageNotesBox
+abrir: herramienta:TabNotes
+titulo: Notas
+texto: Escribí los puntos del mensaje o un aviso para la banda. Salen sólo en la pantalla de escenario: la congregación nunca las ve.
+
+[paso]
+señalar: StageNotesButtons
+abrir: herramienta:TabNotes
+titulo: Mandalas al escenario
+texto: «Mostrar» (o Ctrl+Enter) las manda; si las cambiás, tocalo otra vez. «Quitar» las saca. Se ven en un diseño de escenario con notas, como «Predicador».
+
+[paso]
+señalar: StageButton
+abrir: herramienta:TabNotes
+titulo: La pantalla de escenario
+texto: «🎭 Escenario» la prende. Con la ▾ de al lado elegís el diseño («Predicador», por ejemplo), la pantalla donde va y podés editar los escenarios.
+
+[paso]
+señalar: SectionsList
+abrir: herramienta:TabTimes
+titulo: Tiempos: las partes
+texto: Poné nombre y minutos a cada parte. El círculo elige con cuál trabajás, ▲ y ▼ la mueven, ✕ la quita y «＋ Sección» suma otra.
+
+[paso]
+señalar: SectionTimerButtons
+abrir: herramienta:TabTimes
+titulo: Manejá el reloj
+texto: ▶ inicia o pausa, ⟲ vuelve al total, ±1 min ajusta y «Siguiente ⏭» cambia de parte. Pasado el tiempo se pone rojo. Para verlo en el escenario, agregale el recuadro «Temporizador».
+
+[paso]
+señalar: StopwatchRow
+abrir: herramienta:TabTimes
+titulo: El cronómetro
+texto: Cuenta desde que abriste el programa: ponelo en cero con ⟲ cuando empiece la reunión y tocá «▶ Iniciar». El escenario «Predicador» lo muestra.

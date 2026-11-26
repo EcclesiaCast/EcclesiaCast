@@ -126,6 +126,163 @@ public static partial class YtDlp
         }
     }
 
+    // ── Playing at once: the address of the sound ────────────────
+
+    /// <summary>Addresses of sounds already asked for, with the moment YouTube stops honouring each.</summary>
+    private static readonly Dictionary<string, (string Url, DateTimeOffset Expires)> StreamUrls = [];
+
+    /// <summary>Addresses being asked for now, so ▶ and the look-ahead share one question.</summary>
+    private static readonly Dictionary<string, Task<string>> StreamUrlsOnTheWay = [];
+
+    /// <summary>The address of the sound if it was already asked for and is still good, or null.</summary>
+    public static string? CachedStreamUrl(string videoId)
+    {
+        lock (StreamUrls)
+        {
+            if (StreamUrls.TryGetValue(videoId, out var known) && known.Expires > DateTimeOffset.UtcNow)
+                return known.Url;
+            StreamUrls.Remove(videoId);
+            return null;
+        }
+    }
+
+    /// <summary>Forgets an address that did not play (it expired, or YouTube refused it).</summary>
+    public static void ForgetStreamUrl(string videoId)
+    {
+        lock (StreamUrls)
+            StreamUrls.Remove(videoId);
+    }
+
+    /// <summary>
+    /// The address the sound of a video can be read from, asked from yt-dlp
+    /// (about 2.6 s, of which 1.7 s is only yt-dlp starting) or taken from
+    /// the ones already asked for. It works for any program as long as each
+    /// request carries a <c>Range</c> (see <see cref="RangedHttpStream"/>).
+    /// </summary>
+    public static Task<string> ResolveStreamUrlAsync(string videoId, CancellationToken cancellation = default)
+    {
+        if (CachedStreamUrl(videoId) is { } known)
+            return Task.FromResult(known);
+
+        lock (StreamUrlsOnTheWay)
+        {
+            if (StreamUrlsOnTheWay.TryGetValue(videoId, out var running))
+                return running;
+
+            var task = ResolveCoreAsync(videoId, cancellation);
+            StreamUrlsOnTheWay[videoId] = task;
+            _ = task.ContinueWith(_ =>
+            {
+                lock (StreamUrlsOnTheWay)
+                    StreamUrlsOnTheWay.Remove(videoId);
+            }, TaskScheduler.Default);
+            return task;
+        }
+    }
+
+    private static async Task<string> ResolveCoreAsync(string videoId, CancellationToken cancellation)
+    {
+        await EnsureToolsQuietlyAsync(new Progress<(double, string)>(), cancellation);
+        await AskStreamUrlsAsync([videoId], cancellation);
+        return CachedStreamUrl(videoId)
+               ?? throw new InvalidOperationException("YouTube no devolvió la dirección del audio.");
+    }
+
+    /// <summary>
+    /// Asks the addresses of several videos in ONE yt-dlp (starting it is more than
+    /// half of the time of asking for one); each one is kept as soon as it is printed.
+    /// </summary>
+    public static async Task PreResolveStreamUrlsAsync(IReadOnlyList<string> videoIds, CancellationToken cancellation)
+    {
+        var missing = videoIds.Where(id => CachedStreamUrl(id) is null).ToList();
+        if (missing.Count == 0)
+            return;
+
+        try
+        {
+            await EnsureToolsQuietlyAsync(new Progress<(double, string)>(), cancellation);
+            await AskStreamUrlsAsync(missing, cancellation);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            Log.Debug(ex, "No se pudieron adelantar las direcciones de audio de YouTube");
+        }
+    }
+
+    private static async Task AskStreamUrlsAsync(IReadOnlyList<string> videoIds, CancellationToken cancellation)
+    {
+        var executable = FindExecutable() ?? throw new InvalidOperationException("yt-dlp no está instalado.");
+        var started = System.Diagnostics.Stopwatch.StartNew();
+
+        var info = new ProcessStartInfo(executable)
+        {
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            StandardOutputEncoding = System.Text.Encoding.UTF8,
+            StandardErrorEncoding = System.Text.Encoding.UTF8,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+        };
+        info.Environment["PYTHONUTF8"] = "1";
+        foreach (var argument in new[]
+                 {
+                     "--encoding", "utf-8", "--no-playlist", "--no-warnings", "--ignore-config", "--ignore-errors",
+                     "-f", AudioFormat, "--extractor-args", FastAudioClient,
+                     "--print", "%(id)s\t%(url)s",
+                 })
+            info.ArgumentList.Add(argument);
+
+        if (FindRuntime() is { } runtime)
+        {
+            info.ArgumentList.Add("--js-runtimes");
+            info.ArgumentList.Add($"deno:{runtime}");
+        }
+
+        foreach (var id in videoIds)
+            info.ArgumentList.Add(YouTubeUrl.WatchUrl(id));
+
+        using var process = new Process { StartInfo = info };
+        process.Start();
+        var errors = process.StandardError.ReadToEndAsync(cancellation);
+
+        try
+        {
+            while (await process.StandardOutput.ReadLineAsync(cancellation) is { } line)
+            {
+                var parts = line.Split('\t');
+                if (parts.Length < 2 || !parts[1].StartsWith("https://", StringComparison.Ordinal))
+                    continue;
+
+                lock (StreamUrls)
+                    StreamUrls[parts[0]] = (parts[1], StreamUrlExpiry(parts[1]));
+                Log.Information("Dirección de audio de {Id} lista a los {Ms} ms", parts[0], started.ElapsedMilliseconds);
+            }
+
+            await process.WaitForExitAsync(cancellation);
+        }
+        catch (OperationCanceledException)
+        {
+            try { if (!process.HasExited) process.Kill(entireProcessTree: true); } catch { /* ya terminó */ }
+            throw;
+        }
+
+        if (process.ExitCode != 0 && videoIds.Any(id => CachedStreamUrl(id) is null))
+        {
+            var detail = string.Join("\n", (await errors).Split('\n')
+                .Select(l => l.Trim()).Where(l => l.Length > 0).TakeLast(4));
+            throw new InvalidOperationException(detail.Length > 0 ? detail : "sin detalle");
+        }
+    }
+
+    /// <summary>The <c>expire</c> of the address (a Unix time), less a margin; an hour if it has none.</summary>
+    internal static DateTimeOffset StreamUrlExpiry(string url)
+    {
+        var match = System.Text.RegularExpressions.Regex.Match(url, @"[?&]expire=(\d+)");
+        if (match.Success && long.TryParse(match.Groups[1].Value, out var unix))
+            return DateTimeOffset.FromUnixTimeSeconds(unix).AddMinutes(-15);
+        return DateTimeOffset.UtcNow.AddHours(1);
+    }
+
     /// <summary>The sound of this video already in the cache, or null.</summary>
     public static string? CachedAudio(string videoId)
     {
@@ -285,6 +442,10 @@ public static partial class YtDlp
             CreateNoWindow = true,
         };
         info.Environment["PYTHONUTF8"] = "1";
+        // Not enough for the yt-dlp.exe build: on Windows it still printed titles in the
+        // old code page («Hillsong en Espa?ol», 19/11). Asked outright, it writes UTF-8.
+        info.ArgumentList.Add("--encoding");
+        info.ArgumentList.Add("utf-8");
         foreach (var argument in arguments)
             info.ArgumentList.Add(argument);
 

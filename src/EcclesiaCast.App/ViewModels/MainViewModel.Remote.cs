@@ -30,6 +30,7 @@ public sealed partial class MainViewModel
     // ── Control desde el celular ─────────────────────────────────
 
     private const string RemotePinKey = "remote.pin";
+    private const string RemoteObsPinKey = "remote.obsPin";
     private const string RemotePortKey = "remote.port";
     private const string RemoteEnabledKey = "remote.enabled";
 
@@ -55,7 +56,7 @@ public sealed partial class MainViewModel
             return;
         }
 
-        new Views.BroadcastWindow(_remote!, _settings) { Owner = Application.Current.MainWindow }.ShowDialog();
+        new Views.BroadcastWindow(_remote!, _settings, newPin => _settings.Set(RemoteObsPinKey, newPin)) { Owner = Application.Current.MainWindow }.ShowDialog();
     }
 
     /// <summary>«Transmisión → Estilos de la transmisión…».</summary>
@@ -74,18 +75,33 @@ public sealed partial class MainViewModel
             return true;
 
         var pin = _settings.Get(RemotePinKey);
-        if (string.IsNullOrWhiteSpace(pin) || pin.Length != 4)
+        if (!RemotePin.IsValid(pin))
         {
-            pin = Random.Shared.Next(1000, 10000).ToString();
+            pin = RemotePin.Generate();
             _settings.Set(RemotePinKey, pin);
         }
 
         var port = int.TryParse(_settings.Get(RemotePortKey), out var saved) ? saved : 8080;
 
-        if (!_remote.Start(port, pin))
+        // Whoever had OBS set up before the two PINs were split keeps working: the
+        // OBS PIN starts equal to the phone's until they ask for another.
+        var obsPin = _settings.Get(RemoteObsPinKey);
+        if (!RemotePin.IsValid(obsPin))
+        {
+            obsPin = pin;
+            _settings.Set(RemoteObsPinKey, obsPin);
+        }
+
+        if (!_remote.Start(port, pin, obsPin))
             return false;
 
-        _settings.Set(RemotePortKey, _remote.Port.ToString());
+        // Si el puerto elegido estaba ocupado y se usó otro, no se pisa el
+        // guardado: la próxima vez se vuelve a intentar con el de siempre, así
+        // la dirección pegada en OBS no se corre para siempre.
+        if (_remote.Port == port || _settings.Get(RemotePortKey) is null)
+            _settings.Set(RemotePortKey, _remote.Port.ToString());
+        else
+            Log.Warning("El puerto {Wanted} estaba ocupado: se usa el {Used} esta vez", port, _remote.Port);
         _settings.Set(RemoteEnabledKey, "1");
         IsRemoteRunning = true;
         return true;
@@ -114,7 +130,7 @@ public sealed partial class MainViewModel
             return;
         }
 
-        var window = new Views.RemoteControlWindow(_remote!)
+        var window = new Views.RemoteControlWindow(_remote!, newPin => _settings.Set(RemotePinKey, newPin))
         {
             Owner = Application.Current.MainWindow,
         };
@@ -180,7 +196,10 @@ public sealed partial class MainViewModel
             // A page (or a media) on the air shows as its poster on the phone,
             // not as the words that were up before it.
             LiveMediaId: OnAir is OnAirSource.Presentation or OnAirSource.Media && LiveMediaId > 0 ? LiveMediaId : null,
-            NextMediaId: IsPresentationOpen ? PreviewPageMedia?.Id : null);
+            NextMediaId: IsPresentationOpen ? PreviewPageMedia?.Id : null,
+            BibleSplit: IsBibleOpen && CanSplitBibleVerses
+                ? new RemoteBibleSplit(BibleSplitOn, (int)BibleSplitChars)
+                : null);
     }
 
     /// <summary>What the last phone search found, so a result can be opened by its place in the list.</summary>
@@ -213,6 +232,16 @@ public sealed partial class MainViewModel
             .Where(IsPresentationTab)
             .Select(t => (Tab: t, Pages: PresentationPages.For(t, _allMedia).Count))
             .Where(p => p.Pages > 0)
+            .ToList();
+
+    IReadOnlyList<RemoteMedia> IRemoteHost.GetMediaList() =>
+        _allMedia
+            .Where(m => m.Type is MediaType.Image or MediaType.Video && !IsPresentationTab(m.Category))
+            // In the order of the folders on the computer, so the drop-down reads the same.
+            .OrderBy(m => MediaTabs.IndexOf(m.Category ?? string.Empty) is var at and >= 0 ? at : int.MaxValue)
+            .Take(300)
+            .Select(m => new RemoteMedia(m.Id, m.Name, m.Type == MediaType.Video ? "video" : "image", m.Category ?? string.Empty,
+                IsOnTopMediaTab(m.Category)))
             .ToList();
 
     string? IRemoteHost.GetThumbnailPath(int mediaId)
@@ -403,6 +432,13 @@ public sealed partial class MainViewModel
             case "logo": ToggleLogo(); break;
             case "output": ToggleOutput(); break;
             case "nobackground": ClearBackground(); break;
+            case "versesplit" when index is int split: SetBibleSplitFromRemote(split); break;
+            case "media" when index is int mediaId
+                              && _allMedia.FirstOrDefault(m => m.Id == mediaId) is { Type: MediaType.Image or MediaType.Video } chosen
+                              && !IsPresentationTab(chosen.Category):
+                // A background or an announcement picked on the phone goes on screen like a click on its card.
+                ProjectMedia(chosen);
+                break;
             case "slide" when index is int slide: GoLiveSlide(slide); break;
             case "presentation" when index is int shown:
                 // The phone opens it on the computer: the pages come back with the next poll.

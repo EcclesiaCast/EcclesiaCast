@@ -222,6 +222,27 @@ public sealed partial class MainViewModel
         PutNamePlate(plate);
     }
 
+    /// <summary>
+    /// «Guardar»: the plate goes into the list without being shown, and the
+    /// fields are cleared, ready for the next one.
+    /// </summary>
+    [RelayCommand]
+    private void SaveNamePlate()
+    {
+        if (NamePlate.Clean(NamePlateName, NamePlateRole, NamePlateImagePath, NamePlateImageSide == 1, NamePlateStyleName) is not { } plate)
+        {
+            StatusText = "Escribí el nombre (y si querés, el cargo) para guardar la placa.";
+            return;
+        }
+
+        KeepNamePlate(plate);
+        SelectedSavedNamePlate = null;
+        NamePlateName = string.Empty;
+        NamePlateRole = string.Empty;
+        NamePlateImagePath = null;
+        StatusText = $"Placa «{plate}» guardada en la lista. Doble clic para mostrarla.";
+    }
+
     /// <summary>Double click on a plate of the list: straight to the screen.</summary>
     [RelayCommand]
     private void ShowSavedNamePlate(NamePlate? plate)

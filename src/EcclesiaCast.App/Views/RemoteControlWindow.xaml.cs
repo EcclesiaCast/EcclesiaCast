@@ -2,6 +2,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using EcclesiaCast.App.Remote;
+using EcclesiaCast.App.Services;
 using QRCoder;
 using Serilog;
 
@@ -14,12 +15,20 @@ namespace EcclesiaCast.App.Views;
 /// </summary>
 public partial class RemoteControlWindow : Window
 {
-    public RemoteControlWindow(RemoteControlServer server)
+    private readonly RemoteControlServer _server;
+    private readonly Action<string> _pinChanged;
+
+    public RemoteControlWindow(RemoteControlServer server, Action<string> pinChanged)
     {
         InitializeComponent();
+        _server = server;
+        _pinChanged = pinChanged;
 
         AddressBox.Text = server.Address;
         PinText.Text = server.Pin;
+        NameNote.Text =
+            "Si el celular deja de encontrar la computadora (el router le cambió la dirección), volvé a escanear este código. " +
+            $"También podés probar con el nombre de la PC: {server.NameAddress} (suele funcionar en iPhone y en Android recientes).";
         ShowQr(server.Address);
     }
 
@@ -54,6 +63,21 @@ public partial class RemoteControlWindow : Window
     {
         StopRequested = true;
         Close();
+    }
+
+    private void ChangePin_Click(object sender, RoutedEventArgs e)
+    {
+        var confirmed = Notice.Confirm(
+            "Se genera un PIN nuevo. Los celulares que ya estaban conectados van a pedir el PIN nuevo.\n\n" +
+            "Las direcciones de OBS y vMix no se tocan: tienen su propio PIN.",
+            yes: "Cambiar el PIN",
+            title: "Cambiar el PIN del celular");
+        if (!confirmed)
+            return;
+
+        var pin = _server.ChangePin();
+        _pinChanged(pin);
+        PinText.Text = pin;
     }
 
     private void Done_Click(object sender, RoutedEventArgs e) => Close();

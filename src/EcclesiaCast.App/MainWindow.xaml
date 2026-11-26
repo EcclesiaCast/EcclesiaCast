@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:EcclesiaCast.App.Controls"
         xmlns:services="clr-namespace:EcclesiaCast.App.Services"
+        xmlns:coremedia="clr-namespace:EcclesiaCast.Core.Media;assembly=EcclesiaCast.Core"
         Title="EcclesiaCast — Operador"
         Width="1280" Height="800"
         MinWidth="1000" MinHeight="640"
@@ -146,6 +147,13 @@
                       Command="{Binding PlacementTarget.Tag.UseMediaAsSongBackgroundCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                       CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                       ToolTip="Cada vez que proyectes esa canción, este fondo se pone solo (le gana al «al azar por canción»)."/>
+            <!-- Lo mismo para la Biblia, con la pestaña Biblia abierta (en lugar del de la canción) -->
+            <MenuItem x:Name="UseAsBibleBackgroundItem" Header="Usar como fondo de la Biblia" Visibility="Collapsed"
+                      Command="{Binding PlacementTarget.Tag.UseMediaAsBibleBackgroundCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+            <!-- Con la pestaña Biblia abierta y un fondo propio puesto: dice cuál es -->
+            <MenuItem x:Name="RemoveBibleBackgroundItem" Header="Quitar el fondo de la Biblia" Visibility="Collapsed"
+                      Command="{Binding PlacementTarget.Tag.RemoveBibleBackgroundCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
             <!-- Sus pestañas se llenan al abrirse -->
             <MenuItem x:Name="MoveToTabItem" Header="Mover a la pestaña…" SubmenuOpened="MoveToTab_SubmenuOpened">
                 <MenuItem Header="(cargando)" IsEnabled="False"/>
@@ -212,7 +220,7 @@
              Todo lo que se hace de vez en cuando (importar, copias de
              seguridad, el diseño de la ventana) vive acá; los botones quedan
              para lo que se usa en medio del servicio. -->
-        <Menu Grid.Row="0" Padding="6,2" FontSize="12">
+        <Menu x:Name="MainMenu" Grid.Row="0" Padding="6,2" FontSize="12">
 
             <!-- Archivo quedó sólo con la biblioteca entera, Ajustes y Salir; lo
                  de canciones, Biblias y fondos tiene su propio menú (pedido de
@@ -240,7 +248,7 @@
                 <MenuItem Header="Buscar en todo" InputGestureText="Ctrl+K" Command="{Binding SearchEverythingCommand}"/>
             </MenuItem>
 
-            <MenuItem Header="_Canciones">
+            <MenuItem x:Name="MenuSongs" Header="_Canciones">
                 <MenuItem Header="Crear canción desde cero…" Command="{Binding NewSongCommand}"
                           ToolTip="Una canción nueva en blanco, para escribir o pegar la letra"/>
                 <Separator/>
@@ -249,7 +257,7 @@
                 <MenuItem Header="Importar canciones (.txt, .pro)…" Command="{Binding ImportSongsCommand}"/>
             </MenuItem>
 
-            <MenuItem Header="_Biblias">
+            <MenuItem x:Name="MenuBibles" Header="_Biblias">
                 <MenuItem Header="Bajar Biblias de internet…" Command="{Binding DownloadBiblePackCommand}"
                           ToolTip="Baja el paquete de Biblias sólo a esta computadora y elegís cuáles agregar."/>
                 <Separator/>
@@ -262,9 +270,8 @@
                 <MenuItem Header="Importar paquete de Biblias…" Command="{Binding ImportBiblePackageCommand}"/>
             </MenuItem>
 
-            <MenuItem Header="_Fondos">
+            <MenuItem x:Name="MenuBackgrounds" Header="_Fondos">
                 <MenuItem Header="Agregar imágenes, videos, PDF o PowerPoint…" Command="{Binding ImportMediaCommand}"/>
-                <MenuItem Header="Agregar paquete de fondos (.zip)…" Command="{Binding ImportBackgroundPackCommand}"/>
                 <Separator/>
                 <MenuItem Header="Bajar más fondos de internet…" Command="{Binding DownloadBackgroundPackCommand}"/>
                 <MenuItem Header="Buscar fondos en Pixabay…" Click="Pixabay_Click"
@@ -317,7 +324,7 @@
                 <MenuItem Header="Volver al diseño original" Click="ResetLayout_Click"/>
             </MenuItem>
 
-            <MenuItem Header="_Proyección">
+            <MenuItem x:Name="MenuProjection" Header="_Proyección">
                 <MenuItem Header="Poner en vivo / apagar la salida" Command="{Binding ToggleOutputCommand}"/>
                 <Separator/>
                 <MenuItem Header="Black" InputGestureText="F1" Command="{Binding ToggleBlackCommand}"/>
@@ -352,16 +359,20 @@
                 <MenuItem Header="Actualizar la lista de pantallas" Command="{Binding RefreshDisplaysCommand}"/>
             </MenuItem>
 
-            <MenuItem Header="_Transmisión">
+            <MenuItem x:Name="MenuBroadcast" Header="_Transmisión">
                 <MenuItem Header="Salida para OBS o vMix…" Command="{Binding OpenBroadcastCommand}"
                           ToolTip="Las direcciones para pegar en OBS o vMix: la Biblia, las canciones y los anuncios, cada uno en su capa."/>
                 <MenuItem Header="Estilos de la transmisión…" Command="{Binding OpenBroadcastStylesCommand}"
                           ToolTip="El diseño de cada capa de la transmisión: dónde va la letra, la placa, los colores y el fondo."/>
             </MenuItem>
 
-            <MenuItem Header="A_yuda">
+            <MenuItem x:Name="HelpMenu" Header="A_yuda" SubmenuOpened="HelpMenu_SubmenuOpened">
                 <MenuItem Header="Recorrido del programa" Click="WelcomeTour_Click"
                           ToolTip="Muestra de nuevo, parte por parte, dónde está cada cosa de la ventana."/>
+                <!-- Sin ToolTip: con el submenú abierto se pisaban. Cada tutorial lleva el suyo. -->
+                <MenuItem x:Name="TutorialsMenu" Header="Tutoriales">
+                    <MenuItem Header="Cargando…" IsEnabled="False"/>
+                </MenuItem>
                 <MenuItem Header="Guía de uso (en internet)" Click="Guide_Click"/>
                 <Separator/>
                 <MenuItem Header="Buscar actualizaciones…" Command="{Binding CheckForUpdatesCommand}"/>
@@ -430,8 +441,12 @@
                         </Button.Style>
                     </Button>
                     <!-- Logo: el botón lo prende/apaga, la flecha elige cuál -->
-                    <Button Content="Logo" controls:ShortcutHint.Text="F3" Command="{Binding ToggleLogoCommand}" Margin="6,0,0,0"
-                            ToolTip="{Binding ActiveLogoName, StringFormat='Muestra el logo a pantalla completa (tecla F3). Ahora está elegido: {0}'}">
+                    <Button Content="Logo" controls:ShortcutHint.Text="F3" Command="{Binding ToggleLogoCommand}" Margin="6,0,0,0">
+                        <!-- StringFormat sólo vale para un texto: puesto directo en ToolTip (que es un objeto)
+                             se ignoraba, y el globito decía sólo el nombre del logo (19/11). -->
+                        <Button.ToolTip>
+                            <TextBlock Text="{Binding ActiveLogoName, StringFormat='Muestra el logo a pantalla completa (tecla F3). Ahora está elegido: {0}'}"/>
+                        </Button.ToolTip>
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
                                 <Style.Triggers>
@@ -461,13 +476,13 @@
                             Command="{Binding ClearBackgroundCommand}"
                             IsEnabled="{Binding HasBackground}"
                             ToolTip="Quita la imagen o el video de fondo y deja la letra sola sobre el fondo del tema (tecla F4)"/>
-                    <Button Content="🎨 Temas" Margin="14,0,0,0"
+                    <Button x:Name="ThemesButton" Content="🎨 Temas" Margin="14,0,0,0"
                             Style="{StaticResource DarkButton}"
                             Command="{Binding OpenThemesCommand}"
                             ToolTip="Tipografía, colores, márgenes y fondos"/>
 
                     <!-- Escenario: la pantalla que miran los músicos -->
-                    <Button Content="🎭 Escenario" Margin="14,0,0,0"
+                    <Button x:Name="StageButton" Content="🎭 Escenario" Margin="14,0,0,0"
                             Command="{Binding ToggleStageCommand}"
                             ToolTip="Prende la pantalla de escenario para los músicos y quien predica, con el escenario elegido en el ▾">
                         <Button.Style>
@@ -488,7 +503,7 @@
                             ToolTip="Cambiar de escenario (cantantes, predicador…), editarlos y elegir en qué pantalla va"/>
 
                     <!-- Celular: control remoto por la red de la iglesia -->
-                    <Button Content="📱" Padding="9,7" Margin="8,0,0,0"
+                    <Button x:Name="RemoteButton" Content="📱" Padding="9,7" Margin="8,0,0,0"
                             AutomationProperties.Name="Controlar desde el celular"
                             Command="{Binding OpenRemoteCommand}"
                             ToolTip="Controlar la proyección desde el celular, por la red de la iglesia">
@@ -515,7 +530,7 @@
                 <StackPanel x:Name="OutputControls" DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="Salida:" Foreground="{StaticResource MutedBrush}"
                                FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                    <ComboBox Width="260"
+                    <ComboBox x:Name="OutputCombo" Width="260"
                               ItemsSource="{Binding Displays}"
                               SelectedItem="{Binding SelectedDisplay}"
                               DisplayMemberPath="Label"
@@ -634,12 +649,12 @@
                         <Grid x:Name="LibraryBody">
                             <!-- ── Pestaña Canciones ── -->
                             <DockPanel Visibility="{Binding IsBibleTabActive, Converter={StaticResource InverseBoolToVis}}">
-                                <DockPanel DockPanel.Dock="Top">
+                                <DockPanel x:Name="SongsHeaderRow" DockPanel.Dock="Top" SizeChanged="SongsHeaderRow_SizeChanged">
                                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
                                                 VerticalAlignment="Center" Margin="0,0,10,8">
                                         <!-- Con la palabra, como «➕ Playlist» en Biblia: el ➕ solo no se
                                              encontraba («quiero agregar una canción desde cero y no me da opción») -->
-                                        <Button Content="➕ Agregar" FontSize="11" Padding="7,4"
+                                        <Button x:Name="SongsAddButton" Content="➕ Agregar" FontSize="11" Padding="7,4"
                                                 Style="{StaticResource DarkButton}"
                                                 AutomationProperties.Name="Agregar canciones"
                                                 Click="AddSongMenu_Click"
@@ -655,7 +670,8 @@
                                                 AutomationProperties.Name="Eliminar canción"
                                                 ToolTip="Eliminar canción"/>
                                     </StackPanel>
-                                    <TextBlock Text="CANCIONES" Style="{StaticResource PanelTitle}" Margin="12,0,12,0"
+                                    <TextBlock Text="CANCIONES" Style="{StaticResource PanelTitle}" Margin="12,0,6,0"
+                                               TextTrimming="CharacterEllipsis"
                                                Cursor="Hand" MouseLeftButtonUp="LibraryTitle_MouseLeftButtonUp"
                                                ToolTip="Clic: achicar este panel para darle lugar a la playlist"/>
                                 </DockPanel>
@@ -798,7 +814,7 @@
                                                 AutomationProperties.Name="Agregar a la playlist"
                                                 ToolTip="Abre una cajita para agregar un pasaje a la playlist: ya trae el tramo escrito en el buscador, o el versículo que está en pantalla, o el capítulo; se puede escribir otro («juan 8 del 5 al 10»). También: clic derecho sobre un versículo."/>
                                         <!-- Agregar Biblias: bajarlas, un paquete o un archivo suelto -->
-                                        <Button Content="📥 Biblias" FontSize="11" Padding="7,4"
+                                        <Button x:Name="BibleDownloadButton" Content="📥 Biblias" FontSize="11" Padding="7,4"
                                                 Style="{StaticResource DarkButton}"
                                                 Click="AddBiblesMenu_Click"
                                                 AutomationProperties.Name="Agregar Biblias"
@@ -908,8 +924,11 @@
                                                     CommandParameter="{Binding}"
                                                     Tag="{Binding Tag, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                                     AutomationProperties.Name="{Binding Info.Name}"
-                                                    ToolTip="{Binding Info.Name, StringFormat='{}{0}&#10;Clic: usar sólo esta · Ctrl+clic: sumarla como segunda versión'}"
-                                                    ContextMenu="{StaticResource VersionMenu}"/>
+                                                    ContextMenu="{StaticResource VersionMenu}">
+                                                <Button.ToolTip>
+                                                    <TextBlock Text="{Binding Info.Name, StringFormat='{}{0}&#10;Clic: usar sólo esta · Ctrl+clic: sumarla como segunda versión'}"/>
+                                                </Button.ToolTip>
+                                            </Button>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
@@ -966,24 +985,30 @@
                                 </Border>
 
                                 <!-- La caja de búsqueda y, a su derecha, el historial 🕘 de lo proyectado -->
-                                <DockPanel x:Name="BibleQueryRow" DockPanel.Dock="Top" Margin="12,0,12,6">
+                                <DockPanel x:Name="BibleQueryRow" DockPanel.Dock="Top" Margin="12,0,12,6"
+                                           SizeChanged="BibleQueryRow_SizeChanged">
+                                <!-- «🕘 Historial» con la palabra (20/11: alguien pidió un historial que ya
+                                     existía; el dibujo solo no se encontraba). Con el panel angosto vuelve a
+                                     ser «🕘 Hist.», para que la caja de la cita no quede chica. -->
                                 <Button x:Name="BibleHistoryButton" DockPanel.Dock="Right"
-                                        Content="🕘" FontSize="13" Padding="8,5" Margin="6,0,0,0"
+                                        Content="🕘 Historial" FontSize="12" Padding="8,5" Margin="6,0,0,0"
                                         Style="{StaticResource DarkButton}"
                                         Click="BibleHistoryButton_Click"
                                         AutomationProperties.Name="Historial de versículos"
                                         ToolTip="Historial de los versículos que proyectaste: clic carga y marca el versículo, doble clic lo proyecta. También: flecha ↓ en la caja vacía."/>
+                                <!-- Un solo botón que dice el modo ACTUAL (☰ Lista ⇄ / ▦ Grilla ⇄); al tocarlo pasa al otro. -->
                                 <Button x:Name="BibleViewToggleButton" DockPanel.Dock="Right"
                                         FontSize="11" Padding="8,6" Margin="6,0,0,0"
                                         Command="{Binding ToggleBibleViewCommand}"
-                                        AutomationProperties.Name="Cambiar la vista de la Biblia"
-                                        ToolTip="Vista en grilla: los libros como fichas de colores, con los capítulos y versículos al lado. Vista en lista: la de siempre. Escribir una cita («jn 3 16») + Enter funciona en las dos.">
+                                        AutomationProperties.Name="Cambiar la vista de la Biblia">
                                     <Button.Style>
                                         <Style TargetType="Button" BasedOn="{StaticResource DarkButton}">
-                                            <Setter Property="Content" Value="▦ Grilla"/>
+                                            <Setter Property="Content" Value="☰ Lista ⇄"/>
+                                            <Setter Property="ToolTip" Value="Vista: Lista. Tocá para pasar a Grilla (los libros como fichas de colores). Escribir una cita («jn 3 16») + Enter funciona en las dos."/>
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsBibleGridView}" Value="True">
-                                                    <Setter Property="Content" Value="☰ Lista"/>
+                                                    <Setter Property="Content" Value="▦ Grilla ⇄"/>
+                                                    <Setter Property="ToolTip" Value="Vista: Grilla. Tocá para pasar a Lista. Escribir una cita («jn 3 16») + Enter funciona en las dos."/>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
@@ -1664,8 +1689,38 @@
 
                     <StackPanel Grid.Row="0">
                     <!-- Qué hay en la grilla y, si es otra cosa, qué está en pantalla -->
-                    <DockPanel Margin="12,8,12,8" LastChildFill="False"
+                    <DockPanel x:Name="GridHeader" Margin="12,8,12,8" LastChildFill="False"
+                               SizeChanged="GridHeader_SizeChanged"
                                Visibility="{Binding HasGridTitle, Converter={StaticResource BoolToVis}}">
+                        <!-- Sólo con versículos en la grilla. Va primero para que, con la ventana
+                             angosta, el código lo pueda bajar a un renglón propio sin tapar nada -->
+                        <WrapPanel x:Name="BibleGridTools" DockPanel.Dock="Right" HorizontalAlignment="Right"
+                                   Visibility="{Binding IsBibleOpen, Converter={StaticResource BoolToVis}}"
+                                   IsVisibleChanged="BibleGridTools_IsVisibleChanged">
+                            <!-- «Dividir versículos largos» del tema de la Biblia en uso, sin abrir el editor -->
+                            <StackPanel Orientation="Horizontal" Margin="10,0,0,0" VerticalAlignment="Center"
+                                        IsEnabled="{Binding CanSplitBibleVerses}">
+                                <CheckBox x:Name="BibleSplitCheck" Content="Dividir" FontSize="11"
+                                          Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center"
+                                          IsChecked="{Binding BibleSplitOn}"
+                                          AutomationProperties.Name="Dividir versículos largos"
+                                          ToolTip="Dividir versículos largos: un versículo que pasa el máximo de caracteres sale en varias diapositivas. Queda guardado en el tema de la Biblia (🎨 Temas → Biblia)."/>
+                                <controls:NumericField x:Name="BibleSplitBox" Minimum="50" Maximum="500" Step="10"
+                                                       Width="112" Margin="6,0,0,0" VerticalAlignment="Center"
+                                                       Value="{Binding BibleSplitChars}"
+                                                       IsEnabled="{Binding BibleSplitOn}"
+                                                       AutomationProperties.Name="Máximo de caracteres por diapositiva"
+                                                       ToolTip="Máximo de caracteres por diapositiva, de 50 a 500"/>
+                            </StackPanel>
+                            <!-- El fondo propio de la Biblia, en el mismo lugar que el de las canciones
+                                 (también: clic derecho en un medio) -->
+                            <Button Content="{Binding BibleBackgroundLabel}" FontSize="11" Padding="8,3" Margin="10,0,0,0"
+                                    MaxWidth="200"
+                                    Style="{StaticResource DarkButton}"
+                                    Click="BibleBackgroundButton_Click"
+                                    AutomationProperties.Name="Fondo de la Biblia"
+                                    ToolTip="{Binding BibleBackgroundHint}"/>
+                        </WrapPanel>
                         <!-- Sólo con una canción en la grilla: cuántas líneas lleva cada diapositiva -->
                         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0"
                                     Visibility="{Binding IsSongOpen, Converter={StaticResource BoolToVis}}"
@@ -2161,7 +2216,7 @@
                         <Grid x:Name="ToolsBody">
                             <!-- ── Texto rápido ── -->
                             <DockPanel Visibility="{Binding IsChecked, ElementName=TabQuick, Converter={StaticResource BoolToVis}}">
-                                <Button DockPanel.Dock="Bottom"
+                                <Button x:Name="QuickTextButton" DockPanel.Dock="Bottom"
                                         Content="Proyectar ▶" controls:ShortcutHint.Text="Ctrl+Enter"
                                         Style="{StaticResource AccentButton}"
                                         Command="{Binding GoLiveCommand}"
@@ -2170,12 +2225,12 @@
                                 <StackPanel DockPanel.Dock="Top" Margin="12,0,12,10">
                                     <TextBlock Text="Tipografía" Foreground="{StaticResource MutedBrush}"
                                                FontSize="11" Margin="0,0,0,4"/>
-                                    <ComboBox IsEditable="True" FontSize="12"
+                                    <ComboBox x:Name="QuickTextFontBox" IsEditable="True" FontSize="12"
                                               ItemsSource="{Binding SystemFonts}"
                                               Text="{Binding QuickTextFont, UpdateSourceTrigger=PropertyChanged}"
                                               ToolTip="Letra del texto rápido. Vacía: la del tema de las canciones."/>
                                 </StackPanel>
-                                <TextBox AcceptsReturn="True" TextWrapping="Wrap"
+                                <TextBox x:Name="QuickTextBox" AcceptsReturn="True" TextWrapping="Wrap"
                                          VerticalScrollBarVisibility="Auto"
                                          Text="{Binding QuickText, UpdateSourceTrigger=PropertyChanged}"
                                          Background="{StaticResource SurfaceAltBrush}"
@@ -2199,7 +2254,7 @@
                                            Text="Aparece en una franja abajo, por encima de todo — incluso con Black puesto."
                                            FontSize="11" Foreground="{StaticResource FaintBrush}"
                                            TextWrapping="Wrap" Margin="12,0,12,8"/>
-                                <Grid DockPanel.Dock="Top" Margin="12,0,12,8">
+                                <Grid x:Name="OverlayStyleRow" DockPanel.Dock="Top" Margin="12,0,12,8">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
@@ -2220,7 +2275,7 @@
                                                                ToolTip="Tamaño de la letra del aviso, de 20 a 160. El de siempre es 54."/>
                                     </StackPanel>
                                 </Grid>
-                                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="12,8,12,12">
+                                <StackPanel x:Name="OverlayButtons" DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="12,8,12,12">
                                     <Button Content="Mostrar" Command="{Binding ShowOverlayCommand}" Padding="16,8"
                                             ToolTip="Pone la franja en pantalla">
                                         <Button.Style>
@@ -2238,7 +2293,7 @@
                                             Command="{Binding HideOverlayCommand}"
                                             ToolTip="Saca la franja del aviso"/>
                                 </StackPanel>
-                                <TextBox AcceptsReturn="True" TextWrapping="Wrap"
+                                <TextBox x:Name="OverlayTextBox" AcceptsReturn="True" TextWrapping="Wrap"
                                          VerticalScrollBarVisibility="Auto"
                                          Text="{Binding OverlayText, UpdateSourceTrigger=PropertyChanged}"
                                          Background="{StaticResource SurfaceAltBrush}"
@@ -2362,7 +2417,7 @@
                                         <ComboBoxItem Content="Se va sola a los 15 s"/>
                                     </ComboBox>
 
-                                    <!-- Mostrar y Quitar, anchos y a la par -->
+                                    <!-- Mostrar, Guardar y Quitar, anchos y a la par -->
                                     <UniformGrid Grid.Row="5" Grid.ColumnSpan="2" Rows="1" Margin="0,12,0,0">
                                         <Button Content="Mostrar" Command="{Binding ShowNamePlateCommand}" Padding="14,8" Margin="0,0,4,0"
                                                 ToolTip="Pone la placa en pantalla (Enter en el nombre hace lo mismo)">
@@ -2377,6 +2432,9 @@
                                                 </Style>
                                             </Button.Style>
                                         </Button>
+                                        <Button Content="Guardar" Style="{StaticResource DarkButton}" Padding="14,8" Margin="4,0,4,0"
+                                                Command="{Binding SaveNamePlateCommand}"
+                                                ToolTip="Guarda la placa en la lista sin mostrarla y deja los campos limpios para la próxima"/>
                                         <Button Content="Quitar" Style="{StaticResource DarkButton}" Padding="14,8" Margin="4,0,0,0"
                                                 Command="{Binding HideNamePlateCommand}"
                                                 ToolTip="Saca la placa de la pantalla"/>
@@ -2433,7 +2491,7 @@
                                            Text="Escribí una o varias palabras o frases separadas por ; («gracia; fe») y se pintan al instante en todas las veces que aparecen. También podés marcar con el mouse sobre el LIVE: ahí se resalta sólo esa vez, y con Shift se suman más."
                                            FontSize="11" Foreground="{StaticResource FaintBrush}"
                                            TextWrapping="Wrap" Margin="12,0,12,8"/>
-                                <TextBox DockPanel.Dock="Top"
+                                <TextBox x:Name="HighlightBox" DockPanel.Dock="Top"
                                          Text="{Binding HighlightText, UpdateSourceTrigger=PropertyChanged}"
                                          Background="{StaticResource SurfaceAltBrush}"
                                          Foreground="White"
@@ -2442,7 +2500,7 @@
                                          Margin="12,0,12,0"
                                          Padding="8,6" FontSize="14"
                                          VerticalContentAlignment="Center"/>
-                                <Button DockPanel.Dock="Top" Content="Quitar el resaltado"
+                                <Button x:Name="HighlightClearButton" DockPanel.Dock="Top" Content="Quitar el resaltado"
                                         Style="{StaticResource DarkButton}"
                                         Command="{Binding ClearHighlightCommand}"
                                         HorizontalAlignment="Left"
@@ -2504,6 +2562,45 @@
                                                      ToolTip="Doble clic o Enter: reproducir · Supr: quitar de la lista">
                                                 <ListBox.ItemContainerStyle>
                                                     <Style TargetType="ListBoxItem">
+                                                        <Setter Property="Tag"
+                                                                Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+                                                        <Setter Property="ContextMenu">
+                                                            <Setter.Value>
+                                                                <ContextMenu>
+                                                                    <MenuItem Header="Reproducir ahora"
+                                                                              Command="{Binding PlacementTarget.Tag.PlayAudioCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                                    <MenuItem Header="Reproducir en bucle sólo este"
+                                                                              Command="{Binding PlacementTarget.Tag.PlayAudioLoopingCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                                    <Separator Visibility="{Binding PlacementTarget.DataContext.IsYouTube, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVis}}"/>
+                                                                    <MenuItem Header="Guardar para usar sin internet"
+                                                                              Visibility="{Binding PlacementTarget.DataContext.IsYouTube, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVis}}"
+                                                                              Command="{Binding PlacementTarget.Tag.SaveAudioItemCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                              ToolTip="Baja el audio a la computadora: queda en su mismo lugar de la lista y funciona sin internet."/>
+                                                                    <MenuItem Header="Copiar el link de YouTube"
+                                                                              Visibility="{Binding PlacementTarget.DataContext.IsYouTube, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVis}}"
+                                                                              Command="{Binding PlacementTarget.Tag.CopyAudioLinkCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                                    <MenuItem Header="Mostrar en la carpeta"
+                                                                              Visibility="{Binding PlacementTarget.DataContext.IsYouTube, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource InverseBoolToVis}}"
+                                                                              Command="{Binding PlacementTarget.Tag.ShowAudioInFolderCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                                    <Separator/>
+                                                                    <MenuItem Header="Subir"
+                                                                              Command="{Binding PlacementTarget.Tag.MoveAudioItemUpCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                                    <MenuItem Header="Bajar"
+                                                                              Command="{Binding PlacementTarget.Tag.MoveAudioItemDownCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                                    <Separator/>
+                                                                    <MenuItem Header="Eliminar de la lista"
+                                                                              Command="{Binding PlacementTarget.Tag.RemoveAudioItemCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                                </ContextMenu>
+                                                            </Setter.Value>
+                                                        </Setter>
                                                         <Setter Property="Template">
                                                             <Setter.Value>
                                                                 <ControlTemplate TargetType="ListBoxItem">
@@ -2654,7 +2751,7 @@
                                     <!-- YouTube, sólo el sonido: buscar, escuchar, sumar a la lista, guardar -->
                                     <Rectangle Height="1" Fill="{StaticResource LineBrush}" Margin="0,14,0,0"/>
                                     <TextBlock Text="BUSCAR EN YOUTUBE (SÓLO EL AUDIO)" Style="{StaticResource PanelTitle}" Margin="0,10,0,6"/>
-                                    <DockPanel>
+                                    <DockPanel x:Name="YouTubeMusicSearch">
                                         <Button DockPanel.Dock="Right" Content="🔍" FontSize="12" Padding="9,4" Margin="4,0,0,0"
                                                 Style="{StaticResource AccentButton}"
                                                 Command="{Binding SearchYouTubeMusicCommand}"
@@ -2816,7 +2913,7 @@
                                             </Style>
                                         </TextBlock.Style>
                                     </TextBlock>
-                                    <WrapPanel Margin="0,4,0,0">
+                                    <WrapPanel x:Name="SectionTimerButtons" Margin="0,4,0,0">
                                         <Button Padding="12,6" Margin="0,0,4,4" MinWidth="86"
                                                 Command="{Binding ToggleSectionTimerCommand}">
                                             <Button.Style>
@@ -2902,7 +2999,7 @@
                                     <TextBlock Text="CRONÓMETRO" FontSize="10" FontWeight="SemiBold"
                                                Foreground="{StaticResource FaintBrush}" Margin="0,14,0,2"
                                                ToolTip="Cuánto lleva el servicio. Es el mismo que muestra el recuadro «Cronómetro» del escenario."/>
-                                    <DockPanel>
+                                    <DockPanel x:Name="StopwatchRow">
                                         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
                                             <Button Padding="10,5" MinWidth="82" Margin="0,0,4,0"
                                                     Command="{Binding ToggleStopwatchCommand}">
@@ -2935,7 +3032,7 @@
                                            Text="Sólo se ven en la pantalla de escenario: el guion del predicador, un aviso para la banda. La congregación nunca las ve."
                                            FontSize="11" Foreground="{StaticResource FaintBrush}"
                                            TextWrapping="Wrap" Margin="12,0,12,8"/>
-                                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="12,8,12,12">
+                                <StackPanel x:Name="StageNotesButtons" DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="12,8,12,12">
                                     <Button Content="Mostrar" Command="{Binding ShowStageNotesCommand}" Padding="16,8"
                                             ToolTip="Manda las notas a la pantalla de escenario">
                                         <Button.Style>
@@ -2953,7 +3050,7 @@
                                             Command="{Binding HideStageNotesCommand}"
                                             ToolTip="Saca las notas del escenario"/>
                                 </StackPanel>
-                                <TextBox AcceptsReturn="True" TextWrapping="Wrap"
+                                <TextBox x:Name="StageNotesBox" AcceptsReturn="True" TextWrapping="Wrap"
                                          VerticalScrollBarVisibility="Auto"
                                          Text="{Binding StageNotesText, UpdateSourceTrigger=PropertyChanged}"
                                          Background="{StaticResource SurfaceAltBrush}"
@@ -2992,37 +3089,37 @@
                 </Border.Style>
             <DockPanel>
                 <DockPanel DockPanel.Dock="Top">
-                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,6,10,2">
-                        <Button Content="📥 Agregar" FontSize="11" Padding="8,4"
+                    <StackPanel x:Name="MediaButtons" DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,6,10,2">
+                        <Button x:Name="MediaAddButton" Content="📥 Agregar" FontSize="11" Padding="8,4"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding ImportMediaCommand}"
                                 ToolTip="Agregar imágenes o videos a la pestaña actual"/>
-                        <Button Content="▶ YouTube" FontSize="11" Padding="8,4" Margin="6,0,0,0"
+                        <Button x:Name="MediaYouTubeButton" Content="▶ YouTube" FontSize="11" Padding="8,4" Margin="6,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding OpenYouTubeCommand}"
                                 ToolTip="Buscar en YouTube e iniciar sesión con tu cuenta (Premium: sin anuncios)"/>
-                        <Button Content="🌐 Web" FontSize="11" Padding="8,4" Margin="6,0,0,0"
+                        <Button x:Name="MediaWebButton" Content="🌐 Web" FontSize="11" Padding="8,4" Margin="6,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding OpenWebCommand}"
                                 ToolTip="Abrir una página web en el cuadro central y proyectarla: como foto o en vivo"/>
-                        <Button Content="🖼 Imágenes" FontSize="11" Padding="8,4" Margin="6,0,0,0"
+                        <Button x:Name="MediaImagesButton" Content="🖼 Imágenes" FontSize="11" Padding="8,4" Margin="6,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding OpenImageSearchCommand}"
                                 ToolTip="Buscar imágenes y GIF en Google Imágenes y agregarlos a la pestaña actual con clic derecho → Agregar a medios"/>
-                        <Button Content="🎞 Fondos" FontSize="11" Padding="8,4" Margin="6,0,0,0"
+                        <Button x:Name="MediaPixabayButton" Content="🎞 Fondos" FontSize="11" Padding="8,4" Margin="6,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Click="Pixabay_Click"
                                 AutomationProperties.Name="Buscar fondos en Pixabay"
                                 ToolTip="Buscar videos y fotos de fondo en Pixabay, que se pueden usar gratis, y bajarlos a una pestaña"/>
-                        <Button Content="🖥 Ventana" FontSize="11" Padding="8,4" Margin="6,0,0,0"
+                        <Button x:Name="MediaWindowButton" Content="🖥 Ventana" FontSize="11" Padding="8,4" Margin="6,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding OpenWindowPickerCommand}"
                                 ToolTip="Proyectar otra ventana de esta computadora (un PowerPoint, un reproductor, un navegador) en vivo, tal como se ve"/>
-                        <Button Content="🔗" FontSize="11" Padding="8,4" Margin="4,0,0,0"
+                        <Button x:Name="MediaLinkButton" Content="🔗" FontSize="11" Padding="8,4" Margin="4,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding AddYouTubeLinkCommand}"
                                 ToolTip="Agregar un video de YouTube pegando el link"/>
-                        <Button Content="🎲" FontSize="12" Padding="8,4" Margin="6,0,0,0"
+                        <Button x:Name="MediaDiceButton" Content="🎲" FontSize="12" Padding="8,4" Margin="6,0,0,0"
                                 Style="{StaticResource DarkButton}"
                                 Command="{Binding RandomBackgroundCommand}"
                                 ToolTip="Poner un fondo al azar de esta pestaña. No repite ninguno hasta haberlos usado a todos."/>
@@ -3142,6 +3239,21 @@
                                                             </MultiBinding>
                                                         </TextBlock.Visibility>
                                                     </TextBlock>
+                                                    <!-- «Todo va en primer plano» (o presentación): va encima de todo.
+                                                         El dibujo es el de OnTopIcon (Core) -->
+                                                    <Path x:Name="onTopIcon" DockPanel.Dock="Right" Width="11" Height="11"
+                                                          Margin="4,0,0,0" VerticalAlignment="Center" Stretch="Uniform"
+                                                          Data="{Binding Source={x:Static coremedia:OnTopIcon.PathData}}"
+                                                          Fill="{StaticResource OnTopBrush}"
+                                                          ToolTip="{x:Static coremedia:OnTopIcon.Explanation}">
+                                                        <Path.Visibility>
+                                                            <MultiBinding Converter="{StaticResource TabMutedToVis}">
+                                                                <Binding/>
+                                                                <Binding Path="DataContext.OnTopMediaTabs"
+                                                                         RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                                            </MultiBinding>
+                                                        </Path.Visibility>
+                                                    </Path>
                                                     <TextBlock x:Name="label" Text="{Binding}" FontSize="12" FontWeight="SemiBold"
                                                                Foreground="{StaticResource MutedBrush}"
                                                                TextTrimming="CharacterEllipsis"/>

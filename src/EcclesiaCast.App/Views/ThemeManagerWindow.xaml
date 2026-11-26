@@ -810,6 +810,14 @@
                             <CheckBox Content="Número de versículo en el texto" IsChecked="{Binding ShowVerseNumbers}"/>
                             <CheckBox Content="Mostrar «Selah» y los títulos de los Salmos" IsChecked="{Binding ShowSelahAndTitles}"
                                       ToolTip="Destildada (lo normal), «Selah» y los títulos de los Salmos que traen algunas Biblias no se proyectan."/>
+                            <CheckBox Content="Dividir versículos largos" IsChecked="{Binding SplitLongVerses}"
+                                      ToolTip="Un versículo largo pasa en varias diapositivas, con la cita marcada (1/2), (2/2). Se corta de preferencia en un punto, después en una coma, y nunca en medio de una palabra."/>
+                            <StackPanel Visibility="{Binding SplitLongVerses, Converter={StaticResource BoolToVis}}">
+                                <TextBlock Text="Máximo de caracteres por diapositiva" Style="{StaticResource FieldLabel}"/>
+                                <controls:NumericField Minimum="50" Maximum="500" Step="10" HorizontalAlignment="Left"
+                                                       Value="{Binding VerseSplitChars}"
+                                                       ToolTip="Cuentan las letras, los espacios y los signos. El tamaño de la letra y «Se achica hasta» siguen valiendo para cada parte."/>
+                            </StackPanel>
 
                             <TextBlock Text="Cuando se proyectan dos versiones" Style="{StaticResource GroupTitle}"/>
                             <CheckBox Content="La segunda se ve igual que la primera"

@@ -36,9 +36,13 @@ public class WelcomeTourTests
         bool NoPlaylist(string t) => t != WelcomeTour.Playlist;
         var bible = Index(WelcomeTour.Bible);
         var slides = Index(WelcomeTour.Slides);
+        var run = TourRun.ForWelcome(steps, NoPlaylist);
 
-        Assert.Equal(slides, WelcomeTour.Next(steps, bible, 1, NoPlaylist));
-        Assert.Equal(bible, WelcomeTour.Next(steps, slides, -1, NoPlaylist));
+        Assert.Equal(slides, run.Next(bible, 1));
+        Assert.Equal(bible, run.Next(slides, -1));
+        // The greeting and the goodbye have no number; the total leaves the folded part out.
+        Assert.Null(run.Count(steps, 0));
+        Assert.Equal((1, steps.Count - 3), run.Count(steps, 1));
     }
 
     [Fact]
@@ -46,8 +50,10 @@ public class WelcomeTourTests
     {
         var steps = WelcomeTour.Steps;
 
-        Assert.Equal(-1, WelcomeTour.Next(steps, steps.Count - 1, 1, _ => true));
-        Assert.Equal(-1, WelcomeTour.Next(steps, 0, -1, _ => true));
+        var run = TourRun.ForWelcome(steps, _ => true);
+
+        Assert.Equal(-1, run.Next(steps.Count - 1, 1));
+        Assert.Equal(-1, run.Next(0, -1));
     }
 
     [Fact]
@@ -55,7 +61,7 @@ public class WelcomeTourTests
     {
         var steps = WelcomeTour.Steps;
 
-        Assert.Equal(steps.Count - 1, WelcomeTour.Next(steps, 0, 1, _ => false));
+        Assert.Equal(steps.Count - 1, TourRun.ForWelcome(steps, _ => false).Next(0, 1));
     }
 
     [Fact]

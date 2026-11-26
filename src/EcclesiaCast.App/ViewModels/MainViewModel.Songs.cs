@@ -645,11 +645,11 @@ public sealed partial class MainViewModel
         var bytes = File.ReadAllBytes(path);
         try
         {
-            return new UTF8Encoding(false, throwOnInvalidBytes: true).GetString(bytes);
+            return new UTF8Encoding(false, throwOnInvalidBytes: true).GetString(bytes).TrimStart('﻿');
         }
         catch (DecoderFallbackException)
         {
-            return Encoding.Latin1.GetString(bytes);
+            return Encoding.Latin1.GetString(bytes).TrimStart('﻿');
         }
     }
 }

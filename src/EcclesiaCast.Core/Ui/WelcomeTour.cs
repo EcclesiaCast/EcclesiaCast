@@ -4,8 +4,13 @@ namespace EcclesiaCast.Core.Ui;
 /// One stop of the welcome tour: the part of the window it lights up
 /// (<see cref="Target"/>, one of the <see cref="WelcomeTour"/> names; null for
 /// the greeting and the goodbye, which light nothing) and what it says.
+/// <paramref name="Open"/> is something the step opens first (a menu, a window,
+/// a tab: see <see cref="TourActions"/>) and <paramref name="Highlight"/> the
+/// <c>x:Name</c> of an element of the window it opened, to point at;
+/// <paramref name="Picture"/> is a drawing for the card (see <see cref="TourActions.Pictures"/>).
 /// </summary>
-public sealed record TourStep(string? Target, string Title, string Text);
+public sealed record TourStep(
+    string? Target, string Title, string Text, string? Open = null, string? Highlight = null, string? Picture = null);
 
 /// <summary>A rectangle in window units, without WPF (Core has none).</summary>
 public readonly record struct TourBox(double X, double Y, double Width, double Height)
@@ -63,27 +68,6 @@ public static class WelcomeTour
             "Lo podés volver a ver cuando quieras en Ayuda → «Recorrido del programa». ¡Que sea de bendición!"),
     ];
 
-    /// <summary>
-    /// The step after (<paramref name="direction"/> 1) or before (−1)
-    /// <paramref name="from"/>, skipping the ones whose part of the window is
-    /// not on show (a panel shrunk to icons, for instance). −1 when there is
-    /// none: past the end the tour is over, before the start it stays put.
-    /// </summary>
-    public static int Next(IReadOnlyList<TourStep> steps, int from, int direction, Func<string, bool> isShown)
-    {
-        ArgumentNullException.ThrowIfNull(steps);
-        ArgumentNullException.ThrowIfNull(isShown);
-        if (direction == 0)
-            throw new ArgumentOutOfRangeException(nameof(direction));
-
-        for (var i = from + Math.Sign(direction); i >= 0 && i < steps.Count; i += Math.Sign(direction))
-        {
-            if (steps[i].Target is not { } target || isShown(target))
-                return i;
-        }
-
-        return -1;
-    }
 
     /// <summary>
     /// The lit rectangle: the part of the window with a little room around

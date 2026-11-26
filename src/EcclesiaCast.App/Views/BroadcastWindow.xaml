@@ -29,6 +29,8 @@
                 <Button Content="Copiar la dirección" Style="{StaticResource DarkButton}"
                         FontSize="11" Padding="10,4" Margin="0,8,0,0"
                         HorizontalAlignment="Left" Click="CopyBroadcast_Click"/>
+                <TextBlock x:Name="StableNote" FontSize="11" Foreground="{StaticResource FaintBrush}"
+                           TextWrapping="Wrap" Margin="0,8,0,0"/>
 
                 <TextBlock Text="¿Querés cada cosa en su propia capa de la transmisión? Hay una dirección para cada una: la Biblia, las canciones y los anuncios (texto rápido, imágenes, videos, el aviso al pie y la cuenta regresiva). Así podés mostrar u ocultar cada una por separado."
                            FontSize="11" Foreground="{StaticResource FaintBrush}"
@@ -45,6 +47,11 @@
                 <TextBlock x:Name="ChannelCopied" FontSize="11" Foreground="{StaticResource AccentSoftBrush}" Margin="0,6,0,0"/>
             </StackPanel>
         </Border>
+
+        <Button Content="Cambiar el PIN de OBS" Style="{StaticResource DarkButton}"
+                FontSize="11" Padding="10,4" Margin="0,10,0,0" HorizontalAlignment="Left"
+                Click="ChangeObsPin_Click"
+                ToolTip="Es distinto del PIN del celular: sólo abre estas páginas de salida"/>
 
         <TextBlock Text="Cada dirección usa su estilo de Transmisión → Estilos de la transmisión…"
                    FontSize="11" Foreground="{StaticResource MutedBrush}"

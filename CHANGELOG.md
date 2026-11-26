@@ -5,106 +5,93 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+## [1.5.0] - 2026-11-26
+
 ### Agregado
 
-- **Música de YouTube, sólo el audio.** En la pestaña **Música**, debajo del reproductor, un buscador
-  de YouTube: escribí un artista, una canción o pegá un link, o tocá un tono en **Pads: Do, Do#, Re…**
-  para buscar pads. **▶** escucha el resultado ya, **➕** lo suma a la lista y **💾** guarda el audio en
-  **Música › EcclesiaCast** para que funcione sin internet. Suena sólo el sonido, sin imagen ni
-  propagandas, por el mismo reproductor de los audios: **lo que está en pantalla no cambia**. Lo que
-  todavía necesita internet lleva 🌐 en la lista, y con 💾 arriba de la lista queda guardado. Lo ya
-  escuchado arranca enseguida la próxima vez, y mientras suena una canción se va trayendo la siguiente.
-- **Botón para repetir la música** (al lado del nombre de lo que suena): sin repetir, **🔁 repetir la
-  lista** o **🔂 repetir ésta**, ideal para dejar un pad sonando debajo de una canción.
-- **Placas de nombre («lower third»).** Pestaña nueva **Placas**: nombre y cargo («Pastor Juan Pérez /
-  Predicación») en una tarjeta abajo a la izquierda que entra deslizándose, en el proyector, en el EN VIVO
-  y en la transmisión (OBS). Se va sola a los 5, 10 o 15 segundos, o cuando la quitás. Cada placa
-  mostrada queda guardada en una lista para usarla de nuevo con doble clic. Puede llevar una imagen o un
-  video corto (en bucle, sin sonido) a la izquierda o a la derecha del texto, elegido de tus logos o de
-  la computadora; un **GIF animado** se convierte solo en video y se mueve. (Pedido en GitHub #37.)
-- **Estilos de placa, con «✏ Diseñar…».** Cada placa usa un estilo con nombre. Vienen seis listos
-  (Clásica, Moderna, Noticias, Vidrio, Mínima y Centrada) y en la ventana «Estilos de placa» se crean,
-  duplican, renombran y borran, viendo cómo queda mientras se cambia: **dónde se ve** (proyector y
-  transmisión, **sólo en la transmisión (OBS)** o sólo en el proyector), color y opacidad del recuadro,
-  esquinas redondeadas, **ancho y alto** (o que se acomode a las palabras), la **franja de color**
-  (a la izquierda, arriba, abajo o ninguna; color y grosor; o el nombre sobre un bloque de ese color),
-  tipografía, tamaño y color del nombre y del cargo, negrita, mayúsculas, sombra, lugar (abajo a la
-  izquierda, al centro o a la derecha, y a qué distancia del borde), y **cómo entra y cómo sale**
-  (deslizándose, subiendo o bajando, como persiana o desvaneciéndose) con su duración. La página
-  para OBS dibuja la placa con el mismo estilo.
-- **La salida en vertical (9:16).** En la ventana de salida (clic derecho → Forma) se puede elegir
-  «9:16 (vertical)», con tamaños rápidos 360×640, 720×1280 y 1080×1920, para pantallas paradas o
-  transmisiones verticales. La letra se dibuja igual que en 16:9, así que queda en una franja al medio.
-- **«Crear canción desde cero…» en el menú Canciones**, arriba de todo.
-- **Cuando YouTube no deja pasar un video fuera de su página** (por derechos de autor, errores 101 y
-  150), la pantalla queda en negro en vez de mostrar el cartel de YouTube, y el programa avisa con un
-  mensaje propio que ese video sólo se puede usar descargándolo, con un botón **«Descargar ahora»**.
-- **Fondo propio de cada canción.** Con **🖼 Fondo** arriba de las diapositivas («Usar el fondo que está
-  en pantalla») o con clic derecho en una imagen o video de Medios → «Usar como fondo de «…»». Al
-  proyectar esa canción, su fondo se pone solo; le gana al «al azar por canción». (GitHub #32.)
-- **Buscar en la letra.** Una caja arriba de las diapositivas marca las que tienen esas palabras (sin
-  importar acentos ni mayúsculas); Enter proyecta la marcada, ↓ / F3 pasa a la siguiente. (GitHub #32.)
-- **Deshacer y rehacer en las canciones (Ctrl+Z / Ctrl+Y y ↶ ↷).** Mover, agregar, borrar, duplicar o
-  pegar diapositivas, la edición rápida, el diseño y el editor de la letra se pueden deshacer mientras
-  el programa está abierto. (GitHub #32.)
-- **Diapositiva nueva vacía.** «➕ Diapositiva» arriba de las diapositivas, «Nueva diapositiva después
-  de esta…» en el clic derecho y «➕ Nueva diapositiva» en Editar canción (diseño). Antes sólo se podía
-  duplicar una. (GitHub #32.)
-- **La salida en una ventana.** En la lista «Salida:» está **«⧉ En una ventana»**: la proyección
-  sale en una ventana común (se mueve, se minimiza, se comparte por Discord o una videollamada) en vez
-  de a pantalla completa. Con el clic derecho se elige la forma, 16:9 o 4:3, que se conserva al
-  agrandarla; tamaños rápidos (640×360, 1280×720, 1920×1080 o 640×480, 1024×768, 1440×1080) y
-  «Siempre visible». Recuerda forma, tamaño y lugar. Cerrarla apaga la salida. Las vistas EN VIVO y
-  VISTA PREVIA siguen la forma elegida. **Con una sola pantalla es la primera opción de la lista y
-  la que viene elegida**, también para quien ya usaba el programa así. Desde ahora la salida que se
-  elige en la lista queda recordada (aunque no se ponga en vivo): si alguien elige «Pantalla 1»,
-  arranca ahí la próxima vez.
-- **Biblias en el XML de OpenSong.** Además de JSON y Zefania, se importan las Biblias en el
-  XML que usan ProPresenter, Holyrics y FreeShow (y páginas como Beblia): `<bible><b n="Juan"><c n="3"><v n="16">`.
-  La ventana «Cómo preparar una Biblia para importar» trae su ejemplo y las instrucciones para la IA lo nombran.
+**Música**
+- **Música de YouTube, sólo el audio.** En la pestaña **Música** podés buscar un artista o una
+  canción, pegar un link o tocar un tono en **Pads** para buscar pads. **▶** escucha, **➕** suma a
+  la lista y **💾** guarda el audio para usarlo sin internet. Lo que está en pantalla no cambia. Lo
+  que todavía necesita internet lleva 🌐 en la lista.
+- **Repetir la música:** sin repetir, 🔁 la lista o «🔁 1» un solo audio, ideal para un pad.
+- **Clic derecho en la lista de audios:** reproducir, repetir sólo ese, guardar para usar sin
+  internet, copiar el link, mostrar en la carpeta, subir, bajar y eliminar.
+
+**Biblia**
+- **Dividir versículos largos** en varias diapositivas, con la cita «Juan 3:16 (1/2)». Se activa en
+  la barra de la Biblia («Dividir»), desde el celular o en el editor de temas, con el máximo de
+  caracteres que quieras. Viene apagado.
+- **Fondo propio para la Biblia:** clic derecho en una imagen o video → «Usar como fondo de la
+  Biblia», o con el botón 🖼 arriba de los versículos.
+- **Importar Biblias en el XML de OpenSong,** el que usan ProPresenter, Holyrics y FreeShow (y
+  páginas como Beblia).
+
+**Canciones**
+- **Fondo propio de cada canción:** se pone solo al proyectarla. (GitHub #32)
+- **Traer las canciones de Holyrics,** desde los archivos que exporta Holyrics (también la versión
+  gratis): en Holyrics, Canción → Exportar → «Exportación en lote…» en JSON. Después elegís cuáles traer.
+- **Buscar en la letra** de la canción abierta; Enter proyecta la diapositiva encontrada. (GitHub #32)
+- **Deshacer y rehacer** (Ctrl+Z / Ctrl+Y). (GitHub #32)
+- **Diapositiva nueva vacía** y **«Crear canción desde cero…»** en el menú Canciones. (GitHub #32)
+
+**En pantalla y transmisión**
+- **Placas de nombre:** el nombre y el cargo de quien predica o canta, en una tarjeta al pie, con
+  seis estilos para elegir o diseñar los tuyos, imagen o video opcional, en el proyector y en OBS.
+  (GitHub #37)
+- **La salida en una ventana,** para compartirla en una videollamada o probar con una sola pantalla.
+- **Salida en vertical (9:16).**
+
+**Celular y OBS**
+- **Fondos y medios desde el celular:** elegís la carpeta y tocás una imagen o un video para ponerlo
+  en pantalla.
+- **Cambiar el PIN del celular,** y un **PIN aparte para OBS o vMix** que no sirve para manejar la
+  proyección. Quien ya tenía OBS armado no tiene que cambiar nada.
+
+**Ayuda**
+- **Tutoriales paso a paso** en Ayuda → «Tutoriales», sobre el programa de verdad: canciones, la
+  lista del domingo, la Biblia, fondos y videos, OBS y vMix, el celular, placas, importar canciones,
+  YouTube y web, mensajes en pantalla y lo que se usa durante la reunión.
+
+### Mejorado
+
+- **Buscar sin fijarse en tildes ni mayúsculas,** en la computadora y en el celular: «senor tu estas»
+  encuentra «Señor, tú estás». Tampoco cuentan las comas ni los puntos.
+- **Un solo volumen** debajo del EN VIVO para todo lo que suena en la salida, y la barra de los audios
+  cambia el sonido **mientras la arrastrás**, sin saltos ni cortes.
+- **La dirección de OBS y vMix ya no cambia al reiniciar la computadora.**
+- **Una sola copia del programa:** si lo abrís de nuevo, trae al frente el que ya está abierto.
+- **Las carpetas de medios que van encima de todo** se reconocen por un ícono, y si intentás usar de
+  fondo uno de esos medios, un aviso explica cómo arreglarlo.
+- **Los videos de YouTube se descargan en mejor calidad** y los recién agregados entran sin sonido.
+- **Aviso sobre los anuncios de YouTube:** un video pasado por internet puede mostrarlos en la
+  pantalla; la copia descargada, no.
+- Si YouTube no deja ver un video fuera de su página, la pantalla queda en negro y el programa te
+  ofrece descargarlo.
 
 ### Cambiado
 
-- **Los videos de YouTube entran sin sonido.** Un video de YouTube recién agregado sale silenciado,
-  para que nada suene de golpe. «🔇 Sin sonido», debajo del EN VIVO, le da el sonido, y el video lo
-  recuerda.
-- **La pestaña Placas, menos apretada.** Cada dato va en un renglón con su nombre al costado, el
-  lado de la imagen es un botón chico («◧» / «◨») y Mostrar y Quitar van anchos y a la
-  par: queda más lugar para las placas guardadas.
-- **Un solo volumen en el LIVE.** Las dos barras (la del video y la de toda la salida) eran confusas:
-  ahora hay una sola, «Volumen», que maneja todo lo que suena en la salida, **YouTube incluido**, y se
-  mueve de a 1 % (de a 5 % con la rueda o las flechas grandes). El volumen propio de cada video sigue
-  en sus Propiedades, y al lado de la barra queda el botón «Sin sonido / Suena» del video.
-- **Los videos de YouTube se descargan en mejor calidad.** Se prefiere el formato H.264 (hasta
-  1080p), que en el mismo tamaño trae bastante más detalle que el AV1 que bajaba antes, y que
-  cualquier computadora reproduce sin esfuerzo.
-- **Con el orden de las diapositivas trabado (🔒), Ctrl+Z y Ctrl+Y no hacen nada** (ni los botones
-  ↶ ↷): la barra de abajo dice que hay que destrabar el orden para deshacer.
-- **Las copias de prueba ya no cuentan en el contador anónimo de uso.** No mandan el aviso (ni
-  inventan su número) las versiones de prueba (con «-», como `1.5.0-prueba.2`), las que corren con
-  una biblioteca de prueba (`ECCLESIACAST_DATA_DIR`) y las que no están instaladas (sin el
-  desinstalador `unins000.exe` al lado del programa). El servicio rechaza los avisos de versiones de
-  prueba y su resumen deja afuera las filas viejas que quedaron. Cómo poner los contadores en cero:
-  `servicios/api/LEEME.md`, «Empezar de cero».
-- **El orden de las diapositivas se puede trabar (🔒).** Arranca trabado, para no desacomodarlas sin
-  querer: arrastrar no las mueve y la barra de abajo dice cómo destrabarlo. Un clic en el candado lo
-  destraba (queda amarillo, «🔓 Orden destrabado») y el programa se acuerda. (GitHub #32.)
-- **«➕ Agregar» en Canciones.** El botón para agregar canciones ahora dice «Agregar» al lado del ➕,
-  como «➕ Playlist» en Biblia: alguien no encontraba cómo crear una canción desde cero.
-- **Los comentarios necesitan texto.** «Enviar» queda apagado hasta que se escribe algo, y la ventana
-  explica por qué: seis envíos llegaron sólo con el resumen de uso y no se podían entender ni contestar.
+- **El orden de las diapositivas viene trabado (🔒)** para no desacomodarlas sin querer; un clic en
+  el candado lo destraba. Trabado, tampoco funcionan deshacer y rehacer.
+- El botón de la Biblia dice la vista en la que estás («Lista» o «Grilla») y el del historial,
+  «Historial».
+- «Guardar» en Placas guarda la placa sin mostrarla.
+- «➕ Agregar» en Canciones ahora lo dice con la palabra, y los comentarios necesitan texto.
+- Las copias de prueba ya no cuentan en el contador anónimo de uso.
+
+### Quitado
+
+- «Agregar paquete de fondos (.zip)…» del menú Fondos.
+- «Corregir el texto…» de los versículos: la Biblia no se modifica desde el programa.
 
 ### Arreglado
 
-- **Volver a descargar un video de YouTube que se había sacado de la biblioteca.** Decía «yt-dlp
-  terminó pero no encontré el archivo descargado» porque el archivo seguía en la carpeta de
-  descargas y yt-dlp no lo bajaba de nuevo; ahora se usa ese archivo.
-- **Un video de YouTube ya no deja atrapado con una sola pantalla.** El video en la salida no toma
-  el mouse ni el teclado (tampoco asoman sus controles): el doble clic y la tecla Esc vuelven al
-  programa también con YouTube, aunque se haya hecho clic sobre el video; Esc
-  sobre la salida la apaga, y el aviso «Para volver al programa» se ve encima del video.
-- **La ventana «Cómo preparar una Biblia para importar» entra en la pantalla.** En una notebook
-  quedaba más alta que la pantalla y los botones de abajo no se alcanzaban.
+- Los títulos de YouTube con acentos salían mal.
+- Volver a descargar un video de YouTube que habías sacado de la biblioteca daba error.
+- Con una sola pantalla, un video de YouTube podía dejarte sin poder volver al programa.
+- La ventana «Cómo preparar una Biblia para importar» ahora entra en una notebook.
+- El globito del botón Logo y los de las versiones de la Biblia volvieron a explicar qué hacen.
+- Con Windows configurado para zurdos, los submenús se abrían mal.
 
 ## [1.4.0] - 2026-11-17
 

@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Abstractions;
+using EcclesiaCast.Core.Bible;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Core.Songs;
 using EcclesiaCast.Core.Themes;
@@ -228,6 +229,8 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     [ObservableProperty] private bool _showVersionName = true;
     [ObservableProperty] private bool _showVerseNumbers;
     [ObservableProperty] private bool _showSelahAndTitles;
+    [ObservableProperty] private bool _splitLongVerses;
+    [ObservableProperty] private double _verseSplitChars = VerseSplitter.DefaultMaxChars;
 
     // Segunda versión bíblica
     [ObservableProperty] private bool _secondaryMatchesPrimary;
@@ -513,6 +516,9 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         ShowVersionName = theme.ShowVersionName;
         ShowVerseNumbers = theme.ShowVerseNumbers;
         ShowSelahAndTitles = theme.ShowSelahAndTitles;
+        _loadedVerseSplit = theme.VerseSplitMaxChars;
+        SplitLongVerses = theme.VerseSplitMaxChars > 0;
+        VerseSplitChars = theme.VerseSplitMaxChars > 0 ? theme.VerseSplitMaxChars : VerseSplitter.DefaultMaxChars;
         SecondaryMatchesPrimary = theme.SecondaryMatchesPrimary;
         SecondaryScalePercent = theme.SecondaryScale * 100;
         SecondaryColor = theme.SecondaryColor;
@@ -597,6 +603,9 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         ShowVersionName = ShowVersionName,
         ShowVerseNumbers = ShowVerseNumbers,
         ShowSelahAndTitles = ShowSelahAndTitles,
+        VerseSplitMaxChars = SplitLongVerses
+            ? (int)Math.Clamp(VerseSplitChars, VerseSplitter.MinMaxChars, VerseSplitter.MaxMaxChars)
+            : 0,
         SecondaryMatchesPrimary = SecondaryMatchesPrimary,
         SecondaryScale = Math.Clamp(SecondaryScalePercent / 100, 0.2, 1.5),
         SecondaryColor = SecondaryColor,
@@ -716,7 +725,7 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
             return;
         }
 
-        var saved = _themes.Save(BuildTheme(row.Theme.Id));
+        var saved = _themes.Save(BuildThemeToSave(row.Theme.Id));
         ChangesMade = true;
 
         if (row == SelectedRow)
@@ -849,13 +858,31 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         StatusText = $"Listo: {changed} canción(es) vuelven a seguir este tema.";
     }
 
+    /// <summary>What «Dividir versículos largos» said when the fields were filled.</summary>
+    private int _loadedVerseSplit;
+
+    /// <summary>
+    /// The theme as it is written over the one in the library. The phone can
+    /// change «Dividir» with this window open: left alone here, that stays.
+    /// </summary>
+    private SlideTheme BuildThemeToSave(int id)
+    {
+        var theme = BuildTheme(id);
+        var edited = theme.VerseSplitMaxChars;
+        theme.VerseSplitMaxChars = BibleVerseSplit.ValueToSave(
+            edited, _loadedVerseSplit, _themes.Get(id)?.VerseSplitMaxChars);
+        if (edited != _loadedVerseSplit)
+            _loadedVerseSplit = edited;
+        return theme;
+    }
+
     /// <summary>Saves the theme on the editor without closing the window.</summary>
     private void SaveSelectedKeepingOpen()
     {
         if (SelectedRow is null)
             return;
 
-        var saved = _themes.Save(BuildTheme(SelectedRow.Theme.Id));
+        var saved = _themes.Save(BuildThemeToSave(SelectedRow.Theme.Id));
         ChangesMade = true;
         LoadThemes(saved.Id);
     }

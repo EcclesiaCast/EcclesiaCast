@@ -1,0 +1,50 @@
+titulo: Proyectar YouTube, web, ventanas y más
+resumen: Los botones de abajo a la derecha de la barra de medios.
+icono: 🌐
+orden: 9
+
+[paso]
+señalar: MediaButtons
+titulo: Más cosas para proyectar
+texto: A la derecha de la barra de medios hay botones para proyectar lo que no es un archivo tuyo: YouTube, una página web, imágenes de internet, otra ventana de la computadora. Los vemos uno por uno.
+
+[paso]
+señalar: MediaYouTubeButton
+titulo: ▶ YouTube
+texto: Buscá videos (no hace falta cuenta). Por internet pueden salir anuncios en pantalla, salvo con Premium: para el culto elegí «Descargar para usar sin internet».
+
+[paso]
+señalar: MediaLinkButton
+titulo: 🔗 Pegar un link de YouTube
+texto: Si ya tenés el link, tocá 🔗 y pegalo: también elegís si va por internet o se descarga. El que quedó por internet se baja después con clic derecho → «Descargar para uso local».
+
+[paso]
+señalar: YouTubeMusicSearch
+abrir: herramienta:TabMusic
+titulo: 🎵 Sólo la música de YouTube
+texto: En «Música» podés buscar en YouTube y suena sólo el audio: la pantalla no cambia. ▶ escucha, ➕ suma a la lista y 💾 lo guarda para usarlo sin internet.
+
+[paso]
+señalar: MediaWebButton
+titulo: 🌐 Una página web
+texto: Abre una página web en el recuadro central y la proyectás: como una foto de lo que se ve, o en vivo para poder moverte por ella.
+
+[paso]
+señalar: MediaImagesButton
+titulo: 🖼 Imágenes de internet
+texto: Busca imágenes y GIF en Google Imágenes. Con clic derecho → «Agregar a medios», la imagen queda guardada en la pestaña actual y funciona sin internet.
+
+[paso]
+señalar: MediaPixabayButton
+titulo: 🎞 Fondos gratis
+texto: Busca en Pixabay videos y fotos de fondo que se pueden usar sin pagar, y los baja a una pestaña. También los encontrás en el menú Fondos.
+
+[paso]
+señalar: MediaWindowButton
+titulo: 🖥 Otra ventana
+texto: Proyecta otra ventana de la computadora (un PowerPoint, un reproductor, un navegador) en vivo, tal como se ve. Elegís la ventana de una lista.
+
+[paso]
+señalar: MediaDiceButton
+titulo: 🎲 Un fondo al azar
+texto: Pone un fondo al azar de la pestaña actual. No repite ninguno hasta haberlos usado a todos. Sirve para cambiar el aire sin elegir a mano.

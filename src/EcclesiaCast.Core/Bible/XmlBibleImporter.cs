@@ -11,6 +11,7 @@ public static class XmlBibleImporter
 {
     public static ParsedBible Parse(string xml)
     {
+        xml = xml.TrimStart('﻿');
         var doc = XDocument.Parse(xml);
         var root = doc.Root?.Name.LocalName ?? "";
 

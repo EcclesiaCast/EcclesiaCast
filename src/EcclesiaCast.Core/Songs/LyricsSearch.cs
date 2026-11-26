@@ -25,21 +25,46 @@ public static class LyricsSearch
         return found;
     }
 
+    /// <summary>True when the words typed appear in the text starting at the beginning of a word.</summary>
+    public static bool StartsAtWord(string? text, string normalizedQuery) =>
+        normalizedQuery.Length > 0
+        && string.Concat(" ", Normalize(text)).Contains(string.Concat(" ", normalizedQuery), StringComparison.Ordinal);
+
+    /// <summary>
+    /// Every character in lowercase and without its accent, worked out once: a
+    /// search goes through whole Bibles and can't take each text apart.
+    /// </summary>
+    private static readonly char[] Folded = BuildFolded();
+
+    private static char[] BuildFolded()
+    {
+        var table = new char[char.MaxValue + 1];
+        for (var i = 0; i <= char.MaxValue; i++)
+        {
+            var c = char.ToLowerInvariant((char)i);
+            if (c >= 0x80 && c < 0x2000 && !char.IsSurrogate(c))
+                c = c.ToString().Normalize(NormalizationForm.FormD)[0];
+            table[i] = c;
+        }
+
+        return table;
+    }
+
     /// <summary>Lowercase, without accents or punctuation, one space between words.</summary>
     public static string Normalize(string? text)
     {
         if (string.IsNullOrWhiteSpace(text))
             return string.Empty;
 
-        var decomposed = text.ToLowerInvariant().Normalize(NormalizationForm.FormD);
-        var builder = new StringBuilder(decomposed.Length);
+        var builder = new StringBuilder(text.Length);
         var space = false;
-        foreach (var c in decomposed)
+        foreach (var raw in text)
         {
-            var category = CharUnicodeInfo.GetUnicodeCategory(c);
-            if (category == UnicodeCategory.NonSpacingMark)
+            // A letter typed as letter + loose accent: the accent is skipped.
+            if (CharUnicodeInfo.GetUnicodeCategory(raw) == UnicodeCategory.NonSpacingMark)
                 continue;
 
+            var c = Folded[raw];
             if (char.IsLetterOrDigit(c))
             {
                 if (space && builder.Length > 0)

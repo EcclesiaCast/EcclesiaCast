@@ -24,9 +24,9 @@
                     <Button Content="▶" Style="{StaticResource DarkButton}" Padding="10,7" Margin="4,0,0,0" Click="Forward_Click"/>
                     <Button Content="🏠" Style="{StaticResource DarkButton}" Padding="10,7" Margin="4,0,8,0" Click="Home_Click"/>
                 </StackPanel>
-                <TextBlock Text="Iniciá sesión con tu cuenta (Premium reproduce sin anuncios). La sesión queda guardada."
+                <TextBlock Text="Ojo: un video pasado por internet puede mostrar anuncios en la pantalla (con cuenta Premium, no). Para el culto, descargalo antes. Para buscar no hace falta cuenta; si iniciás sesión, queda guardada."
                            FontSize="11" Foreground="{StaticResource MutedBrush}"
-                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                           VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,10,0"/>
             </DockPanel>
         </Border>
 

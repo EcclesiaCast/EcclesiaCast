@@ -115,7 +115,7 @@ public sealed partial class SlideItemViewModel(
                     ? "Clic: abre el capítulo anterior en su último versículo"
                     : "Clic: abre el capítulo siguiente en su primer versículo";
             if (Verses != null)
-                return "Clic: proyectar · Clic derecho: agregar a la playlist o corregir el texto";
+                return "Clic: proyectar · Clic derecho: agregar a la playlist";
             if (SectionId != 0)
                 return "Clic: proyectar · Arrastrar (con el orden destrabado 🔓): cambiarla de lugar · Clic derecho: más opciones";
             return "Clic: proyectar";

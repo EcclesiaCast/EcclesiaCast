@@ -432,8 +432,15 @@ public partial class MainWindow : Window
     /// </summary>
     private void AddSongMenu_Click(object sender, RoutedEventArgs e)
     {
-        if (DataContext is not MainViewModel vm || sender is not FrameworkElement anchor)
-            return;
+        if (sender is FrameworkElement anchor && BuildAddSongMenu(anchor) is { } menu)
+            menu.IsOpen = true;
+    }
+
+    /// <summary>The ➕ Agregar menu, built but not open (the Nueva canción tutorial opens it too).</summary>
+    private ContextMenu? BuildAddSongMenu(FrameworkElement anchor)
+    {
+        if (DataContext is not MainViewModel vm)
+            return null;
 
         var menu = new ContextMenu
         {
@@ -468,7 +475,7 @@ public partial class MainWindow : Window
             ToolTip = "Elegir archivos sueltos de texto o de ProPresenter",
         });
 
-        menu.IsOpen = true;
+        return menu;
     }
 
     /// <summary>A dimmed, bold row that names the group of entries under it.</summary>
@@ -925,12 +932,29 @@ public partial class MainWindow : Window
                     item.Visibility = isWeb ? Visibility.Collapsed : Visibility.Visible;
                     break;
                 case "UseAsSongBackgroundItem":
-                    item.Visibility = count == 1 && vm.SongForBackground is { } song
+                    item.Visibility = !vm.IsBibleTabActive && count == 1 && vm.SongForBackground is not null
                         && media.Type is MediaType.Image or MediaType.Video or MediaType.YouTube
                         ? Visibility.Visible : Visibility.Collapsed;
                     item.Header = vm.SongForBackground is { } open
-                        ? $"Usar como fondo de «{open.Title}»"
+                        ? $"Usar como fondo de «{open.Title.Replace("_", "__")}»"
                         : "Usar como fondo de la canción";
+                    break;
+                case "UseAsBibleBackgroundItem":
+                    // Not on the one that already is: there «Quitar» takes its place.
+                    item.Visibility = vm.IsBibleTabActive && count == 1
+                        && media.Type is MediaType.Image or MediaType.Video or MediaType.YouTube
+                        && vm.BibleBackgroundMedia?.Id != media.Id
+                        ? Visibility.Visible : Visibility.Collapsed;
+                    item.ToolTip = vm.BibleBackgroundMedia is { } previous
+                        ? $"Reemplaza a «{previous.Name}». Se pone solo cada vez que proyectes un versículo después de otra cosa."
+                        : "Se pone solo cada vez que proyectes un versículo después de otra cosa.";
+                    break;
+                case "RemoveBibleBackgroundItem":
+                    item.Visibility = vm.IsBibleTabActive && vm.BibleBackgroundMedia is not null
+                        ? Visibility.Visible : Visibility.Collapsed;
+                    item.Header = vm.BibleBackgroundMedia is { } bible
+                        ? $"Quitar el fondo de la Biblia («{bible.Name.Replace("_", "__")}»)"
+                        : "Quitar el fondo de la Biblia";
                     break;
                 case "UseAsLogoItem":
                     // A page drawn from a PDF or presentation, or the video made
@@ -1320,6 +1344,29 @@ public partial class MainWindow : Window
 
     private DateTime _historyClosedAt = DateTime.MinValue;
 
+    /// <summary>
+    /// Below this width of the row, «🕘 Historial» goes back to just 🕘: the box
+    /// for the reference keeps about 150 px, enough for «1 co 13 4-7».
+    /// </summary>
+    private const double BibleHistoryWordWidth = 360;
+
+    private void BibleQueryRow_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (!e.WidthChanged)
+            return;
+
+        BibleHistoryButton.Content = e.NewSize.Width >= BibleHistoryWordWidth ? "🕘 Historial" : "🕘 Hist.";
+    }
+
+    /// <summary>With a narrow panel «➕ Agregar» becomes «➕», so the buttons leave room for the title.</summary>
+    private void SongsHeaderRow_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (!e.WidthChanged)
+            return;
+
+        SongsAddButton.Content = e.NewSize.Width >= 260 ? "➕ Agregar" : "➕";
+    }
+
     private void BibleHistoryButton_Click(object sender, RoutedEventArgs e)
     {
         // A popup that does not stay open closes on the mouse press that is
@@ -1567,12 +1614,112 @@ public partial class MainWindow : Window
             IsEnabled = vm.SongHasOwnBackground,
         });
         menu.Items.Add(new Separator());
+        AddBackgroundChoices(menu, vm, vm.UseMediaAsSongBackgroundCommand);
+        menu.IsOpen = true;
+    }
+
+    /// <summary>The button «🖼 Biblia: …» over the slides: the Bible's own background.</summary>
+    private void BibleBackgroundButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm || sender is not FrameworkElement anchor)
+            return;
+
+        var menu = new ContextMenu
+        {
+            PlacementTarget = anchor,
+            Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom,
+        };
         menu.Items.Add(new MenuItem
         {
-            Header = "Otro: clic derecho en una imagen o video de Medios → «Usar como fondo de…»",
-            IsEnabled = false,
+            Header = "Usar el fondo que está en pantalla",
+            Command = vm.UseCurrentBackgroundForBibleCommand,
+            ToolTip = "La imagen o el video que se ve ahora pasa a ser el fondo de la Biblia",
         });
+        menu.Items.Add(new MenuItem
+        {
+            Header = "Quitar el fondo propio",
+            Command = vm.RemoveBibleBackgroundCommand,
+            IsEnabled = vm.BibleHasOwnBackground,
+        });
+        menu.Items.Add(new Separator());
+        AddBackgroundChoices(menu, vm, vm.UseMediaAsBibleBackgroundCommand);
         menu.IsOpen = true;
+    }
+
+    /// <summary>Room the title and the «EN VIVO» badge keep beside the Bible's controls.</summary>
+    private const double GridTitleRoom = 340;
+
+    private void GridHeader_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (e.WidthChanged)
+            PlaceBibleGridTools();
+    }
+
+    private void BibleGridTools_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) =>
+        Dispatcher.BeginInvoke(PlaceBibleGridTools, System.Windows.Threading.DispatcherPriority.Loaded);
+
+    /// <summary>
+    /// The Bible's controls sit at the right of the bar over the slides; when
+    /// they would crowd the title out, they take a row of their own under it.
+    /// </summary>
+    private void PlaceBibleGridTools()
+    {
+        if (!BibleGridTools.IsVisible)
+            return;
+
+        // What they would take in one line.
+        var wanted = BibleGridTools.Children.OfType<FrameworkElement>().Sum(child =>
+        {
+            child.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            return child.DesiredSize.Width;
+        });
+        var dock = GridHeader.ActualWidth < wanted + GridTitleRoom ? Dock.Bottom : Dock.Right;
+        if (DockPanel.GetDock(BibleGridTools) == dock)
+            return;
+
+        DockPanel.SetDock(BibleGridTools, dock);
+        BibleGridTools.Margin = new Thickness(0, dock == Dock.Bottom ? 6 : 0, 0, 0);
+    }
+
+    /// <summary>«Elegir un fondo de la biblioteca»: a submenu per tab with its backgrounds, each one picks it.</summary>
+    private static void AddBackgroundChoices(ContextMenu menu, MainViewModel vm, System.Windows.Input.ICommand pick)
+    {
+        var choose = new MenuItem { Header = "Elegir un fondo de la biblioteca" };
+        // What goes on top of everything carries the same icon as its tab.
+        static object Marked(string name, bool onTop)
+        {
+            if (!onTop)
+                return name.Replace("_", "__");
+
+            var row = new StackPanel { Orientation = Orientation.Horizontal, ToolTip = Core.Media.OnTopIcon.Explanation };
+            row.Children.Add(new TextBlock { Text = name, Margin = new Thickness(0, 0, 6, 0) });
+            row.Children.Add(Controls.OnTopMark.Create(11));
+            return row;
+        }
+
+        foreach (var (tab, tabOnTop, items) in vm.BackgroundChoicesByTab())
+        {
+            var tabItem = new MenuItem { Header = Marked(tab, tabOnTop) };
+            foreach (var (media, onTop) in items.Take(60))
+            {
+                tabItem.Items.Add(new MenuItem
+                {
+                    Header = Marked(media.Name, onTop && !tabOnTop),
+                    Command = pick,
+                    CommandParameter = media,
+                });
+            }
+
+            choose.Items.Add(tabItem);
+        }
+
+        if (choose.Items.Count == 0)
+        {
+            choose.Header = "No hay fondos en la biblioteca todavía (Fondos → Bajar más fondos…)";
+            choose.IsEnabled = false;
+        }
+
+        menu.Items.Add(choose);
     }
 
     /// <summary>
@@ -1810,14 +1957,6 @@ public partial class MainWindow : Window
                 CommandParameter = slide,
             });
         }
-
-        menu.Items.Add(new Separator());
-        menu.Items.Add(new MenuItem
-        {
-            Header = "Corregir el texto…",
-            Command = vm.CorrectVerseTextCommand,
-            CommandParameter = slide,
-        });
 
         menu.IsOpen = true;
     }
