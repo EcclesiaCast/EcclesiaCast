@@ -57,6 +57,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   Biblia y de cada canción, canciones de Holyrics, diapositiva nueva, cambiar el PIN) quedó en la
   parte común, con pruebas. Lo que la versión de Mac todavía no muestra está anotado en
   `docs/plan-mac-fase-3.md`.
+- Por dentro, sin cambios para quien usa el programa en Windows: la versión de Mac ya tiene el
+  aspecto oscuro del programa (colores, botones, menús, listas desplegables, ayudas al pasar el
+  mouse y barras de desplazamiento) y el menú de la ventana principal con los mismos textos y
+  atajos (con ⌘ en la Mac). El programa de prueba de la Mac se ve oscuro. Un banco nuevo dibuja
+  cada pantalla de Windows y de Mac sin mostrar nada, para compararlas una al lado de la otra.
 
 ## [1.5.0] - 2026-11-26
 

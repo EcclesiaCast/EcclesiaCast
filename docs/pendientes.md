@@ -681,6 +681,13 @@ iglesia (11:22–12:53): ningún error ni cierre.
     Windows y en Mac y deja `artifacts/render/avalonia/` como adjunto de la
     corrida (`render-avalonia-windows` y `render-avalonia-mac`): bajar el de
     Mac y ponerlo en `artifacts/render/avalonia/mac/` para comparar.
+  - **Banco de pantallas** (tanda 14): las pantallas del operador, no la
+    letra. `tests/EcclesiaCast.ScreenBench.Wpf` (se corre como el de render:
+    build y el `.exe`) deja las de WPF en `artifacts/pantallas/wpf/`, y
+    `dotnet test tests/EcclesiaCast.Desktop.Tests --filter
+    "FullyQualifiedName~ScreenBench"` deja las de Avalonia y, si están las de
+    WPF, las dos lado a lado en `artifacts/pantallas/comparacion/`. Cómo se
+    suma una pantalla: `docs/guia-wpf-a-avalonia.md`, sección 5.
 - **Ideas tomadas de G-Presenter** (gpresenter.com, mirado el 28/10/2026;
   Alexis dijo que sí a las seis, para más adelante):
   1. **Cámara o capturadora como diapositiva**, o de fondo detrás de la letra
