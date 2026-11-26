@@ -77,4 +77,12 @@ public class BibleVerseSplitTests
         public void Purge(int id) => throw new NotSupportedException();
         public void PurgeOlderThan(DateTime limit) => throw new NotSupportedException();
     }
+
+    [Theory]
+    [InlineData(0, 0, 200, 200)]     // sin tocar en el editor: queda lo del celular
+    [InlineData(150, 150, 0, 0)]
+    [InlineData(180, 0, 200, 180)]   // cambiado en el editor: gana el editor
+    [InlineData(0, 150, 150, 0)]
+    public void An_open_editor_only_overwrites_the_split_it_changed(int edited, int loaded, int stored, int expected) =>
+        Assert.Equal(expected, BibleVerseSplit.ValueToSave(edited, loaded, stored));
 }

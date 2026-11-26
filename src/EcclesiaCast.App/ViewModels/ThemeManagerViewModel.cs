@@ -516,6 +516,7 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         ShowVersionName = theme.ShowVersionName;
         ShowVerseNumbers = theme.ShowVerseNumbers;
         ShowSelahAndTitles = theme.ShowSelahAndTitles;
+        _loadedVerseSplit = theme.VerseSplitMaxChars;
         SplitLongVerses = theme.VerseSplitMaxChars > 0;
         VerseSplitChars = theme.VerseSplitMaxChars > 0 ? theme.VerseSplitMaxChars : VerseSplitter.DefaultMaxChars;
         SecondaryMatchesPrimary = theme.SecondaryMatchesPrimary;
@@ -724,7 +725,7 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
             return;
         }
 
-        var saved = _themes.Save(BuildTheme(row.Theme.Id));
+        var saved = _themes.Save(BuildThemeToSave(row.Theme.Id));
         ChangesMade = true;
 
         if (row == SelectedRow)
@@ -857,13 +858,31 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         StatusText = $"Listo: {changed} canción(es) vuelven a seguir este tema.";
     }
 
+    /// <summary>What «Dividir versículos largos» said when the fields were filled.</summary>
+    private int _loadedVerseSplit;
+
+    /// <summary>
+    /// The theme as it is written over the one in the library. The phone can
+    /// change «Dividir» with this window open: left alone here, that stays.
+    /// </summary>
+    private SlideTheme BuildThemeToSave(int id)
+    {
+        var theme = BuildTheme(id);
+        var edited = theme.VerseSplitMaxChars;
+        theme.VerseSplitMaxChars = BibleVerseSplit.ValueToSave(
+            edited, _loadedVerseSplit, _themes.Get(id)?.VerseSplitMaxChars);
+        if (edited != _loadedVerseSplit)
+            _loadedVerseSplit = edited;
+        return theme;
+    }
+
     /// <summary>Saves the theme on the editor without closing the window.</summary>
     private void SaveSelectedKeepingOpen()
     {
         if (SelectedRow is null)
             return;
 
-        var saved = _themes.Save(BuildTheme(SelectedRow.Theme.Id));
+        var saved = _themes.Save(BuildThemeToSave(SelectedRow.Theme.Id));
         ChangesMade = true;
         LoadThemes(saved.Id);
     }

@@ -21,17 +21,21 @@ pasa a **Ya probado**, más abajo.
 
 ### Falta probar
 
-**Nuevo en la prueba.12**
+**Nuevo en la prueba.13**
 
-1. **Repetir un solo audio:** el botón muestra «🔁 1»; repetir la lista, «🔁».
-2. **Fondo con un medio que va encima de todo** (Biblia y canción): aparece un aviso con la forma de
-   arreglarlo. En «Elegir un fondo de la biblioteca» la pestaña dice «(va encima de todo)».
-3. **Dividir versículos largos** (editor de temas → «Biblia»). Viene apagada. Al activarla arranca en
-   150 caracteres. Probá con un versículo largo (Ester 8:9): partes parecidas, cortes en la
-   puntuación, «(1/2)» en la cita y avanzar con las flechas. Probá también con dos versiones,
-   cambiar el número con un versículo en vivo, y mirar proyector, escenario, OBS, celular y playlist.
-4. **Tutoriales nuevos:** «Mensajes en pantalla» y «Durante la reunión». Mirá que cada paso señale
-   lo que dice, con las herramientas de abajo a la derecha agrandadas y achicadas.
+1. **Tutoriales.** «Mensajes en pantalla» y «Durante la reunión» muestran todos los pasos, con el
+   total fijo desde el 1. Probalos la primera vez, empezando desde la pestaña Música y con las
+   herramientas achicadas (al terminar queda todo como estaba). Texto rápido y Aviso al pie se
+   explican por separado. Los de música y YouTube dicen que se puede buscar y guardar sin internet.
+2. **Ícono de las carpetas que van encima de todo** (dos cuadros superpuestos en amarillo): en la
+   pestaña, en el aviso, en «Elegir un fondo de la biblioteca» y en el celular (donde las carpetas
+   ahora son botones). Las de presentaciones también lo llevan.
+3. **«Dividir» en la barra de la Biblia,** al lado del 🖼: marcado si el tema ya lo tiene, con su
+   número. Cambialo con un versículo en vivo y con la ventana angosta. Mirá que el editor de temas
+   diga lo mismo.
+4. **«Dividir» en el celular** (con versículos abiertos): sincronizado en los dos sentidos. Con el
+   editor de temas abierto, cambialo desde el celular y guardá en el editor sin tocar «Dividir»:
+   tiene que quedar lo del celular.
 
 ### Al publicar la 1.5.0 (no es para probar antes)
 
@@ -44,6 +48,8 @@ pasa a **Ya probado**, más abajo.
 
 ### Ya probado
 
+- **Prueba.12, probada por Alexis el 26/11:** «🔁 1», el aviso de los fondos que van encima de todo y
+  la división de versículos largos (con los pedidos que salieron en la prueba.13).
 - **Prueba.11, probada por Alexis el 26/11:** barra de volumen de los audios en tiempo real y fondo
   propio de la Biblia (con los dos detalles de arriba).
 - **Prueba.10, probado por Alexis, dado por bueno:** el botón único «Lista ⇄ / Grilla ⇄» de la

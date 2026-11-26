@@ -15,6 +15,13 @@ public static class BibleVerseSplit
         on ? Math.Clamp(chars, VerseSplitter.MinMaxChars, VerseSplitter.MaxMaxChars) : 0;
 
     /// <summary>
+    /// What an editor that was open meanwhile writes: its own value only if it
+    /// was changed there; otherwise the one in the library, which may be newer.
+    /// </summary>
+    public static int ValueToSave(int edited, int loaded, int? stored) =>
+        edited == loaded ? stored ?? edited : edited;
+
+    /// <summary>
     /// The number to show beside the checkbox: the theme's when it has one,
     /// else the last one used, else the one the editor proposes.
     /// </summary>
