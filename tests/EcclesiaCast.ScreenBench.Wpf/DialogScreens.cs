@@ -77,8 +77,8 @@ internal static class DialogScreens
         yield return ("copia-liviana", () => Take(new LightCopyWindow(LightCopyViewModel.For(
             Path.Combine(Path.GetTempPath(), "fondo.mp4"), "Fondo de olas 4K"))), 480);
 
-        yield return ("descargar-youtube", () => Take(new YouTubeDownloadWindow(
-            "abcdefghijk", "Alabanza en vivo")), 480);
+        yield return ("descargar-youtube", () => Take(new YouTubeDownloadWindow(YouTubeDownloadViewModel.For(
+            "abcdefghijk", "Alabanza en vivo", () => Task.FromResult<string?>(null)))), 480);
     }
 
     private static FeedbackWindow Feedback(FeedbackReason reason)
