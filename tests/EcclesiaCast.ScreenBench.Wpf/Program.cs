@@ -115,6 +115,9 @@ public static class Program
 
         yield return ("muestrario", () => new Muestrario(), double.NaN);
         yield return ("ayuda-al-pasar", () => new ToolTip { Content = TipSample }, double.NaN);
+
+        foreach (var dialog in DialogScreens.All())
+            yield return dialog;
     }
 
     /// <summary>A long tooltip of the menu: it has to wrap at 400.</summary>
