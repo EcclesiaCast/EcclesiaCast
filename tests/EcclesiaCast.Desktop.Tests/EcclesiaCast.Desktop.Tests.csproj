@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\EcclesiaCast.Desktop\EcclesiaCast.Desktop.csproj" />
+    <ProjectReference Include="..\..\src\EcclesiaCast.Platform.Mac\EcclesiaCast.Platform.Mac.csproj" />
     <ProjectReference Include="..\EcclesiaCast.RenderCompare\EcclesiaCast.RenderCompare.csproj" />
   </ItemGroup>
 

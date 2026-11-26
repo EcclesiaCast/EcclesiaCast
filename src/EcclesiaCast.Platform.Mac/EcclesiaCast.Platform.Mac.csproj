@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- What talks to macOS and does not draw: the output window's level and
+       Spaces, App Nap, «caffeinate» and the folders of the program. Plain
+       net10.0 with calls into the Objective-C runtime (libobjc), taken from
+       the prototype of batch 1. On any other system every class here does
+       nothing, so the Avalonia program can reference it everywhere. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="EcclesiaCast.Desktop.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EcclesiaCast.Presentation\EcclesiaCast.Presentation.csproj" />
+  </ItemGroup>
+
+</Project>

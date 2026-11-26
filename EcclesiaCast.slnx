@@ -4,6 +4,7 @@
     <Project Path="src/EcclesiaCast.Core/EcclesiaCast.Core.csproj" />
     <Project Path="src/EcclesiaCast.Data/EcclesiaCast.Data.csproj" />
     <Project Path="src/EcclesiaCast.Desktop/EcclesiaCast.Desktop.csproj" />
+    <Project Path="src/EcclesiaCast.Platform.Mac/EcclesiaCast.Platform.Mac.csproj" />
     <Project Path="src/EcclesiaCast.Platform.Windows/EcclesiaCast.Platform.Windows.csproj" />
     <Project Path="src/EcclesiaCast.Presentation/EcclesiaCast.Presentation.csproj" />
   </Folder>

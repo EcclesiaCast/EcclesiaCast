@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Animation;
@@ -64,7 +63,7 @@ public partial class StageWindow : Window
         base.OnSourceInitialized(e);
 
         var hwnd = new WindowInteropHelper(this).Handle;
-        _ = SetWindowLong(hwnd, GWL_EXSTYLE, GetWindowLong(hwnd, GWL_EXSTYLE) | WS_EX_NOACTIVATE);
+        _native.Prepare(new NativeWindowHandle(hwnd));
         MoveToDisplay();
     }
 
@@ -77,25 +76,9 @@ public partial class StageWindow : Window
         if (hwnd == IntPtr.Zero)
             return;
 
-        SetWindowPos(hwnd, IntPtr.Zero,
-            _display.X, _display.Y, _display.Width, _display.Height,
-            SWP_NOZORDER | SWP_FRAMECHANGED | SWP_SHOWWINDOW | SWP_NOACTIVATE);
+        _native.Place(new NativeWindowHandle(hwnd), _display);
     }
 
-    private const int GWL_EXSTYLE = -20;
-    private const int WS_EX_NOACTIVATE = 0x08000000;
-    private const uint SWP_NOZORDER = 0x0004;
-    private const uint SWP_NOACTIVATE = 0x0010;
-    private const uint SWP_FRAMECHANGED = 0x0020;
-    private const uint SWP_SHOWWINDOW = 0x0040;
-
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern bool SetWindowPos(
-        IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
-
-    [DllImport("user32.dll")]
-    private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-
-    [DllImport("user32.dll")]
-    private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+    /// <summary>Full screen, on top and never taking the keyboard (Platform.Windows).</summary>
+    private readonly IOutputWindowNative _native = new WindowsOutputWindowNative();
 }
