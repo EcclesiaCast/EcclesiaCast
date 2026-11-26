@@ -41,6 +41,18 @@ public static class PortablePath
         return string.Equals(Key(first), Key(second), StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// True when <paramref name="path"/> is a file inside <paramref name="folder"/>
+    /// (or one of its subfolders), on this computer, ignoring upper and lower
+    /// case. «C:\Posters» does not hold «C:\Posters2\a.jpg».
+    /// </summary>
+    public static bool IsInside(string folder, string path)
+    {
+        var full = Path.GetFullPath(folder);
+        var withBar = Path.EndsInDirectorySeparator(full) ? full : full + Path.DirectorySeparatorChar;
+        return Path.GetFullPath(path).StartsWith(withBar, StringComparison.OrdinalIgnoreCase);
+    }
+
     private static string Key(string path)
     {
         var normalized = Normalize(path);

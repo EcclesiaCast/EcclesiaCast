@@ -8,6 +8,7 @@ using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Bible;
 using EcclesiaCast.Core.Diagnostics;
 using EcclesiaCast.Core.Displays;
+using EcclesiaCast.Core.IO;
 using EcclesiaCast.Core.Logos;
 using EcclesiaCast.Core.Media;
 using EcclesiaCast.Core.Performance;
@@ -216,8 +217,7 @@ public sealed partial class MainViewModel
 
         // Only what the program itself drew into its posters folder: whatever
         // else a media's poster field might point to is not for the network.
-        var folder = Path.GetFullPath(_thumbnails.Directory).TrimEnd('\\') + "\\";
-        return Path.GetFullPath(poster).StartsWith(folder, StringComparison.OrdinalIgnoreCase) ? poster : null;
+        return PortablePath.IsInside(_thumbnails.Directory, poster) ? poster : null;
     }
 
     /// <summary>

@@ -74,4 +74,26 @@ public class PortablePathTests
     {
         Assert.False(PortablePath.SamePath(first, second));
     }
+
+    [Fact]
+    public void IsInside_finds_a_file_in_the_folder_or_below_on_this_system()
+    {
+        // Built with this system's separator: on a Mac the folder used to be
+        // compared with a «\» at the end and nothing was ever inside it.
+        var folder = Path.Combine(Path.GetTempPath(), "Posters");
+
+        Assert.True(PortablePath.IsInside(folder, Path.Combine(folder, "a.jpg")));
+        Assert.True(PortablePath.IsInside(folder + Path.DirectorySeparatorChar, Path.Combine(folder, "sub", "a.jpg")));
+        Assert.True(PortablePath.IsInside(folder.ToUpperInvariant(), Path.Combine(folder, "a.jpg")));
+    }
+
+    [Fact]
+    public void IsInside_does_not_take_a_neighbour_or_a_way_out()
+    {
+        var folder = Path.Combine(Path.GetTempPath(), "Posters");
+
+        Assert.False(PortablePath.IsInside(folder, Path.Combine(Path.GetTempPath(), "Posters2", "a.jpg")));
+        Assert.False(PortablePath.IsInside(folder, Path.Combine(folder, "..", "a.jpg")));
+        Assert.False(PortablePath.IsInside(folder, folder));
+    }
 }
