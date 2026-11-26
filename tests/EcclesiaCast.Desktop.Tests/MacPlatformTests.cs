@@ -23,4 +23,21 @@ public sealed class MacPlatformTests
         native.Place(new NativeWindowHandle(IntPtr.Zero, "NSWindow"), Projector);
         MacOutputWindowNative.Describe(default, "prueba");
     }
+
+    /// <summary>
+    /// On and off as often as the output is switched, twice in a row too;
+    /// on a Mac it really starts caffeinate and stops it again.
+    /// </summary>
+    [Fact]
+    public void The_power_guard_comes_on_and_off_cleanly()
+    {
+        using var guard = new MacPowerGuard();
+
+        guard.Start();
+        guard.BeginProjecting();
+        guard.BeginProjecting();
+        guard.EndProjecting();
+        guard.EndProjecting();
+        guard.BeginProjecting();
+    }
 }

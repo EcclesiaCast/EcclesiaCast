@@ -36,6 +36,9 @@ public partial class App : Application
     private readonly WindowsPdfRenderer _documents = new();
     private readonly PowerPointConverter _decks = new();
 
+    /// <summary>Out of Windows' «efficiency mode» for the whole run.</summary>
+    private readonly IPowerGuard _powerGuard = new WindowsPowerGuard();
+
     public App()
     {
         _uiDispatcher = new WpfUiDispatcher(Dispatcher);
@@ -81,7 +84,7 @@ public partial class App : Application
 
         Log.Information("EcclesiaCast starting");
 
-        PowerThrottling.OptOut();
+        _powerGuard.Start();
 
         DispatcherUnhandledException += (_, args) =>
         {
