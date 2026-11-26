@@ -14,5 +14,6 @@
     <Project Path="tests/EcclesiaCast.Presentation.Tests/EcclesiaCast.Presentation.Tests.csproj" />
     <Project Path="tests/EcclesiaCast.RenderBench.Wpf/EcclesiaCast.RenderBench.Wpf.csproj" />
     <Project Path="tests/EcclesiaCast.RenderCompare/EcclesiaCast.RenderCompare.csproj" />
+    <Project Path="tests/EcclesiaCast.ScreenBench.Wpf/EcclesiaCast.ScreenBench.Wpf.csproj" />
   </Folder>
 </Solution>

@@ -1,0 +1,81 @@
+<!-- The looks of EcclesiaCastTheme, one of each, for the picture
+     «muestrario». The WPF twin is tests/EcclesiaCast.ScreenBench.Wpf/
+     Muestrario.xaml: a change there comes here too. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:EcclesiaCast.Desktop.Controls"
+             x:Class="EcclesiaCast.Desktop.Tests.Muestrario"
+             Width="640" Background="{StaticResource BgBrush}">
+    <StackPanel Margin="16">
+        <TextBlock Text="BOTONES" Theme="{StaticResource PanelTitle}" Margin="0,0,0,8"/>
+        <WrapPanel>
+            <Button Content="Botón" Theme="{StaticResource DarkButton}" Margin="0,0,8,8"/>
+            <Button Content="Black" controls:ShortcutHint.Text="F1" Theme="{StaticResource DarkButton}" Margin="0,0,8,8"/>
+            <Button Content="Aceptar" Theme="{StaticResource AccentButton}" Margin="0,0,8,8"/>
+            <Button Content="Apagado" IsEnabled="False" Theme="{StaticResource DarkButton}" Margin="0,0,8,8"/>
+            <Button Content="«" Theme="{StaticResource FoldButton}" Margin="0,0,8,8"/>
+            <ToggleButton Theme="{StaticResource VersionsExpanderStyle}" Margin="0,0,8,8"/>
+            <ToggleButton Theme="{StaticResource VersionsExpanderStyle}" IsChecked="True" Margin="0,0,8,8"/>
+        </WrapPanel>
+        <WrapPanel>
+            <Button Content="RVR1960" Theme="{StaticResource VersionChip}" Margin="0,0,8,8"/>
+            <Button Content="NVI" Classes="primary" Theme="{StaticResource VersionChip}" Margin="0,0,8,8"/>
+            <Button Content="DHH" Classes="secondary" Theme="{StaticResource VersionChip}" Margin="0,0,8,8"/>
+            <RadioButton Content="Canciones" Theme="{StaticResource TabButton}" IsChecked="True" GroupName="tabs" Margin="0,0,4,8"/>
+            <RadioButton Content="Biblia" Theme="{StaticResource TabButton}" GroupName="tabs" Margin="0,0,8,8"/>
+        </WrapPanel>
+        <Button Content="Reina-Valera 1960" Theme="{StaticResource VersionRow}" Width="240" HorizontalAlignment="Left"/>
+
+        <Grid ColumnDefinitions="*,16,*" Margin="0,8,0,0">
+            <Border Theme="{StaticResource Panel}" Height="140">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="BIBLIOTECA" Theme="{StaticResource PanelTitle}"/>
+                    <TextBlock Text="Todavía no hay canciones. Creá una o traelas de otro programa." Theme="{StaticResource PlaceholderText}"/>
+                </DockPanel>
+            </Border>
+            <Border Grid.Column="2" Theme="{StaticResource Panel}" Height="140">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="PLAYLIST" Theme="{StaticResource PanelTitle}"/>
+                    <ScrollViewer VerticalScrollBarVisibility="Visible" Margin="8,0,4,8">
+                        <StackPanel>
+                            <TextBlock Foreground="White" Text="Cuán grande es Él" Margin="4,3"/>
+                            <TextBlock Foreground="White" Text="Santo, santo, santo" Margin="4,3"/>
+                            <TextBlock Foreground="White" Text="Juan 3:16" Margin="4,3"/>
+                            <TextBlock Foreground="White" Text="Anuncios" Margin="4,3"/>
+                            <TextBlock Foreground="White" Text="Sublime gracia" Margin="4,3"/>
+                            <TextBlock Foreground="White" Text="Salmo 23" Margin="4,3"/>
+                            <TextBlock Foreground="White" Text="Bendición final" Margin="4,3"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+        </Grid>
+
+        <TextBlock Text="LISTAS Y AYUDAS" Theme="{StaticResource PanelTitle}" Margin="0,16,0,8"/>
+        <WrapPanel>
+            <ComboBox Width="180" SelectedIndex="0" Margin="0,0,8,8">
+                <ComboBoxItem Content="Segoe UI"/>
+                <ComboBoxItem Content="Arial"/>
+            </ComboBox>
+            <ComboBox Width="180" IsEditable="True" Text="Medios" Margin="0,0,8,8">
+                <ComboBoxItem Content="Medios"/>
+                <ComboBoxItem Content="Fondos"/>
+            </ComboBox>
+            <ComboBox Width="140" SelectedIndex="0" IsEnabled="False" Margin="0,0,8,8">
+                <ComboBoxItem Content="Apagada"/>
+            </ComboBox>
+        </WrapPanel>
+        <TextBlock Text="Texto de ayuda del diseño de aprendizaje." Foreground="{StaticResource MutedBrush}"
+                   Theme="{StaticResource LearningHint}" Margin="0,0,0,8"/>
+
+        <TextBlock Text="EDITOR" Theme="{StaticResource PanelTitle}" Margin="0,8,0,8"/>
+        <StackPanel Orientation="Horizontal">
+            <Border Width="160" Height="80" Background="{StaticResource CheckerBrush}" Margin="0,0,16,0">
+                <Thumb Theme="{StaticResource BoxHandle}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,6,6"/>
+            </Border>
+            <Image Source="{StaticResource AppLogoImage}" Width="64" Height="64" VerticalAlignment="Top"/>
+            <Border Width="40" Height="24" Background="{StaticResource LiveBrush}" CornerRadius="4" Margin="16,0,0,0" VerticalAlignment="Top"/>
+            <Border Width="40" Height="24" Background="{StaticResource OnTopBrush}" CornerRadius="4" Margin="8,0,0,0" VerticalAlignment="Top"/>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The screens bench (batch 14): draws the operator's screens of WPF in
+       memory, with the real looks of App.xaml, and leaves the pictures in
+       artifacts/pantallas/wpf for the Avalonia ones to be compared with
+       (docs/guia-wpf-a-avalonia.md). WinExe on purpose: a console program
+       opens a black window every time it runs, and this one shows nothing. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>false</UseWindowsForms>
+    <CETCompat>false</CETCompat>
+    <RootNamespace>EcclesiaCast.ScreenBench.Wpf</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\EcclesiaCast.App\EcclesiaCast.App.csproj" />
+  </ItemGroup>
+
+</Project>
