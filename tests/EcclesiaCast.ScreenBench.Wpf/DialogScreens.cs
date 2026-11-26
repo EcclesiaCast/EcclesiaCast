@@ -6,6 +6,7 @@ using EcclesiaCast.Core.Feedback;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Presentation.Platform;
 using EcclesiaCast.Presentation.Services;
+using EcclesiaCast.Presentation.ViewModels;
 
 namespace EcclesiaCast.ScreenBench.Wpf;
 
@@ -65,9 +66,9 @@ internal static class DialogScreens
             "Cuán grande es Él,\nmi corazón entona la canción"), height: 290), 520);
 
         yield return ("cuenta-regresiva", () => Take(new CountdownWindow(
-            CountdownSettings.Default, isRunning: false)), 520);
-        yield return ("cuenta-regresiva-en-marcha", () => Take(new CountdownWindow(
-            new CountdownSettings(10, "19:00", "La reunión empieza en", "¡Bienvenidos!"), isRunning: true)), 520);
+            new CountdownViewModel(CountdownSettings.Default, isRunning: false))), 520);
+        yield return ("cuenta-regresiva-en-marcha", () => Take(new CountdownWindow(new CountdownViewModel(
+            new CountdownSettings(10, "19:00", "La reunión empieza en", "¡Bienvenidos!"), isRunning: true))), 520);
 
         yield return ("comentarios", () => Take(Feedback(FeedbackReason.Menu)), 520);
         yield return ("comentarios-al-cerrar", () => Take(Feedback(FeedbackReason.Closing)), 520);

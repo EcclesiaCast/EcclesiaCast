@@ -15,11 +15,13 @@
                    TextWrapping="Wrap" Margin="0,0,0,14"/>
 
         <!-- Cuánto falta: minutos desde ahora, o una hora del reloj -->
-        <RadioButton x:Name="ByMinutes" GroupName="Modo" IsChecked="True"
+        <!-- Sin GroupName: los dos van sueltos en el mismo panel y así forman su grupo -->
+        <RadioButton IsChecked="{Binding ByMinutes}"
                      Foreground="White" VerticalContentAlignment="Center">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Empezar en" VerticalAlignment="Center" Foreground="White"/>
-                <TextBox x:Name="MinutesBox" Text="5" Width="56" Margin="8,0"
+                <TextBox x:Name="MinutesBox" Text="{Binding Minutes, UpdateSourceTrigger=PropertyChanged}"
+                         Width="56" Margin="8,0"
                          Background="{StaticResource SurfaceAltBrush}" Foreground="White"
                          BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
                          Padding="8,5" TextAlignment="Center"
@@ -35,11 +37,11 @@
             <Button Content="30" Width="44" Style="{StaticResource DarkButton}" Margin="6,0,0,0" Click="Preset_Click" Tag="30"/>
         </StackPanel>
 
-        <RadioButton x:Name="ByClock" GroupName="Modo" Margin="0,14,0,0"
+        <RadioButton IsChecked="{Binding ByClock}" Margin="0,14,0,0"
                      Foreground="White" VerticalContentAlignment="Center">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Empezar a las" VerticalAlignment="Center" Foreground="White"/>
-                <TextBox x:Name="ClockBox" Text="10:30" Width="76" Margin="8,0"
+                <TextBox Text="{Binding Clock, UpdateSourceTrigger=PropertyChanged}" Width="76" Margin="8,0"
                          Background="{StaticResource SurfaceAltBrush}" Foreground="White"
                          BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
                          Padding="8,5" TextAlignment="Center"
@@ -51,26 +53,28 @@
         </RadioButton>
 
         <TextBlock Text="Texto de arriba" Margin="0,18,0,4" Foreground="{StaticResource MutedBrush}" FontSize="12"/>
-        <TextBox x:Name="HeadingBox"
+        <TextBox Text="{Binding Heading, UpdateSourceTrigger=PropertyChanged}"
                  Background="{StaticResource SurfaceAltBrush}" Foreground="White"
                  BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
                  Padding="10,7" FontSize="14"
                  services:SpellChecking.Enabled="True"/>
 
         <TextBlock Text="Cuando llega a cero" Margin="0,14,0,4" Foreground="{StaticResource MutedBrush}" FontSize="12"/>
-        <TextBox x:Name="FinishedBox"
+        <TextBox Text="{Binding FinishedMessage, UpdateSourceTrigger=PropertyChanged}"
                  Background="{StaticResource SurfaceAltBrush}" Foreground="White"
                  BorderBrush="{StaticResource LineBrush}" CaretBrush="White"
                  Padding="10,7" FontSize="14"
                  services:SpellChecking.Enabled="True"
                  ToolTip="Queda en pantalla hasta que la detengas. Vacío deja el 0:00."/>
 
-        <TextBlock x:Name="ErrorText" Foreground="#E86A6A" FontSize="12"
-                   Margin="0,10,0,0" Visibility="Collapsed" TextWrapping="Wrap"/>
+        <TextBlock Text="{Binding Error}" Foreground="#E86A6A" FontSize="12"
+                   Margin="0,10,0,0" TextWrapping="Wrap"
+                   Visibility="{Binding HasError, Converter={StaticResource BoolToVis}}"/>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
-            <Button x:Name="StopButton" Content="Detener la que corre" Style="{StaticResource DarkButton}"
-                    Padding="16,8" Margin="0,0,8,0" Visibility="Collapsed" Click="Stop_Click"/>
+            <Button Content="Detener la que corre" Style="{StaticResource DarkButton}"
+                    Padding="16,8" Margin="0,0,8,0" Click="Stop_Click"
+                    Visibility="{Binding IsRunning, Converter={StaticResource BoolToVis}}"/>
             <Button Content="Proyectar" Style="{StaticResource AccentButton}" Padding="22,8"
                     IsDefault="True" Click="Start_Click"/>
             <Button Content="Cancelar" Style="{StaticResource DarkButton}" Padding="20,8"

@@ -1,4 +1,5 @@
 using EcclesiaCast.App.Views;
+using EcclesiaCast.Presentation.ViewModels;
 
 namespace EcclesiaCast.App.Services;
 
@@ -6,14 +7,12 @@ public sealed class CountdownDialogService : ICountdownDialog
 {
     public CountdownChoice? Show(CountdownSettings settings, bool isRunning)
     {
-        var window = new CountdownWindow(settings, isRunning)
+        var countdown = new CountdownViewModel(settings, isRunning);
+        var window = new CountdownWindow(countdown)
         {
             Owner = System.Windows.Application.Current.MainWindow,
         };
 
-        if (window.ShowDialog() != true)
-            return null;
-
-        return new CountdownChoice(window.Result, window.Settings, window.StopRequested);
+        return window.ShowDialog() == true ? countdown.Choice : null;
     }
 }
