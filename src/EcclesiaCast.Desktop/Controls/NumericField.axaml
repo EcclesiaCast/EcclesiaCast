@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="EcclesiaCast.Desktop.Controls.NumericField">
+    <UserControl.Resources>
+        <!-- Botón cuadrado de paso (−/+), del alto del campo -->
+        <ControlTheme x:Key="StepButton" TargetType="RepeatButton">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="{StaticResource SurfaceAltBrush}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Width" Value="26"/>
+            <Setter Property="Delay" Value="450"/>
+            <Setter Property="Interval" Value="70"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Name="bd" CornerRadius="3"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{StaticResource LineBrush}" BorderThickness="1">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+            <Style Selector="^:pointerover /template/ Border#bd">
+                <Setter Property="Background" Value="#2C3040"/>
+            </Style>
+            <Style Selector="^:pressed /template/ Border#bd">
+                <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+            </Style>
+        </ControlTheme>
+    </UserControl.Resources>
+
+    <DockPanel>
+        <RepeatButton Name="Down" DockPanel.Dock="Left" Content="−"
+                      Theme="{StaticResource StepButton}" Margin="0,0,4,0"
+                      ToolTip.Tip="Bajar (Shift = paso grande)"/>
+        <RepeatButton Name="Up" DockPanel.Dock="Right" Content="+"
+                      Theme="{StaticResource StepButton}" Margin="4,0,0,0"
+                      ToolTip.Tip="Subir (Shift = paso grande)"/>
+        <TextBox Name="Entry"
+                 Padding="6,3" FontSize="12"
+                 MinWidth="46"
+                 TextAlignment="Center"
+                 VerticalContentAlignment="Center"
+                 ToolTip.Tip="Escribí el número, o usá − / + · rueda del mouse y flechas ↑↓ también"/>
+    </DockPanel>
+</UserControl>

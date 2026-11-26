@@ -1,9 +1,13 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
+using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
+using Avalonia.Threading;
+using EcclesiaCast.Core.Presentation;
+using EcclesiaCast.Desktop.Controls;
 using EcclesiaCast.Desktop.Views;
 using EcclesiaCast.Presentation.Platform;
 using EcclesiaCast.Presentation.Services;
@@ -109,6 +113,76 @@ public sealed class DialogWindowTests
 
         Assert.Equal(Color.Parse("#C43B3B"), ((ISolidColorBrush)Background(red)!).Color);
         Assert.Equal(Color.Parse("#2F63C9"), ((ISolidColorBrush)Background(usual)!).Color);
+    }
+
+    [AvaloniaFact]
+    public void The_about_window_opens_its_links_and_closes()
+    {
+        var shell = new RecordingShell();
+        var window = new AboutWindow(shell, "1.5.0");
+
+        Assert.True(Closes(window, () =>
+        {
+            Press(window, "github.com/EcclesiaCast");
+            Press(window, "colaborar con EcclesiaCast");
+            Press(window, "Cerrar");
+        }));
+
+        Assert.Equal([AboutWindow.GitHubUrl, AppInfo.DonateUrl], shell.Opened);
+    }
+
+    [AvaloniaFact]
+    public void A_number_field_steps_reads_and_holds_its_range()
+    {
+        var field = new NumericField { Minimum = 0, Maximum = 10, Step = 0.1, Decimals = 1 };
+        var changes = 0;
+        field.ValueChanged += (_, _) => changes++;
+        var window = new Window { Content = field };
+        window.Show();
+        var entry = field.FindControl<TextBox>("Entry")!;
+
+        field.SetSilently(0.5);
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(0, changes);
+
+        field.FindControl<RepeatButton>("Up")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(0.6, field.Value, 6);
+
+        entry.Text = "2,5";
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(2.5, field.Value);
+
+        entry.Text = "99";
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(10, field.Value);
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void Saving_the_transitions_applies_them_and_cancel_does_not()
+    {
+        var before = TransitionSettings.Current;
+        try
+        {
+            var settings = new MemorySettings();
+            var cancelled = new TransitionsWindow(settings);
+            Assert.True(Closes(cancelled, () => Press(cancelled, "Cancelar")));
+            Assert.Null(settings.Get(OutputTransitions.SettingKey));
+
+            var window = new TransitionsWindow(settings);
+            Assert.True(Closes(window, () =>
+            {
+                window.FindControl<NumericField>("LogoField")!.Value = 2;
+                Press(window, "Guardar");
+            }));
+
+            Assert.Equal(2, OutputTransitions.Parse(settings.Get(OutputTransitions.SettingKey)).LogoSeconds);
+        }
+        finally
+        {
+            TransitionSettings.Set(before, new MemorySettings());
+        }
     }
 
     [AvaloniaFact]

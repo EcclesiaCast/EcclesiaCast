@@ -64,6 +64,19 @@ public sealed partial class ScreenBenchTests
             "No se pudo abrir el archivo. Puede que esté dañado o que lo esté usando otro programa.",
             null, NoticeKind.Error, ["Cancelar", "No guardar", "Guardar"], 2, 0), "aviso-error-sin-titulo");
 
+    [AvaloniaFact]
+    public void The_loading_screen_is_drawn() => DrawWindow(new SplashWindow(), "carga");
+
+    [AvaloniaTheory]
+    [InlineData("acerca-de", false)]
+    [InlineData("acerca-de-primera-vez", true)]
+    public void The_about_window_is_drawn(string name, bool firstRun) =>
+        DrawWindow(new AboutWindow(new RecordingShell(), "1.5.0", firstRun), name);
+
+    [AvaloniaFact]
+    public void The_transitions_are_drawn() =>
+        DrawWindow(new TransitionsWindow(new MemorySettings()), "transiciones");
+
     /// <summary>
     /// A whole dialog in memory, at its own width. <paramref name="height"/>
     /// is for the windows with a fixed one, without the system's title bar.

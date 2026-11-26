@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -112,16 +111,14 @@ public partial class NumericField : UserControl
             RaiseEvent(new RoutedEventArgs(ValueChangedEvent, this));
     }
 
-    private double Clamp(double value) => Math.Clamp(Round(value), Minimum, Maximum);
-
-    private double Round(double value) => Math.Round(value, Math.Clamp(Decimals, 0, 6));
+    private double Clamp(double value) => NumberFieldText.Clamp(value, Minimum, Maximum, Decimals);
 
     private void ShowValue()
     {
         if (Entry is null)
             return;
 
-        var text = Value.ToString("F" + Math.Clamp(Decimals, 0, 6), CultureInfo.CurrentCulture);
+        var text = NumberFieldText.Format(Value, Decimals);
         if (Entry.Text == text)
             return;
 
@@ -140,7 +137,7 @@ public partial class NumericField : UserControl
 
         // Half-typed values ("-", "1,") just wait; the box keeps what was typed
         // until it parses, so nothing is rewritten under the caret.
-        if (!TryParse(Entry.Text, out var parsed))
+        if (!NumberFieldText.TryParse(Entry.Text, out var parsed))
             return;
 
         _writing = true;
@@ -186,13 +183,5 @@ public partial class NumericField : UserControl
         var step = Step * ((Keyboard.Modifiers & ModifierKeys.Shift) != 0 ? 10 : 1);
         Value = Clamp(Value + direction * step);
         ShowValue();
-    }
-
-    /// <summary>Accepts both decimal separators, so "1.15" and "1,15" both work.</summary>
-    private static bool TryParse(string text, out double value)
-    {
-        text = text.Trim();
-        return double.TryParse(text, NumberStyles.Float, CultureInfo.CurrentCulture, out value)
-            || double.TryParse(text.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out value);
     }
 }

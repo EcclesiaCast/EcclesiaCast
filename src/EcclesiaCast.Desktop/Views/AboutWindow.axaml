@@ -1,0 +1,70 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="EcclesiaCast.Desktop.Views.AboutWindow"
+        Title="Acerca de EcclesiaCast"
+        Width="460" SizeToContent="Height"
+        CanResize="False" ShowInTaskbar="False">
+    <Window.Styles>
+        <!-- WPF's Hyperlink inside a sentence -->
+        <Style Selector="HyperlinkButton.inline">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="MinHeight" Value="0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <TextBlock Text="{Binding $parent[HyperlinkButton].Content}" TextDecorations="Underline"
+                               Background="Transparent"/>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+    </Window.Styles>
+    <StackPanel Margin="28,24,28,20">
+        <StackPanel Orientation="Horizontal">
+            <Image Source="{StaticResource AppLogoImage}" Width="64" Height="64"
+                   RenderOptions.BitmapInterpolationMode="HighQuality" Margin="0,0,16,0"/>
+            <StackPanel VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="EcclesiaCast" FontSize="26" FontWeight="SemiBold" Foreground="White"/>
+                    <TextBlock Name="VersionText" FontSize="13" Foreground="{StaticResource MutedBrush}"
+                               VerticalAlignment="Bottom" Margin="10,0,0,5"/>
+                </StackPanel>
+                <TextBlock Text="Software libre de proyección para iglesias."
+                           FontSize="14" Foreground="{StaticResource MutedBrush}" Margin="0,4,0,0"/>
+            </StackPanel>
+        </StackPanel>
+
+        <Rectangle Height="1" Fill="{StaticResource LineBrush}" Margin="0,18"/>
+
+        <TextBlock FontSize="14" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap">
+            <Run Text="Desarrollado por "/><Run Text="Alexis Pérez" FontWeight="SemiBold" Foreground="White"/><Run Text=" · Montevideo, Uruguay."/>
+        </TextBlock>
+
+        <TextBlock Text="Hecho para bendecir a otras iglesias con lo que recibimos."
+                   FontSize="14" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap"
+                   Margin="0,8,0,0"/>
+
+        <TextBlock Text="«De gracia recibisteis, dad de gracia.»  — Mateo 10:8"
+                   FontSize="14" FontStyle="Italic" Foreground="White" TextWrapping="Wrap"
+                   Margin="0,14,0,0"/>
+
+        <Rectangle Height="1" Fill="{StaticResource LineBrush}" Margin="0,18"/>
+
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Licencia GPL-3.0  ·  " FontSize="12" Foreground="{StaticResource FaintBrush}"/>
+            <HyperlinkButton Name="GitHubLink" Classes="inline" Content="github.com/EcclesiaCast"
+                             Click="GitHub_Click"/>
+        </StackPanel>
+
+        <StackPanel Name="DonateLine" Orientation="Horizontal" IsVisible="False" Margin="0,6,0,0">
+            <TextBlock Text="Si te sirve y querés ayudar a que siga:  " FontSize="12"
+                       Foreground="{StaticResource FaintBrush}"/>
+            <HyperlinkButton Name="DonateLink" Classes="inline" Content="colaborar con EcclesiaCast"
+                             Click="Donate_Click"/>
+        </StackPanel>
+
+        <Button Name="CloseButton" Content="Cerrar" Theme="{StaticResource AccentButton}" IsDefault="True" IsCancel="True"
+                HorizontalAlignment="Right" Padding="22,8" Margin="0,18,0,0" Click="Close_Click"/>
+    </StackPanel>
+</Window>

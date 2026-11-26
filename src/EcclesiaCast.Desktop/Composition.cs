@@ -154,12 +154,11 @@ public static class Composition
         services.AddSingleton<IAudioPlayer>(_ => new VlcAudioPlayer(() => videoEngine.Instance));
         services.AddSingleton<SongSaver>();
 
-        // The phone remote is the one dialog the test program has: it is
-        // one of the six things to try on the Mac.
         services.AddSingleton<IRemoteControlDialog, RemoteControlDialog>();
+        services.AddSingleton<IDialogs, AvaloniaDialogs>();
+        services.AddSingleton<MenuDialogs>();
 
         // Every other dialog: «Esto todavía no está en la versión de Mac».
-        services.AddSingleton<IDialogs, AvaloniaDialogs>();
         services.AddSingleton(_ => NotOnMacYet.For<ISongEditor>());
         services.AddSingleton(_ => NotOnMacYet.For<IBibleImportDialog>());
         services.AddSingleton<ITextPrompt, AvaloniaTextPrompt>();
