@@ -134,8 +134,11 @@ public sealed class StageBoxView : Border
     }
 
     /// <summary>
-    /// The projector's own picture. Until the projected view with its video
-    /// arrives (batch 10), the live slide is drawn without the media behind it.
+    /// The projector's own picture: the projected view, with its background,
+    /// fill and logo, and the video as the small copy of the projector's
+    /// frames (<see cref="ProjectionViewModel.LiveFrame"/>). Whoever hands
+    /// that copy out (the window service, batch 11) also asks the views to
+    /// draw it again on every frame.
     /// </summary>
     private Control BuildMirror()
     {
@@ -158,7 +161,7 @@ public sealed class StageBoxView : Border
             };
         }
 
-        var view = new SlideView { Width = StageLayout.CanvasWidth, Height = StageLayout.CanvasHeight };
+        var view = new ProjectedView { Width = StageLayout.CanvasWidth, Height = StageLayout.CanvasHeight };
         void Copy()
         {
             view.Slide = vm.Slide;
@@ -166,6 +169,10 @@ public sealed class StageBoxView : Border
             view.Overlay = vm.Overlay;
             view.Countdown = vm.Countdown;
             view.Highlight = vm.Highlight;
+            view.BackgroundMedia = vm.Background;
+            view.FillMedia = vm.BackgroundFill;
+            view.BackgroundBlur = vm.BackgroundBlur;
+            view.LiveVideoFrame = vm.LiveFrame as IImage;
             view.Logo = vm.ActiveLogo;
         }
 

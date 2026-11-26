@@ -7,9 +7,11 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using EcclesiaCast.Core.Logos;
+using EcclesiaCast.Core.Media;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Core.Themes;
 using EcclesiaCast.Desktop.Platform;
+using EcclesiaCast.Desktop.Services;
 using EcclesiaCast.Presentation.Rendering;
 using EcclesiaCast.Presentation.Services;
 
@@ -24,8 +26,9 @@ namespace EcclesiaCast.Desktop.Controls;
 ///
 /// Left out on purpose, for phase 3 (they belong to the operator): the
 /// selection drawn while dragging over the Live preview (<c>ShowSelection</c>,
-/// <c>PhraseBetween</c>). The framing of an image logo and its fill come with
-/// the video in batch 10.
+/// <c>PhraseBetween</c>). The logo is framed and filled like a background
+/// (<see cref="MediaFraming"/>); a video logo's moving picture comes from the
+/// output's hidden player (<see cref="ProjectedView"/>).
 /// </summary>
 public partial class SlideView : UserControl
 {
@@ -610,6 +613,8 @@ public partial class SlideView : UserControl
             LogoImage.IsVisible = false;
             LogoImage.Source = null;
             _lastLogoImagePath = null;
+            MediaFraming.Apply(LogoImage, null, CanvasWidth, CanvasHeight);
+            RenderLogoFill(null);
             LogoText.Text = "EcclesiaCast";
             LogoText.FontFamily = Fonts.Resolve("Segoe UI");
             LogoText.FontSize = 120;
@@ -651,6 +656,61 @@ public partial class SlideView : UserControl
             LogoImage.Source = LoadBitmap(path);
             LogoImage.IsVisible = LogoImage.Source is not null;
         }
+
+        // Framed exactly like a background: zoom, shift, fixed size and fill.
+        var framing = LogoImage.Source is null ? null : logo.AsFramedMedia();
+        MediaFraming.Apply(LogoImage, framing, CanvasWidth, CanvasHeight);
+        RenderLogoFill(framing);
+    }
+
+    /// <summary>
+    /// The frame of a video logo was written again: Avalonia does not see the
+    /// pixels of a bitmap change by itself.
+    /// </summary>
+    public void RedrawLogoVideo()
+    {
+        if (LogoImage.IsVisible && ReferenceEquals(LogoImage.Source, LogoVideoFrame))
+            LogoImage.InvalidateVisual();
+    }
+
+    private string? _lastLogoFillKey;
+
+    /// <summary>
+    /// What fills the screen around a logo that does not cover it: the colour
+    /// of the layer, or on top of it a blurred copy of the logo or an image of
+    /// the media library. A video logo fills with a blurred still of itself.
+    /// </summary>
+    private void RenderLogoFill(MediaItem? framing)
+    {
+        var ownStill = framing is { Type: MediaType.Video, FillMediaId: MediaItem.FillWithSelfId }
+                       && !string.IsNullOrWhiteSpace(framing.ThumbnailPath);
+        var fill = framing is null || !MediaFraming.NeedsFill(framing) ? null
+            : framing.FillsWithSelf || ownStill ? framing
+            : framing.FillMediaId is int id and > 0 ? MediaLookup.Find(id) : null;
+
+        // Only a still can be drawn here; a video fill shows its poster.
+        var fillPath = fill is null ? null
+            : ReferenceEquals(fill, framing) ? (ownStill ? framing!.ThumbnailPath : framing!.Path)
+            : fill.Type == MediaType.Image ? fill.Path : fill.ThumbnailPath;
+        var key = fillPath is null ? null : $"{(ReferenceEquals(fill, framing) ? "self" : "lib")}|{fillPath}";
+        if (key == _lastLogoFillKey)
+            return;
+        _lastLogoFillKey = key;
+
+        if (fillPath is null)
+        {
+            LogoFillImage.Source = null;
+            LogoFillImage.IsVisible = false;
+            return;
+        }
+
+        // The video's poster is loaded on its own: the logo image may be the moving picture.
+        IImage? own = !ReferenceEquals(fill, framing) ? null
+            : ownStill ? LoadBitmap(fillPath) : LogoImage.Source;
+        LogoFillImage.Source = ReferenceEquals(fill, framing)
+            ? MediaFraming.BlurredFill(own) ?? own
+            : LoadBitmap(fillPath);
+        LogoFillImage.IsVisible = LogoFillImage.Source is not null;
     }
 
     // ── Estados ──────────────────────────────────────────────────

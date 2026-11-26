@@ -56,8 +56,11 @@
                 </TextBlock>
             </Grid>
 
-            <!-- Capa de logo: color de fondo + imagen + texto -->
+            <!-- Capa de logo: color de fondo + relleno + imagen + texto. El
+                 relleno cubre lo que la imagen deja libre (zoom hacia afuera,
+                 tamaño fijo): una copia desenfocada o una imagen. -->
             <Grid x:Name="LogoLayer" Background="#10141E" IsVisible="False" ClipToBounds="True">
+                <Image x:Name="LogoFillImage" Stretch="UniformToFill" IsVisible="False"/>
                 <Image x:Name="LogoImage" Stretch="Uniform" IsVisible="False"/>
                 <TextBlock x:Name="LogoText" Text="EcclesiaCast"
                            FontSize="120" FontWeight="SemiBold"
