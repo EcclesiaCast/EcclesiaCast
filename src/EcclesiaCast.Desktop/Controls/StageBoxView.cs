@@ -5,6 +5,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using EcclesiaCast.Core.Stage;
 using EcclesiaCast.Desktop.Platform;
+using EcclesiaCast.Desktop.Services;
 using EcclesiaCast.Presentation.Rendering;
 using EcclesiaCast.Presentation.ViewModels;
 
@@ -173,13 +174,24 @@ public sealed class StageBoxView : Border
             view.FillMedia = vm.BackgroundFill;
             view.BackgroundBlur = vm.BackgroundBlur;
             view.LiveVideoFrame = vm.LiveFrame as IImage;
+            view.LogoVideoFrame = vm.LiveLogoFrame as IImage;
             view.Logo = vm.ActiveLogo;
         }
 
         Copy();
         PropertyChangedEventHandler follow = (_, _) => Copy();
+        // The copies are written in place: drawn again on every frame.
+        EventHandler video = (_, _) => view.RedrawLiveVideo();
+        EventHandler logo = (_, _) => view.RedrawLogoVideo();
         vm.PropertyChanged += follow;
-        DetachedFromVisualTree += (_, _) => vm.PropertyChanged -= follow;
+        LiveFrames.VideoWritten += video;
+        LiveFrames.LogoWritten += logo;
+        DetachedFromVisualTree += (_, _) =>
+        {
+            vm.PropertyChanged -= follow;
+            LiveFrames.VideoWritten -= video;
+            LiveFrames.LogoWritten -= logo;
+        };
 
         // The slide is laid out on 1920×1080 whatever the size of the box, so
         // it is drawn at that size and scaled down into the rectangle.

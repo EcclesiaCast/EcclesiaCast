@@ -26,6 +26,7 @@
     <ProjectReference Include="..\EcclesiaCast.Core\EcclesiaCast.Core.csproj" />
     <ProjectReference Include="..\EcclesiaCast.Data\EcclesiaCast.Data.csproj" />
     <ProjectReference Include="..\EcclesiaCast.Presentation\EcclesiaCast.Presentation.csproj" />
+    <ProjectReference Include="..\EcclesiaCast.Platform.Mac\EcclesiaCast.Platform.Mac.csproj" />
   </ItemGroup>
 
   <!-- The free fonts that come with the program (SIL OFL 1.1), each in its
