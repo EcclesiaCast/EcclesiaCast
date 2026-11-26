@@ -5,7 +5,7 @@ namespace EcclesiaCast.Core.Tests.Ui;
 
 public class TutorialFileTests
 {
-    private const string Valid = """
+    private static readonly string Valid = """
         # comentario
         titulo: Uno
         resumen: Un resumen
@@ -26,7 +26,7 @@ public class TutorialFileTests
         senalar: SlidesPanel
         titulo: C
         texto: Con ene escrita sin tilde.
-        """;
+        """.ReplaceLineEndings("\n");
 
     [Fact]
     public void Reads_the_card_and_the_steps_and_joins_the_lines_of_a_text()

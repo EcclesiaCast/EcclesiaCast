@@ -21,11 +21,17 @@ pasa a **Ya probado**, más abajo.
 
 ### Falta probar
 
-**Arreglos tras probar la prueba.11 (todavía sin versión de prueba)**
+**Nuevo en la prueba.12**
 
 1. **Repetir un solo audio:** el botón muestra «🔁 1»; repetir la lista, «🔁».
 2. **Fondo con un medio que va encima de todo** (Biblia y canción): aparece un aviso con la forma de
    arreglarlo. En «Elegir un fondo de la biblioteca» la pestaña dice «(va encima de todo)».
+3. **Dividir versículos largos** (editor de temas → «Biblia»). Viene apagada. Al activarla arranca en
+   150 caracteres. Probá con un versículo largo (Ester 8:9): partes parecidas, cortes en la
+   puntuación, «(1/2)» en la cita y avanzar con las flechas. Probá también con dos versiones,
+   cambiar el número con un versículo en vivo, y mirar proyector, escenario, OBS, celular y playlist.
+4. **Tutoriales nuevos:** «Mensajes en pantalla» y «Durante la reunión». Mirá que cada paso señale
+   lo que dice, con las herramientas de abajo a la derecha agrandadas y achicadas.
 
 ### Al publicar la 1.5.0 (no es para probar antes)
 
