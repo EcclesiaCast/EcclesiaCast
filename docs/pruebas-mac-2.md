@@ -40,7 +40,9 @@ Calculá dos horas.
    la segunda visita»). GitHub tarda unos 15 minutos.
 2. Entrá a GitHub → el repositorio de EcclesiaCast → pestaña **Actions** → a
    la izquierda **desktop-mac** → la última ejecución con tilde verde.
-3. Abajo, en **Artifacts**, bajá **EcclesiaCast-mac-prueba**.
+3. Abajo, en **Artifacts**, bajá **EcclesiaCast-mac-prueba**. (Al lado
+   aparece también **render-avalonia-mac**: son las fotos de prueba de la
+   letra para Claude, no hace falta llevarlas.)
 4. Lo que baja es un `.zip` que adentro tiene **otro** `.zip`
    (`EcclesiaCast-mac-prueba.zip`). Abrí el de afuera y copiá **el de adentro
    tal cual** al pendrive. **No lo descomprimas en Windows**: se rompe el
@@ -240,6 +242,17 @@ el programa.
 - ¿Cuántos segundos tardó en abrir?
 - ¿Qué botones dijeron «Esto todavía no está en la versión de Mac»? (Es lo
   esperado; sólo anotalo si algo **se colgó** o **se cerró**.)
+- **Carteles** (el del celular, o cualquier aviso). Mientras un cartel
+  está abierto, el programa espera la respuesta de una forma que en la Mac
+  nunca se probó. Con la salida prendida y un **video de fondo**:
+  1. Abrí **📱 Control desde el celular…** y dejalo abierto 1 minuto: el
+     video del proyector tiene que **seguir moviéndose** y el celular tiene
+     que poder pasar de diapositiva.
+  2. Cerrá el cartel con su botón y volvé a abrirlo; cerralo esta vez con
+     el **botón rojo** de la esquina. El programa tiene que seguir funcionando.
+  3. Último, con el cartel abierto, apretá **⌘Q**. Anotá qué pasa: se
+     cierra, pregunta, o queda colgado (si se cuelga: **⌥⌘Esc** → Forzar
+     salida, y mandá el registro).
 
 ---
 
