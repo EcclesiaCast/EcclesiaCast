@@ -177,6 +177,9 @@ public static class Composition
         services.AddSingleton(_ => NotOnMacYet.For<ILightCopyDialog>());
         services.AddSingleton(_ => NotOnMacYet.For<IColorPicker>());
         services.AddSingleton(_ => NotOnMacYet.For<IBibleFormatHelpDialog>());
+        services.AddSingleton(_ => NotOnMacYet.For<INamePlateDesigner>());
+        // No browser with a YouTube account here: yt-dlp goes without one.
+        services.AddSingleton<IYouTubeSession, NoYouTubeSession>();
         services.AddSingleton(_ => NotOnMacYet.For<IBiblePackageDialog>());
         services.AddSingleton(_ => NotOnMacYet.For<IWindowPickerDialog>());
         services.AddSingleton(_ => NotOnMacYet.For<IYouTubeDownloadDialog>());

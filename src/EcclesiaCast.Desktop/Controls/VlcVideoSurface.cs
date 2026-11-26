@@ -798,7 +798,7 @@ public sealed class VlcVideoSurface : Panel
 
             _player = player;
             _appliedVolume = -1;
-            PlayerSound.MasterChanged += OnMasterChanged;
+            PlayerSound.SessionChanged += OnMasterChanged;
             return player;
         }
         catch (Exception ex)
@@ -811,7 +811,7 @@ public sealed class VlcVideoSurface : Panel
     private void Dispose()
     {
         AudioOutputChanges.OutputChanged -= OnAudioOutputChanged;
-        PlayerSound.MasterChanged -= OnMasterChanged;
+        PlayerSound.SessionChanged -= OnMasterChanged;
         _holdTimer.Stop();
         _coverRetry?.Stop();
         ClearHold();

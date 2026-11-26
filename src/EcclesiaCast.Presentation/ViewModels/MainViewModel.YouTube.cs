@@ -103,10 +103,13 @@ public sealed partial class MainViewModel
                 Type = MediaType.YouTube,
                 ThumbnailPath = YouTubeUrl.ThumbnailUrl(id),
                 Category = tab,
-                // Announcement videos play full screen with sound.
+                // Announcement videos play full screen, but they come in silent
+                // (pedido del 19/11): nothing blares out of the speakers by
+                // surprise. «🔇 Sin sonido» under EN VIVO gives it its sound,
+                // and the video remembers it.
                 Behavior = MediaBehavior.Foreground,
                 EndBehavior = VideoEndBehavior.Logo,
-                Muted = false,
+                Muted = true,
             });
         }
 

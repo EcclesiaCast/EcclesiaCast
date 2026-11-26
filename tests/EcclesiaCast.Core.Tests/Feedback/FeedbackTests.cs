@@ -48,6 +48,14 @@ public class FeedbackTests : IDisposable
     }
 
     [Fact]
+    public void A_message_without_a_comment_is_empty_even_with_the_usage_summary()
+    {
+        Assert.True(new FeedbackMessage("Algo no funcionó", "", "", "", "Versión: 1.4.0").IsEmpty);
+        Assert.True(new FeedbackMessage("Algo no funcionó", "  \r\n ", "Pan de Vida", "a@b.com", "Versión: 1.4.0").IsEmpty);
+        Assert.False(new FeedbackMessage("Algo no funcionó", "Se trabó el video", "", "", "").IsEmpty);
+    }
+
+    [Fact]
     public async Task Send_replaces_an_unknown_kind_with_the_last_option()
     {
         var handler = new FakeHandler();

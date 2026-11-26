@@ -52,6 +52,99 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
   escenario (por encima de la barra de menú, en todos los escritorios, sin que la Mac se duerma)
   y un programa de prueba para llevar a una Mac con proyector; si se desenchufa el proyector, la
   salida se apaga y avisa.
+- Por dentro, sin cambios para quien usa el programa: todo lo de la 1.5.0 se trajo a la versión de
+  Mac. La lógica nueva (placas de nombre, música de YouTube, dividir versículos, fondos de la
+  Biblia y de cada canción, canciones de Holyrics, diapositiva nueva, cambiar el PIN) quedó en la
+  parte común, con pruebas. Lo que la versión de Mac todavía no muestra está anotado en
+  `docs/plan-mac-fase-3.md`.
+
+## [1.5.0] - 2026-11-26
+
+### Agregado
+
+**Música**
+- **Música de YouTube, sólo el audio.** En la pestaña **Música** podés buscar un artista o una
+  canción, pegar un link o tocar un tono en **Pads** para buscar pads. **▶** escucha, **➕** suma a
+  la lista y **💾** guarda el audio para usarlo sin internet. Lo que está en pantalla no cambia. Lo
+  que todavía necesita internet lleva 🌐 en la lista.
+- **Repetir la música:** sin repetir, 🔁 la lista o «🔁 1» un solo audio, ideal para un pad.
+- **Clic derecho en la lista de audios:** reproducir, repetir sólo ese, guardar para usar sin
+  internet, copiar el link, mostrar en la carpeta, subir, bajar y eliminar.
+
+**Biblia**
+- **Dividir versículos largos** en varias diapositivas, con la cita «Juan 3:16 (1/2)». Se activa en
+  la barra de la Biblia («Dividir»), desde el celular o en el editor de temas, con el máximo de
+  caracteres que quieras. Viene apagado.
+- **Fondo propio para la Biblia:** clic derecho en una imagen o video → «Usar como fondo de la
+  Biblia», o con el botón 🖼 arriba de los versículos.
+- **Importar Biblias en el XML de OpenSong,** el que usan ProPresenter, Holyrics y FreeShow (y
+  páginas como Beblia).
+
+**Canciones**
+- **Fondo propio de cada canción:** se pone solo al proyectarla. (GitHub #32)
+- **Traer las canciones de Holyrics,** desde los archivos que exporta Holyrics (también la versión
+  gratis): en Holyrics, Canción → Exportar → «Exportación en lote…» en JSON. Después elegís cuáles traer.
+- **Buscar en la letra** de la canción abierta; Enter proyecta la diapositiva encontrada. (GitHub #32)
+- **Deshacer y rehacer** (Ctrl+Z / Ctrl+Y). (GitHub #32)
+- **Diapositiva nueva vacía** y **«Crear canción desde cero…»** en el menú Canciones. (GitHub #32)
+
+**En pantalla y transmisión**
+- **Placas de nombre:** el nombre y el cargo de quien predica o canta, en una tarjeta al pie, con
+  seis estilos para elegir o diseñar los tuyos, imagen o video opcional, en el proyector y en OBS.
+  (GitHub #37)
+- **La salida en una ventana,** para compartirla en una videollamada o probar con una sola pantalla.
+- **Salida en vertical (9:16).**
+
+**Celular y OBS**
+- **Fondos y medios desde el celular:** elegís la carpeta y tocás una imagen o un video para ponerlo
+  en pantalla.
+- **Cambiar el PIN del celular,** y un **PIN aparte para OBS o vMix** que no sirve para manejar la
+  proyección. Quien ya tenía OBS armado no tiene que cambiar nada.
+
+**Ayuda**
+- **Tutoriales paso a paso** en Ayuda → «Tutoriales», sobre el programa de verdad: canciones, la
+  lista del domingo, la Biblia, fondos y videos, OBS y vMix, el celular, placas, importar canciones,
+  YouTube y web, mensajes en pantalla y lo que se usa durante la reunión.
+
+### Mejorado
+
+- **Buscar sin fijarse en tildes ni mayúsculas,** en la computadora y en el celular: «senor tu estas»
+  encuentra «Señor, tú estás». Tampoco cuentan las comas ni los puntos.
+- **Un solo volumen** debajo del EN VIVO para todo lo que suena en la salida, y la barra de los audios
+  cambia el sonido **mientras la arrastrás**, sin saltos ni cortes.
+- **La dirección de OBS y vMix ya no cambia al reiniciar la computadora.**
+- **Una sola copia del programa:** si lo abrís de nuevo, trae al frente el que ya está abierto.
+- **Las carpetas de medios que van encima de todo** se reconocen por un ícono, y si intentás usar de
+  fondo uno de esos medios, un aviso explica cómo arreglarlo.
+- **Los videos de YouTube se descargan en mejor calidad** y los recién agregados entran sin sonido.
+- **Aviso sobre los anuncios de YouTube:** un video pasado por internet puede mostrarlos en la
+  pantalla; la copia descargada, no.
+- Si YouTube no deja ver un video fuera de su página, la pantalla queda en negro y el programa te
+  ofrece descargarlo.
+
+### Cambiado
+
+- **El orden de las diapositivas viene trabado (🔒)** para no desacomodarlas sin querer; un clic en
+  el candado lo destraba. Trabado, tampoco funcionan deshacer y rehacer.
+- El botón de la Biblia dice la vista en la que estás («Lista» o «Grilla») y el del historial,
+  «Historial».
+- «Guardar» en Placas guarda la placa sin mostrarla.
+- «➕ Agregar» en Canciones ahora lo dice con la palabra, y los comentarios necesitan texto.
+- Las copias de prueba ya no cuentan en el contador anónimo de uso.
+
+### Quitado
+
+- «Agregar paquete de fondos (.zip)…» del menú Fondos.
+- «Corregir el texto…» de los versículos: la Biblia no se modifica desde el programa.
+
+### Arreglado
+
+- Los títulos de YouTube con acentos salían mal.
+- Volver a descargar un video de YouTube que habías sacado de la biblioteca daba error.
+- Con una sola pantalla, un video de YouTube podía dejarte sin poder volver al programa.
+- La ventana «Cómo preparar una Biblia para importar» ahora entra en una notebook.
+- El globito del botón Logo y los de las versiones de la Biblia volvieron a explicar qué hacen.
+- Con Windows configurado para zurdos, los submenús se abrían mal.
 
 ## [1.4.0] - 2026-11-17
 

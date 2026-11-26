@@ -67,6 +67,10 @@ internal sealed class TempPaths(string root) : IPlatformPaths
 
     public string DownloadsFolder { get; } = Path.Combine(root, "downloads");
 
+    public string MusicFolder { get; } = Path.Combine(root, "music");
+
+    public string AudioCacheFolder { get; } = Path.Combine(root, "audio-cache");
+
     public string ToolsFolder { get; } = Path.Combine(root, "tools");
 
     public string ModelsFolder { get; } = Path.Combine(root, "models");
@@ -114,6 +118,14 @@ internal sealed class FitsInOneSlide : ITextMeasurer
         int maxParts = 6) =>
         [(label?.Invoke(slide.MainText) ?? slide.MainText,
             slide.SecondaryText is null ? null : secondaryLabel?.Invoke(slide.SecondaryText) ?? slide.SecondaryText)];
+}
+
+/// <summary>Everything is there, as in Windows, except what the test takes away.</summary>
+internal sealed class AllFeatures(params Feature[] missing) : IPlatformInfo
+{
+    public PlatformSystem System => PlatformSystem.Windows;
+
+    public bool IsAvailable(Feature feature) => !missing.Contains(feature);
 }
 
 /// <summary>The control key is never down.</summary>

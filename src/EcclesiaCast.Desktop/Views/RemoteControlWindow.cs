@@ -84,7 +84,8 @@ public sealed class RemoteControlWindow : Window
 /// <summary>The phone remote's window, waiting for the operator like the WPF one.</summary>
 public sealed class RemoteControlDialog : IRemoteControlDialog
 {
-    public bool Show(RemoteControlServer server)
+    // The Mac window does not offer to change the PIN yet (docs/plan-mac-fase-3.md).
+    public bool Show(RemoteControlServer server, Action<string> pinChanged)
     {
         var window = new RemoteControlWindow(server);
         Modal.Run(window);

@@ -10,5 +10,14 @@ CREATE TABLE IF NOT EXISTS uso (
   PRIMARY KEY (dia, instalacion)
 );
 
--- Si la tabla ya existía (antes de la 1.4.0), agregale la columna una sola vez:
+-- Descargas del instalador, para el panel: la tarea diaria anota el total que
+-- GitHub acumula en cada versión. No tiene nada de las iglesias.
+CREATE TABLE IF NOT EXISTS descargas (
+  dia     TEXT NOT NULL,     -- «2026-11-26», el día de la foto (UTC)
+  version TEXT NOT NULL,     -- etiqueta del release, «v1.5.0»
+  total   INTEGER NOT NULL,  -- descargas acumuladas hasta ese momento
+  PRIMARY KEY (dia, version)
+);
+
+-- Si la tabla «uso» ya existía (antes de la 1.4.0), agregale la columna una sola vez:
 --   ALTER TABLE uso ADD COLUMN iglesia TEXT NOT NULL DEFAULT '';

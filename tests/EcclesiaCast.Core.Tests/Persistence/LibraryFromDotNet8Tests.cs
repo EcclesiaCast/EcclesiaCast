@@ -30,13 +30,17 @@ public class LibraryFromDotNet8Tests : IDisposable
     }
 
     [Fact]
-    public void The_old_library_has_nothing_left_to_migrate_and_migrating_it_changes_nothing()
+    public void The_old_library_only_has_the_later_migrations_left_and_the_model_needs_no_other()
     {
         var path = CopyOfTheOldLibrary();
 
         using (var db = new AppDbContext(path))
         {
-            Assert.Empty(db.Database.GetPendingMigrations());
+            // What came after 1.4.0 (the song's own background and the verse
+            // split, both in 1.5.0); nothing EF Core 10 made up on its own.
+            Assert.Equal(["20261119051117_AddSongBackground", "20261126031240_AddVerseSplit"],
+                db.Database.GetPendingMigrations());
+            Assert.False(db.Database.HasPendingModelChanges());
             db.Database.Migrate();
         }
 

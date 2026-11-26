@@ -7,17 +7,21 @@ using Serilog;
 namespace EcclesiaCast.Presentation.ViewModels;
 
 /// <summary>The programs songs can be brought over from.</summary>
-public enum SongImportSource { ProPresenter, EasyWorship }
+public enum SongImportSource { ProPresenter, EasyWorship, Holyrics }
 
 /// <summary>One song to bring over; <paramref name="Path"/> is its file, when it has one.</summary>
 public sealed record SongImportItem(string Label, string? Path, Func<Song> Load);
 
-/// <summary>A library with its tick box, bound to the list.</summary>
+/// <summary>
+/// A library with its tick box, bound to the list. With <paramref name="single"/>
+/// the row is one song (Holyrics), and its name is just the title.
+/// </summary>
 public sealed partial class SongLibraryRow(
-    string title, string detail, int songCount, int cloudOnlyCount, Func<List<SongImportItem>> items)
+    string title, string detail, int songCount, int cloudOnlyCount, Func<List<SongImportItem>> items,
+    bool single = false)
     : ObservableObject
 {
-    public string Name => cloudOnlyCount > 0
+    public string Name => single ? title : cloudOnlyCount > 0
         ? $"{title}  ·  {songCount} canción(es)  ·  ☁ {cloudOnlyCount} sin descargar"
         : $"{title}  ·  {songCount} canción(es)";
 
@@ -37,11 +41,14 @@ public sealed partial class SongLibraryRow(
 }
 
 /// <summary>
-/// Backs the window that brings songs over from another program (ProPresenter
-/// or EasyWorship) without asking the operator to hunt for files: the operator
-/// picks the program, this looks where that one keeps its libraries, lists
-/// what it found with the song count, and imports the ticked ones in one go.
-/// The folders it looks in come from <see cref="IPlatformPaths"/>.
+/// Backs the window that brings songs over from another program (ProPresenter,
+/// EasyWorship or Holyrics) without asking the operator to hunt for files: the
+/// operator picks the program, this looks where that one keeps its libraries,
+/// lists what it found with the song count, and imports the ticked ones in one
+/// go. The folders it looks in come from <see cref="IPlatformPaths"/>.
+/// Holyrics encrypts its library, so its songs come from the .json or .txt
+/// files that Holyrics itself saves (Canción → Exportar), which work on its
+/// free plan.
 /// </summary>
 public sealed partial class SongImportViewModel : ObservableObject
 {
@@ -51,12 +58,17 @@ public sealed partial class SongImportViewModel : ObservableObject
     {
         [SongImportSource.ProPresenter] = [],
         [SongImportSource.EasyWorship] = [],
+        [SongImportSource.Holyrics] = [],
     };
     private readonly Dictionary<SongImportSource, string> _roots = new()
     {
         [SongImportSource.ProPresenter] = string.Empty,
         [SongImportSource.EasyWorship] = string.Empty,
+        [SongImportSource.Holyrics] = string.Empty,
     };
+
+    /// <summary>Why the last Holyrics file could not be read; empty when it could.</summary>
+    private string _holyricsError = string.Empty;
 
     public SongImportViewModel(SongSaver songSaver, IPlatformPaths paths)
     {
@@ -79,7 +91,18 @@ public sealed partial class SongImportViewModel : ObservableObject
     /// <summary>The libraries found for the program chosen.</summary>
     public List<SongLibraryRow> Rows => _rows[Source];
 
-    public string SourceName => Source == SongImportSource.ProPresenter ? "ProPresenter" : "EasyWorship";
+    public string SourceName => NameOf(Source);
+
+    private static string NameOf(SongImportSource source) => source switch
+    {
+        SongImportSource.ProPresenter => "ProPresenter",
+        SongImportSource.EasyWorship => "EasyWorship",
+        _ => "Holyrics",
+    };
+
+    /// <summary>The heading above the list.</summary>
+    public string ListTitle =>
+        Source == SongImportSource.Holyrics ? "CANCIONES ENCONTRADAS" : "BIBLIOTECAS ENCONTRADAS";
 
     [ObservableProperty]
     private string _headerText = "Buscando…";
@@ -119,7 +142,7 @@ public sealed partial class SongImportViewModel : ObservableObject
 
     /// <summary>
     /// Looks for both programs, so each choice says how much it found. Returns
-    /// the one to open first: the one that has songs, and with both,
+    /// the one to open first: the one that has songs, and with several,
     /// ProPresenter as always.
     /// </summary>
     public SongImportSource DiscoverAll()
@@ -138,7 +161,7 @@ public sealed partial class SongImportViewModel : ObservableObject
     /// <summary>«ProPresenter  ·  12»: the name of the program with how many songs it has, if any.</summary>
     public string ChoiceLabel(SongImportSource source)
     {
-        var name = source == SongImportSource.ProPresenter ? "ProPresenter" : "EasyWorship";
+        var name = NameOf(source);
         return Total(source) > 0 ? $"{name}  ·  {Total(source)}" : name;
     }
 
@@ -216,7 +239,11 @@ public sealed partial class SongImportViewModel : ObservableObject
     private void ShowSource()
     {
         var total = Total(Source);
-        if (Rows.Count == 0)
+        if (Source == SongImportSource.Holyrics)
+        {
+            ShowHolyrics(total);
+        }
+        else if (Rows.Count == 0)
         {
             HeaderText = $"No encontré {SourceName} en esta computadora.";
             RootText = Source == SongImportSource.ProPresenter
@@ -241,6 +268,87 @@ public sealed partial class SongImportViewModel : ObservableObject
             ? "Si tus canciones están en otro lado (un disco externo, una copia), elegí la carpeta a mano"
             : "Si tus canciones están en otro lado (una copia, otra computadora), elegí la carpeta que tiene Songs.db y SongWords.db";
         ShowCloudWarning();
+    }
+
+    /// <summary>What the window says for Holyrics: the songs read, or how to get them.</summary>
+    private void ShowHolyrics(int total)
+    {
+        if (Rows.Count > 0)
+        {
+            HeaderText = total > 0
+                ? $"Encontré {total} canción(es) en Holyrics. Marcá las que querés importar."
+                : "Ese archivo no tiene canciones.";
+            RootText = _roots[SongImportSource.Holyrics];
+            CanImport = total > 0;
+            return;
+        }
+
+        HeaderText = _holyricsError.Length > 0
+            ? _holyricsError
+            : "Elegí los archivos que guardaste desde Holyrics.";
+        RootText =
+            "Holyrics guarda sus canciones cifradas, así que se traen desde un archivo que Holyrics mismo guarda:\n"
+            + "1. En Holyrics, entrá en Canción → Exportar → «Exportación en lote…».\n"
+            + "2. Elegí las canciones (la flecha → las pasa a la derecha), tipo JSON, y tocá Guardar.\n"
+            + "3. Acá abajo tocá «Abrir archivos…» y elegí ese archivo.\n"
+            + "También sirven los .json y .txt de una sola canción (Archivo → Guardar → Canción).";
+        CanImport = false;
+    }
+
+    /// <summary>
+    /// The way in for the free Holyrics: files saved from its «Guardar» or
+    /// «Exportación en lote» (.json or .txt) are read and listed, one row per
+    /// song, and the lists and texts are left up to date.
+    /// </summary>
+    public void ReadHolyricsFiles(IReadOnlyList<string> paths)
+    {
+        if (IsImporting || paths.Count == 0)
+            return;
+
+        var found = new List<(Song Song, string File)>();
+        var failed = new List<string>();
+        foreach (var path in paths)
+        {
+            try
+            {
+                foreach (var song in HolyricsImporter.FromFile(path))
+                    found.Add((song, Path.GetFileName(path)));
+            }
+            catch (Exception ex) when (ex is HolyricsException or IOException or UnauthorizedAccessException)
+            {
+                Log.Warning(ex, "No se pudo leer {File}", path);
+                failed.Add(Path.GetFileName(path));
+            }
+        }
+
+        _holyricsError = found.Count == 0
+            ? "No encontré canciones en ese archivo. Tiene que ser un .json o .txt guardado desde Holyrics."
+            : string.Empty;
+
+        if (found.Count > 0)
+        {
+            var detail = paths.Count == 1
+                ? $"Archivo de Holyrics: {Path.GetFileName(paths[0])}"
+                : $"{paths.Count} archivos de Holyrics";
+            if (failed.Count > 0)
+                detail += $"  ·  no se pudo leer: {string.Join(", ", failed)}";
+
+            // One row per song, each with its own tick box, so the operator picks which come over.
+            _rows[SongImportSource.Holyrics].Clear();
+            foreach (var (song, file) in found)
+            {
+                var one = song;
+                _rows[SongImportSource.Holyrics].Add(new SongLibraryRow(
+                    one.Title, file, 1, 0,
+                    () => [new SongImportItem(one.Title, null, () => one)],
+                    single: true));
+            }
+
+            _roots[SongImportSource.Holyrics] = detail;
+            Log.Information("Holyrics: {Count} canciones leídas de archivos", found.Count);
+        }
+
+        ShowSource();
     }
 
     /// <summary>The text of the dialog that asks for a folder.</summary>
@@ -355,7 +463,9 @@ public sealed partial class SongImportViewModel : ObservableObject
         var chosen = Rows.Where(r => r.Selected).ToList();
         if (chosen.Count == 0)
         {
-            Notice.Show("Marcá al menos una biblioteca.");
+            Notice.Show(Source == SongImportSource.Holyrics
+                ? "Marcá al menos una canción."
+                : "Marcá al menos una biblioteca.");
             return false;
         }
 

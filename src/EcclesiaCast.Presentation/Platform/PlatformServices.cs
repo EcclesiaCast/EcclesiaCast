@@ -19,6 +19,9 @@ public static class PlatformServices
     /// <summary>Notices and questions; null when there is no screen.</summary>
     public static INotices? Notices { get; set; }
 
+    /// <summary>The system's volume for the whole program; null where it has none (see <see cref="IProgramVolume"/>).</summary>
+    public static IProgramVolume? ProgramVolume { get; set; }
+
     /// <summary>The shared video engine; null until it was started.</summary>
     public static IVideoEngine? Video { get; set; }
 

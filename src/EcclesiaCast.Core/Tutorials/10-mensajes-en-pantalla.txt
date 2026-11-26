@@ -1,0 +1,57 @@
+titulo: Mensajes en pantalla
+resumen: Un anuncio a pantalla completa, o una franja abajo sin sacar lo que se ve.
+icono: 💬
+orden: 10
+
+[paso]
+señalar: ToolsTabs
+titulo: Dos maneras de avisar
+texto: «Texto rápido» y «Aviso al pie», dos pestañas de abajo a la derecha, funcionan parecido: escribís y lo mandás. Lo que cambia es cómo se ve en la pantalla principal. Vemos primero uno y después el otro.
+
+[paso]
+señalar: QuickTextBox
+abrir: herramienta:TabQuick
+titulo: Texto rápido: escribilo
+texto: Escribí el anuncio acá. Enter hace un renglón nuevo. Mientras escribís se arma en el PREVIEW, y la gente todavía no lo ve.
+
+[paso]
+señalar: QuickTextFontBox
+abrir: herramienta:TabQuick
+titulo: La tipografía
+texto: Sale con el tema de las canciones. Si querés otra letra sólo para el texto rápido, elegila acá. Si lo dejás vacío, queda la del tema.
+
+[paso]
+señalar: QuickTextButton
+abrir: herramienta:TabQuick
+titulo: Proyectalo
+texto: Con «Proyectar ▶» (o Ctrl+Enter) va a la pantalla en lugar de la letra o el versículo. Para sacarlo, usá Clear (F2) o proyectá otra cosa.
+
+[paso]
+señalar: OverlayTextBox
+abrir: herramienta:TabOverlay
+titulo: Aviso al pie: escribilo
+texto: Se usa parecido: escribís acá y lo mandás. Pero sale como una franja abajo y no reemplaza lo que se ve. Sirve para «el auto ABC 123 tiene las luces prendidas».
+
+[paso]
+señalar: OverlayStyleRow
+abrir: herramienta:TabOverlay
+titulo: Su letra y su tamaño
+texto: Elegí la tipografía y el tamaño del aviso, de 20 a 160 (el de siempre es 54). Lo que elijas queda guardado para la próxima.
+
+[paso]
+señalar: OverlayButtons
+abrir: herramienta:TabOverlay
+titulo: Mostrar y Quitar
+texto: «Mostrar» (o Ctrl+Enter) pone la franja y se queda hasta que toques «Quitar». Si después cambiás el texto, tocá «Mostrar» otra vez.
+
+[paso]
+señalar: LiveView
+abrir: herramienta:TabOverlay
+titulo: En qué se diferencian
+texto: El texto rápido ocupa la pantalla, con el tema de las canciones, y se va con Clear. El aviso va encima de todo, incluso con Black, con su letra y tamaño; Clear no lo saca: tocá «Quitar».
+
+[paso]
+señalar: LiveView
+abrir: herramienta:TabOverlay
+titulo: Mirá cómo quedó
+texto: El recuadro LIVE muestra lo que está saliendo. El aviso al pie también llega a la pantalla de escenario, en los diseños «Cantantes» y «Predicador».

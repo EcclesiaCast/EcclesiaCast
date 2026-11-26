@@ -41,6 +41,7 @@ public partial class MainWindow : Window
 
             vm.IsOutputMerged = !_outputSplit;
             vm.MediaSelectionChanged += (_, _) => RefreshMediaSelectionVisuals();
+            vm.LyricsMatchFocused += (_, slide) => BringSlideIntoView(slide);
 
             // The grid of the Bible scrolls to the book picked or typed.
             vm.BibleBookTileFocusRequested += (_, tile) => Dispatcher.BeginInvoke(
@@ -425,8 +426,15 @@ public partial class MainWindow : Window
     /// </summary>
     private void AddSongMenu_Click(object sender, RoutedEventArgs e)
     {
-        if (DataContext is not MainViewModel vm || sender is not FrameworkElement anchor)
-            return;
+        if (sender is FrameworkElement anchor && BuildAddSongMenu(anchor) is { } menu)
+            menu.IsOpen = true;
+    }
+
+    /// <summary>The ➕ Agregar menu, built but not open (the Nueva canción tutorial opens it too).</summary>
+    private ContextMenu? BuildAddSongMenu(FrameworkElement anchor)
+    {
+        if (DataContext is not MainViewModel vm)
+            return null;
 
         var menu = new ContextMenu
         {
@@ -461,7 +469,7 @@ public partial class MainWindow : Window
             ToolTip = "Elegir archivos sueltos de texto o de ProPresenter",
         });
 
-        menu.IsOpen = true;
+        return menu;
     }
 
     /// <summary>A dimmed, bold row that names the group of entries under it.</summary>
@@ -914,6 +922,31 @@ public partial class MainWindow : Window
                 case "OpenLocationItem":
                     item.Visibility = isWeb ? Visibility.Collapsed : Visibility.Visible;
                     break;
+                case "UseAsSongBackgroundItem":
+                    item.Visibility = !vm.IsBibleTabActive && count == 1 && vm.SongForBackground is not null
+                        && media.Type is MediaType.Image or MediaType.Video or MediaType.YouTube
+                        ? Visibility.Visible : Visibility.Collapsed;
+                    item.Header = vm.SongForBackground is { } open
+                        ? $"Usar como fondo de «{open.Title.Replace("_", "__")}»"
+                        : "Usar como fondo de la canción";
+                    break;
+                case "UseAsBibleBackgroundItem":
+                    // Not on the one that already is: there «Quitar» takes its place.
+                    item.Visibility = vm.IsBibleTabActive && count == 1
+                        && media.Type is MediaType.Image or MediaType.Video or MediaType.YouTube
+                        && vm.BibleBackgroundMedia?.Id != media.Id
+                        ? Visibility.Visible : Visibility.Collapsed;
+                    item.ToolTip = vm.BibleBackgroundMedia is { } previous
+                        ? $"Reemplaza a «{previous.Name}». Se pone solo cada vez que proyectes un versículo después de otra cosa."
+                        : "Se pone solo cada vez que proyectes un versículo después de otra cosa.";
+                    break;
+                case "RemoveBibleBackgroundItem":
+                    item.Visibility = vm.IsBibleTabActive && vm.BibleBackgroundMedia is not null
+                        ? Visibility.Visible : Visibility.Collapsed;
+                    item.Header = vm.BibleBackgroundMedia is { } bible
+                        ? $"Quitar el fondo de la Biblia («{bible.Name.Replace("_", "__")}»)"
+                        : "Quitar el fondo de la Biblia";
+                    break;
                 case "UseAsLogoItem":
                     // A page drawn from a PDF or presentation, or the video made
                     // from a GIF, is deleted with its media, and the logo would
@@ -1302,6 +1335,29 @@ public partial class MainWindow : Window
 
     private DateTime _historyClosedAt = DateTime.MinValue;
 
+    /// <summary>
+    /// Below this width of the row, «🕘 Historial» goes back to just 🕘: the box
+    /// for the reference keeps about 150 px, enough for «1 co 13 4-7».
+    /// </summary>
+    private const double BibleHistoryWordWidth = 360;
+
+    private void BibleQueryRow_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (!e.WidthChanged)
+            return;
+
+        BibleHistoryButton.Content = e.NewSize.Width >= BibleHistoryWordWidth ? "🕘 Historial" : "🕘 Hist.";
+    }
+
+    /// <summary>With a narrow panel «➕ Agregar» becomes «➕», so the buttons leave room for the title.</summary>
+    private void SongsHeaderRow_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (!e.WidthChanged)
+            return;
+
+        SongsAddButton.Content = e.NewSize.Width >= 260 ? "➕ Agregar" : "➕";
+    }
+
     private void BibleHistoryButton_Click(object sender, RoutedEventArgs e)
     {
         // A popup that does not stay open closes on the mouse press that is
@@ -1482,7 +1538,7 @@ public partial class MainWindow : Window
             || _slideDragItem is not { } item
             || sender is not FrameworkElement card
             || DataContext is not MainViewModel vm
-            || !vm.CanMoveSlide(item))
+            || !vm.IsSongSlide(item))
             return;
 
         var moved = e.GetPosition(this) - start;
@@ -1491,6 +1547,18 @@ public partial class MainWindow : Window
             return;
 
         _slideDragStart = null;
+
+        // The order is locked (🔒): nothing moves; the bar says how to unlock it
+        // and the lock blinks so it is found.
+        if (!vm.CanMoveSlide(item))
+        {
+            // Letting go must not project the slide: it was a drag, not a click.
+            card.ReleaseMouseCapture();
+            vm.TellSlidesOrderIsLocked();
+            BlinkSlidesLock();
+            return;
+        }
+
         var layer = AdornerLayer.GetAdornerLayer(SlidesScroll);
         _slideDragAdorner = new SlideDragAdorner(SlidesScroll, card, (Brush)FindResource("AccentBrush"));
         layer?.Add(_slideDragAdorner);
@@ -1508,6 +1576,247 @@ public partial class MainWindow : Window
             _slideDragItem = null;
         }
     }
+
+    /// <summary>
+    /// «🖼 Fondo» over the slides: use the background on the screen as the
+    /// song's own, or take it away. Choosing one from the media bar is a right
+    /// click on its card, which the last line says.
+    /// </summary>
+    private void SongBackgroundButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm || sender is not FrameworkElement anchor)
+            return;
+
+        var menu = new ContextMenu
+        {
+            PlacementTarget = anchor,
+            Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom,
+        };
+        menu.Items.Add(new MenuItem
+        {
+            Header = "Usar el fondo que está en pantalla",
+            Command = vm.UseCurrentBackgroundForSongCommand,
+            ToolTip = "La imagen o el video que se ve ahora pasa a ser el fondo de esta canción",
+        });
+        menu.Items.Add(new MenuItem
+        {
+            Header = "Quitar el fondo propio",
+            Command = vm.RemoveSongBackgroundCommand,
+            IsEnabled = vm.SongHasOwnBackground,
+        });
+        menu.Items.Add(new Separator());
+        AddBackgroundChoices(menu, vm, vm.UseMediaAsSongBackgroundCommand);
+        menu.IsOpen = true;
+    }
+
+    /// <summary>The button «🖼 Biblia: …» over the slides: the Bible's own background.</summary>
+    private void BibleBackgroundButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm || sender is not FrameworkElement anchor)
+            return;
+
+        var menu = new ContextMenu
+        {
+            PlacementTarget = anchor,
+            Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom,
+        };
+        menu.Items.Add(new MenuItem
+        {
+            Header = "Usar el fondo que está en pantalla",
+            Command = vm.UseCurrentBackgroundForBibleCommand,
+            ToolTip = "La imagen o el video que se ve ahora pasa a ser el fondo de la Biblia",
+        });
+        menu.Items.Add(new MenuItem
+        {
+            Header = "Quitar el fondo propio",
+            Command = vm.RemoveBibleBackgroundCommand,
+            IsEnabled = vm.BibleHasOwnBackground,
+        });
+        menu.Items.Add(new Separator());
+        AddBackgroundChoices(menu, vm, vm.UseMediaAsBibleBackgroundCommand);
+        menu.IsOpen = true;
+    }
+
+    /// <summary>Room the title and the «EN VIVO» badge keep beside the Bible's controls.</summary>
+    private const double GridTitleRoom = 340;
+
+    private void GridHeader_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (e.WidthChanged)
+            PlaceBibleGridTools();
+    }
+
+    private void BibleGridTools_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) =>
+        Dispatcher.BeginInvoke(PlaceBibleGridTools, System.Windows.Threading.DispatcherPriority.Loaded);
+
+    /// <summary>
+    /// The Bible's controls sit at the right of the bar over the slides; when
+    /// they would crowd the title out, they take a row of their own under it.
+    /// </summary>
+    private void PlaceBibleGridTools()
+    {
+        if (!BibleGridTools.IsVisible)
+            return;
+
+        // What they would take in one line.
+        var wanted = BibleGridTools.Children.OfType<FrameworkElement>().Sum(child =>
+        {
+            child.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            return child.DesiredSize.Width;
+        });
+        var dock = GridHeader.ActualWidth < wanted + GridTitleRoom ? Dock.Bottom : Dock.Right;
+        if (DockPanel.GetDock(BibleGridTools) == dock)
+            return;
+
+        DockPanel.SetDock(BibleGridTools, dock);
+        BibleGridTools.Margin = new Thickness(0, dock == Dock.Bottom ? 6 : 0, 0, 0);
+    }
+
+    /// <summary>«Elegir un fondo de la biblioteca»: a submenu per tab with its backgrounds, each one picks it.</summary>
+    private static void AddBackgroundChoices(ContextMenu menu, MainViewModel vm, System.Windows.Input.ICommand pick)
+    {
+        var choose = new MenuItem { Header = "Elegir un fondo de la biblioteca" };
+        // What goes on top of everything carries the same icon as its tab.
+        static object Marked(string name, bool onTop)
+        {
+            if (!onTop)
+                return name.Replace("_", "__");
+
+            var row = new StackPanel { Orientation = Orientation.Horizontal, ToolTip = Core.Media.OnTopIcon.Explanation };
+            row.Children.Add(new TextBlock { Text = name, Margin = new Thickness(0, 0, 6, 0) });
+            row.Children.Add(Controls.OnTopMark.Create(11));
+            return row;
+        }
+
+        foreach (var (tab, tabOnTop, items) in vm.BackgroundChoicesByTab())
+        {
+            var tabItem = new MenuItem { Header = Marked(tab, tabOnTop) };
+            foreach (var (media, onTop) in items.Take(60))
+            {
+                tabItem.Items.Add(new MenuItem
+                {
+                    Header = Marked(media.Name, onTop && !tabOnTop),
+                    Command = pick,
+                    CommandParameter = media,
+                });
+            }
+
+            choose.Items.Add(tabItem);
+        }
+
+        if (choose.Items.Count == 0)
+        {
+            choose.Header = "No hay fondos en la biblioteca todavía (Fondos → Bajar más fondos…)";
+            choose.IsEnabled = false;
+        }
+
+        menu.Items.Add(choose);
+    }
+
+    /// <summary>
+    /// «Elegir…» of a name plate: the logos of the library first (a picture or
+    /// a video), then any picture or video from the computer.
+    /// </summary>
+    private void ChooseNamePlateImage_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm || sender is not FrameworkElement anchor)
+            return;
+
+        var menu = new ContextMenu
+        {
+            PlacementTarget = anchor,
+            Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom,
+        };
+
+        var logos = vm.NamePlateLogoChoices();
+        if (logos.Count > 0)
+        {
+            menu.Items.Add(new MenuItem { Header = "Tus logos", IsEnabled = false });
+            foreach (var (name, path) in logos)
+            {
+                var item = new MenuItem
+                {
+                    Header = (EcclesiaCast.Core.Presentation.NamePlateMedia.IsVideo(path) ? "🎞 " : "🖼 ") + name,
+                    ToolTip = path,
+                };
+                item.Click += (_, _) => vm.UseNamePlateImage(path);
+                menu.Items.Add(item);
+            }
+            menu.Items.Add(new Separator());
+        }
+
+        menu.Items.Add(new MenuItem
+        {
+            Header = "Otra imagen o video de la computadora…",
+            Command = vm.ChooseNamePlateFileCommand,
+        });
+        menu.IsOpen = true;
+    }
+
+    /// <summary>Double click on a saved name plate: it goes on the screen.</summary>
+    private void SavedPlatesList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (DataContext is MainViewModel vm
+            && e.OriginalSource is DependencyObject source
+            && ItemsControl.ContainerFromElement(SavedPlatesList, source) is ListBoxItem { DataContext: EcclesiaCast.Core.Presentation.NamePlate plate })
+            vm.ShowSavedNamePlateCommand.Execute(plate);
+    }
+
+    /// <summary>Two quick blinks of the lock, to show where it is.</summary>
+    private void BlinkSlidesLock()
+    {
+        var blink = new System.Windows.Media.Animation.DoubleAnimation(1, 0.25, TimeSpan.FromMilliseconds(180))
+        {
+            AutoReverse = true,
+            RepeatBehavior = new System.Windows.Media.Animation.RepeatBehavior(2),
+        };
+        SlidesLockButton.BeginAnimation(OpacityProperty, blink);
+    }
+
+    // ── Buscar en la letra ───────────────────────────────────────
+
+    /// <summary>
+    /// Enter projects the slide found, ↓ / F3 go to the next one, ↑ to the
+    /// previous one, Esc clears the box. Handled here so F3 (Logo) and the
+    /// arrows do not reach the window while typing.
+    /// </summary>
+    private void LyricsSearchBox_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm)
+            return;
+
+        switch (e.Key)
+        {
+            case Key.Enter:
+                vm.ProjectLyricsMatchCommand.Execute(null);
+                break;
+            case Key.Down:
+            case Key.F3 when Keyboard.Modifiers == ModifierKeys.None:
+                vm.NextLyricsMatchCommand.Execute(null);
+                break;
+            case Key.Up:
+            case Key.F3 when Keyboard.Modifiers == ModifierKeys.Shift:
+                vm.PreviousLyricsMatchCommand.Execute(null);
+                break;
+            case Key.Escape:
+                if (vm.LyricsSearchText.Length == 0)
+                    return; // an empty box lets Esc do what it always does
+                vm.ClearLyricsSearchCommand.Execute(null);
+                break;
+            default:
+                return;
+        }
+
+        e.Handled = true;
+    }
+
+    /// <summary>Scrolls the grid so the slide found is in sight.</summary>
+    private void BringSlideIntoView(SlideItemViewModel slide) =>
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (SlideGrid.ItemContainerGenerator.ContainerFromItem(slide) is FrameworkElement card)
+                card.BringIntoView();
+        }, System.Windows.Threading.DispatcherPriority.Loaded);
 
     private static SlideItemViewModel? DraggedSlide(DragEventArgs e) =>
         e.Data.GetData(typeof(SlideItemViewModel)) as SlideItemViewModel;
@@ -1639,14 +1948,6 @@ public partial class MainWindow : Window
                 CommandParameter = slide,
             });
         }
-
-        menu.Items.Add(new Separator());
-        menu.Items.Add(new MenuItem
-        {
-            Header = "Corregir el texto…",
-            Command = vm.CorrectVerseTextCommand,
-            CommandParameter = slide,
-        });
 
         menu.IsOpen = true;
     }

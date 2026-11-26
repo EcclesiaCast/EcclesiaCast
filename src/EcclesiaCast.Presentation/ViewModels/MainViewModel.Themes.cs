@@ -29,12 +29,24 @@ public sealed partial class MainViewModel
     [RelayCommand]
     private void RefreshDisplays()
     {
-        var saved = SelectedDisplay?.Info.DeviceName ?? _settings.Get(OutputDisplayKey);
+        var all = _displayProvider.GetDisplays();
+        var saved = SelectedDisplay?.Info.DeviceName
+            ?? FloatingOutput.Remembered(all, _settings.Get(OutputChoiceKey), _settings.Get(OutputDisplayKey));
         var savedStage = SelectedStageDisplay?.Info.DeviceName ?? _settings.Get(StageDisplayKey);
 
+        _refreshingDisplays = true;
         Displays.Clear();
         StageDisplays.Clear();
-        var all = _displayProvider.GetDisplays();
+
+        // An ordinary window (to share by Discord, or with a single screen). With
+        // one screen only it goes first: a full screen there covers the program.
+        // Where there is no such window (not on a Mac yet) the list has no entry,
+        // and the choice below falls back to the first screen.
+        var hasFloating = _platformInfo.IsAvailable(Feature.FloatingOutput);
+        var floating = new DisplayOption(FloatingOutput.For(FloatingOutputSettings.Current.Shape), FloatingOutput.Label);
+        if (hasFloating && FloatingOutput.GoesFirst(all))
+            Displays.Add(floating);
+
         for (var i = 0; i < all.Count; i++)
         {
             var d = all[i];
@@ -43,16 +55,22 @@ public sealed partial class MainViewModel
             StageDisplays.Add(new DisplayOption(d, label));
         }
 
+        if (hasFloating && !FloatingOutput.GoesFirst(all))
+            Displays.Add(floating);
+
         // The last entry opens no window at all: the words go only to the pages
         // for OBS. The stage never lands on it, so it stays out of that list.
         Displays.Add(new DisplayOption(BroadcastOnlyOutput.For(all), BroadcastOnlyOutput.Label));
 
-        // Prefer the remembered display, then the first secondary one; the
-        // stream-only entry is only ever picked by hand.
+        // The remembered one; else, with a single screen, the window; else the
+        // projector. The stream-only entry is only ever picked by hand.
+        // (Refreshing the list keeps whatever is chosen, «only the stream» too.)
+        var start = FloatingOutput.StartingChoice(all, saved);
         SelectedDisplay =
             Displays.FirstOrDefault(o => o.Info.DeviceName == saved)
-            ?? Displays.FirstOrDefault(o => !o.BroadcastOnly && !o.Info.IsPrimary)
+            ?? Displays.FirstOrDefault(o => o.Info.DeviceName == start)
             ?? Displays.FirstOrDefault();
+        _refreshingDisplays = false;
 
         // The stage goes anywhere but the congregation's screen.
         SelectedStageDisplay =
@@ -86,6 +104,8 @@ public sealed partial class MainViewModel
     {
         if (!_themeManager.Show())
             return;
+
+        SyncBibleSplit();
 
         // Re-render whatever is on the grid with the fresh themes, keeping
         // the live slide projected.
@@ -141,13 +161,14 @@ public sealed partial class MainViewModel
 
         // A verse is found by its number, not its label: after a theme change
         // it may take more or fewer slides, and its label changes with it.
+        // With fewer parts than before, the last one is the nearest to what
+        // was being read.
         int index;
         if (live.Verses is { } verses)
         {
             index = FindVerseSlide(verses.Chapter, verses.FirstVerse);
-            if (index >= 0 && part > 0 && index + part < Slides.Count
-                && Slides[index + part].Verses?.FirstVerse == verses.FirstVerse)
-                index += part;
+            if (index >= 0 && part > 0)
+                index = Math.Min(index + part, FindVerseSlide(verses.Chapter, verses.FirstVerse, lastPart: true));
         }
         else
         {

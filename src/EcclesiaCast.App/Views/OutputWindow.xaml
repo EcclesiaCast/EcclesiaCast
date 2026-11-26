@@ -12,7 +12,11 @@
         Cursor="None"
         Background="Black"
         MouseDoubleClick="Output_MouseDoubleClick">
-    <Grid>
+    <!-- Frame: el interior de la ventana. Stage: la imagen. A pantalla completa son lo
+         mismo; en la ventana flotante («En una ventana») Stage queda con la forma
+         elegida, centrada, y lo que sobra son bandas negras. -->
+    <Grid x:Name="Frame" Background="Black" SizeChanged="Frame_SizeChanged">
+    <Grid x:Name="Stage">
         <!-- Relleno: se ve donde el fondo no llega (zoom hacia afuera, un
              tamaño fijo más chico, o barras por la proporción) -->
         <Rectangle x:Name="FillColorLayer" Visibility="Collapsed"/>
@@ -37,6 +41,7 @@
                                 Slide="{Binding Slide}"
                                 State="{Binding State}"
                                 Overlay="{Binding Overlay}"
+                                NamePlate="{Binding NamePlate}"
                                 OverlayFontFamily="{Binding OverlayFontFamily}"
                                 OverlayFontSize="{Binding OverlayFontSize}"
                                 Countdown="{Binding Countdown}"
@@ -61,5 +66,6 @@
             <TextBlock Text="Para volver al programa: tecla Esc o doble clic en esta pantalla"
                        FontFamily="Segoe UI" FontSize="20" Foreground="White"/>
         </Border>
+    </Grid>
     </Grid>
 </Window>

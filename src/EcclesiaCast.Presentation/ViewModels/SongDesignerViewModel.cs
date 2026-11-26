@@ -89,6 +89,13 @@ public sealed class SongDesignerViewModel
     private readonly List<string> _texts;
 
     /// <summary>
+    /// The slides as they will be saved, in order: the song's own ones plus
+    /// any new one added here. The song is only touched by <see cref="Save"/>,
+    /// so cancelling leaves it exactly as it was.
+    /// </summary>
+    private readonly List<SongSection> _working;
+
+    /// <summary>
     /// Slides the operator actually changed in this session. Only these get
     /// their format written out in full; the rest keep whatever they had.
     ///
@@ -98,6 +105,9 @@ public sealed class SongDesignerViewModel
     /// </summary>
     private readonly HashSet<int> _touched = [];
 
+    /// <summary>The slides made in this session with «➕ Nueva diapositiva».</summary>
+    private readonly HashSet<SongSection> _added = [];
+
     public SongDesignerViewModel(Song song, SlideTheme theme, IColorPicker colorPicker, IFontCatalog fonts)
     {
         _song = song;
@@ -106,6 +116,7 @@ public sealed class SongDesignerViewModel
         FontNames = fonts.InstalledFamilies();
         _overrides = song.Sections.Select(s => s.GetOverride()).ToList();
         _texts = song.Sections.Select(s => s.Text).ToList();
+        _working = song.Sections.ToList();
     }
 
     /// <summary>The installed fonts, for the font box.</summary>
@@ -122,9 +133,31 @@ public sealed class SongDesignerViewModel
     /// </summary>
     public int SelectedBox { get; set; } = -1;
 
-    public int SlideCount => _song.Sections.Count;
+    public int SlideCount => _working.Count;
 
-    public string SlideLabel(int slide) => _song.Sections[slide].Label;
+    public string SlideLabel(int slide) => _working[slide].Label;
+
+    /// <summary>
+    /// «➕ Nueva diapositiva»: an empty slide after the selected one (-1: at
+    /// the end). It looks like the theme until it is formatted; left empty, it
+    /// is not saved. Returns where it went.
+    /// </summary>
+    public int InsertSlideAfter(int selected)
+    {
+        var at = selected < 0 ? _working.Count : selected + 1;
+        var added = new SongSection { Label = "Nueva" };
+        _added.Add(added);
+        _working.Insert(at, added);
+        _texts.Insert(at, string.Empty);
+        _overrides.Insert(at, null);
+
+        // Slides after it move one place: so do their «edited» marks.
+        var shifted = _touched.Select(i => i >= at ? i + 1 : i).ToList();
+        _touched.Clear();
+        _touched.UnionWith(shifted);
+
+        return at;
+    }
 
     /// <summary>The design of a slide (null: it follows the theme).</summary>
     public SlideOverride? OverrideOf(int slide) => _overrides[slide];
@@ -553,17 +586,26 @@ public sealed class SongDesignerViewModel
     /// <summary>Writes the texts and the designs of the slides the operator worked on into the song.</summary>
     public void Save()
     {
-        for (var i = 0; i < _song.Sections.Count; i++)
+        var keep = new List<SongSection>();
+        for (var i = 0; i < _working.Count; i++)
         {
+            var section = _working[i];
             var text = _texts[i].Trim();
             if (text.Length > 0)
-                _song.Sections[i].Text = text;
+                section.Text = text;
+            else if (_added.Contains(section))
+                continue; // a new slide left empty is not kept
 
             // Slides the operator worked on keep exactly what the panel shows;
             // the rest are left alone so they keep following the theme.
             if (_touched.Contains(i))
-                _song.Sections[i].SetOverride(Clean(_overrides[i]));
+                section.SetOverride(Clean(_overrides[i]));
+            keep.Add(section);
         }
+
+        for (var i = 0; i < keep.Count; i++)
+            keep[i].Order = i;
+        _song.Sections = keep;
 
         Saved = true;
     }

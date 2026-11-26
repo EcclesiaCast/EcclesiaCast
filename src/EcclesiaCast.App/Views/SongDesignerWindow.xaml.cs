@@ -35,7 +35,7 @@ public partial class SongDesignerWindow : Window
     }
 
     private readonly SongDesignerViewModel _vm;
-    private readonly List<Thumb> _thumbs = [];
+    private readonly System.Collections.ObjectModel.ObservableCollection<Thumb> _thumbs = [];
 
     /// <summary>What the box on the canvas is editing (-1 the song's words, 0 and up the extra boxes): the view model keeps it.</summary>
     private int _selectedBox
@@ -206,6 +206,27 @@ public partial class SongDesignerWindow : Window
     {
         ColorSwatch.Background = BrushFromHex(ColorBox.Text.Trim());
         OutlineSwatch.Background = BrushFromHex(OutlineColorBox.Text.Trim());
+    }
+
+    // ── Diapositiva nueva ────────────────────────────────────────
+
+    /// <summary>
+    /// «➕ Nueva diapositiva» (GitHub #32): an empty slide after the selected
+    /// one, ready to write on. It looks like the theme until it is formatted;
+    /// left empty, it is not saved.
+    /// </summary>
+    private void NewSlide_Click(object sender, RoutedEventArgs e)
+    {
+        if (_editing)
+            CommitEdit();
+
+        var at = _vm.InsertSlideAfter(Selected);
+        _thumbs.Insert(at, new Thumb(_vm.SlideLabel(at), _vm.BuildSlide(at)));
+        SlidesList.SelectedIndex = at;
+        SlidesList.ScrollIntoView(SlidesList.SelectedItem);
+
+        // Straight into writing, as a double click on the box would.
+        Dispatcher.BeginInvoke(EnterEdit, System.Windows.Threading.DispatcherPriority.Input);
     }
 
     // ── Edición del texto sobre la propia diapositiva ────────────

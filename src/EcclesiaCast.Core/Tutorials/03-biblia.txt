@@ -1,0 +1,49 @@
+titulo: Proyectar la Biblia
+resumen: Buscá un pasaje, usá varias versiones y mandalo a pantalla.
+icono: 📖
+orden: 3
+
+[paso]
+señalar: BibleQueryRow
+titulo: La pestaña Biblia
+texto: Acá escribís el pasaje, por ejemplo «juan 3:16» o «sal 23», y apretás Enter. No hace falta escribir el nombre completo del libro.
+
+[paso]
+señalar: MenuBibles
+abrir: menu:MenuBibles
+titulo: Importar y bajar Biblias
+texto: En el menú Biblias bajás versiones de internet, importás una propia (JSON o XML) o pasás un paquete de una computadora a otra. Una vez bajadas, funcionan sin internet.
+
+[paso]
+señalar: BibleViewToggleButton
+abrir: vista:lista
+titulo: Modo lista
+texto: Los libros van en una lista, y al elegir uno ves sus capítulos y versículos. Es la vista de siempre. Este botón dice la vista actual: ahora dice «Lista», y al tocarlo pasa a Grilla.
+
+[paso]
+señalar: BibleViewToggleButton
+abrir: vista:grilla
+titulo: Modo grilla
+texto: Ahora el botón dice «Grilla»: los libros se ven como fichas de colores, con los capítulos y versículos al lado: se encuentra todo de un vistazo. Escribir una cita y Enter funciona igual en las dos.
+
+[paso]
+señalar: VersionsRow
+titulo: Varias versiones a la vez
+texto: Un clic en una versión la elige. Con Ctrl+clic sumás otra, y salen una debajo de la otra en la misma pantalla: sirve para leer dos o tres versiones juntas.
+
+[paso]
+señalar: BibleHistoryButton
+abrir: historial
+titulo: El Historial
+texto: Guarda los versículos que ya proyectaste. Un clic en uno lo carga y lo marca; doble clic lo proyecta de nuevo. También se abre con la flecha ↓ en la caja vacía.
+
+[paso]
+señalar: SlidesPanel
+titulo: Los versículos, en el recuadro principal
+texto: El pasaje aparece repartido en diapositivas en este recuadro. Un clic pone una en pantalla (la ves en LIVE), y con las flechas ← → pasás de versículo en versículo.
+
+[paso]
+señalar: MediaPanel
+abrir: pestana:biblia
+titulo: Un fondo para la Biblia
+texto: Con la pestaña Biblia abierta, clic derecho en un medio → «Usar como fondo de la Biblia»: se pone solo al proyectar versículos. El botón 🖼 arriba de ellos dice cuál está, y permite cambiarlo o quitarlo.

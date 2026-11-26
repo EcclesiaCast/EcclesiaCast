@@ -22,6 +22,12 @@ public sealed class WindowsPlatformPaths : IPlatformPaths
     public string DownloadsFolder => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), "EcclesiaCast");
 
+    public string MusicFolder => Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "EcclesiaCast");
+
+    public string AudioCacheFolder => Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EcclesiaCast", "audio-youtube");
+
     public string ToolsFolder => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "EcclesiaCast", "tools");

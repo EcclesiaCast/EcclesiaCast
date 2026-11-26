@@ -30,9 +30,16 @@ public static class FeedbackForm
     public static readonly DateTime AutoPromptUntil = new(2027, 6, 30);
 }
 
-/// <summary>What one person sends. Every part is optional.</summary>
+/// <summary>
+/// What one person sends. The comment is required; the church, the email and
+/// the usage summary are optional.
+/// </summary>
 public sealed record FeedbackMessage(string Kind, string Comment, string Church, string Email, string UsageSummary)
 {
-    public bool IsEmpty =>
-        string.IsNullOrWhiteSpace(Comment) && string.IsNullOrWhiteSpace(UsageSummary);
+    /// <summary>
+    /// Nothing written. A usage summary alone does not count: six of the first
+    /// 22 answers came as «Algo no funcionó» with only the summary, and those
+    /// can be neither understood nor answered.
+    /// </summary>
+    public bool IsEmpty => string.IsNullOrWhiteSpace(Comment);
 }

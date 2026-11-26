@@ -5,9 +5,10 @@ using System.Windows.Data;
 namespace EcclesiaCast.App.Converters;
 
 /// <summary>
-/// Shows the little speaker on a media tab that is silenced. Takes the tab's
-/// name and the set of silenced tabs; both are needed so the icon appears and
-/// disappears the moment the set changes, without rebuilding the list.
+/// Shows a little icon on a media tab that is in a set: the speaker on the
+/// silenced ones, and the mark of those that go on top of everything. Takes the
+/// tab's name and the set; both are needed so the icon appears and disappears
+/// the moment the set changes, without rebuilding the list.
 /// </summary>
 public sealed class TabMutedToVisibilityConverter : IMultiValueConverter
 {

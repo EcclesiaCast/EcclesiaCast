@@ -25,6 +25,9 @@ public enum Feature
 
     /// <summary>The spelling checker of the editors.</summary>
     SpellCheck,
+
+    /// <summary>«⧉ En una ventana»: the output in an ordinary window.</summary>
+    FloatingOutput,
 }
 
 /// <summary>

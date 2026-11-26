@@ -14,6 +14,13 @@ public sealed class Song
     /// </summary>
     public int? ThemeId { get; set; }
 
+    /// <summary>
+    /// A background of its own (an image or a video of the media bar): it goes
+    /// on the screen by itself when the song does, instead of the one that was
+    /// there or one drawn at random. Null: no background of its own.
+    /// </summary>
+    public int? BackgroundMediaId { get; set; }
+
     /// <summary>When the song joined the library, for the "recently added" list.</summary>
     public DateTime AddedAt { get; set; } = DateTime.Now;
 

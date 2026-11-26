@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- Tutoriales de Ayuda: un archivo de texto cada uno, se suman sin tocar código. -->
+    <EmbeddedResource Include="Tutorials\*.txt" LogicalName="Tutorials/%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
     <InternalsVisibleTo Include="EcclesiaCast.Core.Tests" />
   </ItemGroup>
 

@@ -56,6 +56,72 @@ public class UsageCountTests
         Assert.False(UsageCount.ShouldSend(new Settings(), Sunday, isDevelopmentBuild: true));
     }
 
+    private static UsageCopy Church(string version = "1.5.0") =>
+        UsageCopy.Of(version, isDevelopmentBuild: false, testLibrary: null, uninstallerNextToProgram: true);
+
+    [Fact]
+    public void A_released_installed_copy_on_its_own_library_counts()
+    {
+        Assert.True(Church().Counts);
+        Assert.True(Church("1.5.0+d5929187").Counts); // build data after «+» is not a test version
+        Assert.True(UsageCount.ShouldSend(new Settings(), Sunday, Church()));
+    }
+
+    [Theory]
+    [InlineData("1.4.0-prueba.4")]
+    [InlineData("1.5.0-beta.1")]
+    [InlineData("1.5.0-rc.2+abc123")]
+    [InlineData("")]
+    [InlineData(null)]
+    public void A_test_version_does_not_count(string? version)
+    {
+        var copy = Church(version!);
+
+        Assert.True(copy.IsPreRelease);
+        Assert.False(copy.Counts);
+        Assert.False(UsageCount.ShouldSend(new Settings(), Sunday, copy));
+    }
+
+    [Fact]
+    public void A_copy_on_a_test_library_does_not_count()
+    {
+        var copy = UsageCopy.Of("1.5.0", false, testLibrary: @"C:\prueba\datos", uninstallerNextToProgram: true);
+
+        Assert.True(copy.UsesTestLibrary);
+        Assert.False(UsageCount.ShouldSend(new Settings(), Sunday, copy));
+        Assert.True(UsageCopy.Of("1.5.0", false, testLibrary: "  ", uninstallerNextToProgram: true).Counts);
+    }
+
+    [Fact]
+    public void A_copy_run_from_a_loose_folder_does_not_count()
+    {
+        var copy = UsageCopy.Of("1.5.0", false, null, uninstallerNextToProgram: false);
+
+        Assert.False(copy.IsInstalled);
+        Assert.False(UsageCount.ShouldSend(new Settings(), Sunday, copy));
+    }
+
+    [Fact]
+    public void A_copy_that_does_not_count_never_draws_an_installation_number()
+    {
+        // The reporter only asks for the ping after ShouldSend says yes, so a
+        // copy that does not count leaves the settings untouched.
+        var settings = new Settings();
+        foreach (var copy in new[]
+        {
+            Church("1.5.0-prueba.1"),
+            UsageCopy.Of("1.5.0", false, @"C:\prueba", true),
+            UsageCopy.Of("1.5.0", false, null, false),
+            UsageCopy.Of("1.5.0", true, null, true),
+        })
+        {
+            Assert.False(UsageCount.ShouldSend(settings, Sunday, copy));
+        }
+
+        Assert.False(settings.Values.ContainsKey(UsageCount.InstallKey));
+        Assert.False(settings.Values.ContainsKey(UsageCount.LastSentKey));
+    }
+
     [Fact]
     public void Once_a_day_and_again_the_next_day()
     {

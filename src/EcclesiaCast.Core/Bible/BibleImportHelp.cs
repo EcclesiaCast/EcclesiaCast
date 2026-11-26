@@ -58,6 +58,33 @@ public static class BibleImportHelp
         return xml.ToString();
     }
 
+    /// <summary>
+    /// The example as an OpenSong XML file, the shape ProPresenter, Holyrics
+    /// and FreeShow use: each book by its name, in the usual order.
+    /// </summary>
+    public static string ExampleOpenSongXml()
+    {
+        var xml = new StringBuilder();
+        xml.AppendLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+        xml.AppendLine("<bible>");
+        foreach (var book in SampleBible().Books)
+        {
+            xml.AppendLine($"  <b n=\"{SecurityElement.Escape(book.Name)}\">");
+            foreach (var chapter in book.Verses.GroupBy(v => v.Chapter))
+            {
+                xml.AppendLine($"    <c n=\"{chapter.Key}\">");
+                foreach (var verse in chapter)
+                    xml.AppendLine($"      <v n=\"{verse.Verse}\">{SecurityElement.Escape(verse.Text)}</v>");
+                xml.AppendLine("    </c>");
+            }
+
+            xml.AppendLine("  </b>");
+        }
+
+        xml.AppendLine("</bible>");
+        return xml.ToString();
+    }
+
     /// <summary>The first lines of the JSON example, enough to see its shape without scrolling through 66 books.</summary>
     public static string JsonPreview(int lines = 14)
     {
@@ -92,6 +119,8 @@ public static class BibleImportHelp
         ]
 
         TAMBIÉN SIRVE el formato Zefania XML: <XMLBIBLE><BIBLEBOOK bnumber="43" bname="Juan"><CHAPTER cnumber="3"><VERS vnumber="16">texto</VERS></CHAPTER></BIBLEBOOK></XMLBIBLE>, donde bnumber es el número del libro (de 1 a 66).
+
+        Y TAMBIÉN el XML de OpenSong (el que usan ProPresenter, Holyrics y FreeShow): <bible><b n="Juan"><c n="3"><v n="16">texto</v></c></b></bible>, con los libros en el orden de siempre.
 
         COMO UNA BIBLIA ENTERA NO ENTRA EN UNA RESPUESTA, no me escribas el archivo convertido. En su lugar:
         1. Preguntame cómo es el archivo o el texto que tengo (si es un .txt, un .docx, un .pdf, una página web, otro formato) y pedime que te pegue unas líneas de ejemplo.

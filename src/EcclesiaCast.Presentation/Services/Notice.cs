@@ -9,6 +9,9 @@ namespace EcclesiaCast.Presentation.Services;
 /// </summary>
 public static class Notice
 {
+    /// <summary>Written inside a message, the window draws there the «goes on top of everything» icon.</summary>
+    public const string OnTopIconMark = "{icono-encima}";
+
     /// <summary>A notice with a single button.</summary>
     public static void Show(string message, string? title = null,
         NoticeKind kind = NoticeKind.Info, string ok = "Entendido")

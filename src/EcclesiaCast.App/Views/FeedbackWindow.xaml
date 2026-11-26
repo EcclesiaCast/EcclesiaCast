@@ -18,9 +18,14 @@
 
         <TextBlock Text="Tu comentario" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,4"/>
         <TextBox x:Name="CommentBox" Height="110" AcceptsReturn="True" TextWrapping="Wrap"
+                 TextChanged="CommentBox_TextChanged"
                  VerticalScrollBarVisibility="Auto" SpellCheck.IsEnabled="True"
                  Background="{StaticResource SurfaceAltBrush}" Foreground="White"
                  BorderBrush="{StaticResource LineBrush}" CaretBrush="White" Padding="8,6" FontSize="14"/>
+        <!-- Sin texto no se puede enviar: con sólo el resumen de uso no se entiende qué pasó -->
+        <TextBlock x:Name="CommentHint" FontSize="12" Foreground="{StaticResource FaintBrush}" TextWrapping="Wrap"
+                   Margin="0,4,0,0"
+                   Text="Escribí aunque sea una frase para poder enviar: con sólo el resumen de uso no sabemos qué pasó ni cómo contestarte."/>
 
         <Grid Margin="0,12,0,0">
             <Grid.ColumnDefinitions>

@@ -145,7 +145,11 @@ public sealed partial class MainViewModel
 
     partial void OnSearchTextChanged(string value) => LoadSongs();
 
-    partial void OnSelectedSongChanged(Song? value) => BuildSongSlides();
+    partial void OnSelectedSongChanged(Song? value)
+    {
+        BuildSongSlides();
+        AfterSongSlidesBuilt();
+    }
 
     private void LoadSongs()
     {
@@ -253,9 +257,11 @@ public sealed partial class MainViewModel
             index = 0;
 
         var theme = ResolveSongTheme(SelectedSong);
+        var before = SongSnapshot.Of(SelectedSong);
         if (!_songDesigner.Edit(SelectedSong, theme, index))
             return;
 
+        RememberSongChange(before, "los cambios del diseño");
         NoteAction($"Guardar la canción «{SelectedSong.Title}»");
         var saved = _songs.Save(SelectedSong);
         ReloadSongKeepingPlace(saved.Id);
@@ -288,7 +294,9 @@ public sealed partial class MainViewModel
             return;
         }
 
+        var before = SongSnapshot.Of(SelectedSong!);
         section.Text = edited;
+        RememberSongChange(before, $"corregir el texto de «{section.Label}»");
         NoteAction($"Guardar la canción «{SelectedSong!.Title}»");
         var saved = _songs.Save(SelectedSong!);
         ReloadSongKeepingPlace(saved.Id);
@@ -320,9 +328,10 @@ public sealed partial class MainViewModel
             at = SelectedSong.Sections.Count;
 
         var c = _clipboardSlide.Value;
+        var before = SongSnapshot.Of(SelectedSong);
         SelectedSong.Sections.Insert(at,
             new SongSection { Label = c.Label, Text = c.Text, StyleJson = c.StyleJson });
-        ReindexAndSaveSong("Diapositiva pegada.");
+        ReindexAndSaveSong("Diapositiva pegada.", before, $"pegar «{c.Label}»");
     }
 
     [RelayCommand]
@@ -333,9 +342,10 @@ public sealed partial class MainViewModel
             return;
 
         var at = SelectedSong.Sections.FindIndex(s => s.Id == section.Id) + 1;
+        var before = SongSnapshot.Of(SelectedSong);
         SelectedSong.Sections.Insert(at,
             new SongSection { Label = section.Label, Text = section.Text, StyleJson = section.StyleJson });
-        ReindexAndSaveSong("Diapositiva duplicada.");
+        ReindexAndSaveSong("Diapositiva duplicada.", before, $"duplicar «{section.Label}»");
     }
 
     [RelayCommand]
@@ -351,8 +361,9 @@ public sealed partial class MainViewModel
             return;
         }
 
+        var before = SongSnapshot.Of(SelectedSong);
         SelectedSong.Sections.RemoveAll(s => s.Id == section.Id);
-        ReindexAndSaveSong("Diapositiva eliminada.");
+        ReindexAndSaveSong("Diapositiva eliminada. Ctrl+Z la trae de vuelta.", before, $"eliminar «{section.Label}»");
     }
 
     /// <summary>
@@ -381,21 +392,28 @@ public sealed partial class MainViewModel
         if (toIndex == fromIndex)
             return;
 
+        var before = SongSnapshot.Of(SelectedSong);
         sections.RemoveAt(fromIndex);
         sections.Insert(toIndex, from);
-        ReindexAndSaveSong($"«{from.Label}» pasó al lugar {toIndex + 1}.");
+        ReindexAndSaveSong($"«{from.Label}» pasó al lugar {toIndex + 1}. Ctrl+Z lo deshace.", before,
+            $"mover «{from.Label}» al lugar {toIndex + 1}");
     }
 
-    /// <summary>True for slides that can be dragged to a new place.</summary>
-    public bool CanMoveSlide(SlideItemViewModel? item) => SectionOf(item) is not null;
+    /// <summary>
+    /// True for slides that can be dragged to a new place: song slides, while
+    /// the order is not locked (🔒).
+    /// </summary>
+    public bool CanMoveSlide(SlideItemViewModel? item) => SectionOf(item) is not null && !SlidesOrderLocked;
 
-    private void ReindexAndSaveSong(string status)
+    private void ReindexAndSaveSong(string status, SongSnapshot before, string what)
     {
         if (SelectedSong is null)
             return;
 
         for (var i = 0; i < SelectedSong.Sections.Count; i++)
             SelectedSong.Sections[i].Order = i;
+
+        RememberSongChange(before, what);
 
         NoteAction($"Guardar la canción «{SelectedSong.Title}»");
         var saved = _songs.Save(SelectedSong);
@@ -492,10 +510,13 @@ public sealed partial class MainViewModel
         if (SelectedSong is null)
             return;
 
+        var before = SongSnapshot.Of(SelectedSong);
         var edited = _songEditor.Edit(SelectedSong);
         if (edited is null)
             return;
 
+        if (edited.Id == SelectedSong.Id && edited.Id > 0 && !before.SameAs(SongSnapshot.Of(edited)))
+            _songHistory.Record(edited.Id, before, "los cambios de la letra");
         NoteAction($"Guardar la canción «{edited.Title}»");
         var saved = _songs.Save(edited);
         ReloadSongKeepingPlace(saved.Id);
@@ -627,11 +648,11 @@ public sealed partial class MainViewModel
         var bytes = File.ReadAllBytes(path);
         try
         {
-            return new UTF8Encoding(false, throwOnInvalidBytes: true).GetString(bytes);
+            return new UTF8Encoding(false, throwOnInvalidBytes: true).GetString(bytes).TrimStart('﻿');
         }
         catch (DecoderFallbackException)
         {
-            return Encoding.Latin1.GetString(bytes);
+            return Encoding.Latin1.GetString(bytes).TrimStart('﻿');
         }
     }
 }

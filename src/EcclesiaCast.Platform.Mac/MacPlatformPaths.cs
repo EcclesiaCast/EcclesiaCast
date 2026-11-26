@@ -27,6 +27,12 @@ public sealed class MacPlatformPaths : IPlatformPaths
     /// <summary>Movies, where a Mac keeps videos.</summary>
     public string DownloadsFolder => Path.Combine(Home, "Movies", "EcclesiaCast");
 
+    /// <summary>Music, where a Mac keeps music.</summary>
+    public string MusicFolder => Path.Combine(Home, "Music", "EcclesiaCast");
+
+    /// <summary>A cache, so it goes to Caches.</summary>
+    public string AudioCacheFolder => Path.Combine(Home, "Library", "Caches", "EcclesiaCast", "audio-youtube");
+
     public string ToolsFolder => Path.Combine(Support, "tools");
 
     public string ModelsFolder => Path.Combine(Support, "modelos");

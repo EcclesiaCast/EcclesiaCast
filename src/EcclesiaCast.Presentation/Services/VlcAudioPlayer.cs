@@ -1,3 +1,4 @@
+using EcclesiaCast.Core.Audio;
 using EcclesiaCast.Presentation.Platform;
 using LibVLCSharp.Shared;
 using Serilog;
@@ -10,11 +11,19 @@ namespace EcclesiaCast.Presentation.Services;
 /// muting one cannot reach the other. The engine (the same LibVLC the video
 /// uses) is looked up when the first track plays, so a computer where it did
 /// not start simply has no audio list instead of failing at start-up.
+///
+/// It sends its sound through DirectSound, not through LibVLC's usual Windows
+/// output, so that the music list's bar acts while it is being dragged: the
+/// usual output has one volume for the whole program, and the equalizer (the
+/// other way to turn one player down) is only heard about 1.2 s later, because
+/// LibVLC passes the sound through it that long before it plays.
+/// Each song gets a new player: one that was stopped and played again came
+/// back at full volume and no longer obeyed (measured on LibVLC 3.0.23).
 /// </summary>
 public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
 {
     private MediaPlayer? _player;
-    private int _volume = 80;
+    private readonly LivePlayerVolume _volume = new(80);
 
     /// <summary>The file being played, to reopen it in place when the output device changes.</summary>
     private string? _path;
@@ -50,15 +59,16 @@ public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
     public TimeSpan Duration =>
         _player is { } player ? TimeSpan.FromMilliseconds(Math.Max(0, player.Length)) : TimeSpan.Zero;
 
+    /// <summary>
+    /// Set straight on the player, in the same call that moves the bar: with
+    /// DirectSound this is the volume of this player's own sound buffer, heard
+    /// right away (measured: about 0.06 s, against 1.2 to 1.3 s through the
+    /// equalizer). Nothing else touches the player from another thread.
+    /// </summary>
     public int Volume
     {
-        get => _volume;
-        set
-        {
-            _volume = Math.Clamp(value, 0, 100);
-            if (_player is { } player)
-                PlayerSound.SetVolume(player, _volume);
-        }
+        get => _volume.Value;
+        set => _volume.Value = value;
     }
 
     public void Play(string path) => PlayFrom(path, TimeSpan.Zero);
@@ -68,30 +78,43 @@ public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
         if (engine() is not { } libVlc)
             throw new InvalidOperationException("El motor de audio no está disponible.");
 
-        // Windows changed the audio device since this player opened its output:
-        // LibVLC keeps that output inside the player and it can stay dead, so
-        // this one is replaced by a new player (it has no video callbacks to
-        // keep alive, unlike the video surface).
-        if (_player is not null && _audioGeneration != AudioOutputChanges.Generation)
-            DiscardPlayer();
-        _audioGeneration = AudioOutputChanges.Generation;
-
-        var player = EnsurePlayer(libVlc);
-
-        // Stop the old input first, the way the video does: handing a player a
-        // new one while the old is still running is what corrupted its memory.
-        player.Stop();
-        Interlocked.Increment(ref _generation);
+        var player = NewPlayer(libVlc);
 
         using var media = new Media(libVlc, new Uri(path));
         // A cover picture or a video track inside the file must not open a window.
         media.AddOption(":no-video");
         if (start > TimeSpan.Zero)
             media.AddOption($":start-time={start.TotalSeconds.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)}");
-        PlayerSound.KeepSessionFull(player);
-        PlayerSound.SetVolume(player, _volume);
         _path = path;
         player.Play(media);
+    }
+
+    /// <summary>The input LibVLC reads the current stream from; it must outlive the media.</summary>
+    private StreamMediaInput? _input;
+
+    public void PlayStream(Stream stream)
+    {
+        if (engine() is not { } libVlc)
+        {
+            stream.Dispose();
+            throw new InvalidOperationException("El motor de audio no está disponible.");
+        }
+
+        var player = NewPlayer(libVlc);
+
+        _input = new StreamMediaInput(stream);
+        using var media = new Media(libVlc, _input);
+        media.AddOption(":no-video");
+        // A sound that came by the internet is not reopened when the device changes.
+        _path = null;
+        player.Play(media);
+    }
+
+    private void ReleaseInput()
+    {
+        var input = _input;
+        _input = null;
+        try { input?.Dispose(); } catch { /* ya cerrado */ }
     }
 
     public void Pause() => SetPaused(true);
@@ -130,18 +153,23 @@ public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
         }
     }
 
+    /// <summary>Stops the player and lets it go, with the stream it was reading.</summary>
     private void DiscardPlayer()
     {
+        _volume.Detach();
         var old = _player;
         _player = null;
         // Whatever the old player was about to report is not about the track
         // that starts next.
         Interlocked.Increment(ref _generation);
-        if (old is null)
-            return;
+        if (old is not null)
+        {
+            try { old.Stop(); } catch { /* el motor ya lo cerró */ }
+            try { old.Dispose(); } catch { /* ignore */ }
+        }
 
-        try { old.Stop(); } catch { /* el motor ya lo cerró */ }
-        try { old.Dispose(); } catch { /* ignore */ }
+        // Only now: the player was reading it.
+        ReleaseInput();
     }
 
     private void SetPaused(bool paused)
@@ -169,12 +197,24 @@ public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
         try { player.Time = (long)Math.Max(0, position.TotalMilliseconds); } catch { /* el motor ya lo cerró */ }
     }
 
-    private MediaPlayer EnsurePlayer(LibVLC libVlc)
+    /// <summary>
+    /// A fresh player for the song about to start, with its DirectSound output
+    /// and the volume already set, so it never sounds at another one. Being
+    /// new, it also opens the sound device Windows has now.
+    /// </summary>
+    private MediaPlayer NewPlayer(LibVLC libVlc)
     {
-        if (_player is { } existing)
-            return existing;
+        DiscardPlayer();
+        _audioGeneration = AudioOutputChanges.Generation;
 
         var player = new MediaPlayer(libVlc);
+        // Windows only; elsewhere LibVLC's own output is the right one.
+        if (OperatingSystem.IsWindows() && !player.SetAudioOutput("directsound"))
+            Log.Warning("No se pudo abrir DirectSound para los audios");
+
+        // The general volume, which Windows applies on top of the player's own.
+        PlayerSound.ApplySession();
+        _volume.Attach(volume => player.Volume = WithGeneralVolume(volume));
 
         // VLC raises these on its own thread, where calling back into the
         // player would deadlock: they are handed to the UI thread first.
@@ -209,10 +249,18 @@ public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
         return player;
     }
 
+    /// <summary>
+    /// Where the system has no volume for the whole program, this player's
+    /// own volume also carries the general «Volumen» bar.
+    /// </summary>
+    private static int WithGeneralVolume(int volume) =>
+        PlatformServices.ProgramVolume is null ? volume * PlayerSound.Master / 100 : volume;
+
     private void OnMasterChanged(object? sender, EventArgs e)
     {
-        if (_player is { } player)
-            PlayerSound.KeepSessionFull(player);
+        // With a system volume, that one already moved: the player stays as it is.
+        if (PlatformServices.ProgramVolume is null)
+            _volume.Value = _volume.Value;
     }
 
     private static void OnUiThread(Action action)
@@ -228,12 +276,6 @@ public sealed class VlcAudioPlayer(Func<LibVLC?> engine) : IAudioPlayer
         AudioOutputChanges.OutputChanged -= OnOutputChanged;
         PlayerSound.MasterChanged -= OnMasterChanged;
         _listening = false;
-        var player = _player;
-        _player = null;
-        if (player is null)
-            return;
-
-        try { player.Stop(); } catch { /* ignore */ }
-        try { player.Dispose(); } catch { /* ignore */ }
+        DiscardPlayer();
     }
 }

@@ -1,13 +1,15 @@
 using System.ComponentModel;
+using System.IO;
 using System.Windows;
 using EcclesiaCast.Presentation.ViewModels;
 
 namespace EcclesiaCast.App.Views;
 
 /// <summary>
-/// Brings songs over from another program (ProPresenter or EasyWorship). What
-/// is looked for, what is listed and how it is imported is in
-/// <see cref="SongImportViewModel"/>; this window places the controls.
+/// Brings songs over from another program (ProPresenter, EasyWorship or
+/// Holyrics). What is looked for, what is listed and how it is imported is in
+/// <see cref="SongImportViewModel"/>; this window places the controls and
+/// asks for files and folders.
 /// </summary>
 public partial class SongImportWindow : Window
 {
@@ -40,6 +42,8 @@ public partial class SongImportWindow : Window
             BrowseButton.IsEnabled = false;
             ProPresenterChoice.IsEnabled = false;
             EasyWorshipChoice.IsEnabled = false;
+            HolyricsChoice.IsEnabled = false;
+            HolyricsFiles.IsEnabled = false;
             Progress.Visibility = Visibility.Visible;
             ProgressText.Visibility = Visibility.Visible;
             ProgressText.Text = _viewModel.ProgressText;
@@ -48,6 +52,9 @@ public partial class SongImportWindow : Window
             Progress.Value = _viewModel.ProgressValue;
         }
     }
+
+    /// <summary>Opens on the Holyrics choice (the Importar canciones tutorial shows its «Abrir archivos…»).</summary>
+    public void ChooseHolyrics() => HolyricsChoice.IsChecked = true;
 
     /// <summary>How many songs were actually added (0 if cancelled).</summary>
     public int Imported => _viewModel.Imported;
@@ -61,13 +68,21 @@ public partial class SongImportWindow : Window
     {
         var first = _viewModel.DiscoverAll();
         ShowLabels();
-        (first == SongImportSource.ProPresenter ? ProPresenterChoice : EasyWorshipChoice).IsChecked = true;
+        Choice(first).IsChecked = true;
     }
+
+    private System.Windows.Controls.RadioButton Choice(SongImportSource source) => source switch
+    {
+        SongImportSource.ProPresenter => ProPresenterChoice,
+        SongImportSource.EasyWorship => EasyWorshipChoice,
+        _ => HolyricsChoice,
+    };
 
     private void ShowLabels()
     {
         ProPresenterChoice.Content = _viewModel.ChoiceLabel(SongImportSource.ProPresenter);
         EasyWorshipChoice.Content = _viewModel.ChoiceLabel(SongImportSource.EasyWorship);
+        HolyricsChoice.Content = _viewModel.ChoiceLabel(SongImportSource.Holyrics);
     }
 
     private void Source_Checked(object sender, RoutedEventArgs e)
@@ -75,8 +90,8 @@ public partial class SongImportWindow : Window
         if (!_viewModel.Discovered)
             return;
 
-        _viewModel.SelectSource(ReferenceEquals(sender, EasyWorshipChoice)
-            ? SongImportSource.EasyWorship
+        _viewModel.SelectSource(ReferenceEquals(sender, EasyWorshipChoice) ? SongImportSource.EasyWorship
+            : ReferenceEquals(sender, HolyricsChoice) ? SongImportSource.Holyrics
             : SongImportSource.ProPresenter);
         ShowList();
     }
@@ -86,7 +101,40 @@ public partial class SongImportWindow : Window
     {
         LibrariesList.ItemsSource = null;
         LibrariesList.ItemsSource = _viewModel.Rows;
+
+        var holyrics = _viewModel.Source == SongImportSource.Holyrics;
+        ListTitle.Text = _viewModel.ListTitle;
+        HolyricsPanel.Visibility = holyrics ? Visibility.Visible : Visibility.Collapsed;
+        BrowseButton.Visibility = holyrics ? Visibility.Collapsed : Visibility.Visible;
         ShowState();
+    }
+
+    /// <summary>
+    /// The way in for the free Holyrics: files saved from its «Guardar» or
+    /// «Exportación en lote» (.json or .txt).
+    /// </summary>
+    private void HolyricsFiles_Click(object sender, RoutedEventArgs e)
+    {
+        if (_viewModel.IsImporting)
+            return;
+
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = "Canciones guardadas desde Holyrics",
+            Filter = "Canciones de Holyrics (*.json;*.txt)|*.json;*.txt",
+            Multiselect = true,
+        };
+
+        // Holyrics lives in C:\Holyrics and saves its exports there; if it is not there, Documents.
+        dialog.InitialDirectory = Directory.Exists(@"C:\Holyrics")
+            ? @"C:\Holyrics"
+            : Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        if (dialog.ShowDialog() != true)
+            return;
+
+        _viewModel.ReadHolyricsFiles(dialog.FileNames);
+        ShowLabels();
+        ShowList();
     }
 
     private void Browse_Click(object sender, RoutedEventArgs e)

@@ -8,7 +8,7 @@ using Serilog;
 namespace EcclesiaCast.App.Views;
 
 /// <summary>
-/// For whoever brings their own Bible: the two file formats the program reads,
+/// For whoever brings their own Bible: the three file formats the program reads,
 /// a real example of each to save and open in Notepad, and instructions to hand
 /// to an AI chat. Everything it shows comes from <see cref="BibleImportHelp"/>.
 /// </summary>
@@ -17,8 +17,14 @@ public partial class BibleFormatHelpWindow : Window
     public BibleFormatHelpWindow()
     {
         InitializeComponent();
+
+        // Never taller than the screen: with three formats it no longer fits on
+        // a notebook, and the buttons at the bottom were left out of reach.
+        MaxHeight = Math.Min(MaxHeight, SystemParameters.WorkArea.Height - 16);
+
         JsonPreview.Text = BibleImportHelp.JsonPreview();
         XmlPreview.Text = BibleImportHelp.ExampleZefaniaXml();
+        OpenSongPreview.Text = BibleImportHelp.ExampleOpenSongXml();
     }
 
     /// <summary>The operator pressed «Importar una Biblia…»: the caller opens the import.</summary>
@@ -29,6 +35,9 @@ public partial class BibleFormatHelpWindow : Window
 
     private void SaveXml_Click(object sender, RoutedEventArgs e) =>
         Save("Biblia-ejemplo.xml", "Zefania XML (*.xml)|*.xml", BibleImportHelp.ExampleZefaniaXml());
+
+    private void SaveOpenSong_Click(object sender, RoutedEventArgs e) =>
+        Save("Biblia-ejemplo-opensong.xml", "XML de OpenSong (*.xml)|*.xml", BibleImportHelp.ExampleOpenSongXml());
 
     private void Save(string suggestedName, string filter, string content)
     {

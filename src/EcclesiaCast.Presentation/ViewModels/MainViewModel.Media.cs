@@ -77,6 +77,23 @@ public sealed partial class MainViewModel
         MutedMediaTabs = new HashSet<string>(
             MediaTabs.Where(t => TabRule(t).Muted), StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Names of the tabs whose media go on top of everything («Todo va en
+    /// primer plano», and the presentations): the list of tabs marks them.
+    /// Replaced, never edited, like <see cref="MutedMediaTabs"/>.
+    /// </summary>
+    [ObservableProperty]
+    private HashSet<string> _onTopMediaTabs = new(StringComparer.OrdinalIgnoreCase);
+
+    private void RefreshOnTopMediaTabs() =>
+        OnTopMediaTabs = new HashSet<string>(
+            MediaTabs.Where(t => IsPresentationTab(t) || TabRule(t).Mode == MediaTabMode.Foreground),
+            StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>True when everything in the tab goes on top of everything.</summary>
+    public bool IsOnTopMediaTab(string? tab) =>
+        !string.IsNullOrWhiteSpace(tab) && OnTopMediaTabs.Contains(tab);
+
     /// <summary>True when the tab is silenced; the menu of the tab asks it to word its entry.</summary>
     public bool IsMediaTabMuted(string? tab) =>
         !string.IsNullOrWhiteSpace(tab) && TabRule(tab).Muted;
@@ -92,6 +109,7 @@ public sealed partial class MainViewModel
         var soundChanged = TabRule(tab).Muted != rule.Muted;
         _settings.Set(RuleKey(tab), rule.ToSetting());
         RefreshMutedMediaTabs();
+        RefreshOnTopMediaTabs();
 
         if (soundChanged
             && _presentation.Background is { } onScreen
@@ -334,6 +352,7 @@ public sealed partial class MainViewModel
     {
         _allMedia.Clear();
         _allMedia.AddRange(_media.GetAll());
+        UpdateBibleBackgroundLabel();
 
         // A poster whose event is over goes to «Eventos pasados» by itself.
         var overdue = _allMedia.Where(m => MediaExpiry.IsDue(m, DateTime.Today)).ToList();
@@ -380,6 +399,7 @@ public sealed partial class MainViewModel
 
         // A presentation open in the grid follows what the tab holds now.
         RefreshPresentationTabs();
+        RefreshOnTopMediaTabs();
         RefreshOpenPresentation();
     }
 
@@ -1377,6 +1397,35 @@ public sealed partial class MainViewModel
         }
 
         StatusText = "Fondo quitado; la letra sigue en pantalla.";
+    }
+
+    /// <summary>
+    /// YouTube refused the video projected «desde internet». The screen is
+    /// already black (the congregation does not see YouTube's error card); the
+    /// operator is told why and, when only a copy can work, offered to download it.
+    /// </summary>
+    private void OnYouTubeRefused(int code)
+    {
+        var media = _presentation.Background is { Id: > 0 } on
+            ? _allMedia.FirstOrDefault(m => m.Id == on.Id) ?? on
+            : null;
+        StatusText = YouTubePlayerError.Title(code) + ".";
+        StatusAlert++;
+
+        // After the page's message has been handled: the notice waits for an answer.
+        _dispatcher.Post(() =>
+        {
+            if (media is { Type: MediaType.YouTube }
+                && Notice.Confirm(YouTubePlayerError.Explain(code), "Descargar ahora", "Ahora no",
+                    YouTubePlayerError.Title(code)))
+            {
+                DownloadYouTubeCommand.Execute(media);
+            }
+            else if (media is not { Type: MediaType.YouTube })
+            {
+                Notice.Show(YouTubePlayerError.Explain(code), YouTubePlayerError.Title(code), NoticeKind.Warning);
+            }
+        });
     }
 
     /// <summary>A non-looping video finished: honour its end behaviour.</summary>

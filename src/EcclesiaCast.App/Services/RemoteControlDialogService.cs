@@ -5,9 +5,9 @@ namespace EcclesiaCast.App.Services;
 
 public sealed class RemoteControlDialogService : IRemoteControlDialog
 {
-    public bool Show(RemoteControlServer server)
+    public bool Show(RemoteControlServer server, Action<string> pinChanged)
     {
-        var window = new RemoteControlWindow(server)
+        var window = new RemoteControlWindow(server, pinChanged)
         {
             Owner = System.Windows.Application.Current.MainWindow,
         };

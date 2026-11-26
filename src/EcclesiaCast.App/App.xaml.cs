@@ -22,6 +22,7 @@ public partial class App : Application
     private ServiceProvider? _services;
     private UiWatchdog? _watchdog;
     private CrashMarker? _crashMarker;
+    private bool _isDuplicate;
     private readonly EcclesiaCast.Core.Diagnostics.ErrorNoticeGate _errorGate = new(TimeSpan.FromSeconds(30));
 
     /// <summary>Set once the "Acerca de" of the very first start has been shown.</summary>
@@ -48,6 +49,7 @@ public partial class App : Application
         PlatformServices.Paths = _paths;
         PlatformServices.Documents = _documents;
         PlatformServices.Decks = _decks;
+        PlatformServices.ProgramVolume = new WindowsProgramVolume();
     }
 
     protected override void OnStartup(StartupEventArgs e)
@@ -68,6 +70,18 @@ public partial class App : Application
         // ECCLESIACAST_DATA_DIR points a test build at a copy of a library,
         // so it can run next to the real one without touching it.
         var appDataDir = DataDir;
+
+        // Una sola copia abierta: la segunda trae al frente la primera y se va.
+        if (!SingleInstance.TryAcquire(appDataDir, TimeSpan.FromSeconds(1.5)))
+        {
+            _isDuplicate = true;
+            if (!SingleInstance.FocusExisting())
+                MessageBox.Show(
+                    "EcclesiaCast ya está abierto. Buscalo en la barra de tareas.",
+                    "EcclesiaCast", MessageBoxButton.OK, MessageBoxImage.Information);
+            Shutdown(0);
+            return;
+        }
 
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
@@ -245,6 +259,9 @@ public partial class App : Application
         services.AddSingleton<ITrashDialog, TrashDialogService>();
         services.AddSingleton<IBroadcastDialog, BroadcastDialogService>();
         services.AddSingleton<IRemoteControlDialog, RemoteControlDialogService>();
+        services.AddSingleton<INamePlateDesigner, NamePlateDesignerService>();
+        services.AddSingleton<IYouTubeSession, WpfYouTubeSession>();
+        services.AddSingleton<TutorialWindows>();
         services.AddSingleton<IGlobalSearchDialog, GlobalSearchDialogService>();
         services.AddSingleton(sp => new UpdateChecker(
             sp.GetRequiredService<ISettingsStore>(),
@@ -263,9 +280,12 @@ public partial class App : Application
         ColorPickerHelper.Settings = settings;
         TransitionSettings.Load(settings);
         BroadcastStyleSettings.Load(settings);
+        FloatingOutputSettings.Load(settings);
+        NamePlateStyleSettings.Load(settings);
         mainWindow.AttachLayoutPersistence(
             new MainWindowSettings(settings),
             owner => new Views.TransitionsWindow(settings) { Owner = owner }.ShowDialog());
+        mainWindow.AttachTutorialWindows(_services.GetRequiredService<TutorialWindows>().Create);
 
         // How much the program is used, and whether the last run ended badly:
         // both only ever leave the computer inside a comment the person sends.
@@ -325,6 +345,13 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        // La segunda copia no arrancó nada: no tiene que tocar las marcas de cierre de la primera.
+        if (_isDuplicate)
+        {
+            base.OnExit(e);
+            return;
+        }
+
         Log.Information("EcclesiaCast exiting");
         FeedbackCoordinator.RecordEnd();
         _crashMarker?.End();

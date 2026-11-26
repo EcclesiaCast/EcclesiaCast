@@ -100,9 +100,9 @@ public sealed partial class SlideItemViewModel(
                     ? "Clic: abre el capítulo anterior en su último versículo"
                     : "Clic: abre el capítulo siguiente en su primer versículo";
             if (Verses != null)
-                return "Clic: proyectar · Clic derecho: agregar a la playlist o corregir el texto";
+                return "Clic: proyectar · Clic derecho: agregar a la playlist";
             if (SectionId != 0)
-                return "Clic: proyectar · Arrastrar: cambiarla de lugar · Clic derecho: más opciones";
+                return "Clic: proyectar · Arrastrar (con el orden destrabado 🔓): cambiarla de lugar · Clic derecho: más opciones";
             return "Clic: proyectar";
         }
     }
@@ -118,4 +118,12 @@ public sealed partial class SlideItemViewModel(
     /// <summary>Selected as "next up" (e.g. the verse a reference points to), not live yet.</summary>
     [ObservableProperty]
     private bool _isPreviewed;
+
+    /// <summary>Has the words typed in «Buscar en la letra».</summary>
+    [ObservableProperty]
+    private bool _isSearchMatch;
+
+    /// <summary>The match Enter would project («2 de 3»).</summary>
+    [ObservableProperty]
+    private bool _isSearchCurrent;
 }

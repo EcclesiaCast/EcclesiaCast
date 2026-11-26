@@ -8,8 +8,8 @@ namespace EcclesiaCast.App.Services;
 
 public sealed class BroadcastDialogService(ISettingsStore settings, IColorPicker colorPicker) : IBroadcastDialog
 {
-    public void ShowPages(RemoteControlServer server) =>
-        new BroadcastWindow(server, owner => ShowStylesOver(owner))
+    public void ShowPages(RemoteControlServer server, Action<string> obsPinChanged) =>
+        new BroadcastWindow(server, owner => ShowStylesOver(owner), obsPinChanged)
         {
             Owner = Application.Current.MainWindow,
         }.ShowDialog();

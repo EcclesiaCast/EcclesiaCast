@@ -14,6 +14,12 @@ public interface IPlatformPaths
     /// <summary>Default home for downloaded videos.</summary>
     string DownloadsFolder { get; }
 
+    /// <summary>Where the sound of YouTube videos is saved for good: next to the person's music.</summary>
+    string MusicFolder { get; }
+
+    /// <summary>Sounds of YouTube brought to be heard: a cache the program trims, not user data.</summary>
+    string AudioCacheFolder { get; }
+
     /// <summary>Where the helper programs live (yt-dlp and what it needs).</summary>
     string ToolsFolder { get; }
 

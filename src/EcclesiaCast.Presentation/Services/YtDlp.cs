@@ -244,19 +244,20 @@ public static partial class YtDlp
     public static async Task<string?> DownloadAsync(
         string videoId,
         string targetFolder,
-        Func<Task<string?>> exportCookies,
+        Func<Task<string?>>? exportCookies,
         IProgress<(double Percent, string Message)> progress,
-        CancellationToken cancellation)
+        CancellationToken cancellation,
+        bool audioOnly = false)
     {
         await EnsureToolsAsync(progress, cancellation);
 
         progress.Report((-1, "Preparando la descarga…"));
-        var cookies = await exportCookies();
+        var cookies = exportCookies is not null ? await exportCookies() : null;
         try
         {
             try
             {
-                return await RunAsync(videoId, targetFolder, cookies, progress, cancellation);
+                return await RunWithFastClientAsync(videoId, targetFolder, cookies, progress, cancellation, audioOnly);
             }
             catch (InvalidOperationException ex)
                 when (DownloadFailure.Classify(ex.Message) is DownloadFailureKind.Forbidden
@@ -267,7 +268,7 @@ public static partial class YtDlp
                 Log.Warning("YouTube rechazó la descarga; se actualiza yt-dlp y se reintenta: {Error}", ex.Message);
                 await UpdateAsync(progress, cancellation);
                 progress.Report((-1, "Reintentando la descarga…"));
-                return await RunAsync(videoId, targetFolder, cookies, progress, cancellation);
+                return await RunWithFastClientAsync(videoId, targetFolder, cookies, progress, cancellation, audioOnly);
             }
         }
         finally
@@ -279,12 +280,50 @@ public static partial class YtDlp
         }
     }
 
+    /// <summary>
+    /// yt-dlp's default clients for YouTube include one (the Samsung TV) whose
+    /// answer carries an advert, and yt-dlp then waits 6 seconds «as required
+    /// by the site» before downloading. The visionOS client gives the same m4a
+    /// with no wait: measured on 25/11/2026, a song went from 10.7 s to 3.7 s.
+    /// </summary>
+    internal const string FastAudioClient = "youtube:player_client=visionos";
+
+    /// <summary>
+    /// The sound with the quick client first; if YouTube stops offering it
+    /// there (or it fails for any reason), once more the ordinary way, which
+    /// is also what gives the true error to the caller.
+    /// </summary>
+    private static async Task<string?> RunWithFastClientAsync(
+        string videoId,
+        string targetFolder,
+        string? cookieFile,
+        IProgress<(double Percent, string Message)> progress,
+        CancellationToken cancellation,
+        bool audioOnly)
+    {
+        if (audioOnly)
+        {
+            try
+            {
+                return await RunAsync(videoId, targetFolder, cookieFile, progress, cancellation, audioOnly, FastAudioClient);
+            }
+            catch (InvalidOperationException ex)
+            {
+                Log.Information("El cliente rápido de YouTube no sirvió ({Error}); se prueba el normal", ex.Message);
+            }
+        }
+
+        return await RunAsync(videoId, targetFolder, cookieFile, progress, cancellation, audioOnly, null);
+    }
+
     private static async Task<string?> RunAsync(
         string videoId,
         string targetFolder,
         string? cookieFile,
         IProgress<(double Percent, string Message)> progress,
-        CancellationToken cancellation)
+        CancellationToken cancellation,
+        bool audioOnly,
+        string? extractorArgs = null)
     {
         var executable = FindExecutable()
             ?? throw new InvalidOperationException("yt-dlp no está instalado.");
@@ -294,9 +333,19 @@ public static partial class YtDlp
 
         // Above 720p YouTube serves video and audio apart, and joining them
         // needs ffmpeg; without it, ask for the best single file instead.
-        var format = HasFfmpeg()
-            ? "bestvideo[height<=?1080]+bestaudio/best[height<=?1080]/best"
-            : "best[height<=?1080][ext=mp4]/best[ext=mp4]/best";
+        // H.264 first: «best» used to pick YouTube's AV1, which at 1080p comes
+        // at about 1 Mb/s and looks soft on a projector (19/11: 1.1 Mb/s); its
+        // H.264 has around three times the data, every graphics card decodes it,
+        // and the stream page (OBS) plays it too. AAC sound goes with it in MP4.
+        // For the Música tab only the sound: the m4a YouTube keeps for every
+        // video plays everywhere and needs no converting.
+        var format = audioOnly
+            ? AudioFormat
+            : HasFfmpeg()
+                ? "bestvideo[height<=?1080][vcodec^=avc1]+bestaudio[ext=m4a]"
+                  + "/bestvideo[height<=?1080][vcodec^=avc1]+bestaudio"
+                  + "/bestvideo[height<=?1080]+bestaudio/best[height<=?1080]/best"
+                : "best[height<=?1080][ext=mp4]/best[ext=mp4]/best";
 
         var arguments = new List<string>
         {
@@ -306,7 +355,7 @@ public static partial class YtDlp
             "-P", targetFolder,
             "-o", "%(title)s [%(id)s].%(ext)s",
         };
-        if (HasFfmpeg())
+        if (!audioOnly && HasFfmpeg())
         {
             arguments.Add("--merge-output-format");
             arguments.Add("mp4");
@@ -318,6 +367,12 @@ public static partial class YtDlp
             // that yt-dlp solves with this runtime.
             arguments.Add("--js-runtimes");
             arguments.Add($"deno:{runtime}");
+        }
+
+        if (extractorArgs is not null)
+        {
+            arguments.Add("--extractor-args");
+            arguments.Add(extractorArgs);
         }
 
         if (cookieFile is not null)
@@ -339,6 +394,10 @@ public static partial class YtDlp
         };
         // Python would otherwise print titles in the console's old code page.
         info.Environment["PYTHONUTF8"] = "1";
+        // Not enough for the yt-dlp.exe build: on Windows it still printed paths and
+        // titles in the old code page (19/11). Asked outright, it writes UTF-8.
+        info.ArgumentList.Add("--encoding");
+        info.ArgumentList.Add("utf-8");
         foreach (var argument in arguments)
             info.ArgumentList.Add(argument);
 
@@ -402,8 +461,15 @@ public static partial class YtDlp
         }
 
         // If the printed path didn't survive the trip (odd characters in a
-        // title), the file is still the newest one in the folder.
-        return downloaded ?? NewestFileSince(targetFolder, startedAt);
+        // title), the file is still the newest one in the folder. And when the
+        // video had been downloaded before (taken out of the library, its file
+        // left in the folder), yt-dlp skips it and prints nothing: that file is
+        // the one (19/11: «yt-dlp terminó pero no encontré el archivo descargado»).
+        return downloaded
+            ?? NewestFileSince(targetFolder, startedAt)
+            ?? YouTubeDownloadFiles.AlreadyDownloaded(
+                new DirectoryInfo(targetFolder).EnumerateFiles().Where(f => f.Length > 0).Select(f => f.FullName),
+                videoId);
     }
 
     /// <summary>The most recently written finished video in <paramref name="folder"/> since <paramref name="since"/>.</summary>

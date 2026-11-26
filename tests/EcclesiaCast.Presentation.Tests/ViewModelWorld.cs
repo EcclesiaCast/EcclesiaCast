@@ -50,7 +50,7 @@ public sealed class ViewModelWorld : IDisposable
     }
 
     /// <summary>Call after putting in the songs, Bibles and settings the test needs: the view model reads them when it is built.</summary>
-    public MainViewModel Build()
+    public MainViewModel Build(IPlatformInfo? platformInfo = null)
     {
         var paths = new TempPaths(_root);
 
@@ -123,7 +123,11 @@ public sealed class ViewModelWorld : IDisposable
             keyboard: new NoKeys(),
             listFilter: new UnfilteredLists(),
             textMeasurer: new FitsInOneSlide(),
-            bibleFormatHelp: Stub.Of<IBibleFormatHelpDialog>());
+            bibleFormatHelp: Stub.Of<IBibleFormatHelpDialog>(),
+            namePlateDesigner: Stub.Of<INamePlateDesigner>(),
+            youTubeSession: Stub.Of<IYouTubeSession>(),
+            clipboardText: Stub.Of<IClipboardText>(),
+            platformInfo: platformInfo ?? new AllFeatures());
     }
 
     public void Dispose()

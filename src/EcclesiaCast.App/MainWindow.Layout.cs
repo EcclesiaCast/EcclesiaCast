@@ -184,6 +184,7 @@ public partial class MainWindow
     [
         (TabQuick, "✍"),
         (TabOverlay, "📢"),
+        (TabPlates, "👤"),
         (TabHighlight, "🖍"),
         (TabNotes, "📝"),
         (TabMusic, "🎵"),

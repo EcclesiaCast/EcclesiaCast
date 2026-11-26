@@ -1,0 +1,39 @@
+titulo: Importar canciones de otro programa
+resumen: Traé tu biblioteca de ProPresenter, EasyWorship o Holyrics.
+icono: 📥
+orden: 8
+
+[paso]
+señalar: MenuSongs
+abrir: menu:MenuSongs
+titulo: Menú Canciones
+texto: Abrí el menú Canciones y elegí «Traer canciones de otro programa…». Es el mismo camino que el botón «➕ Agregar» de la pestaña Canciones.
+
+[paso]
+señalar: SongsAddButton
+abrir: agregar
+titulo: El botón ➕ Agregar
+texto: Si preferís este botón, ofrece los mismos caminos: crear desde cero, buscar en internet, «Traer de otro programa…» o importar un archivo suelto. Elegimos «Traer de otro programa…».
+
+[paso]
+abrir: ventana:importar
+resaltar: SourceChoices
+titulo: Elegí el programa
+texto: Esta es la ventana. Arriba elegís ProPresenter, EasyWorship o Holyrics. Cada opción dice cuántas canciones encontró, porque busca sola dónde está instalado el programa. Después las importa todas.
+
+[paso]
+abrir: ventana:importar
+resaltar: BrowseButton
+titulo: Si están en otro lado
+texto: Con «Elegir carpeta…» indicás dónde están: un disco externo o una copia de otra computadora. En EasyWorship es la carpeta que tiene Songs.db y SongWords.db.
+
+[paso]
+abrir: ventana:importar-holyrics
+resaltar: HolyricsFiles
+titulo: Holyrics: sus archivos
+texto: Holyrics guarda las canciones cifradas. En Holyrics: Canción → Exportar → Exportación en lote. Acá tocá «Abrir archivos…» y elegí los .json (o .txt) que guardaste.
+
+[paso]
+señalar: SongsList
+titulo: Si una canción ya está
+texto: Si una canción ya existe en tu biblioteca, el programa te pregunta qué hacer, así no se pisan ni se duplican sin que lo decidas. Las importadas aparecen en esta lista y funcionan sin internet.

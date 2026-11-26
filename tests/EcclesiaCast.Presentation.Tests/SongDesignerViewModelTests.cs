@@ -517,6 +517,42 @@ public sealed class SongDesignerViewModelTests
     }
 
     [Fact]
+    public void A_new_slide_goes_after_the_chosen_one_and_the_edits_stay_with_their_slides()
+    {
+        var song = TwoSlides();
+        var vm = New(song);
+        vm.SelectSlide(1);
+        vm.ApplyStyle(1, Form());
+
+        var at = vm.InsertSlideAfter(0);
+        vm.CommitEdit(at, "En el medio");
+
+        Assert.Equal(1, at);
+        Assert.Equal(["Verso 1", "Nueva", "Coro"], Enumerable.Range(0, vm.SlideCount).Select(vm.SlideLabel));
+        // Cancelling has to leave the song alone: nothing is in it yet.
+        Assert.Equal(2, song.Sections.Count);
+
+        vm.Save();
+
+        Assert.Equal(["Primera estrofa", "En el medio", "Estribillo"], song.Sections.Select(s => s.Text));
+        Assert.Equal([0, 1, 2], song.Sections.Select(s => s.Order));
+        Assert.Null(song.Sections[1].StyleJson);
+        Assert.Equal("Georgia", song.Sections[2].GetOverride()!.FontFamily);
+    }
+
+    [Fact]
+    public void A_new_slide_left_empty_is_not_saved()
+    {
+        var song = TwoSlides();
+        var vm = New(song);
+
+        vm.InsertSlideAfter(-1);
+        vm.Save();
+
+        Assert.Equal(["Primera estrofa", "Estribillo"], song.Sections.Select(s => s.Text));
+    }
+
+    [Fact]
     public void Cancelling_leaves_the_song_as_it_was()
     {
         var song = TwoSlides();

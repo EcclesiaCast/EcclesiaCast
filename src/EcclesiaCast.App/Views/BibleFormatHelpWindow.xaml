@@ -6,14 +6,14 @@
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource BgBrush}"
         FontFamily="Segoe UI">
-    <!-- Ayuda para quien trae su propia Biblia: los dos formatos que se leen, un
+    <!-- Ayuda para quien trae su propia Biblia: los tres formatos que se leen, un
          ejemplo real de cada uno (para guardar y mirar en el Bloc de notas) y
          un texto para pegarle a una IA cuando la Biblia está en otro formato. -->
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="22,18,22,20">
             <TextBlock TextWrapping="Wrap" Foreground="White" FontSize="13">
-                <Run Text="EcclesiaCast lee Biblias en dos formatos de archivo."/>
-                <Run Text=" Si la tuya ya está en uno de los dos, usá «Biblias → Importar una Biblia»."
+                <Run Text="EcclesiaCast lee Biblias en tres formatos de archivo."/>
+                <Run Text=" Si la tuya ya está en uno de los tres, usá «Biblias → Importar una Biblia»."
                      Foreground="{StaticResource MutedBrush}"/>
             </TextBlock>
 
@@ -46,6 +46,22 @@
                      BorderBrush="{StaticResource LineBrush}" Padding="8,6"/>
             <Button Content="Guardar este ejemplo…" HorizontalAlignment="Left" Margin="0,8,0,0"
                     Style="{StaticResource DarkButton}" Padding="12,6" Click="SaveXml_Click"/>
+
+            <!-- OpenSong -->
+            <TextBlock Text="3.  XML de OpenSong (ProPresenter, Holyrics, FreeShow)" FontSize="14" FontWeight="SemiBold"
+                       Foreground="White" Margin="0,20,0,2" TextWrapping="Wrap"/>
+            <TextBlock TextWrapping="Wrap" FontSize="12" Foreground="{StaticResource MutedBrush}">
+                El XML que usan esos programas y muchas páginas de Biblias para bajar (Beblia, entre otras).
+                Cada libro va con su nombre, en el orden de siempre, y adentro los capítulos y los versículos.
+                Si tu Biblia ya está en uno de esos programas, exportala o buscá su archivo .xml e importalo tal cual.
+            </TextBlock>
+            <TextBox x:Name="OpenSongPreview" IsReadOnly="True" Margin="0,8,0,0" Height="150"
+                     FontFamily="Consolas" FontSize="11.5"
+                     VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                     Background="{StaticResource SurfaceAltBrush}" Foreground="White"
+                     BorderBrush="{StaticResource LineBrush}" Padding="8,6"/>
+            <Button Content="Guardar este ejemplo…" HorizontalAlignment="Left" Margin="0,8,0,0"
+                    Style="{StaticResource DarkButton}" Padding="12,6" Click="SaveOpenSong_Click"/>
 
             <!-- Otro formato -->
             <Border Margin="0,22,0,0" Padding="14,12" CornerRadius="6"

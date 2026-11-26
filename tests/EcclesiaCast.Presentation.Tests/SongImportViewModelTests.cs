@@ -292,6 +292,51 @@ public sealed class SongImportViewModelTests : IDisposable
         Assert.Equal(["Canciones"], vm.Rows.Where(r => r.Selected).Select(r => Path.GetFileName(r.Folder)));
     }
 
+    // ── Holyrics ─────────────────────────────────────────────────
+
+    [Fact]
+    public async Task Holyrics_files_are_listed_song_by_song_and_only_the_ticked_ones_come_over()
+    {
+        var file = Path.Combine(_root, "lote.json");
+        File.WriteAllText(file, """
+            [
+              { "title": "Las Calles", "artist": "Rescate", "lyrics": { "paragraphs": [ { "text": "Fotos de la vida." } ] } },
+              { "title": "Sola", "artist": "Ella", "lyrics": { "paragraphs": [ { "text": "Hola" } ] } }
+            ]
+            """);
+        var broken = Path.Combine(_root, "roto.json");
+        File.WriteAllText(broken, "{ esto no es");
+        var vm = Make();
+        vm.DiscoverAll();
+        vm.SelectSource(SongImportSource.Holyrics);
+
+        vm.ReadHolyricsFiles([file, broken]);
+
+        Assert.Equal(["Las Calles", "Sola"], vm.Rows.Select(r => r.Name));
+        Assert.True(vm.CanImport);
+        Assert.Equal("CANCIONES ENCONTRADAS", vm.ListTitle);
+
+        vm.Rows[1].Selected = false;
+        Assert.True(await vm.ImportAsync(Repaint));
+
+        Assert.Equal("Las Calles", Assert.Single(_world.Songs.Search()).Title);
+    }
+
+    [Fact]
+    public void A_file_with_no_songs_of_holyrics_says_so()
+    {
+        var broken = Path.Combine(_root, "roto.json");
+        File.WriteAllText(broken, "{ esto no es");
+        var vm = Make();
+        vm.DiscoverAll();
+        vm.SelectSource(SongImportSource.Holyrics);
+
+        vm.ReadHolyricsFiles([broken]);
+
+        Assert.Empty(vm.Rows);
+        Assert.False(vm.CanImport);
+    }
+
     // ── Import ───────────────────────────────────────────────────
 
     [Fact]

@@ -1,6 +1,8 @@
 using System.Media;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
+using EcclesiaCast.App.Controls;
 using System.Windows.Media;
 using EcclesiaCast.App.Services;
 
@@ -24,7 +26,7 @@ public partial class NoticeWindow : Window
     {
         InitializeComponent();
 
-        MessageText.Text = message;
+        WriteMessage(message);
         if (!string.IsNullOrWhiteSpace(title))
         {
             TitleText.Text = title;
@@ -81,6 +83,18 @@ public partial class NoticeWindow : Window
         }
 
         Loaded += (_, _) => PlaySound(kind);
+    }
+
+    private void WriteMessage(string message)
+    {
+        var parts = message.Split(Notice.OnTopIconMark);
+        MessageText.Inlines.Clear();
+        for (var i = 0; i < parts.Length; i++)
+        {
+            if (i > 0)
+                MessageText.Inlines.Add(OnTopMark.InText(13));
+            MessageText.Inlines.Add(new Run(parts[i]));
+        }
     }
 
     private static void PlaySound(NoticeKind kind)

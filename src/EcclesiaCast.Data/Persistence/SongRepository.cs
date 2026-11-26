@@ -13,21 +13,18 @@ public sealed class SongRepository(string dbPath) : ISongRepository
         IQueryable<Song> songs = db.Songs.Include(s => s.Sections).AsNoTracking()
             .Where(s => s.DeletedAt == null);
 
-        if (TextMatching.ContainsPattern(query) is { } pattern)
+        var result = songs.OrderBy(s => s.Title).ToList();
+        if (!string.IsNullOrWhiteSpace(query))
         {
-            // Lyrics keep their line breaks, so the stored text is flattened
-            // the same way the query was: one space per run of whitespace.
-            // Three passes of "  " -> " " flatten up to eight spaces in a row.
-            songs = songs.Where(s =>
-                EF.Functions.Like(s.Title, pattern)
-                || EF.Functions.Like(s.Artist, pattern)
-                || s.Sections.Any(x => EF.Functions.Like(
-                    x.Text.Replace("\r", " ").Replace("\n", " ").Replace("\t", " ")
-                        .Replace("  ", " ").Replace("  ", " ").Replace("  ", " "),
-                    pattern)));
+            // Compared here and not with LIKE, which tells «Senor» from
+            // «Señor»: capitals, accents, punctuation and line breaks don't count.
+            var wanted = LyricsSearch.Normalize(query);
+            bool Has(string? text) => LyricsSearch.Normalize(text).Contains(wanted, StringComparison.Ordinal);
+            result = wanted.Length == 0
+                ? []
+                : result.Where(s => Has(s.Title) || Has(s.Artist) || s.Sections.Any(x => Has(x.Text))).ToList();
         }
 
-        var result = songs.OrderBy(s => s.Title).ToList();
         foreach (var song in result)
             song.Sections = [.. song.Sections.OrderBy(x => x.Order)];
         return result;
@@ -144,6 +141,17 @@ public sealed class SongRepository(string dbPath) : ISongRepository
         var ids = old.Select(s => s.Id).ToList();
         db.Songs.RemoveRange(old);
         db.Themes.RemoveRange(db.Themes.Where(t => t.OwnerSongId != null && ids.Contains(t.OwnerSongId.Value)));
+        db.SaveChanges();
+    }
+
+    public void SetBackground(int songId, int? mediaId)
+    {
+        using var db = new AppDbContext(dbPath);
+        var song = db.Songs.FirstOrDefault(s => s.Id == songId);
+        if (song is null)
+            return;
+
+        song.BackgroundMediaId = mediaId;
         db.SaveChanges();
     }
 

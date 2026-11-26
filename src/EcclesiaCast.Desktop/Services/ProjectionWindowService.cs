@@ -49,6 +49,13 @@ public sealed class ProjectionWindowService : IProjectionWindowService
 
     public event EventHandler? VideoEnded;
 
+    /// <summary>Never raised: this output has no YouTube player yet (docs/plan-mac-fase-3.md).</summary>
+    public event EventHandler<int>? YouTubeRefused
+    {
+        add { }
+        remove { }
+    }
+
     public event EventHandler? TurnOffRequested;
 
     /// <summary>The screen the output was on went away (its name); the output is already off.</summary>

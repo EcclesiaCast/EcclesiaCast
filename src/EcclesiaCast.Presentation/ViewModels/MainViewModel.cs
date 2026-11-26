@@ -27,11 +27,15 @@ public sealed record DisplayOption(DisplayInfo Info, string Label)
 {
     /// <summary>The «only the stream» entry: going live with it opens no output window.</summary>
     public bool BroadcastOnly => BroadcastOnlyOutput.IsBroadcastOnly(Info);
+
+    /// <summary>The «in a window» entry: going live opens an ordinary window instead of a full screen.</summary>
+    public bool Floating => FloatingOutput.IsFloating(Info);
 }
 
 public sealed partial class MainViewModel : ObservableObject, IRemoteHost
 {
     private const string OutputDisplayKey = "output.display";
+    private const string OutputChoiceKey = "output.choice";
     private const string StageNotesKey = "stage.notes.text";
     private const string QuickTextFontKey = "quicktext.font";
     private const string BibleHistoryKey = "bible.history";
@@ -95,6 +99,10 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     private readonly IListFilter _listFilter;
     private readonly ITextMeasurer _textMeasurer;
     private readonly IBibleFormatHelpDialog _bibleFormatHelp;
+    private readonly INamePlateDesigner _namePlateDesigner;
+    private readonly IYouTubeSession _youTubeSession;
+    private readonly IClipboardText _clipboardText;
+    private readonly IPlatformInfo _platformInfo;
 
     /// <summary>Copied slide (label + text + style) for paste/duplicate.</summary>
     private (string Label, string Text, string? StyleJson)? _clipboardSlide;
@@ -149,13 +157,17 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
     public bool IsBroadcastOnlyLive => IsProjecting && IsBroadcastOnly;
 
     /// <summary>Width over height of the output screen: LIVE and PREVIEW are drawn at this proportion.</summary>
-    public double OutputAspectRatio => SelectedDisplay is { Info: var info }
-        ? AspectFit.RatioOf(info.Width, info.Height)
-        : AspectFit.DefaultRatio;
+    public double OutputAspectRatio => SelectedDisplay switch
+    {
+        // The floating window has the shape chosen on it, and it can change while live.
+        { Floating: true } => FloatingOutput.RatioOf(FloatingOutputSettings.Current.Shape),
+        { Info: var info } => AspectFit.RatioOf(info.Width, info.Height),
+        _ => AspectFit.DefaultRatio,
+    };
 
     [ObservableProperty]
     private string _statusText =
-        "Creá una canción con ➕, o escribí un texto rápido y presioná Ctrl+Enter.";
+        "Creá una canción con «➕ Agregar», o escribí un texto rápido y presioná Ctrl+Enter.";
 
     /// <summary>Goes up by one every time something went wrong that the operator has to see: the window makes the status bar flash.</summary>
     [ObservableProperty]
@@ -406,8 +418,16 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         IKeyboardState keyboard,
         IListFilter listFilter,
         ITextMeasurer textMeasurer,
-        IBibleFormatHelpDialog bibleFormatHelp)
+        IBibleFormatHelpDialog bibleFormatHelp,
+        INamePlateDesigner namePlateDesigner,
+        IYouTubeSession youTubeSession,
+        IClipboardText clipboardText,
+        IPlatformInfo platformInfo)
     {
+        _platformInfo = platformInfo;
+        _clipboardText = clipboardText;
+        _namePlateDesigner = namePlateDesigner;
+        _youTubeSession = youTubeSession;
         _keyboard = keyboard;
         _listFilter = listFilter;
         _textMeasurer = textMeasurer;
@@ -488,11 +508,17 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
                 IsProjecting = _projection.IsOutputVisible;
         };
         _projection.VideoEnded += (_, _) => OnProjectedVideoEnded();
+        _projection.YouTubeRefused += (_, code) => OnYouTubeRefused(code);
         // A double click on an output that covers the panel: same as Esc.
+        // Closing the floating window too: the same as «Apagar salida».
         _projection.TurnOffRequested += (_, _) => HideOutput();
+        FloatingOutputSettings.ShapeChanged += (_, _) => OnPropertyChanged(nameof(OutputAspectRatio));
         _stage.VisibilityChanged += (_, _) => IsStageVisible = _stage.IsVisible;
         LoadStageLayouts();
         LoadSongMaxLines();
+        LoadSlidesOrderLock();
+        LoadNamePlates();
+        SyncBibleSplit();
         LoadLowPerformance();
         LoadOutputVolume();
         LoadMeetingSections();
@@ -500,6 +526,8 @@ public sealed partial class MainViewModel : ObservableObject, IRemoteHost
         {
             HasSlides = Slides.Count > 0;
             IsSongOpen = Slides.Any(s => s.SectionId != 0);
+            IsBibleOpen = Slides.Any(s => s.Verses is not null);
+            UpdateBibleBackgroundLabel();
         };
         UpdateStateFlags();
         RefreshDisplays();

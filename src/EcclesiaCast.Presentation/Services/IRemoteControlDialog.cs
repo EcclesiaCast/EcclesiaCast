@@ -7,7 +7,8 @@ public interface IRemoteControlDialog
 {
     /// <summary>
     /// Shows it and returns when it closes: true when the operator asked to
-    /// turn the control off.
+    /// turn the control off. <paramref name="pinChanged"/> gets the new PIN
+    /// when the operator changes the phone's.
     /// </summary>
-    bool Show(RemoteControlServer server);
+    bool Show(RemoteControlServer server, Action<string> pinChanged);
 }

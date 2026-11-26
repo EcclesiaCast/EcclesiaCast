@@ -362,6 +362,9 @@ namespace EcclesiaCast.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("BackgroundMediaId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Copyright")
                         .HasColumnType("TEXT");
 
@@ -565,6 +568,9 @@ namespace EcclesiaCast.Data.Migrations
                         .HasColumnType("REAL");
 
                     b.Property<bool>("TransparentBackground")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("VerseSplitMaxChars")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");

@@ -2,6 +2,7 @@ using EcclesiaCast.Core.Bible;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Core.Songs;
 using EcclesiaCast.Core.Timing;
+using EcclesiaCast.Presentation.Platform;
 using EcclesiaCast.Presentation.ViewModels;
 
 namespace EcclesiaCast.Presentation.Tests;
@@ -31,8 +32,20 @@ public sealed class MainViewModelTests
 
         Assert.NotNull(vm.Projection);
         Assert.Empty(vm.Slides);
-        // A main screen, a second one and the «only the stream» entry.
+        // A main screen, a second one, the floating window and the «only the stream» entry.
+        Assert.Equal(4, vm.Displays.Count);
+        Assert.Equal("screen-2", vm.SelectedDisplay?.Info.DeviceName);
+    }
+
+    [Fact]
+    public void Where_there_is_no_floating_window_the_list_does_not_offer_it()
+    {
+        using var world = new ViewModelWorld();
+
+        var vm = world.Build(new AllFeatures(Feature.FloatingOutput));
+
         Assert.Equal(3, vm.Displays.Count);
+        Assert.DoesNotContain(vm.Displays, d => d.Floating);
         Assert.Equal("screen-2", vm.SelectedDisplay?.Info.DeviceName);
     }
 

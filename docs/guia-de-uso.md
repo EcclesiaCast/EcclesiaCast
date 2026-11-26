@@ -22,7 +22,8 @@ EcclesiaCast**.
 
 En la pestaña **Canciones**:
 
-- **➕** es el único botón para agregar canciones y ofrece cuatro caminos:
+- **➕ Agregar** es el botón para agregar canciones y ofrece cuatro caminos (el primero
+  también está arriba, en el menú **Canciones → Crear canción desde cero…**):
   **Crear desde cero**, **Buscar en internet…**, **Traer de otro programa…** e
   **Importar archivo (.txt, .pro)…**. Crear desde cero abre una canción en
   blanco: pegá la letra, y **cada párrafo** (bloque separado por
@@ -37,6 +38,9 @@ En la pestaña **Canciones**:
   canciones tiene cada una y las importa. Si una canción ya está, pregunta qué
   hacer. Si están en otro lado (un disco externo, una copia de otra máquina), usá
   **Elegir carpeta…**: en EasyWorship es la que tiene `Songs.db` y `SongWords.db`.
+  **Holyrics** se trae desde un archivo que Holyrics mismo guarda (sirve con el plan gratis): en
+  Holyrics, Canción → Exportar → «Exportación en lote…», elegí las canciones, tipo JSON, Guardar;
+  después, en la ventana, tocá **Abrir archivos…** y elegí ese archivo.
 - **➕ → Buscar en internet…** (también en el menú **Canciones**) trae una canción
   nueva sin copiar y pegar: escribí el **nombre**, el **artista** o **una frase
   de la letra** y apretá Enter. Busca en musica.com y, si no está ahí, en
@@ -55,11 +59,49 @@ español de Windows, que viene instalado con el idioma.)
 **Proyectar:** clic en una diapositiva, o doble clic en la canción para empezar
 desde la primera. Las flechas **←→** navegan en vivo.
 
+### Arriba de las diapositivas de una canción
+
+- **🔍 Buscar en la letra…**: escribí unas palabras y se marcan en amarillo las
+  diapositivas que las tienen («1 de 2»). **Enter** proyecta la marcada, **↓** o
+  **F3** pasa a la siguiente, **↑** a la anterior y **Esc** borra la búsqueda. Sirve
+  cuando el cantante salta a otra parte y no sabés dónde está.
+- **➕ Diapositiva** escribe una diapositiva nueva al final. Para ponerla en otro
+  lugar: clic derecho sobre una diapositiva → **Nueva diapositiva después de
+  esta…**. En **Editar canción (diseño)** también está **➕ Nueva diapositiva**,
+  debajo de la lista.
+- **↶ / ↷** (o **Ctrl+Z** / **Ctrl+Y**) deshacen y rehacen los cambios de la
+  canción: mover, agregar, borrar, duplicar o pegar diapositivas, la edición
+  rápida, el diseño y el editor de la letra. Cada canción tiene los suyos y se
+  guardan mientras el programa está abierto.
+- **🔒 Orden trabado**: así arranca, para que las diapositivas no se desacomoden
+  sin querer al hacer clic. Si arrastrás una, no se mueve y abajo te dice cómo
+  destrabarlo. Tocá el candado y queda **🔓 Orden destrabado** (en amarillo):
+  ahí sí se arrastran. Tocalo otra vez para trabarlo. El programa se acuerda.
+- **🖼 Fondo**: el fondo propio de la canción. Poné una imagen o un video de
+  fondo y tocá **🖼 → Usar el fondo que está en pantalla**, o hacé clic derecho
+  en una imagen o video de Medios → **Usar como fondo de «…»**. Desde ahí, cada
+  vez que proyectes esa canción su fondo se pone solo (le gana al **🎲 al azar
+  por canción**). Si en medio de la canción cambiás el fondo a mano, se respeta
+  hasta la canción siguiente. **🖼 → Quitar el fondo propio** lo saca.
+
 ## 3. Biblia
 
 En la pestaña **Biblia**:
 
-- **📥** importa una Biblia en **JSON** o **Zefania XML**. Si la tuya está en otro formato (Word, PDF, texto), **Biblias → Cómo preparar una Biblia para importar…** trae un ejemplo de cada formato y unas instrucciones para pedirle a una IA que la convierta.
+- **Fondo de la Biblia**: con la pestaña **Biblia** abierta, clic derecho en una imagen o video de
+  Medios → **Usar como fondo de la Biblia**. Se pone solo al proyectar un versículo después de otra
+  cosa. Con versículos en la grilla, el botón **🖼** de arriba dice cuál está puesto y permite usar el
+  fondo que está en pantalla, elegir uno de la biblioteca por pestaña o quitarlo (también: clic
+  derecho en un medio → **Quitar el fondo de la Biblia**). Las carpetas de medios que van encima de
+  todo llevan un ícono de dos cuadros superpuestos, en amarillo: lo que hay ahí no sirve de fondo.
+- **Dividir**: al lado del botón **🖼**, la casilla **Dividir** y su número (máximo de caracteres por
+  diapositiva) parten los versículos largos en varias diapositivas, sin abrir el editor de temas. Es
+  la misma opción del tema de la Biblia (ver **Temas**): queda guardada ahí, y el pasaje abierto se
+  rearma sin salir del versículo que está en pantalla. También está en el celular.
+- **🕘 Historial**, a la derecha de la caja de la cita, tiene los versículos que proyectaste: un
+  clic lo carga y lo marca, doble clic lo proyecta (también se abre con la flecha ↓ en la caja
+  vacía). Con el panel angosto el botón es sólo 🕘.
+- **📥** importa una Biblia en **JSON** o en **XML** (Zefania, o el de OpenSong que usan ProPresenter, Holyrics y FreeShow). Si la tuya está en otro formato (Word, PDF, texto), **Biblias → Cómo preparar una Biblia para importar…** trae un ejemplo de cada formato y unas instrucciones para pedirle a una IA que la convierta.
 - El instalador te deja elegir qué **Biblias libres** instalar (Reina-Valera
   1909, Biblia libre para el mundo y Versión Biblia Libre); aparecen solas la
   primera vez que abrís el programa. Las que tienen derechos (RVR1960, NVI…)
@@ -124,7 +166,9 @@ En la barra **MEDIOS**, abajo:
     **otro medio de la biblioteca**. En una imagen en primer plano, cuántos
     segundos se ve y qué pasa pasados esos segundos (nada: sale de la
     pantalla; el logo; u otro medio).
-  - **Audio**: silenciar o volumen.
+  - **Audio**: silenciar o volumen propio de ese video. Para todo lo que suena en la
+    salida (videos, música y YouTube) está la barra **Volumen** debajo del panel EN VIVO,
+    con el botón **Sin sonido / Suena** del video al lado.
   - **Desenfoque**: difumina el fondo para que la letra se lea encima.
   - **Encuadre**: **zoom** para acercar o alejar (100 % es como está), y
     **correr** la imagen a los lados o arriba y abajo. Con **tamaño fijo en
@@ -157,11 +201,23 @@ En la barra **MEDIOS**, abajo:
 > el mismo dos canciones seguidas. Si en medio de una canción aplicás un fondo
 > a mano, se respeta hasta la canción siguiente. Sólo entran los medios
 > marcados como *Fondo*: los de *Primer plano* taparían la letra.
-- **Clic derecho → Descargar para uso local** guarda un video de YouTube en la
-  computadora, para no depender de internet durante el servicio. Queda en la
-  pestaña **Descargados**. Necesita [yt-dlp](https://github.com/yt-dlp/yt-dlp)
-  instalado aparte (`winget install yt-dlp`); con ffmpeg además se baja hasta
-  1080p. Descargá solo videos propios o con licencia que lo permita.
+- Un video de **YouTube** recién agregado **entra sin sonido**, para que nada suene de golpe:
+  tocá **🔇 Sin sonido** debajo del EN VIVO para que suene (el video lo recuerda).
+- **Videos de YouTube.** Con **▶ YouTube** los buscás dentro del programa, y con **🔗**
+  pegás el link de uno. Al sumarlos elegís **🌐 Reproducir por internet** o
+  **💾 Descargar para usar sin internet**. Ojo: un video pasado por internet **puede mostrar
+  anuncios en la pantalla** (con cuenta Premium, no); la copia descargada no los tiene. Para
+  buscar no hace falta cuenta. Uno que quedó por internet se baja después con
+  **clic derecho → Descargar para uso local**: así no dependés de internet durante el
+  servicio. La copia queda en la pestaña que tengas abierta. La primera vez, EcclesiaCast
+  baja solo lo que necesita para descargar (no hay que instalar nada). Con
+  ffmpeg (`winget install ffmpeg`) se baja hasta 1080p (en H.264, que se ve nítido en
+  cualquier computadora). Se descargan videos de a uno, no listas de reproducción enteras.
+  Descargá solo videos
+  propios o con licencia que lo permita.
+- Si YouTube **no deja pasar un video** fuera de su página (pasa con muchos videos
+  con derechos de autor), la pantalla queda en negro y el programa avisa que ese
+  video sólo se puede usar descargándolo, con un botón **Descargar ahora**.
 
 > Al apagar la salida, el video se **pausa** y retoma donde estaba cuando la
 > volvés a prender.
@@ -282,10 +338,11 @@ Botón **🎨 Temas** en la barra superior:
 
 - Editás tipografía, tamaño (con **auto-ajuste**: si un versículo no entra, se
   achica solo), negrita/cursiva, color, alineación, márgenes e interlineado.
-- **Cómo entra la diapositiva**: sin transición (corte), fundido, desde la
-  derecha, desde abajo o con un zoom suave, con su duración en milisegundos.
-  Como es parte del tema, podés tener las canciones con fundido y la Biblia
-  con corte seco.
+- **Transición** («Cómo entra y sale la diapositiva»): sin transición (corte),
+  fundido, de costado (entra por la derecha), hacia arriba (entra por abajo) o
+  se acomoda (zoom), con su duración en segundos. **▶ Ver ejemplo** la muestra
+  en la vista previa. Como es parte del tema, podés tener las canciones con
+  fundido y la Biblia con corte seco.
 - **Uso de mayúsculas**: como está escrito, TODAS MAYÚSCULAS, Cada Palabra,
   como oración o todas minúsculas — cambia lo proyectado sin tocar el texto
   guardado.
@@ -298,6 +355,19 @@ Botón **🎨 Temas** en la barra superior:
 - La **leyenda** (título y artista en canciones, referencia en la Biblia) tiene
   su propia tipografía, color, tamaño y posición; podés ocultarla.
 - **Usar en canciones / Usar en Biblia** fija el tema por defecto de cada uno.
+- **Dividir versículos largos** (en un tema de Biblia, sección **Biblia**) viene
+  apagada. Al tildarla elegís el **máximo de caracteres por diapositiva** (150
+  para empezar, de 50 a 500; cuentan las letras, los espacios y los signos). Un
+  versículo más largo pasa en varias diapositivas de largo parecido, con la cita
+  marcada **Juan 3:16 (1/2)**, **(2/2)**, y se avanza con las flechas como
+  siempre. Corta de preferencia en un punto o un punto y coma; si no hay uno
+  cerca, en una coma o dos puntos; y si no, entre dos palabras: nunca parte una
+  palabra. El tamaño de la letra y **Se achica hasta** siguen valiendo para cada
+  parte (si una parte no entra, se divide una vez más). Con dos versiones, las
+  dos se dividen en la misma cantidad de partes, la que necesite la más larga.
+  Cambiar la opción con un capítulo abierto lo rearma sin salir del versículo
+  que está en pantalla. Vale para la Biblia que usa el tema marcado con **Usar
+  en Biblia**.
 
 En el diseñador, arriba del panel de formato hay un selector: **Letra de la
 canción** o **Cuadro 1, 2, 3…**. Con **➕ Cuadro de texto** agregás otro cuadro
@@ -367,6 +437,36 @@ programa recuerda lo que elijas.
 - **Texto rápido**: escribí un anuncio y proyectalo al momento.
 - **Aviso al pie**: un mensaje que aparece sobre todo lo demás (ideal para
   "el auto ABC 123 está mal estacionado"). Se quita con **Quitar**.
+
+  Texto rápido y Aviso al pie se usan parecido (escribís y mandás, con **Ctrl+Enter**);
+  lo que cambia es la pantalla principal. El texto rápido la ocupa entera, con el tema de
+  las canciones, en lugar de la letra o el versículo, se ve antes en PREVIEW y se saca con
+  **Clear** o proyectando otra cosa. El aviso es una franja abajo que no reemplaza nada,
+  sale incluso con **Black** puesto, tiene su propia letra y tamaño, y sólo se va con
+  **Quitar** (Clear no lo saca).
+- **Placas de nombre** («lower third»): escribí el **nombre** y, si querés, el
+  **cargo** («Pastor Juan Pérez» / «Predicación») y tocá **Mostrar** (o Enter).
+  Aparece una tarjeta por encima de todo, en el proyector y en la transmisión
+  (dónde y cómo lo dice su **estilo**). En **Dura** elegís cuánto queda: hasta que toques
+  **Quitar**, o 5, 10 o 15 segundos. Cada placa que mostrás queda en la lista de
+  **Guardadas**: el próximo domingo es doble clic y listo; el 🗑 la borra.
+  Con **Elegir…** le ponés una **imagen o un video corto** al costado (uno de tus
+  logos o cualquier archivo de la computadora; el video va en bucle y sin sonido),
+  **a la izquierda o a la derecha** del texto (el botón «◧» / «◨» la cambia de lado; un logo apaisado queda ancho; para OBS el
+  video tiene que ser MP4 común, H.264: los videos HEVC de iPhone se ven en el proyector pero
+  no en la transmisión, donde la placa sale sin el video). Un **GIF animado** se convierte
+  solo en un video corto y se mueve.
+  En **Estilo** elegís cómo se ve: Clásica, Moderna, Noticias, Vidrio, Mínima, Centrada o
+  los que hagas vos. **✏ Diseñar…** abre la ventana «Estilos de placa», con la placa a la
+  vista mientras cambiás: si se ve en el proyector y en la transmisión, **sólo en la
+  transmisión (OBS)** o sólo en el proyector; color, opacidad y esquinas del recuadro;
+  **ancho y alto** (0 = que se acomode a las palabras); la franja de color (dónde, color y
+  grosor, o el nombre sobre un bloque de ese color); tipografía, tamaños y colores del
+  nombre y del cargo; negrita, mayúsculas y sombra; el lugar (abajo a la izquierda, al
+  centro o a la derecha) y la distancia a los bordes; y **cómo entra y cómo sale**, con
+  cuánto tarda (en milésimas: 400 es casi medio segundo). «▶ Ver cómo entra» y «◼ Ver
+  cómo sale» lo muestran. Con **Guardar** queda para todas las placas de ese estilo.
+  Todo queda guardado con la placa.
 - **Resaltar en vivo**: escribí una o varias palabras o frases separadas por
   **;** (`gracia; fe`) y se pintan como con marcador, en todas las veces que
   aparecen. También podés marcar con el mouse sobre el panel LIVE: un clic en
@@ -438,9 +538,25 @@ dirección y un **PIN de cuatro dígitos**.
   **Sin fondo**, prender y apagar la **salida**, tocar cualquier **diapositiva**
   y cualquier ítem de la **playlist**. Arriba se ve la letra en vivo y la que
   sigue.
+- Con versículos abiertos aparece **Dividir versículos largos**, con su máximo de
+  caracteres (**−** y **+**). Es lo mismo que la casilla **Dividir** de la
+  computadora: lo que cambiás en un lado se ve en el otro.
 - La primera vez, **Windows pregunta si permitís el acceso a la red**: aceptá
   para *redes privadas*.
 - Queda encendido para el próximo servicio. Se apaga desde la misma ventana.
+
+### La salida en una ventana (Discord, una sola pantalla)
+
+En la lista **Salida:** elegí **⧉ En una ventana**. Al poner en vivo se abre una
+ventana común de Windows con lo mismo que ve la congregación: se mueve, se agranda,
+se minimiza y se comparte por Discord o por una videollamada como cualquier otra.
+Cerrarla es lo mismo que **Apagar salida**.
+
+Con el **clic derecho** sobre la ventana elegís la **forma** (16:9, 4:3 o **9:16 vertical**, para una pantalla parada o una
+transmisión vertical; la letra queda en una franja al medio), un
+**tamaño** rápido (por ejemplo 1280×720) y **Siempre visible**. Al arrastrar un
+borde la imagen conserva la forma; si la maximizás, sobran bandas negras a los
+costados. El programa recuerda la forma, el tamaño y el lugar para la próxima vez.
 
 ### Para la transmisión (OBS o vMix)
 
@@ -550,7 +666,7 @@ contorno, y el video se proyecta igual.
 
 ## 14. Música
 
-En la columna derecha, abajo, la pestaña **Música** tiene dos partes.
+En la columna derecha, abajo, la pestaña **Música** tiene tres partes.
 
 **Audios.** Una lista propia de archivos de sonido (mp3, wav, m4a, ogg y flac)
 para la música de antes de la reunión, la ofrenda o lo que haga falta.
@@ -566,9 +682,35 @@ para la música de antes de la reunión, la ofrenda o lo que haga falta.
 - Al terminar un audio sigue solo con el de abajo; al terminar el último, se
   detiene. **⏮** vuelve al principio del audio si ya pasaron unos segundos, y
   recién ahí pasa al anterior.
+- El botón **🔁** al lado del nombre de lo que suena cambia cómo sigue la
+  música: apagado (sin repetir), **🔁 repetir la lista** (después del último
+  vuelve al primero) o **🔁 1 repetir ésta** (el mismo audio una y otra vez,
+  ideal para un pad debajo de una canción).
 - Los audios suenan por la salida de sonido de la computadora, igual que el
   video. Para que no se pisen con otra cosa, bajales el volumen o pausalos
   antes de proyectar un video con sonido.
+
+**Buscar en YouTube (sólo el audio).** Debajo del reproductor hay un buscador
+para sacar música o pads de YouTube **sin mostrar nada**: suena sólo el audio,
+por el mismo reproductor de arriba, y lo que está en pantalla (el logo, la letra,
+la Biblia) no cambia. Tampoco hay propagandas.
+
+- Escribí un artista, una canción o, por ejemplo, «pad en Re», y tocá **🔍** (o
+  *Enter*). También podés pegar un link de YouTube.
+- Los botones **Pads: Do, Do#, Re…** buscan directamente pads en ese tono.
+- En cada resultado: **▶** lo escucha ya, sin tocar la lista; **➕** lo suma al
+  final de la lista; **💾** guarda el audio en la computadora y lo suma a la
+  lista. **➕ Sumar todos** pone todos los resultados en la lista, para tener
+  música de fondo de corrido.
+- La primera vez que suena una canción tarda unos segundos (se trae el audio de
+  YouTube; la barra de abajo de la ventana dice cómo va). Las siguientes veces
+  arranca enseguida.
+- En la lista, lo que viene de YouTube lleva **🌐**: necesita internet la primera
+  vez. Para que funcione sin internet, elegilo y tocá **💾** arriba de la lista:
+  el audio queda guardado en la carpeta **Música › EcclesiaCast** de Windows y el
+  🌐 desaparece. Conviene hacerlo antes de la reunión.
+- El volumen es el mismo de los audios, y la barra **Volumen** de abajo de EN VIVO
+  también lo sube o lo baja.
 
 **Spotify u otro reproductor.** Los botones **⏮ ⏯ ⏭** y de volumen mandan las
 **teclas multimedia de Windows**, así que manejan el **Spotify instalado en la
