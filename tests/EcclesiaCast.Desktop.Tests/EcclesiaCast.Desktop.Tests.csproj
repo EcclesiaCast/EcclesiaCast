@@ -33,4 +33,19 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
   </ItemGroup>
 
+  <!-- LibVLC itself, for the test that plays a real video: the same Windows
+       package as the program, and on a Mac the official one (3.1.3.2), which
+       carries the Apple-chip build (batch 1 checked it). -->
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+    <PackageReference Include="VideoLAN.LibVLC.Mac" Version="3.1.3.2" />
+  </ItemGroup>
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.23.1" />
+  </ItemGroup>
+
+  <!-- A 3-second test pattern (ffmpeg's testsrc, 320×180, no sound). -->
+  <ItemGroup>
+    <None Include="..\medios\prueba-3s.mp4" Link="medios\prueba-3s.mp4" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
