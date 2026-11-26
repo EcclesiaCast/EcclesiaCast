@@ -204,6 +204,12 @@ public sealed class SlideTheme
     /// </summary>
     public bool ShowSelahAndTitles { get; set; }
 
+    /// <summary>
+    /// The most characters of a verse on one slide; a longer one goes over
+    /// several (see <see cref="Bible.VerseSplitter"/>). 0, the default, is off.
+    /// </summary>
+    public int VerseSplitMaxChars { get; set; }
+
     // ── Transición entre diapositivas ────────────────────────────
     /// <summary>How the text arrives when the slide changes.</summary>
     public SlideTransition Transition { get; set; } = SlideTransition.Fade;

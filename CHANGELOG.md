@@ -5,6 +5,17 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+### Agregado
+
+- **Dividir versículos largos.** Nueva opción en los temas de Biblia (editor de temas, sección
+  «Biblia»), apagada por defecto: con un máximo de caracteres por diapositiva (150 al activarla),
+  un versículo largo pasa en varias de largo parecido, con la cita «Juan 3:16 (1/2)». Corta de
+  preferencia en punto o punto y coma, después en coma o dos puntos y si no entre palabras, sin
+  partir nunca una. Con dos versiones, las dos se dividen en la misma cantidad de partes.
+- **Dos tutoriales nuevos** en Ayuda → «Tutoriales»: «Mensajes en pantalla» (Texto rápido y Aviso
+  al pie) y «Durante la reunión» (Resaltar, Notas y Tiempos). Si un paso señala algo que quedó
+  fuera de la vista en un panel con barra de desplazamiento, ahora lo muestra.
+
 ### Corregido
 
 - **Fondos que van encima de todo.** Al elegir como fondo (de la Biblia o de una canción) un medio

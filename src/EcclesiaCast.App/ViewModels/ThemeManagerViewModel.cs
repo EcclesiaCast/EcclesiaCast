@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EcclesiaCast.App.Services;
 using EcclesiaCast.Core.Abstractions;
+using EcclesiaCast.Core.Bible;
 using EcclesiaCast.Core.Presentation;
 using EcclesiaCast.Core.Songs;
 using EcclesiaCast.Core.Themes;
@@ -228,6 +229,8 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
     [ObservableProperty] private bool _showVersionName = true;
     [ObservableProperty] private bool _showVerseNumbers;
     [ObservableProperty] private bool _showSelahAndTitles;
+    [ObservableProperty] private bool _splitLongVerses;
+    [ObservableProperty] private double _verseSplitChars = VerseSplitter.DefaultMaxChars;
 
     // Segunda versión bíblica
     [ObservableProperty] private bool _secondaryMatchesPrimary;
@@ -513,6 +516,8 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         ShowVersionName = theme.ShowVersionName;
         ShowVerseNumbers = theme.ShowVerseNumbers;
         ShowSelahAndTitles = theme.ShowSelahAndTitles;
+        SplitLongVerses = theme.VerseSplitMaxChars > 0;
+        VerseSplitChars = theme.VerseSplitMaxChars > 0 ? theme.VerseSplitMaxChars : VerseSplitter.DefaultMaxChars;
         SecondaryMatchesPrimary = theme.SecondaryMatchesPrimary;
         SecondaryScalePercent = theme.SecondaryScale * 100;
         SecondaryColor = theme.SecondaryColor;
@@ -597,6 +602,9 @@ public sealed partial class ThemeManagerViewModel : ObservableObject
         ShowVersionName = ShowVersionName,
         ShowVerseNumbers = ShowVerseNumbers,
         ShowSelahAndTitles = ShowSelahAndTitles,
+        VerseSplitMaxChars = SplitLongVerses
+            ? (int)Math.Clamp(VerseSplitChars, VerseSplitter.MinMaxChars, VerseSplitter.MaxMaxChars)
+            : 0,
         SecondaryMatchesPrimary = SecondaryMatchesPrimary,
         SecondaryScale = Math.Clamp(SecondaryScalePercent / 100, 0.2, 1.5),
         SecondaryColor = SecondaryColor,

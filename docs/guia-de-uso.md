@@ -343,6 +343,19 @@ Botón **🎨 Temas** en la barra superior:
 - La **leyenda** (título y artista en canciones, referencia en la Biblia) tiene
   su propia tipografía, color, tamaño y posición; podés ocultarla.
 - **Usar en canciones / Usar en Biblia** fija el tema por defecto de cada uno.
+- **Dividir versículos largos** (en un tema de Biblia, sección **Biblia**) viene
+  apagada. Al tildarla elegís el **máximo de caracteres por diapositiva** (150
+  para empezar, de 50 a 500; cuentan las letras, los espacios y los signos). Un
+  versículo más largo pasa en varias diapositivas de largo parecido, con la cita
+  marcada **Juan 3:16 (1/2)**, **(2/2)**, y se avanza con las flechas como
+  siempre. Corta de preferencia en un punto o un punto y coma; si no hay uno
+  cerca, en una coma o dos puntos; y si no, entre dos palabras: nunca parte una
+  palabra. El tamaño de la letra y **Se achica hasta** siguen valiendo para cada
+  parte (si una parte no entra, se divide una vez más). Con dos versiones, las
+  dos se dividen en la misma cantidad de partes, la que necesite la más larga.
+  Cambiar la opción con un capítulo abierto lo rearma sin salir del versículo
+  que está en pantalla. Vale para la Biblia que usa el tema marcado con **Usar
+  en Biblia**.
 
 En el diseñador, arriba del panel de formato hay un selector: **Letra de la
 canción** o **Cuadro 1, 2, 3…**. Con **➕ Cuadro de texto** agregás otro cuadro

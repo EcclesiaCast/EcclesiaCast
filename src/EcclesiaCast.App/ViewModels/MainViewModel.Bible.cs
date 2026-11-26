@@ -595,29 +595,37 @@ public sealed partial class MainViewModel
                 Text = BibleTextCleaner.Clean(stored.Text, showSelah),
                 SecondaryText = stored.SecondaryText is null ? null : BibleTextCleaner.Clean(stored.SecondaryText, showSelah),
             };
-            var mainText = theme.ShowVerseNumbers ? $"{group.Numbers}  {group.Text}" : group.Text;
             var verseReference = $"{bookName} {group.Chapter}:{group.Numbers}";
 
             // Two versions: label each text inline with its abbreviation (like
             // BibleShow) and drop the version(s) from the reference.
             Func<string, string> label = text => text;
             Func<string, string> secondaryLabel = text => text;
-            string caption;
             if (secondary is not null)
             {
                 label = text => $"[{primary.Abbreviation}] {text}";
                 secondaryLabel = text => $"[{secondary.Abbreviation}] {text}";
-                caption = verseReference;
-            }
-            else
-            {
-                caption = theme.ShowVersionName ? $"{verseReference} · {primary.Abbreviation}" : verseReference;
             }
 
-            // A verse too long to read in one slide goes over several,
-            // rather than shrinking past the theme's minimum.
-            var parts = Controls.SlideTextFit.SplitToFit(
-                new SlideContent(mainText, caption, group.SecondaryText, theme), label, secondaryLabel);
+            string Caption(string reference) => secondary is null && theme.ShowVersionName
+                ? $"{reference} · {primary.Abbreviation}"
+                : reference;
+
+            // With «Dividir versículos largos» the reference says which part
+            // it is, so it is measured with room for that.
+            var splits = theme.VerseSplitMaxChars > 0;
+            var measured = Caption(splits ? $"{verseReference} (9/9)" : verseReference);
+
+            // First the theme's limit of characters, if it has one. Then,
+            // as always, a part too long to read in one slide goes over
+            // several, rather than shrinking past the theme's minimum.
+            var parts = VerseSplitter.Split(group.Text, group.SecondaryText, theme.VerseSplitMaxChars)
+                .SelectMany((piece, i) => Controls.SlideTextFit.SplitToFit(
+                    new SlideContent(
+                        i == 0 && theme.ShowVerseNumbers ? $"{group.Numbers}  {piece.Main}" : piece.Main,
+                        measured, piece.Secondary, theme),
+                    label, secondaryLabel))
+                .ToList();
 
             for (var part = 0; part < parts.Count; part++)
             {
@@ -625,10 +633,14 @@ public sealed partial class MainViewModel
                 if (parts.Count > 1)
                     slideLabel += $" ({part + 1}/{parts.Count})";
 
+                var shownReference = splits && parts.Count > 1
+                    ? $"{verseReference} ({part + 1}/{parts.Count})"
+                    : verseReference;
+
                 Slides.Add(new SlideItemViewModel(
                     Slides.Count,
                     slideLabel,
-                    new SlideContent(parts[part].Main, caption, parts[part].Secondary, theme))
+                    new SlideContent(parts[part].Main, Caption(shownReference), parts[part].Secondary, theme))
                 {
                     Verses = group,
                 });
