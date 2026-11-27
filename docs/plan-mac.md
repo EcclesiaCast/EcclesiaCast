@@ -406,7 +406,7 @@ como versión normal.
 | **16** | Biblia y canciones (9): importar Biblia, paquetes, ayuda de formato, editor, importar canciones, buscador, papelera, buscar letra, ajustes | Sonnet | M–G |
 | **17** | Diseño (7): temas, diseñador de canción, colores, logos, propiedades de un medio, reglas de pestañas, diseñador de escenario | Sonnet | G (2 sesiones) |
 | **18** | Remoto y transmisión (4): control remoto, transmisión, estilos, Pixabay | Sonnet | M |
-| **19** | Ventana principal, parte 1: armazón, barra, PREVIEW y LIVE, atajos | Sonnet | G |
+| **19** | Ventana principal, parte 1: armazón, barra, PREVIEW y LIVE, atajos. Conecta `MenuDialogs` y `FeedbackDialogs` ([plan-mac-fase-3.md](plan-mac-fase-3.md)) | Sonnet | G |
 | **20** | Ventana principal, parte 2: grilla de diapositivas, playlist, arrastrar | Sonnet | G |
 | **21** | Ventana principal, parte 3: Biblia, medios, audio, recorrido de bienvenida | Sonnet | G |
 | **22** | Cosas de Mac: menú global, Cmd, cerrar y salir, una sola copia, soltar desde Finder | Opus | M |

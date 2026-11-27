@@ -48,6 +48,42 @@ se comparan contra WPF como la letra.
 Los textos de los tutoriales nombran botones de Windows y atajos con Ctrl:
 revisarlos para Mac (Cmd).
 
+## Para la tanda 19: conectar `MenuDialogs` y `FeedbackDialogs`
+
+La tanda 15 dejó hechos y registrados en `Composition.cs` los dos servicios, y
+**todavía no los llama nadie**. El modelo es `App/App.xaml.cs` (arranque y
+`OnExit`) y `App/MainWindow*.cs`.
+
+1. **Del menú:** `MenuRequest.About` → `MenuDialogs.ShowAbout()`,
+   `.Transitions` → `ShowTransitions()` y `.Feedback` →
+   `FeedbackDialogs.ShowFromMenu()`.
+2. **La primera vez que se abre el programa:** «Acerca de» sola, una única vez
+   (`OneTimeNotice.ShouldShow`, clave `app.about.seen`, que hoy es una constante
+   de WPF; con `firstRun: true`). En ese orden con lo demás, como en Windows.
+3. **Pedir `FeedbackDialogs` al arrancar**, aunque no se muestre nada. Al crearse
+   `FeedbackSession` **se cuenta cada apertura** y empieza a correr el reloj de
+   la sesión. Si se pide recién al abrir el menú o al cerrar, las aperturas y los
+   minutos salen mal y el aviso del cierre no aparece nunca. (Pedirlo después de
+   saber que no es una segunda copia del programa.)
+4. **El cierre anterior:** el programa de Avalonia todavía no usa `CrashMarker`
+   (de `Core`). Va `Begin()` al arrancar, `End()` al salir (también cuando el
+   sistema se apaga) y, con la ventana ya en pantalla,
+   `FeedbackDialogs.AskAfterCrash(lastRunCrashed)`.
+5. **Antes de cerrar la ventana principal:** `AskOnClosing()`. Abre un diálogo
+   desde adentro de `Closing`, que en Avalonia no está probado: comprobar con una
+   prueba que la ventana espera la respuesta, que un segundo pedido de cierre
+   mientras tanto no abre dos y que después se cierra. Cuando el que cierra es el
+   sistema que se apaga (`CloseReason`), no se pregunta.
+6. **Registrar el fin de la sesión:** al salir, `FeedbackSession.RecordEnd()`
+   **una sola vez**, que suma los minutos de uso. `FeedbackDialogs` no lo expone:
+   pedir `FeedbackSession` o sumarle el método.
+7. **No preguntar cuando el programa se cierra solo:** poner
+   `FeedbackSession.Quiet = true` **antes** de cerrarlo para restaurar una copia
+   (la tanda 16 muda esa lógica) o para actualizarse (fase 4), y en cualquier
+   otro cierre que no pida el operador.
+8. El portapapeles (`AvaloniaClipboardText.Window`) hoy lo apunta `App.axaml.cs`
+   a la ventana de prueba: la ventana del operador tiene que seguir haciéndolo.
+
 ## Cosas de Mac (tanda 22)
 
 - **Una sola copia del programa.** En Windows es `App/Services/SingleInstance.cs`
