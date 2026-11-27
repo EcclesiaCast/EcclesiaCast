@@ -1700,15 +1700,41 @@ public partial class MainWindow : Window
         foreach (var (tab, tabOnTop, items) in vm.BackgroundChoicesByTab())
         {
             var tabItem = new MenuItem { Header = Marked(tab, tabOnTop) };
+            // The pictures are read only when the tab is opened: reading every
+            // tab's at once would make the button slow to answer.
+            var pending = new List<(MediaItem Media, Image Picture)>();
             foreach (var (media, onTop) in items.Take(60))
             {
-                tabItem.Items.Add(new MenuItem
+                var picture = new Image { Stretch = System.Windows.Media.Stretch.UniformToFill };
+                pending.Add((media, picture));
+
+                var row = new StackPanel { Orientation = Orientation.Horizontal };
+                row.Children.Add(ChoiceThumbnail(picture, media.Type == MediaType.Video));
+                row.Children.Add(new ContentPresenter
                 {
-                    Header = Marked(media.Name, onTop && !tabOnTop),
+                    Content = onTop && !tabOnTop
+                        ? Marked(media.Name, true)
+                        : new TextBlock { Text = media.Name },
+                    VerticalAlignment = VerticalAlignment.Center,
+                });
+
+                var item = new MenuItem
+                {
+                    Header = row,
                     Command = pick,
                     CommandParameter = media,
-                });
+                };
+                System.Windows.Automation.AutomationProperties.SetName(item, media.Name);
+                tabItem.Items.Add(item);
             }
+
+            tabItem.SubmenuOpened += async (_, _) =>
+            {
+                var toLoad = pending.ToList();
+                pending.Clear();
+                foreach (var (media, picture) in toLoad)
+                    picture.Source = await Task.Run(() => LoadChoiceThumbnail(media));
+            };
 
             choose.Items.Add(tabItem);
         }
@@ -1720,6 +1746,68 @@ public partial class MainWindow : Window
         }
 
         menu.Items.Add(choose);
+    }
+
+    /// <summary>The little box with a background's picture in the «choose a background» menus.</summary>
+    private static FrameworkElement ChoiceThumbnail(Image picture, bool isVideo)
+    {
+        var content = new Grid { ClipToBounds = true };
+        content.Children.Add(picture);
+        if (isVideo)
+        {
+            // A video shows one still frame: the mark tells it apart from a picture.
+            content.Children.Add(new Border
+            {
+                Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(170, 0, 0, 0)),
+                CornerRadius = new CornerRadius(2),
+                Padding = new Thickness(3, 0, 3, 0),
+                Margin = new Thickness(2),
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                Child = new TextBlock { Text = "▶", FontSize = 9, Foreground = System.Windows.Media.Brushes.White },
+            });
+        }
+
+        return new Border
+        {
+            Width = 80,
+            Height = 45,
+            Margin = new Thickness(0, 2, 8, 2),
+            Background = System.Windows.Media.Brushes.Black,
+            Child = content,
+        };
+    }
+
+    /// <summary>
+    /// The poster of a background (or the picture itself), read small. Apart from
+    /// <see cref="Services.ImageLoadCache"/>, whose few places are the projector's.
+    /// Null when there is nothing to read: the box stays black.
+    /// </summary>
+    private static System.Windows.Media.Imaging.BitmapImage? LoadChoiceThumbnail(MediaItem media)
+    {
+        var path = !string.IsNullOrWhiteSpace(media.ThumbnailPath) && System.IO.File.Exists(media.ThumbnailPath)
+            ? media.ThumbnailPath
+            : media.Type == MediaType.Image && System.IO.File.Exists(media.Path) ? media.Path : null;
+        if (path is null)
+            return null;
+
+        try
+        {
+            var bitmap = new System.Windows.Media.Imaging.BitmapImage();
+            bitmap.BeginInit();
+            bitmap.UriSource = new Uri(path);
+            // Read whole now, so the file is not left open.
+            bitmap.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad;
+            bitmap.DecodePixelWidth = 160;
+            bitmap.EndInit();
+            bitmap.Freeze();
+            return bitmap;
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Debug(ex, "No se pudo leer la miniatura {Path}", path);
+            return null;
+        }
     }
 
     /// <summary>
