@@ -1,5 +1,5 @@
 using System.Windows;
-using EcclesiaCast.Core.Ui;
+using EcclesiaCast.Presentation.Services;
 
 namespace EcclesiaCast.App;
 
@@ -11,18 +11,17 @@ namespace EcclesiaCast.App;
 /// </summary>
 public partial class MainWindow
 {
-    /// <summary>True while the «avanzado» layout (no shortcut hints) is on.</summary>
-    internal bool IsAdvancedUi => AdvancedModeItem.IsChecked;
+    private UiModeChoice? _uiMode;
 
-    private void RestoreUiMode() =>
-        ApplyUiMode(_settings?.ReadAdvancedUi() == true);
+    private UiModeChoice UiMode => _uiMode ??= new UiModeChoice(() => _settings, ApplyUiMode);
+
+    /// <summary>True while the «avanzado» layout (no shortcut hints) is on.</summary>
+    public bool IsAdvancedUi => UiMode.IsAdvanced;
+
+    private void RestoreUiMode() => UiMode.Restore();
 
     /// <summary>Changes the layout and remembers the choice for the next service.</summary>
-    internal void SetUiMode(bool advanced)
-    {
-        ApplyUiMode(advanced);
-        _settings?.WriteAdvancedUi(advanced);
-    }
+    public void SetUiMode(bool advanced) => UiMode.Set(advanced);
 
     /// <summary>
     /// The two visibilities live in the application's resources: the button

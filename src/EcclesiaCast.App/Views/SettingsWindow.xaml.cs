@@ -10,9 +10,9 @@ namespace EcclesiaCast.App.Views;
 /// </summary>
 public partial class SettingsWindow : Window
 {
-    private readonly MainWindow _main;
+    private readonly ISettingsHost _main;
 
-    public SettingsWindow(MainWindow main)
+    public SettingsWindow(ISettingsHost main)
     {
         InitializeComponent();
         _main = main;
@@ -38,7 +38,7 @@ public partial class SettingsWindow : Window
     private void NewVideoColor_Click(object sender, RoutedEventArgs e)
     {
         if (DataContext is Presentation.ViewModels.MainViewModel vm
-            && Services.ColorPickerHelper.Pick(vm.NewVideoFitColor) is { } picked)
+            && _main.PickColor(vm.NewVideoFitColor) is { } picked)
             vm.NewVideoFitColor = picked;
     }
 

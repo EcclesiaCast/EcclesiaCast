@@ -255,6 +255,17 @@ public sealed partial class MainViewModel
         StatusText = "Audios ordenados por nombre.";
     }
 
+    /// <summary>
+    /// «Reiniciar el sonido» (the menu and Ajustes): the escape hatch for when
+    /// the system's audio device changed and nothing is heard even though the
+    /// automatic reopening ran (or did not notice).
+    /// </summary>
+    public void RestartSound()
+    {
+        AudioOutputChanges.RequestRestart();
+        StatusText = "Sonido reiniciado: la música y los videos vuelven a abrir la salida de audio.";
+    }
+
     // ── Clic derecho en un audio de la lista ─────────────────────
 
     /// <summary>Right click → «Reproducir en bucle sólo este»: starts it and repeats it until the repeat is changed.</summary>

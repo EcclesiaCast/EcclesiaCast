@@ -18,7 +18,7 @@ using EcclesiaCast.Core.Songs;
 
 namespace EcclesiaCast.App;
 
-public partial class MainWindow : Window
+public partial class MainWindow : Window, Views.ISettingsHost
 {
     /// <summary>What is remembered between services (null until <see cref="AttachLayoutPersistence"/>).</summary>
     private MainWindowSettings? _settings;
@@ -866,12 +866,13 @@ public partial class MainWindow : Window
 
     private void RestartSound_Click(object sender, RoutedEventArgs e) => RestartSound();
 
-    internal void RestartSound()
-    {
-        AudioOutputChanges.RequestRestart();
-        if (DataContext is MainViewModel vm)
-            vm.StatusText = "Sonido reiniciado: la música y los videos vuelven a abrir la salida de audio.";
-    }
+    public void RestartSound() => (DataContext as MainViewModel)?.RestartSound();
+
+    string? Views.ISettingsHost.PickColor(string current) => Services.ColorPickerHelper.Pick(current);
+
+    void Views.ISettingsHost.OpenTransitions(Window owner) => OpenTransitions(owner);
+
+    void Views.ISettingsHost.OpenListening() => OpenListening();
 
     /// <summary>Ctrl+, and Archivo → «Ajustes…».</summary>
     private void Settings_Click(object sender, RoutedEventArgs e) => OpenSettings();

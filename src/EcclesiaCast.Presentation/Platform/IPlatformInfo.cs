@@ -28,6 +28,9 @@ public enum Feature
 
     /// <summary>«⧉ En una ventana»: the output in an ordinary window.</summary>
     FloatingOutput,
+
+    /// <summary>The program looking for a new version and installing it.</summary>
+    Updates,
 }
 
 /// <summary>
