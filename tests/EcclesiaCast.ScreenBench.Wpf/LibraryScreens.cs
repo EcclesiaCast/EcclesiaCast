@@ -36,9 +36,10 @@ internal static class LibraryScreens
             var window = new GlobalSearchWindow(LibrarySamples.SearchHits, LibrarySamples.SearchQuery);
             // The search waits for a pause in the typing. It is run by hand:
             // waiting for the clock would mean running the dispatcher (see Program.Main).
-            typeof(GlobalSearchWindow)
-                .GetMethod("Run", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
-                .Invoke(window, null);
+            var viewModel = (EcclesiaCast.Presentation.ViewModels.GlobalSearchViewModel)typeof(GlobalSearchWindow)
+                .GetField("_viewModel", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .GetValue(window)!;
+            viewModel.SearchNow();
             return Take(window, 520 - TitleBar);
         }, 720);
 

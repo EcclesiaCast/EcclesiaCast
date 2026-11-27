@@ -28,6 +28,7 @@
                  Background="Transparent" BorderThickness="0"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  MouseDoubleClick="Results_DoubleClick"
+                 SelectionChanged="Results_SelectionChanged"
                  PreviewKeyDown="Results_KeyDown">
             <ListBox.ItemTemplate>
                 <DataTemplate>
