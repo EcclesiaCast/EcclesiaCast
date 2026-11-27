@@ -7,7 +7,11 @@ namespace EcclesiaCast.Presentation.Platform;
 public sealed record FileFilter(string Name, IReadOnlyList<string> Patterns);
 
 /// <summary>What an «Abrir» dialog asks for.</summary>
-public sealed record OpenFileRequest(string Title, IReadOnlyList<FileFilter> Filters);
+public sealed record OpenFileRequest(string Title, IReadOnlyList<FileFilter> Filters)
+{
+    /// <summary>The folder the dialog opens in; null leaves it where the system last was.</summary>
+    public string? InitialDirectory { get; init; }
+}
 
 /// <summary>What a «Guardar» dialog asks for.</summary>
 public sealed record SaveFileRequest(string Title, IReadOnlyList<FileFilter> Filters)

@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.IO;
 using System.Windows;
 using EcclesiaCast.Presentation.ViewModels;
 
@@ -31,7 +30,7 @@ public partial class SongImportWindow : Window
     {
         HeaderText.Text = _viewModel.HeaderText;
         RootText.Text = _viewModel.RootText;
-        ImportButton.IsEnabled = _viewModel.CanImport && !_viewModel.IsImporting;
+        ImportButton.IsEnabled = _viewModel.ImportEnabled;
         BrowseButton.ToolTip = _viewModel.BrowseTip.Length > 0 ? _viewModel.BrowseTip : null;
         CloudWarning.Visibility = _viewModel.CloudWarningVisible ? Visibility.Visible : Visibility.Collapsed;
         CloudWarningText.Text = _viewModel.CloudWarningText;
@@ -102,7 +101,7 @@ public partial class SongImportWindow : Window
         LibrariesList.ItemsSource = null;
         LibrariesList.ItemsSource = _viewModel.Rows;
 
-        var holyrics = _viewModel.Source == SongImportSource.Holyrics;
+        var holyrics = _viewModel.IsHolyrics;
         ListTitle.Text = _viewModel.ListTitle;
         HolyricsPanel.Visibility = holyrics ? Visibility.Visible : Visibility.Collapsed;
         BrowseButton.Visibility = holyrics ? Visibility.Collapsed : Visibility.Visible;
@@ -118,21 +117,10 @@ public partial class SongImportWindow : Window
         if (_viewModel.IsImporting)
             return;
 
-        var dialog = new Microsoft.Win32.OpenFileDialog
-        {
-            Title = "Canciones guardadas desde Holyrics",
-            Filter = "Canciones de Holyrics (*.json;*.txt)|*.json;*.txt",
-            Multiselect = true,
-        };
-
-        // Holyrics lives in C:\Holyrics and saves its exports there; if it is not there, Documents.
-        dialog.InitialDirectory = Directory.Exists(@"C:\Holyrics")
-            ? @"C:\Holyrics"
-            : Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        if (dialog.ShowDialog() != true)
+        if (new Platform.WpfDialogs().OpenFiles(_viewModel.HolyricsFilesRequest()) is not { } files)
             return;
 
-        _viewModel.ReadHolyricsFiles(dialog.FileNames);
+        _viewModel.ReadHolyricsFiles(files);
         ShowLabels();
         ShowList();
     }

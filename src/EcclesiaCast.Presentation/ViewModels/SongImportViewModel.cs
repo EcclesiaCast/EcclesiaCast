@@ -70,11 +70,20 @@ public sealed partial class SongImportViewModel : ObservableObject
     /// <summary>Why the last Holyrics file could not be read; empty when it could.</summary>
     private string _holyricsError = string.Empty;
 
-    public SongImportViewModel(SongSaver songSaver, IPlatformPaths paths)
+    private readonly PlatformSystem _system;
+
+    public SongImportViewModel(SongSaver songSaver, IPlatformPaths paths, PlatformSystem system = PlatformSystem.Windows)
     {
         _songSaver = songSaver;
         _paths = paths;
+        _system = system;
     }
+
+    /// <summary>What the system calls the window of a folder.</summary>
+    private string FileBrowser => _system == PlatformSystem.Mac ? "el Finder" : "el Explorador";
+
+    /// <summary>The button under the OneDrive warning.</summary>
+    public string OpenFolderText => $"Abrir la carpeta en {FileBrowser}";
 
     /// <summary>The program chosen.</summary>
     public SongImportSource Source { get; private set; } = SongImportSource.ProPresenter;
@@ -111,7 +120,20 @@ public sealed partial class SongImportViewModel : ObservableObject
     private string _rootText = string.Empty;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ImportEnabled))]
     private bool _canImport;
+
+    /// <summary>The «Importar» button: there is something to bring over and it is not being brought.</summary>
+    public bool ImportEnabled => CanImport && !IsImporting;
+
+    /// <summary>False while songs are being brought over: closing then would leave it half done unseen.</summary>
+    public bool CanClose => !IsImporting || _finished;
+
+    /// <summary>The import ran to its end; <see cref="IsImporting"/> stays on until the window goes.</summary>
+    private bool _finished;
+
+    /// <summary>The Holyrics choice has its own panel, to open files, and no «Elegir carpeta…».</summary>
+    public bool IsHolyrics => Source == SongImportSource.Holyrics;
 
     [ObservableProperty]
     private string _browseTip = string.Empty;
@@ -124,6 +146,7 @@ public sealed partial class SongImportViewModel : ObservableObject
 
     /// <summary>True from the moment the import starts: nothing else can be changed.</summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ImportEnabled), nameof(CanClose))]
     private bool _isImporting;
 
     [ObservableProperty]
@@ -296,6 +319,20 @@ public sealed partial class SongImportViewModel : ObservableObject
     }
 
     /// <summary>
+    /// The dialog that asks for the files saved from Holyrics. It opens in
+    /// C:\Holyrics, where Holyrics lives and saves its exports; if that is
+    /// not there, in Documents.
+    /// </summary>
+    public OpenFileRequest HolyricsFilesRequest() => new(
+        "Canciones guardadas desde Holyrics",
+        [new FileFilter("Canciones de Holyrics (*.json;*.txt)", ["*.json", "*.txt"])])
+    {
+        InitialDirectory = _system == PlatformSystem.Windows && Directory.Exists(@"C:\Holyrics")
+            ? @"C:\Holyrics"
+            : _paths.DocumentFolders.FirstOrDefault(),
+    };
+
+    /// <summary>
     /// The way in for the free Holyrics: files saved from its «Guardar» or
     /// «Exportación en lote» (.json or .txt) are read and listed, one row per
     /// song, and the lists and texts are left up to date.
@@ -375,7 +412,7 @@ public sealed partial class SongImportViewModel : ObservableObject
         CloudWarningText =
             $"{cloudOnly} de esas canciones están en OneDrive y todavía no bajaron a esta computadora. "
             + "Así como están no se pueden leer.\n\n"
-            + "Abrí la carpeta en el Explorador, hacé clic derecho sobre ella y elegí "
+            + $"Abrí la carpeta en {FileBrowser}, hacé clic derecho sobre ella y elegí "
             + "«Conservar siempre en este dispositivo». Esperá a que termine de bajar "
             + "(el ícono pasa de nube ☁ a tilde verde ✓) y volvé a intentar.";
     }
@@ -564,7 +601,7 @@ public sealed partial class SongImportViewModel : ObservableObject
         {
             var reason = cloudOnly > 0
                 ? $"Las {cloudOnly} canciones están en OneDrive y todavía no bajaron a esta computadora.\n\n"
-                  + "Abrí la carpeta en el Explorador, clic derecho sobre ella → «Conservar siempre en "
+                  + $"Abrí la carpeta en {FileBrowser}, clic derecho sobre ella → «Conservar siempre en "
                   + "este dispositivo», esperá a que termine de bajar y volvé a intentar."
                 : discarded > 0 && discarded + skipped == items.Count
                     ? "Todas ya estaban en tu biblioteca y las descartaste."
@@ -573,6 +610,7 @@ public sealed partial class SongImportViewModel : ObservableObject
             Notice.Show(reason, "No se importó ninguna canción", NoticeKind.Warning);
         }
 
+        _finished = true;
         return true;
     }
 }

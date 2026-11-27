@@ -11,19 +11,19 @@ namespace EcclesiaCast.Desktop.Services;
 /// through Avalonia's <c>StorageProvider</c> (the WPF one is
 /// <c>WpfDialogs</c>). Avalonia answers later and the view models read the
 /// answer on the next line, so the screen's thread waits in a nested loop, as
-/// <see cref="Modal"/> does. Like WPF's, they name no folder to start in: the
-/// system opens where it was last.
+/// <see cref="Modal"/> does. Like WPF's, they open where the system was last,
+/// unless the request names a folder.
 /// </summary>
 public sealed class AvaloniaDialogs : IDialogs
 {
     public string? OpenFile(OpenFileRequest request) =>
-        Ask(storage => storage.OpenFilePickerAsync(OpenOptions(request, several: false)))
+        Ask(storage => storage.OpenFilePickerAsync(StartingIn(storage, request, OpenOptions(request, several: false))))
             ?.Select(f => f.TryGetLocalPath())
             .FirstOrDefault(p => p is not null);
 
     public IReadOnlyList<string>? OpenFiles(OpenFileRequest request)
     {
-        var paths = Ask(storage => storage.OpenFilePickerAsync(OpenOptions(request, several: true)))
+        var paths = Ask(storage => storage.OpenFilePickerAsync(StartingIn(storage, request, OpenOptions(request, several: true))))
             ?.Select(f => f.TryGetLocalPath())
             .OfType<string>()
             .ToList();
@@ -44,6 +44,14 @@ public sealed class AvaloniaDialogs : IDialogs
         AllowMultiple = several,
         FileTypeFilter = FileTypes(request.Filters),
     };
+
+    private static FilePickerOpenOptions StartingIn(
+        IStorageProvider storage, OpenFileRequest request, FilePickerOpenOptions options)
+    {
+        if (request.InitialDirectory is { } folder)
+            options.SuggestedStartLocation = Wait(storage.TryGetFolderFromPathAsync(folder));
+        return options;
+    }
 
     internal static FilePickerSaveOptions SaveOptions(SaveFileRequest request) => new()
     {

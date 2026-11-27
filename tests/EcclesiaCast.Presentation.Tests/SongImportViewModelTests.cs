@@ -1,4 +1,5 @@
 using EcclesiaCast.Core.Songs;
+using EcclesiaCast.Presentation.Platform;
 using EcclesiaCast.Presentation.Services;
 using EcclesiaCast.Presentation.ViewModels;
 using Microsoft.Data.Sqlite;
@@ -354,6 +355,55 @@ public sealed class SongImportViewModelTests : IDisposable
         Assert.Equal("Marcá al menos una biblioteca.", notices.Asked[0].Message);
         Assert.False(vm.IsImporting);
         Assert.Empty(_world.Songs.Search());
+    }
+
+    [Fact]
+    public async Task While_importing_it_cannot_be_closed_or_started_again()
+    {
+        ProLibrary("Canciones", ("Una.pro", "Hola a todos"));
+        var vm = Make();
+        vm.SelectSource(vm.DiscoverAll());
+        Assert.True(vm.ImportEnabled);
+        Assert.True(vm.CanClose);
+        var during = new List<(bool Import, bool Close)>();
+
+        await vm.ImportAsync(() =>
+        {
+            during.Add((vm.ImportEnabled, vm.CanClose));
+            return Task.CompletedTask;
+        });
+
+        Assert.All(during, state => Assert.Equal((false, false), state));
+        // Finished: the window can go.
+        Assert.True(vm.CanClose);
+    }
+
+    [Theory]
+    [InlineData(PlatformSystem.Windows, "el Explorador")]
+    [InlineData(PlatformSystem.Mac, "el Finder")]
+    public void It_calls_the_window_of_a_folder_what_the_system_calls_it(PlatformSystem system, string name)
+    {
+        var vm = new SongImportViewModel(
+            new SongSaver(_world.Songs, new ScriptedPrompt(0)), _paths, system);
+
+        Assert.Equal($"Abrir la carpeta en {name}", vm.OpenFolderText);
+    }
+
+    [Fact]
+    public void The_dialog_of_holyrics_asks_for_its_files()
+    {
+        var vm = new SongImportViewModel(
+            new SongSaver(_world.Songs, new ScriptedPrompt(0)), _paths, PlatformSystem.Mac);
+
+        var request = vm.HolyricsFilesRequest();
+
+        Assert.Equal("Canciones guardadas desde Holyrics", request.Title);
+        Assert.Equal(["*.json", "*.txt"], Assert.Single(request.Filters).Patterns);
+        Assert.Equal(_paths.DocumentFolders[0], request.InitialDirectory);
+        vm.SelectSource(vm.DiscoverAll());
+        Assert.False(vm.IsHolyrics);
+        vm.SelectSource(SongImportSource.Holyrics);
+        Assert.True(vm.IsHolyrics);
     }
 
     [Fact]

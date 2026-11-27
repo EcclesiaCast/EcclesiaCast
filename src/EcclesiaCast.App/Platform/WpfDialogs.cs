@@ -15,6 +15,8 @@ public sealed class WpfDialogs : IDialogs
             Title = request.Title,
             Filter = FilterText(request.Filters),
         };
+        if (request.InitialDirectory is { } folder)
+            dialog.InitialDirectory = folder;
         return dialog.ShowDialog() == true ? dialog.FileName : null;
     }
 
@@ -26,6 +28,8 @@ public sealed class WpfDialogs : IDialogs
             Filter = FilterText(request.Filters),
             Multiselect = true,
         };
+        if (request.InitialDirectory is { } folder)
+            dialog.InitialDirectory = folder;
         return dialog.ShowDialog() == true ? dialog.FileNames : null;
     }
 
