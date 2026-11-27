@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -99,6 +100,87 @@ public sealed partial class DialogKeyTests
         Hit(window, PhysicalKey.Escape);
         Assert.True(closed());
         Assert.False(window.Accepted);
+    }
+
+    [AvaloniaFact]
+    public void The_search_walks_with_the_arrows_and_enter_in_the_box_loads()
+    {
+        var window = ScreenBenchTests.SearchWindow();
+        var closed = Open(window);
+        window.SearchNow();
+        Dispatcher.UIThread.RunJobs();
+        var box = Named<TextBox>(window, "QueryBox");
+        var list = Named<ListBox>(window, "ResultsList");
+        Assert.True(box.IsFocused);
+        Assert.Equal(LibrarySamples.SearchQuery.Length, box.CaretIndex);
+        Assert.Equal(0, list.SelectedIndex);
+
+        Hit(window, PhysicalKey.ArrowDown);
+        Hit(window, PhysicalKey.ArrowDown);
+        Hit(window, PhysicalKey.ArrowUp);
+
+        Assert.Equal(1, list.SelectedIndex);
+        // The arrows leave the cursor where it was, in the box.
+        Assert.True(box.IsFocused);
+        Assert.Equal(LibrarySamples.SearchQuery.Length, box.CaretIndex);
+
+        Hit(window, PhysicalKey.Enter);
+
+        Assert.True(closed());
+        Assert.Equal(LibrarySamples.SearchHits(LibrarySamples.SearchQuery)[1], window.Result);
+    }
+
+    [AvaloniaFact]
+    public void The_search_enter_in_the_list_loads_the_chosen_one()
+    {
+        var window = ScreenBenchTests.SearchWindow();
+        var closed = Open(window);
+        window.SearchNow();
+        Dispatcher.UIThread.RunJobs();
+        var list = Named<ListBox>(window, "ResultsList");
+        list.SelectedIndex = 1;
+        list.ContainerFromIndex(1)!.Focus();
+
+        Hit(window, PhysicalKey.Enter);
+
+        Assert.True(closed());
+        Assert.Equal(LibrarySamples.SearchHits(LibrarySamples.SearchQuery)[1], window.Result);
+    }
+
+    [AvaloniaFact]
+    public void The_search_loads_with_a_double_click()
+    {
+        var window = ScreenBenchTests.SearchWindow();
+        var closed = Open(window);
+        window.SearchNow();
+        Dispatcher.UIThread.RunJobs();
+        var row = Named<ListBox>(window, "ResultsList").ContainerFromIndex(1)!;
+        var middle = row.TranslatePoint(new Point(row.Bounds.Width / 2, row.Bounds.Height / 2), window)!.Value;
+
+        for (var click = 0; click < 2; click++)
+        {
+            window.MouseDown(middle, MouseButton.Left);
+            if (!closed())
+                window.MouseUp(middle, MouseButton.Left);
+        }
+
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(closed());
+        Assert.Equal(LibrarySamples.SearchHits(LibrarySamples.SearchQuery)[1], window.Result);
+    }
+
+    [AvaloniaFact]
+    public void The_search_escape_closes_it_with_nothing()
+    {
+        var window = ScreenBenchTests.SearchWindow();
+        var closed = Open(window);
+        window.SearchNow();
+        Dispatcher.UIThread.RunJobs();
+
+        Hit(window, PhysicalKey.Escape);
+
+        Assert.True(closed());
+        Assert.Null(window.Result);
     }
 
     [AvaloniaTheory]

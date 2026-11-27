@@ -40,6 +40,18 @@ public sealed partial class ScreenBenchTests
         DrawWindow(window, "importar-canciones-holyrics", 600 - 39);
     }
 
+    internal static GlobalSearchWindow SearchWindow() =>
+        new(LibrarySamples.SearchHits, LibrarySamples.SearchQuery, new Platform.AvaloniaUiTimerFactory());
+
+    [AvaloniaFact]
+    public void The_global_search_is_drawn()
+    {
+        var window = SearchWindow();
+        // The search waits for a pause in the typing: it is run by hand.
+        window.SearchNow();
+        DrawWindow(window, "buscador", 520 - 39);
+    }
+
     [AvaloniaFact]
     public void Importing_a_bible_is_drawn() => DrawWindow(new BibleImportWindow("Mi Biblia"), "importar-biblia");
 

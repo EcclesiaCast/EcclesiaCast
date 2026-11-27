@@ -1,0 +1,54 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:svc="using:EcclesiaCast.Presentation.Services"
+        x:Class="EcclesiaCast.Desktop.Views.GlobalSearchWindow"
+        Title="Buscar"
+        Width="720" Height="520">
+    <Window.Styles>
+        <!-- The rows as close together as WPF's, so as many results fit. -->
+        <Style Selector="ListBox#ResultsList ListBoxItem">
+            <Setter Property="Padding" Value="5,1"/>
+            <Setter Property="MinHeight" Value="0"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid Margin="16" RowDefinitions="Auto,Auto,*,Auto">
+        <TextBox Grid.Row="0" Name="QueryBox" FontSize="20" Padding="12,10"/>
+
+        <TextBlock Grid.Row="1" Text="Canciones, versículos y medios, todo junto. ↑↓ para elegir, Enter para cargarlo."
+                   FontSize="11" Foreground="{StaticResource FaintBrush}" Margin="2,6,0,8"
+                   TextWrapping="Wrap"/>
+
+        <ListBox Grid.Row="2" Name="ResultsList" Background="Transparent" BorderThickness="0"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="svc:SearchHit">
+                    <DockPanel Margin="0,4">
+                        <!-- The emoji typeface goes by name: taking the one of the
+                             window, the book and the film come out as empty boxes. -->
+                        <TextBlock DockPanel.Dock="Left" Text="{Binding Icon}" FontSize="18"
+                                   FontFamily="Segoe UI Emoji, Apple Color Emoji"
+                                   Width="34" VerticalAlignment="Top" Margin="0,2,6,0"/>
+                        <StackPanel>
+                            <TextBlock Text="{Binding Title}" Foreground="White" FontSize="14"
+                                       TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Text="{Binding Detail}" Foreground="{StaticResource MutedBrush}"
+                                       FontSize="11" TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+                    </DockPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <DockPanel Grid.Row="3" Margin="0,10,0,0">
+            <TextBlock Name="SummaryText" DockPanel.Dock="Left" VerticalAlignment="Center"
+                       FontSize="11" Foreground="{StaticResource FaintBrush}"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Name="OpenButton" Content="Cargar" Theme="{StaticResource AccentButton}" Padding="20,8"
+                        IsDefault="True" Click="Open_Click"/>
+                <Button Content="Cerrar" Theme="{StaticResource DarkButton}" Padding="18,8"
+                        Margin="8,0,0,0" IsCancel="True" Click="Close_Click"/>
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</Window>

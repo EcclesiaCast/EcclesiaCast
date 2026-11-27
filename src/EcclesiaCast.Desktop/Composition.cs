@@ -195,7 +195,7 @@ public static class Composition
         services.AddSingleton<IYouTubeDownloadDialog, AvaloniaYouTubeDownloadDialog>();
         services.AddSingleton(_ => NotOnMacYet.For<ITrashDialog>());
         services.AddSingleton(_ => NotOnMacYet.For<IBroadcastDialog>());
-        services.AddSingleton(_ => NotOnMacYet.For<IGlobalSearchDialog>());
+        services.AddSingleton<IGlobalSearchDialog, AvaloniaGlobalSearchDialog>();
 
         // Functions the Avalonia program never offers (IPlatformInfo says
         // so): answered without a notice.
