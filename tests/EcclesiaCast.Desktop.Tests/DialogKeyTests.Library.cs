@@ -25,9 +25,13 @@ public sealed partial class DialogKeyTests
         Dispatcher.UIThread.RunJobs();
     }
 
-    /// <summary>Ctrl, or ⌘ on a Mac: the key of the system's «Deshacer».</summary>
-    private static RawInputModifiers CommandKey =>
-        OperatingSystem.IsMacOS() ? RawInputModifiers.Meta : RawInputModifiers.Control;
+    /// <summary>
+    /// The modifier of «Deshacer» where the window is: Ctrl on Windows, ⌘ on a
+    /// real Mac. It is asked, not guessed from the system: the made-up screen of
+    /// the tests uses Ctrl even when the tests run on a Mac.
+    /// </summary>
+    private static RawInputModifiers UndoModifiers(Window window) =>
+        (RawInputModifiers)window.GetPlatformSettings()!.HotkeyConfiguration.Undo[0].KeyModifiers;
 
     [AvaloniaFact]
     public void The_song_editor_enter_writes_a_line_and_never_saves()
@@ -81,7 +85,8 @@ public sealed partial class DialogKeyTests
             : null, lyrics.Text);
         Assert.Equal(change.Caret, lyrics.CaretIndex);
 
-        Press(window, PhysicalKey.Z, CommandKey);
+        Assert.Equal(Key.Z, window.GetPlatformSettings()!.HotkeyConfiguration.Undo[0].Key);
+        Press(window, PhysicalKey.Z, UndoModifiers(window));
 
         Assert.Equal(written, lyrics.Text);
         window.Close();
