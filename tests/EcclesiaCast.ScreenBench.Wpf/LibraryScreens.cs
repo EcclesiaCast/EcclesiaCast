@@ -52,39 +52,39 @@ internal static class LibraryScreens
         yield return ("buscar-letra", () => Take(WebSearch(search: true), 680 - TitleBar), 980);
     }
 
-    private static BiblePackageWindow ExportPackage() => new(
+    private static BiblePackageWindow ExportPackage() => new(new BiblePackageViewModel(
         "Exportar paquete de Biblias",
         "Marcá las versiones que querés guardar en un solo archivo (.ecbiblias) para llevarlas a otra computadora.",
         "Usalo sólo en tus propias computadoras: las versiones con derechos de autor (RVR1960, NVI, NTV…) no se pueden repartir a otras personas.",
         "Guardar…",
         LibrarySamples.InstalledVersions()
-            .Select(v => new BiblePackageWindow.Row($"{v.Name}  ({v.Abbreviation})", $"{v.VerseCount:N0} versículos", isChecked: true))
-            .ToList());
+            .Select(v => new BiblePackageRow($"{v.Name}  ({v.Abbreviation})", $"{v.VerseCount:N0} versículos", isChecked: true))
+            .ToList()));
 
-    private static BiblePackageWindow ImportPackage() => new(
+    private static BiblePackageWindow ImportPackage() => new(new BiblePackageViewModel(
         "Importar paquete de Biblias",
         "El paquete «mis-biblias.ecbiblias» trae estas versiones. Marcá las que querés traer.",
         null,
         "Importar",
         LibrarySamples.PackageChoices()
-            .Select(c => new BiblePackageWindow.Row(
+            .Select(c => new BiblePackageRow(
                 $"{c.Entry.Name}  ({c.Entry.Abbreviation})",
                 c.AlreadyInstalled ? "ya está en la biblioteca" : "se va a agregar",
                 isChecked: !c.AlreadyInstalled))
-            .ToList());
+            .ToList()));
 
-    private static BiblePackageWindow Download() => new(
+    private static BiblePackageWindow Download() => new(new BiblePackageViewModel(
         "Bajar Biblias",
         "Marcá las que querés bajar a esta computadora. Se baja sólo lo que marques.",
         null,
         "Descargar",
         [
-            new BiblePackageWindow.Row("Reina Valera 1909  (RV1909)", "Español · 1,4 MB · Dominio público · ya está en la biblioteca", false, "Español"),
-            new BiblePackageWindow.Row("Biblia del Oso 1569  (BDO)", "Español · 1 KB", true, "Español"),
-            new BiblePackageWindow.Row("World English Bible  (WEB)", "Inglés · 1,2 MB · Dominio público", false, "Inglés"),
+            new BiblePackageRow("Reina Valera 1909  (RV1909)", "Español · 1,4 MB · Dominio público · ya está en la biblioteca", false, "Español"),
+            new BiblePackageRow("Biblia del Oso 1569  (BDO)", "Español · 1 KB", true, "Español"),
+            new BiblePackageRow("World English Bible  (WEB)", "Inglés · 1,2 MB · Dominio público", false, "Inglés"),
         ],
         groups: ["Español", "Inglés"],
-        group: "Español");
+        group: "Español"));
 
     private static TrashWindow Trash(bool empty)
     {
