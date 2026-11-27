@@ -9,6 +9,7 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 - **Miniaturas al elegir un fondo:** en «Elegir un fondo de la biblioteca» (de las canciones y de
   la Biblia), cada fondo se ve en chico al lado de su nombre. Los videos llevan ▶.
+- Los botones «Fondo: …» y «Biblia: …» muestran la miniatura del fondo elegido.
 
 ## [1.5.0] - 2026-11-26
 

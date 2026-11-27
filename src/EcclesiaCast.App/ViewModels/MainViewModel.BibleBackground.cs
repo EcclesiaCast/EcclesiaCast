@@ -18,6 +18,10 @@ public sealed partial class MainViewModel
     [ObservableProperty]
     private bool _isBibleOpen;
 
+    /// <summary>The small picture of the Bible's own background on that button.</summary>
+    [ObservableProperty]
+    private System.Windows.Media.Imaging.BitmapImage? _bibleBackgroundPicture;
+
     [ObservableProperty]
     private string _bibleBackgroundLabel = "🖼 Biblia: sin fondo propio";
 
@@ -38,12 +42,14 @@ public sealed partial class MainViewModel
         if (BibleBackgroundMedia is { } media)
         {
             BibleHasOwnBackground = true;
-            BibleBackgroundLabel = $"🖼 Biblia: {media.Name}";
+            BibleBackgroundPicture = Services.MediaThumbnails.LoadSmall(media);
+            BibleBackgroundLabel = BibleBackgroundPicture is null ? $"🖼 Biblia: {media.Name}" : $"Biblia: {media.Name}";
             BibleBackgroundHint = $"Cuando proyectás un versículo después de otra cosa, se pone solo de fondo «{media.Name}». Clic para cambiarlo o quitarlo.";
         }
         else
         {
             BibleHasOwnBackground = false;
+            BibleBackgroundPicture = null;
             BibleBackgroundLabel = "🖼 Biblia: sin fondo propio";
             BibleBackgroundHint = "La Biblia no tiene un fondo propio: se queda el que esté puesto. Clic para elegir uno de la biblioteca o usar el que está en pantalla (también: con la pestaña Biblia abierta, clic derecho en una imagen o video de Medios → «Usar como fondo de la Biblia»).";
         }
