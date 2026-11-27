@@ -19,6 +19,11 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <!-- The made-up songs, Bibles and library that the WPF screens bench draws too. -->
+  <ItemGroup>
+    <Compile Include="..\pantallas-de-muestra\*.cs" LinkBase="Muestra" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\EcclesiaCast.Desktop\EcclesiaCast.Desktop.csproj" />
     <ProjectReference Include="..\..\src\EcclesiaCast.Platform.Mac\EcclesiaCast.Platform.Mac.csproj" />

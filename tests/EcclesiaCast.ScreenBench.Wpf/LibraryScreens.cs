@@ -53,39 +53,19 @@ internal static class LibraryScreens
         yield return ("buscar-letra", () => Take(WebSearch(search: true), 680 - TitleBar), 980);
     }
 
-    private static BiblePackageWindow ExportPackage() => new(new BiblePackageViewModel(
-        "Exportar paquete de Biblias",
-        "Marcá las versiones que querés guardar en un solo archivo (.ecbiblias) para llevarlas a otra computadora.",
-        "Usalo sólo en tus propias computadoras: las versiones con derechos de autor (RVR1960, NVI, NTV…) no se pueden repartir a otras personas.",
-        "Guardar…",
-        LibrarySamples.InstalledVersions()
-            .Select(v => new BiblePackageRow($"{v.Name}  ({v.Abbreviation})", $"{v.VerseCount:N0} versículos", isChecked: true))
-            .ToList()));
+    private static BiblePackageWindow ExportPackage() =>
+        new(BiblePackageDialog.ForExport(LibrarySamples.InstalledVersions()));
 
-    private static BiblePackageWindow ImportPackage() => new(new BiblePackageViewModel(
-        "Importar paquete de Biblias",
-        "El paquete «mis-biblias.ecbiblias» trae estas versiones. Marcá las que querés traer.",
-        null,
-        "Importar",
-        LibrarySamples.PackageChoices()
-            .Select(c => new BiblePackageRow(
-                $"{c.Entry.Name}  ({c.Entry.Abbreviation})",
-                c.AlreadyInstalled ? "ya está en la biblioteca" : "se va a agregar",
-                isChecked: !c.AlreadyInstalled))
-            .ToList()));
+    private static BiblePackageWindow ImportPackage() =>
+        new(BiblePackageDialog.ForImport("mis-biblias.ecbiblias", LibrarySamples.PackageChoices()));
 
-    private static BiblePackageWindow Download() => new(new BiblePackageViewModel(
-        "Bajar Biblias",
-        "Marcá las que querés bajar a esta computadora. Se baja sólo lo que marques.",
-        null,
-        "Descargar",
-        [
-            new BiblePackageRow("Reina Valera 1909  (RV1909)", "Español · 1,4 MB · Dominio público · ya está en la biblioteca", false, "Español"),
-            new BiblePackageRow("Biblia del Oso 1569  (BDO)", "Español · 1 KB", true, "Español"),
-            new BiblePackageRow("World English Bible  (WEB)", "Inglés · 1,2 MB · Dominio público", false, "Inglés"),
-        ],
-        groups: ["Español", "Inglés"],
-        group: "Español"));
+    private static BiblePackageWindow Download()
+    {
+        var list = BiblePackageDialog.ForDownload(LibrarySamples.Catalog(), LibrarySamples.CatalogInstalled()).List;
+        // One ticked, as when the operator is about to download it.
+        list.VisibleRows[0].IsChecked = true;
+        return new BiblePackageWindow(list);
+    }
 
     private static TrashWindow Trash(bool empty)
     {

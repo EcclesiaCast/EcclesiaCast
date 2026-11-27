@@ -1,0 +1,64 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:EcclesiaCast.Presentation.ViewModels"
+        x:Class="EcclesiaCast.Desktop.Views.BiblePackageWindow"
+        x:DataType="vm:BiblePackageViewModel"
+        Title="{Binding Title}"
+        Width="520" MinWidth="420" MinHeight="320"
+        SizeToContent="Height" MaxHeight="640"
+        ShowInTaskbar="False">
+    <Grid Margin="18" RowDefinitions="Auto,Auto,*,Auto,Auto">
+        <TextBlock Grid.Row="0" Text="{Binding Intro}" FontSize="13" TextWrapping="Wrap" Margin="0,0,0,10"/>
+
+        <StackPanel Grid.Row="1" Name="GroupPanel" Orientation="Horizontal" Margin="0,0,0,10"
+                    IsVisible="{Binding HasGroups}">
+            <TextBlock Text="Idioma:" Foreground="{StaticResource MutedBrush}"
+                       FontSize="12" VerticalAlignment="Center" Margin="0,0,8,0"/>
+            <ComboBox Name="GroupPicker" Width="200" ItemsSource="{Binding Groups}"
+                      SelectedItem="{Binding SelectedGroup, Mode=TwoWay}"/>
+        </StackPanel>
+
+        <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
+                CornerRadius="4" MinHeight="90">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ItemsControl Name="VersionsList" Margin="12,8,12,8" ItemsSource="{Binding VisibleRows}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:BiblePackageRow">
+                            <CheckBox IsChecked="{Binding IsChecked}" Margin="0,5" FontSize="13"
+                                      VerticalContentAlignment="Center">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Title}" FontSize="13" TextWrapping="Wrap"/>
+                                    <TextBlock Text="{Binding Detail}" FontSize="11"
+                                               Foreground="{StaticResource MutedBrush}"/>
+                                </StackPanel>
+                            </CheckBox>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+
+        <Border Grid.Row="3" IsVisible="{Binding HasWarning}"
+                Background="#2A2418" BorderBrush="#7A5A18" BorderThickness="1"
+                CornerRadius="6" Padding="12,10" Margin="0,12,0,0">
+            <TextBlock Text="{Binding Warning}" FontSize="12" Foreground="#E8D9A8" TextWrapping="Wrap"/>
+        </Border>
+
+        <DockPanel Grid.Row="4" Margin="0,16,0,0">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button Content="Cancelar" Theme="{StaticResource DarkButton}" IsCancel="True" Padding="18,9"
+                        Click="Cancel_Click"/>
+                <Button Name="AcceptButton" Content="{Binding AcceptButtonText}"
+                        Theme="{StaticResource AccentButton}" Click="Accept_Click"
+                        Padding="18,9" Margin="10,0,0,0"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Todas" FontSize="11" Padding="10,3" VerticalAlignment="Stretch"
+                        Theme="{StaticResource DarkButton}" Click="CheckAll_Click"/>
+                <Button Content="Ninguna" FontSize="11" Padding="10,3" Margin="4,0,0,0" VerticalAlignment="Stretch"
+                        Theme="{StaticResource DarkButton}" Click="CheckNone_Click"/>
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</Window>

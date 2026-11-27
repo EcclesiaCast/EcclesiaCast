@@ -1,7 +1,10 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.VisualTree;
 using EcclesiaCast.Desktop.Views;
+using EcclesiaCast.Presentation.Services;
+using EcclesiaCast.ScreenSamples;
 
 namespace EcclesiaCast.Desktop.Tests;
 
@@ -9,6 +12,22 @@ namespace EcclesiaCast.Desktop.Tests;
 public sealed partial class DialogKeyTests
 {
     private static T Named<T>(Window window, string name) where T : Control => window.FindControl<T>(name)!;
+
+    [AvaloniaFact]
+    public void The_list_of_bibles_enter_does_nothing_and_escape_cancels()
+    {
+        var window = new BiblePackageWindow(BiblePackageDialog.ForExport(LibrarySamples.InstalledVersions()));
+        var closed = Open(window);
+        window.GetVisualDescendants().OfType<CheckBox>().First().Focus();
+
+        Hit(window, PhysicalKey.Enter);
+        // As in WPF, where no button is the default.
+        Assert.False(closed());
+
+        Hit(window, PhysicalKey.Escape);
+        Assert.True(closed());
+        Assert.False(window.Accepted);
+    }
 
     [AvaloniaTheory]
     [InlineData("NameBox")]
