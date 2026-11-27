@@ -97,7 +97,8 @@ public static class BibleImportHelp
     /// says what the program reads, and — because a whole Bible does not fit in
     /// one answer — asks for a small conversion program instead of the converted text.
     /// </summary>
-    public static string InstructionsForAi() => """
+    /// <param name="computer">Where the person will run that program: «en Windows», «en una Mac».</param>
+    public static string InstructionsForAi(string computer = "en Windows") => $$"""
         Necesito convertir una Biblia a un formato que lee un programa de proyección para iglesias (EcclesiaCast). Hablame en español, simple, como si yo no supiera programar.
 
         EL FORMATO QUE NECESITO (JSON):
@@ -124,7 +125,7 @@ public static class BibleImportHelp
 
         COMO UNA BIBLIA ENTERA NO ENTRA EN UNA RESPUESTA, no me escribas el archivo convertido. En su lugar:
         1. Preguntame cómo es el archivo o el texto que tengo (si es un .txt, un .docx, un .pdf, una página web, otro formato) y pedime que te pegue unas líneas de ejemplo.
-        2. Escribime un programa chico en Python que lea mi archivo y escriba el JSON de arriba, y explicame paso a paso cómo instalarlo y correrlo en Windows.
+        2. Escribime un programa chico en Python que lea mi archivo y escriba el JSON de arriba, y explicame paso a paso cómo instalarlo y correrlo {{computer}}.
         3. Después decime cómo revisar el resultado: cuántos libros salen, que Juan 3:16 sea el versículo correcto, y que no haya capítulos corridos.
 
         Tené en cuenta que sólo puedo usar una Biblia que tenga derecho a usar (una versión libre, o una que ya tenga licencia para mi iglesia).
