@@ -162,6 +162,35 @@ public sealed class TrashViewModelTests
     }
 
     [Fact]
+    public void The_buttons_follow_the_chosen_line()
+    {
+        var (world, _, _) = WorldWithTrash();
+        using var _w = world;
+        var vm = new TrashViewModel(world.Songs, world.Themes);
+        Assert.False(vm.CanRestore);
+        Assert.False(vm.CanPurge);
+        Assert.True(vm.CanEmpty);
+        vm.RestoreSelected();
+        Assert.Equal(2, vm.Entries.Count);
+        var changed = new List<string?>();
+        vm.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
+
+        vm.Selected = vm.Entries.Single(e => e.IsSong);
+
+        Assert.True(vm.CanRestore);
+        Assert.True(vm.CanPurge);
+        Assert.Contains(nameof(TrashViewModel.CanRestore), changed);
+
+        vm.RestoreSelected();
+
+        Assert.Null(vm.Selected);
+        Assert.False(vm.CanRestore);
+        Assert.Single(vm.Entries);
+        Assert.Contains(nameof(TrashViewModel.Entries), changed);
+        Assert.Contains(nameof(TrashViewModel.CanEmpty), changed);
+    }
+
+    [Fact]
     public void Emptying_the_trash_does_nothing_on_no()
     {
         var (world, _, _) = WorldWithTrash();

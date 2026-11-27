@@ -16,45 +16,42 @@ public partial class TrashWindow : Window
         ShowEntries();
     }
 
-    private TrashEntry? Selected => TrashList.SelectedItem as TrashEntry;
-
     private void ShowEntries()
     {
-        TrashList.ItemsSource = _viewModel.Entries;
+        if (!ReferenceEquals(TrashList.ItemsSource, _viewModel.Entries))
+            TrashList.ItemsSource = _viewModel.Entries;
         EmptyText.Visibility = _viewModel.IsEmpty ? Visibility.Visible : Visibility.Collapsed;
-        EmptyButton.IsEnabled = !_viewModel.IsEmpty;
+        EmptyButton.IsEnabled = _viewModel.CanEmpty;
         UpdateButtons();
     }
 
     private void UpdateButtons()
     {
-        RestoreButton.IsEnabled = Selected is not null;
-        PurgeButton.IsEnabled = Selected is not null;
+        RestoreButton.IsEnabled = _viewModel.CanRestore;
+        PurgeButton.IsEnabled = _viewModel.CanPurge;
     }
 
-    private void TrashList_SelectionChanged(object sender, SelectionChangedEventArgs e) => UpdateButtons();
+    private void TrashList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        _viewModel.Selected = TrashList.SelectedItem as TrashEntry;
+        UpdateButtons();
+    }
 
     private void Restore_Click(object sender, RoutedEventArgs e)
     {
-        if (Selected is not { } entry)
-            return;
-
-        _viewModel.Restore(entry);
+        _viewModel.RestoreSelected();
         ShowEntries();
     }
 
     private void Purge_Click(object sender, RoutedEventArgs e)
     {
-        if (Selected is not { } entry)
-            return;
-
-        if (_viewModel.Purge(entry))
-            ShowEntries();
+        _viewModel.PurgeSelected();
+        ShowEntries();
     }
 
     private void Empty_Click(object sender, RoutedEventArgs e)
     {
-        if (_viewModel.EmptyAll())
-            ShowEntries();
+        _viewModel.EmptyAll();
+        ShowEntries();
     }
 }

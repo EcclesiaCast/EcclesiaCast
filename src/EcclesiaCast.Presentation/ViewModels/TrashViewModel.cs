@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using EcclesiaCast.Core.Abstractions;
 using EcclesiaCast.Core.Songs;
 
@@ -11,7 +12,7 @@ public sealed record TrashEntry(bool IsSong, int Id, string Title, string Detail
 /// it back, or erases it for good (asking first). After every change the list
 /// is read again.
 /// </summary>
-public sealed class TrashViewModel
+public sealed partial class TrashViewModel : ObservableObject
 {
     private readonly ISongRepository _songs;
     private readonly IThemeRepository _themes;
@@ -24,9 +25,36 @@ public sealed class TrashViewModel
     }
 
     /// <summary>The newest deleted first.</summary>
-    public IReadOnlyList<TrashEntry> Entries { get; private set; } = [];
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsEmpty), nameof(CanEmpty))]
+    private IReadOnlyList<TrashEntry> _entries = [];
+
+    /// <summary>The line the operator chose, or null.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanRestore), nameof(CanPurge))]
+    private TrashEntry? _selected;
 
     public bool IsEmpty => Entries.Count == 0;
+
+    public bool CanRestore => Selected is not null;
+
+    public bool CanPurge => Selected is not null;
+
+    public bool CanEmpty => !IsEmpty;
+
+    /// <summary>«Restaurar».</summary>
+    public void RestoreSelected()
+    {
+        if (Selected is { } entry)
+            Restore(entry);
+    }
+
+    /// <summary>«Borrar del todo», asking first.</summary>
+    public void PurgeSelected()
+    {
+        if (Selected is { } entry)
+            Purge(entry);
+    }
 
     /// <summary>Reads the trash again.</summary>
     public void Reload() => Reload(DateTime.UtcNow);
@@ -40,6 +68,8 @@ public sealed class TrashViewModel
         foreach (var theme in _themes.GetDeleted())
             entries.Add((theme.DeletedAt ?? nowUtc, new TrashEntry(false, theme.Id, "Tema: " + theme.Name, Describe(theme.DeletedAt, nowUtc))));
 
+        // The list is a new one, so nothing in it is chosen yet.
+        Selected = null;
         Entries = entries.OrderByDescending(e => e.When).Select(e => e.Entry).ToList();
     }
 
