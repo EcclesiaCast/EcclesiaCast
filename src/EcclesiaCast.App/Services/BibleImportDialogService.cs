@@ -10,8 +10,6 @@ public sealed class BibleImportDialogService : IBibleImportDialog
         {
             Owner = System.Windows.Application.Current.MainWindow,
         };
-        return window.ShowDialog() == true
-            ? new BibleImportMetadata(window.ResultName, window.ResultAbbreviation, window.ResultLanguage)
-            : null;
+        return window.ShowDialog() == true ? window.Result : null;
     }
 }

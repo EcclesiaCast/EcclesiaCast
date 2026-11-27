@@ -1,42 +1,34 @@
 using System.Windows;
+using EcclesiaCast.Presentation.ViewModels;
 
 namespace EcclesiaCast.App.Views;
 
+/// <summary>The name, abbreviation and language of a Bible being imported (<see cref="BibleImportViewModel"/>).</summary>
 public partial class BibleImportWindow : Window
 {
+    private readonly BibleImportViewModel _viewModel;
+
     public BibleImportWindow(string suggestedName)
     {
         InitializeComponent();
-        NameBox.Text = suggestedName;
+        _viewModel = new BibleImportViewModel(suggestedName);
+        NameBox.Text = _viewModel.SuggestedName;
         NameBox.Focus();
         NameBox.SelectAll();
     }
 
-    public string ResultName { get; private set; } = string.Empty;
-    public string ResultAbbreviation { get; private set; } = string.Empty;
-    public string ResultLanguage { get; private set; } = "es";
+    public BibleImportMetadata? Result => _viewModel.Result;
 
     private void Import_Click(object sender, RoutedEventArgs e)
     {
-        var name = NameBox.Text.Trim();
-        var abbreviation = AbbreviationBox.Text.Trim();
-
-        if (name.Length == 0)
+        var missing = _viewModel.TryAccept(NameBox.Text, AbbreviationBox.Text, LanguageBox.Text);
+        if (missing is not null)
         {
-            ErrorText.Text = "El nombre es obligatorio.";
-            NameBox.Focus();
-            return;
-        }
-        if (abbreviation.Length == 0)
-        {
-            ErrorText.Text = "La abreviatura es obligatoria.";
-            AbbreviationBox.Focus();
+            ErrorText.Text = _viewModel.Error;
+            (missing == BibleImportField.Name ? NameBox : AbbreviationBox).Focus();
             return;
         }
 
-        ResultName = name;
-        ResultAbbreviation = abbreviation;
-        ResultLanguage = string.IsNullOrWhiteSpace(LanguageBox.Text) ? "es" : LanguageBox.Text.Trim();
         DialogResult = true;
     }
 }
