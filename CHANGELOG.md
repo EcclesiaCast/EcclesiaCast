@@ -5,6 +5,11 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+### Cambiado
+
+- **Miniaturas al elegir un fondo:** en «Elegir un fondo de la biblioteca» (de las canciones y de
+  la Biblia), cada fondo se ve en chico al lado de su nombre. Los videos llevan ▶.
+
 ## [1.5.0] - 2026-11-26
 
 ### Agregado
