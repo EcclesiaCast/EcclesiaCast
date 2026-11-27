@@ -181,7 +181,7 @@ public static class Composition
         services.AddSingleton<ICountdownDialog, AvaloniaCountdownDialog>();
         services.AddSingleton<ILightCopyDialog, AvaloniaLightCopyDialog>();
         services.AddSingleton(_ => NotOnMacYet.For<IColorPicker>());
-        services.AddSingleton(_ => NotOnMacYet.For<IBibleFormatHelpDialog>());
+        services.AddSingleton<IBibleFormatHelpDialog, AvaloniaBibleFormatHelpDialog>();
         services.AddSingleton(_ => NotOnMacYet.For<INamePlateDesigner>());
         // No browser with a YouTube account here: yt-dlp goes without one.
         services.AddSingleton<IYouTubeSession, NoYouTubeSession>();

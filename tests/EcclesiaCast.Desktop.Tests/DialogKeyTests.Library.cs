@@ -13,6 +13,24 @@ public sealed partial class DialogKeyTests
 {
     private static T Named<T>(Window window, string name) where T : Control => window.FindControl<T>(name)!;
 
+    [AvaloniaTheory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void The_help_with_the_bible_formats_closes_with_escape(bool insideAnExample)
+    {
+        var window = ScreenBenchTests.HelpWindow();
+        var closed = Open(window);
+        if (insideAnExample)
+            window.GetVisualDescendants().OfType<TextBox>().First().Focus();
+
+        Hit(window, PhysicalKey.Enter);
+        Assert.False(closed());
+
+        Hit(window, PhysicalKey.Escape);
+        Assert.True(closed());
+        Assert.False(window.ImportRequested);
+    }
+
     [AvaloniaFact]
     public void The_list_of_bibles_enter_does_nothing_and_escape_cancels()
     {

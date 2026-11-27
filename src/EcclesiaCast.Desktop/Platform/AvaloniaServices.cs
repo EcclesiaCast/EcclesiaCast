@@ -8,6 +8,8 @@ using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using EcclesiaCast.Core.Media;
 using EcclesiaCast.Core.Presentation;
+using EcclesiaCast.Desktop.Services;
+using EcclesiaCast.Desktop.Views;
 using EcclesiaCast.Presentation.Rendering;
 using LibVLCSharp.Shared;
 using Serilog;
@@ -123,15 +125,26 @@ public sealed class AvaloniaThumbnailer(IPlatformPaths paths) : IThumbnailer
     }
 }
 
-/// <summary>Text to the clipboard, through the operator's window.</summary>
+/// <summary>
+/// Text to the clipboard, through the window in front or the operator's one.
+/// As on WPF, it returns once the text is there, and throws when it could not
+/// be put: whoever copies says so to the operator.
+/// </summary>
 public sealed class AvaloniaClipboardText : IClipboardText
 {
     public TopLevel? Window { get; set; }
 
     public void SetText(string text)
     {
-        if (Window?.Clipboard is { } clipboard)
-            _ = clipboard.SetTextAsync(text);
+        var clipboard = (Window ?? Modal.Owner)?.Clipboard
+            ?? throw new InvalidOperationException("No hay una ventana desde donde usar el portapapeles.");
+        AvaloniaDialogs.Wait(Copy(clipboard, text));
+    }
+
+    private static async Task<bool> Copy(IClipboard clipboard, string text)
+    {
+        await clipboard.SetTextAsync(text);
+        return true;
     }
 }
 

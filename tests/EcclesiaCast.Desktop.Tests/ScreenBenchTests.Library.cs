@@ -1,6 +1,8 @@
 using Avalonia.Headless.XUnit;
 using EcclesiaCast.Desktop.Views;
+using EcclesiaCast.Presentation.Platform;
 using EcclesiaCast.Presentation.Services;
+using EcclesiaCast.Presentation.ViewModels;
 using EcclesiaCast.ScreenSamples;
 
 namespace EcclesiaCast.Desktop.Tests;
@@ -13,6 +15,28 @@ public sealed partial class ScreenBenchTests
 {
     [AvaloniaFact]
     public void Importing_a_bible_is_drawn() => DrawWindow(new BibleImportWindow("Mi Biblia"), "importar-biblia");
+
+    [AvaloniaFact]
+    public void The_help_with_the_bible_formats_is_drawn()
+    {
+        var window = HelpWindow();
+        // The WPF picture has the whole content: here the screen does not limit it.
+        window.MaxHeight = 2000;
+        DrawWindow(window, "ayuda-formato-biblia");
+    }
+
+    [Theory]
+    [InlineData(1080, 1.0, 900)]
+    [InlineData(768, 1.0, 712)]
+    [InlineData(1440, 2.0, 664)]
+    [InlineData(0, 1.0, 900)]
+    public void The_help_is_never_taller_than_the_screen(int workingPixels, double scaling, double expected) =>
+        Assert.Equal(expected, BibleFormatHelpWindow.HeightLimit(900, workingPixels, scaling));
+
+    internal static BibleFormatHelpWindow HelpWindow(IClipboardText? clipboard = null) => new(
+        new BibleFormatHelpViewModel(
+            LibrarySamples.Sample.Of<IDialogs>(), clipboard ?? LibrarySamples.Sample.Of<IClipboardText>(),
+            PlatformSystem.Windows));
 
     [AvaloniaFact]
     public void The_list_to_export_is_drawn() => DrawWindow(

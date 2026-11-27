@@ -1,0 +1,97 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:EcclesiaCast.Presentation.ViewModels"
+        x:Class="EcclesiaCast.Desktop.Views.BibleFormatHelpWindow"
+        x:DataType="vm:BibleFormatHelpViewModel"
+        Title="Cómo preparar una Biblia para importar"
+        Width="760" SizeToContent="Height" MaxHeight="900">
+    <Window.Styles>
+        <Style Selector="TextBlock.heading">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+        <Style Selector="TextBlock.text">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+        <Style Selector="Button.save">
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Margin" Value="0,8,0,0"/>
+            <Setter Property="Padding" Value="12,6"/>
+        </Style>
+        <Style Selector="TextBox.example">
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="AcceptsReturn" Value="True"/>
+            <Setter Property="FontFamily" Value="Consolas, Menlo, monospace"/>
+            <Setter Property="FontSize" Value="11.5"/>
+            <Setter Property="Margin" Value="0,8,0,0"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="VerticalContentAlignment" Value="Top"/>
+            <Setter Property="(ScrollViewer.VerticalScrollBarVisibility)" Value="Auto"/>
+            <Setter Property="(ScrollViewer.HorizontalScrollBarVisibility)" Value="Auto"/>
+        </Style>
+    </Window.Styles>
+    <!-- Ayuda para quien trae su propia Biblia: los tres formatos que se leen, un
+         ejemplo real de cada uno y un texto para pegarle a una IA cuando la
+         Biblia está en otro formato. -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="22,18,22,20">
+            <TextBlock TextWrapping="Wrap" FontSize="13">
+                <Run Text="EcclesiaCast lee Biblias en tres formatos de archivo."/><Run Text=" Si la tuya ya está en uno de los tres, usá «Biblias → Importar una Biblia»." Foreground="{StaticResource MutedBrush}"/>
+            </TextBlock>
+
+            <!-- JSON -->
+            <TextBlock Classes="heading" Text="1.  JSON (el más simple)" Margin="0,18,0,2"/>
+            <TextBlock Classes="text"
+                       Text="Un arreglo con los 66 libros, de Génesis a Apocalipsis. Cada libro tiene su nombre y sus capítulos; cada capítulo es la lista de los textos de sus versículos. Es el mismo formato que usa el programa al exportar una versión."/>
+            <TextBox Classes="example" Text="{Binding JsonPreview, Mode=OneWay}" Height="125"/>
+            <Button Classes="save" Content="Guardar este ejemplo…"
+                    Theme="{StaticResource DarkButton}" Click="SaveJson_Click"
+                    ToolTip.Tip="{Binding ExampleTip}"/>
+
+            <!-- Zefania -->
+            <TextBlock Classes="heading" Text="2.  Zefania XML" Margin="0,20,0,2"/>
+            <TextBlock Classes="text"
+                       Text="Un formato muy usado por los programas de Biblia gratuitos. Cada libro lleva su número (de 1 a 66), y adentro los capítulos y los versículos."/>
+            <TextBox Classes="example" Text="{Binding XmlPreview, Mode=OneWay}" Height="150"/>
+            <Button Classes="save" Content="Guardar este ejemplo…"
+                    Theme="{StaticResource DarkButton}" Click="SaveXml_Click"/>
+
+            <!-- OpenSong -->
+            <TextBlock Classes="heading" Text="3.  XML de OpenSong (ProPresenter, Holyrics, FreeShow)" Margin="0,20,0,2"/>
+            <TextBlock Classes="text"
+                       Text="El XML que usan esos programas y muchas páginas de Biblias para bajar (Beblia, entre otras). Cada libro va con su nombre, en el orden de siempre, y adentro los capítulos y los versículos. Si tu Biblia ya está en uno de esos programas, exportala o buscá su archivo .xml e importalo tal cual."/>
+            <TextBox Classes="example" Text="{Binding OpenSongPreview, Mode=OneWay}" Height="150"/>
+            <Button Classes="save" Content="Guardar este ejemplo…"
+                    Theme="{StaticResource DarkButton}" Click="SaveOpenSong_Click"/>
+
+            <!-- Otro formato -->
+            <Border Margin="0,22,0,0" Padding="14,12" CornerRadius="6"
+                    Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="¿Tu Biblia está en otro formato (Word, PDF, un texto, una página)?"
+                               FontSize="13" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    <TextBlock Classes="text" Margin="0,4,0,0"
+                               Text="Una IA (ChatGPT, Claude, Gemini…) te puede armar un programita que la convierta. Copiá estas instrucciones, pegalas en el chat y contale cómo es tu archivo."/>
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <Button Name="CopyButton" Content="📋 Copiar instrucciones para una IA"
+                                Theme="{StaticResource AccentButton}" Padding="14,7" Click="CopyInstructions_Click"/>
+                        <TextBlock Name="CopiedText" Text="{Binding Status}" VerticalAlignment="Center"
+                                   Margin="12,0,0,0" FontSize="12" Foreground="{StaticResource AccentSoftBrush}"/>
+                    </StackPanel>
+                    <TextBlock TextWrapping="Wrap" FontSize="11" Foreground="{StaticResource FaintBrush}" Margin="0,10,0,0"
+                               Text="Usá sólo una Biblia que tengas derecho a usar: una versión libre, o una que ya tenga licencia para tu iglesia. Las instrucciones no incluyen ningún texto de Biblia, ni lo mandan a ningún lado: sólo las pegás vos donde quieras."/>
+                </StackPanel>
+            </Border>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                <Button Content="Cerrar" Theme="{StaticResource DarkButton}" IsCancel="True" Padding="18,8"
+                        Click="Close_Click"/>
+                <Button Content="Importar una Biblia…" Theme="{StaticResource AccentButton}" Margin="10,0,0,0"
+                        Padding="18,8" Click="Import_Click"/>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Window>
