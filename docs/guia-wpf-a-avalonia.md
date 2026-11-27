@@ -1,7 +1,8 @@
 # Guía: traducir una pantalla de WPF a Avalonia
 
 Para las tandas 15 a 21 de la versión de Mac. Se escribió en la tanda 14
-(26/11/2026), con Avalonia 12.1.6. Antes de leerla hay que leer las reglas
+(26/11/2026), con Avalonia 12.1.6, y se corrigió con lo que dejó la tanda 15.
+Antes de leerla hay que leer las reglas
 ([plan-mac-reglas.md](plan-mac-reglas.md)), que siguen valiendo todas.
 
 **La idea en una línea:** la pantalla de Avalonia es una copia de la de WPF,
@@ -61,12 +62,34 @@ plan).
 | `DockPanel`, `Grid`, `StackPanel`, `WrapPanel`, `Border`, `ScrollViewer`, `UniformGrid` | Iguales. `Grid` acepta la forma corta `ColumnDefinitions="*,16,*"` |
 | `StackPanel` con márgenes entre hijos | Igual, o `Spacing="8"` |
 | `CaretBrush`, `SelectionBrush` | Iguales |
-| `Run`, `Hyperlink` dentro de un `TextBlock` | `Run` existe. Un enlace: `HyperlinkButton` o un `TextBlock` con `Cursor="Hand"` y un comando |
+| `Run`, `Hyperlink` dentro de un `TextBlock` | `Run` existe. `Hyperlink` no: `<HyperlinkButton Classes="inline" …>`, al lado del texto en un `WrapPanel` (ver `FeedbackWindow.axaml` y `AboutWindow.axaml`) |
+| `ProgressBar` finita de una ventana que hace esperar | `<ProgressBar Classes="work" Height="6" …>`, sin repetir sus colores |
+| `RadioButton` con una caja de texto adentro | `controls:HolderRadioButton`. El `RadioButton` de Avalonia se queda con **Enter** y con la barra espaciadora aunque vengan de adentro, y Enter no llega al botón principal |
+| `HorizontalContentAlignment` en un `DarkButton` o `AccentButton` | **No se copia**: ver abajo |
+| `TextChanged` | Existe, pero llega **más tarde** que en WPF: ver abajo |
 | `SharedSizeGroup`, `Grid.IsSharedSizeScope` | Iguales |
 | `DrawingImage`, `DrawingBrush`, `GeometryDrawing` | Iguales. En `DrawingBrush`, `Viewport="0,0,40,40" ViewportUnits="Absolute"` pasa a `DestinationRect="0,0,40,40"` |
 | `MessageBox` | Nunca. Se pregunta por `INotices` (lo hace el ViewModel) |
 | `Dispatcher.Invoke` | `IUiDispatcher` en el ViewModel; en la pantalla, `Dispatcher.UIThread.Post` |
 | `x:Static` a una constante de la parte común | Igual: `{x:Static local:Clase.Campo}` |
+
+### 2.1 Dos trampas de la tabla
+
+**El `DarkButton` de WPF centra el texto aunque se le pida a la izquierda.** Su
+plantilla tiene el centrado escrito fijo, así que un
+`HorizontalContentAlignment="Left"` en la ventana de WPF no hace nada (pasa en
+`ChoiceWindow`). La plantilla de Avalonia sí obedece esa propiedad: si se
+copia, el texto sale a la izquierda y no se parece. Se copia **lo que se ve** en
+la imagen de WPF, no lo que dice el `.xaml`. Para que un botón ocupe todo el
+ancho, `HorizontalAlignment="Stretch"`.
+
+**`TextChanged` llega más tarde que en WPF.** En WPF se avisa en la misma línea
+que cambia el texto; en Avalonia, después. El truco de WPF de prender una
+bandera (`_writing = true`), escribir en la caja y apagarla **no alcanza**:
+cuando llega el aviso la bandera ya está apagada. Hay que reconocer lo propio
+por el contenido (¿el texto es el que yo escribiría para el valor actual?), como
+`Desktop/Controls/NumericField`. En las pruebas, después de escribir en una caja
+va `Dispatcher.UIThread.RunJobs()` antes de comprobar.
 
 ## 3. Ejemplos del proyecto
 
@@ -179,11 +202,18 @@ public sealed partial class TextPromptWindow : Window
 }
 ```
 
-El servicio hace `var window = new TextPromptWindow(…); Modal.Run(window);` y
-devuelve `window.Accepted ? window.Value : null`, como el de WPF. Después, en
+El servicio (`Desktop/Services/AvaloniaTextPrompt.cs`) hace
+`var window = new TextPromptWindow(…); Modal.Run(window);` y devuelve
+`window.Accepted ? window.Value : null`, como el de WPF. Después, en
 `Composition.cs`, `NotOnMacYet.For<ITextPrompt>()` se cambia por el servicio
-nuevo. Así ya hacen sus ventanas `AvaloniaNotices` (`Views/NoticeWindow.cs`) y
-`RemoteControlDialog`.
+nuevo. Así hacen todos los de la tanda 15.
+
+**La advertencia AVLN3001.** Una ventana como ésta, que sólo tiene un
+constructor con parámetros, da `AVLN3001`: el cargador de XAML en tiempo de
+ejecución no la puede crear. El programa no usa ese cargador (las ventanas se
+arman desde el código, con sus datos), así que está **silenciada en
+`EcclesiaCast.Desktop.csproj`** (`NoWarn`). No hay que hacer nada: ni agregar un
+constructor vacío, ni silenciarla de nuevo, ni sumar otras advertencias ahí.
 
 Fijate en lo que cambió y en lo que no:
 
@@ -196,12 +226,29 @@ Fijate en lo que cambió y en lo que no:
 - el foco se pone en `Opened`, porque en el constructor la ventana todavía no
   existe.
 
-**Los campos de texto:** en WPF cada ventana pinta sus `TextBox` a mano
-(`SurfaceAltBrush`, `LineBrush`, letra blanca). En Avalonia el `TextBox` del
-tema Fluent oscuro ya se ve oscuro y con el borde azul del programa al
-escribir. Si al comparar no alcanza, no lo arregles ventana por ventana:
-agregá un `ControlTheme` para `TextBox` en `EcclesiaCastTheme.axaml`, que vale
-para todas.
+**Cajas de texto, casillas, opciones, enlaces y barra de progreso.** De fábrica
+se ven distintos en Avalonia; la tanda 15 ya lo resolvió en
+`EcclesiaCastTheme.axaml`. `TextBox`, `CheckBox` y `RadioButton` salen solos
+como en WPF; para el enlace y la barra van las clases `inline` y `work` (tabla
+de la sección 2). **No se copian** de la ventana de WPF `Background`,
+`Foreground`, `BorderBrush` ni `CaretBrush` de las cajas; sí `Padding`,
+`FontSize` y el ancho (si se repiten, con una clase en `Window.Styles`, como en
+`CountdownWindow.axaml`). Si otro control no se parece, se arregla en el tema,
+no ventana por ventana.
+
+**Ventanas que trabajan solas** (copia liviana, descarga). El trabajo, su avance
+y su cancelación van en el ViewModel; la ventana sólo lo arranca y se cierra
+cuando se lo piden. En Avalonia **se arranca con `Dispatcher.UIThread.Post`**
+dentro de `Opened`:
+
+```csharp
+copy.CloseRequested += Close;
+Opened += (_, _) => Dispatcher.UIThread.Post(async () => await copy.RunAsync());
+```
+
+Sin el `Post`, un trabajo que termina enseguida pide cerrar la ventana mientras
+todavía se está abriendo. Y como entre abrir y arrancar la pueden cerrar, el
+ViewModel no empieza nada si ya recibió `Closed()`.
 
 ### 3.4 Lo que en WPF resuelve el código de la ventana
 
@@ -248,15 +295,36 @@ Dentro de un `DataTemplate`, otro `x:DataType` con el tipo de cada fila.
 Cada pantalla nueva tiene una prueba que la dibuja en memoria, y su imagen de
 WPF al lado.
 
-1. **En WPF**, en `tests/EcclesiaCast.ScreenBench.Wpf/Program.cs`, sumá la
-   pantalla a `Screens` con un nombre (`"texto-pedir"`), cómo se arma y su
-   ancho. Se arma con la ventana real de `App`, sin mostrarla, y se dibuja su
-   contenido: una ventana no se puede poner adentro de otra cosa, así que
-   primero se lo sacás (`var c = (FrameworkElement)w.Content; w.Content =
-   null;`). Para una ventana con ViewModel, dale uno con datos de ejemplo.
-2. **En Avalonia**, en `ScreenBenchTests.cs`, una prueba `[AvaloniaFact]` que
-   arma la misma ventana con los mismos datos y llama a `Draw(contenido,
-   "texto-pedir")`. El nombre tiene que ser el mismo en los dos lados.
+1. **En WPF**, sumá la pantalla a la lista de `Screens` de
+   `tests/EcclesiaCast.ScreenBench.Wpf` con un nombre (`"texto-pedir"`), cómo se
+   arma y su ancho. Los diálogos de la tanda 15 están en `DialogScreens.cs`; cada
+   tanda puede hacer un archivo igual y sumarlo en `Screens`. Se arma la ventana
+   real de `App`, **sin mostrarla**, y se dibuja su contenido, porque una ventana
+   no se puede poner adentro de otra cosa. Lo hace `Take(ventana)`:
+   - saca el contenido (`var c = (FrameworkElement)w.Content; w.Content = null;`);
+   - **le pasa el `DataContext`** de la ventana (`c.DataContext = …`): al
+     sacarlo lo pierde y los enlaces salen vacíos;
+   - si la ventana tiene altura fija, se la pone al contenido, descontando la
+     barra de título.
+
+   **Ojo con `GroupName`:** los botones de opción con nombre de grupo dependen de
+   la ventana que los contiene, y al sacar el contenido la foto puede salir mal
+   marcada. Si los botones van sueltos en el mismo panel, no hace falta
+   `GroupName`: así forman su grupo (`CountdownWindow`).
+
+   Como la ventana no se muestra, `Loaded` no se dispara: nada empieza a
+   trabajar.
+2. **En Avalonia**, una prueba `[AvaloniaFact]` que arma la misma ventana con los
+   mismos datos. Para un diálogo entero se usa `DrawWindow(ventana,
+   "texto-pedir", alto)` (en `ScreenBenchTests.Dialogs.cs`), que la muestra en
+   memoria, la fotografía y la cierra; `Draw(contenido, nombre)` es para un
+   control suelto. El nombre tiene que ser el mismo en los dos lados.
+
+   **Mostrar la ventana dispara `Opened`**, también en memoria. Si la pantalla
+   trabaja sola (copia, descarga, búsqueda, lo que sea que salga a internet o
+   toque archivos), en el banco va con un **trabajo falso** que no termina
+   (`new TaskCompletionSource<bool>().Task`). Con el de verdad, la prueba
+   copiaría o bajaría cosas.
 3. Corré los dos:
 
    ```powershell
@@ -299,6 +367,12 @@ leer el `.xaml` de WPF y comprobar que cada texto y cada ayuda está en la de
 Avalonia. `The_menu_has_every_row_of_the_WPF_one` lo hace con el menú: si
 alguien agrega una fila al menú de Windows y no al de Mac, falla.
 
+**Y una prueba del teclado.** Cada diálogo comprueba **Enter** y **Esc** como en
+WPF, con la ventana mostrada en memoria y teclas de verdad
+(`KeyPressQwerty`), no apretando el botón desde el código: así se encontró lo de
+`HolderRadioButton`. El ejemplo está en `DialogKeyTests.cs`. Probá Enter con el
+cursor en cada caja de texto.
+
 ## 6. Lo que no se hace
 
 - **Lógica en la pantalla.** Si el `.xaml.cs` de WPF tiene un `if` que decide
@@ -321,13 +395,16 @@ alguien agrega una fila al menú de Windows y no al de Mac, falla.
 diseño de aprendizaje o avanzado, los convertidores, el menú de la ventana
 principal y los dos bancos de pantallas.
 
+**Ya está (tanda 15):** los diálogos chicos con sus servicios; `IDialogs`
+(`AvaloniaDialogs`, abrir y guardar archivos y elegir carpeta; no elige carpeta
+de inicio porque el pedido común no la tiene); `NumericField`; el ícono de «va
+encima de todo» (`OnTopMark`); `HolderRadioButton`; y en el tema, cajas de
+texto, casillas, opciones, enlaces y barra de progreso. `MenuDialogs` (Acerca
+de y transiciones) y `FeedbackDialogs` (comentarios) están hechos y **todavía no
+los llama nadie**: los conecta la tanda 19.
+
 **Falta, y lo necesita la primera tanda que lo use:**
 
-- `IDialogs` (abrir y guardar archivos, elegir carpeta) todavía es
-  `NotOnMacYet`. Avalonia lo hace con `StorageProvider`, que responde más
-  tarde (es asincrónico) y los ViewModels esperan la respuesta en la línea
-  siguiente. Hay que esperarla como `Modal.Run`: un `DispatcherFrame` que
-  termina cuando llega el resultado. Lo usan las tandas 15 y 16.
+- Corrector de ortografía en las cajas de texto (`Feature.SpellCheck`): fase 5.
 - El menú global de la Mac (`NativeMenu`), Cmd en vez de Ctrl en las teclas y
   «Salir» en el menú del programa: tanda 22.
-- Un `ControlTheme` para `TextBox`, si al comparar hace falta (ver 3.3).
