@@ -136,6 +136,31 @@ public sealed class BackupDialogTests : IDisposable
     }
 
     [Fact]
+    public void A_copy_made_by_a_newer_version_is_refused_before_asking()
+    {
+        // A copy whose library knows one change more than this program.
+        var copy = MadeCopy();
+        using (var connection = new SqliteConnection($"Data Source={copy}"))
+        {
+            connection.Open();
+            using var command = connection.CreateCommand();
+            command.CommandText =
+                "INSERT INTO __EFMigrationsHistory (MigrationId, ProductVersion) VALUES ('99991231235959_Futura', '99.0')";
+            command.ExecuteNonQuery();
+        }
+
+        SqliteConnection.ClearAllPools();
+        _notices.Yes();
+
+        Create(new Chooses(open: copy)).RestoreBackup();
+
+        var notice = Assert.Single(_notices.Asked);
+        Assert.StartsWith("Esa copia la hizo una versión de EcclesiaCast más nueva", notice.Message);
+        Assert.Empty(_done);
+        Assert.False(DatabaseBackup.ApplyPendingRestore(_db).WasStaged);
+    }
+
+    [Fact]
     public void When_it_cannot_be_opened_again_it_says_so_and_closes_anyway()
     {
         _notices.Yes();
