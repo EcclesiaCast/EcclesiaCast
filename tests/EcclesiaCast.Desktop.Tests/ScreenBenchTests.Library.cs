@@ -14,6 +14,14 @@ namespace EcclesiaCast.Desktop.Tests;
 public sealed partial class ScreenBenchTests
 {
     [AvaloniaFact]
+    public void The_song_editor_is_drawn() => DrawWindow(
+        new SongEditorWindow(LibrarySamples.Song(), LibrarySamples.Themes()), "editor-cancion", 680 - 39);
+
+    [AvaloniaFact]
+    public void The_editor_of_a_new_song_is_drawn() => DrawWindow(
+        new SongEditorWindow(null, LibrarySamples.Themes()), "editor-cancion-nueva", 680 - 39);
+
+    [AvaloniaFact]
     public void Importing_a_bible_is_drawn() => DrawWindow(new BibleImportWindow("Mi Biblia"), "importar-biblia");
 
     [AvaloniaFact]

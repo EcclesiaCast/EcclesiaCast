@@ -165,7 +165,7 @@ public static class Composition
         services.AddSingleton<FeedbackDialogs>();
 
         // Every other dialog: «Esto todavía no está en la versión de Mac».
-        services.AddSingleton(_ => NotOnMacYet.For<ISongEditor>());
+        services.AddSingleton<ISongEditor, AvaloniaSongEditor>();
         services.AddSingleton<IBibleImportDialog, AvaloniaBibleImportDialog>();
         services.AddSingleton<ITextPrompt, AvaloniaTextPrompt>();
         services.AddSingleton(_ => NotOnMacYet.For<IThemeManagerDialog>());
