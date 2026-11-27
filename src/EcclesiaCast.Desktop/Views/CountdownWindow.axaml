@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:EcclesiaCast.Presentation.ViewModels"
+        xmlns:controls="using:EcclesiaCast.Desktop.Controls"
         x:Class="EcclesiaCast.Desktop.Views.CountdownWindow"
         x:DataType="vm:CountdownViewModel"
         Title="Cuenta regresiva"
@@ -28,14 +29,14 @@
                    TextWrapping="Wrap" Margin="0,0,0,14"/>
 
         <!-- Cuánto falta: minutos desde ahora, o una hora del reloj -->
-        <RadioButton Name="ByMinutesChoice" IsChecked="{Binding ByMinutes}"
+        <controls:HolderRadioButton x:Name="ByMinutesChoice" IsChecked="{Binding ByMinutes}"
                      Foreground="White" VerticalContentAlignment="Center">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Empezar en" VerticalAlignment="Center" Foreground="White"/>
                 <TextBox Name="MinutesBox" Classes="time" Text="{Binding Minutes}" Width="56" Margin="8,0"/>
                 <TextBlock Text="minutos" VerticalAlignment="Center" Foreground="White"/>
             </StackPanel>
-        </RadioButton>
+        </controls:HolderRadioButton>
 
         <StackPanel Orientation="Horizontal" Margin="24,8,0,0">
             <Button Content="5" Width="44" Theme="{StaticResource DarkButton}" Click="Preset_Click" Tag="5"/>
@@ -44,7 +45,7 @@
             <Button Content="30" Width="44" Theme="{StaticResource DarkButton}" Margin="6,0,0,0" Click="Preset_Click" Tag="30"/>
         </StackPanel>
 
-        <RadioButton Name="ByClockChoice" IsChecked="{Binding ByClock}" Margin="0,14,0,0"
+        <controls:HolderRadioButton x:Name="ByClockChoice" IsChecked="{Binding ByClock}" Margin="0,14,0,0"
                      Foreground="White" VerticalContentAlignment="Center">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Empezar a las" VerticalAlignment="Center" Foreground="White"/>
@@ -53,7 +54,7 @@
                 <TextBlock Text="(hora del reloj)" VerticalAlignment="Center"
                            Foreground="{StaticResource MutedBrush}" FontSize="12"/>
             </StackPanel>
-        </RadioButton>
+        </controls:HolderRadioButton>
 
         <TextBlock Classes="label" Text="Texto de arriba" Margin="0,18,0,4"/>
         <TextBox Classes="text" Text="{Binding Heading}"/>
