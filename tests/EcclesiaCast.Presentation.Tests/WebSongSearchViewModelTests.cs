@@ -104,6 +104,29 @@ public sealed class WebSongSearchViewModelTests
     }
 
     [Fact]
+    public async Task Without_a_browser_it_searches_and_promises_no_line_of_the_lyrics()
+    {
+        using var rig = new Rig();
+        var vm = new WebSongSearchViewModel(
+            new SongSaver(rig.World.Songs, rig.Prompt), rig.World.Songs, rig.Web)
+        {
+            PhraseSearchPromised = false,
+        };
+        Assert.Null(vm.BrowserSearch);
+        Assert.DoesNotContain("frase", vm.Hint);
+        Assert.Contains("una frase de la letra", rig.Vm.Hint);
+
+        await vm.SearchAsync("zzzz");
+
+        Assert.Equal("No encontré nada. Probá con el nombre de la canción o con quién la canta.", vm.SearchStatus);
+
+        rig.Web.Quick.Add(Quick("Grande es Dios", "Coro", "https://m/1"));
+        await vm.SearchAsync("grande");
+
+        Assert.Equal("1 resultado.", vm.SearchStatus);
+    }
+
+    [Fact]
     public async Task When_every_source_fails_it_says_there_may_be_no_internet()
     {
         using var rig = new Rig();

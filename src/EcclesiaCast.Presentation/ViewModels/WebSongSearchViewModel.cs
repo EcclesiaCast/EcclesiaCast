@@ -66,6 +66,18 @@ public sealed partial class WebSongSearchViewModel : ObservableObject, IDisposab
     public ObservableCollection<WebSongRow> Results { get; } = [];
 
     /// <summary>
+    /// Whether the window tells the operator a line of the lyrics can be
+    /// searched. False where there is no browser for it (the Avalonia
+    /// program): without it the sources look for names, not for lines.
+    /// </summary>
+    public bool PhraseSearchPromised { get; init; } = true;
+
+    /// <summary>The line under the search box.</summary>
+    public string Hint => PhraseSearchPromised
+        ? "Escribí el nombre, el artista o una frase de la letra y apretá Enter. Busca en musica.com y, como respaldo, en lrclib.net."
+        : "Escribí el nombre o el artista y apretá Enter. Busca en musica.com y, como respaldo, en lrclib.net.";
+
+    /// <summary>
     /// The search by a line of the lyrics, which only a browser can do: the
     /// window sets it when it has one. Null when there is none.
     /// </summary>
@@ -160,7 +172,9 @@ public sealed partial class WebSongSearchViewModel : ObservableObject, IDisposab
         {
             0 when failures.Count == searches.Count =>
                 "No me pude conectar. ¿Hay internet en esta computadora?",
-            0 => "No encontré nada. Probá con otras palabras, o con una frase distinta de la letra.",
+            0 => PhraseSearchPromised
+                ? "No encontré nada. Probá con otras palabras, o con una frase distinta de la letra."
+                : "No encontré nada. Probá con el nombre de la canción o con quién la canta.",
             1 => "1 resultado.",
             _ => $"{Results.Count} resultados.",
         };
