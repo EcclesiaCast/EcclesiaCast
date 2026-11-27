@@ -5,6 +5,8 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
 ## [Sin publicar]
 
+- «Importar canciones» ya no se puede cerrar con la X mientras importa: antes las canciones
+  se seguían guardando sin que se viera y al terminar aparecía un error en la barra de abajo.
 - La pregunta al bajar o importar una Biblia que ya tenés sale con el mismo estilo que los demás avisos.
 - El programa pasa a .NET 10, la versión con soporte de Microsoft hasta 2028. No cambia nada a la vista.
 - Por dentro, sin cambios para quien usa el programa: las pruebas del núcleo

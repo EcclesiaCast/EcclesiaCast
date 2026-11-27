@@ -23,6 +23,18 @@ public partial class SongImportWindow : Window
         Loaded += (_, _) => DiscoverAll();
     }
 
+    /// <summary>
+    /// The X (or Alt+F4) cannot close it half way through an import: the songs
+    /// would go on being saved out of sight and its end would find no window.
+    /// </summary>
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        if (!_viewModel.CanClose)
+            e.Cancel = true;
+
+        base.OnClosing(e);
+    }
+
     private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e) => ShowState();
 
     /// <summary>The texts and buttons follow the view model.</summary>
