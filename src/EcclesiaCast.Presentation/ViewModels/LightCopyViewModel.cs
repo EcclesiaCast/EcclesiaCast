@@ -60,6 +60,10 @@ public sealed partial class LightCopyViewModel : ObservableObject
     /// <summary>Does the work. Call it on the screen's thread, once the window is up.</summary>
     public async Task RunAsync()
     {
+        // Closed before the work could start: there is nothing to do.
+        if (_closed)
+            return;
+
         var progress = new Progress<double>(fraction =>
         {
             IsIndeterminate = false;

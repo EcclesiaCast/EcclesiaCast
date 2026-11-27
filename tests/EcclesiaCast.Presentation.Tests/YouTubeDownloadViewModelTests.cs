@@ -141,6 +141,19 @@ public sealed class YouTubeDownloadViewModelTests
         Assert.Equal(0, closes());
     }
 
+    [Fact]
+    public async Task A_window_closed_before_the_download_starts_starts_nothing()
+    {
+        var (download, work, closes) = New();
+
+        download.Closed();
+        await download.RunAsync();
+
+        Assert.Null(work.Progress);
+        Assert.Equal(0, closes());
+        Assert.Equal("Preparando…", download.Status);
+    }
+
     private sealed class Inline : SynchronizationContext
     {
         public override void Post(SendOrPostCallback d, object? state) => d(state);

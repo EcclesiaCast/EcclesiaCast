@@ -120,6 +120,20 @@ public sealed class LightCopyViewModelTests
         Assert.Equal(LightCopyResult.Cancelled, copy.Result);
     }
 
+    [Fact]
+    public async Task A_window_closed_before_the_work_starts_starts_nothing()
+    {
+        var (copy, work, closes) = New();
+
+        copy.Closed();
+        await copy.RunAsync();
+
+        Assert.Null(work.Progress);
+        Assert.Empty(closes);
+        Assert.Equal(LightCopyResult.Cancelled, copy.Result);
+        Assert.StartsWith("Empezando", copy.Status);
+    }
+
     private sealed class Inline : SynchronizationContext
     {
         public override void Post(SendOrPostCallback d, object? state) => d(state);

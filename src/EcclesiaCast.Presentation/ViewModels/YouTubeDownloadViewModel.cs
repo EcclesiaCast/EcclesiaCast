@@ -70,6 +70,10 @@ public sealed partial class YouTubeDownloadViewModel : ObservableObject
     /// <summary>Downloads. Call it on the screen's thread, once the window is up.</summary>
     public async Task RunAsync()
     {
+        // Closed before the download could start: there is nothing to do.
+        if (_closed)
+            return;
+
         var progress = new Progress<(double Percent, string Message)>(report =>
         {
             if (report.Percent >= 0)
