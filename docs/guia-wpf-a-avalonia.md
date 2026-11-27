@@ -1,7 +1,8 @@
 # Guía: traducir una pantalla de WPF a Avalonia
 
 Para las tandas 15 a 21 de la versión de Mac. Se escribió en la tanda 14
-(26/11/2026), con Avalonia 12.1.6, y se corrigió con lo que dejó la tanda 15.
+(26/11/2026), con Avalonia 12.1.6, y se corrigió con lo que dejaron las tandas
+15 y 16.
 Antes de leerla hay que leer las reglas
 ([plan-mac-reglas.md](plan-mac-reglas.md)), que siguen valiendo todas.
 
@@ -64,7 +65,9 @@ plan).
 | `CaretBrush`, `SelectionBrush` | Iguales |
 | `Run`, `Hyperlink` dentro de un `TextBlock` | `Run` existe. `Hyperlink` no: `<HyperlinkButton Classes="inline" …>`, al lado del texto en un `WrapPanel` (ver `FeedbackWindow.axaml` y `AboutWindow.axaml`) |
 | `ProgressBar` finita de una ventana que hace esperar | `<ProgressBar Classes="work" Height="6" …>`, sin repetir sus colores |
-| `RadioButton` con una caja de texto adentro | `controls:HolderRadioButton`. El `RadioButton` de Avalonia se queda con **Enter** y con la barra espaciadora aunque vengan de adentro, y Enter no llega al botón principal |
+| `RadioButton` con una caja de texto adentro | `controls:HolderRadioButton`. El `RadioButton` de Avalonia se queda con **Enter** y con la barra espaciadora aunque vengan de adentro, y Enter no llega al botón principal (ver 2.1: les pasa también a listas, casillas y desplegables) |
+| `ComboBox` con `DisplayMemberPath="Label"` | `ItemTemplate` con un `DataTemplate` (y su `x:DataType`) que muestra `Label`: es lo que dibuja también la opción elegida, con el desplegable cerrado (ver 2.1) |
+| `ListBox` con filas propias (`ItemTemplate`) | Igual, pero las filas salen más altas: ver 2.1 |
 | `HorizontalContentAlignment` en un `DarkButton` o `AccentButton` | **No se copia**: ver abajo |
 | `TextChanged` | Existe, pero llega **más tarde** que en WPF: ver abajo |
 | `SharedSizeGroup`, `Grid.IsSharedSizeScope` | Iguales |
@@ -73,15 +76,55 @@ plan).
 | `Dispatcher.Invoke` | `IUiDispatcher` en el ViewModel; en la pantalla, `Dispatcher.UIThread.Post` |
 | `x:Static` a una constante de la parte común | Igual: `{x:Static local:Clase.Campo}` |
 
-### 2.1 Dos trampas de la tabla
+### 2.1 Trampas de la tabla
 
-**El `DarkButton` de WPF centra el texto aunque se le pida a la izquierda.** Su
+**Se copia la alineación que Windows muestra, no la que dice el código.** El
+`DarkButton` de WPF centra el texto aunque se le pida a la izquierda: su
 plantilla tiene el centrado escrito fijo, así que un
 `HorizontalContentAlignment="Left"` en la ventana de WPF no hace nada (pasa en
-`ChoiceWindow`). La plantilla de Avalonia sí obedece esa propiedad: si se
-copia, el texto sale a la izquierda y no se parece. Se copia **lo que se ve** en
-la imagen de WPF, no lo que dice el `.xaml`. Para que un botón ocupe todo el
-ancho, `HorizontalAlignment="Stretch"`.
+`ChoiceWindow` y en las pastillas de Ajustes, que en WPF dicen `Left` en un
+estilo propio y se ven centradas). La plantilla de Avalonia sí obedece esa
+propiedad: si se copia, el texto sale a la izquierda y no se parece. Lo mismo
+con cualquier propiedad que una plantilla de `App.xaml` tape: antes de copiar
+un `Alignment`, un `Padding` o un color de la ventana de WPF, mirá la imagen de
+WPF del banco. Para que un botón ocupe todo el ancho,
+`HorizontalAlignment="Stretch"`.
+
+**Enter se queda en listas, casillas, opciones y desplegables.** En WPF, Enter
+con el foco en una `ListBox`, una `CheckBox`, un `RadioButton` (también las
+pastillas, que son `RadioButton`) o un `ComboBox` cerrado llega al botón
+`IsDefault`. En Avalonia esos controles se lo quedan y **el botón principal no
+responde**. Si en WPF Enter hace algo con el foco ahí, la ventana lo atrapa
+antes, con `AddHandler(KeyDownEvent, …, RoutingStrategies.Tunnel)`, y hace lo
+mismo que el botón: `TrashWindow` (la lista) y `SettingsWindow` (pastillas,
+casillas y desplegables cerrados; con el desplegable abierto, Enter elige la
+opción). Si en WPF no hay botón `IsDefault`, no se hace nada. La prueba del
+teclado (sección 5) prueba Enter **con el foco en cada uno** de esos controles,
+no sólo en las cajas de texto.
+
+**Las filas de una lista salen más altas.** El `ListBoxItem` de Avalonia trae
+más relleno y un alto mínimo que el de WPF no tiene: con la misma plantilla de
+fila entran menos resultados y la imagen no se parece. Se ajusta en la ventana:
+
+```xml
+<Window.Styles>
+    <Style Selector="ListBox#ResultsList ListBoxItem">
+        <Setter Property="Padding" Value="5,1"/>
+        <Setter Property="MinHeight" Value="0"/>
+    </Style>
+</Window.Styles>
+```
+
+(`GlobalSearchWindow.axaml`). Compará la altura de las filas en la imagen lado a
+lado, no sólo los textos.
+
+**En los desplegables va `ItemTemplate`.** WPF muestra el texto de cada opción
+con `DisplayMemberPath`. En Avalonia se escribe un `ItemTemplate` con su
+`x:DataType`: con eso salen bien tanto la lista abierta como **la opción
+elegida**, que es lo único que se ve con el desplegable cerrado y lo que sale
+en la imagen (`SongEditorWindow`, `SettingsWindow`). Sin plantilla, la caja
+cerrada muestra lo que da el objeto por sí solo (su `ToString()`), no el
+texto de la opción. Mirá la caja cerrada en la imagen lado a lado.
 
 **`TextChanged` llega más tarde que en WPF.** En WPF se avisa en la misma línea
 que cambia el texto; en Avalonia, después. El truco de WPF de prender una
@@ -297,15 +340,38 @@ WPF al lado.
 
 1. **En WPF**, sumá la pantalla a la lista de `Screens` de
    `tests/EcclesiaCast.ScreenBench.Wpf` con un nombre (`"texto-pedir"`), cómo se
-   arma y su ancho. Los diálogos de la tanda 15 están en `DialogScreens.cs`; cada
-   tanda puede hacer un archivo igual y sumarlo en `Screens`. Se arma la ventana
-   real de `App`, **sin mostrarla**, y se dibuja su contenido, porque una ventana
-   no se puede poner adentro de otra cosa. Lo hace `Take(ventana)`:
+   arma y su ancho. Los diálogos de la tanda 15 están en `DialogScreens.cs` y los
+   de la tanda 16 en `LibraryScreens.cs` y `SettingsScreens.cs`; cada tanda puede
+   hacer un archivo igual y sumarlo en `Screens`. Los datos de muestra que usan
+   los dos bancos van en `tests/pantallas-de-muestra/` (lo compilan los dos
+   proyectos), así las dos imágenes salen con lo mismo. Se arma la ventana real
+   de `App`, **sin mostrarla**, y se dibuja su contenido, porque una ventana no
+   se puede poner adentro de otra cosa. Lo hace `DialogScreens.Take(ventana)`:
    - saca el contenido (`var c = (FrameworkElement)w.Content; w.Content = null;`);
    - **le pasa el `DataContext`** de la ventana (`c.DataContext = …`): al
      sacarlo lo pierde y los enlaces salen vacíos;
+   - **le pasa los recursos y los nombres** de la ventana: los estilos que la
+     ventana declara en `Window.Resources` y el `NameScope` (los enlaces con
+     `ElementName` y los disparadores que apuntan a un `x:Name`). Sin eso, lo
+     dibujado pierde su aspecto propio o sus enlaces entre controles, sin error;
    - si la ventana tiene altura fija, se la pone al contenido, descontando la
      barra de título.
+
+   **Nunca hay que correr el dispatcher en el banco de WPF**: ni `PushFrame`,
+   ni `DoEvents`, ni `Dispatcher.Yield`, ni `Dispatcher.Invoke` con prioridad,
+   ni `Run()`, ni esperar un reloj (`DispatcherTimer`). El banco crea el `App`
+   del programa para tener sus estilos, y el constructor de cualquier
+   `Application` deja su arranque esperando en la cola del dispatcher: la
+   primera vez que la cola corre, **arranca el programa de verdad**, con sus
+   ventanas, el control del celular y la biblioteca de la persona. Pasó en la
+   tanda 16 y borró las miniaturas. Lo que en el programa espera un reloj o un
+   `await` se llama a mano (`SearchNow()` en el buscador) y lo que espera
+   `Loaded` se dispara con `RaiseEvent` (importar canciones). Como segundo
+   candado, `Program.Main` apunta `ECCLESIACAST_DATA_DIR` a una carpeta temporal
+   vacía antes de crear el `App`: no lo saques. Antes de correr el banco,
+   buscá en sus archivos que nadie haya sumado algo de esto. (El banco de
+   render, `RenderBench.Wpf`, sí deja correr la cola un momento: puede porque
+   crea un `Application` vacío, no el `App` del programa. Que siga así.)
 
    **Ojo con `GroupName`:** los botones de opción con nombre de grupo dependen de
    la ventana que los contiene, y al sacar el contenido la foto puede salir mal
@@ -346,6 +412,15 @@ WPF al lado.
 4. **Mirá cada imagen lado a lado** (con la herramienta de leer imágenes). Lo
    que importa: textos, orden, tamaños, colores, márgenes, qué está prendido o
    apagado. Anotá en el informe lo que quedó distinto y por qué.
+
+**La pantalla simulada corta las imágenes grandes.** En memoria, Avalonia hace
+de cuenta que hay una pantalla de tamaño fijo, y una ventana que se ajusta a
+su contenido (`SizeToContent`) no pasa de ese tamaño: lo que sobra se corta
+sin aviso. Le pasaba a la imagen lado a lado de las ventanas anchas o altas
+(Buscar letra, la ayuda de formato). Por eso la ventana que arma las dos
+imágenes juntas tiene su ancho y su alto escritos (`ScreenBenchTests.cs`). Si
+una ventana sola sale cortada, dale tamaño fijo en la prueba en vez de
+`SizeToContent`. Mirá siempre el borde derecho y el de abajo de cada imagen.
 
 **Diferencias que se esperan y no hay que perseguir:**
 
@@ -396,12 +471,22 @@ diseño de aprendizaje o avanzado, los convertidores, el menú de la ventana
 principal y los dos bancos de pantallas.
 
 **Ya está (tanda 15):** los diálogos chicos con sus servicios; `IDialogs`
-(`AvaloniaDialogs`, abrir y guardar archivos y elegir carpeta; no elige carpeta
-de inicio porque el pedido común no la tiene); `NumericField`; el ícono de «va
+(`AvaloniaDialogs`, abrir y guardar archivos y elegir carpeta); `NumericField`; el ícono de «va
 encima de todo» (`OnTopMark`); `HolderRadioButton`; y en el tema, cajas de
 texto, casillas, opciones, enlaces y barra de progreso. `MenuDialogs` (Acerca
 de y transiciones) y `FeedbackDialogs` (comentarios) están hechos y **todavía no
 los llama nadie**: los conecta la tanda 19.
+
+**Ya está (tanda 16):** el editor de canción, importar canciones (con
+Holyrics), el buscador, la papelera, buscar letra en internet, importar
+Biblias, los paquetes de Biblias, la ayuda de formato, Ajustes
+(`SettingsDialog`: no modal y una sola; la conecta la tanda 19) y las copias de
+seguridad (`BackupDialog`, común a los dos programas). **`AvaloniaDialogs` ahora
+sí puede empezar en una carpeta**: `OpenFileRequest.InitialDirectory` (común;
+WPF también la usa) pasa a `SuggestedStartLocation`, esperando la respuesta como
+el resto. `SaveFileRequest` todavía no tiene carpeta de inicio: si una tanda la
+necesita, se suma igual. `UiModeChoice` guarda y aplica el diseño de
+aprendizaje o avanzado en los dos programas.
 
 **Falta, y lo necesita la primera tanda que lo use:**
 
