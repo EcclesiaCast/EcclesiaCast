@@ -1,50 +1,37 @@
 using System.Windows;
 using EcclesiaCast.Core.Songs;
 using EcclesiaCast.Core.Themes;
+using EcclesiaCast.Presentation.ViewModels;
 
 namespace EcclesiaCast.App.Views;
 
+/// <summary>
+/// The song editor. What it starts with, what is missing when it cannot be
+/// saved and the song it makes are in <see cref="SongEditorViewModel"/>; this
+/// window places the texts in the boxes and moves the cursor.
+/// </summary>
 public partial class SongEditorWindow : Window
 {
-    /// <summary>An entry in the theme dropdown; null Id means "use the default theme".</summary>
-    public sealed record ThemeChoice(int? Id, string Label);
-
-    private readonly int _songId;
-    private readonly List<SongSection> _existingSections = [];
+    private readonly SongEditorViewModel _viewModel;
 
     public SongEditorWindow(Song? existing, IReadOnlyList<SlideTheme> themes)
     {
         InitializeComponent();
+        _viewModel = new SongEditorViewModel(existing, themes);
 
-        var choices = new List<ThemeChoice> { new(null, "(Tema principal)") };
-        choices.AddRange(themes.Select(t => new ThemeChoice(t.Id, t.Name)));
+        ThemeCombo.ItemsSource = _viewModel.Themes;
+        ThemeCombo.SelectedItem = _viewModel.SelectedTheme;
 
-        // The song's own theme is not among the shared ones: offered apart, so
-        // saving the lyrics does not take it away. Picking another one does.
-        if (existing?.ThemeId is int own && choices.All(c => c.Id != own))
-            choices.Insert(1, new ThemeChoice(own, "(Tema propio de esta canción)"));
-        ThemeCombo.ItemsSource = choices;
-        ThemeCombo.SelectedItem = choices.FirstOrDefault(c => c.Id == existing?.ThemeId) ?? choices[0];
-
-        if (existing is not null)
-        {
-            _songId = existing.Id;
-            _existingSections = existing.Sections;
-            Title = "Editar canción";
-            TitleBox.Text = existing.Title;
-            ArtistBox.Text = existing.Artist;
-            CopyrightBox.Text = existing.Copyright ?? string.Empty;
-            LyricsBox.Text = LyricsParser.ToTaggedText(existing.Sections);
-        }
-        else
-        {
-            Title = "Nueva canción";
-        }
+        Title = _viewModel.WindowTitle;
+        TitleBox.Text = _viewModel.InitialTitle;
+        ArtistBox.Text = _viewModel.InitialArtist;
+        CopyrightBox.Text = _viewModel.InitialCopyright;
+        LyricsBox.Text = _viewModel.InitialLyrics;
 
         TitleBox.Focus();
     }
 
-    public Song? Result { get; private set; }
+    public Song? Result => _viewModel.Result;
 
     /// <summary>
     /// «Coro», «Estrofa»…: writes the tag line above the paragraph the cursor
@@ -64,36 +51,15 @@ public partial class SongEditorWindow : Window
 
     private void Save_Click(object sender, RoutedEventArgs e)
     {
-        var title = TitleBox.Text.Trim();
-        if (title.Length == 0)
+        _viewModel.SelectedTheme = ThemeCombo.SelectedItem as SongThemeChoice;
+        var missing = _viewModel.TrySave(TitleBox.Text, ArtistBox.Text, CopyrightBox.Text, LyricsBox.Text);
+        if (missing is not null)
         {
-            ErrorText.Text = "La canción necesita un título.";
-            TitleBox.Focus();
+            ErrorText.Text = _viewModel.Error;
+            (missing == SongEditorField.Title ? TitleBox : LyricsBox).Focus();
             return;
         }
 
-        var sections = LyricsParser.Parse(LyricsBox.Text);
-        if (sections.Count == 0)
-        {
-            ErrorText.Text = "La letra está vacía.";
-            LyricsBox.Focus();
-            return;
-        }
-
-        // Best effort: los diseños por diapositiva sobreviven la edición de
-        // la letra emparejando por posición.
-        for (var i = 0; i < sections.Count && i < _existingSections.Count; i++)
-            sections[i].StyleJson = _existingSections[i].StyleJson;
-
-        Result = new Song
-        {
-            Id = _songId,
-            Title = title,
-            Artist = ArtistBox.Text.Trim(),
-            Copyright = string.IsNullOrWhiteSpace(CopyrightBox.Text) ? null : CopyrightBox.Text.Trim(),
-            ThemeId = (ThemeCombo.SelectedItem as ThemeChoice)?.Id,
-            Sections = sections,
-        };
         DialogResult = true;
     }
 }
