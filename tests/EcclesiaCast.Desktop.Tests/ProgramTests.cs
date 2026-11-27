@@ -40,6 +40,17 @@ public sealed class ProgramTests
 
         var vm = program.Services.GetRequiredService<MainViewModel>();
 
+        // The windows of songs, Bibles and the library (batch 16) are there.
+        Assert.IsType<AvaloniaSongEditor>(program.Services.GetRequiredService<ISongEditor>());
+        Assert.IsType<AvaloniaBibleImportDialog>(program.Services.GetRequiredService<IBibleImportDialog>());
+        Assert.IsType<BiblePackageDialog>(program.Services.GetRequiredService<IBiblePackageDialog>());
+        Assert.IsType<AvaloniaBibleFormatHelpDialog>(program.Services.GetRequiredService<IBibleFormatHelpDialog>());
+        Assert.IsType<AvaloniaSongImportDialog>(program.Services.GetRequiredService<ISongImportDialog>());
+        Assert.IsType<AvaloniaGlobalSearchDialog>(program.Services.GetRequiredService<IGlobalSearchDialog>());
+        Assert.IsType<AvaloniaTrashDialog>(program.Services.GetRequiredService<ITrashDialog>());
+        Assert.IsType<AvaloniaWebSongSearchDialog>(program.Services.GetRequiredService<IWebSongSearchDialog>());
+        Assert.IsType<BackupDialog>(program.Services.GetRequiredService<IBackupDialog>());
+
         // The real services, not stand-ins, behind the projection.
         Assert.IsType<ProjectionWindowService>(program.Services.GetRequiredService<IProjectionWindowService>());
         Assert.IsType<StageWindowService>(program.Services.GetRequiredService<IStageWindowService>());

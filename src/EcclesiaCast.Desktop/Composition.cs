@@ -187,7 +187,13 @@ public static class Composition
         services.AddSingleton<ISongImportDialog, AvaloniaSongImportDialog>();
         services.AddSingleton<IWebSongSearchDialog, AvaloniaWebSongSearchDialog>();
         services.AddSingleton(_ => NotOnMacYet.For<IStageDesigner>());
-        services.AddSingleton(_ => NotOnMacYet.For<IBackupDialog>());
+        services.AddSingleton<IBackupDialog>(sp => new BackupDialog(
+            dbPath,
+            sp.GetRequiredService<IDialogs>(),
+            Relaunch.Start,
+            beQuiet: () => sp.GetRequiredService<FeedbackSession>().Quiet = true,
+            shutdown: () => (Avalonia.Application.Current?.ApplicationLifetime
+                as Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)?.Shutdown()));
         services.AddSingleton<ICountdownDialog, AvaloniaCountdownDialog>();
         services.AddSingleton<ILightCopyDialog, AvaloniaLightCopyDialog>();
         services.AddSingleton(_ => NotOnMacYet.For<IColorPicker>());
