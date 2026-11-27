@@ -16,6 +16,11 @@
     <RootNamespace>EcclesiaCast.ScreenBench.Wpf</RootNamespace>
   </PropertyGroup>
 
+  <!-- The sample data of some screens, the same file the Avalonia tests compile. -->
+  <ItemGroup>
+    <Compile Include="..\pantallas-de-muestra\*.cs" LinkBase="Muestra" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\EcclesiaCast.App\EcclesiaCast.App.csproj" />
   </ItemGroup>

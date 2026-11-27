@@ -52,6 +52,18 @@ public static class Program
                 File.Delete(old);
 
             // The program's own App: its constructor and App.xaml, never Run().
+            //
+            // NEVER RUN THE DISPATCHER HERE (PushFrame, DoEvents, Run,
+            // Dispatcher.Yield…). The constructor of any Application leaves its
+            // start-up waiting in the dispatcher: the first time it runs, the
+            // real program starts, with its windows, the phone control and the
+            // person's library (it happened in batch 16 and emptied the
+            // folder of thumbnails). As a second lock, the data folder points
+            // to an empty temporary one before App is even loaded.
+            var data = Path.Combine(Path.GetTempPath(), "ecclesiacast-banco-datos");
+            Directory.CreateDirectory(data);
+            Environment.SetEnvironmentVariable("ECCLESIACAST_DATA_DIR", data);
+
             var app = new EcclesiaCast.App.App { ShutdownMode = ShutdownMode.OnExplicitShutdown };
             app.InitializeComponent();
 
@@ -118,6 +130,8 @@ public static class Program
 
         foreach (var dialog in DialogScreens.All())
             yield return dialog;
+        foreach (var screen in LibraryScreens.All())
+            yield return screen;
     }
 
     /// <summary>A long tooltip of the menu: it has to wrap at 400.</summary>

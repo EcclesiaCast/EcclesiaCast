@@ -91,11 +91,18 @@ internal static class DialogScreens
     /// What the window shows, free to be drawn alone. The height is for the
     /// windows with a fixed one (without the system's title bar).
     /// </summary>
-    private static FrameworkElement Take(Window window, double height = double.NaN)
+    internal static FrameworkElement Take(Window window, double height = double.NaN)
     {
         var content = (FrameworkElement)window.Content;
         var data = window.DataContext;
+        var names = NameScope.GetNameScope(window);
         window.Content = null;
+        // The looks the window declares for itself, and the names its own
+        // bindings point at, stay with what is drawn.
+        if (window.Resources.Count > 0 || window.Resources.MergedDictionaries.Count > 0)
+            content.Resources.MergedDictionaries.Add(window.Resources);
+        if (names is not null && NameScope.GetNameScope(content) is null)
+            NameScope.SetNameScope(content, names);
         if (data is not null)
             content.DataContext = data;
         if (!double.IsNaN(height))
