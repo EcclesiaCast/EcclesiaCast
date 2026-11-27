@@ -239,12 +239,12 @@ public sealed partial class ScreenBenchTests
             },
         };
 
-        // The width is said: left to the content, a wide pair is cut at the
-        // width of the made-up screen.
+        // The size is said: left to the content, a wide or a tall pair is cut
+        // at the size of the made-up screen. 60: the margins and the titles.
         var window = new Window
         {
             Width = left.Size.Width + right.Size.Width + 48,
-            SizeToContent = SizeToContent.Height,
+            Height = Math.Max(left.Size.Height, right.Size.Height) + 60,
             Background = new SolidColorBrush(Color.Parse("#3A3F4C")),
             Content = new StackPanel
             {
