@@ -1733,7 +1733,7 @@ public partial class MainWindow : Window
                 var toLoad = pending.ToList();
                 pending.Clear();
                 foreach (var (media, picture) in toLoad)
-                    picture.Source = await Task.Run(() => LoadChoiceThumbnail(media));
+                    picture.Source = await Task.Run(() => Services.MediaThumbnails.LoadSmall(media));
             };
 
             choose.Items.Add(tabItem);
@@ -1776,38 +1776,6 @@ public partial class MainWindow : Window
             Background = System.Windows.Media.Brushes.Black,
             Child = content,
         };
-    }
-
-    /// <summary>
-    /// The poster of a background (or the picture itself), read small. Apart from
-    /// <see cref="Services.ImageLoadCache"/>, whose few places are the projector's.
-    /// Null when there is nothing to read: the box stays black.
-    /// </summary>
-    private static System.Windows.Media.Imaging.BitmapImage? LoadChoiceThumbnail(MediaItem media)
-    {
-        var path = !string.IsNullOrWhiteSpace(media.ThumbnailPath) && System.IO.File.Exists(media.ThumbnailPath)
-            ? media.ThumbnailPath
-            : media.Type == MediaType.Image && System.IO.File.Exists(media.Path) ? media.Path : null;
-        if (path is null)
-            return null;
-
-        try
-        {
-            var bitmap = new System.Windows.Media.Imaging.BitmapImage();
-            bitmap.BeginInit();
-            bitmap.UriSource = new Uri(path);
-            // Read whole now, so the file is not left open.
-            bitmap.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad;
-            bitmap.DecodePixelWidth = 160;
-            bitmap.EndInit();
-            bitmap.Freeze();
-            return bitmap;
-        }
-        catch (Exception ex)
-        {
-            Serilog.Log.Debug(ex, "No se pudo leer la miniatura {Path}", path);
-            return null;
-        }
     }
 
     /// <summary>

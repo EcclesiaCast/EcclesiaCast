@@ -1714,12 +1714,29 @@
                             </StackPanel>
                             <!-- El fondo propio de la Biblia, en el mismo lugar que el de las canciones
                                  (también: clic derecho en un medio) -->
-                            <Button Content="{Binding BibleBackgroundLabel}" FontSize="11" Padding="8,3" Margin="10,0,0,0"
+                            <Button FontSize="11" Padding="8,3" Margin="10,0,0,0"
                                     MaxWidth="200"
                                     Style="{StaticResource DarkButton}"
                                     Click="BibleBackgroundButton_Click"
                                     AutomationProperties.Name="Fondo de la Biblia"
-                                    ToolTip="{Binding BibleBackgroundHint}"/>
+                                    ToolTip="{Binding BibleBackgroundHint}">
+                                <DockPanel>
+                                    <Border Width="28" Height="16" Margin="0,0,5,0" Background="Black">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding BibleBackgroundPicture}" Value="{x:Null}">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Image Source="{Binding BibleBackgroundPicture}" Stretch="UniformToFill" ClipToBounds="True"/>
+                                    </Border>
+                                    <TextBlock Text="{Binding BibleBackgroundLabel}" TextTrimming="CharacterEllipsis"
+                                               VerticalAlignment="Center"/>
+                                </DockPanel>
+                            </Button>
                         </WrapPanel>
                         <!-- Sólo con una canción en la grilla: cuántas líneas lleva cada diapositiva -->
                         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0"
@@ -1745,13 +1762,30 @@
                                 AutomationProperties.Name="Tema de esta canción"
                                 ToolTip="{Binding SongThemeHint}"/>
                         <!-- Sólo con una canción: su fondo propio, que se pone solo al proyectarla -->
-                        <Button DockPanel.Dock="Right" Content="{Binding SongBackgroundLabel}" FontSize="11" Padding="8,3" Margin="10,0,0,0"
+                        <Button DockPanel.Dock="Right" FontSize="11" Padding="8,3" Margin="10,0,0,0"
                                 MaxWidth="200"
                                 Style="{StaticResource DarkButton}"
                                 Click="SongBackgroundButton_Click"
                                 Visibility="{Binding IsSongOpen, Converter={StaticResource BoolToVis}}"
                                 AutomationProperties.Name="Fondo de esta canción"
-                                ToolTip="{Binding SongBackgroundHint}"/>
+                                ToolTip="{Binding SongBackgroundHint}">
+                            <DockPanel>
+                                <Border Width="28" Height="16" Margin="0,0,5,0" Background="Black">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SongBackgroundPicture}" Value="{x:Null}">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Image Source="{Binding SongBackgroundPicture}" Stretch="UniformToFill" ClipToBounds="True"/>
+                                </Border>
+                                <TextBlock Text="{Binding SongBackgroundLabel}" TextTrimming="CharacterEllipsis"
+                                           VerticalAlignment="Center"/>
+                            </DockPanel>
+                        </Button>
                         <!-- Sólo con una presentación en la grilla -->
                         <Button DockPanel.Dock="Right" Content="➕ Playlist" FontSize="11" Padding="8,3" Margin="10,0,0,0"
                                 Style="{StaticResource DarkButton}"

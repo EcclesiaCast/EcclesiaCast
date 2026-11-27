@@ -16,7 +16,11 @@ public sealed partial class MainViewModel
     /// <summary>The open song, when the grid shows one: the one «Usar como fondo de…» is for.</summary>
     public Song? SongForBackground => IsSongOpen ? SelectedSong : null;
 
-    /// <summary>«🖼 Fondo: Atardecer» or «🖼 Sin fondo propio», over the slides.</summary>
+    /// <summary>The small picture of the song's own background on that button; null shows the 🖼 of the label.</summary>
+    [ObservableProperty]
+    private System.Windows.Media.Imaging.BitmapImage? _songBackgroundPicture;
+
+    /// <summary>«Fondo: Atardecer» (beside its picture) or «🖼 Sin fondo propio», over the slides.</summary>
     [ObservableProperty]
     private string _songBackgroundLabel = "🖼 Sin fondo propio";
 
@@ -36,12 +40,14 @@ public sealed partial class MainViewModel
         if (OwnBackgroundOf(song) is { } media)
         {
             SongHasOwnBackground = true;
-            SongBackgroundLabel = $"🖼 Fondo: {media.Name}";
+            SongBackgroundPicture = Services.MediaThumbnails.LoadSmall(media);
+            SongBackgroundLabel = SongBackgroundPicture is null ? $"🖼 Fondo: {media.Name}" : $"Fondo: {media.Name}";
             SongBackgroundHint = $"Cuando proyectás esta canción se pone sola de fondo «{media.Name}». Clic para cambiarlo o quitarlo.";
         }
         else
         {
             SongHasOwnBackground = false;
+            SongBackgroundPicture = null;
             SongBackgroundLabel = "🖼 Sin fondo propio";
             SongBackgroundHint = "Esta canción no tiene un fondo propio: se queda el que esté puesto. Clic para elegir uno de la biblioteca o usar el que está en pantalla (también: clic derecho en una imagen o video de Medios → «Usar como fondo de…»).";
         }

@@ -46,6 +46,38 @@ public static class MediaThumbnails
             : type == MediaType.Image ? sourcePath : null;
     }
 
+    /// <summary>
+    /// The poster of a media (or the picture itself), read small, for the
+    /// background buttons and menus. Apart from <see cref="ImageLoadCache"/>,
+    /// whose few places are the projector's. Null when there is nothing to read.
+    /// </summary>
+    public static BitmapImage? LoadSmall(MediaItem media)
+    {
+        var path = !string.IsNullOrWhiteSpace(media.ThumbnailPath) && File.Exists(media.ThumbnailPath)
+            ? media.ThumbnailPath
+            : media.Type == MediaType.Image && File.Exists(media.Path) ? media.Path : null;
+        if (path is null)
+            return null;
+
+        try
+        {
+            var bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.UriSource = new Uri(path);
+            // Read whole now, so the file is not left open.
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.DecodePixelWidth = 160;
+            bitmap.EndInit();
+            bitmap.Freeze();
+            return bitmap;
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "No se pudo leer la miniatura {Path}", path);
+            return null;
+        }
+    }
+
     /// <summary>Deletes a generated thumbnail; ignores the media's own file.</summary>
     public static void Delete(string? thumbnailPath)
     {
