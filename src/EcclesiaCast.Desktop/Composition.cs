@@ -193,7 +193,7 @@ public static class Composition
         }));
         services.AddSingleton(_ => NotOnMacYet.For<IWindowPickerDialog>());
         services.AddSingleton<IYouTubeDownloadDialog, AvaloniaYouTubeDownloadDialog>();
-        services.AddSingleton(_ => NotOnMacYet.For<ITrashDialog>());
+        services.AddSingleton<ITrashDialog, AvaloniaTrashDialog>();
         services.AddSingleton(_ => NotOnMacYet.For<IBroadcastDialog>());
         services.AddSingleton<IGlobalSearchDialog, AvaloniaGlobalSearchDialog>();
 

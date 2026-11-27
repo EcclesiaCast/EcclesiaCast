@@ -52,6 +52,17 @@ public sealed partial class ScreenBenchTests
         DrawWindow(window, "buscador", 520 - 39);
     }
 
+    internal static TrashWindow Trash(bool empty)
+    {
+        var (songs, themes) = LibrarySamples.Trash(empty);
+        return new TrashWindow(new TrashViewModel(songs, themes));
+    }
+
+    [AvaloniaTheory]
+    [InlineData(false, "papelera")]
+    [InlineData(true, "papelera-vacia")]
+    public void The_trash_is_drawn(bool empty, string name) => DrawWindow(Trash(empty), name, 460 - 39);
+
     [AvaloniaFact]
     public void Importing_a_bible_is_drawn() => DrawWindow(new BibleImportWindow("Mi Biblia"), "importar-biblia");
 

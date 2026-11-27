@@ -184,6 +184,25 @@ public sealed partial class DialogKeyTests
     }
 
     [AvaloniaTheory]
+    [InlineData(PhysicalKey.Enter)]
+    [InlineData(PhysicalKey.Escape)]
+    public void The_trash_closes_with_enter_and_with_escape(PhysicalKey key)
+    {
+        var window = ScreenBenchTests.Trash(empty: false);
+        var closed = Open(window);
+        var list = Named<ListBox>(window, "TrashList");
+        list.SelectedIndex = 0;
+        list.ContainerFromIndex(0)!.Focus();
+        Assert.True(Named<Button>(window, "RestoreButton").IsEnabled);
+        Assert.True(Named<Button>(window, "PurgeButton").IsEnabled);
+
+        // «Cerrar» is the default button and the one of Esc, as in WPF.
+        Hit(window, key);
+
+        Assert.True(closed());
+    }
+
+    [AvaloniaTheory]
     [InlineData(false)]
     [InlineData(true)]
     public void The_help_with_the_bible_formats_closes_with_escape(bool insideAnExample)

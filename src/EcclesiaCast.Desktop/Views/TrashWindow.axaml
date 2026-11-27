@@ -1,0 +1,52 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:EcclesiaCast.Presentation.ViewModels"
+        x:Class="EcclesiaCast.Desktop.Views.TrashWindow"
+        Title="Papelera"
+        Width="640" Height="460" MinWidth="520" MinHeight="320">
+    <Window.Styles>
+        <!-- The rows as close together as WPF's. -->
+        <Style Selector="ListBox#TrashList ListBoxItem">
+            <Setter Property="Padding" Value="5,1"/>
+            <Setter Property="MinHeight" Value="0"/>
+        </Style>
+    </Window.Styles>
+
+    <DockPanel Margin="18">
+        <TextBlock DockPanel.Dock="Top" FontSize="12" Foreground="{StaticResource MutedBrush}"
+                   TextWrapping="Wrap" Margin="0,0,0,12"
+                   Text="Lo que borrás de la biblioteca queda acá 30 días. Después se borra del todo."/>
+
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button Name="RestoreButton" Content="Restaurar" Padding="14,6" Theme="{StaticResource DarkButton}"
+                    IsEnabled="False" Click="Restore_Click"/>
+            <Button Name="PurgeButton" Content="Borrar del todo" Padding="14,6" Margin="8,0,0,0"
+                    Theme="{StaticResource DarkButton}" IsEnabled="False" Click="Purge_Click"/>
+            <Button Name="EmptyButton" Content="Vaciar la papelera" Padding="14,6" Margin="8,0,0,0"
+                    Theme="{StaticResource DarkButton}" Click="Empty_Click"/>
+            <Button Content="Cerrar" Padding="14,6" Margin="8,0,0,0" Theme="{StaticResource DarkButton}"
+                    IsCancel="True" IsDefault="True" Click="Close_Click"/>
+        </StackPanel>
+
+        <Border Theme="{StaticResource Panel}">
+            <Grid>
+                <ListBox Name="TrashList" Background="Transparent" BorderThickness="0"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         SelectionChanged="TrashList_SelectionChanged">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:TrashEntry">
+                            <StackPanel Margin="4,3">
+                                <TextBlock Text="{Binding Title}" Foreground="White" FontSize="13"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding Detail}" Foreground="{StaticResource MutedBrush}"
+                                           FontSize="11"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <TextBlock Name="EmptyText" Text="La papelera está vacía."
+                           Theme="{StaticResource PlaceholderText}" IsHitTestVisible="False"/>
+            </Grid>
+        </Border>
+    </DockPanel>
+</Window>
