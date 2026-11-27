@@ -1,0 +1,45 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="EcclesiaCast.Desktop.Views.BibleImportWindow"
+        Title="Importar Biblia"
+        Width="440" SizeToContent="Height" CanResize="False">
+    <Window.Styles>
+        <Style Selector="TextBlock.label">
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+        <Style Selector="TextBox">
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="MinWidth" Value="0"/>
+        </Style>
+    </Window.Styles>
+    <Grid Margin="20" RowDefinitions="Auto,Auto,Auto,Auto">
+        <StackPanel Grid.Row="0">
+            <TextBlock Classes="label" Text="Nombre *"/>
+            <TextBox Name="NameBox"/>
+        </StackPanel>
+
+        <Grid Grid.Row="1" Margin="0,12,0,0" ColumnDefinitions="*,12,120">
+            <StackPanel Grid.Column="0">
+                <TextBlock Classes="label" Text="Abreviatura *"/>
+                <TextBox Name="AbbreviationBox"
+                         ToolTip.Tip="Se muestra junto a cada versículo proyectado, ej. RVR1960"/>
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+                <TextBlock Classes="label" Text="Idioma"/>
+                <TextBox Name="LanguageBox" Text="es"/>
+            </StackPanel>
+        </Grid>
+
+        <TextBlock Grid.Row="2" Name="ErrorText" Foreground="#E08A8A" FontSize="12" Margin="0,10,0,0"/>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button Content="Cancelar" Theme="{StaticResource DarkButton}" IsCancel="True" Padding="18,9"
+                    Click="Cancel_Click"/>
+            <Button Content="Importar" Theme="{StaticResource AccentButton}" Click="Import_Click"
+                    Padding="18,9" Margin="10,0,0,0"/>
+        </StackPanel>
+    </Grid>
+</Window>

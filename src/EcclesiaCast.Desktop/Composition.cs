@@ -166,7 +166,7 @@ public static class Composition
 
         // Every other dialog: «Esto todavía no está en la versión de Mac».
         services.AddSingleton(_ => NotOnMacYet.For<ISongEditor>());
-        services.AddSingleton(_ => NotOnMacYet.For<IBibleImportDialog>());
+        services.AddSingleton<IBibleImportDialog, AvaloniaBibleImportDialog>();
         services.AddSingleton<ITextPrompt, AvaloniaTextPrompt>();
         services.AddSingleton(_ => NotOnMacYet.For<IThemeManagerDialog>());
         services.AddSingleton(_ => NotOnMacYet.For<ISongDesigner>());

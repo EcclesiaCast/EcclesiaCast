@@ -12,7 +12,7 @@ using EcclesiaCast.Presentation.ViewModels;
 namespace EcclesiaCast.Desktop.Tests;
 
 /// <summary>Enter and Esc in the simple dialogs do what they do in WPF.</summary>
-public sealed class DialogKeyTests
+public sealed partial class DialogKeyTests
 {
     private static Func<bool> Open(Window window)
     {
