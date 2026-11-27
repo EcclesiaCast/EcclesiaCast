@@ -71,6 +71,16 @@ Este proyecto usa [versionado semántico](https://semver.org/lang/es/).
 - Por dentro, sin cambios para quien usa el programa en Windows: lo que deciden las ventanas de
   comentarios, cuenta regresiva, copia liviana y descarga de YouTube, y cómo se leen los números
   de los campos con − y +, pasó a la parte común (con pruebas).
+- En la versión de Mac ya están hechas las ventanas de canciones, Biblias y biblioteca, con el
+  mismo aspecto que en Windows: el editor de canciones, importar canciones de otro programa,
+  buscar una letra en internet, importar una Biblia, bajar, exportar e importar paquetes de
+  Biblias, la ayuda con los formatos, el buscador general, la papelera, Ajustes y las copias de
+  seguridad. Se van a poder abrir desde el menú cuando esté la ventana principal de Mac. Por
+  ahora en la Mac la letra se busca en internet por nombre o artista (no por una frase), no se
+  marcan las faltas de ortografía, y todavía no se puede elegir el color de fondo de los videos.
+- Por dentro, sin cambios para quien usa el programa en Windows: lo que deciden las ventanas de
+  canciones, Biblias, buscador, papelera, Ajustes y copias de seguridad pasó a la parte común
+  (con pruebas).
 
 ## [1.5.0] - 2026-11-26
 
