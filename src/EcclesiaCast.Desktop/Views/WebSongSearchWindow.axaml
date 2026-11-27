@@ -1,0 +1,107 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:EcclesiaCast.Presentation.ViewModels"
+        x:Class="EcclesiaCast.Desktop.Views.WebSongSearchWindow"
+        Title="Buscar canciones en internet"
+        Width="980" Height="680"
+        MinWidth="760" MinHeight="480">
+    <Window.Styles>
+        <!-- The rows as close together as WPF's. -->
+        <Style Selector="ListBox#ResultsList ListBoxItem">
+            <Setter Property="Padding" Value="5,1"/>
+            <Setter Property="MinHeight" Value="0"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid Margin="16" RowDefinitions="Auto,Auto,*,Auto">
+        <DockPanel Grid.Row="0">
+            <Button DockPanel.Dock="Right" Content="Buscar" Theme="{StaticResource AccentButton}"
+                    Padding="22,0" Margin="8,0,0,0" VerticalAlignment="Stretch" Click="Search_Click"/>
+            <TextBox Name="QueryBox" FontSize="18" Padding="12,8"/>
+        </DockPanel>
+
+        <!-- What it says depends on whether there is a browser to search by a line of the lyrics. -->
+        <TextBlock Grid.Row="1" Name="HintText" FontSize="11" Foreground="{StaticResource FaintBrush}"
+                   Margin="2,6,0,10" TextWrapping="Wrap"/>
+
+        <Grid Grid.Row="2" ColumnDefinitions="340,14,*">
+            <!-- Results -->
+            <Border Grid.Column="0"
+                    Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
+                    CornerRadius="4">
+                <DockPanel>
+                    <TextBlock Name="SearchStatusText" DockPanel.Dock="Bottom"
+                               FontSize="11" Foreground="{StaticResource MutedBrush}"
+                               TextWrapping="Wrap" Margin="12,6,12,10"/>
+                    <ListBox Name="ResultsList" Background="Transparent" BorderThickness="0" Margin="4"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             SelectionChanged="Results_SelectionChanged">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:WebSongRow">
+                                <DockPanel Margin="4,4">
+                                    <TextBlock DockPanel.Dock="Right" Text="✓"
+                                               Foreground="{StaticResource AccentBrush}" FontSize="14"
+                                               VerticalAlignment="Center" Margin="6,0,0,0"
+                                               ToolTip.Tip="Ya la importaste"
+                                               IsVisible="{Binding Imported}"/>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Hit.Title}" Foreground="White" FontSize="14"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding Detail}" Foreground="{StaticResource MutedBrush}"
+                                                   FontSize="11" TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+            </Border>
+
+            <!-- Editable preview -->
+            <Grid Grid.Column="2" RowDefinitions="Auto,Auto,*,Auto">
+                <Grid Grid.Row="0" ColumnDefinitions="3*,12,2*">
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Título" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,4"/>
+                        <TextBox Name="TitleBox" Padding="8,6" FontSize="14"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Artista" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,4"/>
+                        <TextBox Name="ArtistBox" Padding="8,6" FontSize="14"/>
+                    </StackPanel>
+                </Grid>
+
+                <DockPanel Grid.Row="1" Margin="0,12,0,4">
+                    <HyperlinkButton Name="SourceLink" DockPanel.Dock="Right" Classes="inline"
+                                     Content="Ver en la web" FontSize="11" VerticalAlignment="Bottom"
+                                     IsVisible="False" Click="OpenSource_Click"/>
+                    <TextBlock FontSize="12" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap"
+                               Text="Letra · cada párrafo es una diapositiva. Revisala antes de importar: podés corregirla acá mismo."/>
+                </DockPanel>
+
+                <TextBox Grid.Row="2" Name="LyricsBox"
+                         AcceptsReturn="True" TextWrapping="Wrap"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         VerticalContentAlignment="Top"
+                         Padding="10,8" FontSize="14"/>
+
+                <TextBlock Grid.Row="3" Name="PreviewInfoText" FontSize="11"
+                           Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap"
+                           Margin="0,6,0,0"/>
+            </Grid>
+        </Grid>
+
+        <DockPanel Grid.Row="3" Margin="0,14,0,0">
+            <TextBlock Name="StatusText" DockPanel.Dock="Left" VerticalAlignment="Center"
+                       FontSize="12" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap"
+                       MaxWidth="560"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Name="ImportButton" Content="Importar a la biblioteca"
+                        Theme="{StaticResource AccentButton}" Padding="20,8"
+                        IsEnabled="False" Click="Import_Click"/>
+                <Button Content="Cerrar" Theme="{StaticResource DarkButton}" Padding="20,8"
+                        Margin="8,0,0,0" IsCancel="True" Click="Close_Click"/>
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</Window>

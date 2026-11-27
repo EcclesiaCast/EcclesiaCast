@@ -63,6 +63,27 @@ public sealed partial class ScreenBenchTests
     [InlineData(true, "papelera-vacia")]
     public void The_trash_is_drawn(bool empty, string name) => DrawWindow(Trash(empty), name, 460 - 39);
 
+    /// <summary>The internet here is made up: nothing is asked outside.</summary>
+    internal static WebSongSearchWindow WebSearch() => new(
+        new WebSongSearchViewModel(
+            new SongSaver(LibrarySamples.NoSongs(), LibrarySamples.Sample.Of<ITextPrompt>()),
+            LibrarySamples.NoSongs(), new LibrarySamples.WebSongs())
+        {
+            PhraseSearchPromised = false,
+        },
+        new RecordingShell());
+
+    [AvaloniaFact]
+    public void The_empty_web_search_is_drawn() => DrawWindow(WebSearch(), "buscar-letra-vacia", 680 - 39);
+
+    [AvaloniaFact]
+    public void The_web_search_with_results_is_drawn()
+    {
+        var window = WebSearch();
+        window.Opened += (_, _) => Dispatcher.UIThread.Post(() => window.Search("renuévame"));
+        DrawWindow(window, "buscar-letra", 680 - 39);
+    }
+
     [AvaloniaFact]
     public void Importing_a_bible_is_drawn() => DrawWindow(new BibleImportWindow("Mi Biblia"), "importar-biblia");
 

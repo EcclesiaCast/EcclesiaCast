@@ -202,6 +202,41 @@ public sealed partial class DialogKeyTests
         Assert.True(closed());
     }
 
+    [AvaloniaFact]
+    public void The_web_search_enter_in_the_box_searches_and_does_not_close()
+    {
+        var window = ScreenBenchTests.WebSearch();
+        var closed = Open(window);
+        var box = Named<TextBox>(window, "QueryBox");
+        Assert.True(box.IsFocused);
+        box.Text = "renuévame";
+
+        Hit(window, PhysicalKey.Enter);
+
+        Assert.False(closed());
+        var list = Named<ListBox>(window, "ResultsList");
+        Assert.Equal(3, list.ItemCount);
+        Assert.Equal(0, list.SelectedIndex);
+        Assert.True(Named<Button>(window, "ImportButton").IsEnabled);
+        Assert.StartsWith("2 diapositivas.", Named<TextBlock>(window, "PreviewInfoText").Text);
+
+        // Enter in the lyrics writes a line: it neither imports nor closes.
+        var lyrics = Named<TextBox>(window, "LyricsBox");
+        lyrics.Focus();
+        lyrics.CaretIndex = lyrics.Text!.Length;
+        Hit(window, PhysicalKey.Enter);
+        Assert.False(closed());
+        Assert.EndsWith("\n", lyrics.Text);
+
+        // What the operator rewrites is counted again.
+        lyrics.Text = "uno\n\ndos\n\ntres";
+        Dispatcher.UIThread.RunJobs();
+        Assert.StartsWith("3 diapositivas.", Named<TextBlock>(window, "PreviewInfoText").Text);
+
+        Hit(window, PhysicalKey.Escape);
+        Assert.True(closed());
+    }
+
     [AvaloniaTheory]
     [InlineData(false)]
     [InlineData(true)]

@@ -239,9 +239,12 @@ public sealed partial class ScreenBenchTests
             },
         };
 
+        // The width is said: left to the content, a wide pair is cut at the
+        // width of the made-up screen.
         var window = new Window
         {
-            SizeToContent = SizeToContent.WidthAndHeight,
+            Width = left.Size.Width + right.Size.Width + 48,
+            SizeToContent = SizeToContent.Height,
             Background = new SolidColorBrush(Color.Parse("#3A3F4C")),
             Content = new StackPanel
             {

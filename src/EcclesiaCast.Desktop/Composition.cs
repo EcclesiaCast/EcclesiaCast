@@ -175,7 +175,7 @@ public static class Composition
         services.AddSingleton(_ => NotOnMacYet.For<IYouTubeBrowser>());
         services.AddSingleton(_ => NotOnMacYet.For<ILogoManagerDialog>());
         services.AddSingleton<ISongImportDialog, AvaloniaSongImportDialog>();
-        services.AddSingleton(_ => NotOnMacYet.For<IWebSongSearchDialog>());
+        services.AddSingleton<IWebSongSearchDialog, AvaloniaWebSongSearchDialog>();
         services.AddSingleton(_ => NotOnMacYet.For<IStageDesigner>());
         services.AddSingleton(_ => NotOnMacYet.For<IBackupDialog>());
         services.AddSingleton<ICountdownDialog, AvaloniaCountdownDialog>();
