@@ -1,0 +1,149 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:EcclesiaCast.Presentation.ViewModels"
+        x:Class="EcclesiaCast.Desktop.Views.SongImportWindow"
+        Title="Traer canciones de otro programa"
+        Width="640" Height="600"
+        MinWidth="520" MinHeight="480">
+    <Window.Resources>
+        <ControlTheme x:Key="SourceChoice" TargetType="RadioButton">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="Padding" Value="14,7"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Name="Box" Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1"
+                            CornerRadius="4" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter Name="PART_ContentPresenter" Content="{TemplateBinding Content}"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+            <Style Selector="^:checked /template/ Border#Box">
+                <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+            </Style>
+            <Style Selector="^:pointerover /template/ Border#Box">
+                <Setter Property="BorderBrush" Value="{StaticResource MutedBrush}"/>
+            </Style>
+            <Style Selector="^:focus-visible /template/ Border#Box">
+                <Setter Property="BorderBrush" Value="{StaticResource AccentSoftBrush}"/>
+            </Style>
+            <Style Selector="^:disabled">
+                <Setter Property="Opacity" Value="0.4"/>
+            </Style>
+        </ControlTheme>
+    </Window.Resources>
+
+    <Grid Margin="18" RowDefinitions="Auto,Auto,Auto,*,Auto,Auto">
+        <TextBlock Grid.Row="0" Text="¿De qué programa querés traer las canciones?"
+                   FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,8"/>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,14">
+            <RadioButton Name="ProPresenterChoice" Content="ProPresenter" GroupName="Source"
+                         Theme="{StaticResource SourceChoice}" IsCheckedChanged="Source_Checked"/>
+            <RadioButton Name="EasyWorshipChoice" Content="EasyWorship" GroupName="Source"
+                         Theme="{StaticResource SourceChoice}" IsCheckedChanged="Source_Checked"/>
+            <RadioButton Name="HolyricsChoice" Content="Holyrics" GroupName="Source"
+                         Theme="{StaticResource SourceChoice}" IsCheckedChanged="Source_Checked"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2">
+            <TextBlock Name="HeaderText" Text="Buscando…" FontSize="15" TextWrapping="Wrap"/>
+            <TextBlock Name="RootText" FontSize="11" Foreground="{StaticResource FaintBrush}"
+                       TextWrapping="Wrap" Margin="0,6,0,10"/>
+
+            <!-- Holyrics keeps its songs encrypted: they come from the .json/.txt it saves itself. -->
+            <Border Name="HolyricsPanel" IsVisible="False"
+                    Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
+                    CornerRadius="4" Padding="12,10" Margin="0,0,0,10">
+                <DockPanel>
+                    <Button Name="HolyricsFiles" DockPanel.Dock="Right" Content="Abrir archivos…" FontSize="12"
+                            Padding="14,4" Margin="8,0,0,0"
+                            Theme="{StaticResource DarkButton}" Click="HolyricsFiles_Click"
+                            ToolTip.Tip="Elegí los archivos .json o .txt que guardaste desde Holyrics"/>
+                    <TextBlock Text="Los archivos .json o .txt que guardaste desde Holyrics."
+                               FontSize="12" Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap"
+                               VerticalAlignment="Center"/>
+                </DockPanel>
+            </Border>
+        </StackPanel>
+
+        <Border Grid.Row="3" Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="4">
+            <DockPanel>
+                <DockPanel DockPanel.Dock="Top" Margin="12,10,12,6">
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                        <Button Content="Todas" FontSize="11" Padding="10,3"
+                                Theme="{StaticResource DarkButton}" Click="CheckAll_Click"
+                                ToolTip.Tip="Marcar todas"/>
+                        <Button Content="Ninguna" FontSize="11" Padding="10,3" Margin="4,0,0,0"
+                                Theme="{StaticResource DarkButton}" Click="CheckNone_Click"/>
+                    </StackPanel>
+                    <TextBlock Name="ListTitle" Text="BIBLIOTECAS ENCONTRADAS" FontSize="10" FontWeight="SemiBold"
+                               Foreground="{StaticResource FaintBrush}" VerticalAlignment="Center"/>
+                </DockPanel>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl Name="LibrariesList" Margin="12,0,12,10">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SongLibraryRow">
+                                <CheckBox IsChecked="{Binding Selected}" Margin="0,5" FontSize="13"
+                                          VerticalContentAlignment="Center">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" FontSize="13"/>
+                                        <TextBlock Text="{Binding Detail}" FontSize="10"
+                                                   Foreground="{StaticResource MutedBrush}"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+                                </CheckBox>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <StackPanel Grid.Row="4" Margin="0,12,0,0">
+            <Border Name="CloudWarning" IsVisible="False"
+                    Background="#2A2418" BorderBrush="#7A5A18" BorderThickness="1"
+                    CornerRadius="6" Padding="12,10" Margin="0,0,0,12">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Left" Text="☁" FontSize="20"
+                               Foreground="#E0B84A" Margin="0,0,10,0" VerticalAlignment="Top"/>
+                    <StackPanel>
+                        <TextBlock Name="CloudWarningText" FontSize="12" Foreground="#E8D9A8"
+                                   TextWrapping="Wrap"/>
+                        <Button Name="OpenFolderButton" FontSize="11" Padding="10,4"
+                                Theme="{StaticResource DarkButton}"
+                                HorizontalAlignment="Left" Margin="0,10,0,0"
+                                Click="OpenFolder_Click"/>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <TextBlock FontSize="11" Foreground="{StaticResource FaintBrush}" TextWrapping="Wrap"
+                       Text="Si una canción ya está en la biblioteca (mismo título), el programa pregunta qué hacer: reemplazarla, guardar las dos o descartar la nueva."/>
+            <TextBlock Name="ProgressText" FontSize="11" Foreground="{StaticResource MutedBrush}"
+                       Margin="0,10,0,0" IsVisible="False"/>
+            <ProgressBar Name="Progress" Classes="work" Height="4" Margin="0,6,0,0" IsVisible="False"/>
+        </StackPanel>
+
+        <DockPanel Grid.Row="5" Margin="0,16,0,0">
+            <Button Name="BrowseButton" DockPanel.Dock="Left" Content="Elegir carpeta…"
+                    Theme="{StaticResource DarkButton}" Padding="14,8" Click="Browse_Click"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Name="ImportButton" Content="Importar" Theme="{StaticResource AccentButton}"
+                        Padding="24,8" Click="Import_Click" IsEnabled="False"/>
+                <Button Name="CancelButton" Content="Cancelar" Theme="{StaticResource DarkButton}"
+                        Padding="24,8" Margin="8,0,0,0" IsCancel="True" Click="Cancel_Click"/>
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</Window>

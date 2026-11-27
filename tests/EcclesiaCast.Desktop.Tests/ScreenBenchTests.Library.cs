@@ -1,4 +1,5 @@
 using Avalonia.Headless.XUnit;
+using Avalonia.Threading;
 using EcclesiaCast.Desktop.Views;
 using EcclesiaCast.Presentation.Platform;
 using EcclesiaCast.Presentation.Services;
@@ -20,6 +21,24 @@ public sealed partial class ScreenBenchTests
     [AvaloniaFact]
     public void The_editor_of_a_new_song_is_drawn() => DrawWindow(
         new SongEditorWindow(null, LibrarySamples.Themes()), "editor-cancion-nueva", 680 - 39);
+
+    /// <summary>Looks only in the made-up folders: never in those of this computer.</summary>
+    internal static SongImportWindow SongImportWindow() => new(
+        new SongImportViewModel(
+            new SongSaver(LibrarySamples.NoSongs(), LibrarySamples.Sample.Of<ITextPrompt>()),
+            LibrarySamples.ImportPaths()),
+        LibrarySamples.Sample.Of<IDialogs>(), new RecordingShell());
+
+    [AvaloniaFact]
+    public void The_song_import_is_drawn() => DrawWindow(SongImportWindow(), "importar-canciones", 600 - 39);
+
+    [AvaloniaFact]
+    public void The_song_import_from_holyrics_is_drawn()
+    {
+        var window = SongImportWindow();
+        window.Opened += (_, _) => Dispatcher.UIThread.Post(window.ChooseHolyrics);
+        DrawWindow(window, "importar-canciones-holyrics", 600 - 39);
+    }
 
     [AvaloniaFact]
     public void Importing_a_bible_is_drawn() => DrawWindow(new BibleImportWindow("Mi Biblia"), "importar-biblia");

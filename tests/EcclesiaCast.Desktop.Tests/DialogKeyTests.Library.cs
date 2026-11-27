@@ -86,6 +86,21 @@ public sealed partial class DialogKeyTests
         window.Close();
     }
 
+    [AvaloniaFact]
+    public void The_song_import_enter_does_nothing_and_escape_cancels()
+    {
+        var window = ScreenBenchTests.SongImportWindow();
+        var closed = Open(window);
+        Assert.True(Named<Button>(window, "ImportButton").IsEnabled);
+
+        Hit(window, PhysicalKey.Enter);
+        Assert.False(closed());
+
+        Hit(window, PhysicalKey.Escape);
+        Assert.True(closed());
+        Assert.False(window.Accepted);
+    }
+
     [AvaloniaTheory]
     [InlineData(false)]
     [InlineData(true)]
