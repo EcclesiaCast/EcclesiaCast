@@ -163,6 +163,16 @@ public static class Composition
             sp.GetRequiredService<ISettingsStore>(), platform.Paths.DataFolder,
             OperatingSystem.IsMacOS() ? "Mac" : "Windows"));
         services.AddSingleton<FeedbackDialogs>();
+        // «Ajustes» and the learning or advanced layout it chooses.
+        services.AddSingleton<MainWindowSettings>();
+        services.AddSingleton(sp => new UiModeChoice(
+            sp.GetRequiredService<MainWindowSettings>,
+            advanced =>
+            {
+                if (Avalonia.Application.Current is { } app)
+                    Styles.EcclesiaCastTheme.ShowHints(app, !advanced);
+            }));
+        services.AddSingleton<SettingsDialog>();
 
         // Every other dialog: «Esto todavía no está en la versión de Mac».
         services.AddSingleton<ISongEditor, AvaloniaSongEditor>();
@@ -219,6 +229,7 @@ public static class Composition
         var settings = services.GetRequiredService<ISettingsStore>();
         TransitionSettings.Load(settings);
         BroadcastStyleSettings.Load(settings);
+        services.GetRequiredService<UiModeChoice>().Restore();
 
         var vm = services.GetRequiredService<MainViewModel>();
         var screens = services.GetRequiredService<IScreenList>();

@@ -132,6 +132,8 @@ public static class Program
             yield return dialog;
         foreach (var screen in LibraryScreens.All())
             yield return screen;
+        foreach (var screen in SettingsScreens.All())
+            yield return screen;
     }
 
     /// <summary>A long tooltip of the menu: it has to wrap at 400.</summary>

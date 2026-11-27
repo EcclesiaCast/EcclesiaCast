@@ -14,7 +14,7 @@ namespace EcclesiaCast.Desktop.Tests;
 /// <summary>Enter and Esc in the simple dialogs do what they do in WPF.</summary>
 public sealed partial class DialogKeyTests
 {
-    private static Func<bool> Open(Window window)
+    internal static Func<bool> Open(Window window)
     {
         var closed = false;
         window.Closed += (_, _) => closed = true;
@@ -23,7 +23,7 @@ public sealed partial class DialogKeyTests
         return () => closed;
     }
 
-    private static void Hit(Window window, PhysicalKey key)
+    internal static void Hit(Window window, PhysicalKey key)
     {
         var closed = false;
         void Closed(object? sender, EventArgs e) => closed = true;

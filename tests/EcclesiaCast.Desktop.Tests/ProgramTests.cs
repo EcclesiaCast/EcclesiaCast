@@ -198,7 +198,7 @@ public sealed class ProgramTests
     }
 
     /// <summary>The program over a temporary library and made-up screens.</summary>
-    private sealed class TestProgram : IDisposable
+    internal sealed class TestProgram : IDisposable
     {
         private readonly string _root = Path.Combine(Path.GetTempPath(), "ecclesiacast-desktop-" + Guid.NewGuid().ToString("N"));
         private readonly string? _variableBefore = Environment.GetEnvironmentVariable(Variable);

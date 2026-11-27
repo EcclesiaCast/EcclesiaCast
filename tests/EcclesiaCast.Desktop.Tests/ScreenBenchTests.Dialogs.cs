@@ -122,7 +122,7 @@ public sealed partial class ScreenBenchTests
     /// A whole dialog in memory, at its own width. <paramref name="height"/>
     /// is for the windows with a fixed one, without the system's title bar.
     /// </summary>
-    private static Avalonia.PixelSize DrawWindow(Window window, string name, double? height = null)
+    internal static Avalonia.PixelSize DrawWindow(Window window, string name, double? height = null)
     {
         if (height is { } fixedHeight)
             window.Height = fixedHeight;

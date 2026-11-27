@@ -101,7 +101,7 @@ internal static class LibraryScreens
     /// <paramref name="height"/> is the whole inside of the window: the margin
     /// of what it shows comes out of it.
     /// </summary>
-    private static FrameworkElement Take(Window window, double height = double.NaN)
+    internal static FrameworkElement Take(Window window, double height = double.NaN)
     {
         var margin = ((FrameworkElement)window.Content).Margin;
         return DialogScreens.Take(window, height - margin.Top - margin.Bottom);
